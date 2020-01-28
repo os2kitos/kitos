@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;

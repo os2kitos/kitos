@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.System
 {

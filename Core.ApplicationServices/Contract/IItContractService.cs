@@ -1,6 +1,5 @@
-﻿using Core.ApplicationServices.Model.Result;
-using Core.DomainModel.ItContract;
-using Core.DomainServices.Model.Result;
+﻿using Core.DomainModel.ItContract;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Contract
 {

@@ -1,6 +1,5 @@
-﻿using Core.ApplicationServices.Model.Result;
-using Core.DomainModel.ItSystem;
-using Core.DomainServices.Model.Result;
+﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Interface
 {

@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
