@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItProject;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Project
 {

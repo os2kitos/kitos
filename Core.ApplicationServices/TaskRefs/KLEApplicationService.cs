@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.KLE;
 
 namespace Core.ApplicationServices.TaskRefs

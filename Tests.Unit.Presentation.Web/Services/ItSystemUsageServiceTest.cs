@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
 using Moq;

@@ -1,7 +1,6 @@
-﻿using Core.ApplicationServices.Model.Result;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SystemUsage
 {

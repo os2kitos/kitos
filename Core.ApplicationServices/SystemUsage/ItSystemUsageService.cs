@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.System;
 
 namespace Core.ApplicationServices.SystemUsage

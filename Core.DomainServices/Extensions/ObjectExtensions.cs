@@ -1,4 +1,4 @@
-﻿using Core.DomainServices.Model.Result;
+﻿using Core.DomainModel.Result;
 
 namespace Core.DomainServices.Extensions
 {
