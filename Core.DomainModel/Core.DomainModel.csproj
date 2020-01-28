@@ -58,7 +58,6 @@
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
-    <Compile Include="IAggregateRoot.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />

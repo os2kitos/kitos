@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItInterface : ItSystemBase, IAggregateRoot
+    public class ItInterface : ItSystemBase
     {
         public ItInterface()
         {
