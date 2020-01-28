@@ -439,15 +439,14 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+
             if (Id == destination.Id)
-            {
                 return Result<SystemRelation, OperationError>.Failure(new OperationError("Cannot create relation to self", OperationFailure.BadInput));
-            }
 
             if (this.IsInSameOrganizationAs(destination))
-            {
                 return Result<SystemRelation, OperationError>.Failure(new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput));
-            }
 
             var targetContractIsInSameOrganization =
                 targetContract
@@ -455,9 +454,7 @@ namespace Core.DomainModel.ItSystemUsage
                     .GetValueOrFallback(true);
 
             if (!targetContractIsInSameOrganization)
-            {
                 return Result<SystemRelation, OperationError>.Failure(new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput));
-            }
 
             var exposedInterface = Maybe<ItInterface>.None;
             if (interfaceId.HasValue)
@@ -465,9 +462,7 @@ namespace Core.DomainModel.ItSystemUsage
 
                 exposedInterface = destination.GetExposedInterface(interfaceId.Value);
                 if (!exposedInterface.HasValue)
-                {
                     return Result<SystemRelation, OperationError>.Failure(new OperationError("Interface is not exposed by the target system", OperationFailure.BadInput));
-                }
             }
 
             var newRelation = new SystemRelation(this, destination)
@@ -475,12 +470,12 @@ namespace Core.DomainModel.ItSystemUsage
                 Description = description,
                 AssociatedContract = targetContract.GetValueOrDefault(),
                 RelationInterface = exposedInterface.GetValueOrDefault(),
+                UsageFrequency = targetFrequency.GetValueOrDefault(),
                 Reference =
                 {
                     Name = linkName,
                     Url = linkUrl
-                },
-                UsageFrequency = targetFrequency.GetValueOrDefault()
+                }
             };
 
             UsageRelations.Add(newRelation);
