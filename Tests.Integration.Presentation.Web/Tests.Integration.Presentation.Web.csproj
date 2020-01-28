@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="ItSystem\SystemRelationsTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
     <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />

@@ -57,6 +57,7 @@
     <Compile Include="ExternalLink.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
+    <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
@@ -211,6 +212,8 @@
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
     <Compile Include="Result\Maybe.cs" />
+    <Compile Include="Result\ObjectExtensions.cs" />
+    <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
     <Compile Include="Text.cs" />

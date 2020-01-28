@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -31,6 +34,8 @@ namespace Core.DomainModel.ItSystemUsage
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
+            UsageRelations = new List<SystemRelation>();
+            UsedByRelations = new List<SystemRelation>();
         }
 
         public bool IsActive
@@ -303,7 +308,7 @@ namespace Core.DomainModel.ItSystemUsage
             return OrganizationId == organizationId;
         }
 
-        
+
         public int? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }
@@ -340,9 +345,9 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ItSystemCategoriesId { get; set; }
 
-        public virtual ItSystemCategories ItSystemCategories  { get; set; }
+        public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-        public string GeneralPurpose { get; set;}
+        public string GeneralPurpose { get; set; }
         public DataOptions isBusinessCritical { get; set; }
         public DataOptions ContainsLegalInfo { get; set; }
         public DataSensitivityLevel DataLevel { get; set; }
@@ -357,7 +362,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? lastControl { get; set; }
 
         public string noteUsage { get; set; }
-        
+
         public int precautions { get; set; }
 
         public int riskAssessment { get; set; }
@@ -400,7 +405,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
-        
+
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
@@ -424,5 +429,80 @@ namespace Core.DomainModel.ItSystemUsage
         /// Defines how this system is used by other systems
         /// </summary>
         public ICollection<SystemRelation> UsedByRelations { get; set; }
+
+        public Result<SystemRelation, OperationError> AddUsageRelationTo(
+            User activeUser,
+            ItSystemUsage destination,
+            int? interfaceId,
+            string description,
+            string linkName,
+            string linkUrl,
+            Maybe<RelationFrequencyType> targetFrequency,
+            Maybe<ItContract.ItContract> targetContract)
+        {
+            if(activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+
+            if (Id == destination.Id)
+                return new OperationError("Cannot create relation to self", OperationFailure.BadInput);
+
+            if (!this.IsInSameOrganizationAs(destination))
+                return new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
+
+            var allowContractBinding =
+                targetContract
+                    .Select(this.IsInSameOrganizationAs)
+                    .GetValueOrFallback(true);
+
+            if (!allowContractBinding)
+                return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
+
+            var exposedInterface = Maybe<ItInterface>.None;
+            if (interfaceId.HasValue)
+            {
+
+                exposedInterface = destination.GetExposedInterface(interfaceId.Value);
+                if (!exposedInterface.HasValue)
+                    return new OperationError("Interface is not exposed by the target system", OperationFailure.BadInput);
+            }
+
+            var newRelation = new SystemRelation(this, destination)
+            {
+                Description = description,
+                AssociatedContract = targetContract.GetValueOrDefault(),
+                RelationInterface = exposedInterface.GetValueOrDefault(),
+                UsageFrequency = targetFrequency.GetValueOrDefault(),
+                Reference =
+                {
+                    Name = linkName,
+                    Url = linkUrl,
+                    ObjectOwner = ObjectOwner,
+                    LastChangedByUser = activeUser,
+                    LastChanged = DateTime.Now
+                },
+                ObjectOwner = ObjectOwner,
+                LastChangedByUser = activeUser,
+                LastChanged = DateTime.Now
+            };
+
+            UsageRelations.Add(newRelation);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newRelation;
+        }
+
+        private Maybe<ItInterface> GetExposedInterface(int interfaceId)
+        {
+            return ItSystem
+                .ItInterfaceExhibits
+                .FirstOrDefault(x => x.Id == interfaceId)
+                .FromNullable()
+                .Select(x => x.ItInterface);
+        }
     }
 }

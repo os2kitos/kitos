@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
@@ -71,7 +72,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItSystemUsageDataWorkerRelationDTO> SetUsageDataWorkerAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
         {
-            using (var response = await SendSetUsageDataWorkerRequestAsync(systemUsageId,organizationId,optionalLogin))
+            using (var response = await SendSetUsageDataWorkerRequestAsync(systemUsageId, organizationId, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDataWorkerRelationDTO>();
@@ -177,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})?$select=Id&$expand=AccessTypes");
 
-            using (var response = await HttpApi.GetWithCookieAsync(url,cookie))
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
@@ -194,9 +195,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendSetParentSystemRequestAsync(
-            int systemId, 
+            int systemId,
             int parentSystemId,
-            int organizationId, 
+            int organizationId,
             Cookie login)
         {
             var cookie = login;
@@ -233,6 +234,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}");
 
             return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendPostRelationAsync(CreateSystemRelationDTO input, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
+
+            return await HttpApi.PostWithCookieAsync(url, login, input);
         }
     }
 }

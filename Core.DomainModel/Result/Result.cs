@@ -7,6 +7,15 @@ namespace Core.DomainModel.Result
         private readonly Maybe<TFailure> _failure;
         private readonly Maybe<TSuccess> _value;
 
+        public static implicit operator Result<TSuccess, TFailure>(TFailure failure)
+        {
+            return Failure(failure);
+        }
+
+        public static implicit operator Result<TSuccess, TFailure>(TSuccess successValue)
+        {
+            return Success(successValue);
+        }
 
         protected Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
         {
