@@ -355,7 +355,9 @@
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\Controllers\exposed-interfaces-controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-usage-tab-interfaces.config.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
@@ -716,6 +718,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-usage-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
     <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
@@ -1180,7 +1183,7 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-hierarchy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\it-system-usage.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.config.ts" />
     <TypeScriptCompile Include="app\components\org\structure\org-structure.controller.ts" />
     <TypeScriptCompile Include="app\components\org\org-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\org\overview\org-overview.controller.ts" />
