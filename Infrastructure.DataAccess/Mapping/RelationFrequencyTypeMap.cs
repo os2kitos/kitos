@@ -3,7 +3,7 @@ using Core.DomainModel.ItSystemUsage;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class FrequencyTypeMap : OptionEntityMap<FrequencyType, DataRowUsage>
+    public class RelationFrequencyTypeMap : OptionEntityMap<RelationFrequencyType, SystemRelation>
     {
     }
 }
