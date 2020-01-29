@@ -10,6 +10,7 @@ using Core.DomainModel.Reports;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Model;
+using Tests.Toolkit.Patterns;
 
 namespace Tests.Integration.Presentation.Web.Security
 {

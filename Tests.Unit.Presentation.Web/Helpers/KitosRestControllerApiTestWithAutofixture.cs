@@ -3,12 +3,12 @@ using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Helpers

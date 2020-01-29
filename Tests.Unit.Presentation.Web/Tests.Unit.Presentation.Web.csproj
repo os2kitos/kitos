@@ -212,7 +212,6 @@
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
-    <Compile Include="Helpers\WithAutoFixture.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
@@ -253,6 +252,10 @@
     <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
       <Project>{e75385a3-ea7c-4dff-b989-bee64bc506ed}</Project>
       <Name>Presentation.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
+      <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>
+      <Name>Tests.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

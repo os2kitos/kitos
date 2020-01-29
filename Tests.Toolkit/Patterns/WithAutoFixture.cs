@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoFixture;
 
-namespace Tests.Unit.Presentation.Web.Helpers
+namespace Tests.Toolkit.Patterns
 {
     public abstract class WithAutoFixture
     {

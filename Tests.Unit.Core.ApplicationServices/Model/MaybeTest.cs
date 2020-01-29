@@ -2,7 +2,7 @@
 using Core.DomainModel.Result;
 using Xunit;
 
-namespace Tests.Unit.Core.DomainServices
+namespace Tests.Unit.Core.Model
 {
     public class MaybeTest
     {

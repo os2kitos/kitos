@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

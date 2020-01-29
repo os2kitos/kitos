@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
