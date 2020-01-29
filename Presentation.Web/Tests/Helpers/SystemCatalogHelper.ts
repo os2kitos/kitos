@@ -4,7 +4,6 @@ import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
-import SystemUsageHelper = require("./SystemUsageHelper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -20,7 +19,8 @@ class SystemCatalogHelper {
             .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
-            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click());
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click())
+            .then(() => console.log("System created"));
     }
 
     public static deleteSystem(name: string) {
@@ -57,7 +57,8 @@ class SystemCatalogHelper {
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.applyCatalogNameKendoFilter(name))
             .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().activationToggle.first().click());
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().activationToggle.first().click())
+            .then(() => console.log("Local system created"));
     }
 
     public static openSystem(name: string) {
@@ -75,6 +76,13 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.applyFilter(
             SystemCatalogHelper.pageObject.kendoToolbarWrapper.filterInputs().catalogNameFilter,
             name);
+    }
+
+    public static resetFilters() {
+        console.log("Resetting system catalog filters");
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().resetFilter.click());
     }
 
     public static waitForKendoGrid() {

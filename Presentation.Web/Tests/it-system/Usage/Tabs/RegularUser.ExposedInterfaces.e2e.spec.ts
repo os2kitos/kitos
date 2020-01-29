@@ -31,11 +31,14 @@ describe("Regular user can",
         afterAll(() => {
             testFixture.disableLongRunningTest();
             testFixture.cleanupState();
+            loginHelper.loginAsRegularUser()
+                .then(() => ItSystemHelper.resetFilters())
+                .then(() => browser.waitForAngular())
+                .then(() => testFixture.cleanupState());
         });
 
         it("View exposed interfaces from it system usage details",
             () => {
-
                 loginHelper.loginAsRegularUser()
                     .then(() => SystemUsageHelper.openLocalSystem(itSystemName))
                     .then(() => LocalItSystemNavigation.exposedInterfacesPage())
@@ -46,7 +49,6 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system details",
             () => {
-
                 loginHelper.loginAsRegularUser()
                     .then(() => ItSystemHelper.openSystem(itSystemName))
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
@@ -54,7 +56,6 @@ describe("Regular user can",
                     .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
                     .then(() => expect(getInterfaceName().getText()).toEqual(interfaceName));
             });
-
     });
 
 function createItSystemName() {

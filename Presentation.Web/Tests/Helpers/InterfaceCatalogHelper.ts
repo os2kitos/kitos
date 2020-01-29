@@ -15,7 +15,8 @@ class InterfaceCatalogHelper {
             .then(() => this.interfacePage.getCreateInterfaceButton().click())
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
-            .then(() => this.interfacePage.getSaveInterfaceButton().click());
+            .then(() => this.interfacePage.getSaveInterfaceButton().click())
+            .then(() => console.log("Interface created"));;
     }
 
     public static bindInterfaceToSystem(systemName: string, interfaceName: string) {
@@ -23,7 +24,8 @@ class InterfaceCatalogHelper {
         return this.gotoSpecificInterface(interfaceName)
             .then(() => element(this.cssHelper.byDataElementType("interfaceDetailsLink")).click())
             .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
-            .then(() => Select2.waitForDataAndSelect());
+            .then(() => Select2.waitForDataAndSelect())
+            .then(() => console.log("Interface bound to system"));;
     }
 
     public static waitForKendoGrid() {
