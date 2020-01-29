@@ -20,7 +20,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Mandatory relation target
         /// </summary>
-        public virtual int RelationSourceId { get; set; }
+        public int RelationSourceId { get; set; }
         /// <summary>
         /// Mandatory relation target
         /// </summary>
@@ -28,7 +28,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Mandatory relation target
         /// </summary>
-        public virtual int RelationTargetId { get; set; }
+        public int RelationTargetId { get; set; }
         /// <summary>
         /// Mandatory relation target
         /// </summary>
@@ -44,7 +44,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Link to information about the relation
         /// </summary>
-        public ExternalLink Reference { get; set; }
+        public virtual ExternalLink Reference { get; set; }
         /// <summary>
         /// Optional usage frequency
         /// </summary>

@@ -424,11 +424,11 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Defines how this system uses other systems.
         /// </summary>
-        public ICollection<SystemRelation> UsageRelations { get; set; }
+        public virtual ICollection<SystemRelation> UsageRelations { get; set; }
         /// <summary>
         /// Defines how this system is used by other systems
         /// </summary>
-        public ICollection<SystemRelation> UsedByRelations { get; set; }
+        public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             User activeUser,
