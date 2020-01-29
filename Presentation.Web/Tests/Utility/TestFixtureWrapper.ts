@@ -30,7 +30,7 @@ class TestFixtureWrapper {
     }
 
     public longRunningSetup() {
-        const minutes = 2;
+        const minutes = 5;
         return minutes * 60 * 1000;
     }
 
