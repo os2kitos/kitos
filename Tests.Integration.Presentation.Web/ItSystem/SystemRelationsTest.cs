@@ -52,6 +52,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relations = (await ItSystemHelper.GetRelationsAsync(usage1.Id)).ToList();
+                Assert.Equal(1,relations.Count);
             }
         }
 

@@ -10,7 +10,7 @@ namespace Core.DomainModel
     /// <remarks>
     /// These types of OptionEntities can only be used by one <see cref="References"/>.
     /// </remarks>
-    public abstract class OptionEntity<TReference> : Entity
+    public abstract class OptionEntity<TReference> : Entity, IHasName
     {
         /// <summary>
         /// Gets or sets the name.

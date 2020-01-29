@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
 using Core.DomainModel;
@@ -10,6 +11,7 @@ using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage
 {
@@ -171,5 +173,21 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId)
+        {
+            Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(systemUsageId);
+            if (itSystemUsage.HasValue == false)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            var systemUsage = itSystemUsage.Value;
+            if (!_authorizationContext.AllowModify(systemUsage))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return systemUsage.UsageRelations.ToList();
+        }
     }
 }
