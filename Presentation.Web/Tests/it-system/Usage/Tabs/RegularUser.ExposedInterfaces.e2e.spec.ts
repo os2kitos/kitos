@@ -15,12 +15,6 @@ describe("Regular user can",
         var ec = protractor.ExpectedConditions;
 
         beforeAll(() => {
-            loginHelper.loginAsGlobalAdmin()
-                .then(() => ItSystemHelper.createSystem(itSystemName))
-                .then(() => ItSystemHelper.createLocalSystem(itSystemName))
-                .then(() => InterfaceHelper.createInterface(interfaceName))
-                .then(() => InterfaceHelper.bindInterfaceToSystem(itSystemName, interfaceName))
-                .then(() => browser.waitForAngular());
         }, testFixture.longRunningSetup());
 
         beforeEach(() => {
@@ -39,7 +33,15 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system usage details",
             () => {
-                loginHelper.loginAsRegularUser()
+                loginHelper.loginAsGlobalAdmin()
+                    .then(() => ItSystemHelper.createSystem(itSystemName))
+                    .then(() => ItSystemHelper.createLocalSystem(itSystemName))
+                    .then(() => InterfaceHelper.createInterface(interfaceName))
+                    .then(() => InterfaceHelper.bindInterfaceToSystem(itSystemName, interfaceName))
+                    .then(() => browser.waitForAngular())
+                    .then(() => testFixture.cleanupState())
+
+                    .then(() => loginHelper.loginAsRegularUser())
                     .then(() => SystemUsageHelper.openLocalSystem(itSystemName))
                     .then(() => LocalItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
