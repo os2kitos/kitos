@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -15,7 +17,7 @@ using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.Services
+namespace Tests.Unit.Core.ApplicationServices
 {
     public class ItSystemUsageServiceTest : WithAutoFixture
     {
@@ -23,19 +25,28 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<ItSystemUsage>> _usageRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
+        private readonly Mock<IItContractRepository> _contractRepository;
+        private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _optionsService;
+        private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly User _activeUser;
 
         public ItSystemUsageServiceTest()
         {
             _usageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
+            _contractRepository = new Mock<IItContractRepository>();
+            _optionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
+            _userContext = new Mock<IOrganizationalUserContext>();
+            _activeUser = new User();
+            _userContext.Setup(x => x.UserEntity).Returns(_activeUser);
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
                 _systemRepository.Object,
-                new Mock<IItContractRepository>().Object,
-                new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>().Object,
-                new Mock<IOrganizationalUserContext>().Object);
+                _contractRepository.Object,
+                _optionsService.Object,
+                _userContext.Object);
         }
 
         [Fact]
@@ -176,7 +187,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var id = A<int>();
-            _usageRepository.Setup(x => x.GetByKey(id)).Returns(default(ItSystemUsage));
+            ExpectGetUsageByKeyReturns(id, null);
 
             //Act
             var result = _sut.Delete(id);
@@ -192,7 +203,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var id = A<int>();
             var itSystemUsage = new ItSystemUsage();
-            _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
             _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(false);
 
             //Act
@@ -209,7 +220,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var id = A<int>();
             var itSystemUsage = new ItSystemUsage();
-            _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
             _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(true);
 
             //Act
@@ -258,13 +269,148 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var id = A<int>();
             var itSystemUsage = new ItSystemUsage();
-            _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
 
             //Act
             var result = _sut.GetById(id);
 
             //Assert
             Assert.Same(itSystemUsage, result);
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Error_If_Source_Is_Not_Found()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            ExpectGetUsageByKeyReturns(sourceId, null);
+
+            //Act
+            var result = _sut.AddRelation(sourceId, A<int>(), null, A<string>(), A<string>(), A<string>(), null, null);
+
+            //Assert
+            AssertAddRelationError(result, OperationFailure.NotFound, "Source not found");
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Error_If_Destination_Is_Not_Found()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            ExpectGetUsageByKeyReturns(sourceId, new ItSystemUsage());
+            ExpectGetUsageByKeyReturns(destinationId, null);
+
+
+            //Act
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), null, null);
+
+            //Assert
+            AssertAddRelationError(result, OperationFailure.BadInput, "Destination could not be found");
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Error_If_Modification_Is_Denied_On_Source()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            var source = new ItSystemUsage
+            {
+                OrganizationId = A<int>()
+            };
+            ExpectGetUsageByKeyReturns(sourceId, source);
+            ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage());
+            ExpectAllowModifyReturns(source, false);
+
+            //Act
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), A<int>(), null);
+
+            //Assert
+            AssertAddRelationError(result, OperationFailure.Forbidden, Maybe<string>.None);
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Error_If_Provided_Frequency_Is_Not_Available()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            var frequencyId = A<int>();
+            var source = new ItSystemUsage
+            {
+                OrganizationId = A<int>()
+            };
+            ExpectGetUsageByKeyReturns(sourceId, source);
+            ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage());
+            ExpectAllowModifyReturns(source, true);
+            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId + 1 });
+
+            //Act
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, null);
+
+            //Assert
+            AssertAddRelationError(result, OperationFailure.BadInput, "Frequency type is not available in the organization");
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Error_If_Provided_Contract_Is_Not_found()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            var frequencyId = A<int>();
+            var contractId = A<int>();
+            var source = new ItSystemUsage
+            {
+                Id = sourceId,
+                OrganizationId = A<int>()
+            };
+            ExpectGetUsageByKeyReturns(sourceId, source);
+            ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage() { Id = sourceId + 1, OrganizationId = source.OrganizationId });
+            ExpectAllowModifyReturns(source, true);
+            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId });
+            _contractRepository.Setup(x => x.GetById(contractId)).Returns(default(ItContract));
+
+            //Act
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, contractId);
+
+            //Assert
+            AssertAddRelationError(result, OperationFailure.BadInput, "Contract id does not point to a valid contract");
+        }
+
+        [Fact]
+        public void AddRelation_Returns_Ok()
+        {
+            //Arrange
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            var frequencyId = A<int>();
+            var contractId = A<int>();
+            var source = new ItSystemUsage
+            {
+                Id = sourceId,
+                OrganizationId = A<int>()
+            };
+            ExpectGetUsageByKeyReturns(sourceId, source);
+            ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage() { Id = sourceId + 1, OrganizationId = source.OrganizationId });
+            ExpectAllowModifyReturns(source, true);
+            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId });
+            _contractRepository.Setup(x => x.GetById(contractId)).Returns(new ItContract() { OrganizationId = source.OrganizationId });
+
+            //Act
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, contractId);
+
+            //Assert
+            Assert.True(result.Ok);
+            _usageRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        private static void AssertAddRelationError(Result<SystemRelation, OperationError> result, OperationFailure operationFailure, Maybe<string> message)
+        {
+            Assert.False(result.Ok);
+            Assert.Equal(operationFailure, result.Error.FailureType);
+            Assert.Equal(message, result.Error.Message);
         }
 
         private ItSystemUsage SetupRepositoryQueryWith(int organizationId, int systemId)
@@ -283,6 +429,19 @@ namespace Tests.Unit.Presentation.Web.Services
             _usageRepository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
 
-        //TODO: Add coverage of new types
+        private void ExpectGetUsageByKeyReturns(int id, ItSystemUsage itSystemUsage)
+        {
+            _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
+        }
+
+        private void ExpectGetAvailableOptionsReturns(ItSystemUsage source, params RelationFrequencyType[] results)
+        {
+            _optionsService.Setup(x => x.GetAvailableOptions(source.OrganizationId)).Returns(new List<RelationFrequencyType>(results));
+        }
+
+        private void ExpectAllowModifyReturns(ItSystemUsage source, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
+        }
     }
 }
