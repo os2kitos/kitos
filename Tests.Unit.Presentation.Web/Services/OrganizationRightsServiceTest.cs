@@ -1,7 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;

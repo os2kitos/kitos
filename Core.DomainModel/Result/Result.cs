@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainServices.Model.Result
+namespace Core.DomainModel.Result
 {
     public class Result<TSuccess, TFailure>
     {

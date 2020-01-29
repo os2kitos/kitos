@@ -1,8 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Model.Result;
 using Serilog;
 
 namespace Core.ApplicationServices.Interface.ExhibitUsage

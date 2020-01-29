@@ -6,6 +6,7 @@ import NavigationHelper = require("../../Utility/NavigationHelper")
 class ItSystemOverview implements IPageObject {
     private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
+    private ec = protractor.ExpectedConditions;
 
     public getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/system/overview");

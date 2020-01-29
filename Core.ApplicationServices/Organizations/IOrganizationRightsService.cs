@@ -1,6 +1,5 @@
-﻿using Core.ApplicationServices.Model.Result;
-using Core.DomainModel.Organization;
-using Core.DomainServices.Model.Result;
+﻿using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Organizations
 {

@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.LocalOptions
 {
-    public class LocalFrequencyType : LocalOptionEntity<FrequencyType>
+    public class LocalRelationFrequencyType : LocalOptionEntity<RelationFrequencyType>
     {
     }
 }

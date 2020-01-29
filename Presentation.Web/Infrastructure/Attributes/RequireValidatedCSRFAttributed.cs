@@ -6,7 +6,7 @@ using System.Web.Helpers;
 using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using Core.ApplicationServices.Authentication;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Serilog;

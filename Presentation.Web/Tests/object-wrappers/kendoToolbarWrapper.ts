@@ -16,11 +16,11 @@ type HeaderButtons = {
 
 type InputFields =
 {
-        referenceDocTitle: protractor.ElementFinder,
-        referenceDocId: protractor.ElementFinder,
-        referenceDocUrl: protractor.ElementFinder,
-        referenceCreator: protractor.ElementFinder
-}
+    referenceDocTitle: protractor.ElementFinder,
+    referenceDocId: protractor.ElementFinder,
+    referenceDocUrl: protractor.ElementFinder,
+    referenceCreator: protractor.ElementFinder
+};
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
@@ -31,7 +31,8 @@ type ColumnHeaders = {
     catalogUsage: protractor.ElementFinder,
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
-    userEmail: protractor.ElementFinder
+    userEmail: protractor.ElementFinder,
+    systemRightsOwner: protractor.ElementFinder
 };
 
 type ColumnObjects = {
@@ -44,6 +45,7 @@ type ColumnObjects = {
     catalogUsage: protractor.ElementArrayFinder,
     userApi: protractor.ElementArrayFinder,
     UserEmail: protractor.ElementArrayFinder,
+    systemRightsOwner: protractor.ElementArrayFinder,
     activationToggle: protractor.ElementArrayFinder
 };
 
@@ -94,7 +96,8 @@ class kendoToolbarWrapper {
             referenceId: kendo.getColumnHeaderClickable(consts.kendoReferenceHeaderId),
             userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
-            usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeaderObject)
+            usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
+            systemRightsOwner: kendo.getColumnHeaderClickable(consts.kendoSystemRightsOwnerHeader)
 
         };
         return columns;
@@ -113,8 +116,9 @@ class kendoToolbarWrapper {
             referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects),
             referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects),
             usedByName: kendo.getColumnItemLinks(consts.kendoUsedByObject),
+            systemRightsOwner: kendo.getColumnItemLinks(consts.kendoSystemRightsOwnerObject),
             activationToggle: kendo.getButtons(consts.kendoCatalogUsageObjects)
-    };
+        };
         return columns;
     }
 

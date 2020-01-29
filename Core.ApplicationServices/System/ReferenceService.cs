@@ -2,9 +2,8 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;

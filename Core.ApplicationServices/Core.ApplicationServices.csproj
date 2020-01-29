@@ -114,7 +114,6 @@
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
     <Compile Include="TaskRefs\KLEApplicationService.cs" />
-    <Compile Include="Model\Result\OperationFailure.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />

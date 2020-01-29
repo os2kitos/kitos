@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Model.Result;
 
 namespace Core.DomainServices.Queries
 {

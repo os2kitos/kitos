@@ -4,12 +4,11 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Model.Result;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
