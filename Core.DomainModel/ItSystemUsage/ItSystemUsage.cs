@@ -496,6 +496,31 @@ namespace Core.DomainModel.ItSystemUsage
             return newRelation;
         }
 
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser, int sourceSystemRelationId, ItSystemUsage targetSystemUsage)
+        {
+            if (activeUser == null)
+            {
+                throw new ArgumentNullException(nameof(activeUser));
+            }
+
+            if (targetSystemUsage == null)
+            {
+                throw new ArgumentNullException(nameof(targetSystemUsage));
+            }
+
+            var relation = UsageRelations.FirstOrDefault(r => r.Id == sourceSystemRelationId);
+            if (relation == null)
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.BadInput);
+            }
+
+            relation.RelationTarget = targetSystemUsage;
+
+            return relation;
+        }
+
+        #region Helpers
+
         private Maybe<ItInterface> GetExposedInterface(int interfaceId)
         {
             return ItSystem
@@ -503,5 +528,7 @@ namespace Core.DomainModel.ItSystemUsage
                 .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
                 ?.ItInterface;
         }
+
+        #endregion
     }
 }

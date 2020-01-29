@@ -406,6 +406,8 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Verify(x => x.Save(), Times.Once);
         }
 
+        #region Helpers
+
         private static void AssertAddRelationError(Result<SystemRelation, OperationError> result, OperationFailure operationFailure, Maybe<string> message)
         {
             Assert.False(result.Ok);
@@ -443,5 +445,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
+
+        #endregion
     }
 }

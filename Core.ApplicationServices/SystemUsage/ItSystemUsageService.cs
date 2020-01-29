@@ -11,6 +11,7 @@ using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage
 {
@@ -169,6 +170,34 @@ namespace Core.ApplicationServices.SystemUsage
             {
                 _usageRepository.Save();
             }
+            return result;
+        }
+
+        public Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int newTargetSystemUsageId)
+        {
+            var sourceSystemUsage = _usageRepository.GetByKey(sourceSystemUsageId);
+            if (sourceSystemUsage == null)
+            {
+                return new OperationError("Source not found", OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(sourceSystemUsage))
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
+            }
+
+            var targetSystemUsage = _usageRepository.GetByKey(newTargetSystemUsageId);
+            if (targetSystemUsage == null)
+            {
+                return new OperationError("Target not found", OperationFailure.NotFound);
+            }
+
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage);
+            if (result.Ok)
+            {
+                _usageRepository.Save();
+            }
+
             return result;
         }
 

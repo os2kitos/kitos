@@ -2,6 +2,7 @@
 {
     public class SystemRelationDTO
     {
+        public int Id { get; set; }
         public NamedEntityDTO Source { get; set; }
         public NamedEntityDTO Destination { get; set; }
         public NamedEntityDTO Interface { get; set; }
