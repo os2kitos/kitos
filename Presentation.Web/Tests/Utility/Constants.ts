@@ -6,6 +6,8 @@
 class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
+    readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractNameObject";
@@ -19,7 +21,7 @@ class Constants {
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
-    readonly kendoUsedByHeaderObject = "usedByNameHeader";
+    readonly kendoUsedByHeader = "usedByNameHeader";
     readonly kendoUsedByObject = "usedByNameObject";
 
     readonly kendoUserEmailHeader = "userHeaderEmail";
@@ -98,7 +100,7 @@ class Constants {
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
     readonly kendoSystemDeleteButton = "deleteSystemButton";
-
+    
     readonly kleStatusLabel = "KLEStatusLabel";
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
