@@ -54,10 +54,13 @@ class SystemCatalogHelper {
     public static createLocalSystem(name: string) {
         console.log(`Creating local system for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
+            //.then(() => SystemCatalogHelper.waitForKendoGrid())
+            //.then(() => console.log("Applying filter"))
+            //.then(() => SystemCatalogHelper.applyCatalogNameKendoFilter(name))
+            //.then(() => console.log("Filter applied"))
             .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.applyCatalogNameKendoFilter(name))
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().activationToggle.first().click())
+            .then(() => console.log("Ready to activate"))
+            .then(() => SystemCatalogHelper.getActivationToggleButton(name).click())
             .then(() => console.log("Local system created"));
     }
 
@@ -70,6 +73,12 @@ class SystemCatalogHelper {
 
     public static findCatalogColumnsFor(name: string) {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+    }
+
+
+    public static getActivationToggleButton(name: string) {
+        const filteredRows = SystemCatalogHelper.findCatalogColumnsFor(name);
+        return filteredRows.first().element(by.xpath("../..")).element(this.cssHelper.byDataElementType(this.consts.toggleActivatingSystem));
     }
 
     public static applyCatalogNameKendoFilter(name: string) {
@@ -89,5 +98,7 @@ class SystemCatalogHelper {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
+
+
 }
 export = SystemCatalogHelper;
