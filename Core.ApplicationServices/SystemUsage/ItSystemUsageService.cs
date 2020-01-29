@@ -173,7 +173,7 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
-        public Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int newTargetSystemUsageId)
+        public Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int? targetSystemUsageId = null, int? targetInterfaceId = null)
         {
             var sourceSystemUsage = _usageRepository.GetByKey(sourceSystemUsageId);
             if (sourceSystemUsage == null)
@@ -186,13 +186,26 @@ namespace Core.ApplicationServices.SystemUsage
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
             }
 
-            var targetSystemUsage = _usageRepository.GetByKey(newTargetSystemUsageId);
-            if (targetSystemUsage == null)
+            ItSystemUsage targetSystemUsage = null;
+            if (targetSystemUsageId.HasValue)
             {
-                return new OperationError("Target not found", OperationFailure.NotFound);
+                targetSystemUsage = _usageRepository.GetByKey(targetSystemUsageId.Value);
+                if (targetSystemUsage == null)
+                {
+                    return new OperationError("Target system usage not found", OperationFailure.NotFound);
+                }
             }
 
-            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage);
+            ItInterfaceExhibit targetInterfaceExhibit = null;
+            if (targetInterfaceId.HasValue)
+            {
+                if (!targetSystemUsage.ItSystem.TryGetInterfaceExhibit(out targetInterfaceExhibit, targetInterfaceId.Value))
+                {
+                    return new OperationError("Target system interface not found", OperationFailure.NotFound);
+                }
+            }
+
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage, targetInterfaceExhibit);
             if (result.Ok)
             {
                 _usageRepository.Save();

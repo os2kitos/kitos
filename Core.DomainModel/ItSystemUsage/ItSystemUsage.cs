@@ -496,16 +496,12 @@ namespace Core.DomainModel.ItSystemUsage
             return newRelation;
         }
 
-        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser, int sourceSystemRelationId, ItSystemUsage targetSystemUsage)
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser, int sourceSystemRelationId,
+            ItSystemUsage targetSystemUsage = null, ItInterfaceExhibit targetExhibitedInterface = null)
         {
             if (activeUser == null)
             {
                 throw new ArgumentNullException(nameof(activeUser));
-            }
-
-            if (targetSystemUsage == null)
-            {
-                throw new ArgumentNullException(nameof(targetSystemUsage));
             }
 
             var relation = UsageRelations.FirstOrDefault(r => r.Id == sourceSystemRelationId);
@@ -514,7 +510,15 @@ namespace Core.DomainModel.ItSystemUsage
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.BadInput);
             }
 
-            relation.RelationTarget = targetSystemUsage;
+            if (targetSystemUsage != null)
+            {
+                relation.SetRelationTarget(targetSystemUsage);
+            }
+
+            if (targetExhibitedInterface != null)
+            {
+                relation.SetRelationInterface(targetExhibitedInterface.ItInterface);
+            }
 
             return relation;
         }

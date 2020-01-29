@@ -53,5 +53,22 @@ namespace Core.DomainModel.ItSystemUsage
         /// Optional contract relation
         /// </summary>
         public virtual ItContract.ItContract AssociatedContract { get; set; }
+        /// <summary>
+        /// Replaces mandatory relation target and resets relation interface
+        /// </summary>
+        /// <param name="targetSystemUsage">Replacement system usage</param>
+        public void SetRelationTarget(ItSystemUsage targetSystemUsage)
+        {
+            RelationTarget = targetSystemUsage ?? throw new ArgumentNullException(nameof(targetSystemUsage));
+            RelationInterface = null;
+        }
+        /// <summary>
+        /// Replace relation interface
+        /// </summary>
+        /// <param name="targetInterface">Replacement interface to be used on the relation</param>
+        public void SetRelationInterface(ItInterface targetInterface)
+        {
+            RelationInterface = targetInterface ?? throw new ArgumentNullException(nameof(targetInterface));
+        }
     }
 }
