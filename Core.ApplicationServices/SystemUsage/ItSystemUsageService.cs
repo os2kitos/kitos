@@ -11,7 +11,6 @@ using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage
 {
