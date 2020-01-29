@@ -5,7 +5,6 @@ import Select2 = require("./Select2Helper");
 import interfaceHelper = require("./InterfaceHelper");
 
 class InterfaceCatalogHelper {
-    private cssHelper = new CSSLocator();
     private waitUpTo = new WaitTimers();
     private interfacePage = new InterfaceCatalogPage();
     private interfaceHelper = new interfaceHelper();
@@ -23,7 +22,6 @@ class InterfaceCatalogHelper {
     public bindInterfaceToSystem(systemName: string, interfaceName: string) {
         console.log(`Binding interface with name ${interfaceName} to system with name ${systemName}`);
         return this.gotoSpecificInterface(interfaceName)
-            .then(() => element(this.cssHelper.byDataElementType("interfaceDetailsLink")).click())
             .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
             .then(() => Select2.waitForDataAndSelect());
     }
