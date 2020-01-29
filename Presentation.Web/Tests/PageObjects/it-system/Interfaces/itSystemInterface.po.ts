@@ -35,5 +35,8 @@ class ItSystemInterfaceCatalog implements IPageObject {
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
+
+
+
 }
 export = ItSystemInterfaceCatalog;

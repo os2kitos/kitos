@@ -2,11 +2,13 @@
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
+import interfaceHelper = require("./InterfaceHelper");
 
 class InterfaceCatalogHelper {
     private cssHelper = new CSSLocator();
     private waitUpTo = new WaitTimers();
     private interfacePage = new InterfaceCatalogPage();
+    private interfaceHelper = new interfaceHelper();
 
     public createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
@@ -26,12 +28,26 @@ class InterfaceCatalogHelper {
             .then(() => Select2.waitForDataAndSelect());
     }
 
+    public insertRandomDataToInterface(name: string, data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
+        console.log("Entering random data into a interface");
+        return this.gotoSpecificInterface(name).then(() => {
+            return this.interfaceHelper.writeDataToAllInputs(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
+        });
+    }
+
+    public verifyRandomDataToInterface(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
+        console.log("Verifying random data in interface " + data);
+        return this.gotoSpecificInterface(data).then(() => {
+            return this.interfaceHelper.verifyDataWasSaved(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
+        });
+    }
+
     public waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(this.interfacePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 
-    private gotoSpecificInterface(name : string) {
+    public gotoSpecificInterface(name: string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
             .then(() => this.findSpecificInterfaceInNameColumn(name).click());
