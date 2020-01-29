@@ -140,7 +140,7 @@ namespace Tests.Unit.Core.ApplicationServices
             return mockSystemUsage1;
         }
 
-        private void SetupUsageSystemRelation(int systemRelationId, IMock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage = null)
+        private void SetupUsageSystemRelation(int systemRelationId, IMock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object, targetSystemUsage.Object)
             {
