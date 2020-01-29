@@ -14,10 +14,6 @@ type HeaderButtons = {
     createReference: protractor.ElementFinder
 };
 
-type FilterInputs = {
-    catalogNameFilter: protractor.ElementFinder
-}
-
 type InputFields =
 {
         referenceDocTitle: protractor.ElementFinder,
@@ -25,7 +21,6 @@ type InputFields =
         referenceDocUrl: protractor.ElementFinder,
         referenceCreator: protractor.ElementFinder
 }
-
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
@@ -74,13 +69,6 @@ class kendoToolbarWrapper {
 
         };
         return buttons;
-    }
-
-    public filterInputs(): FilterInputs {
-        var filters: FilterInputs = {
-            catalogNameFilter: element(byDataField(consts.kendoCatalogNameFilter)).element(by.tagName("input"))
-    }
-        return filters;
     }
 
     public inputFields(): InputFields {
@@ -139,10 +127,6 @@ class kendoToolbarWrapper {
             });
         });
         return test;
-    }
-
-    public applyFilter(filter: protractor.ElementFinder, textValue: string) {
-        filter.sendKeys(textValue+"\n");
     }
 }
 

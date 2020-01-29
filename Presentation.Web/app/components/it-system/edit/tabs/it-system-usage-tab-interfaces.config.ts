@@ -49,17 +49,25 @@
                 ],
                 systemUsageId: [
                     "$http", "itSystem", "user",
-                    ($http, itSystem, user) => $http.get(`api/itSystemUsage/?itSystemId=${itSystem.id}&organizationId=${user.currentOrganizationId}`)
+                    ($http, itSystem, user) => $http
+                        .get(`api/itSystemUsage/?itSystemId=${itSystem.id}&organizationId=${user.currentOrganizationId}`)
                         .then(systemUsageResult => systemUsageResult.data.response.id)
+                        .catch(response => {
+                            if (response.status === 404)
+                                return 0;
+                            throw "unexpected error when trying to get specific it system";
+                        })
                 ],
                 exhibits: [
                     "$http", "itSystem", "user", "systemUsageId", ($http, itSystem, user, systemUsageId) =>
                         $http.get(`api/exhibit/?interfaces=true&sysId=${itSystem.id}&orgId=${user.currentOrganizationId}`).then(result => {
                             var interfaces = result.data.response;
                             _.each(interfaces, (data: { exhibitedById; usage; }) => {
-                                $http.get(`api/itInterfaceExhibitUsage/?usageId=${systemUsageId}&exhibitId=${data.exhibitedById}`).success(usageResult => {
-                                    data.usage = usageResult.response;
-                                });
+                                if (systemUsageId !== 0) {
+                                    $http.get(`api/itInterfaceExhibitUsage/?usageId=${systemUsageId}&exhibitId=${data.exhibitedById}`).success(usageResult => {
+                                        data.usage = usageResult.response;
+                                    });
+                                }
                             });
                             return interfaces;
                         })
