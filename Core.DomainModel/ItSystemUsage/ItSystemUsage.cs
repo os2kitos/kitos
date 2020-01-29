@@ -440,7 +440,7 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
-            if(activeUser == null)
+            if (activeUser == null)
                 throw new ArgumentNullException(nameof(activeUser));
 
             if (destination == null)
@@ -500,9 +500,8 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return ItSystem
                 .ItInterfaceExhibits
-                .FirstOrDefault(x => x.Id == interfaceId)
-                .FromNullable()
-                .Select(x => x.ItInterface);
+                .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
+                ?.ItInterface;
         }
     }
 }

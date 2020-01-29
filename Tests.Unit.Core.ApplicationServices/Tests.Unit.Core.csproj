@@ -143,6 +143,7 @@
     <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\KLEUpdateHistoryItemRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
+    <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />

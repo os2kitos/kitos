@@ -22,6 +22,11 @@ namespace Core.DomainModel.Result
             }
         }
 
+        public static implicit operator Maybe<T>(T source)
+        {
+            return source == null ? None : Some(source);
+        }
+
         private Maybe(bool hasValue, T value = default(T))
         {
             HasValue = hasValue;
