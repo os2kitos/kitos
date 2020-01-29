@@ -81,7 +81,7 @@ function createInterfaceName() {
 }
 
 function getInterfaceName() {
-    return element(by.css("[data-ui-sref='it-system.interface-edit.interface-details({ id: exposure.id })']"));
+    return element(by.css("[data-ui-sref='it-system.interface-edit.main({ id: exposure.id })']"));
 }
 
 function urlRegex() {
