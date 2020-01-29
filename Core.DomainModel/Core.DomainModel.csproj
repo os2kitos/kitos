@@ -54,7 +54,6 @@
     <Compile Include="AttachedOption.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
-    <Compile Include="ExternalLink.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />

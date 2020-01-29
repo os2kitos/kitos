@@ -42,8 +42,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 ContractId = contract.Id,
                 InterfaceId = targetInterface.Id,
                 Description = A<string>(),
-                LinkName = A<string>(),
-                LinkUrl = A<string>(),
+                Reference = A<string>(),
                 FrequencyTypeId = targetFrequencyTypeId
             };
 
@@ -53,7 +52,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relations = (await ItSystemHelper.GetRelationsAsync(usage1.Id)).ToList();
-                Assert.Equal(1,relations.Count);
+                Assert.Equal(1, relations.Count);
+                var dto = relations.Single();
+                Assert.Equal(usage1.Id, dto.Source.Id);
+                Assert.Equal(usage2.Id, dto.Destination.Id);
+                Assert.Equal(input.Description, dto.Description);
+                Assert.Equal(input.Reference, dto.Reference);
+                Assert.Equal(input.ContractId.Value, dto.Contract.Id);
+                Assert.Equal(input.InterfaceId.Value, dto.Interface.Id);
+                Assert.Equal(input.FrequencyTypeId.Value, dto.FrequencyType.Id);
             }
         }
 

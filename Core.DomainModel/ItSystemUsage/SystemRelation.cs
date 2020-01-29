@@ -8,13 +8,12 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// NOTE: For EF
         /// </summary>
-        private SystemRelation() { }
+        protected SystemRelation() { }
 
         public SystemRelation(ItSystemUsage relationSource, ItSystemUsage relationTarget)
         {
             RelationSource = relationSource ?? throw new ArgumentNullException(nameof(relationSource));
             RelationTarget = relationTarget ?? throw new ArgumentNullException(nameof(relationTarget));
-            Reference = new ExternalLink();
         }
 
         /// <summary>
@@ -36,6 +35,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Defines the optional interface to the <see cref="RelationTarget"/>
         /// </summary>
+        public int? RelationInterfaceId { get; set; }
+        /// <summary>
+        /// Defines the optional interface to the <see cref="RelationTarget"/>
+        /// </summary>
         public virtual ItInterface RelationInterface { get; set; }
         /// <summary>
         /// Optional description for the relation
@@ -44,11 +47,19 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Link to information about the relation
         /// </summary>
-        public virtual ExternalLink Reference { get; set; }
+        public string Reference { get; set; }
+        /// <summary>
+        /// Optional usage frequency
+        /// </summary>
+        public int? UsageFrequencyId { get; set; }
         /// <summary>
         /// Optional usage frequency
         /// </summary>
         public virtual RelationFrequencyType UsageFrequency { get; set; }
+        /// <summary>
+        /// Optional contract relation
+        /// </summary>
+        public int? AssociatedContractId { get; set; }
         /// <summary>
         /// Optional contract relation
         /// </summary>

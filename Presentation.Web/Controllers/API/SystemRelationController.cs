@@ -35,8 +35,7 @@ namespace Presentation.Web.Controllers.API
                 relation.TargetUsageId,
                 relation.InterfaceId,
                 relation.Description,
-                relation.LinkName,
-                relation.LinkUrl,
+                relation.Reference,
                 relation.FrequencyTypeId,
                 relation.ContractId);
 
@@ -70,8 +69,7 @@ namespace Presentation.Web.Controllers.API
                 Source = relation.RelationSource.MapToNamedEntityDTO(),
                 Destination = relation.RelationTarget.MapToNamedEntityDTO(),
                 Description = relation.Description,
-                LinkName = relation.Reference.Name,
-                LinkUrl = relation.Reference.Url,
+                Reference = relation.Reference,
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
                 FrequencyType = relation.UsageFrequency?.MapToNamedEntityDTO(),
                 Interface = relation.RelationInterface?.MapToNamedEntityDTO()

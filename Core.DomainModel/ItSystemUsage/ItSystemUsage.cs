@@ -435,8 +435,7 @@ namespace Core.DomainModel.ItSystemUsage
             ItSystemUsage destination,
             int? interfaceId,
             string description,
-            string linkName,
-            string linkUrl,
+            string reference,
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
@@ -475,14 +474,7 @@ namespace Core.DomainModel.ItSystemUsage
                 AssociatedContract = targetContract.GetValueOrDefault(),
                 RelationInterface = exposedInterface.GetValueOrDefault(),
                 UsageFrequency = targetFrequency.GetValueOrDefault(),
-                Reference =
-                {
-                    Name = linkName,
-                    Url = linkUrl,
-                    ObjectOwner = ObjectOwner,
-                    LastChangedByUser = activeUser,
-                    LastChanged = DateTime.Now
-                },
+                Reference = reference,
                 ObjectOwner = ObjectOwner,
                 LastChangedByUser = activeUser,
                 LastChanged = DateTime.Now

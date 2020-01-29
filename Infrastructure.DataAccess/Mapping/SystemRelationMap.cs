@@ -7,10 +7,18 @@ namespace Infrastructure.DataAccess.Mapping
         public SystemRelationMap()
         {
             this.HasOptional(t => t.UsageFrequency)
-                .WithMany(d => d.References);
+                .WithMany(d => d.References)
+                .HasForeignKey(x => x.UsageFrequencyId)
+                .WillCascadeOnDelete(false);
 
-            this.HasOptional(x => x.AssociatedContract);
-            this.HasOptional(x => x.RelationInterface);
+            this.HasOptional(x => x.AssociatedContract)
+                .WithMany(x => x.AssociatedSystemRelations)
+                .HasForeignKey(x => x.AssociatedContractId)
+                .WillCascadeOnDelete(false);
+
+            this.HasOptional(x => x.RelationInterface)
+                .WithMany(x => x.AssociatedSystemRelations)
+                .HasForeignKey(x => x.RelationInterfaceId);
 
             this.HasRequired(x => x.RelationTarget)
                 .WithMany(x => x.UsedByRelations)
@@ -22,7 +30,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.RelationSourceId)
                 .WillCascadeOnDelete(true);
 
-            this.HasRequired(x => x.Reference);
+            this.Property(x => x.Reference).IsOptional();
             this.Property(x => x.Description).IsOptional();
         }
     }

@@ -128,8 +128,7 @@ namespace Core.ApplicationServices.SystemUsage
             int destinationId,
             int? interfaceId,
             string description,
-            string linkName,
-            string linkUrl,
+            string reference,
             int? frequencyId,
             int? contractId)
         {
@@ -164,7 +163,7 @@ namespace Core.ApplicationServices.SystemUsage
                     return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
             }
 
-            var result = source.AddUsageRelationTo(_userContext.UserEntity, destination, interfaceId, description, linkName, linkUrl, targetFrequency, targetContract);
+            var result = source.AddUsageRelationTo(_userContext.UserEntity, destination, interfaceId, description, reference, targetFrequency, targetContract);
             if (result.Ok)
             {
                 _usageRepository.Save();

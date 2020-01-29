@@ -8,7 +8,6 @@
         public int? InterfaceId { get; set; }
         public int? FrequencyTypeId { get; set; }
         public int? ContractId { get; set; }
-        public string LinkName { get; set; }
-        public string LinkUrl { get; set; }
+        public string Reference { get; set; }
     }
 }
