@@ -1,34 +1,51 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import ItSystemEditPo = require("../PageObjects/it-system/ItSystemOverview.po");
+import ItSystemOverviewPo = require("../PageObjects/it-system/ItSystemOverview.po");
 import WaitTimers = require("../Utility/waitTimers");
+import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
 describe("Regular user IT Systems tests", () => {
     var ec = protractor.ExpectedConditions;
     var loginHelper = new Login();
-    var pageObject = new ItSystemEditPo(); 
+    var pageObject = new ItSystemOverviewPo(); 
+    var waitUpTo = new WaitTimers();
+    var testFixture = new TestFixtureWrapper();
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var headerButtonsHelper = pageObject.kendoToolbarHelper.headerButtons;
     var gridObjects = pageObject.kendoToolbarWrapper.columnObjects();
-    var waitUpTo = new WaitTimers();
+    var headerObjects = pageObject.kendoToolbarWrapper.columnHeaders();
 
-    beforeAll(() => {
-        loginHelper.loginAsRegularUser();
+    afterEach(() => {
+        testFixture.cleanupState();
     });
 
-    beforeEach(() => {
-        pageObject.getPage();
+    beforeAll(() => {
+        testFixture.enableLongRunningTest();
+    });
+
+    afterAll(() => {
+        testFixture.disableLongRunningTest();
     });
 
     it("Apply and delete filter buttons are disabled", () => {
-        browser.wait(ec.visibilityOf(headerButtons.useFilter), waitUpTo.twentySeconds);
-        expect(headerButtonsHelper.isUseDisabled()).toEqual("true");
-        expect(headerButtonsHelper.isDeleteDisabled()).toEqual("true");
+        loginHelper.loginAsRegularUser()
+            .then(() => pageObject.getPage())
+            .then(() => browser.wait(ec.visibilityOf(headerButtons.useFilter), waitUpTo.twentySeconds))
+            .then(() => expect(headerButtonsHelper.isUseDisabled()).toEqual("true"))
+            .then(() => expect(headerButtonsHelper.isDeleteDisabled()).toEqual("true"));
     });
 
     it("Can open IT system",() => {
-        browser.wait(ec.visibilityOf(gridObjects.systemName.first()), waitUpTo.twentySeconds);
-        gridObjects.systemName.first().click();
-        expect(browser.getCurrentUrl()).toContain("system/usage");
+        loginHelper.loginAsRegularUser()
+            .then(() => pageObject.getPage())
+            .then(() => pageObject.waitForKendoGrid())
+            .then(() => gridObjects.systemName.first().click())
+            .then(() => expect(browser.getCurrentUrl()).toContain("system/usage"));
     });
 
+    it("Show rights owner column data", () => {
+        loginHelper.loginAsRegularUser()
+            .then(() => pageObject.getPage())
+            .then(() => pageObject.waitForKendoGrid())
+            .then(() => expect(headerObjects.systemRightsOwner.isPresent()).toBe(true));
+    });
 });
