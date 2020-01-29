@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
@@ -51,6 +52,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relations = (await ItSystemHelper.GetRelationsAsync(usage1.Id)).ToList();
+                Assert.Equal(1,relations.Count);
             }
         }
 

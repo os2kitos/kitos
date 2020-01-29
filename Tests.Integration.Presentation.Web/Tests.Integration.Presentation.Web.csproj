@@ -136,7 +136,6 @@
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
-    <Compile Include="Tools\WithAutoFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
@@ -167,6 +166,10 @@
     <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
       <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
       <Name>Presentation.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
+      <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>
+      <Name>Tests.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

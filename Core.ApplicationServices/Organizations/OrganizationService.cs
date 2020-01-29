@@ -83,12 +83,12 @@ namespace Core.ApplicationServices.Organizations
             var organization = _orgRepository.GetByKey(organizationId);
             if (organization == null)
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowModify(organization))
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var rights = _orgRightRepository
@@ -102,7 +102,7 @@ namespace Core.ApplicationServices.Organizations
             }
             _orgRightRepository.Save();
 
-            return Result<Organization, OperationFailure>.Success(organization);
+            return organization;
         }
 
         public bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType)
@@ -138,12 +138,12 @@ namespace Core.ApplicationServices.Organizations
             if (newOrg.IsCvrInvalid())
             {
                 _logger.Error("Invalid cvr {cvr} provided for org with name {name}", newOrg.Cvr, newOrg.Name);
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
 
             if (!_authorizationContext.AllowCreate<Organization>(newOrg))
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -158,7 +158,7 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 transaction.Commit();
-                return Result<Organization, OperationFailure>.Success(newOrg);
+                return newOrg;
             }
         }
     }

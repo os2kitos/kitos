@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 
@@ -24,5 +25,11 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="contractId">Optional contract Id</param>
         /// <returns></returns>
         Result<SystemRelation, OperationError> AddRelation(int sourceId, int destinationId, int? interfaceId, string description, string linkName, string linkUrl, int? frequencyId, int? contractId);
+        /// <summary>
+        /// Gets all relations FROM the target system usage
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <returns></returns>
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -242,6 +243,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
 
             return await HttpApi.PostWithCookieAsync(url, login, input);
+        }
+
+        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsAsync(int systemUsageId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
+            }
         }
     }
 }

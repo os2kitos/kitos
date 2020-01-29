@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
 using Core.DomainModel;
@@ -141,7 +142,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError("Source not found", OperationFailure.NotFound);
 
             if (destination == null)
-                return new OperationError("Destination id does not point to a valid system usage", OperationFailure.BadInput);
+                return new OperationError("Destination could not be found", OperationFailure.BadInput);
 
             if (!_authorizationContext.AllowModify(source))
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
@@ -150,8 +151,7 @@ namespace Core.ApplicationServices.SystemUsage
             {
                 targetFrequency = _frequencyService
                     .GetAvailableOptions(source.OrganizationId)
-                    .FirstOrDefault(x => x.Id == frequencyId.Value)
-                    .FromNullable();
+                    .FirstOrDefault(x => x.Id == frequencyId.Value);
 
                 if (!targetFrequency.HasValue)
                     return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
@@ -159,9 +159,9 @@ namespace Core.ApplicationServices.SystemUsage
 
             if (contractId.HasValue)
             {
-                targetContract = _contractRepository.GetById(contractId.Value).FromNullable();
+                targetContract = _contractRepository.GetById(contractId.Value);
                 if (!targetContract.HasValue)
-                    return new OperationError("Contract id doew not point to a valid contract", OperationFailure.BadInput);
+                    return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
             }
 
             var result = source.AddUsageRelationTo(_userContext.UserEntity, destination, interfaceId, description, linkName, linkUrl, targetFrequency, targetContract);
@@ -172,5 +172,21 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId)
+        {
+            Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(systemUsageId);
+            if (itSystemUsage.HasValue == false)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            var systemUsage = itSystemUsage.Value;
+            if (!_authorizationContext.AllowModify(systemUsage))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return systemUsage.UsageRelations.ToList();
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
+using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

@@ -21,5 +21,11 @@
         {
 
         }
+
+        public OperationError(OperationFailure failureType)
+            : this(Maybe<string>.None, failureType)
+        {
+
+        }
     }
 }

@@ -34,11 +34,21 @@ namespace Core.DomainModel.Result
 
         public TFailure Error => _failure.Value;
 
+        /// <summary>
+        /// Consider using implicit ctor in stead
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Result<TSuccess, TFailure> Success(TSuccess value)
         {
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
         }
 
+        /// <summary>
+        /// Consider using the implicit ctor in stead
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Result<TSuccess, TFailure> Failure(TFailure value)
         {
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));

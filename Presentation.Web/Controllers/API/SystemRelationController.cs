@@ -1,7 +1,12 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 
 namespace Presentation.Web.Controllers.API
@@ -35,9 +40,42 @@ namespace Presentation.Web.Controllers.API
                 relation.FrequencyTypeId,
                 relation.ContractId);
 
-            return result.Ok
-                ? Created($"system-usages/{relation.SourceUsageId}/usage-relations/{result.Value.Id}")
-                : FromOperationError(result.Error);
+            return Either(result,
+                onSuccess: value => Created($"system-usages/{relation.SourceUsageId}/usage-relations/{value.Id}"),
+                onFailure: FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("from/{systemUsageId}")]
+        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
+        {
+            var result = _usageService.GetRelations(systemUsageId);
+
+            return Either(result,
+                onSuccess: value => Ok(MapRelations(value)),
+                onFailure: FromOperationError);
+        }
+
+        private static SystemRelationDTO[] MapRelations(IEnumerable<SystemRelation> systemRelations)
+        {
+            return systemRelations
+                .Select(MapRelation)
+                .ToArray();
+        }
+
+        private static SystemRelationDTO MapRelation(SystemRelation relation)
+        {
+            return new SystemRelationDTO
+            {
+                Source = relation.RelationSource.MapToNamedEntityDTO(),
+                Destination = relation.RelationTarget.MapToNamedEntityDTO(),
+                Description = relation.Description,
+                LinkName = relation.Reference.Name,
+                LinkUrl = relation.Reference.Url,
+                Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
+                FrequencyType = relation.UsageFrequency?.MapToNamedEntityDTO(),
+                Interface = relation.RelationInterface?.MapToNamedEntityDTO()
+            };
         }
     }
 }

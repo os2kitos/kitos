@@ -156,14 +156,14 @@ namespace Core.ApplicationServices.System
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)
             {
-                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
-            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
+            return MapToUsingOrganization(itSystem.Usages).ToList();
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
