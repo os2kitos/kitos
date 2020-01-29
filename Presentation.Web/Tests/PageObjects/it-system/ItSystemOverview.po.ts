@@ -4,7 +4,6 @@ import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper"
 import NavigationHelper = require("../../Utility/NavigationHelper")
 
 class ItSystemOverview implements IPageObject {
-    private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
     private ec = protractor.ExpectedConditions;
 
