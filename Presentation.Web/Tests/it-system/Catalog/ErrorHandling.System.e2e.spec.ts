@@ -17,7 +17,6 @@ describe("Getting the correct message when there is a conflict deleting a system
         var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
         var EC = protractor.ExpectedConditions;
         var waitTimer = new waitUpTo();
-        var interfaceHelper = new InterfaceHelper();
 
         afterEach(() => {
             testFixture.enableAutoBrowserWaits();
@@ -77,8 +76,8 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
                     .then(() => expectSystemWithName(systemName))
-                    .then(() => interfaceHelper.createInterface(interfaceName))
-                    .then(() => interfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
+                    .then(() => InterfaceHelper.createInterface(interfaceName))
+                    .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(systemName))
                     .then(() => itSystemFrontPage.getDeleteButton().click())
                     .then(() => testFixture.disableAutoBrowserWaits())
