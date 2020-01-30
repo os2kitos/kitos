@@ -19,8 +19,7 @@ class SystemCatalogHelper {
             .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
-            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click())
-            .then(() => console.log("System created"));
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click());
     }
 
     public static deleteSystem(name: string) {
@@ -51,42 +50,13 @@ class SystemCatalogHelper {
             .then(() => Select2.waitForDataAndSelect());
     }
 
-    public static createLocalSystem(name: string) {
-        console.log(`Creating local system for system: ${name}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.getActivationToggleButton(name).click())
-            .then(() => console.log("Local system created"));
-    }
-
-    public static openSystem(name: string) {
-        console.log(`open details for local system: ${name}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click());
-    }
-
     public static findCatalogColumnsFor(name: string) {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
-    }
-
-    public static getActivationToggleButton(name: string) {
-        const filteredRows = SystemCatalogHelper.findCatalogColumnsFor(name);
-        return filteredRows.first().element(by.xpath("../..")).element(this.cssHelper.byDataElementType(this.consts.toggleActivatingSystem));
-    }
-
-    public static resetFilters() {
-        console.log("Resetting system catalog filters");
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().resetFilter.click());
     }
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
-
-
 }
 export = SystemCatalogHelper;

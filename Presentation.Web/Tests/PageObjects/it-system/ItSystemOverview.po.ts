@@ -3,7 +3,7 @@ import KendoToolbarHelper = require("../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper")
 import NavigationHelper = require("../../Utility/NavigationHelper")
 
-class ItSystemOverview implements IPageObject {
+class ItSystemOverview implements IPageObject { 
     private navigationHelper = new NavigationHelper();
     private ec = protractor.ExpectedConditions;
 

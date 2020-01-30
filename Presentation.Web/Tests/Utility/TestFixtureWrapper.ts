@@ -18,7 +18,6 @@ class TestFixtureWrapper {
         const mill = minutes * 60 * 1000;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = mill;
         browser.manage().timeouts().setScriptTimeout(mill);
-        browser.manage().timeouts().pageLoadTimeout(mill);
     }
 
     public disableLongRunningTest() {
@@ -26,12 +25,6 @@ class TestFixtureWrapper {
         const mill = seconds * 1000;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = defaultJasmineTimeout;
         browser.manage().timeouts().setScriptTimeout(mill);
-        browser.manage().timeouts().pageLoadTimeout(mill);
-    }
-
-    public longRunningSetup() {
-        const minutes = 5;
-        return minutes * 60 * 1000;
     }
 
 }

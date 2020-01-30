@@ -24,8 +24,6 @@ class Constants {
     readonly kendoUsedByHeader = "usedByNameHeader";
     readonly kendoUsedByObject = "usedByNameObject";
 
-    readonly kendoCatalogNameFilter = "Name";
-
     readonly kendoUserEmailHeader = "userHeaderEmail";
     readonly kendoUserEmailObject = "userEmailObject";
     readonly kendoUserApiHeader = "userHeader";
