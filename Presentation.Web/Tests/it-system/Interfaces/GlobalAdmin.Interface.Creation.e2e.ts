@@ -54,14 +54,14 @@ describe("Only Global Administrator is able to create and fill out an interface"
     });
 
     function createInterfaceName() {
-        return "Interface" + new Date().getTime();
+        return `Interface${new Date().getTime()}`;
     }
 
     function createItSystem() {
-        return "ItSystem" + new Date().getTime();
+        return `ItSystem${new Date().getTime()}`;
     }
 
     function getRandomData() {
-        return "SawData" + new Date().getTime();
+        return `SawData${new Date().getTime()}`;
     }
 });
