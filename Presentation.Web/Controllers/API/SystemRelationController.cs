@@ -103,7 +103,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpDelete]
         [Route("from/{systemUsageId}/{relationId}")]
-        public HttpResponseMessage DeleteRelationsFromSystem(int systemUsageId, int relationId)
+        public HttpResponseMessage DeleteRelationFromSystem(int systemUsageId, int relationId)
         {
             return _usageService.RemoveRelation(systemUsageId, relationId)
                 .Match
