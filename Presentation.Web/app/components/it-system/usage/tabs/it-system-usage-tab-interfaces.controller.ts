@@ -24,8 +24,8 @@
         });
     }]);
 
-    app.controller("systemUsage.ExposedInterfaces", ["$scope", "itSystemUsage", "exhibits", "user", "lazyLoadingService",
-        ($scope, itSystemUsage, exhibits, user, lazyLoadingService) => {
+    app.controller("systemUsage.ExposedInterfaces", ["$scope", "itSystemUsage", "exhibits",
+        ($scope, itSystemUsage, exhibits) => {
 
             $scope.systemUsage = itSystemUsage;
 
@@ -36,9 +36,6 @@
             });
 
             $scope.interfaceExposures = exhibits;
-
-            $scope.itSystemUsageSelectOptions = lazyLoadingService.selectLazyLoading("api/itSystemUsage", [`organizationId=${user.organizationId}`]);
-            
         }
     ]);
 
