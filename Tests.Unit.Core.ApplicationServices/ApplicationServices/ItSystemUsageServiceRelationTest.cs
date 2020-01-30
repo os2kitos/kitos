@@ -157,14 +157,14 @@ namespace Tests.Unit.Core.ApplicationServices
             return mockSystemUsage1;
         }
 
-        private void SetupUsageSystemRelation(int systemRelationId, IMock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
+        private void SetupUsageSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object, targetSystemUsage.Object)
             {
                 Id = systemRelationId,
                 RelationInterface = _mockSourceSystemInterface.Object
             };
-            sourceSystemUsage.Object.UsageRelations = new List<SystemRelation> {usageSystemRelation};
+            sourceSystemUsage.SetupGet(u => u.UsageRelations).Returns(new List<SystemRelation> {usageSystemRelation});
             var itInterfaceExhibits = new List<ItInterfaceExhibit>
             {
                 new ItInterfaceExhibit { ItInterface = new ItInterface { Id = 100 }},
@@ -172,7 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             var mockTargetItSystem = new Mock<ItSystem>();
             mockTargetItSystem.SetupGet(s => s.ItInterfaceExhibits).Returns(itInterfaceExhibits);
-            targetSystemUsage?.SetupGet(u => u.ItSystem).Returns(mockTargetItSystem.Object);
+            targetSystemUsage.SetupGet(u => u.ItSystem).Returns(mockTargetItSystem.Object);
         }
 
         #endregion
