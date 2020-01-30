@@ -22,7 +22,6 @@ namespace Infrastructure.DataAccess
         public KitosContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             Database.Log = null;
         }
 

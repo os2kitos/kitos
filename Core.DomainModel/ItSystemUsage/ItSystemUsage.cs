@@ -529,7 +529,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
         {
-            var relationResult = GetRelation(relationId);
+            var relationResult = GetUsageRelation(relationId);
 
             if (!relationResult.HasValue)
             {
@@ -541,7 +541,7 @@ namespace Core.DomainModel.ItSystemUsage
             return relation;
         }
 
-        public Maybe<SystemRelation> GetRelation(int relationId)
+        public Maybe<SystemRelation> GetUsageRelation(int relationId)
         {
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
         }

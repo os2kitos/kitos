@@ -173,6 +173,63 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(activeUser, _sut.LastChangedByUser);
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void GetUsageRelation_Returns(bool some)
+        {
+            //Arrange
+            var id = A<int>();
+            var systemRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = some ? id : A<int>() };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            _sut.UsageRelations.Add(ignoredRelation);
+            _sut.UsageRelations.Add(systemRelation);
+
+            //Act
+            var relation = _sut.GetUsageRelation(id);
+
+            //Assert
+            Assert.Equal(some, relation.HasValue);
+            if (some)
+            {
+                Assert.Same(systemRelation, relation.Value);
+            }
+        }
+
+        [Fact]
+        public void RemoveUsageRelation_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            _sut.UsageRelations.Add(ignoredRelation);
+
+            //Act
+            var result = _sut.RemoveUsageRelation(id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void RemoveUsageRelation_Returns_Ok()
+        {
+            //Arrange
+            var id = A<int>();
+            var removedRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = id };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            _sut.UsageRelations.Add(ignoredRelation);
+            _sut.UsageRelations.Add(removedRelation);
+
+            //Act
+            var result = _sut.RemoveUsageRelation(id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(removedRelation, result.Value);
+        }
+
         private static void AssertErrorResult(Result<SystemRelation, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);

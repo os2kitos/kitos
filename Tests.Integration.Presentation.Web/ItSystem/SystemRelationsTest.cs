@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Result;
 using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -16,11 +17,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     {
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
-        [Fact]
-        public async Task Post_SystemRelation_Returns_201()
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, true)]
+        public async Task Post_SystemRelation_Returns_201(bool withContract, bool withInterface, bool withFrequency)
         {
             //Arrange
-            var input = await PrepareFullRelationAsync();
+            var input = await PrepareFullRelationAsync(withContract, withInterface, withFrequency);
 
             //Act
             using (var response = await ItSystemHelper.SendPostRelationAsync(input))
@@ -34,9 +42,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(input.TargetUsageId, dto.Destination.Id);
                 Assert.Equal(input.Description, dto.Description);
                 Assert.Equal(input.Reference, dto.Reference);
-                Assert.Equal(input.ContractId.Value, dto.Contract.Id);
-                Assert.Equal(input.InterfaceId.Value, dto.Interface.Id);
-                Assert.Equal(input.FrequencyTypeId.Value, dto.FrequencyType.Id);
+                Assert.Equal(input.ContractId, dto.Contract?.Id);
+                Assert.Equal(input.InterfaceId, dto.Interface?.Id);
+                Assert.Equal(input.FrequencyTypeId, dto.FrequencyType?.Id);
             }
         }
 
@@ -75,7 +83,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Can_Delete_SystemUsageWithRelations()
         {
             //Arrange
-            var input = await PrepareFullRelationAsync();
+            var input = await PrepareFullRelationAsync(false, false, false);
 
             using (await ItSystemHelper.SendPostRelationAsync(input))
             using (var deletionResponse = await ItSystemHelper.SendRemoveUsageAsync(input.SourceUsageId, OrganizationId))
@@ -86,7 +94,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        [Fact]
+		[Fact]
         public async Task Can_Edit_SystemUsageWithRelations()
         {
             //Arrange
@@ -108,35 +116,37 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        //TODO: Test that it system can be deleted without any nasty bindings
-
         #region Helpers
 
-        private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync()
+        private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)
         {
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
             var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, OrganizationId);
             var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, OrganizationId);
-            var targetInterface = await InterfaceHelper.CreateInterface(
-                InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
-            await InterfaceExhibitHelper.CreateExhibit(system2.Id, targetInterface.Id);
-            var contract = await ItContractHelper.CreateContract(CreateName(), OrganizationId);
+            var targetInterface = Maybe<ItInterfaceDTO>.None;
+            if (withInterface)
+            {
+                targetInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
+                await InterfaceExhibitHelper.CreateExhibit(system2.Id, targetInterface.Value.Id);
+            }
 
-            var targetFrequencyTypeId = DatabaseAccess.MapFromEntitySet<RelationFrequencyType, int>(repo =>
+            var contract = withContract ? await ItContractHelper.CreateContract(CreateName(), OrganizationId) : Maybe<ItContractDTO>.None;
+
+            var targetFrequencyTypeId = withFrequency ? DatabaseAccess.MapFromEntitySet<RelationFrequencyType, int>(repo =>
             {
                 var first = repo
                     .AsQueryable()
                     .First(x => x.IsEnabled);
                 return first.Id;
-            });
+            }) : default(int?);
 
             var input = new CreateSystemRelationDTO
             {
                 SourceUsageId = usage1.Id,
                 TargetUsageId = usage2.Id,
-                ContractId = contract.Id,
-                InterfaceId = targetInterface.Id,
+                ContractId = contract.Select<int?>(x => x.Id).GetValueOrDefault(),
+                InterfaceId = targetInterface.Select<int?>(x => x.Id).GetValueOrDefault(),
                 Description = A<string>(),
                 Reference = A<string>(),
                 FrequencyTypeId = targetFrequencyTypeId

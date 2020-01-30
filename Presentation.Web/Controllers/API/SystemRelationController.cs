@@ -41,7 +41,12 @@ namespace Presentation.Web.Controllers.API
                 relation.ContractId);
 
             return result.Match(
-                onSuccess: systemRelation => Created(MapRelation(systemRelation), new Uri(Request.RequestUri + $"/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")),
+                onSuccess: systemRelation =>
+                    Created
+                    (
+                        response: MapRelation(systemRelation),
+                        location: new Uri($"{Request.RequestUri.ToString().TrimEnd('/')}/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")
+                    ),
                 onFailure: FromOperationError);
         }
 

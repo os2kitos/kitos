@@ -39,14 +39,13 @@
                 loadTasks();
             };
 
+            // default kle sort order
+            $scope.pagination.orderBy = "taskKey";
+
             function loadTasks() {
-
                 var url = baseUrl + "?tasks=true";
-
                 url += '&onlySelected=' + !$scope.showAllTasks;
-
                 url += '&taskGroup=' + $scope.selectedTaskGroup;
-
                 url += '&skip=' + $scope.pagination.skip + '&take=' + $scope.pagination.take;
 
                 if ($scope.pagination.orderBy) {
@@ -59,11 +58,9 @@
 
                     var paginationHeader = JSON.parse(headers('X-Pagination'));
                     $scope.totalCount = paginationHeader.TotalCount;
-
                 }).error(function() {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
-
             }
 
             function add(task) {

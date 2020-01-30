@@ -69,9 +69,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
                 _mockOrganizationalUserContext.Object,
-                _mockLogger.Object,
+                _mockSystemRelationRepository.Object,
                 _mockTransactionManager.Object,
-                _mockSystemRelationRepository.Object);
+                _mockLogger.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId);
@@ -101,9 +101,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
                 _mockOrganizationalUserContext.Object,
-                _mockLogger.Object,
+                _mockSystemRelationRepository.Object,
                 _mockTransactionManager.Object,
-                _mockSystemRelationRepository.Object);
+                _mockLogger.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, replacementSystemUsageId, null);
@@ -135,9 +135,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
                 _mockOrganizationalUserContext.Object,
-                _mockLogger.Object,
+                _mockSystemRelationRepository.Object,
                 _mockTransactionManager.Object,
-                _mockSystemRelationRepository.Object);
+                _mockLogger.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, TargetSystemUsageId, 100);
