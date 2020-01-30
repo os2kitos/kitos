@@ -94,6 +94,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task Can_Get_AvailableDestinationSystems()
+        {
+            //Arrange
+            var prefix = CreateName();
+            var source = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var target1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(prefix + 1, OrganizationId, AccessModifier.Public);
+            var target2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(prefix + 2, OrganizationId, AccessModifier.Public);
+            var ignoredSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var sourceUsage = await ItSystemHelper.TakeIntoUseAsync(source.Id, OrganizationId);
+            var targetUsage1 = await ItSystemHelper.TakeIntoUseAsync(target1.Id, OrganizationId);
+            var targetUsage2 = await ItSystemHelper.TakeIntoUseAsync(target2.Id, OrganizationId);
+            await ItSystemHelper.TakeIntoUseAsync(ignoredSystem.Id, OrganizationId);
+
+            //Act
+            var availableDestinationSystems = (await ItSystemHelper.GetAvailableDestinationSystemsAsync(sourceUsage.Id, prefix))?.ToList();
+
+            //Assert
+            Assert.NotNull(availableDestinationSystems);
+            Assert.Equal(2, availableDestinationSystems.Count);
+            Assert.True(new[] { targetUsage1.Id, targetUsage2.Id }.SequenceEqual(availableDestinationSystems.Select(x => x.Id)));
+        }
+
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)
         {
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);

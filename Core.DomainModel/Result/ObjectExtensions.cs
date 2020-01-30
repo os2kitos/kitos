@@ -6,5 +6,12 @@
         {
             return src == null ? Maybe<T>.None : Maybe<T>.Some(src);
         }
+
+        public static Maybe<string> FromString(this string src)
+        {
+            return src
+                .FromNullable()
+                .Select(value => string.IsNullOrEmpty(value) ? default(string) : value);
+        }
     }
 }
