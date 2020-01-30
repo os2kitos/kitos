@@ -14,7 +14,6 @@ using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage
 {
