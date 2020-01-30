@@ -10,29 +10,17 @@ namespace Presentation.Web.Extensions
         public static NamedEntityDTO MapToNamedEntityDTO<T>(this T source)
             where T : Entity, IHasName
         {
-            return new NamedEntityDTO
-            {
-                Id = source.Id,
-                Name = source.Name
-            };
+            return new NamedEntityDTO(source.Id, source.Name);
         }
 
         public static NamedEntityDTO MapToNamedEntityDTO(this NamedEntity source)
         {
-            return new NamedEntityDTO
-            {
-                Id = source.Id,
-                Name = source.Name
-            };
+            return new NamedEntityDTO(source.Id, source.Name);
         }
 
         public static NamedEntityDTO MapToNamedEntityDTO(this ItSystemUsage source)
         {
-            return new NamedEntityDTO
-            {
-                Id = source.Id,
-                Name = source.LocalCallName ?? source.ItSystem.Name
-            };
+            return new NamedEntityDTO(source.Id, source.LocalCallName ?? source.ItSystem.Name);
         }
     }
 }

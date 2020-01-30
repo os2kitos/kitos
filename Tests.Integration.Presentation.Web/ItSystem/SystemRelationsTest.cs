@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -85,6 +86,32 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task Can_Edit_SystemUsageWithRelations()
+        {
+            //Arrange
+            var input = await PreparePatchedRelationAsync();
+
+            //Act
+            using (var response = await ItSystemHelper.SendPatchRelationAsync(input))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+                var relations = (await ItSystemHelper.GetRelationsAsync(input.Source.Id)).ToList();
+                Assert.Single(relations);
+                var dto = relations.Single();
+                Assert.Equal(input.Source.Id, dto.Source.Id);
+                Assert.Equal(input.Destination.Id, dto.Destination.Id);
+                Assert.Equal(input.Description, dto.Description);
+                Assert.Equal(input.Reference, dto.Reference);
+                Assert.Equal(input.Interface.Id, dto.Interface.Id);
+            }
+        }
+
+        //TODO: Test that it system can be deleted without any nasty bindings
+
+        #region Helpers
+
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync()
         {
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
@@ -117,11 +144,33 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return input;
         }
 
-        //TODO: Test that it system can be deleted without any nasty bindings
+        private async Task<SystemRelationDTO> PreparePatchedRelationAsync()
+        {
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, OrganizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, OrganizationId);
+            var targetInterface = await InterfaceHelper.CreateInterface(
+                InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
+            await InterfaceExhibitHelper.CreateExhibit(system2.Id, targetInterface.Id);
+
+            var input = new SystemRelationDTO
+            {
+                Source = new NamedEntityDTO(usage1.Id, ""),
+                Destination = new NamedEntityDTO(usage2.Id, ""),
+                Interface = new NamedEntityDTO(targetInterface.Id, ""),
+                Description = A<string>(),
+                Reference = A<string>(),
+            };
+
+            return input;
+        }
 
         private string CreateName()
         {
             return $"Relations_{A<Guid>():N}";
         }
+
+        #endregion
     }
 }

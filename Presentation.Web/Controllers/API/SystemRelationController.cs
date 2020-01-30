@@ -78,6 +78,29 @@ namespace Presentation.Web.Controllers.API
                 onFailure: FromOperationFailure);
         }
 
+        [HttpPatch]
+        [Route("")]
+        public HttpResponseMessage PatchRelation([FromBody] SystemRelationDTO relation)
+        {
+            if (relation == null)
+            {
+                return BadRequest("Missing relation data");
+            }
+
+            var result = _usageService.ModifyRelation(
+                relation.Source.Id,
+                relation.Id,
+                relation.Destination.Id,
+                relation.Interface.Id
+                );
+
+            return result.Match(
+                onSuccess: systemRelation => Created(MapRelation(systemRelation), new Uri(Request.RequestUri + $"/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")),
+                onFailure: FromOperationError);
+        }
+
+        #region Helpers
+
         private static SystemRelationDTO[] MapRelations(IEnumerable<SystemRelation> systemRelations)
         {
             return systemRelations
@@ -100,5 +123,7 @@ namespace Presentation.Web.Controllers.API
                 Interface = relation.RelationInterface?.MapToNamedEntityDTO()
             };
         }
+
+        #endregion
     }
 }

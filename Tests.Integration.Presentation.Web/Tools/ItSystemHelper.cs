@@ -279,5 +279,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.GetWithCookieAsync(url, login);
         }
+
+        public static async Task<HttpResponseMessage> SendPatchRelationAsync(SystemRelationDTO input, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
+
+            return await HttpApi.PatchWithCookieAsync(url, login, input);
+        }
     }
 }
