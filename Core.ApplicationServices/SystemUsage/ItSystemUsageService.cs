@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Options;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
@@ -250,6 +254,72 @@ namespace Core.ApplicationServices.SystemUsage
                 .GetUsageRelation(relationId)
                 .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
                 .GetValueOrFallback(OperationFailure.NotFound);
+        }
+
+        public Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int systemUsageId, Maybe<string> nameContent, int pageSize)
+        {
+            if (pageSize > 25)
+            {
+                return new OperationError("Max page size is 25", OperationFailure.BadInput);
+            }
+
+            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+            if (systemUsage.IsNone)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            var usage = systemUsage.Value;
+            if (!_authorizationContext.AllowReads(usage))
+            {
+                return new OperationError("Not allowed to read target system usage", OperationFailure.Forbidden);
+            }
+
+            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(usage.OrganizationId);
+            if (accessLevel < OrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError("User does not have full READ access within the organization", OperationFailure.Forbidden);
+            }
+
+            var systemsInUse = _systemRepository
+                .GetSystemsInUse(usage.OrganizationId);
+
+            var idsOfSystemsInUse = nameContent
+                .Select(name => systemsInUse.ByPartOfName(name))
+                .GetValueOrFallback(systemsInUse)
+                .OrderBy(x => x.Name)
+                .Take(pageSize)
+                .Select(x => x.Id)
+                .ToList();
+
+            return _usageRepository
+                .AsQueryable()
+                .Where(u => idsOfSystemsInUse.Contains(u.ItSystemId))
+                .ToList();
+        }
+
+        public Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int systemUsageId, int targetUsageId)
+        {
+            var source = _usageRepository.GetByKey(systemUsageId);
+            var destination = _usageRepository.GetByKey(targetUsageId);
+
+            if (source == null)
+                return new OperationError("Source not found", OperationFailure.NotFound);
+
+            if (destination == null)
+                return new OperationError("Destination could not be found", OperationFailure.BadInput);
+
+            if (!source.IsInSameOrganizationAs(destination))
+                return new OperationError("source and destination usages are from different organizations", OperationFailure.BadInput);
+
+            if (!_authorizationContext.AllowReads(source))
+                return new OperationError(OperationFailure.BadInput);
+
+            var availableFrequencyTypes = _frequencyService.GetAvailableOptions(source.OrganizationId).ToList();
+            var exposedInterfaces = destination.GetExposedInterfaces();
+            var contracts = _contractRepository.GetByOrganizationId(source.OrganizationId).OrderBy(c => c.Name).ToList();
+
+            return new RelationOptionsDTO(source, destination, exposedInterfaces, contracts, availableFrequencyTypes);
         }
     }
 }

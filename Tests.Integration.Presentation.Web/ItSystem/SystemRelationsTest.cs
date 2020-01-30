@@ -36,8 +36,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relations = (await ItSystemHelper.GetRelationsAsync(input.SourceUsageId)).ToList();
-                Assert.Equal(1, relations.Count);
-                var dto = relations.Single();
+                var dto = Assert.Single(relations);
                 Assert.Equal(input.SourceUsageId, dto.Source.Id);
                 Assert.Equal(input.TargetUsageId, dto.Destination.Id);
                 Assert.Equal(input.Description, dto.Description);
@@ -92,6 +91,47 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.OK, deletionResponse.StatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
             }
+        }
+
+        [Fact]
+        public async Task Can_Get_AvailableDestinationSystems()
+        {
+            //Arrange
+            var prefix = CreateName();
+            var source = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var target1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(prefix + 1, OrganizationId, AccessModifier.Public);
+            var target2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(prefix + 2, OrganizationId, AccessModifier.Public);
+            var ignoredSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var sourceUsage = await ItSystemHelper.TakeIntoUseAsync(source.Id, OrganizationId);
+            var targetUsage1 = await ItSystemHelper.TakeIntoUseAsync(target1.Id, OrganizationId);
+            var targetUsage2 = await ItSystemHelper.TakeIntoUseAsync(target2.Id, OrganizationId);
+            await ItSystemHelper.TakeIntoUseAsync(ignoredSystem.Id, OrganizationId);
+
+            //Act
+            var availableDestinationSystems = (await ItSystemHelper.GetAvailableDestinationSystemsAsync(sourceUsage.Id, prefix))?.ToList();
+
+            //Assert
+            Assert.NotNull(availableDestinationSystems);
+            Assert.Equal(2, availableDestinationSystems.Count);
+            Assert.True(new[] { targetUsage1.Id, targetUsage2.Id }.SequenceEqual(availableDestinationSystems.Select(x => x.Id)));
+        }
+
+        [Fact]
+        public async Task Can_Get_AvailableOptions()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, true, true);
+
+
+            //Act
+            var options = await ItSystemHelper.GetAvailableOptionsAsync(input.SourceUsageId, input.TargetUsageId);
+
+            //Assert
+            Assert.NotNull(options);
+            var interfaceDTO = Assert.Single(options.AvailableInterfaces);
+            Assert.Equal(input.InterfaceId.Value, interfaceDTO.Id);
+            Assert.Contains(options.AvailableContracts.Select(x => x.Id), x => x == input.ContractId);
+            Assert.Contains(options.AvailableFrequencyTypes.Select(x => x.Id), x => x == input.FrequencyTypeId);
         }
 
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)

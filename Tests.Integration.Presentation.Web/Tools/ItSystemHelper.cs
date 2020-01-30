@@ -272,6 +272,30 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<IEnumerable<NamedEntityDTO>> GetAvailableDestinationSystemsAsync(int systemUsageId, string prefix,Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/options/{systemUsageId}/available-destination-systems?nameContent={prefix}&amount=25");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<NamedEntityDTO>>();
+            }
+        }
+
+        public static async Task<SystemRelationOptionsDTO> GetAvailableOptionsAsync(int systemUsageId, int targetUsageId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/options/{systemUsageId}/in-relation-to/{targetUsageId}");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationOptionsDTO>();
+            }
+        }
+
         public static async Task<HttpResponseMessage> SendGetRelationAsync(int systemUsageId, int relationId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
