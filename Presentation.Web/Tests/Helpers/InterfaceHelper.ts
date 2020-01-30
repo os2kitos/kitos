@@ -51,14 +51,14 @@ class InterfaceHelper {
     }
 
     private writeDataToTextInput(data: string, ele: string) {
-        console.log("Writing " + data + " To " + ele);
+        console.log(`Writing ${data} To ${ele}`);
         return element(this.cssHelper.byDataElementType(ele)).clear().then(() => {
             return element(this.cssHelper.byDataElementType(ele)).sendKeys(data);
         });
     }
 
     private writeDataToTable(data: string, dataType: string) {
-        console.log("Writing " + data + " " + dataType + " to table");
+        console.log(`Writing ${data} ${dataType} to table`);
         return element(this.cssHelper.byDataElementType(this.const.interfaceNewRowButton)).click().then(() => {
             return this.writeDataToTextInput(data, this.const.interfaceDataInput);
         }).then(() => {
@@ -67,18 +67,18 @@ class InterfaceHelper {
     }
 
     private verifyDataFromTextInput(data: string, ele: string) {
-        console.log("Verifying " + ele + " Has value - " + data);
+        console.log(`Verifying ${ele} Has value - ${data}`);
         expect(element(this.cssHelper.byDataElementType(ele)).isDisplayed()).toBe(true);
         expect(element(this.cssHelper.byDataElementType(ele)).getAttribute('value')).toEqual(data);
     }
 
     private verifyDataFromSelect2(data: string, ele: string) {
-        console.log("Verifying " + ele + " Has value - " + data);
+        console.log(`Verifying ${ele} Has value - ${data}`);
         return expect(Select2.getData(ele).getText()).toEqual(data);
     }
 
     private selectDataFromSelect2Field(search: string, id: string) {
-        console.log("Entering data into select2 field " + id);
+        console.log(`Entering data into select2 field ${id}`);
         return Select2.searchFor(search, id).then(() => {
             console.log("Waiting for select2 data");
             return Select2.waitForDataAndSelect();
