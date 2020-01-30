@@ -58,6 +58,7 @@ namespace Presentation.Web.Controllers.API
         private static SystemRelationDTO[] MapRelations(IEnumerable<SystemRelation> systemRelations)
         {
             return systemRelations
+                .OrderBy(relation => relation.Id)
                 .Select(MapRelation)
                 .ToArray();
         }
@@ -66,6 +67,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new SystemRelationDTO
             {
+                Id = relation.Id,
                 Source = relation.RelationSource.MapToNamedEntityDTO(),
                 Destination = relation.RelationTarget.MapToNamedEntityDTO(),
                 Description = relation.Description,
