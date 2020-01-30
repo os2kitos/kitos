@@ -248,7 +248,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return systemUsage
                 .Value
-                .GetRelation(relationId)
+                .GetUsageRelation(relationId)
                 .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
                 .GetValueOrFallback(OperationFailure.NotFound);
         }
