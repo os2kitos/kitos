@@ -6,10 +6,14 @@ namespace Core.DomainServices.Repositories.System
 {
     public interface IItSystemRepository
     {
+        IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters);
+
         IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters);
 
         IQueryable<ItSystem> GetSystemsInUse(int organizationId);
 
         ItSystem GetSystem(int systemId);
+
+        void DeleteSystem(ItSystem itSystem);
     }
 }

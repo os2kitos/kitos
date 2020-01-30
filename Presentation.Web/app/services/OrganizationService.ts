@@ -39,10 +39,6 @@
             return this.$http.get(`odata/OrganizationRights?$expand=Organization&$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
         }
 
-        //GetOrganizationAdminData = (userId: number, organizationId: number) => {
-        //    return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
-        //}
-
         DeleteOrganizationAdminData = (user: any, adminRole: string, module: string) => {
             var localRight = user.OrganizationRights.filter(x => x.Role === adminRole);
             var localId = localRight[0].Id;

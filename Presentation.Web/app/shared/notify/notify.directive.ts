@@ -6,7 +6,7 @@ angular.module("notify").directive("notify", ["$rootScope", function ($rootScope
         template: '<div class="notify">' +
         '	<div class="notify-item alert" ng-repeat="message in messages" ng-class="computeClasses(message)">' +
         '		<button type="button" class="close" ng-click="deleteMessage(message)">&times;</button>' +
-        '       <div ng-bind-html="message.text"></div>' +
+        '       <div data-element-type="notification-message-block" ng-bind-html="message.text"></div>' +
         '	</div>' +
         '</div>',
         replace: false,

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
+using Presentation.Web.Helpers;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -50,6 +52,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             return SendWithCookieAsync(cookie, requestMessage);
         }
 
+        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url);
+
+            if (body != null)
+            {
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            }
+
+            return SendWithCookieAsync(cookie, requestMessage);
+        }
+
         public static Task<HttpResponseMessage> GetWithCookieAsync(Uri url, Cookie cookie)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
@@ -76,19 +90,64 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         private static async Task<HttpResponseMessage> SendWithCookieAsync(Cookie cookie, HttpRequestMessage requestMessage)
         {
-            //Make sure state does not bleed into stateless handler
+            return await SendWithCSRFToken(requestMessage, cookie);
+        }
+
+        private static async Task<HttpResponseMessage> SendWithCSRFToken(HttpRequestMessage requestMessage,
+            Cookie authCookie = null)
+        {
+            var csrfToken = await GetCSRFToken(authCookie);
+            requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
+
             var cookieContainer = new CookieContainer();
-            cookieContainer.Add(cookie);
+            if (authCookie != null)
+            {
+                cookieContainer.Add(authCookie);
+            }
+            cookieContainer.Add(csrfToken.CookieToken);
             using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
             {
                 return await client.SendAsync(requestMessage);
             }
         }
 
+        public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
+        {
+            var url = TestEnvironment.CreateUrl("api/authorize/antiforgery");
+            var csrfRequest = new HttpRequestMessage(HttpMethod.Get, url);
+            HttpResponseMessage csrfResponse;
+
+            if (authCookie == null)
+            {
+                using (var client = new HttpClient())
+                {
+                    csrfResponse = await client.SendAsync(csrfRequest);
+                }
+            }
+            else
+            {
+                var cookieContainer = new CookieContainer();
+                cookieContainer.Add(authCookie);
+                using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
+                {
+                    csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                }
+            }
+
+            Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
+            var cookieParts = csrfResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
+            var cookie = new Cookie(Constants.CSRFValues.CookieName, cookieParts[1].Split(';')[0], "/", url.Host);
+            return new CSRFTokenDTO
+            {
+                CookieToken = cookie,
+                FormToken = await csrfResponse.ReadResponseBodyAsAsync<string>()
+            };
+        }
+
         public static Task<HttpResponseMessage> PostAsync(Uri url, object body)
         {
             var requestMessage = CreatePostMessage(url, body);
-            return StatelessHttpClient.SendAsync(requestMessage);
+            return SendWithCSRFToken(requestMessage);
         }
 
         private static HttpRequestMessage CreatePostMessage(Uri url, object body)
@@ -126,13 +185,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
+        public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
+        {
+            var requestMessage = CreatePostMessage(url, loginDto);
+            using (var client = new HttpClient())
+            {
+                return await client.SendAsync(requestMessage);
+            }
+        }
+
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
             var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var httpResponseMessage = await PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
             {
                 return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
@@ -142,7 +210,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
 
-            using (var httpResponseMessage = await PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
             {
                 return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
@@ -162,26 +230,27 @@ namespace Tests.Integration.Presentation.Web.Tools
             return tokenResponse;
         }
 
+        
+
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var client = new HttpClient())
-            {
-                var request = CreatePostMessage(url, loginDto);
-                var cookieResponse = await client.SendAsync(request);
-                Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
-                var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
-                var cookieName = cookieParts[0];
-                var cookieValue = cookieParts[1].Split(';')[0];
+            var request = CreatePostMessage(url, loginDto);
 
-                return new Cookie(cookieName, cookieValue)
-                {
-                    Domain = url.Host
-                };
-            }
+            var cookieResponse = await SendWithCSRFToken(request);
+
+            Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
+            var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
+            var cookieName = cookieParts[0];
+            var cookieValue = cookieParts[1].Split(';')[0];
+
+            return new Cookie(cookieName, cookieValue)
+            {
+                Domain = url.Host
+            };
         }
 
         public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
@@ -225,7 +294,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
         }
 
-        public static async Task<HttpResponseMessage> DeleteOdataUserAsync(int id)
+        public static async Task<HttpResponseMessage> DeleteUserAsync(int id)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
             var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);

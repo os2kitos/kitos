@@ -52,7 +52,8 @@
                 "userMigrationRights",
                 "gridStateService",
                 "$uibModal",
-                "needsWidthFixService"
+                "needsWidthFixService",
+                "exportGridToExcelService"
             ];
 
         constructor(
@@ -71,14 +72,15 @@
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
+            private needsWidthFixService,
+            private exportGridToExcelService,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
             private newItSystemObject,
             private municipalityId,
             private municipalityName,
-            public migrationConsequenceText,
-            private needsWidthFixService) {
+            public migrationConsequenceText) {
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -104,6 +106,7 @@
                     $(".k-grid-excel").click(() => {
                         kendo.ui.progress(this.mainGrid.element, true);
                     });
+
                 }
 
             });
@@ -208,17 +211,30 @@
                         },
                         parse: response => {
                             // iterrate each usage
-                            this._.forEach(response.value, system => {
-                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
-                                if (!system.Parent) { system.Parent = { Name: "" }; }
-                                if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
-                                if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
-                                if (!system.BelongsTo) { system.BelongsTo = { Name: "" }; }
-                                if (!system.Usages) { system.Usages = []; }
-                                if (!system.Organization) { system.Organization = { Name: "" }; }
-
-
-                            });
+                            this._.forEach(response.value,
+                                system => {
+                                    if (!system.Reference) {
+                                        system.Reference = { Title: "", ExternalReferenceId: "" };
+                                    }
+                                    if (!system.Parent) {
+                                        system.Parent = { Name: "" };
+                                    }
+                                    if (!system.BusinessType) {
+                                        system.BusinessType = { Name: "" };
+                                    }
+                                    if (!system.AppTypeOption) {
+                                        system.AppTypeOption = { Name: "" };
+                                    }
+                                    if (!system.BelongsTo) {
+                                        system.BelongsTo = { Name: "" };
+                                    }
+                                    if (!system.Usages) {
+                                        system.Usages = [];
+                                    }
+                                    if (!system.Organization) {
+                                        system.Organization = { Name: "" };
+                                    }
+                                });
                             return response;
                         }
                     },
@@ -280,12 +296,13 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions,
+                dataBound: this.saveGridOptions, 
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "Usages", title: "Anvendes", width: 40,
@@ -426,6 +443,7 @@
                     {
                         field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
                         persistId: "apptype", // DON'T YOU DARE RENAME!
+                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -711,6 +729,11 @@
             this.gridState.saveGridOptions(this.mainGrid);
         }
 
+        // Resets the scrollbar position
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
+        }
+
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             //Add only excel option if user is not readonly
@@ -909,7 +932,7 @@
                 },
                 serverPaging: true,
                 serverSorting: true,
-                serverFiltering: true
+                serverFiltering: true,
             },
             autoBind: false,
             columns: [
@@ -926,76 +949,11 @@
                         }
                     },
                 }
-            ]
+            ],
         };
 
-        private exportFlag = false;
-
-        private exportToExcel = (e) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                var sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
-
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loadingbar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-                this.needsWidthFixService.fixWidth();
-            }
-        }
-
-        private getTemplateMethod(column) {
-            var template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = <Function>column.template;
-            } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
-            } else {
-                template = t => t;
-            }
-            return template;
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+            this.exportGridToExcelService.getExcel(e,this._,this.$timeout,this.mainGrid);
         }
 
         // adds usage at selected system within current context
@@ -1068,12 +1026,11 @@
                 if (selectedValue) {
                     newFilter = self._.addFilter(newFilter, field, "eq", selectedValue, "and");
                 }
-
                 dataSource.filter(newFilter);
             }
 
-
-
+    
+           
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({

@@ -5,12 +5,6 @@
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: any;
-        //modal: kendo.ui.Window;
-        //usageGrid: kendo.ui.Grid;
-        //usageDetailsGrid: kendo.ui.GridOptions;
-        //exhibitModal: kendo.ui.Window;
-        //exhibitGrid: kendo.ui.Grid;
-        //exhibitDetailsGrid: kendo.ui.GridOptions;
     }
 
     export interface IItSystemUsageOverview extends Models.ItSystemUsage.IItSystemUsage {
@@ -26,13 +20,6 @@
 
         public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
-
-        //public usageGrid: kendo.ui.Grid;
-        //public modal: kendo.ui.Window;
-
-        //public exhibitGrid: kendo.ui.Grid;
-        //public exhibitModal: kendo.ui.Window;
-
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -48,7 +35,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "needsWidthFixService"
+            "needsWidthFixService",
+            "exportGridToExcelService"
         ];
 
         constructor(
@@ -66,7 +54,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: Array<any>,
-            private needsWidthFixService) {
+            private needsWidthFixService,
+            private exportGridToExcelService) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -104,9 +93,14 @@
             return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
         }
 
-        // saves grid state to localStorage
+        // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // Resets the position of the scrollbar
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // loads kendo grid options from localstorage
@@ -329,6 +323,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page:this.onPaging,
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
@@ -346,19 +341,6 @@
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
-                        //{
-                        //    cell: {
-                        //        template: args => {
-                        //            args.element.kendoDropDownList({
-                        //                dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                        //                dataTextField: "type",
-                        //                dataValueField: "value",
-                        //                valuePrimitive: true
-                        //            });
-                        //        },
-                        //        showOperators: false
-                        //    }
-                        //}
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
@@ -721,6 +703,12 @@
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
                         hidden: false,
+                        excelTemplate: dataItem => {
+                            if (!dataItem || !dataItem.Concluded) {
+                                return "";
+                            }
+                            return dataItem.Concluded.toLocaleDateString("da-DK");
+                        },
                         filterable: 
                         {
                             operators: {
@@ -966,22 +954,6 @@
             return concatRoles;
         }
 
-        private getTemplateMethod(column) {
-            var template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = <Function>column.template;
-            } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
-            } else {
-                template = t => t;
-            }
-
-            return template;
-        }
-
         private isContractActive(dataItem) {
             if (!dataItem.Active) {
                 var today = moment();
@@ -1132,57 +1104,8 @@
             }
         };
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItSystemUsageOverview>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                var sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
-
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loadingbar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-                this.needsWidthFixService.fixWidth();
-            }
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
     }
 

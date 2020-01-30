@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -16,10 +15,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     {
         public AttachedOptionsRegisterTypesController(
                 IGenericRepository<AttachedOption> repository,
-                IAuthenticationService authService,
                 IGenericRepository<RegisterType> registerTypeRepository,
                 IGenericRepository<LocalRegisterType> localRegisterTypeRepository)
-               : base(repository, authService, registerTypeRepository, localRegisterTypeRepository)
+               : base(repository, registerTypeRepository, localRegisterTypeRepository)
         {
 
         }

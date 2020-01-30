@@ -13,7 +13,8 @@ var app = angular.module("app", [
     "ngMessages",
     "ui.tree",
     "ui.tinymce",
-    "oidc-angular"]);
+    "oidc-angular",
+    "ngCookies"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
@@ -28,11 +29,6 @@ app.config([
 
 app.config(["$authProvider", $authProvider => {
 
-    //var xmlHttp = new XMLHttpRequest();
-    //xmlHttp.open("GET", "/api/SSOConfig", false);
-    //xmlHttp.send(null);
-    //var config = JSON.parse(xmlHttp.response);
-    
     $authProvider.configure({
         redirectUri: location.origin + "/#/?",
         scope: "openid email",
@@ -51,11 +47,17 @@ app.config([
         $httpProvider.defaults.headers.get = {
             "Cache-Control": "no-cache"
         };
+
+        //Disable built-in xsrf in angular - it overrides our interceptor
+        $httpProvider.defaults.xsrfCookieName = "IGNORED-XSRF-TOKEN";
+        $httpProvider.defaults.xsrfHeaderName = "IGNORED-XSRF-TOKEN";
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
 
         // $window isn't ready yet, so fetch it ourself
         var $window = $windowProvider.$get();
+
+        $httpProvider.interceptors.push("csrfRequestInterceptor");
 
         // encode all url requests - fixes IE not correctly encoding special chars
         $httpProvider.interceptors.push(() => ({
@@ -75,8 +77,9 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService, $cookies) => {
+
         // init info
         $rootScope.page = {
             title: "Index",
@@ -128,6 +131,7 @@ app.run([
             userService.logout().then(() => {
                 $rootScope.changingOrganization = false;
                 $state.go("index");
+                $cookies.remove(Kitos.Constants.CSRF.CSRFCookie);
             });
         };
 

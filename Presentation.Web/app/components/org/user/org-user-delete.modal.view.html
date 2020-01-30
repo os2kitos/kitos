@@ -46,8 +46,6 @@
         </thead>
         <tbody>
             <tr ng-repeat="orgUnit in ctrl.vmOrgUnits | orderBy: 'Rolle'">
-                <!--<tr ng-repeat="orgUnit in ctrl.vmOrgRoles.items | orderBy: 'Role.Name'">-->
-                <!--ng-true-value doesn't accept dynamically allocated values-->
                 <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.collectionUpdate('OrganizationUnitRights', orgUnit, orgUnitModel)" /></td>
                 <td>{{orgUnit.Object.Name}}</td>
                 <td>{{orgUnit.Role.Name}}</td>
@@ -169,7 +167,6 @@
 <div class="modal-footer">
     <button type="submit" class="btn btn-danger" data-ng-click="ctrl.deleteSelectedRoles()" data-disabled-on-busy>Slet valgte roller</button>
     <button type="submit" class="btn btn-danger" data-element-type="userDeleteButton" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
-    <!--<button type="submit" ng-disabled="ctrl.disabled" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>-->
     <button type="submit" ng-disabled="ctrl.disabled" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
     <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Luk</button>
 </div>

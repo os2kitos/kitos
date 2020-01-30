@@ -1,4 +1,5 @@
 ﻿using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
 using Moq;
@@ -83,14 +84,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void AllowEntityVisibilityControl_Returns_Response_From_Context(bool expectedResult)
+        public void HasPermission_Returns_Response_From_Context(bool expectedResult)
         {
             //Arrange
-            var entity = Mock.Of<IEntity>();
-            _authContext.Setup(x => x.AllowEntityVisibilityControl(entity)).Returns(expectedResult);
+            var permission = Mock.Of<Permission>();
+            _authContext.Setup(x => x.HasPermission(permission)).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowEntityVisibilityControl(entity);
+            var result = _sut.HasPermission(permission);
 
             //Assert
             Assert.Equal(expectedResult, result);

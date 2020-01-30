@@ -1,27 +1,25 @@
 ﻿using System;
-using Core.ApplicationServices;
-using Core.DomainServices;
+using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Presentation.Web.Controllers.OData.ReportsControllers;
 using Core.DomainModel.ItSystem;
-using System.Collections.Generic;
+using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
     public class ReportsITSystemContactsController : BaseOdataAuthorizationController<ItSystemRight>
     {
-        private readonly IAuthenticationService _authService;
-        public ReportsITSystemContactsController(IGenericRepository<ItSystemRight> repository, IAuthenticationService authService)
-            : base(repository){
-            _authService = authService;
+        public ReportsITSystemContactsController(IGenericRepository<ItSystemRight> repository)
+            : base(repository)
+        {
         }
 
         [HttpGet]
@@ -31,16 +29,17 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Get()
         {
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
             {
                 return StatusCode(HttpStatusCode.Forbidden);
             }
             var result = Repository.Get();
-            try {
-            var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
+            try
+            {
+                var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
                 return Ok(dtos);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }

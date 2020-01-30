@@ -40,7 +40,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		DOCUMENTATION.md = DOCUMENTATION.md
 		gulpfile.js = gulpfile.js
 		InstallSelfSignedCert.ps1 = InstallSelfSignedCert.ps1
-		karma.conf.js = karma.conf.js
 		package.json = package.json
 		paths.config.js = paths.config.js
 		protractor.conf.js = protractor.conf.js
@@ -54,7 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gulp", "gulp", "{8E3F47CB-D
 	ProjectSection(SolutionItems) = preProject
 		gulp\deploy.js = gulp\deploy.js
 		gulp\linting.js = gulp\linting.js
-		gulp\test.js = gulp\test.js
+		gulp\ui-test.js = gulp\ui-test.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{F9AC0D85-511A-4B8A-A7B0-02763A1BC618}"
@@ -85,6 +84,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
 		DeploymentScripts\RunE2ETestsLocally.ps1 = DeploymentScripts\RunE2ETestsLocally.ps1
 		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
+		DeploymentScripts\runE2ETestsSingle.ps1 = DeploymentScripts\runE2ETestsSingle.ps1
 		DeploymentScripts\VpnCli.ps1 = DeploymentScripts\VpnCli.ps1
 	EndProjectSection
 EndProject

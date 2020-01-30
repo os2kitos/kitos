@@ -26,8 +26,8 @@ namespace Core.DomainModel
 
         public static Config Default(User objectOwner)
         {
-            return new Config()
-                {
+            return new Config
+            {
                     ShowItContractModule = true,
                     ShowItProjectModule = true,
                     ShowItSystemModule = true,

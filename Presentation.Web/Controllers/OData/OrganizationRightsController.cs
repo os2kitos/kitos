@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -14,14 +16,14 @@ namespace Presentation.Web.Controllers.OData
     [InternalApi]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
-        private readonly IUserService _userService;
-        private readonly IAuthenticationService _authService;
+        private readonly IOrganizationRightsService _organizationRightsService;
 
-        public OrganizationRightsController(IGenericRepository<OrganizationRight> repository, IUserService userService, IAuthenticationService authService)
-            : base(repository, authService)
+        public OrganizationRightsController(
+            IGenericRepository<OrganizationRight> repository,
+            IOrganizationRightsService organizationRightsService)
+            : base(repository)
         {
-            _userService = userService;
-            _authService = authService;
+            _organizationRightsService = organizationRightsService;
         }
 
         // GET /Organizations(1)/Rights
@@ -29,7 +31,14 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult GetRights(int orgKey)
         {
-            var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgKey);
+            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
+            {
+                return Forbidden();
+            }
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey);
+
             return Ok(result);
         }
 
@@ -42,182 +51,66 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            var user = _userService.GetUserById(UserId);
-
-            if(entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if(!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if(entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            entity.OrganizationId = orgKey;
-            entity.ObjectOwnerId = UserId;
-
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
-
-            entity.LastChangedByUserId = UserId;
-            
             try
             {
-                entity = Repository.Insert(entity);
-                Repository.Save();
+                var result = _organizationRightsService.AssignRole(orgKey, entity.UserId, entity.Role);
+                if (result.Ok)
+                {
+                    return Created(entity);
+                }
+
+                return FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                Logger.ErrorException("Failed to add right", e);
+                return InternalServerError();
             }
-
-            return Created(entity);
         }
 
         /// <summary>
-        /// Always Use 403 - POST /Organizations(orgKey)/Rights instead
+        /// Always Use 405 - POST /Organizations(orgKey)/Rights instead
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return StatusCode(HttpStatusCode.Forbidden);
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         // DELETE /Organizations(1)/Rights(1)
         [ODataRoute("Organizations({orgKey})/Rights({key})")]
         public IHttpActionResult DeleteRights(int orgKey, int key)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var user = _userService.GetUserById(UserId);
-
-            if (entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
-
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
+            return PerformDelete(key);
         }
 
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            if (entity == null)
-                return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
-
-            var user = _userService.GetUserById(UserId);
-
-            if (entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
+            return entity == null ?
+                NotFound() :
+                PerformDelete(entity.Id);
         }
 
-        public override IHttpActionResult Patch(int key, Delta<OrganizationRight> delta)
+        private IHttpActionResult PerformDelete(int key)
         {
-            var entity = Repository.GetByKey(key);
-            
-            // does the entity exist?
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
-
-            // check model state
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
-                // patch the entity
-                delta.Patch(entity);
-                Repository.Save();
+                var result = _organizationRightsService.RemoveRole(key);
+
+                if (result.Ok)
+                {
+                    return StatusCode(HttpStatusCode.NoContent);
+                }
+
+                return FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
-
-            // add the request header "Prefer: return=representation"
-            // if you want the updated entity returned,
-            // else you'll just get 204 (No Content) returned
-            return Updated(entity);
         }
     }
 }

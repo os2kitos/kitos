@@ -6,7 +6,7 @@
             controller: 'system.EditCtrl',
             resolve: {
                 itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id)
+                    return $http.get("api/itsystem/" + $stateParams.id) 
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -34,10 +34,11 @@
 
     app.controller('system.EditCtrl',
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights',
-            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','SystemDeletedErrorResponseTranslationService',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
+               
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
@@ -116,12 +117,7 @@
                             $state.go('it-system.catalog');
                         })
                         .error(function (data, status) {
-                            if (status === 409)
-                                msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
-                            else if (status === 401)
-                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
-                            else
-                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                            msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(status , data.response));
                         });
                 }
             }

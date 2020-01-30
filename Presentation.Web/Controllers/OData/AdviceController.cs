@@ -1,33 +1,31 @@
 ﻿using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Hangfire;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Results;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
     using Core.DomainModel.AdviceSent;
     using System.Net;
 
-    [PublicApi]
+    [InternalApi]
     public class AdviceController : BaseEntityController<Advice>
     {
-        readonly IAdviceService _adviceService;
-        readonly IGenericRepository<Advice> _repository;
-        readonly IGenericRepository<AdviceSent> _sentRepository;
+        private readonly IAdviceService _adviceService;
+        private readonly IGenericRepository<Advice> _repository;
+        private readonly IGenericRepository<AdviceSent> _sentRepository;
 
-        public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
-            : base(repository, authService)
+        public AdviceController(
+            IAdviceService adviceService, 
+            IGenericRepository<Advice> repository, 
+            IGenericRepository<AdviceSent> sentRepository)
+            : base(repository)
         {
             _adviceService = adviceService;
             _repository = repository;
@@ -53,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
                     _repository.Save();
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to add advice",e);
                     return InternalServerError(e);
                 }
 
@@ -112,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
                         }
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to schedule advice", e);
                     return InternalServerError(e);
                 }
             }
@@ -180,41 +178,12 @@ namespace Presentation.Web.Controllers.OData
                 }
                 catch (Exception e)
                 {
-                    //todo log error
+                    Logger.ErrorException("Failed to update advice", e);
                     return InternalServerError(e);
                 }
             }
             
             return response;
-        }
-
-        [EnableQuery]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
-        public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
-        {
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
-
-            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-                return Ok(Repository.AsQueryable().Where(x=> x.RelationId == id && x.Type == type));
-
-            return Ok(Repository.AsQueryable()
-                    .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
-        }
-
-        [EnableQuery]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
-        {
-            var currentOrgId = AuthService.GetCurrentOrganizationId(UserId);
-            if (orgKey != currentOrgId)
-            {
-                return Forbidden();
-            }
-
-            var result = _adviceService.GetAdvicesForOrg(orgKey);
-
-            return Ok(result.AsQueryable());
         }
 
         [EnableQuery]
@@ -232,7 +201,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (!AllowDelete(entity))
             {
                 return Forbidden();
             }
@@ -252,6 +221,7 @@ namespace Presentation.Web.Controllers.OData
             }
             catch (Exception e)
             {
+                Logger.ErrorException("Failed to delete advice", e);
                 return InternalServerError(e);
             }
 

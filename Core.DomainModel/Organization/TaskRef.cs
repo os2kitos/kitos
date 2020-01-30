@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.DomainModel.Organization
 {
@@ -7,23 +9,17 @@ namespace Core.DomainModel.Organization
     /// Represents a task (such as KLE), which can be associated
     /// with Systems, Projects or Organization Units.
     /// </summary>
-    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasAccessModifier, IContextAware, IOrganizationModule
+    public class TaskRef : Entity, IHierarchy<TaskRef>
     {
         public TaskRef()
         {
             this.Children = new List<TaskRef>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
+            this.ItSystemUsagesOptOut = new List<ItSystemUsage.ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
+            this.Usages = new List<TaskUsage>();
         }
-
-        /// <summary>
-        /// Gets or sets the access modifier.
-        /// </summary>
-        /// <value>
-        /// The access modifier.
-        /// </value>
-        public AccessModifier AccessModifier { get; set; }
 
         /// <summary>
         /// Global ID
@@ -83,20 +79,5 @@ namespace Core.DomainModel.Organization
         /// List of inherited IT System tasks not currently used by an ItSystemUsage
         /// </summary>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsagesOptOut { get; set; }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            if (OwnedByOrganizationUnit != null)
-                return OwnedByOrganizationUnit.IsInContext(organizationId);
-
-            return false;
-        }
     }
 }

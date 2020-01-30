@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
@@ -17,6 +18,12 @@ namespace Core.ApplicationServices.Authorization
         /// <param name="organizationId"></param>
         /// <returns></returns>
         OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
+        /// <summary>
+        /// Determines read access level of the entity type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        EntityReadAccessLevel GetReadAccessLevel<T>();
         /// <summary>
         /// Determines if read-access is allowed for the provided entity
         /// </summary>
@@ -48,15 +55,10 @@ namespace Core.ApplicationServices.Authorization
         /// <returns></returns>
         bool AllowDelete(IEntity entity);
         /// <summary>
-        /// Determines if write-access is allowed to entity's visibility control
+        /// Determines if the current context allows for the permission
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="permission"></param>
         /// <returns></returns>
-        bool AllowEntityVisibilityControl(IEntity entity);
-        /// <summary>
-        /// Determines if the current context allows system migration
-        /// </summary>
-        /// <returns></returns>
-        bool AllowSystemUsageMigration();
+        bool HasPermission(Permission permission);
     }
 }

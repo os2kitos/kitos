@@ -16,7 +16,7 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth","$location",
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location",
         ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];

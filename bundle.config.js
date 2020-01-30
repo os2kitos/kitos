@@ -43,11 +43,11 @@ module.exports = {
         bower("/angular-messages/angular-messages.min.js"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
         bower("/angular-ui-tinymce/src/tinymce.js"),
-        bower("/ZingChart-AngularJS/src/zingchart-angularjs.js"),
         bower("/angular-route/angular-route.js"),
         bower("/ngstorage/ngstorage.js"),
         bower("/angular-base64/angular-base64.js"),
-        bower("/oidc-angular/oidc-angular.js")
+        bower("/oidc-angular/oidc-angular.js"),
+        npm("/angular-cookies/angular-cookies.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
@@ -65,6 +65,7 @@ module.exports = {
         appReport("services/stimulsoftService.js"),
         app("services/ReportService.js"),
         app("services/userServices.js"),
+        app("interceptors/csrfRequestInterceptor.js"),
         appReport("report-viewer.controller.js")
     ],
     appReportBundle: "appReport-bundle.min.js",

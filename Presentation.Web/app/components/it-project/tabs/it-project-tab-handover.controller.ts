@@ -22,7 +22,6 @@
                             var rights = rightResult.data.response;
 
                             //get the role names
-                            //return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             return $http.get("odata/ItProjectRoles?%24format=json&%24top=100&%24orderby=priority+desc&%24count=true")
                                 .then(function(roleResult) {
                                     var roles: { Name }[] = roleResult.data.value;
@@ -74,11 +73,19 @@
                 if (newValue.length > oldValue.length) {
                     // something was added
                     var addId = _.difference(newValue, oldValue);
-                    $http.post($scope.autosaveUrl + "?participantId=" + addId);
+                    if (!_.isUndefined(addId)) {
+                        for (var j = 0; j < addId.length; j++) {
+                            $http.post($scope.autosaveUrl + "?participantId=" + addId[j]);
+                        }
+                    }
                 } else if (newValue.length < oldValue.length) {
                     // something was removed
                     var removeId = _.difference(oldValue, newValue);
-                    $http.delete($scope.autosaveUrl + "?participantId=" + removeId);
+                    if (!_.isUndefined(removeId)) {
+                        for (var i = 0; i < removeId.length; i++) {
+                            $http.delete($scope.autosaveUrl + "?participantId=" + removeId[i]);
+                        }
+                    }
                 }
             });
         }]);

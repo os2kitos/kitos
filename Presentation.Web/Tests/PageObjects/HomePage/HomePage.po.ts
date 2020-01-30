@@ -20,5 +20,4 @@ class HomePagePo implements IPageObject {
         return this.ec.visibilityOf(this.loginFormField);
     }
 }
-
 export = HomePagePo;

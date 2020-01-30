@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 
 namespace Core.ApplicationServices
@@ -62,7 +63,11 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         public Stream ExportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
         {
-            var orgUnits = _orgUnitRepository.Get(x => x.OrganizationId == organizationId).ToList();
+            var orgUnits = _orgUnitRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .ToList();
+
             var set = new DataSet();
             set.Tables.Add(GetOrganizationTable(orgUnits));
 

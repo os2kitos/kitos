@@ -32,8 +32,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.Equal(2, systems.Count);
-            Assert.True(systems.Contains(includedWithOrgMatch));
-            Assert.True(systems.Contains(includedWithAccessMatch));
+            Assert.Contains(includedWithOrgMatch, systems);
+            Assert.Contains(includedWithAccessMatch, systems);
         }
 
         private ItSystem CreateItSystem(int organizationId, AccessModifier accessModifier)

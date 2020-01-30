@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
@@ -14,15 +13,14 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
+    public class DataRowController : GenericApiController<DataRow, DataRowDTO>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
 
         public DataRowController(
             IGenericRepository<DataRow> repository,
-            IGenericRepository<ItInterface> interfaceRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+            IGenericRepository<ItInterface> interfaceRepository)
+            : base(repository)
         {
             _interfaceRepository = interfaceRepository;
         }
@@ -35,7 +33,8 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.Get(x => x.ItInterfaceId == interfaceId);
                 if (item == null) return NotFound();
 
-                var dto = Map(item);
+
+                var dto = Map(item.Where(AllowRead));
                 return Ok(dto);
             }
             catch (Exception e)
@@ -46,7 +45,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<DataRow>(x => _interfaceRepository.AsQueryable().ById(x.ItInterfaceId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<DataRow, ItInterface>(x => _interfaceRepository.GetByKey(x.ItInterfaceId), base.GetCrudAuthorization());
         }
     }
 }

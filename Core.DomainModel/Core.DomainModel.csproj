@@ -52,17 +52,24 @@
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="AttachedOption.cs" />
+    <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
+    <Compile Include="KLE\KLEChange.cs" />
+    <Compile Include="KLE\KLEChangeType.cs" />
+    <Compile Include="KLE\KLEMostRecent.cs" />
+    <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="OptionHasChecked.cs" />
@@ -211,6 +218,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

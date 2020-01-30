@@ -67,7 +67,7 @@
             };
             $scope.updateDefaultOrgUnit = function() {
                 userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function (newUser) {
-                    var updatedUser = userService.getUser().then(
+                    userService.getUser().then(
                         (data) => { return data });
                     //init(newUser);
                     notify.addSuccessMessage("Feltet er opdateret!");

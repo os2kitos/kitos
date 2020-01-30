@@ -1,6 +1,6 @@
 # OS2KITOS
 
-The OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)
+OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)
 for OS2 - Offentligt digitaliseringsfællesskab (https://os2.eu/).
 
 Copyright (c) 2014, OS2 - Offentligt digitaliseringsfællesskab.

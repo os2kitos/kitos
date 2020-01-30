@@ -5,7 +5,10 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -13,12 +16,21 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class DataProtectionAdvisorController : GenericApiController<DataProtectionAdvisor, DataProtectionAdvisorDTO>
     {
-        IGenericRepository<DataProtectionAdvisor> _repository;
-        IGenericRepository<Organization> _orgRepository;
-        public DataProtectionAdvisorController(IGenericRepository<DataProtectionAdvisor> repository, IGenericRepository<Organization> orgRepository) : base(repository)
+        private readonly IGenericRepository<DataProtectionAdvisor> _repository;
+        private readonly IGenericRepository<Organization> _orgRepository;
+
+        public DataProtectionAdvisorController(
+            IGenericRepository<DataProtectionAdvisor> repository,
+            IGenericRepository<Organization> orgRepository)
+            : base(repository)
         {
             _repository = repository;
             _orgRepository = orgRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<DataProtectionAdvisor, Organization>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId
@@ -39,21 +51,26 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 
                 //create object if it doesnt exsist
-                if (item == null) {
-                    try {
-                        _repository.Insert(new DataProtectionAdvisor {
+                if (item == null)
+                {
+                    try
+                    {
+                        _repository.Insert(new DataProtectionAdvisor
+                        {
                             OrganizationId = organization.Id,
                             ObjectOwnerId = organization.ObjectOwnerId,
                             LastChangedByUserId = KitosUser.Id
                         });
                         _repository.Save();
                         item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
-                    } catch(Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         return LogError(e);
                     }
                 };
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }

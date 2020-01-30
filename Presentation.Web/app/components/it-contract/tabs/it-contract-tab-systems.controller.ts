@@ -59,11 +59,8 @@
 
             $scope.deleteExhibit = function (exhibitId, usageId) {
                 $http({
-                    method: "PATCH",
-                    url: "api/itInterfaceExhibitUsage/?usageId=" + usageId + "&exhibitId=" + exhibitId,
-                    data: {
-                        itContractId: null
-                    }
+                    method: "DELETE",
+                    url: "api/itInterfaceExhibitUsage/?usageId=" + usageId + "&exhibitId=" + exhibitId
                 })
                     .success(function () {
                         notify.addSuccessMessage("Snitfladerelationen er slettet.");
@@ -76,11 +73,8 @@
 
             $scope.deleteUsed = function (usageId, sysId, interfaceId) {
                 $http({
-                    method: "PATCH",
-                    url: "api/ItInterfaceUsage/?usageId=" + usageId + "&sysId=" + sysId + "&interfaceId=" + interfaceId + "&organizationId=" + user.currentOrganizationId,
-                    data: {
-                        itContractId: null
-                    }
+                    method: "DELETE",
+                    url: "api/ItInterfaceUsage/?usageId=" + usageId + "&sysId=" + sysId + "&interfaceId=" + interfaceId + "&organizationId=" + user.currentOrganizationId
                 })
                     .success(function () {
                         notify.addSuccessMessage("Snitfladerelationen er slettet.");

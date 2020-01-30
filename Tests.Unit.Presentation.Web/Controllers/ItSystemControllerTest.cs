@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Core.ApplicationServices;
+using System.Net.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -10,6 +11,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
@@ -34,12 +36,11 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _sut = new ItSystemController(
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
-                _systemService.Object,
-                new ReferenceService(),
-                _authorizationContext.Object
+                _systemService.Object
                 );
 
             SetupControllerFrorTest(_sut);
+            _sut.AuthorizationContext = _authorizationContext.Object;
         }
 
         [Fact]
@@ -108,7 +109,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -122,7 +123,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -132,20 +133,20 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(OperationResult.Conflict)]
-        [InlineData(OperationResult.BadInput)]
-        [InlineData(OperationResult.UnknownError)]
-        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationResult operationResult)
+        [InlineData(OperationFailure.Conflict, HttpStatusCode.Conflict)]
+        [InlineData(OperationFailure.BadInput, HttpStatusCode.BadRequest)]
+        [InlineData(OperationFailure.UnknownError, HttpStatusCode.InternalServerError)]
+        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationFailure operationResult, HttpStatusCode expectedStatusCode)
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(operationResult));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(operationResult));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
 
             //Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, responseMessage.StatusCode);
+            Assert.Equal(expectedStatusCode, responseMessage.StatusCode);
         }
 
         [Fact]
@@ -155,7 +156,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             var itSystemId = A<int>();
             var usingOrganizations = Many<UsingOrganization>().ToList();
 
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(usingOrganizations));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(usingOrganizations));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -185,12 +186,76 @@ namespace Tests.Unit.Presentation.Web.Controllers
                         })));
         }
 
+        [Theory]
+        [InlineData(SystemDeleteResult.InUse, SystemDeleteConflict.InUse)]
+        [InlineData(SystemDeleteResult.HasChildren, SystemDeleteConflict.HasChildren)]
+        [InlineData(SystemDeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits)]
+        public void Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult deleteResult, SystemDeleteConflict deleteConflict)
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, deleteResult);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, responseMessage.StatusCode);
+            var responseValue = ExpectResponseOf<string>(responseMessage);
+            Assert.Equal(deleteConflict, Enum.Parse(typeof(SystemDeleteConflict), responseValue));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.Forbidden, SystemDeleteResult.Forbidden)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.InUse)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasChildren)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasInterfaceExhibits)]
+        [InlineData(HttpStatusCode.NotFound, SystemDeleteResult.NotFound)]
+        [InlineData(HttpStatusCode.InternalServerError, SystemDeleteResult.UnknownError)]
+        public void Delete_Returns_Failed(HttpStatusCode code, SystemDeleteResult result)
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, result);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(code, responseMessage.StatusCode);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, SystemDeleteResult.Ok);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+        }
+
+        private HttpResponseMessage DeleteSystem(int systemId)
+        {
+            return _sut.Delete(systemId, 0); // OrgId is only a route qualifier and is therefore not used.
+        }
+
         private void ExpectGetUsingOrganizationsReturn(
             int itSystemId,
-            Result<OperationResult, IReadOnlyList<UsingOrganization>> result)
+            Result<IReadOnlyList<UsingOrganization>,OperationFailure > result)
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);
+        }
+
+        private void ExpectDeleteSystemReturn(int systemId, SystemDeleteResult deleteResult)
+        {
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(deleteResult);
         }
 
         private void ExpectAllowDeleteReturns(bool allowDelete, ItSystem itSystem)

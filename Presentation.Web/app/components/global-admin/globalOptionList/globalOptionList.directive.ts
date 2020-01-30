@@ -61,13 +61,6 @@
                             url: `${this.optionsUrl}`,
                             dataType: "json"
                         }
-                        //,destroy: {
-                        //    url: (entity) => {
-                        //        return `/odata/Organizations(${this.user.currentOrganizationId})/RemoveUser()`;
-                        //    },
-                        //    dataType: "json",
-                        //    contentType: "application/json"
-                        //},
                     },
                     sort: {
                         field: "priority",
