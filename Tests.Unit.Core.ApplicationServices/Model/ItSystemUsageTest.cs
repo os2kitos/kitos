@@ -26,14 +26,14 @@ namespace Tests.Unit.Core.Model
         public void AddUsageRelationTo_Throws_If_ActiveUser_Is_Null()
         {
             Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(null, new ItSystemUsage(), A<int?>(),
-                A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
+                A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
         }
 
         [Fact]
         public void AddUsageRelationTo_Throws_If_Destination_Is_Null()
         {
             Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(new User(), null, A<int?>(),
-                A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
+                A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
+            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
             AssertErrorResult(result, "Cannot create relation to self", OperationFailure.BadInput);
@@ -63,7 +63,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
+            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.Model
             var itContract = new ItContract { OrganizationId = _sut.OrganizationId + 1 };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
@@ -116,7 +116,7 @@ namespace Tests.Unit.Core.Model
 
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, interfaceId, A<string>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(new User(), destination, interfaceId, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Interface is not exposed by the target system", OperationFailure.BadInput);
@@ -152,11 +152,10 @@ namespace Tests.Unit.Core.Model
             var itContract = new ItContract { OrganizationId = _sut.OrganizationId };
             var frequencyType = new RelationFrequencyType();
             var description = A<string>();
-            var linkName = A<string>();
-            var linkUrl = A<string>();
+            var reference = A<string>();
 
             //Act
-            var result = _sut.AddUsageRelationTo(activeUser, destination, interfaceId, description, linkName, linkUrl, frequencyType, itContract);
+            var result = _sut.AddUsageRelationTo(activeUser, destination, interfaceId, description, reference, frequencyType, itContract);
 
             //Assert
             Assert.True(result.Ok);
@@ -170,10 +169,7 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(destination, newRelation.RelationTarget);
             Assert.Equal(description, newRelation.Description);
             Assert.NotNull(newRelation.Reference);
-            Assert.Equal(linkName,newRelation.Reference.Name);
-            Assert.Equal(linkUrl,newRelation.Reference.Url);
-            Assert.Equal(objectOwner,newRelation.Reference.ObjectOwner);
-            Assert.Equal(activeUser,newRelation.Reference.LastChangedByUser);
+            Assert.Equal(reference, newRelation.Reference);
             Assert.Equal(activeUser, _sut.LastChangedByUser);
         }
 

@@ -424,19 +424,18 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Defines how this system uses other systems.
         /// </summary>
-        public ICollection<SystemRelation> UsageRelations { get; set; }
+        public virtual ICollection<SystemRelation> UsageRelations { get; set; }
         /// <summary>
         /// Defines how this system is used by other systems
         /// </summary>
-        public ICollection<SystemRelation> UsedByRelations { get; set; }
+        public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             User activeUser,
             ItSystemUsage destination,
             int? interfaceId,
             string description,
-            string linkName,
-            string linkUrl,
+            string reference,
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
@@ -475,14 +474,7 @@ namespace Core.DomainModel.ItSystemUsage
                 AssociatedContract = targetContract.GetValueOrDefault(),
                 RelationInterface = exposedInterface.GetValueOrDefault(),
                 UsageFrequency = targetFrequency.GetValueOrDefault(),
-                Reference =
-                {
-                    Name = linkName,
-                    Url = linkUrl,
-                    ObjectOwner = ObjectOwner,
-                    LastChangedByUser = activeUser,
-                    LastChanged = DateTime.Now
-                },
+                Reference = reference,
                 ObjectOwner = ObjectOwner,
                 LastChangedByUser = activeUser,
                 LastChanged = DateTime.Now
@@ -534,5 +526,24 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         #endregion
+
+        public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
+        {
+            var relationResult = GetRelation(relationId);
+
+            if (!relationResult.HasValue)
+            {
+                return OperationFailure.NotFound;
+            }
+
+            var relation = relationResult.Value;
+            UsageRelations.Remove(relation);
+            return relation;
+        }
+
+        public Maybe<SystemRelation> GetRelation(int relationId)
+        {
+            return UsageRelations.FirstOrDefault(r => r.Id == relationId);
+        }
     }
 }

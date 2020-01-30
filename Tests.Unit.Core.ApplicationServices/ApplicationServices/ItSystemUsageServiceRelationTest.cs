@@ -10,7 +10,9 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices
@@ -27,6 +29,9 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IItContractRepository> _mockContractRepository;
         private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _mockOptionsService;
         private readonly Mock<IOrganizationalUserContext> _mockOrganizationalUserContext;
+        private readonly Mock<IGenericRepository<SystemRelation>> _mockSystemRelationRepository;
+        private readonly Mock<ITransactionManager> _mockTransactionManager;
+        private readonly Mock<ILogger> _mockLogger;
         private readonly Mock<ItInterface> _mockSourceSystemInterface;
 
         public ItSystemUsageServiceRelationTest()
@@ -37,6 +42,9 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockContractRepository = new Mock<IItContractRepository>();
             _mockOptionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
             _mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
+            _mockSystemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
+            _mockTransactionManager = new Mock<ITransactionManager>();
+            _mockLogger = new Mock<ILogger>();
             _mockSourceSystemInterface = new Mock<ItInterface>();
             _mockSourceSystemInterface.Object.Id = 21;
             _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
@@ -60,7 +68,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockSystemRepository.Object,
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object);
+                _mockOrganizationalUserContext.Object,
+                _mockLogger.Object,
+                _mockTransactionManager.Object,
+                _mockSystemRelationRepository.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId);
@@ -89,7 +100,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockSystemRepository.Object,
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object);
+                _mockOrganizationalUserContext.Object,
+                _mockLogger.Object,
+                _mockTransactionManager.Object,
+                _mockSystemRelationRepository.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, replacementSystemUsageId, null);
@@ -120,7 +134,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockSystemRepository.Object,
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object);
+                _mockOrganizationalUserContext.Object,
+                _mockLogger.Object,
+                _mockTransactionManager.Object,
+                _mockSystemRelationRepository.Object);
 
             // Act
             var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, TargetSystemUsageId, 100);

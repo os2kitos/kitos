@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 
 namespace Presentation.Web.Controllers.API
@@ -35,13 +36,12 @@ namespace Presentation.Web.Controllers.API
                 relation.TargetUsageId,
                 relation.InterfaceId,
                 relation.Description,
-                relation.LinkName,
-                relation.LinkUrl,
+                relation.Reference,
                 relation.FrequencyTypeId,
                 relation.ContractId);
 
-            return Either(result,
-                onSuccess: value => Created($"system-usages/{relation.SourceUsageId}/usage-relations/{value.Id}"),
+            return result.Match(
+                onSuccess: systemRelation => Created(MapRelation(systemRelation), new Uri(Request.RequestUri + $"/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")),
                 onFailure: FromOperationError);
         }
 
@@ -51,14 +51,37 @@ namespace Presentation.Web.Controllers.API
         {
             var result = _usageService.GetRelations(systemUsageId);
 
-            return Either(result,
+            return result.Match(
                 onSuccess: value => Ok(MapRelations(value)),
                 onFailure: FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("from/{systemUsageId}/{relationId}")]
+        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId, int relationId)
+        {
+            var result = _usageService.GetRelation(systemUsageId, relationId);
+
+            return result.Match(
+                onSuccess: relation => Ok(MapRelation(relation)),
+                onFailure: FromOperationFailure);
+        }
+
+        [HttpDelete]
+        [Route("from/{systemUsageId}/{relationId}")]
+        public HttpResponseMessage DeleteRelationsFromSystem(int systemUsageId, int relationId)
+        {
+            var result = _usageService.RemoveRelation(systemUsageId, relationId);
+
+            return result.Match(
+                onSuccess: _ => NoContent(),
+                onFailure: FromOperationFailure);
         }
 
         private static SystemRelationDTO[] MapRelations(IEnumerable<SystemRelation> systemRelations)
         {
             return systemRelations
+                .OrderBy(relation => relation.Id)
                 .Select(MapRelation)
                 .ToArray();
         }
@@ -67,11 +90,11 @@ namespace Presentation.Web.Controllers.API
         {
             return new SystemRelationDTO
             {
+                Id = relation.Id,
                 Source = relation.RelationSource.MapToNamedEntityDTO(),
                 Destination = relation.RelationTarget.MapToNamedEntityDTO(),
                 Description = relation.Description,
-                LinkName = relation.Reference.Name,
-                LinkUrl = relation.Reference.Url,
+                Reference = relation.Reference,
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
                 FrequencyType = relation.UsageFrequency?.MapToNamedEntityDTO(),
                 Interface = relation.RelationInterface?.MapToNamedEntityDTO()

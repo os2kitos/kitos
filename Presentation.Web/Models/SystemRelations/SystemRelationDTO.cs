@@ -9,7 +9,6 @@
         public NamedEntityDTO Contract { get; set; }
         public NamedEntityDTO FrequencyType { get; set; }
         public string Description { get; set; }
-        public string LinkName { get; set; }
-        public string LinkUrl { get; set; }
+        public string Reference { get; set; }
     }
 }

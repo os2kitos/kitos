@@ -13,7 +13,9 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -46,7 +48,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _systemRepository.Object,
                 _contractRepository.Object,
                 _optionsService.Object,
-                _userContext.Object);
+                _userContext.Object,
+                Mock.Of<ILogger>(),
+                Mock.Of<ITransactionManager>(),
+                Mock.Of<IGenericRepository<SystemRelation>>());
         }
 
         [Fact]
@@ -286,7 +291,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetUsageByKeyReturns(sourceId, null);
 
             //Act
-            var result = _sut.AddRelation(sourceId, A<int>(), null, A<string>(), A<string>(), A<string>(), null, null);
+            var result = _sut.AddRelation(sourceId, A<int>(), null, A<string>(), A<string>(), null, null);
 
             //Assert
             AssertAddRelationError(result, OperationFailure.NotFound, "Source not found");
@@ -303,7 +308,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
 
             //Act
-            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), null, null);
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), null, null);
 
             //Assert
             AssertAddRelationError(result, OperationFailure.BadInput, "Destination could not be found");
@@ -324,7 +329,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(source, false);
 
             //Act
-            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), A<int>(), null);
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<int>(), null);
 
             //Assert
             AssertAddRelationError(result, OperationFailure.Forbidden, Maybe<string>.None);
@@ -347,7 +352,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId + 1 });
 
             //Act
-            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, null);
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), frequencyId, null);
 
             //Assert
             AssertAddRelationError(result, OperationFailure.BadInput, "Frequency type is not available in the organization");
@@ -373,7 +378,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(default(ItContract));
 
             //Act
-            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, contractId);
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), frequencyId, contractId);
 
             //Assert
             AssertAddRelationError(result, OperationFailure.BadInput, "Contract id does not point to a valid contract");
@@ -399,7 +404,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(new ItContract() { OrganizationId = source.OrganizationId });
 
             //Act
-            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), A<string>(), frequencyId, contractId);
+            var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), frequencyId, contractId);
 
             //Assert
             Assert.True(result.Ok);

@@ -13,19 +13,88 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class SystemRelationsTest : WithAutoFixture
     {
+        private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
+
         [Fact]
         public async Task Post_SystemRelation_Returns_201()
         {
             //Arrange
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var input = await PrepareFullRelationAsync();
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
-            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
-            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
-            var targetInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, organizationId, AccessModifier.Public));
+            //Act
+            using (var response = await ItSystemHelper.SendPostRelationAsync(input))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relations = (await ItSystemHelper.GetRelationsAsync(input.SourceUsageId)).ToList();
+                Assert.Single(relations);
+                var dto = relations.Single();
+                Assert.Equal(input.SourceUsageId, dto.Source.Id);
+                Assert.Equal(input.TargetUsageId, dto.Destination.Id);
+                Assert.Equal(input.Description, dto.Description);
+                Assert.Equal(input.Reference, dto.Reference);
+                Assert.Equal(input.ContractId.Value, dto.Contract.Id);
+                Assert.Equal(input.InterfaceId.Value, dto.Interface.Id);
+                Assert.Equal(input.FrequencyTypeId.Value, dto.FrequencyType.Id);
+            }
+        }
+
+        [Fact]
+        public async Task Delete_SystemRelation_Returns_204()
+        {
+            //Arrange
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, OrganizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, OrganizationId);
+
+            var input = new CreateSystemRelationDTO
+            {
+                SourceUsageId = usage1.Id,
+                TargetUsageId = usage2.Id,
+                Description = A<string>(),
+                Reference = A<string>(),
+            };
+
+            using (var response = await ItSystemHelper.SendPostRelationAsync(input))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var createdRelation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+
+                //Act
+                using (var deleteResponse = await ItSystemHelper.SendDeleteRelationAsync(usage1.Id, createdRelation.Id))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Can_Delete_SystemUsageWithRelations()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync();
+
+            using (await ItSystemHelper.SendPostRelationAsync(input))
+            using (var deletionResponse = await ItSystemHelper.SendRemoveUsageAsync(input.SourceUsageId, OrganizationId))
+            using (var getAfterDeleteResponse = await ItSystemHelper.SendGetRelationAsync(input.SourceUsageId, OrganizationId))
+            {
+                Assert.Equal(HttpStatusCode.OK, deletionResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
+            }
+        }
+
+        private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync()
+        {
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, OrganizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, OrganizationId);
+            var targetInterface = await InterfaceHelper.CreateInterface(
+                InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
             await InterfaceExhibitHelper.CreateExhibit(system2.Id, targetInterface.Id);
-            var contract = await ItContractHelper.CreateContract(CreateName(), organizationId);
+            var contract = await ItContractHelper.CreateContract(CreateName(), OrganizationId);
 
             var targetFrequencyTypeId = DatabaseAccess.MapFromEntitySet<RelationFrequencyType, int>(repo =>
             {
@@ -42,19 +111,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 ContractId = contract.Id,
                 InterfaceId = targetInterface.Id,
                 Description = A<string>(),
-                LinkName = A<string>(),
-                LinkUrl = A<string>(),
+                Reference = A<string>(),
                 FrequencyTypeId = targetFrequencyTypeId
             };
-
-            //Act
-            using (var response = await ItSystemHelper.SendPostRelationAsync(input))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                var relations = (await ItSystemHelper.GetRelationsAsync(usage1.Id)).ToList();
-                Assert.Equal(1,relations.Count);
-            }
+            return input;
         }
 
         //TODO: Test that it system can be deleted without any nasty bindings

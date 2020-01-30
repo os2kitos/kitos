@@ -179,11 +179,6 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
 
-        protected new HttpResponseMessage Either<TSuccess, TFailure>(Result<TSuccess, TFailure> result, Func<TSuccess, HttpResponseMessage> onSuccess, Func<TFailure, HttpResponseMessage> onFailure)
-        {
-            return result.Ok ? onSuccess(result.Value) : onFailure(result.Error);
-        }
-
         protected User KitosUser => UserContext.UserEntity;
 
         protected int UserId => UserContext.UserId;

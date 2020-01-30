@@ -60,6 +60,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<HttpResponseMessage> SendRemoveUsageAsync(int systemUsageId, int organizationId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={organizationId}"), cookie);
+        }
+
         public static async Task<ItSystemUsageDTO> GetItSystemUsage(int itSystemUsageId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -245,6 +252,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, login, input);
         }
 
+        public static async Task<HttpResponseMessage> SendDeleteRelationAsync(int systemUsageId, int relationId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}/{relationId}");
+
+            return await HttpApi.DeleteWithCookieAsync(url, login);
+        }
+
         public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsAsync(int systemUsageId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -255,6 +270,14 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
             }
+        }
+
+        public static async Task<HttpResponseMessage> SendGetRelationAsync(int systemUsageId, int relationId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}/{relationId}");
+
+            return await HttpApi.GetWithCookieAsync(url, login);
         }
     }
 }

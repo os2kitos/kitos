@@ -8,6 +8,8 @@ namespace Core.DomainModel.Result
 
         private readonly T _value;
 
+        public bool IsNone => !HasValue;
+
         public bool HasValue { get; }
 
         public T Value
