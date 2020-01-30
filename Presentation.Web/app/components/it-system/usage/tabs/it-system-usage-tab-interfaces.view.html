@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{systemUsage.itSystem.name}} <span ng-if="systemUsage.itSystem.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
 
@@ -36,7 +36,7 @@
                         </span>
                     </td>
 
-                    <!-- name of the system -->
+                    <!-- name of the interface -->
                     <td rowspan="{{exposure.numRows || 1}}">
                         <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span data-ng-if="exposure.disabled">(Slettes)</span></a>
                     </td>
