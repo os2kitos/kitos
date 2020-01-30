@@ -24,8 +24,8 @@
         });
     }]);
 
-    app.controller("systemUsage.ExposedInterfaces", ["$scope", "$http", "itSystemUsage", "exhibits", "user",
-        ($scope, $http, itSystemUsage, exhibits, user) => {
+    app.controller("systemUsage.ExposedInterfaces", ["$scope", "itSystemUsage", "exhibits", "user", "lazyLoadingService",
+        ($scope, itSystemUsage, exhibits, user, lazyLoadingService) => {
 
             $scope.systemUsage = itSystemUsage;
 
@@ -37,39 +37,9 @@
 
             $scope.interfaceExposures = exhibits;
 
-            $scope.itSystemUsageSelectOptions = selectLazyLoading("api/itSystemUsage", [`organizationId=${user.organizationId}`]);
-            function selectLazyLoading(url, paramAry) {
-                return {
-                    allowClear: true,
-                    minimumInputLength: 1,
-                    initSelection: (elem, callback) => {
-                    },
-                    ajax: {
-                        data: (term, page) => ({ query: term }),
-                        quietMillis: 500,
-                        transport: queryParams => {
-                            var extraParams = paramAry ? "&" + paramAry.join("&") : "";
-                            var res = $http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
-                            res.abort = () => null;
-
-                            return res;
-                        },
-
-                        results: (data, page) => {
-                            var results = [];
-
-                            _.each(data.data.response, (obj: { id; itSystem; }) => {
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.itSystem.name
-                                });
-                            });
-
-                            return { results: results };
-                        }
-                    }
-                };
-            }
+            $scope.itSystemUsageSelectOptions = lazyLoadingService.selectLazyLoading("api/itSystemUsage", [`organizationId=${user.organizationId}`]);
+            
         }
     ]);
+
 })(angular, app);
