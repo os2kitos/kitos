@@ -45,10 +45,12 @@ type ColumnObjects = {
     catalogUsage: protractor.ElementArrayFinder,
     userApi: protractor.ElementArrayFinder,
     UserEmail: protractor.ElementArrayFinder,
-    systemRightsOwner: protractor.ElementArrayFinder
+    systemRightsOwner: protractor.ElementArrayFinder,
+    activationToggle: protractor.ElementArrayFinder
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
+var byDataField = new CSSLocator().byDataField;
 var consts = new Constants();
 
 class kendoToolbarWrapper {
@@ -114,7 +116,8 @@ class kendoToolbarWrapper {
             referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects),
             referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects),
             usedByName: kendo.getColumnItemLinks(consts.kendoUsedByObject),
-            systemRightsOwner: kendo.getColumnItemLinks(consts.kendoSystemRightsOwnerObject)
+            systemRightsOwner: kendo.getColumnItemLinks(consts.kendoSystemRightsOwnerObject),
+            activationToggle: kendo.getButtons(consts.kendoCatalogUsageObjects)
         };
         return columns;
     }
@@ -143,6 +146,10 @@ class kendoHelper {
 
     public getColumnItemLinks(itemHook: string) {
         return element.all(byDataElementType(itemHook)).all(by.tagName("a"));
+    }
+
+    public getButtons(itemHook: string) {
+        return element.all(byDataElementType(itemHook)).all(by.tagName("button"));
     }
 }
 
