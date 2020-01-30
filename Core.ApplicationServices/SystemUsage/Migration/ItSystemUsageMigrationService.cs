@@ -73,7 +73,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
             if (dataAccessLevel.CurrentOrganization < OrganizationDataReadAccessLevel.Public)
             {
-                return Result<IReadOnlyList<ItSystem>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
@@ -87,48 +87,47 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .ToList()
                 .AsReadOnly();
 
-            return Result<IReadOnlyList<ItSystem>, OperationFailure>.Success(result);
+            return result;
         }
 
         public Result<ItSystemUsageMigration, OperationFailure> GetSystemUsageMigration(int usageId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             // Get usage
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
             if (itSystemUsage == null)
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             // Get system
             var toItSystem = _systemRepository.GetSystem(toSystemId);
             if (toItSystem == null)
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
             if (!_authorizationContext.AllowReads(toItSystem))
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             // Map all contract migrations
             var contractMigrations = GetContractMigrations(itSystemUsage);
 
-            return Result<ItSystemUsageMigration, OperationFailure>.Success(
-                new ItSystemUsageMigration(
-                    systemUsage: itSystemUsage,
-                    fromItSystem: itSystemUsage.ItSystem,
-                    toItSystem: toItSystem,
-                    affectedProjects: itSystemUsage.ItProjects,
-                    affectedContracts: contractMigrations));
+            return new ItSystemUsageMigration(
+                systemUsage: itSystemUsage,
+                fromItSystem: itSystemUsage.ItSystem,
+                toItSystem: toItSystem,
+                affectedProjects: itSystemUsage.ItProjects,
+                affectedContracts: contractMigrations);
         }
 
         private IEnumerable<ItContractMigration> GetContractMigrations(ItSystemUsage itSystemUsage)
@@ -162,7 +161,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             if (!CanExecuteMigration())
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -177,7 +176,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
                     if (migrationConsequences.Ok == false)
                     {
-                        return Result<ItSystemUsage, OperationFailure>.Failure(migrationConsequences.Error);
+                        return migrationConsequences.Error;
                     }
                     var migration = migrationConsequences.Value;
                     var systemUsage = migration.SystemUsage;
@@ -185,25 +184,25 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     //If modification of the target usage is not allowed, bail out
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
-                        return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                        return OperationFailure.Forbidden;
                     }
 
                     // If target equals current system, bail out
                     if (systemUsage.ItSystemId == migration.ToItSystem.Id)
                     {
-                        return Result<ItSystemUsage, OperationFailure>.Success(systemUsage);
+                        return systemUsage;
                     }
 
                     // *************************
                     // *** Perform migration ***
                     // *************************
-                    
+
                     // Migrate interface usages
                     var interfaceMigration = UpdateInterfaceUsages(migration);
                     if (interfaceMigration == false)
                     {
                         transaction.Rollback();
-                        return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
+                        return OperationFailure.UnknownError;
                     }
 
                     // Delete interface exhibit usages
@@ -211,7 +210,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     if (deletedStatus == false)
                     {
                         transaction.Rollback();
-                        return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
+                        return OperationFailure.UnknownError;
                     }
 
                     //***********************************************
@@ -226,13 +225,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     _systemUsageRepository.Update(systemUsage);
 
                     transaction.Commit();
-                    return Result<ItSystemUsage, OperationFailure>.Success(systemUsage);
+                    return systemUsage;
                 }
                 catch (Exception e)
                 {
                     _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                     transaction.Rollback();
-                    return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
+                    return OperationFailure.UnknownError;
                 }
             }
         }

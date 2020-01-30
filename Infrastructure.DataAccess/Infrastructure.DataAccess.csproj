@@ -64,7 +64,6 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
-    <Compile Include="Mapping\ExternalLinkMap.cs" />
     <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
@@ -524,6 +523,14 @@
     <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.cs" />
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.Designer.cs">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.cs" />
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.Designer.cs">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -838,6 +845,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291246020_Fix_SystemRelation.resx">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.resx">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

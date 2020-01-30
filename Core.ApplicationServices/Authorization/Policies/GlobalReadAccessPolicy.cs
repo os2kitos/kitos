@@ -5,7 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
+using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies

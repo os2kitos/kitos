@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.LocalAdminArea
