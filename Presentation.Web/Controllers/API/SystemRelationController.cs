@@ -99,9 +99,7 @@ namespace Presentation.Web.Controllers.API
                 relation.Interface.Id
                 );
 
-            return result.Match(
-                onSuccess: systemRelation => Created(MapRelation(systemRelation), new Uri(Request.RequestUri + $"/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")),
-                onFailure: FromOperationError);
+            return result.Match(onSuccess: systemRelation => Ok(MapRelation(systemRelation)), onFailure: FromOperationError);
         }
 
         #region Helpers
