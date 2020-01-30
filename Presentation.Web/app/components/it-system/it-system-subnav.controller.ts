@@ -14,7 +14,7 @@
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: 'it-system.overview', text: "IT Systemer i " + user.currentOrganizationName},
-                    { state: 'it-system.catalog', text: 'IT System Katalog' },
+                    { state: 'it-system.catalog', text: 'IT Systemkatalog' },
                     { state: 'it-system.interfaceCatalog', text: 'Snitfladekatalog' }
                 ];
                 

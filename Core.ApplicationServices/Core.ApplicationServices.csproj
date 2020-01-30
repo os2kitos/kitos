@@ -108,6 +108,8 @@
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\OptionsService.cs" />
     <Compile Include="TaskRefs\IKLEApplicationService.cs" />
     <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />

@@ -70,16 +70,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ItSystemCategories)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItSystemCategoriesId);
-
-            this.HasMany(x => x.UsageRelations)
-                .WithRequired(x=>x.RelationSource)
-                .HasForeignKey(x=>x.RelationSourceId)
-                .WillCascadeOnDelete(true); //Delete all owned relations when system usage is deleted
-
-            this.HasMany(x => x.UsedByRelations)
-                .WithRequired(x => x.RelationTarget)
-                .HasForeignKey(x => x.RelationTargetId)
-                .WillCascadeOnDelete(false);
         }
     }
 }

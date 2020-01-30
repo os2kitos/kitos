@@ -578,7 +578,7 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-
+        public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
 
     }
 }

@@ -71,5 +71,7 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
 
         public bool Disabled { get; set; }
+
+        public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
     }
 }

@@ -7,6 +7,15 @@ namespace Core.DomainModel.Result
         private readonly Maybe<TFailure> _failure;
         private readonly Maybe<TSuccess> _value;
 
+        public static implicit operator Result<TSuccess, TFailure>(TFailure failure)
+        {
+            return Failure(failure);
+        }
+
+        public static implicit operator Result<TSuccess, TFailure>(TSuccess successValue)
+        {
+            return Success(successValue);
+        }
 
         protected Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
         {
@@ -21,15 +30,27 @@ namespace Core.DomainModel.Result
 
         public bool Ok { get; }
 
+        public bool Failed => !Ok;
+
         public TSuccess Value => _value.Value;
 
         public TFailure Error => _failure.Value;
 
+        /// <summary>
+        /// Consider using implicit ctor in stead
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Result<TSuccess, TFailure> Success(TSuccess value)
         {
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
         }
 
+        /// <summary>
+        /// Consider using the implicit ctor in stead
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Result<TSuccess, TFailure> Failure(TFailure value)
         {
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));

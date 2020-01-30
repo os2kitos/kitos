@@ -12,7 +12,7 @@ using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services

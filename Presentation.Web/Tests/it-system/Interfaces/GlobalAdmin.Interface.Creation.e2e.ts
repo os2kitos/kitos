@@ -8,7 +8,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
     var loginHelper = new Login();
     var pageObject = new ItSystemInterface();
     var testFixture = new TestFixtureWrapper();
-    var interfaceCatalogHelper = new InterfaceCatalogHelper();
 
 
     afterEach(() => {
@@ -40,16 +39,16 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return pageObject.getPage();
             }).then(() => {
                 console.log("Creating interface");
-                return interfaceCatalogHelper.createInterface(iName);
+                return InterfaceCatalogHelper.createInterface(iName);
             }).then(() => {
                 console.log("Creating IT system");
                 return ItSystemHelper.createSystem(sysName);
             }).then(() => {
                 console.log("Inserting data");
-                return interfaceCatalogHelper.insertRandomDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
+                return InterfaceCatalogHelper.insertRandomDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
             }).then(() => {
                 console.log("Verifying data");
-                return interfaceCatalogHelper.verifyRandomDataToInterface(data, sysName, sysInterface, access, org, dataType);
+                return InterfaceCatalogHelper.verifyRandomDataToInterface(data, sysName, sysInterface, access, org, dataType);
             });
     });
 

@@ -22,8 +22,6 @@ namespace Infrastructure.DataAccess
         public KitosContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-            //Disabled by MEMA 23/11-2016 to speed up debug sessions
-            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             Database.Log = null;
         }
 
@@ -143,7 +141,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ContactPerson> ContactPersons { get; set; }
         public DbSet<KLEUpdateHistoryItem> KLEUpdateHistoryItems { get; set; }
         public DbSet<SystemRelation> SystemRelations { get; set; }
-        public DbSet<ExternalLink> ExternalLinks { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -228,7 +225,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
-            modelBuilder.Configurations.Add(new ExternalLinkMap());
             modelBuilder.Configurations.Add(new SystemRelationMap());
         }
     }
