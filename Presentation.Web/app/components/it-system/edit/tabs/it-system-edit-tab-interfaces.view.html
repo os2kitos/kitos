@@ -1,15 +1,12 @@
 ﻿<div class="object-section-container">
-    <h4>{{systemUsage.itSystem.name}} <span ng-if="systemUsage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{system.name}} <span ng-if="system.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
 
         <table class="table table-striped table-condensed">
             <thead data-ng-if="interfaceExposures.length > 0">
                 <tr>
-                    <th>Ønske</th>
-                    <th>Aktiv</th>
                     <th class="col-xs-2">Snitflade</th>
-                    <th class="col-xs-2">Kontrakt ID</th>
                     <th class="col-xs-1">TSA</th>
                     <th class="col-xs-1">Snitfladetype</th>
                     <th class="col-xs-1">Grænseflade</th>
@@ -20,32 +17,10 @@
             </thead>
             <tbody class="small">
                 <tr data-ng-repeat-start="exposure in interfaceExposures">
-                    <!-- wished to be used -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <input type="checkbox" data-ng-model="exposure.usage.isWishedFor"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="isWishedFor"
-                               data-appendurl="{{exposure.urlParams}}"
-                               data-autosave="{{exposure.updateUrl}}" />
-                    </td>
-
-                    <!-- active (depends on contract) -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <span data-ng-if="exposure.usage.itContract.isActive" class="text-success">
-                            <i class="glyphicon glyphicon-ok"></i>
-                        </span>
-                    </td>
 
                     <!-- name of the interface -->
                     <td rowspan="{{exposure.numRows || 1}}">
                         <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span data-ng-if="exposure.disabled">(Slettes)</span></a>
-                    </td>
-
-                    <!-- contract id -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <a data-ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">
-                            {{exposure.usage.itContract.itContractId}}
-                        </a>
                     </td>
 
                     <!-- tsa -->
