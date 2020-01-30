@@ -375,7 +375,6 @@
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
-    <TypeScriptCompile Include="app\services\lazyLoadingService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
