@@ -31,7 +31,7 @@ describe("Only Global Administrator is able to create and fill out an interface"
         var sysInterface = "CSV";
         var access = "Lokal";
         var org = "Fælles Kommune";
-        var DataType = "Sag";
+        var dataType = "Sag";
         var data = getRandomData();
         
         loginHelper.loginAsGlobalAdmin()
@@ -46,10 +46,10 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return ItSystemHelper.createSystem(sysName);
             }).then(() => {
                 console.log("Inserting data");
-                return interfaceCatalogHelper.insertRandomDataToInterface(iName, data, sysName, sysInterface, access, org, DataType);
+                return interfaceCatalogHelper.insertRandomDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
             }).then(() => {
                 console.log("Verifying data");
-                return interfaceCatalogHelper.verifyRandomDataToInterface(data, sysName, sysInterface, access, org, DataType);
+                return interfaceCatalogHelper.verifyRandomDataToInterface(data, sysName, sysInterface, access, org, dataType);
             });
     });
 

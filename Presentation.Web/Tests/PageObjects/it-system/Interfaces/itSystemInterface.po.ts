@@ -6,7 +6,6 @@ import NavigationHelper = require("../../../Utility/NavigationHelper");
 var ec = protractor.ExpectedConditions;
 
 class ItSystemInterfaceCatalog implements IPageObject {
-
     private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
@@ -35,8 +34,5 @@ class ItSystemInterfaceCatalog implements IPageObject {
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
-
-
-
 }
 export = ItSystemInterfaceCatalog;

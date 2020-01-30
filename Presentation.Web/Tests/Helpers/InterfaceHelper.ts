@@ -1,49 +1,35 @@
-﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
-import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
-import WaitTimers = require("../Utility/WaitTimers");
+﻿import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Select2 = require("./Select2Helper");
 import constant = require("../Utility/Constants")
 
 class InterfaceHelper {
-    private const = new constant();
+    private const = new constant();s
     private cssHelper = new CSSLocator();
 
-
     public writeDataToAllInputs(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
-        console.log("Writing data to field: " + this.const.interfaceNameInput);
         return this.writeDataToTextInput(data, this.const.interfaceNameInput)
             .then(() => {
-                console.log("Writing data to field: " + this.const.interfaceIdInput);
                 return this.writeDataToTextInput(data, this.const.interfaceIdInput);
             }).then(() => {
-                console.log("Writing data to field: " + this.const.interfaceVersionInput);
                 return this.writeDataToTextInput(data, this.const.interfaceVersionInput);
             }).then(() => {
-                console.log("Writing data to field: " + this.const.interfaceDescriptionInput);
                 return this.writeDataToTextInput(data, this.const.interfaceDescriptionInput);
             }).then(() => {
-                console.log("Writing data to field: " + this.const.interfaceDescriptionLinkInput);
                 return this.writeDataToTextInput(data, this.const.interfaceDescriptionLinkInput);
             }).then(() => {
-                console.log("Writing data to field: " + this.const.interfaceNoteInput);
                 return this.writeDataToTextInput(data, this.const.interfaceNoteInput);
             }).then(() => {
-                console.log("Entering data into select2 field");
                 return this.selectDataFromSelect2Field(exposedBy, this.const.interfaceSelectExhibit);
             }).then(() => {
-                console.log("Entering data into select2 field");
                 return this.selectDataFromSelect2Field(sysInterface, this.const.interfaceSelectInterface);
             }).then(() => {
-                console.log("Entering data into select2 field");
                 return this.selectDataFromSelect2Field(access, this.const.interfaceSelectAccess);
             }).then(() => {
-                console.log("Entering data into select2 field");
                 return this.selectDataFromSelect2Field(belongsTo, this.const.interfaceSelectBelongs);
             }).then(() => {
                 return this.writeDataToTable(data, dataTypeTable);
             });
     }
-
 
     public verifyDataWasSaved(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
         // text 
@@ -63,7 +49,6 @@ class InterfaceHelper {
         this.verifyDataFromSelect2(dataTypeTable, this.const.interfaceSelectTableDataType);
 
     }
-
 
     private writeDataToTextInput(data: string, ele: string) {
         console.log("Writing " + data + " To " + ele);
@@ -99,6 +84,5 @@ class InterfaceHelper {
             return Select2.waitForDataAndSelect();
         });
     }
-
 }
 export = InterfaceHelper
