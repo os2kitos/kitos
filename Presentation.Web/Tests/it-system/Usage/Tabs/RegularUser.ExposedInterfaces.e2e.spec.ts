@@ -58,7 +58,6 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system details without interface",
             () => {
-                expect("https://localhost:44300/#/system/edit/5/interfaces").toMatch(urlRegex());
                 loginHelper.loginAsRegularUser()
                     .then(() => ItSystemHelper.openSystem(itSystemName))
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
