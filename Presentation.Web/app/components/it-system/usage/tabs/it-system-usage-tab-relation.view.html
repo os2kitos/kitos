@@ -1,0 +1,53 @@
+﻿<div class="object-section-container">
+    <h4> <span ng-if="">(Slettes)</span></h4>
+    <div class="panel panel-default">
+        <div class="panel-heading">har oprettet følgende relationer til andre systemer/snitflader:</div>
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        IT System (udstiller)
+                    </th>
+                    <th>
+                        Snitflade
+                    </th>
+                    <th>
+                        Relationsbeskrivelse
+                    </th>
+                    <th>
+                        Frekvens
+                    </th>
+                    <th>
+                        Kontrakt
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--data-ng-repeat=""-->
+                <tr>
+                    <!-- system name -->
+                    <td>
+                        system name
+                    </td>
+                    <!-- interface -->
+                    <td>
+                         interface
+                    </td>
+                    <!-- Relation Description -->
+                    <td>
+                        Relation Description
+                    </td>
+                    <!-- Frequency -->
+                    <td>
+                        Frequency
+                    </td>
+                    <!-- Contract -->
+                    <td>
+                         Contract
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 5px">Opret relation</button>
+    </div>
+</div>

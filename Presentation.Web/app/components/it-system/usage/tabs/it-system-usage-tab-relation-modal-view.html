@@ -1,0 +1,97 @@
+﻿<div class="modal-header">
+    <div class="clearfix">
+        <h3 class="modal-title pull-left">Opret Relation</h3>
+        <help-text class="pull-right" data-key="relation_create" data-default-title="Opret relation"></help-text>
+    </div>
+</div>
+
+<form name="createForm">
+    <div class="modal-body">
+        <div class="row">
+            <!--Udstiller System-->
+            <div class="col-md-6">
+                <div class="form-group">
+
+                    <select-option data-id="exposedSystem"
+                                   data-label="Snitflade"
+                                   data-placeholder="Vælg udstiller system"
+                                   data-selected-text=""
+                                   data-options=""
+                                   data=""
+                                   data-field="itSystemRelationexposedSystemId">
+                    </select-option>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <!--Snitflade-->
+                <div class="form-group">
+                    <select-option data-id="interface"
+                                   data-label="Snitflade"
+                                   data-placeholder="Vælg Snitflade"
+                                   data-selected-text=""
+                                   data-options=""
+                                   data-field="itSystemRelationInterfaceId">
+                    </select-option>
+                </div>
+                <!--frequency-->
+                <div class="form-group">
+                    <select-option data-id="frequency"
+                                   data-label="Frekvens"
+                                   data-placeholder="Vælg frekvens"
+                                   data-selected-text=""
+                                   data-options="paymentFrequencies"
+                                   data-field="itSystemRelationFrequencyId">
+                    </select-option>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!--Contract-->
+                <div class="form-group">
+                    <select-option data-id="contracts"
+                                   data-label="Kontrakter"
+                                   data-placeholder="Vælg kontrakt"
+                                   data-selected-text=""
+                                   data-options=""
+                                   data-field="itSystemRelationcontractsId">
+                    </select-option>
+                </div>
+                <div class="form-group">
+                    <!--Reference-->
+                    <label class="control-label" for="Reference">Reference</label>
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" data-ng-model="Reference" data-ng-disabled="hasWriteAccess">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <!--Description-->
+                    <label class="control-label" for="description">Beskrivelse</label>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" data-ng-model="description" data-ng-disabled="hasWriteAccess" ></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()">Gem</button>
+
+    </div>
+</form>
+
+
+<script>
+
+    $(document).ready(function() { 
+
+        var sampleArray = [{id:0,text:'enhancement'}, {id:1,text:'bug'}
+            ,{id:2,text:'duplicate'},{id:3,text:'invalid'}
+            ,{id:4,text:'wontfix'}];
+
+        $("#exposedSystem").select2({ data: sampleArray });
+
+    });
+</script>
