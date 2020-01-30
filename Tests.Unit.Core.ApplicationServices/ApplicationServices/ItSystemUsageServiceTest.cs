@@ -13,7 +13,9 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -46,7 +48,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _systemRepository.Object,
                 _contractRepository.Object,
                 _optionsService.Object,
-                _userContext.Object);
+                _userContext.Object,
+                Mock.Of<ILogger>(),
+                Mock.Of<ITransactionManager>(),
+                Mock.Of<IGenericRepository<SystemRelation>>());
         }
 
         [Fact]

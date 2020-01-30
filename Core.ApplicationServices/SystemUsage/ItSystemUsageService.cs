@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
@@ -11,6 +12,9 @@ using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
+using Serilog;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage
 {
@@ -22,6 +26,9 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IItContractRepository _contractRepository;
         private readonly IOptionsService<SystemRelation, RelationFrequencyType> _frequencyService;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<SystemRelation> _relationRepository;
+        private readonly ILogger _logger;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -29,7 +36,10 @@ namespace Core.ApplicationServices.SystemUsage
             IItSystemRepository systemRepository,
             IItContractRepository contractRepository,
             IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            ILogger logger,
+            ITransactionManager transactionManager,
+            IGenericRepository<SystemRelation> relationRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -37,6 +47,9 @@ namespace Core.ApplicationServices.SystemUsage
             _contractRepository = contractRepository;
             _frequencyService = frequencyService;
             _userContext = userContext;
+            _transactionManager = transactionManager;
+            _relationRepository = relationRepository;
+            _logger = logger;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
@@ -180,12 +193,64 @@ namespace Core.ApplicationServices.SystemUsage
             }
 
             var systemUsage = itSystemUsage.Value;
-            if (!_authorizationContext.AllowModify(systemUsage))
+            if (!_authorizationContext.AllowReads(systemUsage))
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
 
             return systemUsage.UsageRelations.ToList();
+        }
+
+        public Result<SystemRelation, OperationFailure> RemoveRelation(int systemUsageId, int relationId)
+        {
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            {
+                Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+                if (systemUsage.IsNone)
+                {
+                    return OperationFailure.NotFound;
+                }
+
+                var usage = systemUsage.Value;
+                if (!_authorizationContext.AllowModify(usage))
+                {
+                    return OperationFailure.Forbidden;
+                }
+
+                var removalResult = usage.RemoveUsageRelation(relationId);
+                if (removalResult.Failed)
+                {
+                    _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", systemUsage, relationId, removalResult.Error);
+                    return removalResult;
+                }
+
+                _relationRepository.DeleteWithReferencePreload(removalResult.Value);
+                _relationRepository.Save();
+                _usageRepository.Save();
+                transaction.Commit();
+                return removalResult;
+            }
+        }
+
+        public Result<SystemRelation, OperationFailure> GetRelation(int systemUsageId, int relationId)
+        {
+            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+            if (systemUsage.IsNone)
+            {
+                return OperationFailure.NotFound;
+            }
+
+            var usage = systemUsage.Value;
+            if (!_authorizationContext.AllowReads(usage))
+            {
+                return OperationFailure.Forbidden;
+            }
+
+            return systemUsage
+                .Value
+                .GetRelation(relationId)
+                .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
+                .GetValueOrFallback(OperationFailure.NotFound);
         }
     }
 }

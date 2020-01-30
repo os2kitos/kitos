@@ -30,6 +30,8 @@ namespace Core.DomainModel.Result
 
         public bool Ok { get; }
 
+        public bool Failed => !Ok;
+
         public TSuccess Value => _value.Value;
 
         public TFailure Error => _failure.Value;

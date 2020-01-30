@@ -18,7 +18,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasOptional(x => x.RelationInterface)
                 .WithMany(x => x.AssociatedSystemRelations)
-                .HasForeignKey(x => x.RelationInterfaceId);
+                .HasForeignKey(x => x.RelationInterfaceId)
+                .WillCascadeOnDelete(false);
 
             this.HasRequired(x => x.RelationTarget)
                 .WithMany(x => x.UsedByRelations)

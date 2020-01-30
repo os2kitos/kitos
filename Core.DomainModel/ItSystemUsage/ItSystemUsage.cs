@@ -495,5 +495,24 @@ namespace Core.DomainModel.ItSystemUsage
                 .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
                 ?.ItInterface;
         }
+
+        public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
+        {
+            var relationResult = GetRelation(relationId);
+
+            if (!relationResult.HasValue)
+            {
+                return OperationFailure.NotFound;
+            }
+
+            var relation = relationResult.Value;
+            UsageRelations.Remove(relation);
+            return relation;
+        }
+
+        public Maybe<SystemRelation> GetRelation(int relationId)
+        {
+            return UsageRelations.FirstOrDefault(r => r.Id == relationId);
+        }
     }
 }

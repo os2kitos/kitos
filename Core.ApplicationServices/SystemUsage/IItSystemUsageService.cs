@@ -30,5 +30,19 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="systemUsageId"></param>
         /// <returns></returns>
         Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId);
+        /// <summary>
+        /// Removes a system relation from the specified system usage
+        /// </summary>
+        /// <param name="systemUsageId">Id of the "source" it system usage</param>
+        /// <param name="relationId">Relation Id</param>
+        /// <returns></returns>
+        Result<SystemRelation, OperationFailure> RemoveRelation(int systemUsageId, int relationId);
+        /// <summary>
+        /// Gets a system relation
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <param name="relationId"></param>
+        /// <returns></returns>
+        Result<SystemRelation, OperationFailure> GetRelation(int systemUsageId, int relationId);
     }
 }
