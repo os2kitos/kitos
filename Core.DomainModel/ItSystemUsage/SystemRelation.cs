@@ -8,19 +8,18 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// NOTE: For EF
         /// </summary>
-        private SystemRelation() { }
+        protected SystemRelation() { }
 
         public SystemRelation(ItSystemUsage relationSource, ItSystemUsage relationTarget)
         {
             RelationSource = relationSource ?? throw new ArgumentNullException(nameof(relationSource));
             RelationTarget = relationTarget ?? throw new ArgumentNullException(nameof(relationTarget));
-            Reference = new ExternalLink();
         }
 
         /// <summary>
         /// Mandatory relation target
         /// </summary>
-        public virtual int RelationSourceId { get; set; }
+        public int RelationSourceId { get; set; }
         /// <summary>
         /// Mandatory relation target
         /// </summary>
@@ -28,11 +27,15 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Mandatory relation target
         /// </summary>
-        public virtual int RelationTargetId { get; set; }
+        public int RelationTargetId { get; set; }
         /// <summary>
         /// Mandatory relation target
         /// </summary>
         public virtual ItSystemUsage RelationTarget { get; set; }
+        /// <summary>
+        /// Defines the optional interface to the <see cref="RelationTarget"/>
+        /// </summary>
+        public int? RelationInterfaceId { get; set; }
         /// <summary>
         /// Defines the optional interface to the <see cref="RelationTarget"/>
         /// </summary>
@@ -44,11 +47,19 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Link to information about the relation
         /// </summary>
-        public ExternalLink Reference { get; set; }
+        public string Reference { get; set; }
+        /// <summary>
+        /// Optional usage frequency
+        /// </summary>
+        public int? UsageFrequencyId { get; set; }
         /// <summary>
         /// Optional usage frequency
         /// </summary>
         public virtual RelationFrequencyType UsageFrequency { get; set; }
+        /// <summary>
+        /// Optional contract relation
+        /// </summary>
+        public int? AssociatedContractId { get; set; }
         /// <summary>
         /// Optional contract relation
         /// </summary>

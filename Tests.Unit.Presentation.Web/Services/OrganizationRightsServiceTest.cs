@@ -4,7 +4,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Moq;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services

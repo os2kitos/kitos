@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System;
+
+namespace Core.DomainModel
 {
     /// <summary>
     /// Defines interface for objects that have a 1:M option choice in another object.
@@ -8,7 +10,7 @@
     /// <remarks>
     /// These types of OptionEntities can only be used by one <see cref="References"/>.
     /// </remarks>
-    public abstract class OptionEntity<TReference> : Entity
+    public abstract class OptionEntity<TReference> : Entity, IHasName
     {
         /// <summary>
         /// Gets or sets the name.

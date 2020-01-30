@@ -8,6 +8,8 @@ namespace Core.DomainModel.Result
 
         private readonly T _value;
 
+        public bool IsNone => !HasValue;
+
         public bool HasValue { get; }
 
         public T Value
@@ -20,6 +22,11 @@ namespace Core.DomainModel.Result
                 }
                 throw new InvalidOperationException("No item");
             }
+        }
+
+        public static implicit operator Maybe<T>(T source)
+        {
+            return source == null ? None : Some(source);
         }
 
         private Maybe(bool hasValue, T value = default(T))
@@ -48,14 +55,21 @@ namespace Core.DomainModel.Result
                 Maybe<TResult>.None;
         }
 
-        public T GetValueOrFallback(T defaultValue)
+        public T GetValueOrFallback(T fallback)
         {
-            if (defaultValue == null)
-                throw new ArgumentNullException(nameof(defaultValue));
+            if (fallback == null)
+                throw new ArgumentNullException(nameof(fallback));
 
             return HasValue ?
                 Value :
-                defaultValue;
+                fallback;
+        }
+
+        public T GetValueOrDefault()
+        {
+            return HasValue ?
+                Value :
+                default(T);
         }
 
         public override bool Equals(object obj)

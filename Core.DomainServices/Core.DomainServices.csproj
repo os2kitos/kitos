@@ -56,7 +56,6 @@
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
-    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />

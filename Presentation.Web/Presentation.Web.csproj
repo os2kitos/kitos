@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
@@ -352,6 +353,8 @@
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
+    <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
