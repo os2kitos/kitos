@@ -36,9 +36,9 @@ namespace Core.ApplicationServices.SystemUsage
             IItContractRepository contractRepository,
             IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
             IOrganizationalUserContext userContext,
-            ILogger logger,
+            IGenericRepository<SystemRelation> relationRepository,
             ITransactionManager transactionManager,
-            IGenericRepository<SystemRelation> relationRepository)
+            ILogger logger)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;

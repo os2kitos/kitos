@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
@@ -53,9 +54,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _contractRepository.Object,
                 _optionsService.Object,
                 _userContext.Object,
-                Mock.Of<ILogger>(),
-                 _transactionManager.Object,
-                _relationRepositoryMock.Object);
+                _relationRepositoryMock.Object,
+                _transactionManager.Object,
+                Mock.Of<ILogger>());
         }
 
         [Fact]
@@ -516,62 +517,68 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(relation.Ok);
-            Assert.Same(systemRelation,relation.Value);
+            Assert.Same(systemRelation, relation.Value);
         }
 
-        //[Fact]
-        //public void RemoveRelation_Returns_NotFound()
-        //{
-        //    //Arrange
-        //    var id = A<int>();
-        //    var relationId = A<int>();
-        //    ExpectGetUsageByKeyReturns(id, null);
+        [Fact]
+        public void RemoveRelation_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            var relationId = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
 
-        //    //Act
-        //    var relation = _sut.GetRelation(id, relationId);
+            //Act
+            var relation = _sut.RemoveRelation(id, relationId);
 
-        //    //Assert
-        //    Assert.False(relation.Ok);
-        //    Assert.Equal(OperationFailure.NotFound, relation.Error);
-        //}
+            //Assert
+            Assert.False(relation.Ok);
+            Assert.Equal(OperationFailure.NotFound, relation.Error);
+        }
 
-        //[Fact]
-        //public void GetRelation_Returns_Forbidden()
-        //{
-        //    //Arrange
-        //    var id = A<int>();
-        //    var relationId = A<int>();
-        //    var itSystemUsage = new ItSystemUsage();
-        //    ExpectGetUsageByKeyReturns(id, itSystemUsage);
-        //    ExpectAllowReadReturns(itSystemUsage, false);
+        [Fact]
+        public void RemoveRelation_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var relationId = A<int>();
+            var itSystemUsage = new ItSystemUsage();
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, false);
 
-        //    //Act
-        //    var relation = _sut.GetRelation(id, relationId);
+            //Act
+            var relation = _sut.RemoveRelation(id, relationId);
 
-        //    //Assert
-        //    Assert.False(relation.Ok);
-        //    Assert.Equal(OperationFailure.Forbidden, relation.Error);
-        //}
+            //Assert
+            Assert.False(relation.Ok);
+            Assert.Equal(OperationFailure.Forbidden, relation.Error);
+        }
 
-        //[Fact]
-        //public void GetRelation_Returns_Ok()
-        //{
-        //    //Arrange
-        //    var id = A<int>();
-        //    var relationId = A<int>();
-        //    var systemRelation = CreateRelation();
-        //    systemRelation.Id = relationId;
-        //    var itSystemUsage = new ItSystemUsage { UsageRelations = new List<SystemRelation>() { CreateRelation(), systemRelation } };
-        //    ExpectGetUsageByKeyReturns(id, itSystemUsage);
-        //    ExpectAllowReadReturns(itSystemUsage, true);
+        [Fact]
+        public void RemoveRelation_Returns_Ok()
+        {
+            //Arrange
+            var id = A<int>();
+            var relationId = A<int>();
+            var systemRelation = CreateRelation();
+            systemRelation.Id = relationId;
+            var itSystemUsage = new ItSystemUsage { UsageRelations = new List<SystemRelation> { CreateRelation(), systemRelation } };
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
 
-        //    //Act
-        //    var relation = _sut.GetRelation(id, relationId);
+            //Act
+            var relation = _sut.RemoveRelation(id, relationId);
 
-        //    //Assert
-        //    Assert.True(relation.Ok);
-        //    Assert.Same(systemRelation, relation.Value);
-        //}
+            //Assert
+            Assert.True(relation.Ok);
+            Assert.Same(systemRelation, relation.Value);
+            _relationRepositoryMock.Verify(x => x.DeleteWithReferencePreload(systemRelation), Times.Once);
+            _relationRepositoryMock.Verify(x => x.Save(), Times.Once);
+            _usageRepository.Verify(x => x.Save(), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
 
         private static SystemRelation CreateRelation()
         {
