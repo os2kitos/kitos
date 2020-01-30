@@ -41,6 +41,9 @@
                 loadTasks();
             };
 
+            // default kle sort order
+            $scope.pagination.orderBy = "taskKey";
+
             function loadTasks() {
                 var url = baseUrl + "?tasks=true";
                 url += '&onlySelected=' + !$scope.showAllTasks;
