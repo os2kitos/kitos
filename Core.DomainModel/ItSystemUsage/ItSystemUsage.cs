@@ -490,10 +490,15 @@ namespace Core.DomainModel.ItSystemUsage
 
         private Maybe<ItInterface> GetExposedInterface(int interfaceId)
         {
+            return GetExposedInterfaces().FirstOrDefault(x => x.Id == interfaceId);
+        }
+
+        public IEnumerable<ItInterface> GetExposedInterfaces()
+        {
             return ItSystem
                 .ItInterfaceExhibits
-                .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
-                ?.ItInterface;
+                .Select(x => x.ItInterface)
+                .ToList();
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)

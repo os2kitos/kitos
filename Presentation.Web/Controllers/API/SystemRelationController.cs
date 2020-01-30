@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
@@ -88,6 +89,18 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        [HttpGet]
+        [Route("options/{systemUsageId}/in-relation-to/{targetUsageId}")]
+        public HttpResponseMessage GetAvailableOptions(int systemUsageId, int targetUsageId)
+        {
+            return _usageService.GetAvailableOptions(systemUsageId, targetUsageId)
+                .Match
+                (
+                    onSuccess: options => Ok(MapOptions(options)),
+                    onFailure: FromOperationError
+                );
+        }
+
         [HttpDelete]
         [Route("from/{systemUsageId}/{relationId}")]
         public HttpResponseMessage DeleteRelationsFromSystem(int systemUsageId, int relationId)
@@ -120,6 +133,16 @@ namespace Presentation.Web.Controllers.API
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
                 FrequencyType = relation.UsageFrequency?.MapToNamedEntityDTO(),
                 Interface = relation.RelationInterface?.MapToNamedEntityDTO()
+            };
+        }
+
+        private static SystemRelationOptionsDTO MapOptions(RelationOptionsDTO options)
+        {
+            return new SystemRelationOptionsDTO
+            {
+                AvailableContracts = options.AvailableContracts.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+                AvailableFrequencyTypes = options.AvailableFrequencyTypes.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+                AvailableInterfaces = options.AvailableInterfaces.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
             };
         }
     }

@@ -117,6 +117,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.True(new[] { targetUsage1.Id, targetUsage2.Id }.SequenceEqual(availableDestinationSystems.Select(x => x.Id)));
         }
 
+        [Fact]
+        public async Task Can_Get_AvailableOptions()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, true, true);
+
+
+            //Act
+            var options = await ItSystemHelper.GetAvailableOptionsAsync(input.SourceUsageId, input.TargetUsageId);
+
+            //Assert
+            Assert.NotNull(options);
+            var interfaceDTO = Assert.Single(options.AvailableInterfaces);
+            Assert.Equal(input.InterfaceId.Value, interfaceDTO.Id);
+            Assert.Contains(options.AvailableContracts.Select(x => x.Id), x => x == input.ContractId);
+            Assert.Contains(options.AvailableFrequencyTypes.Select(x => x.Id), x => x == input.FrequencyTypeId);
+        }
+
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)
         {
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
@@ -53,5 +54,12 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="pageSize"></param>
         /// <returns></returns>
         Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int systemUsageId, Maybe<string> nameContent, int pageSize);
+        /// <summary>
+        /// Gets the valid options for the given system relation
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <param name="targetUsageId"></param>
+        /// <returns></returns>
+        Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int systemUsageId, int targetUsageId);
     }
 }
