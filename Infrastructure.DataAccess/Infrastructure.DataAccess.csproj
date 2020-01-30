@@ -521,10 +521,6 @@
     <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202001281238079_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs" />
-    <Compile Include="Migrations\202001281238079_Removed-Datatypes-Method-Tsa-ItInterfaceType.Designer.cs">
-      <DependentUpon>202001281238079_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -839,9 +835,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202001281238079_Removed-Datatypes-Method-Tsa-ItInterfaceType.resx">
-      <DependentUpon>202001281238079_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
