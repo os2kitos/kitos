@@ -36,8 +36,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relations = (await ItSystemHelper.GetRelationsAsync(input.SourceUsageId)).ToList();
-                Assert.Equal(1, relations.Count);
-                var dto = relations.Single();
+                var dto = Assert.Single(relations);
                 Assert.Equal(input.SourceUsageId, dto.Source.Id);
                 Assert.Equal(input.TargetUsageId, dto.Destination.Id);
                 Assert.Equal(input.Description, dto.Description);
