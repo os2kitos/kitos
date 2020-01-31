@@ -27,15 +27,15 @@ class InterfaceCatalogHelper {
             .then(() => console.log("Interface bound to system"));;
     }
 
-    public static insertRandomDataToInterface(name: string, data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
-        console.log("Entering random data into a interface");
+    public static insertDataToInterface(name: string, data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
+        console.log("Entering data into a interface");
         return this.gotoSpecificInterface(name).then(() => {
             return this.interfaceHelper.writeDataToAllInputs(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
         });
     }
 
-    public static verifyRandomDataToInterface(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
-        console.log("Verifying random data in interface " + data);
+    public static verifyDataInInterface(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
+        console.log(`Verifying data in interface ${data}`);
         return this.gotoSpecificInterface(data).then(() => {
             return this.interfaceHelper.verifyDataWasSaved(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
         });

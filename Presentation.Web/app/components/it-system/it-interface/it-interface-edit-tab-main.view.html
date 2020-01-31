@@ -95,11 +95,11 @@
                             <label for="interface-interface" class="control-label small">Grænseflade</label>
                             <select-option data-id="interface-interface" data-element-type="InterfaceInterfaceInput"
                                            data-placeholder="Vælg grænseflade"
-                                           data-selected-text="{{ system.interfaceName }}"
+                                           data-selected-text="{{ interface.interfaceName }}"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="system.interfaceId"
+                                           data-ng-model="interface.interfaceId"
                                            data-options="interfaces"
-                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-auto-save-url="{{ interface.updateUrl }}"
                                            data-field="interfaceId">
                             </select-option>
                         </div>

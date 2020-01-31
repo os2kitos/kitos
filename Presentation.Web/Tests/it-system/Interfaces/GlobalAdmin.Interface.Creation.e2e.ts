@@ -45,10 +45,10 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return ItSystemHelper.createSystem(sysName);
             }).then(() => {
                 console.log("Inserting data");
-                return InterfaceCatalogHelper.insertRandomDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
+                return InterfaceCatalogHelper.insertDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
             }).then(() => {
                 console.log("Verifying data");
-                return InterfaceCatalogHelper.verifyRandomDataToInterface(data, sysName, sysInterface, access, org, dataType);
+                return InterfaceCatalogHelper.verifyDataInInterface(data, sysName, sysInterface, access, org, dataType);
             });
     });
 

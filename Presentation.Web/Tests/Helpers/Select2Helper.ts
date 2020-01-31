@@ -24,7 +24,7 @@ class Select2Helper {
     }
 
     public static getData(elementId: string) {
-        console.log("Finding value in " + elementId);
+        console.log(`Finding value in ${elementId}`);
         return element(by.xpath(`//div[@id  = "${elementId}"]/child::*//span[@class = "select2-chosen"]`));
     }
 }
