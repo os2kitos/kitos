@@ -57,15 +57,17 @@ namespace Core.DomainModel.Result
         }
 
         /// <summary>
-        /// Applies the provide <paramref name="transform"/> to the successful value if present
+        /// Applies the provided <paramref name="transform"/> to the successful value if present
+        /// If the current state of the result is "error", the error is returned.
+        /// Applies state-based decision logic on how to build the next result.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="transform"></param>
         /// <returns></returns>
-        //public Result<T, TFailure> Select<T>(Func<TSuccess, Result<T, TFailure>> transform)
-        //{
-        //    return Ok ? transform(Value) : Error;
-        //}
+        public Result<T, TFailure> Select<T>(Func<TSuccess, Result<T, TFailure>> transform)
+        {
+            return Match(transform, failure => failure);
+        }
 
         public T Match<T>(Func<TSuccess, T> onSuccess, Func<TFailure, T> onFailure)
         {

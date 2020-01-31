@@ -60,16 +60,17 @@ namespace Core.DomainModel.Result
             if (fallback == null)
                 throw new ArgumentNullException(nameof(fallback));
 
-            return HasValue ?
-                Value :
-                fallback;
+            return Match(val => val, () => fallback);
         }
 
         public T GetValueOrDefault()
         {
-            return HasValue ?
-                Value :
-                default(T);
+            return Match(val => val, () => default(T));
+        }
+
+        public TOut Match<TOut>(Func<T, TOut> onValue, Func<TOut> onNone)
+        {
+            return HasValue ? onValue(Value) : onNone();
         }
 
         public override bool Equals(object obj)
