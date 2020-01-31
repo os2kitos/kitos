@@ -7,11 +7,11 @@
             resolve: {
                 interfaces: [
                     "optionsService", optionsService =>
-                    optionsService.getLocalInterfaceTypes()
+                        optionsService.getLocalInterfaceTypes()
                 ],
                 dataTypes: [
                     "optionsService", optionsService =>
-                    optionsService.getLocalDataTypes()
+                        optionsService.getLocalDataTypes()
                 ],
                 dataRows: [
                     "$http", "itInterface",
@@ -24,13 +24,13 @@
 
     app.controller("system.SystemInterfaceMainCtrl",
         [
-            "$scope", "$http", "$state", "notify", "itInterface", "user", "hasWriteAccess", "interfaces", "dataTypes", "dataRows", "select2LoadingService",
-            ($scope, $http, $state, notify, itInterface, user, hasWriteAccess, interfaces, dataTypes, dataRows, select2LoadingService) => {
+            "$scope", "$http", "$state", "notify", "itInterface", "user", "hasWriteAccess", "interfaces", "dataTypes", "dataRows", "select2LoadingService", "_",
+            ($scope, $http, $state, notify, itInterface, user, hasWriteAccess, interfaces, dataTypes, dataRows, select2LoadingService, _) => {
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
-                
+
 
                 const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Slettes)" : "";
                 $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
@@ -41,7 +41,7 @@
 
                 $scope.dataRows = [];
                 _.each(dataRows, pushDataRow);
-                
+
                 function pushDataRow(dataRow: any) {
                     dataRow.show = true;
                     dataRow.updateUrl = `api/dataRow/${dataRow.id}`;
@@ -71,10 +71,9 @@
                     });
                 };
 
-                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem?", true, [`organizationId=${user.currentOrganizationId}`]);
+                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`], true);
 
-                $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`]);
-
+                $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`], false);
 
 
                 function reload() {

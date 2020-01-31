@@ -1,12 +1,10 @@
 ﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
-import interfaceHelper = require("./InterfaceHelper");
 
 class InterfaceCatalogHelper {
     private static waitUpTo = new WaitTimers();
     private static interfacePage = new InterfaceCatalogPage();
-    private static interfaceHelper = new interfaceHelper();
 
     public static createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
@@ -26,27 +24,13 @@ class InterfaceCatalogHelper {
             .then(() => Select2.waitForDataAndSelect())
             .then(() => console.log("Interface bound to system"));;
     }
-
-    public static insertDataToInterface(name: string, data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
-        console.log("Entering data into a interface");
-        return this.gotoSpecificInterface(name).then(() => {
-            return this.interfaceHelper.writeDataToAllInputs(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
-        });
-    }
-
-    public static verifyDataInInterface(data: string, exposedBy: string, sysInterface: string, access: string, belongsTo: string, dataTypeTable: string) {
-        console.log(`Verifying data in interface ${data}`);
-        return this.gotoSpecificInterface(data).then(() => {
-            return this.interfaceHelper.verifyDataWasSaved(data, exposedBy, sysInterface, access, belongsTo, dataTypeTable);
-        });
-    }
     
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(this.interfacePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 
-    private static gotoSpecificInterface(name : string) {
+    public static gotoSpecificInterface(name : string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
             .then(() => this.findSpecificInterfaceInNameColumn(name).click());

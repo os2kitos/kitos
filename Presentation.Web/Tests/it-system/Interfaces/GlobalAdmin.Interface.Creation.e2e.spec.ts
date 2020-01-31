@@ -2,6 +2,7 @@
 import ItSystemInterface = require("../../PageObjects/It-system/Interfaces/itSystemInterface.po");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import InterfaceCatalogHelper = require("../../Helpers/InterfaceCatalogHelper");
+import InterfaceHelper = require("../../Helpers/InterfaceHelper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
 describe("Only Global Administrator is able to create and fill out an interface", () => {
@@ -31,7 +32,8 @@ describe("Only Global Administrator is able to create and fill out an interface"
         var access = "Lokal";
         var org = "Fælles Kommune";
         var dataType = "Sag";
-        var data = getRandomData();
+        var data = createData();
+        var version = createVersion();
         
         loginHelper.loginAsGlobalAdmin()
             .then(() => {
@@ -45,10 +47,10 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return ItSystemHelper.createSystem(sysName);
             }).then(() => {
                 console.log("Inserting data");
-                return InterfaceCatalogHelper.insertDataToInterface(iName, data, sysName, sysInterface, access, org, dataType);
+                return InterfaceHelper.writeDataToAllInputs(iName, data, sysName, sysInterface, access, org, dataType, version);
             }).then(() => {
                 console.log("Verifying data");
-                return InterfaceCatalogHelper.verifyDataInInterface(data, sysName, sysInterface, access, org, dataType);
+                return InterfaceHelper.verifyDataWasSaved(data, sysName, sysInterface, access, org, dataType, version);
             });
     });
 
@@ -60,7 +62,11 @@ describe("Only Global Administrator is able to create and fill out an interface"
         return `ItSystem${new Date().getTime()}`;
     }
 
-    function getRandomData() {
+    function createData() {
         return `SawData${new Date().getTime()}`;
+    }
+
+    function createVersion() {
+        return `${new Date().getTime()}`;
     }
 });

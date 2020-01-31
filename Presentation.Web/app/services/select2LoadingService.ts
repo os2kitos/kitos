@@ -1,16 +1,16 @@
 ﻿module Kitos.Services {
 
     export interface ISelect2LoadingService {
-        loadSelect2(url: string, allowClear: boolean, paramArray: any)
+        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean)
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
 
-        static $inject = ["$http", "_"];
-        constructor(private readonly $http: ng.IHttpService, private readonly _: _.LoDashStatic) {
+        static $inject = ["$http"];
+        constructor(private readonly $http: ng.IHttpService) {
         }
 
-        loadSelect2(url: string, allowClear: boolean, paramArray) {
+        loadSelect2(url: string, allowClear: boolean, paramArray, checkResultsForDisabled) {
             var self = this;
             return {
                 minimumInputLength: 1,
@@ -30,18 +30,31 @@
 
                     results(data, page) {
                         var results = [];
-
-                        self._.each(data.data.response, (obj: { id; name; }) => {
-                            results.push({
-                                id: obj.id,
-                                text: obj.name
-                            });
+                        _.each(data.data.response, (obj) => {
+                            if (checkResultsForDisabled) {
+                                self.handleResultsWithDisabled(results, obj);
+                            } else {
+                                self.handleResults(results, obj);
+                            }
+                            
                         });
-
                         return { results: results };
                     }
                 }
             };
+        }
+
+        private handleResultsWithDisabled(list: any, obj: { id; name; disabled; }) {
+            if (!obj.disabled) {
+                this.handleResults(list, obj);
+            }
+        }
+
+        private handleResults(list: any, obj: { id; name; }) {
+            list.push({
+                id: obj.id,
+                text: obj.name
+            });
         }
         
     }
