@@ -528,10 +528,6 @@
     <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.Designer.cs">
       <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202001301515393_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs" />
-    <Compile Include="Migrations\202001301515393_Removed-Datatypes-Method-Tsa-ItInterfaceType.Designer.cs">
-      <DependentUpon>202001301515393_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -852,9 +848,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.resx">
       <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202001301515393_Removed-Datatypes-Method-Tsa-ItInterfaceType.resx">
-      <DependentUpon>202001301515393_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
