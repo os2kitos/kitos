@@ -33,8 +33,8 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("Missing relation data");
 
             var result = _usageService.AddRelation(
-                relation.SourceUsageId,
-                relation.TargetUsageId,
+                relation.FromUsageId,
+                relation.ToUsageId,
                 relation.InterfaceId,
                 relation.Description,
                 relation.Reference,
@@ -47,17 +47,17 @@ namespace Presentation.Web.Controllers.API
                     Created
                     (
                         response: MapRelation(systemRelation),
-                        location: new Uri($"{Request.RequestUri.ToString().TrimEnd('/')}/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")
+                        location: new Uri($"{Request.RequestUri.ToString().TrimEnd('/')}/from/{systemRelation.FromSystemUsageId}/{systemRelation.Id}")
                     ),
                 onFailure: FromOperationError
             );
         }
 
         [HttpGet]
-        [Route("from/{systemUsageId}")]
-        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
+        [Route("from/{fromSystemUsageId}")]
+        public HttpResponseMessage GetRelationsFromSystem(int fromSystemUsageId)
         {
-            return _usageService.GetRelations(systemUsageId)
+            return _usageService.GetRelations(fromSystemUsageId)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -66,10 +66,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("from/{systemUsageId}/{relationId}")]
-        public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
+        [Route("from/{fromSystemUsageId}/{relationId}")]
+        public HttpResponseMessage GetRelationFromSystem(int fromSystemUsageId, int relationId)
         {
-            return _usageService.GetRelation(systemUsageId, relationId)
+            return _usageService.GetRelation(fromSystemUsageId, relationId)
                 .Match
                 (
                     onSuccess: relation => Ok(MapRelation(relation)),
@@ -78,10 +78,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("options/{systemUsageId}/available-destination-systems")]
-        public HttpResponseMessage GetAvailableDestinationSystems(int systemUsageId, string nameContent, int amount)
+        [Route("options/{fromSystemUsageId}/available-destination-systems")]
+        public HttpResponseMessage GetAvailableDestinationSystems(int fromSystemUsageId, string nameContent, int amount)
         {
-            return _usageService.GetAvailableRelationTargets(systemUsageId, nameContent.FromString(), amount)
+            return _usageService.GetAvailableRelationTargets(fromSystemUsageId, nameContent.FromString(), amount)
                 .Match
                 (
                     onSuccess: systemUsages => Ok(systemUsages.Select(x => x.MapToNamedEntityDTO()).ToList()),
@@ -90,10 +90,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("options/{systemUsageId}/in-relation-to/{targetUsageId}")]
-        public HttpResponseMessage GetAvailableOptions(int systemUsageId, int targetUsageId)
+        [Route("options/{fromSystemUsageId}/in-relation-to/{toSystemUsageId}")]
+        public HttpResponseMessage GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
         {
-            return _usageService.GetAvailableOptions(systemUsageId, targetUsageId)
+            return _usageService.GetAvailableOptions(fromSystemUsageId, toSystemUsageId)
                 .Match
                 (
                     onSuccess: options => Ok(MapOptions(options)),
@@ -102,10 +102,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpDelete]
-        [Route("from/{systemUsageId}/{relationId}")]
-        public HttpResponseMessage DeleteRelationFromSystem(int systemUsageId, int relationId)
+        [Route("from/{fromSystemUsageId}/{relationId}")]
+        public HttpResponseMessage DeleteRelationFromSystem(int fromSystemUsageId, int relationId)
         {
-            return _usageService.RemoveRelation(systemUsageId, relationId)
+            return _usageService.RemoveRelation(fromSystemUsageId, relationId)
                 .Match
                 (
                     onSuccess: _ => NoContent(),
@@ -122,15 +122,15 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("Missing relation data");
             }
 
-            if (relation.Source == null || relation.Destination == null)
+            if (relation.FromUsage == null || relation.ToUsage == null)
             {
-                return NotFound();
+                return BadRequest("FromUsage AND ToUsage MUST be defined");
             }
 
             var result = _usageService.ModifyRelation(
-                relation.Source.Id,
+                relation.FromUsage.Id,
                 relation.Id,
-                relation.Destination.Id,
+                relation.ToUsage.Id,
                 relation.Interface?.Id
                 );
 
@@ -152,8 +152,8 @@ namespace Presentation.Web.Controllers.API
             return new SystemRelationDTO
             {
                 Id = relation.Id,
-                Source = relation.RelationSource.MapToNamedEntityDTO(),
-                Destination = relation.RelationTarget.MapToNamedEntityDTO(),
+                FromUsage = relation.FromSystemUsage.MapToNamedEntityDTO(),
+                ToUsage = relation.ToSystemUsage.MapToNamedEntityDTO(),
                 Description = relation.Description,
                 Reference = relation.Reference,
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),

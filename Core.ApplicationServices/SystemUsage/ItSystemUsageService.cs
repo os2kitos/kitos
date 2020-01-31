@@ -140,32 +140,32 @@ namespace Core.ApplicationServices.SystemUsage
         }
 
         public Result<SystemRelation, OperationError> AddRelation(
-            int sourceId,
-            int destinationId,
+            int fromSystemUsageId,
+            int toSystemUsageId,
             int? interfaceId,
             string description,
             string reference,
             int? frequencyId,
             int? contractId)
         {
-            var source = _usageRepository.GetByKey(sourceId);
-            var destination = _usageRepository.GetByKey(destinationId);
+            var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
+            var toSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
             var targetContract = Maybe<ItContract>.None;
             var targetFrequency = Maybe<RelationFrequencyType>.None;
 
-            if (source == null)
+            if (fromSystemUsage == null)
                 return new OperationError("Source not found", OperationFailure.NotFound);
 
-            if (destination == null)
+            if (toSystemUsage == null)
                 return new OperationError("Destination could not be found", OperationFailure.BadInput);
 
-            if (!_authorizationContext.AllowModify(source))
+            if (!_authorizationContext.AllowModify(fromSystemUsage))
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
 
             if (frequencyId.HasValue)
             {
                 targetFrequency = _frequencyService
-                    .GetAvailableOptions(source.OrganizationId)
+                    .GetAvailableOptions(fromSystemUsage.OrganizationId)
                     .FirstOrDefault(x => x.Id == frequencyId.Value);
 
                 if (!targetFrequency.HasValue)
@@ -179,7 +179,7 @@ namespace Core.ApplicationServices.SystemUsage
                     return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
             }
 
-            var result = source.AddUsageRelationTo(_userContext.UserEntity, destination, interfaceId, description, reference, targetFrequency, targetContract);
+            var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, interfaceId, description, reference, targetFrequency, targetContract);
             if (result.Ok)
             {
                 _usageRepository.Save();
@@ -187,9 +187,13 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
-        public Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int? targetSystemUsageId = null, int? targetInterfaceId = null)
+        public Result<SystemRelation, OperationError> ModifyRelation(
+            int fromSystemUsageId, 
+            int relationId, 
+            int toSystemUsageId, 
+            int? targetInterfaceId = null)
         {
-            var sourceSystemUsage = _usageRepository.GetByKey(sourceSystemUsageId);
+            var sourceSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (sourceSystemUsage == null)
             {
                 return new OperationError("Source not found", OperationFailure.NotFound);
@@ -200,27 +204,23 @@ namespace Core.ApplicationServices.SystemUsage
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
             }
 
-            var targetSystemUsage = Maybe<ItSystemUsage>.None;
-            if (targetSystemUsageId.HasValue)
+            Maybe<ItSystemUsage> targetSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
+            if (targetSystemUsage.IsNone)
             {
-                targetSystemUsage = _usageRepository.GetByKey(targetSystemUsageId.Value);
-                if (targetSystemUsage == null)
-                {
-                    return new OperationError("Target system usage not found", OperationFailure.BadInput);
-                }
+                return new OperationError("Target system usage not found", OperationFailure.BadInput);
             }
 
             var targetInterface = Maybe<ItInterface>.None;
             if (targetInterfaceId.HasValue)
             {
                 targetInterface = targetSystemUsage.Value.GetExposedInterface(targetInterfaceId.Value);
-                if (targetInterface == null)
+                if (targetInterface.IsNone)
                 {
                     return new OperationError("Target system interface not found", OperationFailure.BadInput);
                 }
             }
 
-            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage, targetInterface);
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, targetSystemUsage.Value, targetInterface.GetValueOrDefault());
             if (result.Ok)
             {
                 _usageRepository.Save();
@@ -229,9 +229,9 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
-        public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId)
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int fromSystemUsageId)
         {
-            Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(systemUsageId);
+            Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (itSystemUsage.HasValue == false)
             {
                 return new OperationError(OperationFailure.NotFound);
@@ -246,11 +246,11 @@ namespace Core.ApplicationServices.SystemUsage
             return systemUsage.UsageRelations.ToList();
         }
 
-        public Result<SystemRelation, OperationFailure> RemoveRelation(int systemUsageId, int relationId)
+        public Result<SystemRelation, OperationFailure> RemoveRelation(int fromSystemUsageId, int relationId)
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+                Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
                 if (systemUsage.IsNone)
                 {
                     return OperationFailure.NotFound;
@@ -277,9 +277,9 @@ namespace Core.ApplicationServices.SystemUsage
             }
         }
 
-        public Result<SystemRelation, OperationFailure> GetRelation(int systemUsageId, int relationId)
+        public Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId)
         {
-            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (systemUsage.IsNone)
             {
                 return OperationFailure.NotFound;
@@ -298,14 +298,14 @@ namespace Core.ApplicationServices.SystemUsage
                 .GetValueOrFallback(OperationFailure.NotFound);
         }
 
-        public Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int systemUsageId, Maybe<string> nameContent, int pageSize)
+        public Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int fromSystemUsageId, Maybe<string> nameContent, int pageSize)
         {
             if (pageSize > 25)
             {
                 return new OperationError("Max page size is 25", OperationFailure.BadInput);
             }
 
-            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(systemUsageId);
+            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (systemUsage.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
@@ -340,10 +340,10 @@ namespace Core.ApplicationServices.SystemUsage
                 .ToList();
         }
 
-        public Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int systemUsageId, int targetUsageId)
+        public Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
         {
-            var source = _usageRepository.GetByKey(systemUsageId);
-            var destination = _usageRepository.GetByKey(targetUsageId);
+            var source = _usageRepository.GetByKey(fromSystemUsageId);
+            var destination = _usageRepository.GetByKey(toSystemUsageId);
 
             if (source == null)
                 return new OperationError("Source not found", OperationFailure.NotFound);

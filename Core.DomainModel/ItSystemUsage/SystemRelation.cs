@@ -1,43 +1,42 @@
 ﻿using System;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystemUsage
 {
     public class SystemRelation : Entity
     {
-        /// <summary>
-        /// NOTE: For EF
-        /// </summary>
+        //NOTE: For EF
         protected SystemRelation() { }
 
-        public SystemRelation(ItSystemUsage relationSource, ItSystemUsage relationTarget)
+        public SystemRelation(ItSystemUsage fromSystemUsage)
         {
-            RelationSource = relationSource ?? throw new ArgumentNullException(nameof(relationSource));
-            RelationTarget = relationTarget ?? throw new ArgumentNullException(nameof(relationTarget));
+            FromSystemUsage = fromSystemUsage ?? throw new ArgumentNullException(nameof(fromSystemUsage));
         }
 
         /// <summary>
-        /// Mandatory relation target
+        /// Mandatory relation "from"
         /// </summary>
-        public int RelationSourceId { get; set; }
+        public int FromSystemUsageId { get; set; }
         /// <summary>
-        /// Mandatory relation target
+        /// Mandatory relation "from"
         /// </summary>
-        public virtual ItSystemUsage RelationSource { get; set; }
+        public virtual ItSystemUsage FromSystemUsage { get; set; }
         /// <summary>
-        /// Mandatory relation target
+        /// Mandatory relation "to"
         /// </summary>
-        public int RelationTargetId { get; set; }
+        public int ToSystemUsageId { get; set; }
         /// <summary>
-        /// Mandatory relation target
+        /// Mandatory relation "to"
         /// </summary>
-        public virtual ItSystemUsage RelationTarget { get; set; }
+        public virtual ItSystemUsage ToSystemUsage { get; set; }
         /// <summary>
-        /// Defines the optional interface to the <see cref="RelationTarget"/>
+        /// Defines the optional interface to the <see cref="ToSystemUsage"/>
         /// </summary>
         public int? RelationInterfaceId { get; set; }
         /// <summary>
-        /// Defines the optional interface to the <see cref="RelationTarget"/>
+        /// Defines the optional interface to the <see cref="ToSystemUsage"/>
         /// </summary>
         public virtual ItInterface RelationInterface { get; set; }
         /// <summary>
@@ -65,21 +64,71 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         public virtual ItContract.ItContract AssociatedContract { get; set; }
         /// <summary>
-        /// Replaces mandatory relation target and resets relation interface
+        /// Replaces mandatory relation "to" and resets relation interface
         /// </summary>
-        /// <param name="targetSystemUsage">Replacement system usage</param>
-        public void SetRelationTarget(ItSystemUsage targetSystemUsage)
+        /// <param name="toSystemUsage">Replacement system usage</param>
+        public Result<ItSystemUsage, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
         {
-            RelationTarget = targetSystemUsage ?? throw new ArgumentNullException(nameof(targetSystemUsage));
-            RelationInterface = null;
+            if(toSystemUsage == null)
+                throw new ArgumentNullException(nameof(toSystemUsage));
+
+            
+            if (FromSystemUsage.Id == toSystemUsage.Id)
+            {
+                return new OperationError("'From' cannot equal 'To'", OperationFailure.BadInput);
+            }
+
+            if (!FromSystemUsage.IsInSameOrganizationAs(toSystemUsage))
+            {
+                return new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
+            }
+
+            ToSystemUsage = toSystemUsage;
+
+            if (RelationInterface != null && toSystemUsage.GetExposedInterface(RelationInterface.Id).IsNone)
+            {
+                RelationInterface = null;
+            }
+            
+            return ToSystemUsage;
+        }
+
+        public Result<Maybe<ItContract.ItContract>, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
+        {
+            var passOrganizationConstraint = 
+                contract
+                    .Select(x=>x.IsInSameOrganizationAs(FromSystemUsage))
+                    .GetValueOrFallback(true);
+
+            if (!passOrganizationConstraint)
+            {
+                return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
+            }
+
+            AssociatedContract = contract.GetValueOrDefault();
+            return contract;
         }
         /// <summary>
         /// Replace relation interface
         /// </summary>
-        /// <param name="targetInterface">Replacement interface to be used on the relation</param>
-        public void SetRelationInterface(ItInterface targetInterface)
+        /// <param name="targetInterface">Replacement interface to be used on the relation. NULL is allowed</param>
+        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(Maybe<ItInterface> targetInterface)
         {
-            RelationInterface = targetInterface ?? throw new ArgumentNullException(nameof(targetInterface));
+            if(ToSystemUsage == null)
+                throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
+
+            var passExpositionConstraint =
+                targetInterface
+                    .Select(x => ToSystemUsage.GetExposedInterface(x.Id).HasValue)
+                    .GetValueOrFallback(true);
+
+            if (!passExpositionConstraint)
+            {
+                return new OperationError("Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
+            }
+
+            RelationInterface = targetInterface.GetValueOrDefault();
+            return targetInterface;
         }
     }
 }

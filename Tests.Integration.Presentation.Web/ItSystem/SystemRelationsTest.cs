@@ -35,10 +35,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                var relations = (await SystemRelationHelper.SendGetRelationsAsync(input.SourceUsageId)).ToList();
+                var relations = (await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId)).ToList();
                 var dto = Assert.Single(relations);
-                Assert.Equal(input.SourceUsageId, dto.Source.Id);
-                Assert.Equal(input.TargetUsageId, dto.Destination.Id);
+                Assert.Equal(input.FromUsageId, dto.FromUsage.Id);
+                Assert.Equal(input.ToUsageId, dto.ToUsage.Id);
                 Assert.Equal(input.Description, dto.Description);
                 Assert.Equal(input.Reference, dto.Reference);
                 Assert.Equal(input.ContractId, dto.Contract?.Id);
@@ -58,8 +58,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var input = new CreateSystemRelationDTO
             {
-                SourceUsageId = usage1.Id,
-                TargetUsageId = usage2.Id,
+                FromUsageId = usage1.Id,
+                ToUsageId = usage2.Id,
                 Description = A<string>(),
                 Reference = A<string>(),
             };
@@ -85,8 +85,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(false, false, false);
 
             using (await SystemRelationHelper.SendPostRelationAsync(input))
-            using (var deletionResponse = await ItSystemHelper.SendRemoveUsageAsync(input.SourceUsageId, OrganizationId))
-            using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.SourceUsageId, OrganizationId))
+            using (var deletionResponse = await ItSystemHelper.SendRemoveUsageAsync(input.FromUsageId, OrganizationId))
+            using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, OrganizationId))
             {
                 Assert.Equal(HttpStatusCode.OK, deletionResponse.StatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
@@ -124,7 +124,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
 
             //Act
-            var options = await SystemRelationHelper.GetAvailableOptionsAsync(input.SourceUsageId, input.TargetUsageId);
+            var options = await SystemRelationHelper.GetAvailableOptionsAsync(input.FromUsageId, input.ToUsageId);
 
             //Assert
             Assert.NotNull(options);
@@ -140,7 +140,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var input = await PrepareFullRelationAsync(true, false, true);
             await SystemRelationHelper.SendPostRelationAsync(input);
-            var relations = await SystemRelationHelper.SendGetRelationsAsync(input.SourceUsageId);
+            var relations = await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId);
             var edited = await PrepareEditedRelationAsync(relations.Single());
 
             //Act
@@ -149,8 +149,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var relationDTO = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
-                Assert.Equal(input.SourceUsageId, relationDTO.Source.Id);
-                Assert.Equal(edited.Destination.Id, relationDTO.Destination.Id);
+                Assert.Equal(input.FromUsageId, relationDTO.FromUsage.Id);
+                Assert.Equal(edited.ToUsage.Id, relationDTO.ToUsage.Id);
                 Assert.Equal(input.Description, relationDTO.Description);
                 Assert.Equal(input.Reference, relationDTO.Reference);
                 Assert.Equal(edited.Interface.Id, relationDTO.Interface.Id);
@@ -184,8 +184,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var input = new CreateSystemRelationDTO
             {
-                SourceUsageId = usage1.Id,
-                TargetUsageId = usage2.Id,
+                FromUsageId = usage1.Id,
+                ToUsageId = usage2.Id,
                 ContractId = contract.Select<int?>(x => x.Id).GetValueOrDefault(),
                 InterfaceId = targetInterface.Select<int?>(x => x.Id).GetValueOrDefault(),
                 Description = A<string>(),
@@ -204,7 +204,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             return new SystemRelationDTO(
                 created.Id,
-                created.Source,
+                created.FromUsage,
                 new NamedEntityDTO(usage3.Id, usage3.LocalCallName),
                 new NamedEntityDTO(interfaceExhibitDTO.ItInterfaceId, interfaceExhibitDTO.ItInterfaceName),
                 null, // contract

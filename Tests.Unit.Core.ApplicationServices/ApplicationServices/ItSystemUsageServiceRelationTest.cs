@@ -13,11 +13,12 @@ using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices
 {
-    public class ItSystemUsageServiceRelationTest
+    public class ItSystemUsageServiceRelationTest : WithAutoFixture
     {
         private const int SourceSystemUsageId = 1;
         private const int TargetSystemUsageId = 2;
@@ -69,13 +70,13 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             // Arrange
             var systemUsage = new ItSystemUsage { Id = SourceSystemUsageId };
-            var systemRelation = new SystemRelation(systemUsage, systemUsage) { Id = SourceSystemRelationId };
+            var systemRelation = new SystemRelation(systemUsage) { Id = SourceSystemRelationId };
             systemUsage.UsageRelations = new List<SystemRelation> { systemRelation };
             _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<int>())).Returns(systemUsage);
             _mockAuthorizationContext.Setup(c => c.AllowModify(systemUsage)).Returns(allowModifications);
 
             // Act
-            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId);
+            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId,A<int>());
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
@@ -101,7 +102,7 @@ namespace Tests.Unit.Core.ApplicationServices
             // Assert
             Assert.True(result.Ok);
             var modifiedSystemRelation = mockSourceSystemUsage.Object.UsageRelations.First(r => r.Id == SourceSystemRelationId);
-            Assert.Equal(mockReplacementSystemUsage.Object, modifiedSystemRelation.RelationTarget);
+            Assert.Equal(mockReplacementSystemUsage.Object, modifiedSystemRelation.ToSystemUsage);
             Assert.Null(modifiedSystemRelation.RelationInterface);
         }
 
@@ -138,11 +139,12 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void SetupUsageSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
-            var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object, targetSystemUsage.Object)
+            var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object)
             {
                 Id = systemRelationId,
                 RelationInterface = _mockSourceSystemInterface.Object
             };
+            usageSystemRelation.SetRelationTo(targetSystemUsage.Object);
             sourceSystemUsage.SetupGet(u => u.UsageRelations).Returns(new List<SystemRelation> {usageSystemRelation});
             var itInterfaceExhibits = new List<ItInterfaceExhibit>
             {

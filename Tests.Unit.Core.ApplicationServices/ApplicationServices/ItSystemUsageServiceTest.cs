@@ -581,9 +581,11 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
-        private static SystemRelation CreateRelation()
+        private SystemRelation CreateRelation()
         {
-            return new SystemRelation(new ItSystemUsage(), new ItSystemUsage());
+            var systemRelation = new SystemRelation(new ItSystemUsage());
+            systemRelation.SetRelationTo(new ItSystemUsage() {Id = A<int>()});
+            return systemRelation;
         }
 
         private static void AssertAddRelationError(Result<SystemRelation, OperationError> result, OperationFailure operationFailure, Maybe<string> message)

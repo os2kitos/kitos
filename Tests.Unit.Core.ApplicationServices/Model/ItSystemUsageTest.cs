@@ -130,7 +130,7 @@ namespace Tests.Unit.Core.Model
             var objectOwner = new User();
             _sut.ObjectOwner = objectOwner;
             var activeUser = new User();
-            _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage(), new ItSystemUsage()));
+            _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage()));
             var destination = new ItSystemUsage
             {
                 Id = A<int>(),
@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(activeUser, newRelation.LastChangedByUser);
             Assert.Equal(itContract, newRelation.AssociatedContract);
             Assert.Equal(frequencyType, newRelation.UsageFrequency);
-            Assert.Equal(destination, newRelation.RelationTarget);
+            Assert.Equal(destination, newRelation.ToSystemUsage);
             Assert.Equal(description, newRelation.Description);
             Assert.NotNull(newRelation.Reference);
             Assert.Equal(reference, newRelation.Reference);
@@ -180,8 +180,8 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var systemRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = some ? id : A<int>() };
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var systemRelation = new SystemRelation(new ItSystemUsage()) { Id = some ? id : A<int>() };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
             _sut.UsageRelations.Add(systemRelation);
 
@@ -201,7 +201,7 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
 
             //Act
@@ -217,8 +217,8 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var removedRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = id };
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var removedRelation = new SystemRelation(new ItSystemUsage()) { Id = id };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
             _sut.UsageRelations.Add(removedRelation);
 
