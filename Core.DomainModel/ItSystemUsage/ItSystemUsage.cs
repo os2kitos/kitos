@@ -445,10 +445,6 @@ namespace Core.DomainModel.ItSystemUsage
             if (toSystemUsage == null)
                 throw new ArgumentNullException(nameof(toSystemUsage));
 
-            var exposedInterface = interfaceId.HasValue
-                ? toSystemUsage.GetExposedInterface(interfaceId.Value)
-                : Maybe<ItInterface>.None;
-
             var newRelation = new SystemRelation(this)
             {
                 Description = description,
@@ -459,7 +455,7 @@ namespace Core.DomainModel.ItSystemUsage
                 LastChanged = DateTime.Now
             };
 
-            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, exposedInterface, targetContract);
+            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, interfaceId, targetContract);
 
             if (updateRelationResult.Failed)
             {
@@ -478,7 +474,7 @@ namespace Core.DomainModel.ItSystemUsage
             User activeUser,
             int relationId,
             ItSystemUsage toSystemUsage,
-            Maybe<ItInterface> targetInterface)
+            int? interfaceId)
         {
             if (activeUser == null)
             {
@@ -493,7 +489,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, targetInterface, Maybe<ItContract.ItContract>.None);
+            return UpdateRelation(relation, toSystemUsage, interfaceId, Maybe<ItContract.ItContract>.None);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -513,9 +509,11 @@ namespace Core.DomainModel.ItSystemUsage
         public IEnumerable<ItInterface> GetExposedInterfaces()
         {
             return ItSystem
-                .ItInterfaceExhibits
-                .Select(x => x.ItInterface)
-                .ToList();
+                .FromNullable()
+                .Select(system => system.ItInterfaceExhibits)
+                .Select(interfaceExhibits => interfaceExhibits.Select(interfaceExhibit => interfaceExhibit.ItInterface))
+                .Select(interfaces => interfaces.ToList())
+                .GetValueOrFallback(new List<ItInterface>());
         }
 
         public Maybe<ItInterface> GetExposedInterface(int interfaceId)
@@ -531,7 +529,7 @@ namespace Core.DomainModel.ItSystemUsage
         private static Result<SystemRelation, OperationError> UpdateRelation(
             SystemRelation relation,
             ItSystemUsage toSystemUsage,
-            Maybe<ItInterface> exposedInterface,
+            int? interfaceId,
             Maybe<ItContract.ItContract> targetContract)
         {
             var relationToResult = relation.SetRelationTo(toSystemUsage);
@@ -540,7 +538,7 @@ namespace Core.DomainModel.ItSystemUsage
                 return relationToResult.Error;
             }
 
-            var setInterfaceResult = relation.SetRelationInterface(exposedInterface);
+            var setInterfaceResult = relation.SetRelationInterface(interfaceId);
             if (setInterfaceResult.Failed)
             {
                 return setInterfaceResult.Error;

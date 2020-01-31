@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -210,17 +209,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError("Target system usage not found", OperationFailure.BadInput);
             }
 
-            var targetInterface = Maybe<ItInterface>.None;
-            if (targetInterfaceId.HasValue)
-            {
-                targetInterface = targetSystemUsage.Value.GetExposedInterface(targetInterfaceId.Value);
-                if (targetInterface.IsNone)
-                {
-                    return new OperationError("Target system interface not found", OperationFailure.BadInput);
-                }
-            }
-
-            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, targetSystemUsage.Value, targetInterface.GetValueOrDefault());
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, targetSystemUsage.Value, targetInterfaceId);
             if (result.Ok)
             {
                 _usageRepository.Save();

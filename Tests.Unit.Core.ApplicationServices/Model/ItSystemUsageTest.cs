@@ -49,7 +49,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
-            AssertErrorResult(result, "Cannot create relation to self", OperationFailure.BadInput);
+            AssertErrorResult(result, "'From' cannot equal 'To'", OperationFailure.BadInput);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.Model
             var itContract = new ItContract { OrganizationId = _sut.OrganizationId + 1 };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(new User(), destination, null, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
@@ -119,7 +119,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.AddUsageRelationTo(new User(), destination, interfaceId, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
-            AssertErrorResult(result, "Interface is not exposed by the target system", OperationFailure.BadInput);
+            AssertErrorResult(result, "Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
         }
 
         [Fact]

@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202001310958558_SystemRelation_Renaming"; }
+            get { return "202001311141051_SystemRelation_Renaming"; }
         }
         
         string IMigrationMetadata.Source

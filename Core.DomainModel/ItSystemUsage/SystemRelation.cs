@@ -69,38 +69,38 @@ namespace Core.DomainModel.ItSystemUsage
         /// <param name="toSystemUsage">Replacement system usage</param>
         public Result<ItSystemUsage, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
         {
-            if(toSystemUsage == null)
+            if (toSystemUsage == null)
                 throw new ArgumentNullException(nameof(toSystemUsage));
 
-            
+
             if (FromSystemUsage.Id == toSystemUsage.Id)
             {
                 return new OperationError("'From' cannot equal 'To'", OperationFailure.BadInput);
             }
 
-            if (!FromSystemUsage.IsInSameOrganizationAs(toSystemUsage))
+            //Both ends of the relation must be in same organization
+            if (!CheckSameOrganizationConstraint<ItSystemUsage>(toSystemUsage).GetValueOrFallback(false))
             {
                 return new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
             }
 
             ToSystemUsage = toSystemUsage;
 
-            if (RelationInterface != null && toSystemUsage.GetExposedInterface(RelationInterface.Id).IsNone)
-            {
-                RelationInterface = null;
-            }
-            
+            RelationInterface =
+                RelationInterface
+                    .FromNullable()
+                    .Select(relationInterface => ToSystemUsage.GetExposedInterface(relationInterface.Id).HasValue)
+                    .GetValueOrFallback(false)
+                    ? RelationInterface
+                    : null;
+
             return ToSystemUsage;
         }
 
         public Result<Maybe<ItContract.ItContract>, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
         {
-            var passOrganizationConstraint = 
-                contract
-                    .Select(x=>x.IsInSameOrganizationAs(FromSystemUsage))
-                    .GetValueOrFallback(true);
-
-            if (!passOrganizationConstraint)
+            //IF contract is defined it MUST be in the same organization
+            if (!CheckSameOrganizationConstraint(contract).GetValueOrFallback(true))
             {
                 return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
             }
@@ -108,27 +108,37 @@ namespace Core.DomainModel.ItSystemUsage
             AssociatedContract = contract.GetValueOrDefault();
             return contract;
         }
+
+        private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IHasOrganization
+        {
+            return other.Select(x => x.IsInSameOrganizationAs(FromSystemUsage));
+        }
+
         /// <summary>
         /// Replace relation interface
         /// </summary>
-        /// <param name="targetInterface">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(Maybe<ItInterface> targetInterface)
+        /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
+        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(int? targetInterfaceId)
         {
-            if(ToSystemUsage == null)
+            if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
 
-            var passExpositionConstraint =
-                targetInterface
-                    .Select(x => ToSystemUsage.GetExposedInterface(x.Id).HasValue)
-                    .GetValueOrFallback(true);
-
-            if (!passExpositionConstraint)
+            if (targetInterfaceId.HasValue)
             {
-                return new OperationError("Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
+                var exposedInterface = ToSystemUsage.GetExposedInterface(targetInterfaceId.Value);
+                if (exposedInterface.IsNone)
+                {
+                    return new OperationError("Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
+                }
+
+                RelationInterface = exposedInterface.Value;
+            }
+            else
+            {
+                RelationInterface = null;
             }
 
-            RelationInterface = targetInterface.GetValueOrDefault();
-            return targetInterface;
+            return RelationInterface.FromNullable();
         }
     }
 }

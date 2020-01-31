@@ -70,13 +70,15 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             // Arrange
             var systemUsage = new ItSystemUsage { Id = SourceSystemUsageId };
+            var targetUsage = new ItSystemUsage { Id = TargetSystemUsageId };
             var systemRelation = new SystemRelation(systemUsage) { Id = SourceSystemRelationId };
             systemUsage.UsageRelations = new List<SystemRelation> { systemRelation };
-            _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<int>())).Returns(systemUsage);
+            _mockSystemUsageRepository.Setup(r => r.GetByKey(SourceSystemUsageId)).Returns(systemUsage);
+            _mockSystemUsageRepository.Setup(r => r.GetByKey(TargetSystemUsageId)).Returns(targetUsage);
             _mockAuthorizationContext.Setup(c => c.AllowModify(systemUsage)).Returns(allowModifications);
 
             // Act
-            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId,A<int>());
+            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId,TargetSystemUsageId);
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
