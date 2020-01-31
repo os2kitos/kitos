@@ -531,6 +531,10 @@
     <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.Designer.cs">
       <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.cs" />
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.Designer.cs">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -851,6 +855,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.resx">
       <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001311141051_SystemRelation_Renaming.resx">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

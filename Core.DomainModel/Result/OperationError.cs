@@ -27,5 +27,10 @@
         {
 
         }
+
+        public override string ToString()
+        {
+            return $"{FailureType:G}{Message.GetValueOrFallback(string.Empty)}";
+        }
     }
 }

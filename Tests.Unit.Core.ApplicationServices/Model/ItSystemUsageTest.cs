@@ -49,7 +49,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
-            AssertErrorResult(result, "Cannot create relation to self", OperationFailure.BadInput);
+            AssertErrorResult(result, "'From' cannot equal 'To'", OperationFailure.BadInput);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.Model
             var itContract = new ItContract { OrganizationId = _sut.OrganizationId + 1 };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, A<int?>(), A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(new User(), destination, null, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
@@ -119,7 +119,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.AddUsageRelationTo(new User(), destination, interfaceId, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
-            AssertErrorResult(result, "Interface is not exposed by the target system", OperationFailure.BadInput);
+            AssertErrorResult(result, "Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace Tests.Unit.Core.Model
             var objectOwner = new User();
             _sut.ObjectOwner = objectOwner;
             var activeUser = new User();
-            _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage(), new ItSystemUsage()));
+            _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage()));
             var destination = new ItSystemUsage
             {
                 Id = A<int>(),
@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(activeUser, newRelation.LastChangedByUser);
             Assert.Equal(itContract, newRelation.AssociatedContract);
             Assert.Equal(frequencyType, newRelation.UsageFrequency);
-            Assert.Equal(destination, newRelation.RelationTarget);
+            Assert.Equal(destination, newRelation.ToSystemUsage);
             Assert.Equal(description, newRelation.Description);
             Assert.NotNull(newRelation.Reference);
             Assert.Equal(reference, newRelation.Reference);
@@ -180,8 +180,8 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var systemRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = some ? id : A<int>() };
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var systemRelation = new SystemRelation(new ItSystemUsage()) { Id = some ? id : A<int>() };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
             _sut.UsageRelations.Add(systemRelation);
 
@@ -201,7 +201,7 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
 
             //Act
@@ -217,8 +217,8 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var id = A<int>();
-            var removedRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = id };
-            var ignoredRelation = new SystemRelation(new ItSystemUsage(), new ItSystemUsage()) { Id = A<int>() };
+            var removedRelation = new SystemRelation(new ItSystemUsage()) { Id = id };
+            var ignoredRelation = new SystemRelation(new ItSystemUsage()) { Id = A<int>() };
             _sut.UsageRelations.Add(ignoredRelation);
             _sut.UsageRelations.Add(removedRelation);
 
