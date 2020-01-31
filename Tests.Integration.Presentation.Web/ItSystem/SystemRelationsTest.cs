@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.TakeIntoUseAsync(ignoredSystem.Id, OrganizationId);
 
             //Act
-            var availableDestinationSystems = (await ItSystemHelper.GetAvailableDestinationSystemsAsync(sourceUsage.Id, prefix))?.ToList();
+            var availableDestinationSystems = (await SystemRelationHelper.GetAvailableDestinationSystemsAsync(sourceUsage.Id, prefix))?.ToList();
 
             //Assert
             Assert.NotNull(availableDestinationSystems);
@@ -124,7 +124,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
 
             //Act
-            var options = await ItSystemHelper.GetAvailableOptionsAsync(input.SourceUsageId, input.TargetUsageId);
+            var options = await SystemRelationHelper.GetAvailableOptionsAsync(input.SourceUsageId, input.TargetUsageId);
 
             //Assert
             Assert.NotNull(options);
