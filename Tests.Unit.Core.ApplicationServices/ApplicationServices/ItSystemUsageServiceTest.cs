@@ -416,6 +416,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Verify(x => x.Save(), Times.Once);
         }
 
+        #region Helpers
         [Fact]
         public void GetRelations_Returns_NotFound()
         {
@@ -623,6 +624,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
 
+        #endregion
         private void ExpectAllowReadReturns(ItSystemUsage itSystemUsage, bool value)
         {
             _authorizationContext.Setup(x => x.AllowReads(itSystemUsage)).Returns(value);

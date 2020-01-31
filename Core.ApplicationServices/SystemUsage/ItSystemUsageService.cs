@@ -183,6 +183,48 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
+        public Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int? targetSystemUsageId = null, int? targetInterfaceId = null)
+        {
+            var sourceSystemUsage = _usageRepository.GetByKey(sourceSystemUsageId);
+            if (sourceSystemUsage == null)
+            {
+                return new OperationError("Source not found", OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(sourceSystemUsage))
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
+            }
+
+            var targetSystemUsage = Maybe<ItSystemUsage>.None;
+            if (targetSystemUsageId.HasValue)
+            {
+                targetSystemUsage = _usageRepository.GetByKey(targetSystemUsageId.Value);
+                if (targetSystemUsage == null)
+                {
+                    return new OperationError("Target system usage not found", OperationFailure.BadInput);
+                }
+            }
+
+            var targetInterface = Maybe<ItInterface>.None;
+            if (targetInterfaceId.HasValue)
+            {
+                targetInterface = targetSystemUsage.Value.GetExposedInterface(targetInterfaceId.Value);
+                if (targetInterface == null)
+                {
+                    return new OperationError("Target system interface not found", OperationFailure.BadInput);
+                }
+            }
+
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage, targetInterface);
+            if (result.Ok)
+            {
+                _usageRepository.Save();
+            }
+
+            return result;
+        }
+
         public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int systemUsageId)
         {
             Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(systemUsageId);
