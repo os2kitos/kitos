@@ -13,7 +13,8 @@
 
         public SystemRelationDTO() {}
 
-        public SystemRelationDTO(int id, NamedEntityDTO source, NamedEntityDTO destination, NamedEntityDTO @interface, NamedEntityDTO contract, NamedEntityDTO frequencyType, string description, string reference)
+        public SystemRelationDTO(int id, NamedEntityDTO source, NamedEntityDTO destination, NamedEntityDTO @interface, 
+            NamedEntityDTO contract, NamedEntityDTO frequencyType, string description, string reference)
         {
             Id = id;
             Source = source;

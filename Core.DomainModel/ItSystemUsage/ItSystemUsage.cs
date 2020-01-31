@@ -489,7 +489,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser, int sourceSystemRelationId,
-            ItSystemUsage targetSystemUsage = null, ItInterfaceExhibit targetExhibitedInterface = null)
+            Maybe<ItSystemUsage> targetSystemUsage, Maybe<ItInterface> targetInterface)
         {
             if (activeUser == null)
             {
@@ -502,30 +502,18 @@ namespace Core.DomainModel.ItSystemUsage
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.BadInput);
             }
 
-            if (targetSystemUsage != null)
+            if (targetSystemUsage.HasValue)
             {
-                relation.SetRelationTarget(targetSystemUsage);
+                relation.SetRelationTarget(targetSystemUsage.Value);
             }
 
-            if (targetExhibitedInterface != null)
+            if (targetInterface.HasValue)
             {
-                relation.SetRelationInterface(targetExhibitedInterface.ItInterface);
+                relation.SetRelationInterface(targetInterface.Value);
             }
 
             return relation;
         }
-
-        #region Helpers
-
-        private Maybe<ItInterface> GetExposedInterface(int interfaceId)
-        {
-            return ItSystem
-                .ItInterfaceExhibits
-                .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
-                ?.ItInterface;
-        }
-
-        #endregion
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
         {
@@ -539,6 +527,14 @@ namespace Core.DomainModel.ItSystemUsage
             var relation = relationResult.Value;
             UsageRelations.Remove(relation);
             return relation;
+        }
+
+        public Maybe<ItInterface> GetExposedInterface(int interfaceId)
+        {
+            return ItSystem
+                .ItInterfaceExhibits
+                .FirstOrDefault(x => x.ItInterface.Id == interfaceId)
+                ?.ItInterface;
         }
 
         public Maybe<SystemRelation> GetUsageRelation(int relationId)

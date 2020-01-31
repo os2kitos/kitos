@@ -196,26 +196,27 @@ namespace Core.ApplicationServices.SystemUsage
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
             }
 
-            ItSystemUsage targetSystemUsage = null;
+            var targetSystemUsage = Maybe<ItSystemUsage>.None;
             if (targetSystemUsageId.HasValue)
             {
                 targetSystemUsage = _usageRepository.GetByKey(targetSystemUsageId.Value);
                 if (targetSystemUsage == null)
                 {
-                    return new OperationError("Target system usage not found", OperationFailure.NotFound);
+                    return new OperationError("Target system usage not found", OperationFailure.BadInput);
                 }
             }
 
-            ItInterfaceExhibit targetInterfaceExhibit = null;
+            var targetInterface = Maybe<ItInterface>.None;
             if (targetInterfaceId.HasValue)
             {
-                if (!targetSystemUsage.ItSystem.TryGetInterfaceExhibit(out targetInterfaceExhibit, targetInterfaceId.Value))
+                targetInterface = targetSystemUsage.Value.GetExposedInterface(targetInterfaceId.Value);
+                if (targetInterface == null)
                 {
-                    return new OperationError("Target system interface not found", OperationFailure.NotFound);
+                    return new OperationError("Target system interface not found", OperationFailure.BadInput);
                 }
             }
 
-            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage, targetInterfaceExhibit);
+            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, sourceSystemRelationId, targetSystemUsage, targetInterface);
             if (result.Ok)
             {
                 _usageRepository.Save();

@@ -33,6 +33,8 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _mockTransactionManager;
         private readonly Mock<ILogger> _mockLogger;
         private readonly Mock<ItInterface> _mockSourceSystemInterface;
+        private readonly ItSystemUsageService _sut;
+
 
         public ItSystemUsageServiceRelationTest()
         {
@@ -48,6 +50,16 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockSourceSystemInterface = new Mock<ItInterface>();
             _mockSourceSystemInterface.Object.Id = 21;
             _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
+            _sut = new ItSystemUsageService(
+                _mockSystemUsageRepository.Object,
+                _mockAuthorizationContext.Object,
+                _mockSystemRepository.Object,
+                _mockContractRepository.Object,
+                _mockOptionsService.Object,
+                _mockOrganizationalUserContext.Object,
+                _mockSystemRelationRepository.Object,
+                _mockTransactionManager.Object,
+                _mockLogger.Object);
         }
 
         [Theory]
@@ -62,19 +74,8 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<int>())).Returns(systemUsage);
             _mockAuthorizationContext.Setup(c => c.AllowModify(systemUsage)).Returns(allowModifications);
 
-            var sut = new ItSystemUsageService(
-                _mockSystemUsageRepository.Object,
-                _mockAuthorizationContext.Object,
-                _mockSystemRepository.Object,
-                _mockContractRepository.Object,
-                _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object,
-                _mockSystemRelationRepository.Object,
-                _mockTransactionManager.Object,
-                _mockLogger.Object);
-
             // Act
-            var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId);
+            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId);
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
@@ -94,19 +95,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 .Returns((object[] key) => systemUsages[(int)key[0]]);
             _mockAuthorizationContext.Setup(c => c.AllowModify(mockSourceSystemUsage.Object)).Returns(true);
 
-            var sut = new ItSystemUsageService(
-                _mockSystemUsageRepository.Object,
-                _mockAuthorizationContext.Object,
-                _mockSystemRepository.Object,
-                _mockContractRepository.Object,
-                _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object,
-                _mockSystemRelationRepository.Object,
-                _mockTransactionManager.Object,
-                _mockLogger.Object);
-
             // Act
-            var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, replacementSystemUsageId, null);
+            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, replacementSystemUsageId, null);
 
             // Assert
             Assert.True(result.Ok);
@@ -128,19 +118,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 .Returns((object[] key) => systemUsages[(int)key[0]]);
             _mockAuthorizationContext.Setup(c => c.AllowModify(mockSourceSystemUsage.Object)).Returns(true);
 
-            var sut = new ItSystemUsageService(
-                _mockSystemUsageRepository.Object,
-                _mockAuthorizationContext.Object,
-                _mockSystemRepository.Object,
-                _mockContractRepository.Object,
-                _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object,
-                _mockSystemRelationRepository.Object,
-                _mockTransactionManager.Object,
-                _mockLogger.Object);
-
             // Act
-            var result = sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, TargetSystemUsageId, 100);
+            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, TargetSystemUsageId, 100);
 
             // Assert
             Assert.True(result.Ok);

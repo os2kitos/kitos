@@ -92,11 +92,16 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("Missing relation data");
             }
 
+            if (relation.Source == null || relation.Destination == null)
+            {
+                return NotFound();
+            }
+
             var result = _usageService.ModifyRelation(
                 relation.Source.Id,
                 relation.Id,
                 relation.Destination.Id,
-                relation.Interface.Id
+                relation.Interface?.Id
                 );
 
             return result.Match(onSuccess: systemRelation => Ok(MapRelation(systemRelation)), onFailure: FromOperationError);
