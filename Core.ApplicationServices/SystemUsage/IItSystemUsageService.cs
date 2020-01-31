@@ -45,7 +45,6 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="relationId"></param>
         /// <returns></returns>
         Result<SystemRelation, OperationFailure> GetRelation(int systemUsageId, int relationId);
-
         /// <summary>
         /// Gets the systems which the target system can relate to
         /// </summary>
@@ -61,5 +60,14 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="targetUsageId"></param>
         /// <returns></returns>
         Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int systemUsageId, int targetUsageId);
+        /// <summary>
+        /// Edits a system relation
+        /// </summary>
+        /// <param name="sourceSystemUsageId">Id of the "source" it system usage</param>
+        /// <param name="sourceSystemRelationId">Id of the specific relation in the "source" system usage</param>
+        /// <param name="targetSystemUsageId">Id of the "target" it system usage</param>
+        /// <param name="targetInterfaceId">Id of the specific "target" system usage interface to be used by the "source" system usage</param>
+        /// <returns></returns>
+        Result<SystemRelation, OperationError> ModifyRelation(int sourceSystemUsageId, int sourceSystemRelationId, int? targetSystemUsageId = null, int? targetInterfaceId = null);
     }
 }

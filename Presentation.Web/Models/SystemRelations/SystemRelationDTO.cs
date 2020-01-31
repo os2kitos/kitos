@@ -10,5 +10,20 @@
         public NamedEntityDTO FrequencyType { get; set; }
         public string Description { get; set; }
         public string Reference { get; set; }
+
+        public SystemRelationDTO() {}
+
+        public SystemRelationDTO(int id, NamedEntityDTO source, NamedEntityDTO destination, NamedEntityDTO @interface, 
+            NamedEntityDTO contract, NamedEntityDTO frequencyType, string description, string reference)
+        {
+            Id = id;
+            Source = source;
+            Destination = destination;
+            Interface = @interface;
+            Contract = contract;
+            FrequencyType = frequencyType;
+            Description = description;
+            Reference = reference;
+        }
     }
 }

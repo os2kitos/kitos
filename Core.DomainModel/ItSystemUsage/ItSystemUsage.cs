@@ -488,17 +488,31 @@ namespace Core.DomainModel.ItSystemUsage
             return newRelation;
         }
 
-        private Maybe<ItInterface> GetExposedInterface(int interfaceId)
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser, int sourceSystemRelationId,
+            Maybe<ItSystemUsage> targetSystemUsage, Maybe<ItInterface> targetInterface)
         {
-            return GetExposedInterfaces().FirstOrDefault(x => x.Id == interfaceId);
-        }
+            if (activeUser == null)
+            {
+                throw new ArgumentNullException(nameof(activeUser));
+            }
 
-        public IEnumerable<ItInterface> GetExposedInterfaces()
-        {
-            return ItSystem
-                .ItInterfaceExhibits
-                .Select(x => x.ItInterface)
-                .ToList();
+            var relation = UsageRelations.FirstOrDefault(r => r.Id == sourceSystemRelationId);
+            if (relation == null)
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.BadInput);
+            }
+
+            if (targetSystemUsage.HasValue)
+            {
+                relation.SetRelationTarget(targetSystemUsage.Value);
+            }
+
+            if (targetInterface.HasValue)
+            {
+                relation.SetRelationInterface(targetInterface.Value);
+            }
+
+            return relation;
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -513,6 +527,19 @@ namespace Core.DomainModel.ItSystemUsage
             var relation = relationResult.Value;
             UsageRelations.Remove(relation);
             return relation;
+        }
+		
+		public IEnumerable<ItInterface> GetExposedInterfaces()
+        {
+            return ItSystem
+                .ItInterfaceExhibits
+                .Select(x => x.ItInterface)
+                .ToList();
+		}
+
+        public Maybe<ItInterface> GetExposedInterface(int interfaceId)
+        {
+			return GetExposedInterfaces().FirstOrDefault(x => x.Id == interfaceId);
         }
 
         public Maybe<SystemRelation> GetUsageRelation(int relationId)

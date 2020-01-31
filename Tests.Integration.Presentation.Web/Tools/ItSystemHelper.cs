@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
-using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
@@ -303,5 +301,6 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.GetWithCookieAsync(url, login);
         }
+
     }
 }
