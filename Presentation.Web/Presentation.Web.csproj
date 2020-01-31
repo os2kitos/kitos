@@ -355,6 +355,7 @@
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
+    <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />

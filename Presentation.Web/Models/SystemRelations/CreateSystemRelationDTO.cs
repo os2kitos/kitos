@@ -2,8 +2,8 @@
 {
     public class CreateSystemRelationDTO
     {
-        public int SourceUsageId { get; set; }
-        public int TargetUsageId { get; set; }
+        public int FromUsageId { get; set; }
+        public int ToUsageId { get; set; }
         public string Description { get; set; }
         public int? InterfaceId { get; set; }
         public int? FrequencyTypeId { get; set; }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystem
@@ -119,5 +120,12 @@ namespace Core.DomainModel.ItSystem
 
         public string LinkToDirectoryAdminUrl { get; set; }
         public string LinkToDirectoryAdminUrlName { get; set; }
+
+        public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
+        {
+            interfaceExhibit = ItInterfaceExhibits.FirstOrDefault(i => i.ItInterface.Id == interfaceId);
+
+            return interfaceExhibit != null;
+        }
     }
 }

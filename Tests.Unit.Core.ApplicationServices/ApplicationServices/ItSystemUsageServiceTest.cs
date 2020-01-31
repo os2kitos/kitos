@@ -416,6 +416,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Verify(x => x.Save(), Times.Once);
         }
 
+        #region Helpers
         [Fact]
         public void GetRelations_Returns_NotFound()
         {
@@ -580,9 +581,11 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
-        private static SystemRelation CreateRelation()
+        private SystemRelation CreateRelation()
         {
-            return new SystemRelation(new ItSystemUsage(), new ItSystemUsage());
+            var systemRelation = new SystemRelation(new ItSystemUsage());
+            systemRelation.SetRelationTo(new ItSystemUsage() {Id = A<int>()});
+            return systemRelation;
         }
 
         private static void AssertAddRelationError(Result<SystemRelation, OperationError> result, OperationFailure operationFailure, Maybe<string> message)
@@ -623,6 +626,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
 
+        #endregion
         private void ExpectAllowReadReturns(ItSystemUsage itSystemUsage, bool value)
         {
             _authorizationContext.Setup(x => x.AllowReads(itSystemUsage)).Returns(value);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
@@ -32,56 +33,111 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("Missing relation data");
 
             var result = _usageService.AddRelation(
-                relation.SourceUsageId,
-                relation.TargetUsageId,
+                relation.FromUsageId,
+                relation.ToUsageId,
                 relation.InterfaceId,
                 relation.Description,
                 relation.Reference,
                 relation.FrequencyTypeId,
                 relation.ContractId);
 
-            return result.Match(
+            return result.Match
+            (
                 onSuccess: systemRelation =>
                     Created
                     (
                         response: MapRelation(systemRelation),
-                        location: new Uri($"{Request.RequestUri.ToString().TrimEnd('/')}/from/{systemRelation.RelationSourceId}/{systemRelation.Id}")
+                        location: new Uri($"{Request.RequestUri.ToString().TrimEnd('/')}/from/{systemRelation.FromSystemUsageId}/{systemRelation.Id}")
                     ),
-                onFailure: FromOperationError);
+                onFailure: FromOperationError
+            );
         }
 
         [HttpGet]
-        [Route("from/{systemUsageId}")]
-        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
+        [Route("from/{fromSystemUsageId}")]
+        public HttpResponseMessage GetRelationsFromSystem(int fromSystemUsageId)
         {
-            var result = _usageService.GetRelations(systemUsageId);
-
-            return result.Match(
-                onSuccess: value => Ok(MapRelations(value)),
-                onFailure: FromOperationError);
+            return _usageService.GetRelations(fromSystemUsageId)
+                .Match
+                (
+                    onSuccess: value => Ok(MapRelations(value)),
+                    onFailure: FromOperationError
+                );
         }
 
         [HttpGet]
-        [Route("from/{systemUsageId}/{relationId}")]
-        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId, int relationId)
+        [Route("from/{fromSystemUsageId}/{relationId}")]
+        public HttpResponseMessage GetRelationFromSystem(int fromSystemUsageId, int relationId)
         {
-            var result = _usageService.GetRelation(systemUsageId, relationId);
+            return _usageService.GetRelation(fromSystemUsageId, relationId)
+                .Match
+                (
+                    onSuccess: relation => Ok(MapRelation(relation)),
+                    onFailure: FromOperationFailure
+                );
+        }
 
-            return result.Match(
-                onSuccess: relation => Ok(MapRelation(relation)),
-                onFailure: FromOperationFailure);
+        [HttpGet]
+        [Route("options/{fromSystemUsageId}/available-destination-systems")]
+        public HttpResponseMessage GetAvailableDestinationSystems(int fromSystemUsageId, string nameContent, int amount)
+        {
+            return _usageService.GetAvailableRelationTargets(fromSystemUsageId, nameContent.FromString(), amount)
+                .Match
+                (
+                    onSuccess: systemUsages => Ok(systemUsages.Select(x => x.MapToNamedEntityDTO()).ToList()),
+                    onFailure: FromOperationError
+                );
+        }
+
+        [HttpGet]
+        [Route("options/{fromSystemUsageId}/in-relation-to/{toSystemUsageId}")]
+        public HttpResponseMessage GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
+        {
+            return _usageService.GetAvailableOptions(fromSystemUsageId, toSystemUsageId)
+                .Match
+                (
+                    onSuccess: options => Ok(MapOptions(options)),
+                    onFailure: FromOperationError
+                );
         }
 
         [HttpDelete]
-        [Route("from/{systemUsageId}/{relationId}")]
-        public HttpResponseMessage DeleteRelationsFromSystem(int systemUsageId, int relationId)
+        [Route("from/{fromSystemUsageId}/{relationId}")]
+        public HttpResponseMessage DeleteRelationFromSystem(int fromSystemUsageId, int relationId)
         {
-            var result = _usageService.RemoveRelation(systemUsageId, relationId);
-
-            return result.Match(
-                onSuccess: _ => NoContent(),
-                onFailure: FromOperationFailure);
+            return _usageService.RemoveRelation(fromSystemUsageId, relationId)
+                .Match
+                (
+                    onSuccess: _ => NoContent(),
+                    onFailure: FromOperationFailure
+                );
         }
+
+        [HttpPatch]
+        [Route("")]
+        public HttpResponseMessage PatchRelation([FromBody] SystemRelationDTO relation)
+        {
+            if (relation == null)
+            {
+                return BadRequest("Missing relation data");
+            }
+
+            if (relation.FromUsage == null || relation.ToUsage == null)
+            {
+                return BadRequest("FromUsage AND ToUsage MUST be defined");
+            }
+
+            var result = _usageService.ModifyRelation(
+                relation.FromUsage.Id,
+                relation.Id,
+                relation.ToUsage.Id,
+                relation.Interface?.Id
+                );
+
+            return result.Match(onSuccess: systemRelation => Ok(MapRelation(systemRelation)), onFailure: FromOperationError);
+        }
+
+        #region Helpers
 
         private static SystemRelationDTO[] MapRelations(IEnumerable<SystemRelation> systemRelations)
         {
@@ -96,8 +152,8 @@ namespace Presentation.Web.Controllers.API
             return new SystemRelationDTO
             {
                 Id = relation.Id,
-                Source = relation.RelationSource.MapToNamedEntityDTO(),
-                Destination = relation.RelationTarget.MapToNamedEntityDTO(),
+                FromUsage = relation.FromSystemUsage.MapToNamedEntityDTO(),
+                ToUsage = relation.ToSystemUsage.MapToNamedEntityDTO(),
                 Description = relation.Description,
                 Reference = relation.Reference,
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
@@ -105,5 +161,17 @@ namespace Presentation.Web.Controllers.API
                 Interface = relation.RelationInterface?.MapToNamedEntityDTO()
             };
         }
+
+        private static SystemRelationOptionsDTO MapOptions(RelationOptionsDTO options)
+        {
+            return new SystemRelationOptionsDTO
+            {
+                AvailableContracts = options.AvailableContracts.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+                AvailableFrequencyTypes = options.AvailableFrequencyTypes.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+                AvailableInterfaces = options.AvailableInterfaces.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+            };
+        }
+		
+        #endregion
     }
 }
