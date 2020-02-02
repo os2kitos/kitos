@@ -24,6 +24,8 @@ namespace Core.DomainModel
         public string Name { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.
+        /// NOTE: This value is confusing since the db value does not reflect reality.
+        /// It is set by the controllers and is set based on <see cref="IsObligatory"/> OR <see cref="LocalOptionEntity{OptionType}.IsActive"/>
         /// </summary>
         /// <value>
         ///   <c>true</c> if this instance is active; otherwise, <c>false</c>.

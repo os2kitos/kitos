@@ -23,21 +23,23 @@ namespace Core.ApplicationServices.Options
 
         public IEnumerable<TOption> GetAvailableOptions(int organizationId)
         {
-            var activeOptions = _localOptionRepository
+            var activeOptionIds = _localOptionRepository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
                 .Where(x => x.IsActive)
-                .Select(x => x.Id)
+                .Select(x => x.OptionId)
                 .ToList();
 
             var allLocallyEnabled = _optionRepository
                 .AsQueryable()
-                .ByIds(activeOptions);
+                .Where(x => x.IsEnabled) //Local cannot include not-enabled options
+                .ByIds(activeOptionIds);
 
             var allObligatory = _optionRepository
                 .AsQueryable()
-                .ExceptEntitiesWithIds(activeOptions)
-                .Where(x => x.IsObligatory && x.IsEnabled); //Add enabled global options which are obligatory as well
+                .Where(x => x.IsEnabled)
+                .ExceptEntitiesWithIds(activeOptionIds)
+                .Where(x => x.IsObligatory); //Add enabled global options which are obligatory as well
 
             return allObligatory
                 .Concat(allLocallyEnabled)
