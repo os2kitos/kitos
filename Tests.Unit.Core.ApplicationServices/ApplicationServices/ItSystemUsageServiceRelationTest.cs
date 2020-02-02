@@ -28,6 +28,8 @@ namespace Tests.Unit.Core.ApplicationServices
         private const int Interface2Id = 101;
         private const int Contract1Id = 200;
         private const int Contract2Id = 201;
+        private const int FrequencyType1Id = 300;
+        private const int FrequencyType2Id = 301;
 
         private readonly Mock<IGenericRepository<ItSystemUsage>> _mockSystemUsageRepository;
         private readonly Mock<IAuthorizationContext> _mockAuthorizationContext;
@@ -121,14 +123,8 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(Interface2Id, GetModifiedSystemRelation(mockFromSystemUsage).RelationInterface.Id);
         }
 
-        private static SystemRelation GetModifiedSystemRelation(Mock<ItSystemUsage> mockFromSystemUsage)
-        {
-            var modifiedSystemRelation = mockFromSystemUsage.Object.UsageRelations.First(r => r.Id == FromSystemRelationId);
-            return modifiedSystemRelation;
-        }
-
         [Fact]
-        private void ModifyRelation_GivenSystemUsageAndContractChange_ValidatesContractFromSameMunicipalityAndUpdates()
+        private void ModifyRelation_GivenSystemUsageAndContractChange_ValidatesContractAndUpdates()
         {
             // Arrange
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
@@ -136,12 +132,26 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupContractRepository();
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, Interface2Id, Contract2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, Contract2Id);
 
             // Assert
             Assert.True(result.Ok);
-
             Assert.Equal(Contract2Id, GetModifiedSystemRelation(mockFromSystemUsage).AssociatedContract.Id);
+        }
+
+        [Fact]
+        private void ModifyRelation_GivenSystemUsageAndFrequencyChange_ValidatesFrequencyAndUpdates()
+        {
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
+            SetupFrequencyService();
+
+            // Act
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, null, FrequencyType2Id);
+
+            // Assert
+            Assert.True(result.Ok);
+            Assert.Equal(FrequencyType2Id, GetModifiedSystemRelation(mockFromSystemUsage).UsageFrequency.Id);
         }
 
         #region Helpers
@@ -158,20 +168,14 @@ namespace Tests.Unit.Core.ApplicationServices
             return systemUsages;
         }
 
-        private static Mock<ItSystemUsage> SetupMockSystemUsage(int id)
-        {
-            var mockSystemUsage1 = new Mock<ItSystemUsage>();
-            mockSystemUsage1.Object.Id = id;
-            return mockSystemUsage1;
-        }
-
         private static void SetupSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object)
             {
                 Id = systemRelationId,
                 RelationInterface = new ItInterface { Id = Interface1Id },
-                AssociatedContract = new ItContract { Id = Contract1Id }
+                AssociatedContract = new ItContract { Id = Contract1Id },
+                UsageFrequency = new RelationFrequencyType { Id = FrequencyType1Id }
             };
             usageSystemRelation.SetRelationTo(targetSystemUsage.Object);
             sourceSystemUsage.SetupGet(u => u.UsageRelations).Returns(new List<SystemRelation> {usageSystemRelation});
@@ -200,6 +204,29 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             _mockContractRepository.Setup(r => r.GetById(It.IsAny<int>()))
                 .Returns((int key) => contracts[key]);
+        }
+
+        private void SetupFrequencyService()
+        {
+            _mockOptionsService.Setup(s => s.GetAvailableOptions(It.IsAny<int>())).Returns(
+                new List<RelationFrequencyType>()
+                {
+                    new RelationFrequencyType { Id = FrequencyType1Id },
+                    new RelationFrequencyType { Id = FrequencyType2Id },
+                });
+        }
+
+        private static SystemRelation GetModifiedSystemRelation(IMock<ItSystemUsage> mockFromSystemUsage)
+        {
+            var modifiedSystemRelation = mockFromSystemUsage.Object.UsageRelations.First(r => r.Id == FromSystemRelationId);
+            return modifiedSystemRelation;
+        }
+
+        private static Mock<ItSystemUsage> SetupMockSystemUsage(int id)
+        {
+            var mockSystemUsage1 = new Mock<ItSystemUsage>();
+            mockSystemUsage1.Object.Id = id;
+            return mockSystemUsage1;
         }
 
         #endregion

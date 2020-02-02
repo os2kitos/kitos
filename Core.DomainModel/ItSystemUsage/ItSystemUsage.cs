@@ -447,14 +447,13 @@ namespace Core.DomainModel.ItSystemUsage
             var newRelation = new SystemRelation(this)
             {
                 Description = description,
-                UsageFrequency = targetFrequency.GetValueOrDefault(),
                 Reference = reference,
                 ObjectOwner = ObjectOwner,
                 LastChangedByUser = activeUser,
                 LastChanged = DateTime.Now
             };
 
-            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, interfaceId, targetContract);
+            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, interfaceId, targetContract, targetFrequency);
 
             if (updateRelationResult.Failed)
             {
@@ -472,8 +471,9 @@ namespace Core.DomainModel.ItSystemUsage
         public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser,
             int relationId,
             ItSystemUsage toSystemUsage,
-            Maybe<int> interfaceId, 
-            Maybe<ItContract.ItContract> toContract)
+            int? interfaceId,
+            Maybe<ItContract.ItContract> toContract, 
+            Maybe<RelationFrequencyType> toFrequency)
         {
             if (activeUser == null)
             {
@@ -488,7 +488,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, interfaceId, toContract);
+            return UpdateRelation(relation, toSystemUsage, interfaceId, toContract, toFrequency);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -525,11 +525,11 @@ namespace Core.DomainModel.ItSystemUsage
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
         }
 
-        private static Result<SystemRelation, OperationError> UpdateRelation(
-            SystemRelation relation,
+        private static Result<SystemRelation, OperationError> UpdateRelation(SystemRelation relation,
             ItSystemUsage toSystemUsage,
-            Maybe<int> interfaceId,
-            Maybe<ItContract.ItContract> targetContract)
+            int? interfaceId,
+            Maybe<ItContract.ItContract> toContract, 
+            Maybe<RelationFrequencyType> toFrequency)
         {
             var relationToResult = relation.SetRelationTo(toSystemUsage);
             if (relationToResult.Failed)
@@ -543,8 +543,14 @@ namespace Core.DomainModel.ItSystemUsage
                 return setInterfaceResult.Error;
             }
 
-            var setContractResult = relation.SetContract(targetContract);
+            var setContractResult = relation.SetContract(toContract);
             if (setContractResult.Failed)
+            {
+                return setContractResult.Error;
+            }
+
+            var setFrequencyResult = relation.SetFrequency(toFrequency);
+            if (setFrequencyResult.Failed)
             {
                 return setContractResult.Error;
             }

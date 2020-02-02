@@ -191,7 +191,8 @@ namespace Core.ApplicationServices.SystemUsage
             int relationId, 
             int toSystemUsageId, 
             int? toInterfaceId = null,
-            int? toContractId = null)
+            int? toContractId = null,
+            int? toFrequencyId = null)
         {
             var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (fromSystemUsage == null)
@@ -221,7 +222,19 @@ namespace Core.ApplicationServices.SystemUsage
 
             }
 
-            var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, toInterfaceId, toContract);
+            var toFrequency = Maybe<RelationFrequencyType>.None;
+            if (toFrequencyId.HasValue)
+            {
+                toFrequency = _frequencyService
+                    .GetAvailableOptions(fromSystemUsage.OrganizationId)
+                    .FirstOrDefault(x => x.Id == toFrequencyId.Value);
+
+                if (!toFrequency.HasValue)
+                    return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+            }
+
+
+            var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, toInterfaceId, toContract, toFrequency);
             if (result.Ok)
             {
                 _usageRepository.Save();

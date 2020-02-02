@@ -118,7 +118,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// Replace relation interface
         /// </summary>
         /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(Maybe<int> targetInterfaceId)
+        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(int? targetInterfaceId)
         {
             if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
@@ -139,6 +139,21 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return RelationInterface.FromNullable();
+        }
+
+        /// <summary>
+        /// Replaces frequency type
+        /// </summary>
+        /// <param name="toFrequency">Replacement frequency to be used in relation. NULL is allowed</param>
+        /// <returns></returns>
+        public Result<Maybe<RelationFrequencyType>, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
+        {
+            if (toFrequency.HasValue)
+            {
+                UsageFrequency = toFrequency.GetValueOrDefault();
+            }
+
+            return UsageFrequency.FromNullable();
         }
     }
 }
