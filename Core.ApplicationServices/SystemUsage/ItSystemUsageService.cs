@@ -190,6 +190,8 @@ namespace Core.ApplicationServices.SystemUsage
             int fromSystemUsageId, 
             int relationId, 
             int toSystemUsageId, 
+            string changedDescription = "",
+            string changedReference = "",
             int? toInterfaceId = null,
             int? toContractId = null,
             int? toFrequencyId = null)
@@ -234,7 +236,8 @@ namespace Core.ApplicationServices.SystemUsage
             }
 
 
-            var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, toInterfaceId, toContract, toFrequency);
+            var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, 
+                changedDescription, changedReference, toInterfaceId, toContract, toFrequency);
             if (result.Ok)
             {
                 _usageRepository.Save();

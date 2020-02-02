@@ -155,5 +155,13 @@ namespace Core.DomainModel.ItSystemUsage
 
             return UsageFrequency.FromNullable();
         }
+
+        public Result<string, OperationError> SetReference(string changedReference)
+        {
+            // TODO: Are only valid URL's allowed as reference values?
+            Reference = changedReference;
+
+            return Reference;
+        }
     }
 }

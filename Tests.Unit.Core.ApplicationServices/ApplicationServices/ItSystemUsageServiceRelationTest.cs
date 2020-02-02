@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockAuthorizationContext.Setup(c => c.AllowModify(fromSystemUsage)).Returns(allowModifications);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId,ToSystemUsageId);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId);
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
@@ -99,7 +99,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, replacementSystemUsageId, null);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, replacementSystemUsageId);
 
             // Assert
             Assert.True(result.Ok);
@@ -116,7 +116,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, Interface2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", Interface2Id);
 
             // Assert
             Assert.True(result.Ok);
@@ -132,7 +132,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupContractRepository();
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, Contract2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", null, Contract2Id);
 
             // Assert
             Assert.True(result.Ok);
@@ -147,11 +147,30 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupFrequencyService();
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, null, FrequencyType2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", 
+                null, null, FrequencyType2Id);
 
             // Assert
             Assert.True(result.Ok);
             Assert.Equal(FrequencyType2Id, GetModifiedSystemRelation(mockFromSystemUsage).UsageFrequency.Id);
+        }
+
+        [Fact]
+        private void ModifyRelation_GivenSystemUsageAndChangedDescriptionAndReference_TheseFieldsAreValidatedAndUpdated()
+        {
+            // Arrange
+            const string changedDescription = "ChangedDescription";
+            const string changedReference = "ChangedReference";
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
+
+            // Act
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, changedDescription, changedReference);
+
+            // Assert
+            Assert.True(result.Ok);
+            Assert.Equal(changedDescription, GetModifiedSystemRelation(mockFromSystemUsage).Description);
+            Assert.Equal(changedReference, GetModifiedSystemRelation(mockFromSystemUsage).Reference);
         }
 
         #region Helpers
@@ -173,6 +192,8 @@ namespace Tests.Unit.Core.ApplicationServices
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object)
             {
                 Id = systemRelationId,
+                Description = "MyDescription",
+                Reference = "https://dummy.dk",
                 RelationInterface = new ItInterface { Id = Interface1Id },
                 AssociatedContract = new ItContract { Id = Contract1Id },
                 UsageFrequency = new RelationFrequencyType { Id = FrequencyType1Id }
