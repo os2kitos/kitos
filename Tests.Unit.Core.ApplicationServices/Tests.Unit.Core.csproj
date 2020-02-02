@@ -150,7 +150,6 @@
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
-    <Compile Include="Model\SystemRelationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
