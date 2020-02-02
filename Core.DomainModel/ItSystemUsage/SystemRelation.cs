@@ -118,7 +118,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// Replace relation interface
         /// </summary>
         /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(int? targetInterfaceId)
+        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(Maybe<int> targetInterfaceId)
         {
             if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");

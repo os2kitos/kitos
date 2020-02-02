@@ -4,6 +4,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
@@ -20,9 +21,13 @@ namespace Tests.Unit.Core.ApplicationServices
 {
     public class ItSystemUsageServiceRelationTest : WithAutoFixture
     {
-        private const int SourceSystemUsageId = 1;
-        private const int TargetSystemUsageId = 2;
-        private const int SourceSystemRelationId = 11;
+        private const int FromSystemUsageId = 1;
+        private const int ToSystemUsageId = 2;
+        private const int FromSystemRelationId = 11;
+        private const int Interface1Id = 100;
+        private const int Interface2Id = 101;
+        private const int Contract1Id = 200;
+        private const int Contract2Id = 201;
 
         private readonly Mock<IGenericRepository<ItSystemUsage>> _mockSystemUsageRepository;
         private readonly Mock<IAuthorizationContext> _mockAuthorizationContext;
@@ -33,7 +38,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<SystemRelation>> _mockSystemRelationRepository;
         private readonly Mock<ITransactionManager> _mockTransactionManager;
         private readonly Mock<ILogger> _mockLogger;
-        private readonly Mock<ItInterface> _mockSourceSystemInterface;
         private readonly ItSystemUsageService _sut;
 
 
@@ -48,8 +52,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockSystemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
             _mockTransactionManager = new Mock<ITransactionManager>();
             _mockLogger = new Mock<ILogger>();
-            _mockSourceSystemInterface = new Mock<ItInterface>();
-            _mockSourceSystemInterface.Object.Id = 21;
             _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
             _sut = new ItSystemUsageService(
                 _mockSystemUsageRepository.Object,
@@ -69,16 +71,16 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ModifyRelation_GivenAnyUserWithItSystemWriteAccess_AllowsModifications(bool allowModifications)
         {
             // Arrange
-            var systemUsage = new ItSystemUsage { Id = SourceSystemUsageId };
-            var targetUsage = new ItSystemUsage { Id = TargetSystemUsageId };
-            var systemRelation = new SystemRelation(systemUsage) { Id = SourceSystemRelationId };
-            systemUsage.UsageRelations = new List<SystemRelation> { systemRelation };
-            _mockSystemUsageRepository.Setup(r => r.GetByKey(SourceSystemUsageId)).Returns(systemUsage);
-            _mockSystemUsageRepository.Setup(r => r.GetByKey(TargetSystemUsageId)).Returns(targetUsage);
-            _mockAuthorizationContext.Setup(c => c.AllowModify(systemUsage)).Returns(allowModifications);
+            var fromSystemUsage = new ItSystemUsage { Id = FromSystemUsageId };
+            var toSystemUsage = new ItSystemUsage { Id = ToSystemUsageId };
+            var systemRelation = new SystemRelation(fromSystemUsage) { Id = FromSystemRelationId };
+            fromSystemUsage.UsageRelations = new List<SystemRelation> { systemRelation };
+            _mockSystemUsageRepository.Setup(r => r.GetByKey(FromSystemUsageId)).Returns(fromSystemUsage);
+            _mockSystemUsageRepository.Setup(r => r.GetByKey(ToSystemUsageId)).Returns(toSystemUsage);
+            _mockAuthorizationContext.Setup(c => c.AllowModify(fromSystemUsage)).Returns(allowModifications);
 
             // Act
-            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId,TargetSystemUsageId);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId,ToSystemUsageId);
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
@@ -89,21 +91,17 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             // Arrange
             const int replacementSystemUsageId = 3;
-            var mockSourceSystemUsage = SetupMockSystemUsage(SourceSystemUsageId);
-            var mockTargetSystemUsage = SetupMockSystemUsage(TargetSystemUsageId);
             var mockReplacementSystemUsage = SetupMockSystemUsage(replacementSystemUsageId);
-            var systemUsages = new Dictionary<int, ItSystemUsage> {{ SourceSystemUsageId, mockSourceSystemUsage.Object}, { TargetSystemUsageId, mockTargetSystemUsage.Object}, { replacementSystemUsageId, mockReplacementSystemUsage.Object}};
-            SetupUsageSystemRelation(SourceSystemRelationId, mockSourceSystemUsage, mockTargetSystemUsage);
-            _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<object[]>()))
-                .Returns((object[] key) => systemUsages[(int)key[0]]);
-            _mockAuthorizationContext.Setup(c => c.AllowModify(mockSourceSystemUsage.Object)).Returns(true);
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            systemUsages.Add(replacementSystemUsageId, mockReplacementSystemUsage.Object);
+            SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, replacementSystemUsageId, null);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, replacementSystemUsageId, null);
 
             // Assert
             Assert.True(result.Ok);
-            var modifiedSystemRelation = mockSourceSystemUsage.Object.UsageRelations.First(r => r.Id == SourceSystemRelationId);
+            var modifiedSystemRelation = mockFromSystemUsage.Object.UsageRelations.First(r => r.Id == FromSystemRelationId);
             Assert.Equal(mockReplacementSystemUsage.Object, modifiedSystemRelation.ToSystemUsage);
             Assert.Null(modifiedSystemRelation.RelationInterface);
         }
@@ -112,25 +110,53 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ModifyRelation_GivenSystemUsageAndInterfaceChange_ValidatesInterfaceIsExposedByTargetSystemAndUpdates()
         {
             // Arrange
-            var mockSourceSystemUsage = SetupMockSystemUsage(SourceSystemUsageId);
-            var mockTargetSystemUsage = SetupMockSystemUsage(TargetSystemUsageId);
-            var systemUsages = new Dictionary<int, ItSystemUsage> {{ SourceSystemUsageId, mockSourceSystemUsage.Object}, { TargetSystemUsageId, mockTargetSystemUsage.Object}};            
-            SetupUsageSystemRelation(SourceSystemRelationId, mockSourceSystemUsage, mockTargetSystemUsage);
-            _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
-            _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<object[]>()))
-                .Returns((object[] key) => systemUsages[(int)key[0]]);
-            _mockAuthorizationContext.Setup(c => c.AllowModify(mockSourceSystemUsage.Object)).Returns(true);
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(SourceSystemUsageId, SourceSystemRelationId, TargetSystemUsageId, 100);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, Interface2Id);
 
             // Assert
             Assert.True(result.Ok);
-            var modifiedSystemRelation = mockSourceSystemUsage.Object.UsageRelations.First(r => r.Id == SourceSystemRelationId);
-            Assert.Equal(100, modifiedSystemRelation.RelationInterface.Id);
+            Assert.Equal(Interface2Id, GetModifiedSystemRelation(mockFromSystemUsage).RelationInterface.Id);
+        }
+
+        private static SystemRelation GetModifiedSystemRelation(Mock<ItSystemUsage> mockFromSystemUsage)
+        {
+            var modifiedSystemRelation = mockFromSystemUsage.Object.UsageRelations.First(r => r.Id == FromSystemRelationId);
+            return modifiedSystemRelation;
+        }
+
+        [Fact]
+        private void ModifyRelation_GivenSystemUsageAndContractChange_ValidatesContractFromSameMunicipalityAndUpdates()
+        {
+            // Arrange
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
+            SetupContractRepository();
+
+            // Act
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, Interface2Id, Contract2Id);
+
+            // Assert
+            Assert.True(result.Ok);
+
+            Assert.Equal(Contract2Id, GetModifiedSystemRelation(mockFromSystemUsage).AssociatedContract.Id);
         }
 
         #region Helpers
+
+        private Dictionary<int, ItSystemUsage> SetupSystemRelationWithIngredients(out Mock<ItSystemUsage> mockFromSystemUsage)
+        {
+            mockFromSystemUsage = SetupMockSystemUsage(FromSystemUsageId);
+            var mockToSystemUsage = SetupMockSystemUsage(ToSystemUsageId);
+            var fromSystemUsage = mockFromSystemUsage.Object;
+            var systemUsages = new Dictionary<int, ItSystemUsage>
+                {{FromSystemUsageId, fromSystemUsage}, {ToSystemUsageId, mockToSystemUsage.Object}};
+            SetupSystemRelation(FromSystemRelationId, mockFromSystemUsage, mockToSystemUsage);
+            _mockAuthorizationContext.Setup(c => c.AllowModify(fromSystemUsage)).Returns(true);
+            return systemUsages;
+        }
 
         private static Mock<ItSystemUsage> SetupMockSystemUsage(int id)
         {
@@ -139,23 +165,41 @@ namespace Tests.Unit.Core.ApplicationServices
             return mockSystemUsage1;
         }
 
-        private void SetupUsageSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
+        private static void SetupSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object)
             {
                 Id = systemRelationId,
-                RelationInterface = _mockSourceSystemInterface.Object
+                RelationInterface = new ItInterface { Id = Interface1Id },
+                AssociatedContract = new ItContract { Id = Contract1Id }
             };
             usageSystemRelation.SetRelationTo(targetSystemUsage.Object);
             sourceSystemUsage.SetupGet(u => u.UsageRelations).Returns(new List<SystemRelation> {usageSystemRelation});
             var itInterfaceExhibits = new List<ItInterfaceExhibit>
             {
-                new ItInterfaceExhibit { ItInterface = new ItInterface { Id = 100 }},
-                new ItInterfaceExhibit { ItInterface = new ItInterface { Id = 101 }}
+                new ItInterfaceExhibit { ItInterface = new ItInterface { Id = Interface1Id }},
+                new ItInterfaceExhibit { ItInterface = new ItInterface { Id = Interface2Id }}
             };
             var mockTargetItSystem = new Mock<ItSystem>();
             mockTargetItSystem.SetupGet(s => s.ItInterfaceExhibits).Returns(itInterfaceExhibits);
             targetSystemUsage.SetupGet(u => u.ItSystem).Returns(mockTargetItSystem.Object);
+        }
+
+        private void SetupSystemUsageRepository(IReadOnlyDictionary<int, ItSystemUsage> systemUsages)
+        {
+            _mockSystemUsageRepository.Setup(r => r.GetByKey(It.IsAny<object[]>()))
+                .Returns((object[] key) => systemUsages[(int) key[0]]);
+        }
+
+        private void SetupContractRepository()
+        {
+            var contracts = new Dictionary<int, ItContract>
+            {
+                {Contract1Id, new ItContract {Id = Contract1Id}},
+                {Contract2Id, new ItContract {Id = Contract2Id}}
+            };
+            _mockContractRepository.Setup(r => r.GetById(It.IsAny<int>()))
+                .Returns((int key) => contracts[key]);
         }
 
         #endregion

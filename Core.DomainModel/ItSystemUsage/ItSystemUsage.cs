@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -470,11 +469,11 @@ namespace Core.DomainModel.ItSystemUsage
             return newRelation;
         }
 
-        public Result<SystemRelation, OperationError> ModifyUsageRelation(
-            User activeUser,
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser,
             int relationId,
             ItSystemUsage toSystemUsage,
-            int? interfaceId)
+            Maybe<int> interfaceId, 
+            Maybe<ItContract.ItContract> toContract)
         {
             if (activeUser == null)
             {
@@ -489,7 +488,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, interfaceId, Maybe<ItContract.ItContract>.None);
+            return UpdateRelation(relation, toSystemUsage, interfaceId, toContract);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -529,7 +528,7 @@ namespace Core.DomainModel.ItSystemUsage
         private static Result<SystemRelation, OperationError> UpdateRelation(
             SystemRelation relation,
             ItSystemUsage toSystemUsage,
-            int? interfaceId,
+            Maybe<int> interfaceId,
             Maybe<ItContract.ItContract> targetContract)
         {
             var relationToResult = relation.SetRelationTo(toSystemUsage);
