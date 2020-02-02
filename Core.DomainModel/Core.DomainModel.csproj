@@ -215,7 +215,6 @@
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
-    <Compile Include="Result\ResultExtensions.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />

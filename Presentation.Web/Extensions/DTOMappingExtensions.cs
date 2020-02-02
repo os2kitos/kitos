@@ -20,7 +20,7 @@ namespace Presentation.Web.Extensions
 
         public static NamedEntityDTO MapToNamedEntityDTO(this ItSystemUsage source)
         {
-            return new NamedEntityDTO(source.Id, source.LocalCallName ?? source.ItSystem.Name);
+            return new NamedEntityDTO(source.Id, source.ItSystem.Name);
         }
     }
 }

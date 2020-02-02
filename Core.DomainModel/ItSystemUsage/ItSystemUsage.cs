@@ -532,25 +532,10 @@ namespace Core.DomainModel.ItSystemUsage
             int? interfaceId,
             Maybe<ItContract.ItContract> targetContract)
         {
-            var relationToResult = relation.SetRelationTo(toSystemUsage);
-            if (relationToResult.Failed)
-            {
-                return relationToResult.Error;
-            }
-
-            var setInterfaceResult = relation.SetRelationInterface(interfaceId);
-            if (setInterfaceResult.Failed)
-            {
-                return setInterfaceResult.Error;
-            }
-
-            var setContractResult = relation.SetContract(targetContract);
-            if (setContractResult.Failed)
-            {
-                return setContractResult.Error;
-            }
-
-            return relation;
+            return relation
+                    .SetRelationTo(toSystemUsage)
+                    .Select(_ => _.SetRelationInterface(interfaceId))
+                    .Select(_ => _.SetContract(targetContract));
         }
     }
 }
