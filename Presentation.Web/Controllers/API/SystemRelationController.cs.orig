@@ -138,12 +138,17 @@ namespace Presentation.Web.Controllers.API
                 relation.FromUsage.Id,
                 relation.Id,
                 relation.ToUsage.Id,
+<<<<<<< HEAD
                 relation.Description,
                 relation.Reference,
                 relation.Interface?.Id,
                 relation.Contract?.Id,
                 relation.FrequencyType?.Id
+                );
+=======
+                relation.Interface?.Id
             );
+>>>>>>> 7636178263bdef6c5b22572b756232b5b6801303
 
             return result.Match(onSuccess: systemRelation => Ok(MapRelation(systemRelation)), onFailure: FromOperationError);
         }

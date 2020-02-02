@@ -534,14 +534,45 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
         {
+<<<<<<< HEAD
             relation.Description = changedDescription;
+            var relationReferenceResult = relation.SetReference(changedReference);
+            if (relationReferenceResult.Failed)
+            {
+                return relationReferenceResult.Error;
+            }
 
+            var relationToResult = relation.SetRelationTo(toSystemUsage);
+            if (relationToResult.Failed)
+            {
+                return relationToResult.Error;
+            }
+
+            var setInterfaceResult = relation.SetRelationInterface(interfaceId);
+            if (setInterfaceResult.Failed)
+            {
+                return setInterfaceResult.Error;
+            }
+
+            var setContractResult = relation.SetContract(toContract);
+            if (setContractResult.Failed)
+            {
+                return setContractResult.Error;
+            }
+
+            var setFrequencyResult = relation.SetFrequency(toFrequency);
+            if (setFrequencyResult.Failed)
+            {
+                return setContractResult.Error;
+            }
+
+            return relation;
+=======
             return relation
-                .SetRelationTo(toSystemUsage)
-                .Select(_ => _.SetRelationInterface(interfaceId))
-                .Select(_ => _.SetContract(toContract))
-                .Select(_ => _.SetFrequency(toFrequency))
-                .Select(_ => _.SetReference(changedReference));
+                    .SetRelationTo(toSystemUsage)
+                    .Select(_ => _.SetRelationInterface(interfaceId))
+                    .Select(_ => _.SetContract(targetContract));
+>>>>>>> 7636178263bdef6c5b22572b756232b5b6801303
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// Replaces mandatory relation "to" and resets relation interface
         /// </summary>
         /// <param name="toSystemUsage">Replacement system usage</param>
-        public Result<ItSystemUsage, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
+        public Result<SystemRelation, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
         {
             if (toSystemUsage == null)
                 throw new ArgumentNullException(nameof(toSystemUsage));
@@ -94,10 +94,10 @@ namespace Core.DomainModel.ItSystemUsage
                     ? RelationInterface
                     : null;
 
-            return ToSystemUsage;
+            return this;
         }
 
-        public Result<Maybe<ItContract.ItContract>, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
+        public Result<SystemRelation, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
         {
             //IF contract is defined it MUST be in the same organization
             if (!CheckSameOrganizationConstraint(contract).GetValueOrFallback(true))
@@ -106,7 +106,7 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             AssociatedContract = contract.GetValueOrDefault();
-            return contract;
+            return this;
         }
 
         private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IHasOrganization
@@ -118,7 +118,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// Replace relation interface
         /// </summary>
         /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(int? targetInterfaceId)
+        public Result<SystemRelation, OperationError> SetRelationInterface(int? targetInterfaceId)
         {
             if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
@@ -138,7 +138,7 @@ namespace Core.DomainModel.ItSystemUsage
                 RelationInterface = null;
             }
 
-            return RelationInterface.FromNullable();
+            return this;
         }
 
         /// <summary>
@@ -146,22 +146,22 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         /// <param name="toFrequency">Replacement frequency to be used in relation. NULL is allowed</param>
         /// <returns></returns>
-        public Result<Maybe<RelationFrequencyType>, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
+        public Result<SystemRelation, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
         {
             if (toFrequency.HasValue)
             {
                 UsageFrequency = toFrequency.GetValueOrDefault();
             }
 
-            return UsageFrequency.FromNullable();
+            return this;
         }
 
-        public Result<string, OperationError> SetReference(string changedReference)
+        public Result<SystemRelation, OperationError> SetReference(string changedReference)
         {
             // TODO: Are only valid URL's allowed as reference values?
             Reference = changedReference;
 
-            return Reference;
+            return this;
         }
     }
 }

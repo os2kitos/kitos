@@ -56,6 +56,24 @@ namespace Core.DomainModel.Result
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
         }
 
+        /// <summary>
+        /// Applies the provided <paramref name="transform"/> to the successful value if present
+        /// If the current state of the result is "error", the error is returned.
+        /// Applies state-based decision logic on how to build the next result.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transform"></param>
+        /// <returns></returns>
+        public Result<T, TFailure> Select<T>(Func<TSuccess, Result<T, TFailure>> transform)
+        {
+            return Match(transform, failure => failure);
+        }
+
+        public T Match<T>(Func<TSuccess, T> onSuccess, Func<TFailure, T> onFailure)
+        {
+            return Ok ? onSuccess(Value) : onFailure(Error);
+        }
+
         public override string ToString()
         {
             return Ok ? "RESULT: SUCCESS" : $"RESULT: ERROR '{Error}'";
