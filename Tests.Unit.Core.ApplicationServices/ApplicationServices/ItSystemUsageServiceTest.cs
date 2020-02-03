@@ -634,25 +634,6 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_Forbidden_Due_To_Bad_InOrg_Access()
-        {
-            //Arrange
-            var id = A<int>();
-            var organizationId = A<int>();
-            var itSystemUsage = new ItSystemUsage { OrganizationId = organizationId };
-            ExpectGetUsageByKeyReturns(id, itSystemUsage);
-            ExpectAllowReadReturns(itSystemUsage, true);
-            ExpectGetOrganizationReadAccessReturns(itSystemUsage, OrganizationDataReadAccessLevel.Public);
-
-            //Act
-            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
-
-            //Assert
-            Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
-        [Fact]
         public void GetSystemUsagesWhichCanBeRelatedTo_Without_NameContent_Returns_AvailableSystemUsages()
         {
             //Arrange
@@ -666,7 +647,6 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectGetUsageByKeyReturns(fromItSystemUsage.Id, fromItSystemUsage);
             ExpectAllowReadReturns(fromItSystemUsage, true);
-            ExpectGetOrganizationReadAccessReturns(fromItSystemUsage, OrganizationDataReadAccessLevel.All);
             _systemRepository.Setup(x => x.GetSystemsInUse(organizationId)).Returns(new[] { itSystem1, itSystem2, itSystem3 }.AsQueryable());
             _usageRepository.Setup(x => x.AsQueryable()).Returns(new[] { includedSystemUsage1, includedSystemUsage2, fromItSystemUsage }.AsQueryable());
 
@@ -687,11 +667,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 ItSystemId = itSystem.Id,
                 ItSystem = itSystem
             };
-        }
-
-        private void ExpectGetOrganizationReadAccessReturns(ItSystemUsage itSystemUsage, OrganizationDataReadAccessLevel value)
-        {
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(itSystemUsage.OrganizationId)).Returns(value);
         }
 
         private ItSystem CreateItSystem()
