@@ -347,7 +347,11 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
         {
-            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters
+            {
+                FromSystemUsageId = fromSystemUsageId,
+                ToSystemUsageId = toSystemUsageId
+            }, new SystemRelationOperationEntities());
 
             return
                 LoadFromSystemUsage(operationContext)
