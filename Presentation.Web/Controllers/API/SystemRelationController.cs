@@ -78,10 +78,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("options/{fromSystemUsageId}/available-destination-systems")]
-        public HttpResponseMessage GetAvailableDestinationSystems(int fromSystemUsageId, string nameContent, int amount)
+        [Route("options/{fromSystemUsageId}/systems-which-can-be-related-to")]
+        public HttpResponseMessage GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, string nameContent, int amount)
         {
-            return _usageService.GetAvailableRelationTargets(fromSystemUsageId, nameContent.FromString(), amount)
+            return _usageService.GetSystemUsagesWhichCanBeRelatedTo(fromSystemUsageId, nameContent.FromString(), amount)
                 .Match
                 (
                     onSuccess: systemUsages => Ok

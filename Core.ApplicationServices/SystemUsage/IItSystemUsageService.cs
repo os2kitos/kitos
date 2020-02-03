@@ -46,13 +46,13 @@ namespace Core.ApplicationServices.SystemUsage
         /// <returns></returns>
         Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId);
         /// <summary>
-        /// Gets the systems which the target system can relate to
+        /// Gets the systems which the "from" system can relate to
         /// </summary>
         /// <param name="fromSystemUsageId"></param>
         /// <param name="nameContent"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int fromSystemUsageId, Maybe<string> nameContent, int pageSize);
+        Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, Maybe<string> nameContent, int pageSize);
         /// <summary>
         /// Gets the valid options for the given system relation
         /// </summary>

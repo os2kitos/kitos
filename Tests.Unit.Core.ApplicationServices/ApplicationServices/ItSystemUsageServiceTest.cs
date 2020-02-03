@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -12,6 +11,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -32,8 +32,8 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _optionsService;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly User _activeUser;
-        private Mock<ITransactionManager> _transactionManager;
-        private Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
 
         public ItSystemUsageServiceTest()
         {
@@ -581,10 +581,129 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(26)]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_BadInput_For_PageSize(int pageSize)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, pageSize);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var itSystemUsage = new ItSystemUsage();
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, false);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_Forbidden_Due_To_Bad_InOrg_Access()
+        {
+            //Arrange
+            var id = A<int>();
+            var organizationId = A<int>();
+            var itSystemUsage = new ItSystemUsage { OrganizationId = organizationId };
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, true);
+            ExpectGetOrganizationReadAccessReturns(itSystemUsage, OrganizationDataReadAccessLevel.Public);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Without_NameContent_Returns_AvailableSystemUsages()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var itSystem1 = CreateItSystem();
+            var itSystem2 = CreateItSystem();
+            var itSystem3 = CreateItSystem();
+            var fromItSystemUsage = CreateSystemUsage(organizationId, itSystem1);
+            var includedSystemUsage1 = CreateSystemUsage(organizationId, itSystem2);
+            var includedSystemUsage2 = CreateSystemUsage(organizationId, itSystem3);
+
+            ExpectGetUsageByKeyReturns(fromItSystemUsage.Id, fromItSystemUsage);
+            ExpectAllowReadReturns(fromItSystemUsage, true);
+            ExpectGetOrganizationReadAccessReturns(fromItSystemUsage, OrganizationDataReadAccessLevel.All);
+            _systemRepository.Setup(x => x.GetSystemsInUse(organizationId)).Returns(new[] { itSystem1, itSystem2, itSystem3 }.AsQueryable());
+            _usageRepository.Setup(x => x.AsQueryable()).Returns(new[] { includedSystemUsage1, includedSystemUsage2, fromItSystemUsage }.AsQueryable());
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(fromItSystemUsage.Id, Maybe<string>.None, 3);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(new[] { includedSystemUsage1.Id, includedSystemUsage2.Id }.OrderBy(x => x), result.Value.Select(x => x.Id).OrderBy(x => x));
+        }
+
+        private ItSystemUsage CreateSystemUsage(int organizationId, ItSystem itSystem)
+        {
+            return new ItSystemUsage
+            {
+                OrganizationId = organizationId,
+                Id = A<int>(),
+                ItSystemId = itSystem.Id,
+                ItSystem = itSystem
+            };
+        }
+
+        private void ExpectGetOrganizationReadAccessReturns(ItSystemUsage itSystemUsage, OrganizationDataReadAccessLevel value)
+        {
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(itSystemUsage.OrganizationId)).Returns(value);
+        }
+
+        private ItSystem CreateItSystem()
+        {
+            return new ItSystem
+            {
+                Name = A<string>(),
+                Id = A<int>()
+            };
+        }
+
         private SystemRelation CreateRelation()
         {
             var systemRelation = new SystemRelation(new ItSystemUsage());
-            systemRelation.SetRelationTo(new ItSystemUsage() {Id = A<int>()});
+            systemRelation.SetRelationTo(new ItSystemUsage { Id = A<int>() });
             return systemRelation;
         }
 

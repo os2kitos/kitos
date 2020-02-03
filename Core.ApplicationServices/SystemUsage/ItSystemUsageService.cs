@@ -187,9 +187,9 @@ namespace Core.ApplicationServices.SystemUsage
         }
 
         public Result<SystemRelation, OperationError> ModifyRelation(
-            int fromSystemUsageId, 
-            int relationId, 
-            int toSystemUsageId, 
+            int fromSystemUsageId,
+            int relationId,
+            int toSystemUsageId,
             int? targetInterfaceId = null)
         {
             var sourceSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
@@ -287,12 +287,13 @@ namespace Core.ApplicationServices.SystemUsage
                 .GetValueOrFallback(OperationFailure.NotFound);
         }
 
-        public Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int fromSystemUsageId, Maybe<string> nameContent, int pageSize)
+        public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, Maybe<string> nameContent, int pageSize)
         {
+            if (pageSize < 1)
+                return new OperationError("Min page size is 1", OperationFailure.BadInput);
+
             if (pageSize > 25)
-            {
                 return new OperationError("Max page size is 25", OperationFailure.BadInput);
-            }
 
             Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (systemUsage.IsNone)
@@ -300,20 +301,20 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError(OperationFailure.NotFound);
             }
 
-            var usage = systemUsage.Value;
-            if (!_authorizationContext.AllowReads(usage))
+            var fromUsage = systemUsage.Value;
+            if (!_authorizationContext.AllowReads(fromUsage))
             {
                 return new OperationError("Not allowed to read target system usage", OperationFailure.Forbidden);
             }
 
-            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(usage.OrganizationId);
+            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(fromUsage.OrganizationId);
             if (accessLevel < OrganizationDataReadAccessLevel.All)
             {
                 return new OperationError("User does not have full READ access within the organization", OperationFailure.Forbidden);
             }
 
             var systemsInUse = _systemRepository
-                .GetSystemsInUse(usage.OrganizationId);
+                .GetSystemsInUse(fromUsage.OrganizationId);
 
             var idsOfSystemsInUse = nameContent
                 .Select(name => systemsInUse.ByPartOfName(name))
@@ -325,6 +326,8 @@ namespace Core.ApplicationServices.SystemUsage
 
             return _usageRepository
                 .AsQueryable()
+                .ByOrganizationId(fromUsage.OrganizationId) //Only usages from same organization
+                .ExceptEntitiesWithIds(fromSystemUsageId)   //do not include "from" system
                 .Where(u => idsOfSystemsInUse.Contains(u.ItSystemId))
                 .ToList();
         }
