@@ -235,71 +235,74 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int fromSystemUsageId)
         {
-            Maybe<ItSystemUsage> itSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
-            if (itSystemUsage.HasValue == false)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-            var systemUsage = itSystemUsage.Value;
-            if (!_authorizationContext.AllowReads(systemUsage))
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-
-            return systemUsage.UsageRelations.ToList();
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Select(WithAuthorizedReadAccess)
+                    .Match<Result<IEnumerable<SystemRelation>, OperationError>>
+                    (
+                        onSuccess: context => context
+                            .Entities
+                            .FromSystemUsage
+                            .UsageRelations
+                            .ToList(),
+                        onFailure: error => error
+                    );
         }
 
         public Result<SystemRelation, OperationFailure> RemoveRelation(int fromSystemUsageId, int relationId)
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
-                if (systemUsage.IsNone)
-                {
-                    return OperationFailure.NotFound;
-                }
+                var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-                var usage = systemUsage.Value;
-                if (!_authorizationContext.AllowModify(usage))
-                {
-                    return OperationFailure.Forbidden;
-                }
-
-                var removalResult = usage.RemoveUsageRelation(relationId);
-                if (removalResult.Failed)
-                {
-                    _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", systemUsage, relationId, removalResult.Error);
-                    return removalResult;
-                }
-
-                _relationRepository.DeleteWithReferencePreload(removalResult.Value);
-                _relationRepository.Save();
-                _usageRepository.Save();
-                transaction.Commit();
-                return removalResult;
+                return
+                    LoadFromSystemUsage(operationContext)
+                        .Select(WithAuthorizedModificationAccess)
+                        .Match
+                        (
+                            onSuccess: context => context
+                                .Entities
+                                .FromSystemUsage
+                                .RemoveUsageRelation(relationId)
+                                .Match<Result<SystemRelation, OperationFailure>>
+                                (
+                                    onSuccess: removedRelation =>
+                                    {
+                                        _relationRepository.DeleteWithReferencePreload(removedRelation);
+                                        _relationRepository.Save();
+                                        _usageRepository.Save();
+                                        transaction.Commit();
+                                        return removedRelation;
+                                    },
+                                    onFailure: error =>
+                                    {
+                                        _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", fromSystemUsageId, relationId, error);
+                                        return error;
+                                    }),
+                            onFailure: error => error.FailureType
+                        );
             }
         }
 
         public Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId)
         {
-            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
-            if (systemUsage.IsNone)
-            {
-                return OperationFailure.NotFound;
-            }
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-            var usage = systemUsage.Value;
-            if (!_authorizationContext.AllowReads(usage))
-            {
-                return OperationFailure.Forbidden;
-            }
-
-            return systemUsage
-                .Value
-                .GetUsageRelation(relationId)
-                .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
-                .GetValueOrFallback(OperationFailure.NotFound);
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Select(WithAuthorizedReadAccess)
+                    .Match
+                    (
+                        onSuccess: context => context
+                            .Entities
+                            .FromSystemUsage
+                            .GetUsageRelation(relationId)
+                            .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
+                            .GetValueOrFallback(OperationFailure.NotFound),
+                        onFailure: error => error.FailureType
+                    );
         }
 
         public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, Maybe<string> nameContent, int pageSize)
@@ -310,76 +313,79 @@ namespace Core.ApplicationServices.SystemUsage
             if (pageSize > 25)
                 return new OperationError("Max page size is 25", OperationFailure.BadInput);
 
-            Maybe<ItSystemUsage> systemUsage = _usageRepository.GetByKey(fromSystemUsageId);
-            if (systemUsage.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-            var fromUsage = systemUsage.Value;
-            if (!_authorizationContext.AllowReads(fromUsage))
-            {
-                return new OperationError("Not allowed to read target system usage", OperationFailure.Forbidden);
-            }
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Select(WithAuthorizedReadAccess)
+                    .Match<Result<IEnumerable<ItSystemUsage>, OperationError>>
+                    (
+                        onSuccess: context =>
+                        {
+                            var fromUsage = context.Entities.FromSystemUsage;
+                            var systemsInUse = _systemRepository
+                                .GetSystemsInUse(fromUsage.OrganizationId);
 
-            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(fromUsage.OrganizationId);
-            if (accessLevel < OrganizationDataReadAccessLevel.All)
-            {
-                return new OperationError("User does not have full READ access within the organization", OperationFailure.Forbidden);
-            }
+                            var idsOfSystemsInUse = nameContent
+                                .Select(name => systemsInUse.ByPartOfName(name))
+                                .GetValueOrFallback(systemsInUse)
+                                .OrderBy(x => x.Name)
+                                .Take(pageSize)
+                                .Select(x => x.Id)
+                                .ToList();
 
-            var systemsInUse = _systemRepository
-                .GetSystemsInUse(fromUsage.OrganizationId);
-
-            var idsOfSystemsInUse = nameContent
-                .Select(name => systemsInUse.ByPartOfName(name))
-                .GetValueOrFallback(systemsInUse)
-                .OrderBy(x => x.Name)
-                .Take(pageSize)
-                .Select(x => x.Id)
-                .ToList();
-
-            return _usageRepository
-                .AsQueryable()
-                .ByOrganizationId(fromUsage.OrganizationId) //Only usages from same organization
-                .ExceptEntitiesWithIds(fromSystemUsageId)   //do not include "from" system
-                .Where(u => idsOfSystemsInUse.Contains(u.ItSystemId))
-                .ToList();
+                            return _usageRepository
+                                .AsQueryable()
+                                .ByOrganizationId(fromUsage.OrganizationId) //Only usages from same organization
+                                .ExceptEntitiesWithIds(fromSystemUsageId)   //do not include "from" system
+                                .Where(u => idsOfSystemsInUse.Contains(u.ItSystemId))
+                                .ToList();
+                        },
+                        onFailure: error => error
+                    );
         }
 
         public Result<RelationOptionsDTO, OperationError> GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
         {
-            var source = _usageRepository.GetByKey(fromSystemUsageId);
-            var destination = _usageRepository.GetByKey(toSystemUsageId);
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-            if (source == null)
-                return new OperationError("Source not found", OperationFailure.NotFound);
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Select(LoadToSystemUsage)
+                    .Select(WithAuthorizedReadAccess)
+                    .Match<Result<RelationOptionsDTO, OperationError>>
+                    (
+                        onSuccess: context =>
+                        {
+                            var fromSystemUsage = context.Entities.FromSystemUsage;
+                            var toSystemUsage = context.Entities.ToSystemUsage;
 
-            if (destination == null)
-                return new OperationError("Destination could not be found", OperationFailure.BadInput);
+                            if (!fromSystemUsage.IsInSameOrganizationAs(toSystemUsage))
+                                return new OperationError("source and destination usages are from different organizations", OperationFailure.BadInput);
 
-            if (!source.IsInSameOrganizationAs(destination))
-                return new OperationError("source and destination usages are from different organizations", OperationFailure.BadInput);
+                            var availableFrequencyTypes = _frequencyService.GetAvailableOptions(fromSystemUsage.OrganizationId).ToList();
+                            var exposedInterfaces = toSystemUsage.GetExposedInterfaces();
+                            var contracts = _contractRepository.GetByOrganizationId(fromSystemUsage.OrganizationId).OrderBy(c => c.Name).ToList();
 
-            if (!_authorizationContext.AllowReads(source))
-                return new OperationError(OperationFailure.BadInput);
-
-            var availableFrequencyTypes = _frequencyService.GetAvailableOptions(source.OrganizationId).ToList();
-            var exposedInterfaces = destination.GetExposedInterfaces();
-            var contracts = _contractRepository.GetByOrganizationId(source.OrganizationId).OrderBy(c => c.Name).ToList();
-
-            return new RelationOptionsDTO(source, destination, exposedInterfaces, contracts, availableFrequencyTypes);
+                            return new RelationOptionsDTO(fromSystemUsage, toSystemUsage, exposedInterfaces, contracts, availableFrequencyTypes);
+                        },
+                        onFailure: error => error
+                    );
         }
 
         #region Parameter Types
 
         private class SystemRelationOperationParameters
         {
-            public int FromSystemUsageId { get; }
-            public int ToSystemUsageId { get; }
-            public int? InterfaceId { get; }
-            public int? FrequencyId { get; }
-            public int? ContractId { get; }
+            public int FromSystemUsageId { get; set; }
+            public int ToSystemUsageId { get; set; }
+            public int? InterfaceId { get; set; }
+            public int? FrequencyId { get; set; }
+            public int? ContractId { get; set; }
+
+            public SystemRelationOperationParameters()
+            {
+            }
 
             public SystemRelationOperationParameters(int fromSystemUsageId, int systemUsageId, int? interfaceId, int? frequencyId, int? contractId)
             {
@@ -427,6 +433,13 @@ namespace Core.ApplicationServices.SystemUsage
         private Result<SystemRelationOperationContext, OperationError> WithAuthorizedModificationAccess(SystemRelationOperationContext context)
         {
             return !_authorizationContext.AllowModify(context.Entities.FromSystemUsage)
+                ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
+                : context;
+        }
+
+        private Result<SystemRelationOperationContext, OperationError> WithAuthorizedReadAccess(SystemRelationOperationContext context)
+        {
+            return !_authorizationContext.AllowReads(context.Entities.FromSystemUsage)
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
