@@ -42,6 +42,7 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
+using Infrastructure.Services.DomainEvents;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -102,8 +103,8 @@ namespace Presentation.Web
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
-
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
@@ -142,6 +143,11 @@ namespace Presentation.Web
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
             RegisterOptions(kernel);
+        }
+
+        private static void RegisterDomainEventsEngine(IKernel kernel)
+        {
+            kernel.Bind<IDomainEvents>().To<DomainEvents>().InRequestScope();
         }
 
         private static void RegisterOptions(IKernel kernel)
