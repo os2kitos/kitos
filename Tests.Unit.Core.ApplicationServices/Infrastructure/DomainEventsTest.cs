@@ -7,6 +7,52 @@ namespace Tests.Unit.Core.Infrastructure
 {
     public class DomainEventsTest
     {
+        private const int ExpectedDomainEventId = 1;
+
+        private readonly StandardKernel _kernel;
+
+        public DomainEventsTest()
+        {
+            _kernel = new StandardKernel();
+        }
+
+        [Fact]
+        private void Raise_GivenRegisteredHandler_ThenHandlerIsCalledOnRaisedEvent()
+        {
+            // Arrange
+            var resultHolder = new ResultHolder();
+            _kernel.Bind<IResultHolder>().ToConstant(resultHolder);
+            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().To<MyHandler>().InThreadScope();
+            var sut = new DomainEvents(_kernel);
+
+            // Act
+            sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
+
+            // Assert
+            Assert.Equal(ExpectedDomainEventId, resultHolder.ResultingValue);
+        }
+
+        [Fact]
+        private void Raise_GivenMultipleRegisteredHandlersOnSameEvent_ThenAllhandlersAreCalledOnRaisedEvent()
+        {
+            // Arrange
+            _kernel.Bind<IResultHolder>().To<ResultHolder>().InThreadScope();
+            var firstHandlerResult = new ResultHolder();
+            var secondHandlerResult = new ResultHolder();
+            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(firstHandlerResult)).InThreadScope();
+            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(secondHandlerResult)).InThreadScope();
+            var sut = new DomainEvents(_kernel);
+
+            // Act
+            sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
+
+            // Assert
+            Assert.Equal(ExpectedDomainEventId, firstHandlerResult.ResultingValue);
+            Assert.Equal(ExpectedDomainEventId, secondHandlerResult.ResultingValue);
+        }
+
+        #region Helpers
+
         public interface IResultHolder
         {
             int ResultingValue { get; set; }  
@@ -37,43 +83,6 @@ namespace Tests.Unit.Core.Infrastructure
             }
         }
 
-        [Fact]
-        private void Raise_GivenRegisteredDomainEvent_ThenHandlerIsCalled()
-        {
-            // Arrange
-            var kernel = new StandardKernel();
-            var resultHolder = new ResultHolder();
-            kernel.Bind<IResultHolder>().ToConstant(resultHolder);
-            kernel.Bind<IDomainEventHandler<MyDomainEvent>>().To<MyHandler>().InThreadScope();
-            var sut = new DomainEvents(kernel);
-
-            // Act
-            const int expectedDomainEventId = 1;
-            sut.Raise(new MyDomainEvent { Id = expectedDomainEventId });
-
-            // Assert
-            Assert.Equal(expectedDomainEventId, resultHolder.ResultingValue);
-        }
-
-        [Fact]
-        private void Raise_GivenMultipleRegisteredHandlersOnSameEvent_ThenAllhandlersAreCalled()
-        {
-            // Arrange
-            var kernel = new StandardKernel();
-            kernel.Bind<IResultHolder>().To<ResultHolder>().InThreadScope();
-            var firstHandlerResult = new ResultHolder();
-            var secondHandlerResult = new ResultHolder();
-            kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(firstHandlerResult)).InThreadScope();
-            kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(secondHandlerResult)).InThreadScope();
-            var sut = new DomainEvents(kernel);
-
-            // Act
-            const int expectedDomainEventId = 1;
-            sut.Raise(new MyDomainEvent { Id = expectedDomainEventId });
-
-            // Assert
-            Assert.Equal(expectedDomainEventId, firstHandlerResult.ResultingValue);
-            Assert.Equal(expectedDomainEventId, secondHandlerResult.ResultingValue);
-        }
+        #endregion
     }
 }
