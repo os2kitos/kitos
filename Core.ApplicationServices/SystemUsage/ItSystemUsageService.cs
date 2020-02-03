@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -12,7 +11,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
@@ -158,7 +156,7 @@ namespace Core.ApplicationServices.SystemUsage
             return
                 LoadFromSystemUsage(operationContext)
                     .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedModificationAccess)
+                    .Select(WithAuthorizedModificationAccessToFromSystem)
                     .Select(LoadFrequency)
                     .Select(LoadInterface)
                     .Select(LoadContract)
@@ -204,7 +202,7 @@ namespace Core.ApplicationServices.SystemUsage
             return
                 LoadFromSystemUsage(operationContext)
                     .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedModificationAccess)
+                    .Select(WithAuthorizedModificationAccessToFromSystem)
                     .Select(LoadFrequency)
                     .Select(LoadInterface)
                     .Select(LoadContract)
@@ -233,19 +231,40 @@ namespace Core.ApplicationServices.SystemUsage
                     );
         }
 
-        public Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int fromSystemUsageId)
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsFrom(int systemUsageId)
         {
-            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = systemUsageId }, new SystemRelationOperationEntities());
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Select(WithAuthorizedReadAccessToFromSystem)
                     .Match<Result<IEnumerable<SystemRelation>, OperationError>>
                     (
                         onSuccess: context => context
                             .Entities
                             .FromSystemUsage
                             .UsageRelations
+                            .ToList(),
+                        onFailure: error => error
+                    );
+        }
+
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsTo(int systemUsageId)
+        {
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters
+            {
+                FromSystemUsageId = systemUsageId 
+            }, new SystemRelationOperationEntities());
+
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Select(WithAuthorizedReadAccessToFromSystem)
+                    .Match<Result<IEnumerable<SystemRelation>, OperationError>>
+                    (
+                        onSuccess: context => context
+                            .Entities
+                            .FromSystemUsage
+                            .UsedByRelations
                             .ToList(),
                         onFailure: error => error
                     );
@@ -259,7 +278,7 @@ namespace Core.ApplicationServices.SystemUsage
 
                 return
                     LoadFromSystemUsage(operationContext)
-                        .Select(WithAuthorizedModificationAccess)
+                        .Select(WithAuthorizedModificationAccessToFromSystem)
                         .Match
                         (
                             onSuccess: context => context
@@ -286,13 +305,13 @@ namespace Core.ApplicationServices.SystemUsage
             }
         }
 
-        public Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId)
+        public Result<SystemRelation, OperationFailure> GetRelationFrom(int fromSystemUsageId, int relationId)
         {
             var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Select(WithAuthorizedReadAccessToFromSystem)
                     .Match
                     (
                         onSuccess: context => context
@@ -317,7 +336,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Select(WithAuthorizedReadAccessToFromSystem)
                     .Match<Result<IEnumerable<ItSystemUsage>, OperationError>>
                     (
                         onSuccess: context =>
@@ -356,7 +375,7 @@ namespace Core.ApplicationServices.SystemUsage
             return
                 LoadFromSystemUsage(operationContext)
                     .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedReadAccess)
+                    .Select(WithAuthorizedReadAccessToFromSystem)
                     .Match<Result<RelationOptionsDTO, OperationError>>
                     (
                         onSuccess: context =>
@@ -434,20 +453,20 @@ namespace Core.ApplicationServices.SystemUsage
             return context;
         }
 
-        private Result<SystemRelationOperationContext, OperationError> WithAuthorizedModificationAccess(SystemRelationOperationContext context)
+        private Result<SystemRelationOperationContext, OperationError> WithAuthorizedModificationAccessToFromSystem(SystemRelationOperationContext context)
         {
             return !_authorizationContext.AllowModify(context.Entities.FromSystemUsage)
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
 
-        private Result<SystemRelationOperationContext, OperationError> WithAuthorizedReadAccess(SystemRelationOperationContext context)
+        private Result<SystemRelationOperationContext, OperationError> WithAuthorizedReadAccessToFromSystem(SystemRelationOperationContext context)
         {
             return !_authorizationContext.AllowReads(context.Entities.FromSystemUsage)
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
-
+     
         private Result<SystemRelationOperationContext, OperationError> LoadToSystemUsage(SystemRelationOperationContext context)
         {
             var toSystemUsage = _usageRepository.GetByKey(context.Input.ToSystemUsageId);

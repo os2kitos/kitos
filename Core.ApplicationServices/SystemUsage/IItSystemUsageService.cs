@@ -28,9 +28,15 @@ namespace Core.ApplicationServices.SystemUsage
         /// <summary>
         /// Gets all relations FROM the target system usage
         /// </summary>
-        /// <param name="fromSystemUsageId"></param>
+        /// <param name="systemUsageId"></param>
         /// <returns></returns>
-        Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int fromSystemUsageId);
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsFrom(int systemUsageId);
+        /// <summary>
+        /// Gets all relations TO the target system usage
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <returns></returns>
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsTo(int systemUsageId);
         /// <summary>
         /// Removes a system relation from the specified system usage
         /// </summary>
@@ -44,7 +50,7 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="fromSystemUsageId"></param>
         /// <param name="relationId"></param>
         /// <returns></returns>
-        Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId);
+        Result<SystemRelation, OperationFailure> GetRelationFrom(int fromSystemUsageId, int relationId);
         /// <summary>
         /// Gets the systems which the "from" system can relate to
         /// </summary>

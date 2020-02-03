@@ -11,10 +11,22 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class SystemRelationHelper
     {
-        public static async Task<IEnumerable<SystemRelationDTO>> SendGetRelationsAsync(int systemUsageId, Cookie login = null)
+        public static async Task<IEnumerable<SystemRelationDTO>> SendGetRelationsFromAsync(int systemUsageId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
+            }
+        }
+
+        public static async Task<IEnumerable<SystemRelationDTO>> SendGetRelationsToAsync(int systemUsageId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/to/{systemUsageId}");
 
             using (var response = await HttpApi.GetWithCookieAsync(url, login))
             {
