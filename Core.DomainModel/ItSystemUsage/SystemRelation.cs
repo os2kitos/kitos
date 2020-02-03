@@ -148,18 +148,21 @@ namespace Core.DomainModel.ItSystemUsage
         /// <returns></returns>
         public Result<SystemRelation, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
         {
-            if (toFrequency.HasValue)
-            {
-                UsageFrequency = toFrequency.GetValueOrDefault();
-            }
+            UsageFrequency = toFrequency.GetValueOrDefault();
 
             return this;
         }
 
         public Result<SystemRelation, OperationError> SetReference(string changedReference)
         {
-            // TODO: Are only valid URL's allowed as reference values?
             Reference = changedReference;
+
+            return this;
+        }
+
+        public Result<SystemRelation, OperationError> SetDescription(string changedDescription)
+        {
+            Description = changedDescription;
 
             return this;
         }

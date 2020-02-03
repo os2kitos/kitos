@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockAuthorizationContext.Setup(c => c.AllowModify(fromSystemUsage)).Returns(allowModifications);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, null, null, null, null);
 
             // Assert
             Assert.True(allowModifications ? result.Ok : result.Error.FailureType == OperationFailure.Forbidden);
@@ -99,7 +99,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, replacementSystemUsageId);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, replacementSystemUsageId, null, null, null, null, null);
 
             // Assert
             Assert.True(result.Ok);
@@ -116,7 +116,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", Interface2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", Interface2Id, null, null);
 
             // Assert
             Assert.True(result.Ok);
@@ -132,7 +132,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupContractRepository();
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", null, Contract2Id);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", null, Contract2Id, null);
 
             // Assert
             Assert.True(result.Ok);
@@ -165,7 +165,7 @@ namespace Tests.Unit.Core.ApplicationServices
             SetupSystemUsageRepository(systemUsages);
 
             // Act
-            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, changedDescription, changedReference);
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, changedDescription, changedReference, null, null, null);
 
             // Assert
             Assert.True(result.Ok);

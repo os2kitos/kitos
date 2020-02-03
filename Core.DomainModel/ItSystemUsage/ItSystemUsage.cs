@@ -534,10 +534,9 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
         {
-            relation.Description = changedDescription;
-
             return relation
                 .SetRelationTo(toSystemUsage)
+                .Select(_ => _.SetDescription(changedDescription))
                 .Select(_ => _.SetRelationInterface(interfaceId))
                 .Select(_ => _.SetContract(toContract))
                 .Select(_ => _.SetFrequency(toFrequency))

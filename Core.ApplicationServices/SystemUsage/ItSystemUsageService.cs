@@ -167,15 +167,19 @@ namespace Core.ApplicationServices.SystemUsage
                     .GetAvailableOptions(fromSystemUsage.OrganizationId)
                     .FirstOrDefault(x => x.Id == frequencyId.Value);
 
-                if (!targetFrequency.HasValue)
+                if (targetFrequency.IsNone)
+                {
                     return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+                }
             }
 
             if (contractId.HasValue)
             {
                 toContract = _contractRepository.GetById(contractId.Value);
-                if (!toContract.HasValue)
+                if (toContract.IsNone)
+                {
                     return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
+                }
             }
 
             var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, interfaceId, description, reference, targetFrequency, toContract);
@@ -190,11 +194,11 @@ namespace Core.ApplicationServices.SystemUsage
             int fromSystemUsageId, 
             int relationId, 
             int toSystemUsageId, 
-            string changedDescription = "",
-            string changedReference = "",
-            int? toInterfaceId = null,
-            int? toContractId = null,
-            int? toFrequencyId = null)
+            string changedDescription,
+            string changedReference,
+            int? toInterfaceId,
+            int? toContractId,
+            int? toFrequencyId)
         {
             var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             if (fromSystemUsage == null)
@@ -217,11 +221,10 @@ namespace Core.ApplicationServices.SystemUsage
             if (toContractId.HasValue)
             {
                 toContract = _contractRepository.GetById(toContractId.Value);
-                if (!toContract.HasValue)
+                if (toContract.IsNone)
                 {
                     return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
                 }
-
             }
 
             var toFrequency = Maybe<RelationFrequencyType>.None;
@@ -231,8 +234,10 @@ namespace Core.ApplicationServices.SystemUsage
                     .GetAvailableOptions(fromSystemUsage.OrganizationId)
                     .FirstOrDefault(x => x.Id == toFrequencyId.Value);
 
-                if (!toFrequency.HasValue)
+                if (toFrequency.IsNone)
+                {
                     return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+                }
             }
 
 
