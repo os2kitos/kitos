@@ -117,26 +117,21 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Replace relation interface
         /// </summary>
-        /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<SystemRelation, OperationError> SetRelationInterface(int? targetInterfaceId)
+        /// <param name="relationInterface">Replacement interface to be used on the relation. None is allowed</param>
+        public Result<SystemRelation, OperationError> SetRelationInterface(Maybe<ItInterface> relationInterface)
         {
             if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
 
-            if (targetInterfaceId.HasValue)
+            if (relationInterface.HasValue)
             {
-                var exposedInterface = ToSystemUsage.GetExposedInterface(targetInterfaceId.Value);
-                if (exposedInterface.IsNone)
+                if (!ToSystemUsage.HasExposedInterface(relationInterface.Value.Id))
                 {
                     return new OperationError("Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
                 }
+            }
 
-                RelationInterface = exposedInterface.Value;
-            }
-            else
-            {
-                RelationInterface = null;
-            }
+            RelationInterface = relationInterface.GetValueOrDefault();
 
             return this;
         }

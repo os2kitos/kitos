@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -12,6 +11,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -32,8 +32,9 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _optionsService;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly User _activeUser;
-        private Mock<ITransactionManager> _transactionManager;
-        private Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
+        private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
 
         public ItSystemUsageServiceTest()
         {
@@ -47,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _userContext.Setup(x => x.UserEntity).Returns(_activeUser);
             _transactionManager = new Mock<ITransactionManager>();
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
+            _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -55,6 +57,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _optionsService.Object,
                 _userContext.Object,
                 _relationRepositoryMock.Object,
+                _interfaceRepository.Object,
                 _transactionManager.Object,
                 Mock.Of<ILogger>());
         }
@@ -299,7 +302,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.AddRelation(sourceId, A<int>(), null, A<string>(), A<string>(), null, null);
 
             //Assert
-            AssertAddRelationError(result, OperationFailure.NotFound, "Source not found");
+            AssertAddRelationError(result, OperationFailure.NotFound, "'From' not found");
         }
 
         [Fact]
@@ -316,7 +319,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), null, null);
 
             //Assert
-            AssertAddRelationError(result, OperationFailure.BadInput, "Destination could not be found");
+            AssertAddRelationError(result, OperationFailure.BadInput, "'To' could not be found");
         }
 
         [Fact]
@@ -354,7 +357,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetUsageByKeyReturns(sourceId, source);
             ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage());
             ExpectAllowModifyReturns(source, true);
-            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId + 1 });
+            ExpectGetAvailableOptionsReturns(source, frequencyId, Maybe<RelationFrequencyType>.None);
 
             //Act
             var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), frequencyId, null);
@@ -379,7 +382,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetUsageByKeyReturns(sourceId, source);
             ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage() { Id = sourceId + 1, OrganizationId = source.OrganizationId });
             ExpectAllowModifyReturns(source, true);
-            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId });
+            ExpectGetAvailableOptionsReturns(source, frequencyId, new RelationFrequencyType { Id = frequencyId });
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(default(ItContract));
 
             //Act
@@ -405,7 +408,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetUsageByKeyReturns(sourceId, source);
             ExpectGetUsageByKeyReturns(destinationId, new ItSystemUsage() { Id = sourceId + 1, OrganizationId = source.OrganizationId });
             ExpectAllowModifyReturns(source, true);
-            ExpectGetAvailableOptionsReturns(source, new RelationFrequencyType { Id = frequencyId });
+            ExpectGetAvailableOptionsReturns(source, frequencyId, new RelationFrequencyType { Id = frequencyId });
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(new ItContract() { OrganizationId = source.OrganizationId });
 
             //Act
@@ -581,10 +584,104 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(26)]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_BadInput_For_PageSize(int pageSize)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, pageSize);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var itSystemUsage = new ItSystemUsage();
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, false);
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(id, Maybe<string>.None, 2);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystemUsagesWhichCanBeRelatedTo_Without_NameContent_Returns_AvailableSystemUsages()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var itSystem1 = CreateItSystem();
+            var itSystem2 = CreateItSystem();
+            var itSystem3 = CreateItSystem();
+            var fromItSystemUsage = CreateSystemUsage(organizationId, itSystem1);
+            var includedSystemUsage1 = CreateSystemUsage(organizationId, itSystem2);
+            var includedSystemUsage2 = CreateSystemUsage(organizationId, itSystem3);
+
+            ExpectGetUsageByKeyReturns(fromItSystemUsage.Id, fromItSystemUsage);
+            ExpectAllowReadReturns(fromItSystemUsage, true);
+            _systemRepository.Setup(x => x.GetSystemsInUse(organizationId)).Returns(new[] { itSystem1, itSystem2, itSystem3 }.AsQueryable());
+            _usageRepository.Setup(x => x.AsQueryable()).Returns(new[] { includedSystemUsage1, includedSystemUsage2, fromItSystemUsage }.AsQueryable());
+
+            //Act
+            var result = _sut.GetSystemUsagesWhichCanBeRelatedTo(fromItSystemUsage.Id, Maybe<string>.None, 3);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(new[] { includedSystemUsage1.Id, includedSystemUsage2.Id }.OrderBy(x => x), result.Value.Select(x => x.Id).OrderBy(x => x));
+        }
+
+        private ItSystemUsage CreateSystemUsage(int organizationId, ItSystem itSystem)
+        {
+            return new ItSystemUsage
+            {
+                OrganizationId = organizationId,
+                Id = A<int>(),
+                ItSystemId = itSystem.Id,
+                ItSystem = itSystem
+            };
+        }
+
+        private ItSystem CreateItSystem()
+        {
+            return new ItSystem
+            {
+                Name = A<string>(),
+                Id = A<int>()
+            };
+        }
+
         private SystemRelation CreateRelation()
         {
             var systemRelation = new SystemRelation(new ItSystemUsage());
-            systemRelation.SetRelationTo(new ItSystemUsage() {Id = A<int>()});
+            systemRelation.SetRelationTo(new ItSystemUsage { Id = A<int>() });
             return systemRelation;
         }
 
@@ -616,9 +713,9 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
         }
 
-        private void ExpectGetAvailableOptionsReturns(ItSystemUsage source, params RelationFrequencyType[] results)
+        private void ExpectGetAvailableOptionsReturns(ItSystemUsage source, int optionId, Maybe<RelationFrequencyType> response)
         {
-            _optionsService.Setup(x => x.GetAvailableOptions(source.OrganizationId)).Returns(new List<RelationFrequencyType>(results));
+            _optionsService.Setup(x => x.GetAvailableOption(source.OrganizationId, optionId)).Returns(response);
         }
 
         private void ExpectAllowModifyReturns(ItSystemUsage source, bool value)
