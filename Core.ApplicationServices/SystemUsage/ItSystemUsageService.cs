@@ -149,7 +149,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             var toSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
-            var targetContract = Maybe<ItContract>.None;
+            var toContract = Maybe<ItContract>.None;
             var targetFrequency = Maybe<RelationFrequencyType>.None;
 
             if (fromSystemUsage == null)
@@ -167,18 +167,22 @@ namespace Core.ApplicationServices.SystemUsage
                     .GetAvailableOptions(fromSystemUsage.OrganizationId)
                     .FirstOrDefault(x => x.Id == frequencyId.Value);
 
-                if (!targetFrequency.HasValue)
+                if (targetFrequency.IsNone)
+                {
                     return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+                }
             }
 
             if (contractId.HasValue)
             {
-                targetContract = _contractRepository.GetById(contractId.Value);
-                if (!targetContract.HasValue)
+                toContract = _contractRepository.GetById(contractId.Value);
+                if (toContract.IsNone)
+                {
                     return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
+                }
             }
 
-            var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, interfaceId, description, reference, targetFrequency, targetContract);
+            var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, interfaceId, description, reference, targetFrequency, toContract);
             if (result.Ok)
             {
                 _usageRepository.Save();
@@ -190,26 +194,55 @@ namespace Core.ApplicationServices.SystemUsage
             int fromSystemUsageId, 
             int relationId, 
             int toSystemUsageId, 
-            int? targetInterfaceId = null)
+            string changedDescription,
+            string changedReference,
+            int? toInterfaceId,
+            int? toContractId,
+            int? toFrequencyId)
         {
-            var sourceSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
-            if (sourceSystemUsage == null)
+            var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
+            if (fromSystemUsage == null)
             {
                 return new OperationError("Source not found", OperationFailure.NotFound);
             }
 
-            if (!_authorizationContext.AllowModify(sourceSystemUsage))
+            if (!_authorizationContext.AllowModify(fromSystemUsage))
             {
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
             }
 
-            Maybe<ItSystemUsage> targetSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
-            if (targetSystemUsage.IsNone)
+            var toSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
+            if (toSystemUsage == null)
             {
                 return new OperationError("Target system usage not found", OperationFailure.BadInput);
             }
 
-            var result = sourceSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, targetSystemUsage.Value, targetInterfaceId);
+            var toContract = Maybe<ItContract>.None;
+            if (toContractId.HasValue)
+            {
+                toContract = _contractRepository.GetById(toContractId.Value);
+                if (toContract.IsNone)
+                {
+                    return new OperationError("Contract id does not point to a valid contract", OperationFailure.BadInput);
+                }
+            }
+
+            var toFrequency = Maybe<RelationFrequencyType>.None;
+            if (toFrequencyId.HasValue)
+            {
+                toFrequency = _frequencyService
+                    .GetAvailableOptions(fromSystemUsage.OrganizationId)
+                    .FirstOrDefault(x => x.Id == toFrequencyId.Value);
+
+                if (toFrequency.IsNone)
+                {
+                    return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+                }
+            }
+
+
+            var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, 
+                changedDescription, changedReference, toInterfaceId, toContract, toFrequency);
             if (result.Ok)
             {
                 _usageRepository.Save();

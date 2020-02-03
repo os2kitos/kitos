@@ -140,5 +140,31 @@ namespace Core.DomainModel.ItSystemUsage
 
             return this;
         }
+
+        /// <summary>
+        /// Replaces frequency type
+        /// </summary>
+        /// <param name="toFrequency">Replacement frequency to be used in relation. NULL is allowed</param>
+        /// <returns></returns>
+        public Result<SystemRelation, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
+        {
+            UsageFrequency = toFrequency.GetValueOrDefault();
+
+            return this;
+        }
+
+        public Result<SystemRelation, OperationError> SetReference(string changedReference)
+        {
+            Reference = changedReference;
+
+            return this;
+        }
+
+        public Result<SystemRelation, OperationError> SetDescription(string changedDescription)
+        {
+            Description = changedDescription;
+
+            return this;
+        }
     }
 }
