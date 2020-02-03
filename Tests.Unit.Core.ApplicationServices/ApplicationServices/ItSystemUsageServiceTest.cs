@@ -302,7 +302,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.AddRelation(sourceId, A<int>(), null, A<string>(), A<string>(), null, null);
 
             //Assert
-            AssertAddRelationError(result, OperationFailure.NotFound, "Source not found");
+            AssertAddRelationError(result, OperationFailure.NotFound, "'From' not found");
         }
 
         [Fact]
@@ -319,7 +319,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.AddRelation(sourceId, destinationId, null, A<string>(), A<string>(), null, null);
 
             //Assert
-            AssertAddRelationError(result, OperationFailure.BadInput, "Destination could not be found");
+            AssertAddRelationError(result, OperationFailure.BadInput, "'To' could not be found");
         }
 
         [Fact]
