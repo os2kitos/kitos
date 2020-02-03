@@ -1,4 +1,4 @@
-﻿(function (ng, app) {
+﻿    (function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('local-config.system', {
             url: '/system',

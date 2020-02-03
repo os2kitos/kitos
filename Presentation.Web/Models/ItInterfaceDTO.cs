@@ -26,14 +26,8 @@ namespace Presentation.Web.Models
         public int? ExhibitedByItSystemId { get; set; }
         public string ExhibitedByItSystemName { get; set; }
         public bool ExhibitedByItSystemDisabled { get; set; }
-        public int? TsaId { get; set; }
-        public string TsaName { get; set; }
         public int? InterfaceId { get; set; }
         public string InterfaceName { get; set; }
-        public int? InterfaceTypeId { get; set; }
-        public string InterfaceTypeName { get; set; }
-        public int? MethodId { get; set; }
-        public string MethodName { get; set; }
         public IEnumerable<DataRowDTO> DataRows { get; set; }
         public int? BelongsToId { get; set; }
         public string BelongsToName { get; set; }

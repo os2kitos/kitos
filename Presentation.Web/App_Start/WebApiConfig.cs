@@ -265,8 +265,6 @@ namespace Presentation.Web
             itInterfaces.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             itInterfaces.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
 
-            BindEntitySet<ItInterfaceType, ItInterfaceTypesController>(builder);
-
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
             itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, entitySetItSystems);
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
@@ -275,10 +273,6 @@ namespace Presentation.Web
             itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
-
-            BindEntitySet<TsaType, TsaTypesController>(builder);
-
-            BindEntitySet<MethodType, MethodTypesController>(builder);
 
             BindEntitySet<SensitiveDataType, SensitiveDataTypesController>(builder);
 
@@ -357,9 +351,6 @@ namespace Presentation.Web
             var localItContractType = BindEntitySet<LocalItContractType, LocalItContractTypesController>(builder);
             localItContractType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localItInterfaceType = BindEntitySet<LocalItInterfaceType, LocalItInterfaceTypesController>(builder);
-            localItInterfaceType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var localItProjectRole = BindEntitySet<LocalItProjectRole, LocalItProjectRolesController>(builder);
             localItProjectRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
@@ -371,9 +362,6 @@ namespace Presentation.Web
 
             var localItSystemType = BindEntitySet<LocalItSystemType, LocalItSystemTypesController>(builder);
             localItSystemType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localMethodType = BindEntitySet<LocalMethodType, LocalMethodTypesController>(builder);
-            localMethodType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localOptionExtendType = BindEntitySet<LocalOptionExtendType, LocalOptionExtendTypesController>(builder);
             localOptionExtendType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
@@ -444,9 +432,6 @@ namespace Presentation.Web
 
             var localTerminationDeadlineType = BindEntitySet<LocalTerminationDeadlineType, LocalTerminationDeadlineTypesController>(builder);
             localTerminationDeadlineType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localTsaType = BindEntitySet<LocalTsaType, LocalTsaTypesController>(builder);
-            localTsaType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localOrganizationUnitRole = BindEntitySet<LocalOrganizationUnitRole, LocalOrganizationUnitRolesController>(builder);
             localOrganizationUnitRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
