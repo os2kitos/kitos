@@ -72,7 +72,6 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="toContractId">Id of the specific "to" system usage contract to replace the existing system relation value</param>
         /// <param name="toFrequencyTypeId">Id of the specific "to" system frequency type to replace the existing system relation value</param>
         /// <returns></returns>
-        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference,
-            int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
+        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference, int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
     }
 }

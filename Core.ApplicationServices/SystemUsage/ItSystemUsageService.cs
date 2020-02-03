@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Options;
 using Core.DomainModel;
@@ -30,6 +31,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IOrganizationalUserContext _userContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<SystemRelation> _relationRepository;
+        private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly ILogger _logger;
 
         public ItSystemUsageService(
@@ -40,6 +42,7 @@ namespace Core.ApplicationServices.SystemUsage
             IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
             IOrganizationalUserContext userContext,
             IGenericRepository<SystemRelation> relationRepository,
+            IGenericRepository<ItInterface> interfaceRepository,
             ITransactionManager transactionManager,
             ILogger logger)
         {
@@ -51,6 +54,7 @@ namespace Core.ApplicationServices.SystemUsage
             _userContext = userContext;
             _transactionManager = transactionManager;
             _relationRepository = relationRepository;
+            _interfaceRepository = interfaceRepository;
             _logger = logger;
         }
 
@@ -150,7 +154,8 @@ namespace Core.ApplicationServices.SystemUsage
             var fromSystemUsage = _usageRepository.GetByKey(fromSystemUsageId);
             var toSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
             var toContract = Maybe<ItContract>.None;
-            var targetFrequency = Maybe<RelationFrequencyType>.None;
+            var toFrequency = Maybe<RelationFrequencyType>.None;
+            var toInterface = Maybe<ItInterface>.None;
 
             if (fromSystemUsage == null)
                 return new OperationError("Source not found", OperationFailure.NotFound);
@@ -163,13 +168,20 @@ namespace Core.ApplicationServices.SystemUsage
 
             if (frequencyId.HasValue)
             {
-                targetFrequency = _frequencyService
-                    .GetAvailableOptions(fromSystemUsage.OrganizationId)
-                    .FirstOrDefault(x => x.Id == frequencyId.Value);
+                toFrequency = _frequencyService.GetAvailableOption(fromSystemUsage.OrganizationId, frequencyId.Value);
 
-                if (targetFrequency.IsNone)
+                if (toFrequency.IsNone)
                 {
                     return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
+                }
+            }
+
+            if (interfaceId.HasValue)
+            {
+                toInterface = _interfaceRepository.GetByKey(interfaceId.Value);
+                if (toInterface.IsNone)
+                {
+                    return new OperationError("The provided interface id does not point to a valid interface",OperationFailure.BadInput);
                 }
             }
 
@@ -182,7 +194,7 @@ namespace Core.ApplicationServices.SystemUsage
                 }
             }
 
-            var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, interfaceId, description, reference, targetFrequency, toContract);
+            var result = fromSystemUsage.AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, toInterface, description, reference, toFrequency, toContract);
             if (result.Ok)
             {
                 _usageRepository.Save();
@@ -230,9 +242,7 @@ namespace Core.ApplicationServices.SystemUsage
             var toFrequency = Maybe<RelationFrequencyType>.None;
             if (toFrequencyId.HasValue)
             {
-                toFrequency = _frequencyService
-                    .GetAvailableOptions(fromSystemUsage.OrganizationId)
-                    .FirstOrDefault(x => x.Id == toFrequencyId.Value);
+                toFrequency = _frequencyService.GetAvailableOption(fromSystemUsage.OrganizationId, toFrequencyId.Value);
 
                 if (toFrequency.IsNone)
                 {
@@ -240,9 +250,18 @@ namespace Core.ApplicationServices.SystemUsage
                 }
             }
 
+            var toInterface = Maybe<ItInterface>.None;
+            if (toInterfaceId.HasValue)
+            {
+                toInterface = _interfaceRepository.GetByKey(toInterfaceId.Value);
+                if (toInterface.IsNone)
+                {
+                    return new OperationError("The provided interface id does not point to a valid interface", OperationFailure.BadInput);
+                }
+            }
 
             var result = fromSystemUsage.ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, 
-                changedDescription, changedReference, toInterfaceId, toContract, toFrequency);
+                changedDescription, changedReference, toInterface, toContract, toFrequency);
             if (result.Ok)
             {
                 _usageRepository.Save();
