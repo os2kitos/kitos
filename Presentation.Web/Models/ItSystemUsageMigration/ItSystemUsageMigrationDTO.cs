@@ -9,6 +9,7 @@ namespace Presentation.Web.Models.ItSystemUsageMigration
         public NamedEntityDTO ToSystem { get; set; }
         public IEnumerable<NamedEntityDTO> AffectedItProjects { get; set; }
         public IEnumerable<ItSystemUsageContractMigrationDTO> AffectedContracts { get; set; }
+        public IEnumerable<RelationMigrationDTO> AffectedRelations { get; set; }
 
     }
 }

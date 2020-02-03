@@ -122,12 +122,44 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             // Map all contract migrations
             var contractMigrations = GetContractMigrations(itSystemUsage);
 
+            // Map relations
+            var relationMigrations = GetRelationMigrations(itSystemUsage.UsageRelations, itSystemUsage.UsedByRelations);
+
             return new ItSystemUsageMigration(
                 systemUsage: itSystemUsage,
                 fromItSystem: itSystemUsage.ItSystem,
                 toItSystem: toItSystem,
                 affectedProjects: itSystemUsage.ItProjects,
-                affectedContracts: contractMigrations);
+                affectedContracts: contractMigrations,
+                affectedRelations: relationMigrations);
+        }
+
+        private IEnumerable<SystemRelationMigration> GetRelationMigrations(IEnumerable<SystemRelation> sourceRelations, IEnumerable<SystemRelation> targetRelations)
+        {
+            var sources = sourceRelations
+                .AsEnumerable()
+                .Select(
+                    relation => new SystemRelationMigration(
+                        relation.FromSystemUsage,
+                        relation.ToSystemUsage,
+                        relation.RelationInterface,
+                        false,
+                        relation.AssociatedContract))
+                .ToList()
+                .AsReadOnly();
+
+            var targets = targetRelations
+                .AsEnumerable()
+                .Select(
+                    relation => new SystemRelationMigration(
+                        relation.FromSystemUsage,
+                        relation.ToSystemUsage,
+                        relation.RelationInterface,
+                        true,
+                        relation.AssociatedContract))
+                .ToList()
+                .AsReadOnly();
+            return sources.Concat(targets);
         }
 
         private IEnumerable<ItContractMigration> GetContractMigrations(ItSystemUsage itSystemUsage)

@@ -9,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystemUsageMigration;
+using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
@@ -337,6 +338,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task GetMigration_When_System_Has_Relation()
+        {
+            //Arrange
+            var contract = await CreateSystemRelationDTO();
+            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
+
+            //Act
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                var dto = Assert.Single(result.AffectedContracts);
+                Assert.Equal(contract.Id, dto?.Contract?.Id);
+                Assert.Empty(dto.AffectedInterfaceUsages);
+                Assert.Empty(dto.InterfaceExhibitUsagesToBeDeleted);
+                Assert.True(dto.SystemAssociatedInContract);
+            }
+        }
+
+        [Fact]
         public async Task PostMigration_Can_Migrate_System_Usage_With_No_Associated_Entities()
         {
             //Act
@@ -637,6 +659,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AccessModifier accessModifier = AccessModifier.Local)
         {
             return ItSystemHelper.CreateItSystemInOrganizationAsync(name ?? CreateName(), organizationId, accessModifier);
+        }
+
+        private static async Task<SystemRelationDTO> CreateSystemRelation(int sourceSystemId, int targetSystemId,
+            int? interfaceId, int? contractId)
+        {
+            var relationDTO = new CreateSystemRelationDTO()
+            {
+                FromUsageId = sourceSystemId,
+                ToUsageId = targetSystemId,
+                InterfaceId = interfaceId,
+                ContractId = contractId
+            };
+            var response = await SystemRelationHelper.SendPostRelationAsync(relationDTO);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
         }
 
         private static async Task<ItInterfaceExhibitDTO> CreateExhibitAsync(ItInterfaceDTO exposedInterface, ItSystemDTO exposingSystem)

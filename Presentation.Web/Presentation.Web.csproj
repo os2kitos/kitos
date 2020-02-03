@@ -323,6 +323,7 @@
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
