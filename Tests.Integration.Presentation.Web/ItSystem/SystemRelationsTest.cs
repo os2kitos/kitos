@@ -151,8 +151,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var relationDTO = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                 Assert.Equal(input.FromUsageId, relationDTO.FromUsage.Id);
                 Assert.Equal(edited.ToUsage.Id, relationDTO.ToUsage.Id);
-                Assert.Equal(input.Description, relationDTO.Description);
-                Assert.Equal(input.Reference, relationDTO.Reference);
+                Assert.Equal(edited.Description, relationDTO.Description);
+                Assert.Equal(edited.Reference, relationDTO.Reference);
                 Assert.Equal(edited.Interface.Id, relationDTO.Interface.Id);
             }
         }

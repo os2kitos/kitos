@@ -78,13 +78,19 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("options/{fromSystemUsageId}/available-destination-systems")]
-        public HttpResponseMessage GetAvailableDestinationSystems(int fromSystemUsageId, string nameContent, int amount)
+        [Route("options/{fromSystemUsageId}/systems-which-can-be-related-to")]
+        public HttpResponseMessage GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, string nameContent, int amount)
         {
-            return _usageService.GetAvailableRelationTargets(fromSystemUsageId, nameContent.FromString(), amount)
+            return _usageService.GetSystemUsagesWhichCanBeRelatedTo(fromSystemUsageId, nameContent.FromString(), amount)
                 .Match
                 (
-                    onSuccess: systemUsages => Ok(systemUsages.Select(x => x.MapToNamedEntityDTO()).ToList()),
+                    onSuccess: systemUsages => Ok
+                    (
+                        systemUsages
+                            .Select(x => x.MapToNamedEntityDTO())
+                            .OrderBy(x => x.Name)
+                            .ToList()
+                    ),
                     onFailure: FromOperationError
                 );
         }
@@ -127,12 +133,17 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("FromUsage AND ToUsage MUST be defined");
             }
 
-            var result = _usageService.ModifyRelation(
+            var result = _usageService.ModifyRelation
+            (
                 relation.FromUsage.Id,
                 relation.Id,
                 relation.ToUsage.Id,
-                relation.Interface?.Id
-                );
+                relation.Description,
+                relation.Reference,
+                relation.Interface?.Id,
+                relation.Contract?.Id,
+                relation.FrequencyType?.Id
+            );
 
             return result.Match(onSuccess: systemRelation => Ok(MapRelation(systemRelation)), onFailure: FromOperationError);
         }
@@ -166,12 +177,27 @@ namespace Presentation.Web.Controllers.API
         {
             return new SystemRelationOptionsDTO
             {
-                AvailableContracts = options.AvailableContracts.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
-                AvailableFrequencyTypes = options.AvailableFrequencyTypes.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
-                AvailableInterfaces = options.AvailableInterfaces.Select(contract => contract.MapToNamedEntityDTO()).ToArray(),
+                AvailableContracts =
+                    options
+                        .AvailableContracts
+                        .Select(contract => contract.MapToNamedEntityDTO())
+                        .OrderBy(x => x.Name)
+                        .ToArray(),
+                AvailableFrequencyTypes =
+                    options
+                        .AvailableFrequencyTypes
+                        .Select(contract => contract.MapToNamedEntityDTO())
+                        .OrderBy(x => x.Name)
+                        .ToArray(),
+                AvailableInterfaces =
+                    options
+                        .AvailableInterfaces
+                        .Select(contract => contract.MapToNamedEntityDTO())
+                        .OrderBy(x => x.Name)
+                        .ToArray(),
             };
         }
-		
+
         #endregion
     }
 }

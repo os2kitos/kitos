@@ -67,7 +67,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// Replaces mandatory relation "to" and resets relation interface
         /// </summary>
         /// <param name="toSystemUsage">Replacement system usage</param>
-        public Result<ItSystemUsage, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
+        public Result<SystemRelation, OperationError> SetRelationTo(ItSystemUsage toSystemUsage)
         {
             if (toSystemUsage == null)
                 throw new ArgumentNullException(nameof(toSystemUsage));
@@ -94,10 +94,10 @@ namespace Core.DomainModel.ItSystemUsage
                     ? RelationInterface
                     : null;
 
-            return ToSystemUsage;
+            return this;
         }
 
-        public Result<Maybe<ItContract.ItContract>, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
+        public Result<SystemRelation, OperationError> SetContract(Maybe<ItContract.ItContract> contract)
         {
             //IF contract is defined it MUST be in the same organization
             if (!CheckSameOrganizationConstraint(contract).GetValueOrFallback(true))
@@ -106,7 +106,7 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             AssociatedContract = contract.GetValueOrDefault();
-            return contract;
+            return this;
         }
 
         private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IHasOrganization
@@ -117,28 +117,49 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// Replace relation interface
         /// </summary>
-        /// <param name="targetInterfaceId">Replacement interface to be used on the relation. NULL is allowed</param>
-        public Result<Maybe<ItInterface>, OperationError> SetRelationInterface(int? targetInterfaceId)
+        /// <param name="relationInterface">Replacement interface to be used on the relation. None is allowed</param>
+        public Result<SystemRelation, OperationError> SetRelationInterface(Maybe<ItInterface> relationInterface)
         {
             if (ToSystemUsage == null)
                 throw new InvalidOperationException("Cannot set interface to unknown 'To' system");
 
-            if (targetInterfaceId.HasValue)
+            if (relationInterface.HasValue)
             {
-                var exposedInterface = ToSystemUsage.GetExposedInterface(targetInterfaceId.Value);
-                if (exposedInterface.IsNone)
+                if (!ToSystemUsage.HasExposedInterface(relationInterface.Value.Id))
                 {
                     return new OperationError("Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
                 }
-
-                RelationInterface = exposedInterface.Value;
-            }
-            else
-            {
-                RelationInterface = null;
             }
 
-            return RelationInterface.FromNullable();
+            RelationInterface = relationInterface.GetValueOrDefault();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Replaces frequency type
+        /// </summary>
+        /// <param name="toFrequency">Replacement frequency to be used in relation. NULL is allowed</param>
+        /// <returns></returns>
+        public Result<SystemRelation, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
+        {
+            UsageFrequency = toFrequency.GetValueOrDefault();
+
+            return this;
+        }
+
+        public Result<SystemRelation, OperationError> SetReference(string changedReference)
+        {
+            Reference = changedReference;
+
+            return this;
+        }
+
+        public Result<SystemRelation, OperationError> SetDescription(string changedDescription)
+        {
+            Description = changedDescription;
+
+            return this;
         }
     }
 }
