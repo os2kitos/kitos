@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -36,6 +37,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IInterfaceExhibitUsageService> _interfaceExhibitUsageService;
         private readonly Mock<IInterfaceUsageService> _interfaceUsageService;
+        private readonly Mock<IItSystemUsageService> _itSystemUsageService;
 
         public ItSystemUsageMigrationServiceTest()
         {
@@ -47,6 +49,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _interfaceExhibitUsageService = new Mock<IInterfaceExhibitUsageService>();
             _interfaceUsageService = new Mock<IInterfaceUsageService>();
+            _itSystemUsageService = new Mock<IItSystemUsageService>();
             _sut = new ItSystemUsageMigrationService(
                 _authorizationContext.Object,
                 _transactionManager.Object,
@@ -55,7 +58,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _systemUsageRepository.Object,
                 _itContractRepository.Object,
                 _interfaceExhibitUsageService.Object,
-                _interfaceUsageService.Object);
+                _interfaceUsageService.Object,
+                _itSystemUsageService.Object);
         }
 
         [Theory]
@@ -386,10 +390,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
-            var sourceSystem = CreateSystem();
+            var migrateToSystem = CreateSystem();
             var targetSystemUsage = CreateSystemUsage();
             var relationInterface = CreateInterface();
-            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
             ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
             var usageRelations = new List<SystemRelation>();
             var usedByRelations = new List<SystemRelation>
@@ -399,14 +403,14 @@ namespace Tests.Unit.Presentation.Web.Services
             sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
 
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.True(migration.AffectedRelations.First().itInterfaceToBeDeleted);
-            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().itInterface.Id);
+            Assert.True(migration.AffectedRelations.First().ItInterfaceToBeDeleted);
+            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().Relation.RelationInterfaceId);
             Assert.Equal(0, migration.AffectedContracts.Count);
             Assert.Equal(0, migration.AffectedProjects.Count);
         }
@@ -435,7 +439,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.Equal(contract.Id, migration.AffectedRelations.First().itContract.Id);
+            Assert.Equal(contract.Id, migration.AffectedRelations.First().Relation.AssociatedContractId);
             Assert.Equal(0, migration.AffectedContracts.Count);
             Assert.Equal(0, migration.AffectedProjects.Count);
         }
@@ -578,6 +582,33 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Empty(systemUsage.AccessTypes);
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
+
+        //[Fact]
+        //public void ExecuteMigration_Returns_Ok_And_Deletes_UsedByRelation_Interfaces()
+        //{
+        //    //Arrange
+        //    var sourceSystemUsage = CreateSystemUsage();
+        //    var migrateToSystem = CreateSystem();
+        //    var targetSystemUsage = CreateSystemUsage();
+        //    var relationInterface = CreateInterface();
+        //    ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
+        //    ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+        //    var usageRelations = new List<SystemRelation>();
+        //    var usedByRelations = new List<SystemRelation>
+        //    {
+        //        new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, RelationInterfaceId = relationInterface.Id, RelationInterface = relationInterface}
+        //    };
+        //    sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+        //    var transaction = ExpectBeginTransaction();
+
+        //    //Act
+        //    var result = _sut.ExecuteSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
+
+        //    //Assert - Check that access types have been removed from the system usage
+        //    Assert.True(result.Ok);
+        //    Assert.Null(sourceSystemUsage.UsedByRelations.First().RelationInterfaceId);
+        //    VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
+        //}
 
         [Fact]
         public void ExecuteMigration_Returns_UnknownError_If_Usage_Creation_Fails()

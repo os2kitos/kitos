@@ -32,6 +32,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IItContractRepository _contractRepository;
         private readonly IInterfaceExhibitUsageService _interfaceExhibitUsageService;
         private readonly IInterfaceUsageService _interfaceUsageService;
+        private readonly IItSystemUsageService _itSystemUsageService;
 
 
         public ItSystemUsageMigrationService(
@@ -42,7 +43,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IInterfaceExhibitUsageService interfaceExhibitUsageService,
-            IInterfaceUsageService interfaceUsageService)
+            IInterfaceUsageService interfaceUsageService, 
+            IItSystemUsageService itSystemUsageService)
         {
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
@@ -52,6 +54,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _contractRepository = contractRepository;
             _interfaceExhibitUsageService = interfaceExhibitUsageService;
             _interfaceUsageService = interfaceUsageService;
+            _itSystemUsageService = itSystemUsageService;
         }
 
         public Result<IReadOnlyList<ItSystem>, OperationFailure> GetUnusedItSystemsByOrganization(
@@ -139,24 +142,14 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             var sources = sourceRelations
                 .AsEnumerable()
                 .Select(
-                    relation => new SystemRelationMigration(
-                        relation.FromSystemUsage,
-                        relation.ToSystemUsage,
-                        relation.RelationInterface,
-                        false,
-                        relation.AssociatedContract))
+                    relation => new SystemRelationMigration(false, relation))
                 .ToList()
                 .AsReadOnly();
 
             var targets = targetRelations
                 .AsEnumerable()
                 .Select(
-                    relation => new SystemRelationMigration(
-                        relation.FromSystemUsage,
-                        relation.ToSystemUsage,
-                        relation.RelationInterface,
-                        true,
-                        relation.AssociatedContract))
+                    relation => new SystemRelationMigration(true, relation))
                 .ToList()
                 .AsReadOnly();
             return sources.Concat(targets);
@@ -245,6 +238,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         return OperationFailure.UnknownError;
                     }
 
+                    // Delete UsedByRelation interfaces
+                    var deletedRelationInterfaceStatus = DeleteUsedByRelationInterfaces(migration);
+                    if (deletedRelationInterfaceStatus == false)
+                    {
+                        transaction.Rollback();
+                        return OperationFailure.UnknownError;
+                    }
                     //***********************************************
                     //Perform final switchover of "source IT-System"
                     //***********************************************
@@ -299,6 +299,33 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     return false;
                 }
             }
+            return true;
+        }
+
+        private bool DeleteUsedByRelationInterfaces(ItSystemUsageMigration migration)
+        {
+            var relationWithInterfaceToBeDeleted = migration.AffectedRelations
+                .Where(x => x.ItInterfaceToBeDeleted && x.Relation.RelationInterfaceId != null)
+                .Select(x => x.Relation);
+            foreach (var relation in relationWithInterfaceToBeDeleted)
+            {
+                var modifyStatus = _itSystemUsageService.ModifyRelation(
+                    relation.FromSystemUsageId, 
+                    relation.Id, 
+                    relation.ToSystemUsageId,
+                    relation.Description, 
+                    relation.Reference, 
+                    null, 
+                    relation.AssociatedContractId,
+                    relation.UsageFrequencyId);
+                if (modifyStatus.Ok == false)
+                {
+                    _logger.Error($"Deleting interface from relation failed with {modifyStatus.Error}");
+                    return false;
+                }
+
+            }
+
             return true;
         }
 
