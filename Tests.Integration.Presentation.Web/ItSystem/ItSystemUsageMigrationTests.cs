@@ -338,23 +338,121 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation()
+        public async Task GetMigration_When_System_Has_Relation_With_Interface()
         {
             //Arrange
-            var contract = await CreateSystemRelationDTO();
-            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
+            var sourceItSystem = await CreateSystemAsync();
+            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
+            var targetItSystem = await CreateSystemAsync();
+            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var createdInterface = await CreateInterfaceAsync();
+            var exhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
+
+            var migrateToItSystem = await CreateSystemAsync();
+
+            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, exhibit.Id, null);
 
             //Act
-            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
+            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                var dto = Assert.Single(result.AffectedContracts);
-                Assert.Equal(contract.Id, dto?.Contract?.Id);
-                Assert.Empty(dto.AffectedInterfaceUsages);
-                Assert.Empty(dto.InterfaceExhibitUsagesToBeDeleted);
-                Assert.True(dto.SystemAssociatedInContract);
+                Assert.Empty(result.AffectedContracts);
+                var dto = Assert.Single(result.AffectedRelations);
+                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
+                Assert.Equal(relation.ToUsage, dto?.targetSystem);
+                Assert.Equal(relation.Interface, dto?.itInterface);
+                Assert.False(dto?.itInterfaceToBeDeleted);
+                Assert.Null(dto?.itContract);
+            }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Is_Target_Of_Relation_With_Interface()
+        {
+            //Arrange
+            var sourceItSystem = await CreateSystemAsync();
+            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
+            var targetItSystem = await CreateSystemAsync();
+            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var createdInterface = await CreateInterfaceAsync();
+            var exhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
+
+            var migrateToItSystem = await CreateSystemAsync();
+
+            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, exhibit.Id, null);
+
+            //Act
+            using (var response = await GetMigration(targetItSystemUsage, migrateToItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                Assert.Empty(result.AffectedContracts);
+                var dto = Assert.Single(result.AffectedRelations);
+                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
+                Assert.Equal(relation.ToUsage, dto?.targetSystem);
+                Assert.Equal(relation.Interface, dto?.itInterface);
+                Assert.True(dto?.itInterfaceToBeDeleted);
+                Assert.Null(dto?.itContract);
+            }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Has_Relation()
+        {
+            //Arrange
+            var sourceItSystem = await CreateSystemAsync();
+            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
+            var targetItSystem = await CreateSystemAsync();
+            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+
+            var migrateToItSystem = await CreateSystemAsync();
+
+            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, null);
+
+            //Act
+            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                Assert.Empty(result.AffectedContracts);
+                var dto = Assert.Single(result.AffectedRelations);
+                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
+                Assert.Equal(relation.ToUsage, dto?.targetSystem);
+                Assert.Null(dto?.itInterface);
+                Assert.Null(dto?.itContract);
+            }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Has_Relation_With_Contract()
+        {
+            //Arrange
+            var sourceItSystem = await CreateSystemAsync();
+            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
+            var targetItSystem = await CreateSystemAsync();
+            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var contract = await CreateContractAsync();
+
+            var migrateToItSystem = await CreateSystemAsync();
+
+            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, contract.Id);
+
+            //Act
+            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                Assert.Empty(result.AffectedContracts);
+                var dto = Assert.Single(result.AffectedRelations);
+                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
+                Assert.Equal(relation.ToUsage, dto?.targetSystem);
+                Assert.Null(dto?.itInterface);
+                Assert.Equal(contract.Id, dto?.itContract.Id);
             }
         }
 

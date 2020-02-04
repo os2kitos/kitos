@@ -354,6 +354,93 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void GetSystemUsageMigration_Returns_Ok_With_Affected_Relation()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var sourceSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id}
+            };
+            var usedByRelations = new List<SystemRelation>();
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(1, migration.AffectedRelations.Count);
+
+            Assert.Equal(0, migration.AffectedContracts.Count);
+            Assert.Equal(0, migration.AffectedProjects.Count);
+        }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Ok_With_Affected_UsedByRelation_With_Interface()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var sourceSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            var relationInterface = CreateInterface();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>();
+            var usedByRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, RelationInterfaceId = relationInterface.Id, RelationInterface = relationInterface}
+            };
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(1, migration.AffectedRelations.Count);
+            Assert.True(migration.AffectedRelations.First().itInterfaceToBeDeleted);
+            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().itInterface.Id);
+            Assert.Equal(0, migration.AffectedContracts.Count);
+            Assert.Equal(0, migration.AffectedProjects.Count);
+        }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Ok_With_Affected_UsedByRelation_With_Contract()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var sourceSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            var contract = CreateItContract();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>();
+            var usedByRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, AssociatedContractId = contract.Id, AssociatedContract = contract}
+            };
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(1, migration.AffectedRelations.Count);
+            Assert.Equal(contract.Id, migration.AffectedRelations.First().itContract.Id);
+            Assert.Equal(0, migration.AffectedContracts.Count);
+            Assert.Equal(0, migration.AffectedProjects.Count);
+        }
+
+        [Fact]
         public void ExecuteMigration_Returns_Forbidden_If_Migration_Is_UnAuthorized()
         {
             //Arrange
@@ -624,6 +711,13 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(systemUsage)).Returns(value);
         }
 
+        private ItSystemUsage AddRelationsToSystemUsage(ItSystemUsage usage, ICollection<SystemRelation> usageRelations, ICollection<SystemRelation> usedByRelations)
+        {
+            usage.UsageRelations = usageRelations;
+            usage.UsedByRelations = usedByRelations;
+            return usage;
+        }
+
         private void ExpectGetContractsBySystemUsageReturns(int usageId, IEnumerable<ItContract> itContracts)
         {
             _itContractRepository.Setup(x => x.GetBySystemUsageAssociation(usageId)).Returns(itContracts.AsQueryable());
@@ -757,6 +851,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private ItProject CreateProject()
         {
             return new ItProject() { Id = A<int>() };
+        }
+
+        private ItInterface CreateInterface()
+        {
+            return new ItInterface() {Id = A<int>()};
         }
     }
 }
