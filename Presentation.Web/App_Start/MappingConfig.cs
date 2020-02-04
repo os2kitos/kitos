@@ -74,10 +74,6 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItInterfaceType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<InterfaceType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
@@ -86,19 +82,11 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<MethodType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<ItProjectType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<PurchaseFormType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<TsaType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -366,7 +354,6 @@ namespace Presentation.Web
             Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
-                .ForMember(dest => dest.InterfaceTypeName, opt => opt.MapFrom(src => src.InterfaceType.Name)) // have to map here else the EF proxy class type name is used :(
                 .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.Usages.Any()))
                 .ReverseMap();
 

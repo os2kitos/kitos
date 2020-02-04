@@ -10,10 +10,7 @@
                     <th>Aktiv</th>
                     <th class="col-xs-2">Snitflade</th>
                     <th class="col-xs-2">Kontrakt ID</th>
-                    <th class="col-xs-1">TSA</th>
-                    <th class="col-xs-1">Snitfladetype</th>
                     <th class="col-xs-1">Grænseflade</th>
-                    <th class="col-xs-1">Metode</th>
                     <th class="col-xs-1">Data</th>
                     <th class="col-xs-1">Datatype</th>
                 </tr>
@@ -48,19 +45,8 @@
                         </a>
                     </td>
 
-                    <!-- tsa -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        {{exposure.tsaName}}
-                    </td>
-
-                    <!-- inteface type -->
-                    <td rowspan="{{exposure.numRows || 1}}">{{exposure.interfaceTypeName}}</td>
-
                     <!-- interface (grænseflade) -->
                     <td rowspan="{{exposure.numRows || 1}}">{{exposure.interfaceName}}</td>
-
-                    <!-- method -->
-                    <td rowspan="{{exposure.numRows || 1}}">{{exposure.methodName}}</td>
 
                     <!-- data -->
                     <td rowspan="1">
