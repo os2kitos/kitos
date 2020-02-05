@@ -12,6 +12,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Project

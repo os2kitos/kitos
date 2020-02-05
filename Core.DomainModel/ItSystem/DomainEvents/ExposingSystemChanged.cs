@@ -1,17 +1,19 @@
-﻿using Infrastructure.Services.DomainEvents;
+﻿using Core.DomainModel.Result;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainModel.ItSystem.DomainEvents
 {
-    public class ExposingSystemChanged: IDomainEvent
+    public class ExposingSystemChanged : IDomainEvent
     {
-        public ItInterface Interface { get; }
-        // TODO: Why do we need the ExposingSystem info when there is an Interface.AssociatedSystemRelations?
-        //public Maybe<ItSystem> ExposingSystem { get; }
+        public ItInterface AffectedInterface { get; }
+        public Maybe<ItSystem> PreviousSystem { get; }
+        public Maybe<ItSystem> NewSystem { get; }
 
-        public ExposingSystemChanged(ItInterface @interface/*, Maybe<ItSystem> exposingSystem*/)
+        public ExposingSystemChanged(ItInterface affectedInterface, Maybe<ItSystem> previousSystem, Maybe<ItSystem> newSystem)
         {
-            Interface = @interface;
-            //ExposingSystem = exposingSystem;
+            AffectedInterface = affectedInterface;
+            PreviousSystem = previousSystem;
+            NewSystem = newSystem;
         }
     }
 }

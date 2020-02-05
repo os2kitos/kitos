@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
 using Serilog;

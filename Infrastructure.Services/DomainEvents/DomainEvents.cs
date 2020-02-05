@@ -10,7 +10,7 @@ namespace Infrastructure.Services.DomainEvents
     /// </summary>
     public class DomainEvents : IDomainEvents
     {
-        private static IKernel _kernel;
+        private readonly IKernel _kernel;
 
         public DomainEvents(IKernel kernel)
         {

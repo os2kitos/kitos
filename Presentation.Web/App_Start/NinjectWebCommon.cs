@@ -16,15 +16,20 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Context;
+using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -148,6 +153,7 @@ namespace Presentation.Web
         private static void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InRequestScope();
+            kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<ExposingSystemChangedHandler>().InRequestScope();
         }
 
         private static void RegisterOptions(IKernel kernel)
@@ -207,6 +213,20 @@ namespace Presentation.Web
                     return new UnauthenticatedUserContext();
                 })
                 .InRequestScope();
+
+            //Injecting it as a maybe since service calls and background processes do not have an active user
+            kernel.Bind<Maybe<ActiveUserContext>>()
+                .ToMethod(ctx =>
+                {
+                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
+                    if (authentication.Method == AuthenticationMethod.Anonymous)
+                    {
+                        return Maybe<ActiveUserContext>.None;
+                    }
+
+                    var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
+                    return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
+                });
 
             //Authorization context
             kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();

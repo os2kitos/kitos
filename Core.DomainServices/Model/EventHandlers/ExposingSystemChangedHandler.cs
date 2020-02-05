@@ -1,28 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Core.ApplicationServices.Authorization;
+﻿using System.Data;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
-using Core.DomainServices;
-using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Context;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 
-namespace Core.DomainModel.ItSystemUsage.Handlers
+namespace Core.DomainServices.Model.EventHandlers
 {
-    public class ExposingSystemChangedHandler: IDomainEventHandler<ExposingSystemChanged>
+    public class ExposingSystemChangedHandler : IDomainEventHandler<ExposingSystemChanged>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _clock;
+        private readonly Maybe<ActiveUserContext> _userContext;
 
         public ExposingSystemChangedHandler(
             IGenericRepository<ItSystemUsage> systemUsageRepository,
-            ITransactionManager transactionManager, 
-            IOrganizationalUserContext userContext, 
+            ITransactionManager transactionManager,
+            Maybe<ActiveUserContext> userContext,
             IOperationClock clock)
         {
             _systemUsageRepository = systemUsageRepository;
@@ -33,25 +31,26 @@ namespace Core.DomainModel.ItSystemUsage.Handlers
 
         public void Handle(ExposingSystemChanged @event)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
                 var updateTime = _clock.Now;
 
-                foreach (var systemRelation in @event.Interface.AssociatedSystemRelations)
+                foreach (var systemRelation in @event.AffectedInterface.AssociatedSystemRelations)
                 {
-                    var withReferencePreload = _systemUsageRepository
-                        .GetWithReferencePreload(su => su.UsageRelations);
+                    var activeUser = _userContext.Match(ctx => ctx.UserEntity, () => systemRelation.ObjectOwner);
 
-                    var systemUsageWithRelation = withReferencePreload
-                        .First(su => su.UsageRelations.Contains(systemRelation));
-
-                    systemUsageWithRelation.ModifyUsageRelation(_userContext.UserEntity, systemRelation.Id, systemRelation.ToSystemUsage, 
-                        systemRelation.Description, systemRelation.Reference, 
-                        null, 
-                        Maybe<ItContract.ItContract>.None, 
-                        Maybe<RelationFrequencyType>.None);
-                    systemUsageWithRelation.LastChangedByUser = _userContext.UserEntity;
-                    systemUsageWithRelation.LastChanged = updateTime;
+                    var fromSystemUsage = systemRelation.FromSystemUsage;
+                    fromSystemUsage.ModifyUsageRelation(
+                        activeUser: activeUser,
+                        relationId: systemRelation.Id,
+                        toSystemUsage: systemRelation.ToSystemUsage,
+                        changedDescription: systemRelation.Description,
+                        changedReference: systemRelation.Reference,
+                        relationInterface: Maybe<ItInterface>.None, //Remove the interface binding
+                        toContract: systemRelation.AssociatedContract,
+                        toFrequency: systemRelation.UsageFrequency);
+                    fromSystemUsage.LastChangedByUser = activeUser;
+                    fromSystemUsage.LastChanged = updateTime;
                 }
 
                 _systemUsageRepository.Save();
