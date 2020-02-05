@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using ExpectedObjects;
 using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -35,15 +36,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                var relations = (await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId)).ToList();
-                var dto = Assert.Single(relations);
-                Assert.Equal(input.FromUsageId, dto.FromUsage.Id);
-                Assert.Equal(input.ToUsageId, dto.ToUsage.Id);
-                Assert.Equal(input.Description, dto.Description);
-                Assert.Equal(input.Reference, dto.Reference);
-                Assert.Equal(input.ContractId, dto.Contract?.Id);
-                Assert.Equal(input.InterfaceId, dto.Interface?.Id);
-                Assert.Equal(input.FrequencyTypeId, dto.FrequencyType?.Id);
+                var relationsFrom = (await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId)).ToList();
+                var relationsTo = (await SystemRelationHelper.SendGetRelationsToAsync(input.ToUsageId)).ToList();
+                var fromDto = Assert.Single(relationsFrom);
+                var toDto = Assert.Single(relationsTo);
+
+                fromDto.ToExpectedObject().ShouldMatch(toDto); //Same relation should yield same data at the dto level
+
+                Assert.Equal(input.FromUsageId, fromDto.FromUsage.Id);
+                Assert.Equal(input.ToUsageId, fromDto.ToUsage.Id);
+                Assert.Equal(input.Description, fromDto.Description);
+                Assert.Equal(input.Reference, fromDto.Reference);
+                Assert.Equal(input.ContractId, fromDto.Contract?.Id);
+                Assert.Equal(input.InterfaceId, fromDto.Interface?.Id);
+                Assert.Equal(input.FrequencyTypeId, fromDto.FrequencyType?.Id);
             }
         }
 
@@ -134,13 +140,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Contains(options.AvailableFrequencyTypes.Select(x => x.Id), x => x == input.FrequencyTypeId);
         }
 
-		[Fact]
+        [Fact]
         public async Task Can_Edit_SystemUsageWithRelations()
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, false, true);
             await SystemRelationHelper.SendPostRelationAsync(input);
-            var relations = await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId);
+            var relations = await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId);
             var edited = await PrepareEditedRelationAsync(relations.Single());
 
             //Act
