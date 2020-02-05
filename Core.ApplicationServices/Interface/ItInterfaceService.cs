@@ -138,44 +138,42 @@ namespace Core.ApplicationServices.Interface
                     return OperationFailure.Forbidden;
                 }
 
-                var newValue = Maybe<ItInterfaceExhibit>.None;
+                Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
                 Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
-                var exhibitorChanged = itInterface.ExhibitedBy?.ItSystemId != newSystemId;
+                var newSystem = Maybe<ItSystem>.None;
 
-                if (exhibitorChanged)
+                if (newSystemId.HasValue)
                 {
-                    if (newSystemId.HasValue)
+                    newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
+                    if (newSystem.IsNone)
                     {
-                        var systemResult = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
-                        if (systemResult.IsNone)
-                        {
-                            return OperationFailure.BadInput;
-                        }
-
-                        var system = systemResult.Value;
-                        if (!_authorizationContext.AllowReads(system))
-                        {
-                            return OperationFailure.Forbidden;
-                        }
-
-                        newValue = new ItInterfaceExhibit
-                        {
-                            ItInterface = itInterface,
-                            ItSystem = system,
-                            LastChanged = _operationClock.Now,
-                            ObjectOwner = itInterface.ObjectOwner,
-                            LastChangedByUser = _userContext.UserEntity
-                        };
+                        return OperationFailure.BadInput;
                     }
 
-                    itInterface.ExhibitedBy = newValue.GetValueOrDefault();
+                    if (!_authorizationContext.AllowReads(newSystem.Value))
+                    {
+                        return OperationFailure.Forbidden;
+                    }
+                }
 
-                    _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newValue.Select(x => x.ItSystem)));
+                var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
+
+                var changed = !oldExhibit.Equals(newExhibit);
+
+                if (changed)
+                {
+                    if (newExhibit.HasValue)
+                    {
+                        var exhibit = newExhibit.Value;
+                        exhibit.LastChangedByUser = _userContext.UserEntity;
+                        exhibit.LastChanged = _operationClock.Now;
+                    }
+                    _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
 
                     _repository.Save();
                     transaction.Commit();
                 }
-                
+
                 return itInterface;
             }
         }

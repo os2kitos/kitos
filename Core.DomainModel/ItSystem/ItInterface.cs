@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
+
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItSystem
@@ -73,5 +75,32 @@ namespace Core.DomainModel.ItSystem
         public bool Disabled { get; set; }
 
         public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
+
+        public Maybe<ItInterfaceExhibit> ChangeExhibitingSystem(Maybe<ItSystem> system)
+        {
+            if (system.IsNone)
+            {
+                ExhibitedBy = null;
+            }
+            else
+            {
+                var sameAsExisting =
+                    ExhibitedBy != null &&
+                    system.Select(x => x.Id == ExhibitedBy.ItSystem.Id)
+                        .GetValueOrFallback(false);
+
+                if (!sameAsExisting)
+                {
+                    ExhibitedBy = new ItInterfaceExhibit
+                    {
+                        ItInterface = this,
+                        ItSystem = system.Value,
+                        ObjectOwner = ObjectOwner,
+                    };
+                }
+            }
+
+            return ExhibitedBy;
+        }
     }
 }

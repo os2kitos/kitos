@@ -139,6 +139,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
     <Compile Include="ApplicationServices\KLE\KLEApplicationServiceTest.cs" />
