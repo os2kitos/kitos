@@ -1,10 +1,8 @@
 ﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
-import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
 
 class InterfaceCatalogHelper {
-    private static cssHelper = new CSSLocator();
     private static waitUpTo = new WaitTimers();
     private static interfacePage = new InterfaceCatalogPage();
 
@@ -22,18 +20,17 @@ class InterfaceCatalogHelper {
     public static bindInterfaceToSystem(systemName: string, interfaceName: string) {
         console.log(`Binding interface with name ${interfaceName} to system with name ${systemName}`);
         return this.gotoSpecificInterface(interfaceName)
-            .then(() => element(this.cssHelper.byDataElementType("interfaceDetailsLink")).click())
             .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
             .then(() => Select2.waitForDataAndSelect())
             .then(() => console.log("Interface bound to system"));;
     }
-
+    
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(this.interfacePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 
-    private static gotoSpecificInterface(name : string) {
+    public static gotoSpecificInterface(name : string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
             .then(() => this.findSpecificInterfaceInNameColumn(name).click());

@@ -28,9 +28,15 @@ namespace Core.ApplicationServices.SystemUsage
         /// <summary>
         /// Gets all relations FROM the target system usage
         /// </summary>
-        /// <param name="fromSystemUsageId"></param>
+        /// <param name="systemUsageId"></param>
         /// <returns></returns>
-        Result<IEnumerable<SystemRelation>, OperationError> GetRelations(int fromSystemUsageId);
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsFrom(int systemUsageId);
+        /// <summary>
+        /// Gets all relations TO the target system usage
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <returns></returns>
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsTo(int systemUsageId);
         /// <summary>
         /// Removes a system relation from the specified system usage
         /// </summary>
@@ -41,18 +47,18 @@ namespace Core.ApplicationServices.SystemUsage
         /// <summary>
         /// Gets a system relation
         /// </summary>
-        /// <param name="fromSystemUsageId"></param>
+        /// <param name="systemUsageId"></param>
         /// <param name="relationId"></param>
         /// <returns></returns>
-        Result<SystemRelation, OperationFailure> GetRelation(int fromSystemUsageId, int relationId);
+        Result<SystemRelation, OperationFailure> GetRelationFrom(int systemUsageId, int relationId);
         /// <summary>
-        /// Gets the systems which the target system can relate to
+        /// Gets the systems which the "from" system can relate to
         /// </summary>
         /// <param name="fromSystemUsageId"></param>
         /// <param name="nameContent"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        Result<IEnumerable<ItSystemUsage>, OperationError> GetAvailableRelationTargets(int fromSystemUsageId, Maybe<string> nameContent, int pageSize);
+        Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, Maybe<string> nameContent, int pageSize);
         /// <summary>
         /// Gets the valid options for the given system relation
         /// </summary>
@@ -72,7 +78,6 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="toContractId">Id of the specific "to" system usage contract to replace the existing system relation value</param>
         /// <param name="toFrequencyTypeId">Id of the specific "to" system frequency type to replace the existing system relation value</param>
         /// <returns></returns>
-        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference,
-            int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
+        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference, int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
     }
 }

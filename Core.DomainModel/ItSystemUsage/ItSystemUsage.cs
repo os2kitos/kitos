@@ -433,7 +433,7 @@ namespace Core.DomainModel.ItSystemUsage
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             User activeUser,
             ItSystemUsage toSystemUsage,
-            int? interfaceId,
+            Maybe<ItInterface> relationInterface,
             string description,
             string reference,
             Maybe<RelationFrequencyType> targetFrequency,
@@ -452,7 +452,7 @@ namespace Core.DomainModel.ItSystemUsage
                 LastChanged = DateTime.Now
             };
 
-            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, description, reference, interfaceId, targetContract, targetFrequency);
+            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, description, reference, relationInterface, targetContract, targetFrequency);
 
             if (updateRelationResult.Failed)
             {
@@ -471,8 +471,8 @@ namespace Core.DomainModel.ItSystemUsage
             int relationId,
             ItSystemUsage toSystemUsage,
             string changedDescription,
-            string changedReference,
-            int? interfaceId,
+            string changedFrequency,
+            Maybe<ItInterface> relationInterface,
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
         {
@@ -489,7 +489,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, changedDescription, changedReference, interfaceId, toContract, toFrequency);
+            return UpdateRelation(relation, toSystemUsage, changedDescription, changedFrequency, relationInterface, toContract, toFrequency);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -521,6 +521,11 @@ namespace Core.DomainModel.ItSystemUsage
             return GetExposedInterfaces().FirstOrDefault(x => x.Id == interfaceId);
         }
 
+        public bool HasExposedInterface(int interfaceId)
+        {
+            return GetExposedInterface(interfaceId).HasValue;
+        }
+
         public Maybe<SystemRelation> GetUsageRelation(int relationId)
         {
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
@@ -530,14 +535,14 @@ namespace Core.DomainModel.ItSystemUsage
             ItSystemUsage toSystemUsage,
             string changedDescription,
             string changedReference,
-            int? interfaceId,
+            Maybe<ItInterface> relationInterface,
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
         {
             return relation
                 .SetRelationTo(toSystemUsage)
                 .Select(_ => _.SetDescription(changedDescription))
-                .Select(_ => _.SetRelationInterface(interfaceId))
+                .Select(_ => _.SetRelationInterface(relationInterface))
                 .Select(_ => _.SetContract(toContract))
                 .Select(_ => _.SetFrequency(toFrequency))
                 .Select(_ => _.SetReference(changedReference));

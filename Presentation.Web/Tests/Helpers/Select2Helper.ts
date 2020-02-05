@@ -7,6 +7,7 @@ class Select2Helper {
     private static readonly selectDrop = "select2-drop";
     private static readonly selectChoice = "select2-choice";
     private static readonly selectResult = "select2-result-label";
+    private static readonly selectData = "select2-chosen";
 
     public static waitForDataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
@@ -20,6 +21,11 @@ class Select2Helper {
             .then(() => console.log("next"))
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).click())
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
+    }
+
+    public static getData(elementId: string) {
+        console.log(`Finding value in ${elementId}`);
+        return element(by.xpath(`//div[@id  = "${elementId}"]/child::*//span[@class = "select2-chosen"]`));
     }
 }
 export = Select2Helper;
