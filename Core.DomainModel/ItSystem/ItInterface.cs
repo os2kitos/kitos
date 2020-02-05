@@ -84,17 +84,18 @@ namespace Core.DomainModel.ItSystem
             }
             else
             {
-                var sameAsExisting =
-                    ExhibitedBy != null &&
-                    system.Select(x => x.Id == ExhibitedBy.ItSystem.Id)
-                        .GetValueOrFallback(false);
+                var newSystem = system.Value;
 
-                if (!sameAsExisting)
+                var changed =
+                    ExhibitedBy == null ||
+                    (newSystem.Id != ExhibitedBy.ItSystem.Id);
+
+                if (changed)
                 {
                     ExhibitedBy = new ItInterfaceExhibit
                     {
                         ItInterface = this,
-                        ItSystem = system.Value,
+                        ItSystem = newSystem,
                         ObjectOwner = ObjectOwner,
                     };
                 }
