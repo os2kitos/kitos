@@ -333,7 +333,9 @@ namespace Core.ApplicationServices.Authorization
 
         private static bool IsContextBound(Type entityType)
         {
-            return typeof(IContextAware).IsAssignableFrom(entityType) || typeof(IHasOrganization).IsAssignableFrom(entityType);
+            return typeof(IContextAware).IsAssignableFrom(entityType) || 
+                   typeof(IHasOrganization).IsAssignableFrom(entityType) ||
+                   typeof(IHasRelationshipWithOrganization).IsAssignableFrom(entityType);
         }
 
         private bool ActiveContextIsEntityContext(IEntity entity)
