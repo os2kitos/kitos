@@ -1,7 +1,7 @@
 ﻿<div class="object-section-container">
     <h4> <span ng-if="">(Slettes)</span></h4>
     <div class="panel panel-default">
-        <div class="panel-heading">har oprettet følgende relationer til andre systemer/snitflader:</div>
+        <div class="panel-heading">Der er oprettet følgende relationer til andre systemer/snitflader:</div>
         <table class="table table-condensed table-striped">
             <thead>
                 <tr>
@@ -12,39 +12,28 @@
                         Snitflade
                     </th>
                     <th>
-                        Relationsbeskrivelse
-                    </th>
-                    <th>
                         Frekvens
                     </th>
                     <th>
                         Kontrakt
                     </th>
+                    <th>
+                        Relationsbeskrivelse    
+                    </th>
+                    <th>
+                        Beskrivelse
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <!--data-ng-repeat=""-->
-                <tr>
-                    <!-- system name -->
-                    <td>
-                        system name
-                    </td>
-                    <!-- interface -->
-                    <td>
-                         interface
-                    </td>
-                    <!-- Relation Description -->
-                    <td>
-                        Relation Description
-                    </td>
-                    <!-- Frequency -->
-                    <td>
-                        Frequency
-                    </td>
-                    <!-- Contract -->
-                    <td>
-                         Contract
-                    </td>
+                <tr ng-repeat="relation in relationTabledata">
+                    <td><a href="#/system/usage/{{relation.toUsage.id}}/main">{{relation.toUsage.name}}</a></td>
+                    <td><a href="#/system/edit/{{relation.interface.id}}/interface/main">{{relation.interface.name}}</a></td>
+                    <td>{{relation.frequencyType.name}}</td>
+                    <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
+                    <td>{{relation.reference}}</td>
+                    <td>{{relation.description}}</td>
                 </tr>
             </tbody>
         </table>

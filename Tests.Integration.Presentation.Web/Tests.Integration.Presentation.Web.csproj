@@ -135,6 +135,7 @@
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
     <Compile Include="Tools\OrganizationHelper.cs" />
+    <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
   </ItemGroup>
   <ItemGroup>

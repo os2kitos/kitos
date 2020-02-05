@@ -21,14 +21,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(x => x.RelationInterfaceId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(x => x.RelationTarget)
+            this.HasRequired(x => x.ToSystemUsage)
                 .WithMany(x => x.UsedByRelations)
-                .HasForeignKey(x => x.RelationTargetId)
+                .HasForeignKey(x => x.ToSystemUsageId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(x => x.RelationSource)
+            this.HasRequired(x => x.FromSystemUsage)
                 .WithMany(x => x.UsageRelations)
-                .HasForeignKey(x => x.RelationSourceId)
+                .HasForeignKey(x => x.FromSystemUsageId)
                 .WillCascadeOnDelete(true);
 
             this.Property(x => x.Reference).IsOptional();
