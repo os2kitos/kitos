@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 
@@ -11,7 +12,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
         public ItSystem FromItSystem { get; }
         public ItSystem ToItSystem { get; }
         public IReadOnlyList<ItProject> AffectedProjects { get; }
-        public IReadOnlyList<ItContractMigration> AffectedContracts { get; }
+        public IReadOnlyList<ItContract> AffectedContracts { get; }
         public IReadOnlyList<SystemRelationMigration> AffectedRelations { get; }
 
         public ItSystemUsageMigration(
@@ -19,7 +20,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
             ItSystem fromItSystem,
             ItSystem toItSystem,
             IEnumerable<ItProject> affectedProjects, 
-            IEnumerable<ItContractMigration> affectedContracts,
+            IEnumerable<ItContract> affectedContracts,
             IEnumerable<SystemRelationMigration> affectedRelations)
         {
             SystemUsage = systemUsage;

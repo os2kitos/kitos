@@ -109,21 +109,11 @@ namespace Presentation.Web.Controllers.API
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
                 AffectedItProjects = input.AffectedProjects.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
-                AffectedContracts = input.AffectedContracts.Select(Map).ToList(),
+                AffectedContracts = input.AffectedContracts.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
                 AffectedRelations = input.AffectedRelations.Select(Map).ToList()
             };
         }
-
-        private static ItSystemUsageContractMigrationDTO Map(ItContractMigration input)
-        {
-            return new ItSystemUsageContractMigrationDTO
-            {
-                Contract = input.Contract.MapToNamedEntityDTO(),
-                SystemAssociatedInContract = input.SystemAssociatedInContract,
-                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(Map).ToList(),
-                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(Map).ToList()
-            };
-        }
+        
 
         private static RelationMigrationDTO Map(SystemRelationMigration input)
         {

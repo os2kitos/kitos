@@ -5,8 +5,6 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Interface.ExhibitUsage;
-using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -14,7 +12,6 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
@@ -29,9 +26,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
-        private readonly IItContractRepository _contractRepository;
-        private readonly IInterfaceExhibitUsageService _interfaceExhibitUsageService;
-        private readonly IInterfaceUsageService _interfaceUsageService;
         private readonly IItSystemUsageService _itSystemUsageService;
 
 
@@ -41,9 +35,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             ILogger logger,
             IItSystemRepository systemRepository,
             IItSystemUsageRepository systemUsageRepository,
-            IItContractRepository contractRepository,
-            IInterfaceExhibitUsageService interfaceExhibitUsageService,
-            IInterfaceUsageService interfaceUsageService, 
             IItSystemUsageService itSystemUsageService)
         {
             _authorizationContext = authorizationContext;
@@ -51,9 +42,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _logger = logger;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
-            _contractRepository = contractRepository;
-            _interfaceExhibitUsageService = interfaceExhibitUsageService;
-            _interfaceUsageService = interfaceUsageService;
             _itSystemUsageService = itSystemUsageService;
         }
 
@@ -69,7 +57,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             }
             if (numberOfItSystems < 1)
             {
-                throw new ArgumentException(nameof(numberOfItSystems) + $" Cannot be less than 1");
+                throw new ArgumentException(nameof(numberOfItSystems) + " Cannot be less than 1");
             }
 
             var dataAccessLevel = _authorizationContext.GetDataAccessLevel(organizationId);
@@ -122,8 +110,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return OperationFailure.Forbidden;
             }
 
-            // Map all contract migrations
-            var contractMigrations = GetContractMigrations(itSystemUsage);
+            // Get contracts
+            var contracts = itSystemUsage.Contracts.Select(x => x.ItContract);
 
             // Map relations
             var relationMigrations = GetRelationMigrations(itSystemUsage.UsageRelations, itSystemUsage.UsedByRelations);
@@ -133,7 +121,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 fromItSystem: itSystemUsage.ItSystem,
                 toItSystem: toItSystem,
                 affectedProjects: itSystemUsage.ItProjects,
-                affectedContracts: contractMigrations,
+                affectedContracts: contracts,
                 affectedRelations: relationMigrations);
         }
 
@@ -153,33 +141,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .ToList()
                 .AsReadOnly();
             return sources.Concat(targets);
-        }
-
-        private IEnumerable<ItContractMigration> GetContractMigrations(ItSystemUsage itSystemUsage)
-        {
-            //Find all contract associations by it system usage ID and then map into contract migration
-            return _contractRepository
-                .GetBySystemUsageAssociation(itSystemUsage.Id)
-                .AsEnumerable()
-                .Select(
-                    contract =>
-                        new ItContractMigration(
-                            contract: contract,
-                            systemAssociatedInContract: contract
-                                .AssociatedSystemUsages
-                                .Any(x => x.ItSystemUsageId == itSystemUsage.Id),
-                            affectedUsages: contract
-                                .AssociatedInterfaceUsages
-                                .Where(x => x.ItSystemUsageId == itSystemUsage.Id)
-                                .ToList(),
-                            exhibitUsagesToBeDeleted: contract
-                                .AssociatedInterfaceExposures
-                                .Where(x => x.ItSystemUsageId == itSystemUsage.Id)
-                                .ToList()
-                        )
-                )
-                .ToList()
-                .AsReadOnly();
         }
 
         public Result<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
@@ -221,22 +182,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     // *************************
                     // *** Perform migration ***
                     // *************************
-
-                    // Migrate interface usages
-                    var interfaceMigration = UpdateInterfaceUsages(migration);
-                    if (interfaceMigration == false)
-                    {
-                        transaction.Rollback();
-                        return OperationFailure.UnknownError;
-                    }
-
-                    // Delete interface exhibit usages
-                    var deletedStatus = DeleteExhibits(migration);
-                    if (deletedStatus == false)
-                    {
-                        transaction.Rollback();
-                        return OperationFailure.UnknownError;
-                    }
 
                     // Delete UsedByRelation interfaces
                     var deletedRelationInterfaceStatus = DeleteUsedByRelationInterfaces(migration);
@@ -284,24 +229,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return _authorizationContext.HasPermission(new SystemUsageMigrationPermission());
         }
 
-        private bool DeleteExhibits(ItSystemUsageMigration migration)
-        {
-            var exhibitsToBeDeleted = migration.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted);
-            foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
-            {
-                var deletedStatus = _interfaceExhibitUsageService.Delete(
-                    itInterfaceExhibitUsage.ItSystemUsageId,
-                    itInterfaceExhibitUsage.ItInterfaceExhibitId);
-
-                if (deletedStatus.Ok == false)
-                {
-                    _logger.Error($"Deleting interface exhibit usages failed with {deletedStatus.Error}");
-                    return false;
-                }
-            }
-            return true;
-        }
-
         private bool DeleteUsedByRelationInterfaces(ItSystemUsageMigration migration)
         {
             var relationWithInterfaceToBeDeleted = migration.AffectedRelations
@@ -326,42 +253,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
             }
 
-            return true;
-        }
-
-        private bool UpdateInterfaceUsages(ItSystemUsageMigration migration)
-        {
-            var usagesToBeUpdated = migration.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages);
-            var toSystemId = migration.ToItSystem.Id;
-
-            foreach (var interfaceUsage in usagesToBeUpdated)
-            {
-                var interfaceCreationResult = _interfaceUsageService.Create(
-                    interfaceUsage.ItSystemUsageId,
-                    toSystemId,
-                    interfaceUsage.ItInterfaceId,
-                    interfaceUsage.IsWishedFor,
-                    interfaceUsage.ItContractId.GetValueOrDefault(),
-                    interfaceUsage.InfrastructureId);
-
-                if (interfaceCreationResult.Ok == false)
-                {
-                    _logger.Error($"Creating new interface usages failed with {interfaceCreationResult.Error}");
-                    return false;
-                }
-
-                var deletedStatus = _interfaceUsageService.Delete(
-                    interfaceUsage.ItSystemUsageId,
-                    interfaceUsage.ItSystemId,
-                    interfaceUsage.ItInterfaceId);
-
-                if (deletedStatus.Ok == false)
-                {
-                    _logger.Error($"Deleting old interface usages failed with {deletedStatus.Error}");
-                    return false;
-                }
-
-            }
             return true;
         }
 
