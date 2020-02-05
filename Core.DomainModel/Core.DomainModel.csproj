@@ -35,12 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Core.ApplicationServices">
-      <HintPath>..\Presentation.Web\Bin\Core.ApplicationServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Core.DomainServices">
-      <HintPath>..\Presentation.Web\Bin\Core.DomainServices.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -68,7 +62,6 @@
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
-    <Compile Include="ItSystemUsage\Handlers\ExposingSystemChangedHandler.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
@@ -232,12 +225,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

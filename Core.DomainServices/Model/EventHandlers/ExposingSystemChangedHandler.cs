@@ -19,8 +19,11 @@ namespace Core.DomainModel.ItSystemUsage.Handlers
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _clock;
 
-        public ExposingSystemChangedHandler(IGenericRepository<ItSystemUsage> systemUsageRepository,
-            ITransactionManager transactionManager, IOrganizationalUserContext userContext, IOperationClock clock)
+        public ExposingSystemChangedHandler(
+            IGenericRepository<ItSystemUsage> systemUsageRepository,
+            ITransactionManager transactionManager, 
+            IOrganizationalUserContext userContext, 
+            IOperationClock clock)
         {
             _systemUsageRepository = systemUsageRepository;
             _transactionManager = transactionManager;
