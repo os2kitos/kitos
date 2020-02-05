@@ -76,9 +76,9 @@ namespace Tests.Unit.Core.Infrastructure
                 _holder = holder;
             }
 
-            public void Handle(MyDomainEvent args)
+            public void Handle(MyDomainEvent domainEvent)
             {
-                _holder.ResultingValue = args.Id;
+                _holder.ResultingValue = domainEvent.Id;
             }
         }
 
