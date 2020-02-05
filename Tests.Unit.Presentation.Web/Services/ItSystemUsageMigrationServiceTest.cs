@@ -362,9 +362,9 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
-            var sourceSystem = CreateSystem();
+            var migrateToSystem = CreateSystem();
             var targetSystemUsage = CreateSystemUsage();
-            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
             ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
             var usageRelations = new List<SystemRelation>
             {
@@ -374,7 +374,7 @@ namespace Tests.Unit.Presentation.Web.Services
             sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
 
             //Assert
             Assert.True(result.Ok);
@@ -420,10 +420,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
-            var sourceSystem = CreateSystem();
+            var migrateToSystem = CreateSystem();
             var targetSystemUsage = CreateSystemUsage();
             var contract = CreateItContract();
-            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, sourceSystem);
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
             ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
             var usageRelations = new List<SystemRelation>();
             var usedByRelations = new List<SystemRelation>
@@ -433,7 +433,7 @@ namespace Tests.Unit.Presentation.Web.Services
             sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, sourceSystem.Id);
+            var result = _sut.GetSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
 
             //Assert
             Assert.True(result.Ok);
@@ -583,32 +583,94 @@ namespace Tests.Unit.Presentation.Web.Services
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
 
-        //[Fact]
-        //public void ExecuteMigration_Returns_Ok_And_Deletes_UsedByRelation_Interfaces()
-        //{
-        //    //Arrange
-        //    var sourceSystemUsage = CreateSystemUsage();
-        //    var migrateToSystem = CreateSystem();
-        //    var targetSystemUsage = CreateSystemUsage();
-        //    var relationInterface = CreateInterface();
-        //    ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
-        //    ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
-        //    var usageRelations = new List<SystemRelation>();
-        //    var usedByRelations = new List<SystemRelation>
-        //    {
-        //        new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, RelationInterfaceId = relationInterface.Id, RelationInterface = relationInterface}
-        //    };
-        //    sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
-        //    var transaction = ExpectBeginTransaction();
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_And_Deletes_UsedByRelation_Interfaces()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var migrateToSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            var relationInterface = CreateInterface();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
+            ExpectAllowModifyReturns(sourceSystemUsage, true);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>();
+            var usedByRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, RelationInterfaceId = relationInterface.Id, RelationInterface = relationInterface}
+            };
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+            ExpectSystemUsageServiceToRemoveRelationInterface(usedByRelations.First());
+            var transaction = ExpectBeginTransaction();
 
-        //    //Act
-        //    var result = _sut.ExecuteSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
 
-        //    //Assert - Check that access types have been removed from the system usage
-        //    Assert.True(result.Ok);
-        //    Assert.Null(sourceSystemUsage.UsedByRelations.First().RelationInterfaceId);
-        //    VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
-        //}
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Null(migration.UsedByRelations.First().RelationInterfaceId);
+            VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_With_Affected_Relation()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var migrateToSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
+            ExpectAllowModifyReturns(sourceSystemUsage, true);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id}
+            };
+            var usedByRelations = new List<SystemRelation>();
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+            var transaction = ExpectBeginTransaction();
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(migration.UsageRelations.First().Id, usageRelations.First().Id);
+            
+            VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_With_Affected_UsedByRelation_With_Contract()
+        {
+            //Arrange
+            var sourceSystemUsage = CreateSystemUsage();
+            var migrateToSystem = CreateSystem();
+            var targetSystemUsage = CreateSystemUsage();
+            var contract = CreateItContract();
+            ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
+            ExpectAllowModifyReturns(sourceSystemUsage, true);
+            ExpectGetContractsBySystemUsageReturns(sourceSystemUsage.Id, Enumerable.Empty<ItContract>());
+            var usageRelations = new List<SystemRelation>();
+            var usedByRelations = new List<SystemRelation>
+            {
+                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, AssociatedContractId = contract.Id, AssociatedContract = contract}
+            };
+            sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
+            var transaction = ExpectBeginTransaction();
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(sourceSystemUsage.Id, migrateToSystem.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(migration.UsedByRelations.First().Id, usedByRelations.First().Id);
+            Assert.Equal(migration.UsedByRelations.First().AssociatedContractId, usedByRelations.First().AssociatedContractId);
+            VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
+        }
 
         [Fact]
         public void ExecuteMigration_Returns_UnknownError_If_Usage_Creation_Fails()
@@ -828,6 +890,24 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectAllowSystemMigrationReturns(bool value)
         {
             _authorizationContext.Setup(x => x.HasPermission(It.IsAny<SystemUsageMigrationPermission>())).Returns(value);
+        }
+
+        private void ExpectSystemUsageServiceToRemoveRelationInterface(SystemRelation relation)
+        {
+            var newRelation = relation;
+            newRelation.RelationInterfaceId = null;
+            newRelation.RelationInterface = null;
+            _itSystemUsageService
+                .Setup(x => x.ModifyRelation(
+                    relation.FromSystemUsageId,
+                    relation.Id,
+                    relation.ToSystemUsageId,
+                    relation.Description,
+                    relation.Reference,
+                    null,
+                    relation.AssociatedContractId,
+                    relation.UsageFrequencyId))
+                .Returns(Result<SystemRelation, OperationError>.Success(newRelation));
         }
 
         private static List<ItSystem> CreateItSystemSequenceWithNamePrefix(int amount, string prefix)
