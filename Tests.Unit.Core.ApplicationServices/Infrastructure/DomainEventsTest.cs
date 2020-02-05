@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using Infrastructure.Services.DomainEvents;
+﻿using Infrastructure.Services.DomainEvents;
 using Ninject;
 using Xunit;
 

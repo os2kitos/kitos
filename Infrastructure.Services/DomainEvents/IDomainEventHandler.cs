@@ -2,6 +2,6 @@
 {
     public interface IDomainEventHandler<in T> where T: IDomainEvent
     {
-        void Handle(T args);
+        void Handle(T @event);
     }
 }

@@ -471,7 +471,7 @@ namespace Core.DomainModel.ItSystemUsage
             int relationId,
             ItSystemUsage toSystemUsage,
             string changedDescription,
-            string changedFrequency,
+            string changedReference,
             int? interfaceId,
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
@@ -489,7 +489,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, changedDescription, changedFrequency, interfaceId, toContract, toFrequency);
+            return UpdateRelation(relation, toSystemUsage, changedDescription, changedReference, interfaceId, toContract, toFrequency);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
