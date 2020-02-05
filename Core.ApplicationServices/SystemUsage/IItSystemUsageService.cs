@@ -47,10 +47,10 @@ namespace Core.ApplicationServices.SystemUsage
         /// <summary>
         /// Gets a system relation
         /// </summary>
-        /// <param name="fromSystemUsageId"></param>
+        /// <param name="systemUsageId"></param>
         /// <param name="relationId"></param>
         /// <returns></returns>
-        Result<SystemRelation, OperationFailure> GetRelationFrom(int fromSystemUsageId, int relationId);
+        Result<SystemRelation, OperationFailure> GetRelationFrom(int systemUsageId, int relationId);
         /// <summary>
         /// Gets the systems which the "from" system can relate to
         /// </summary>
