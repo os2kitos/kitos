@@ -1,85 +1,71 @@
-﻿//using System.Collections.Generic;
-//using System.Data;
-//using System.Linq;
-//using System.Web.Http.Description;
-//using Core.ApplicationServices.Authorization;
-//using Core.DomainModel;
-//using Core.DomainModel.ItSystem;
-//using Core.DomainModel.ItSystem.DomainEvents;
-//using Core.DomainModel.ItSystemUsage;
-//using Core.DomainServices;
-//using Core.DomainServices.Context;
-//using Core.DomainServices.Model.EventHandlers;
-//using Core.DomainServices.Repositories.KLE;
-//using Core.DomainServices.Time;
-//using Infrastructure.Services.DataAccess;
-//using Moq;
-//using Xunit;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices;
+using Core.DomainServices.Context;
+using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Time;
+using Infrastructure.Services.DataAccess;
+using Moq;
+using Serilog;
+using Tests.Toolkit.Patterns;
+using Xunit;
 
-//namespace Tests.Unit.Core.Model
-//{
-//    public class ExposingSystemChangedHandlerTest
-//    {
-//        //TODO: Rewrite
-//        [Fact]
-//        private void
-//            Handle_GivenInterfaceAndPossibleSystemChange_WhenSystemInUse_ThenInterfaceOnSystemRelationsIsReset()
-//        {
-//            // Arrange
-//            var mockChangedSystem = new Mock<ItSystem>();
-//            var mockFirstFromSystemUsage = new Mock<ItSystemUsage>();
-//            var mockFirstToSystemUsage = new Mock<ItSystemUsage>();
-//            mockFirstToSystemUsage.SetupGet(su => su.ItSystem).Returns(mockChangedSystem.Object);
-//            var mockSecondFromSystemUsage = new Mock<ItSystemUsage>();
-//            var mockSecondToSystemUsage = new Mock<ItSystemUsage>();
-//            mockSecondToSystemUsage.SetupGet(su => su.ItSystem).Returns(mockChangedSystem.Object);
-//            var mockAffectedInterface = new Mock<ItInterface>();
-//            var systemRelations = new List<SystemRelation>
-//            {
-//                SetupSystemRelation(1, mockFirstFromSystemUsage, mockAffectedInterface, mockFirstToSystemUsage),
-//                SetupSystemRelation(2, mockSecondFromSystemUsage, mockAffectedInterface, mockSecondToSystemUsage),
-//            };
-//            mockAffectedInterface.SetupGet(i => i.AssociatedSystemRelations).Returns(systemRelations);
-//            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
-//            var itSystemUsages = new List<ItSystemUsage>
-//            {
-//                mockFirstFromSystemUsage.Object,
-//                mockSecondFromSystemUsage.Object
-//            };
-//            mockSystemUsageRepository
-//                .Setup(r => r.GetWithReferencePreload(su => su.UsageRelations))
-//                .Returns(itSystemUsages.AsQueryable());
-//            var mockTransactionManager = new Mock<ITransactionManager>();
-//            var mockTransaction = new Mock<IDatabaseTransaction>();
-//            mockTransactionManager.Setup(m => m.Begin(It.IsAny<IsolationLevel>())).Returns(mockTransaction.Object);
-//            var activeUserContext = new ActiveUserContext(1, new User());
-//            var mockClock = new Mock<IOperationClock>();
+namespace Tests.Unit.Core.Model
+{
+    public class ExposingSystemChangedHandlerTest : WithAutoFixture
+    {
+        private readonly ExposingSystemChangedHandler _sut;
+        private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly ActiveUserContext _activeUserContext;
 
-//            // Act
-//            var sut = new ExposingSystemChangedHandler(mockSystemUsageRepository.Object, mockTransactionManager.Object,
-//                activeUserContext, mockClock.Object);
-//            //sut.Handle(new ExposingSystemChanged(mockAffectedInterface.Object));
+        public ExposingSystemChangedHandlerTest()
+        {
+            _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            _transactionManager = new Mock<ITransactionManager>();
+            _activeUserContext = new ActiveUserContext(1337, new User());
+            _sut = new ExposingSystemChangedHandler(_systemUsageRepository.Object, _transactionManager.Object, _activeUserContext, Mock.Of<IOperationClock>(x => x.Now == DateTime.Now), Mock.Of<ILogger>());
+        }
 
-//            // Assert
-//            // TODO: Check mockFirst/SecondSystemUsage relation removals
-//        }
+        [Fact]
+        private void Handle_GivenInterfaceAndPossibleSystemChange_WhenSystemInUse_ThenInterfaceOnSystemRelationsIsReset()
+        {
+            //Arrange
+            var affectedInterface = new ItInterface() { };
+            affectedInterface.AssociatedSystemRelations = new List<SystemRelation>()
+            {
+                CreateRelation(affectedInterface),
+                CreateRelation(affectedInterface),
+            };
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
-//        #region Helpers
+            //Act
+            _sut.Handle(new ExposingSystemChanged(affectedInterface, new ItSystem(), new ItSystem()));
 
-//        private static SystemRelation SetupSystemRelation(int id, Mock<ItSystemUsage> mockFirstFromSystemUsage,
-//            IMock<ItInterface> mockAffectedInterface, IMock<ItSystemUsage> mockFirstToSystemUsage)
-//        {
-//            var systemRelation = new SystemRelation(mockFirstFromSystemUsage.Object)
-//            {
-//                Id = id,
-//                RelationInterface = mockAffectedInterface.Object,
-//                ToSystemUsage = mockFirstToSystemUsage.Object
-//            };
-//            mockFirstFromSystemUsage.SetupGet(su => su.UsageRelations)
-//                .Returns(new List<SystemRelation> { systemRelation });
-//            return systemRelation;
-//        }
+            //Assert that all interface fields were reset
+            Assert.True(affectedInterface.AssociatedSystemRelations.All(x => x.RelationInterface == null));
+            _systemUsageRepository.Verify(x => x.Save(), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
 
-//        #endregion
-//    }
-//}
+        }
+
+        private SystemRelation CreateRelation(ItInterface affectedInterface)
+        {
+            var fromSystemUsage = new ItSystemUsage { Id = A<int>() };
+            var systemRelation = new SystemRelation(fromSystemUsage)
+            {
+                RelationInterface = affectedInterface,
+                ToSystemUsage = new ItSystemUsage { Id = A<int>() }
+            };
+            fromSystemUsage.UsageRelations.Add(systemRelation);
+            return systemRelation;
+        }
+    }
+}

@@ -42,36 +42,45 @@ namespace Core.DomainServices.Model.EventHandlers
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
+                var affectedInterface = domainEvent.AffectedInterface;
+
                 _logger.Debug(
                     "Exposing system for interface with id {interfaceId} changed from {fromSystemId} to {toSystemId}. Resetting 'interface' field on all associated system relations",
-                    domainEvent.AffectedInterface.Id,
+                    affectedInterface.Id,
                     domainEvent.PreviousSystem.Match(x => x.Id.ToString(), () => "_none_"),
                     domainEvent.NewSystem.Match(x => x.Id.ToString(), () => "_none_"));
 
                 var updateTime = _clock.Now;
 
-                foreach (var systemRelation in domainEvent.AffectedInterface.AssociatedSystemRelations.ToList())
+                var systemRelations = affectedInterface.AssociatedSystemRelations.ToList();
+                if (systemRelations.Any())
                 {
-                    var activeUser = _userContext.Match(ctx => ctx.UserEntity, () => systemRelation.ObjectOwner);
+                    foreach (var systemRelation in systemRelations)
+                    {
+                        var activeUser = _userContext.Match(ctx => ctx.UserEntity, () => systemRelation.ObjectOwner);
 
-                    var fromSystemUsage = systemRelation.FromSystemUsage;
+                        var fromSystemUsage = systemRelation.FromSystemUsage;
 
-                    fromSystemUsage.ModifyUsageRelation(
-                        activeUser: activeUser,
-                        relationId: systemRelation.Id,
-                        toSystemUsage: systemRelation.ToSystemUsage,
-                        changedDescription: systemRelation.Description,
-                        changedReference: systemRelation.Reference,
-                        relationInterface: Maybe<ItInterface>.None, //Remove the interface binding
-                        toContract: systemRelation.AssociatedContract,
-                        toFrequency: systemRelation.UsageFrequency);
-                    fromSystemUsage.LastChangedByUser = activeUser;
-                    fromSystemUsage.LastChanged = updateTime;
+                        var result = fromSystemUsage.ModifyUsageRelation(
+                            activeUser: activeUser,
+                            relationId: systemRelation.Id,
+                            toSystemUsage: systemRelation.ToSystemUsage,
+                            changedDescription: systemRelation.Description,
+                            changedReference: systemRelation.Reference,
+                            relationInterface: Maybe<ItInterface>.None, //Remove the interface binding
+                            toContract: systemRelation.AssociatedContract,
+                            toFrequency: systemRelation.UsageFrequency);
+
+                        if(result.Failed)
+                            throw new InvalidOperationException($"Failed to modify system relation. Error: {result.Error}");
+
+                        fromSystemUsage.LastChangedByUser = activeUser;
+                        fromSystemUsage.LastChanged = updateTime;
+                    }
+
+                    _systemUsageRepository.Save();
+                    transaction.Commit();
                 }
-
-                _systemUsageRepository.Save();
-
-                transaction.Commit();
             }
         }
     }
