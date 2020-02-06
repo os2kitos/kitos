@@ -1,7 +1,9 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
@@ -24,6 +26,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IOrganizationalUserContext> _UserContext;
+        private readonly Mock<IGenericRepository<DataRow>> _dataRowRepository;
 
         public ItInterfaceServiceTest()
         {
@@ -33,9 +36,10 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents = new Mock<IDomainEvents>();
             _transactionManager = new Mock<ITransactionManager>();
             _UserContext = new Mock<IOrganizationalUserContext>();
+            _dataRowRepository = new Mock<IGenericRepository<DataRow>>();
             _sut = new ItInterfaceService(
                 _interfaceRepository.Object,
-                Mock.Of<IGenericRepository<DataRow>>(),
+                _dataRowRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _UserContext.Object,
@@ -183,6 +187,94 @@ namespace Tests.Unit.Core.ApplicationServices
             _interfaceRepository.Verify(x => x.Save(), Times.Once);
         }
 
+        [Fact]
+        public void Delete_Returns_NotFound()
+        {
+            //Arrange
+            var interfaceId = A<int>();
+            ExpectGetInterfaceReturns(interfaceId, default(ItInterface));
+
+            //Act
+            var result = _sut.Delete(interfaceId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void Delete_Returns_Forbidden()
+        {
+            //Arrange
+            var interfaceId = A<int>();
+            var itInterface = new ItInterface() { InterfaceId = interfaceId };
+            ExpectGetInterfaceReturns(interfaceId, itInterface);
+            ExpectAllowDeleteReturns(itInterface, false);
+
+            //Act
+            var result = _sut.Delete(interfaceId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void Delete_Returns_Conflict_If_Interface_Is_Exhibited()
+        {
+            //Arrange
+            var interfaceId = A<int>();
+            var itInterface = new ItInterface
+            {
+                InterfaceId = interfaceId,
+                ExhibitedBy = new ItInterfaceExhibit()
+            };
+            ExpectGetInterfaceReturns(interfaceId, itInterface);
+            ExpectAllowDeleteReturns(itInterface, true);
+
+            //Act
+            var result = _sut.Delete(interfaceId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Conflict, result.Error);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_And_Raises_Domain_Event()
+        {
+            //Arrange
+            var interfaceId = A<int>();
+            var dataRow1 = new DataRow { Id = A<int>() };
+            var dataRow2 = new DataRow { Id = A<int>() };
+            var interfaceToDelete = new ItInterface
+            {
+                InterfaceId = interfaceId,
+                DataRows = new List<DataRow>()
+                {
+                    dataRow1,
+                    dataRow2
+                }
+            };
+            var transaction = new Mock<IDatabaseTransaction>();
+            ExpectGetInterfaceReturns(interfaceId, interfaceToDelete);
+            ExpectAllowDeleteReturns(interfaceToDelete, true);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.Delete(interfaceId);
+
+            //Assert
+            Assert.True(result.Ok);
+            _domainEvents.Verify(x => x.Raise(It.Is<InterfaceDeleted>(d => d.DeletedInterface == interfaceToDelete)), Times.Once);
+            _dataRowRepository.Verify(x => x.DeleteByKey(dataRow1.Id), Times.Once);
+            _dataRowRepository.Verify(x => x.DeleteByKey(dataRow2.Id), Times.Once);
+            _dataRowRepository.Verify(x => x.Save(), Times.Once);
+            _interfaceRepository.Verify(x => x.DeleteWithReferencePreload(interfaceToDelete), Times.Once);
+            _interfaceRepository.Verify(x => x.Save(), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
         private void ExpectGetInterfaceReturns(int interfaceId, ItInterface value)
         {
             _interfaceRepository.Setup(x => x.GetByKey(interfaceId)).Returns(value);
@@ -201,6 +293,11 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectGetSystemReturns(int newSystemId, ItSystem value)
         {
             _systemRepository.Setup(x => x.GetSystem(newSystemId)).Returns(value);
+        }
+
+        private void ExpectAllowDeleteReturns(ItInterface itInterface, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowDelete(itInterface)).Returns(value);
         }
     }
 }

@@ -151,7 +151,7 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
-    <Compile Include="Model\ExposingSystemChangedHandlerTest.cs" />
+    <Compile Include="Model\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />

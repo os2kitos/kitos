@@ -66,6 +66,7 @@
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
+    <Compile Include="ItSystem\DomainEvents\InterfaceDeleted.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />

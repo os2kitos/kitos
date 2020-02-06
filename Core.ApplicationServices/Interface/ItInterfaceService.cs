@@ -66,7 +66,7 @@ namespace Core.ApplicationServices.Interface
                     return OperationFailure.Conflict;
                 }
 
-                var dataRows = _dataRowRepository.Get(x => x.ItInterfaceId == id);
+                var dataRows = itInterface.DataRows.ToList();
                 foreach (var dataRow in dataRows)
                 {
                     _dataRowRepository.DeleteByKey(dataRow.Id);
@@ -74,6 +74,7 @@ namespace Core.ApplicationServices.Interface
                 _dataRowRepository.Save();
 
                 // delete it interface
+                _domainEvents.Raise(new InterfaceDeleted(itInterface));
                 _repository.DeleteWithReferencePreload(itInterface);
                 _repository.Save();
 

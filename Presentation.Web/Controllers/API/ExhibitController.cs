@@ -73,20 +73,32 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
         }
 
+        /// <param name="id">Interface id</param>
+        /// <param name="organizationId">Not used</param>
+        /// <returns></returns>
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
-            Maybe<ItInterfaceExhibit> exhibit = _repository.GetByKey(id);
+            Maybe<ItInterface> sourceInterface = _interfaceRepository.GetByKey(id);
 
-            return exhibit
+            return sourceInterface
                 .Match
                 (
                     onValue: val => _interfaceService
-                        .ChangeExposingSystem(val.ItInterface.Id, null)
+                        .ChangeExposingSystem(val.Id, null)
                         .Match(_ => Ok(), FromOperationFailure),
                     onNone: NotFound
                 );
         }
 
+        public override HttpResponseMessage GetSingle(int id)
+        {
+            return CreateResponse(HttpStatusCode.MethodNotAllowed);
+        }
+
+        /// <param name="id">Interface id</param>
+        /// <param name="organizationId">Not used</param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             const string changeSystemProperty = nameof(ItInterfaceExhibitDTO.ItSystemId);
@@ -98,13 +110,13 @@ namespace Presentation.Web.Controllers.API
 
             var systemId = token.Value<int>();
 
-            Maybe<ItInterfaceExhibit> exhibit = _repository.GetByKey(id);
+            Maybe<ItInterface> sourceInterface = _interfaceRepository.GetByKey(id);
 
-            return exhibit
+            return sourceInterface
                 .Match
                 (
                     onValue: val => _interfaceService
-                        .ChangeExposingSystem(val.ItInterface.Id, systemId)
+                        .ChangeExposingSystem(val.Id, systemId)
                         .Match(_ => Ok(), FromOperationFailure),
                     onNone: NotFound
                 );

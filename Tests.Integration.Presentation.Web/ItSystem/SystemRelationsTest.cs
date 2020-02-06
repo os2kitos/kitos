@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -181,6 +182,35 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.NotNull(relation.Interface);
                 using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
                 {
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Interface);
+                }
+            }
+        }
+
+        [Fact]
+        [Description("Even if we already get the reset from the Exhibit removal (exhibit blocks deletion of interfaces), we still want to make sure that delete works if this changes")]
+        public async Task Deleting_Interface_Clears_InterfaceField_In_All_Relations_To_Old_Exposing_System()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(false, false, true);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+
+                using (var removeExhibitResponse = await InterfaceExhibitHelper.SendRemoveExhibitRequest(input.InterfaceId.GetValueOrDefault())) //Must remove exposition to allow deletion
+                using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(input.InterfaceId.GetValueOrDefault()))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.OK, removeExhibitResponse.StatusCode);
+                    Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
                     Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
                     var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                     Assert.Null(relationAfterChange.Interface);
