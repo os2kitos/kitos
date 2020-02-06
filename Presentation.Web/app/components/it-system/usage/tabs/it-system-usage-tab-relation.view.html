@@ -1,7 +1,7 @@
 ﻿<div class="object-section-container">
-    <h4> <span ng-if="">(Slettes)</span></h4>
+    <h4> {{usage.itSystem.name}}<span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
-        <div class="panel-heading">Der er oprettet følgende relationer til andre systemer/snitflader:</div>
+        <div class="panel-heading">{{usage.itSystem.name}} har følgende relationer til andre systemer/snitflader:</div>
         <table class="table table-condensed table-striped">
             <thead>
                 <tr>
@@ -18,7 +18,7 @@
                         Kontrakt
                     </th>
                     <th>
-                        Relationsbeskrivelse    
+                        Reference
                     </th>
                     <th>
                         Beskrivelse
@@ -32,7 +32,10 @@
                     <td><a href="#/system/edit/{{relation.interface.id}}/interface/main">{{relation.interface.name}}</a></td>
                     <td>{{relation.frequencyType.name}}</td>
                     <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
-                    <td>{{relation.reference}}</td>
+                    <td>
+                        <span ng-if="validateReference(relation.reference)" style="text-align: center"><a ng-href="{{relation.reference}}">➤</a></span>
+                        <span ng-if="!validateReference(relation.reference)">{{relation.reference}}</span>
+                    </td>
                     <td>{{relation.description}}</td>
                 </tr>
             </tbody>
@@ -40,3 +43,4 @@
         <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 5px">Opret relation</button>
     </div>
 </div>
+<ng-template #RefNoLink>{{relation.reference}}</ng-template>
