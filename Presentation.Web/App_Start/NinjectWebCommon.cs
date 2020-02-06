@@ -154,7 +154,8 @@ namespace Presentation.Web
         private static void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InRequestScope();
-            kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<ExposingSystemChangedHandler>().InRequestScope();
+            kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<RelationSpecificInterfaceEventsHandler>().InRequestScope();
+            kernel.Bind<IDomainEventHandler<InterfaceDeleted>>().To<RelationSpecificInterfaceEventsHandler>().InRequestScope();
         }
 
         private static void RegisterOptions(IKernel kernel)
