@@ -6,23 +6,22 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
-using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services

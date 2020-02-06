@@ -8,8 +8,8 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -151,19 +151,32 @@ namespace Presentation.Web.Controllers.API
 
         protected new HttpResponseMessage FromOperationFailure(OperationFailure failure)
         {
-            switch (failure)
+            return FromOperationError(failure);
+        }
+
+        protected new HttpResponseMessage FromOperationError(OperationError failure)
+        {
+            HttpStatusCode statusCode;
+            switch (failure.FailureType)
             {
                 case OperationFailure.BadInput:
-                    return BadRequest();
+                    statusCode = HttpStatusCode.BadRequest;
+                    break;
                 case OperationFailure.NotFound:
-                    return NotFound();
+                    statusCode = HttpStatusCode.NotFound;
+                    break;
                 case OperationFailure.Forbidden:
-                    return Forbidden();
+                    statusCode = HttpStatusCode.Forbidden;
+                    break;
                 case OperationFailure.Conflict:
-                    return Conflict("");
+                    statusCode = HttpStatusCode.Conflict;
+                    break;
                 default:
-                    return CreateResponse(HttpStatusCode.InternalServerError);
+                    statusCode = HttpStatusCode.InternalServerError;
+                    break;
             }
+
+            return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
 
         protected User KitosUser => UserContext.UserEntity;

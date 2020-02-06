@@ -55,8 +55,8 @@
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
+    <Compile Include="Context\ActiveUserContext.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
-    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
@@ -64,10 +64,9 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\ExposingSystemChangedHandler.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
-    <Compile Include="Model\Result\Maybe.cs" />
-    <Compile Include="Model\Result\Result.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
@@ -84,7 +83,7 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
-    <Compile Include="Repositories\KLE\IOperationClock.cs" />
+    <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEStandardRepository.cs" />
@@ -94,7 +93,7 @@
     <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
     <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
-    <Compile Include="Repositories\KLE\OperationClock.cs" />
+    <Compile Include="Time\OperationClock.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />

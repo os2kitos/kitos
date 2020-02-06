@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new
             {
-                id = interfaceId,
+                itInterfaceId = interfaceId,
                 itSystemId = systemId
             };
 

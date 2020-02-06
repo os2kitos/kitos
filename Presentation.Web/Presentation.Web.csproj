@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
@@ -352,10 +353,14 @@
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
+    <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
+    <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
@@ -371,6 +376,8 @@
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
+    <TypeScriptCompile Include="app\services\optionsService.ts" />
+    <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
@@ -449,13 +456,11 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTemplateTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItInterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalMethodTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentFrequencyTypesController.cs" />
@@ -468,7 +473,6 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTestLocationsController.cs" />
@@ -482,13 +486,11 @@
     <Compile Include="Controllers\OData\OptionControllers\ItContractRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItContractTemplateTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItContractTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\ItInterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItProjectTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PaymentFrequencyTypesController.cs" />
@@ -502,7 +504,6 @@
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\TsaTypesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
@@ -662,15 +663,21 @@
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SystemUsageHelper.ts" />
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Organization\CreateUser.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
@@ -680,6 +687,8 @@
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageExposedInterfaces.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
@@ -716,6 +725,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
     <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
@@ -983,7 +993,6 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-edit.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-catalog.view.html" />
-    <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-details.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.view.html" />
     <Content Include="app\components\it-system\it-system-catalog.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.view.html" />
@@ -1081,15 +1090,12 @@
     <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\interface-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\interface.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
-    <TypeScriptCompile Include="app\models\it-system\method.ts" />
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
@@ -1169,7 +1175,6 @@
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-catalog.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-details.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-system-catalog.controller.ts" />

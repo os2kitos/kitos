@@ -4,15 +4,14 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
-using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -157,14 +156,14 @@ namespace Core.ApplicationServices.System
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)
             {
-                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
-            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
+            return MapToUsingOrganization(itSystem.Usages).ToList();
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)

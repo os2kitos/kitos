@@ -88,15 +88,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\VpnCli.ps1 = DeploymentScripts\VpnCli.ps1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{8FD29D91-1CAC-4A14-B085-7631FA4E81DB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02_Unit", "02_Unit", "{8FD29D91-1CAC-4A14-B085-7631FA4E81DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CiscoAnyConnectTool", "DeploymentTools\CiscoAnyConnectTool\CiscoAnyConnectTool.csproj", "{FE733415-7189-4EB7-A694-8D3B2BE27549}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{1A926F74-9D45-4E47-AD27-967027E1C64A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_Integration", "03_Integration", "{1A926F74-9D45-4E47-AD27-967027E1C64A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration.Presentation.Web", "Tests.Integration.Presentation.Web\Tests.Integration.Presentation.Web.csproj", "{46D4551A-7301-456B-A9BA-1E0621C09112}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Services", "Infrastructure.Services\Infrastructure.Services.csproj", "{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Toolkit", "Tests.Toolkit\Tests.Toolkit.csproj", "{43199485-65C5-4BFF-88B2-B594D5B58146}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_Tools", "01_Tools", "{D8C15077-71C5-4837-9F3C-3B642B142434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +156,10 @@ Global
 		{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43199485-65C5-4BFF-88B2-B594D5B58146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43199485-65C5-4BFF-88B2-B594D5B58146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43199485-65C5-4BFF-88B2-B594D5B58146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43199485-65C5-4BFF-88B2-B594D5B58146}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +181,8 @@ Global
 		{1A926F74-9D45-4E47-AD27-967027E1C64A} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 		{46D4551A-7301-456B-A9BA-1E0621C09112} = {1A926F74-9D45-4E47-AD27-967027E1C64A}
 		{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
+		{43199485-65C5-4BFF-88B2-B594D5B58146} = {D8C15077-71C5-4837-9F3C-3B642B142434}
+		{D8C15077-71C5-4837-9F3C-3B642B142434} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}

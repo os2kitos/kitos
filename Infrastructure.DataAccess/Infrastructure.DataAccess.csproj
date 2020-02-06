@@ -64,6 +64,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
@@ -105,13 +106,11 @@
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
-    <Compile Include="Mapping\DataRowUsageMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\FrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
-    <Compile Include="Mapping\TsaTypeMap.cs" />
+    <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
@@ -120,7 +119,6 @@
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
-    <Compile Include="Mapping\ItInterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
@@ -131,7 +129,6 @@
     <Compile Include="Mapping\ItSystemRightMap.cs" />
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\TaskRefMap.cs" />
-    <Compile Include="Mapping\MethodTypeMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
@@ -515,6 +512,30 @@
     <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.Designer.cs">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.cs" />
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.Designer.cs">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.cs" />
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.cs" />
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.Designer.cs">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.cs" />
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.Designer.cs">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.cs" />
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.Designer.cs">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs" />
+    <Compile Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.Designer.cs">
+      <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -823,6 +844,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001201357301_Added-KLEHistoryTable.resx">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280931470_Add_SystemRelation.resx">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291246020_Fix_SystemRelation.resx">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.resx">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001311141051_SystemRelation_Renaming.resx">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.resx">
+      <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

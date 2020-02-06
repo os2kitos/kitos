@@ -1,8 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Model.Result;
 
 namespace Core.ApplicationServices.Contract
 {
@@ -27,12 +26,12 @@ namespace Core.ApplicationServices.Contract
 
             if (contract == null)
             {
-                return Result<ItContract, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowDelete(contract))
             {
-                return Result<ItContract, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             // delete it interface
@@ -47,7 +46,7 @@ namespace Core.ApplicationServices.Contract
             }
             _economyStreamRepository.Save();
 
-            return Result<ItContract, OperationFailure>.Success(contract);
+            return contract;
         }
     }
 }

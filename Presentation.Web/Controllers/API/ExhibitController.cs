@@ -4,9 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
+using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Result;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
@@ -19,12 +22,17 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
+        private readonly IItInterfaceService _interfaceService;
 
-        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository, IGenericRepository<ItInterface> interfaceRepository)
+        public ExhibitController(
+            IGenericRepository<ItInterfaceExhibit> repository,
+            IGenericRepository<ItInterface> interfaceRepository,
+            IItInterfaceService interfaceService)
             : base(repository)
         {
             _repository = repository;
             _interfaceRepository = interfaceRepository;
+            _interfaceService = interfaceService;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
@@ -56,6 +64,50 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        public override HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
+        {
+            return _interfaceService
+                .ChangeExposingSystem(dto.ItInterfaceId, dto.ItSystemId)
+                .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
+        }
+
+        public override HttpResponseMessage Delete(int id, int organizationId)
+        {
+            Maybe<ItInterfaceExhibit> exhibit = _repository.GetByKey(id);
+
+            return exhibit
+                .Match
+                (
+                    onValue: val => _interfaceService
+                        .ChangeExposingSystem(val.ItInterface.Id, null)
+                        .Match(_ => Ok(), FromOperationFailure),
+                    onNone: NotFound
+                );
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            const string changeSystemProperty = nameof(ItInterfaceExhibitDTO.ItSystemId);
+
+            if (!obj.TryGetValue(changeSystemProperty, StringComparison.OrdinalIgnoreCase,out var token))
+            {
+                return BadRequest(changeSystemProperty + " was not provided");
+            }
+
+            var systemId = token.Value<int>();
+
+            Maybe<ItInterfaceExhibit> exhibit = _repository.GetByKey(id);
+
+            return exhibit
+                .Match
+                (
+                    onValue: val => _interfaceService
+                        .ChangeExposingSystem(val.ItInterface.Id, systemId)
+                        .Match(_ => Ok(), FromOperationFailure),
+                    onNone: NotFound
+                );
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()

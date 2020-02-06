@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
+
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItSystem
@@ -43,23 +45,6 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual InterfaceType Interface { get; set; }
 
-        public int? InterfaceTypeId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the type of the interface.
-        ///     Provides details about an it system of type interface.
-        /// </summary>
-        /// <value>
-        ///     The type of the interface.
-        /// </value>
-        public virtual ItInterfaceType InterfaceType { get; set; }
-
-        public int? TsaId { get; set; }
-        public virtual TsaType Tsa { get; set; }
-
-        public int? MethodId { get; set; }
-        public virtual MethodType Method { get; set; }
-
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }
 
@@ -88,5 +73,35 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
 
         public bool Disabled { get; set; }
+
+        public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
+
+        public Maybe<ItInterfaceExhibit> ChangeExhibitingSystem(Maybe<ItSystem> system)
+        {
+            if (system.IsNone)
+            {
+                ExhibitedBy = null;
+            }
+            else
+            {
+                var newSystem = system.Value;
+
+                var changed =
+                    ExhibitedBy == null ||
+                    (newSystem.Id != ExhibitedBy.ItSystem.Id);
+
+                if (changed)
+                {
+                    ExhibitedBy = new ItInterfaceExhibit
+                    {
+                        ItInterface = this,
+                        ItSystem = newSystem,
+                        ObjectOwner = ObjectOwner,
+                    };
+                }
+            }
+
+            return ExhibitedBy;
+        }
     }
 }

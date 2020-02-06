@@ -4,12 +4,11 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Model.Result;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -84,12 +83,12 @@ namespace Core.ApplicationServices.Organizations
             var organization = _orgRepository.GetByKey(organizationId);
             if (organization == null)
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowModify(organization))
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var rights = _orgRightRepository
@@ -103,7 +102,7 @@ namespace Core.ApplicationServices.Organizations
             }
             _orgRightRepository.Save();
 
-            return Result<Organization, OperationFailure>.Success(organization);
+            return organization;
         }
 
         public bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType)
@@ -139,12 +138,12 @@ namespace Core.ApplicationServices.Organizations
             if (newOrg.IsCvrInvalid())
             {
                 _logger.Error("Invalid cvr {cvr} provided for org with name {name}", newOrg.Cvr, newOrg.Name);
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
 
             if (!_authorizationContext.AllowCreate<Organization>(newOrg))
             {
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -159,7 +158,7 @@ namespace Core.ApplicationServices.Organizations
                 }
 
                 transaction.Commit();
-                return Result<Organization, OperationFailure>.Success(newOrg);
+                return newOrg;
             }
         }
     }

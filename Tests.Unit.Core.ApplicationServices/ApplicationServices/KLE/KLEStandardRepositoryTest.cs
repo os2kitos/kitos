@@ -11,6 +11,7 @@ using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
 using Moq;

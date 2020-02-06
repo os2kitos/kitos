@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Project;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services

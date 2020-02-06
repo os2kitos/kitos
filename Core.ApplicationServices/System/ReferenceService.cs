@@ -2,9 +2,8 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -35,12 +34,12 @@ namespace Core.ApplicationServices.System
             var system = _itSystemRepository.GetSystem(systemId);
             if (system == null)
             {
-                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (! _authorizationContext.AllowModify(system))
             {
-                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -49,7 +48,7 @@ namespace Core.ApplicationServices.System
 
                 if (systemExternalReferences.Count == 0)
                 {
-                    return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                    return systemExternalReferences;
                 }
 
                 foreach (var reference in systemExternalReferences)
@@ -57,7 +56,7 @@ namespace Core.ApplicationServices.System
                     _referenceRepository.Delete(reference);
                 }
                 transaction.Commit();
-                return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                return systemExternalReferences;
             }
             
         }

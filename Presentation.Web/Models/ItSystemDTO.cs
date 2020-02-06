@@ -69,9 +69,6 @@ namespace Presentation.Web.Models
         public string BusinessTypeName { get; set; }
 
         public int? InterfaceId { get; set; }
-        public int? InterfaceTypeId { get; set; }
-        public int? TsaId { get; set; }
-        public int? MethodId { get; set; }
 
         public IEnumerable<DataRowDTO> DataRows { get; set; }
 

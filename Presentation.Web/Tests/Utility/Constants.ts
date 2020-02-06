@@ -6,6 +6,8 @@
 class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
+    readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractNameObject";
@@ -19,8 +21,10 @@ class Constants {
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
-    readonly kendoUsedByHeaderObject = "usedByNameHeader";
+    readonly kendoUsedByHeader = "usedByNameHeader";
     readonly kendoUsedByObject = "usedByNameObject";
+
+    readonly kendoCatalogNameFilter = "Name";
 
     readonly kendoUserEmailHeader = "userHeaderEmail";
     readonly kendoUserEmailObject = "userEmailObject";
@@ -49,6 +53,31 @@ class Constants {
     readonly refId = "1337";
     readonly refTitle = "STRONGMINDS";
 
+    //interfaceInoputConstants
+    readonly interfaceNameInput = "InterfaceNameInput";
+    readonly interfaceIdInput = "InterfaceIdInput";
+    readonly interfaceVersionInput = "InterfaceVersionInput";
+    readonly interfaceExhibitInput = "InterfaceExhibitInput";
+    readonly interfaceBelongsToInput = "InterfaceBelongsToInput";
+    readonly interfaceAccesAbilityInput = "InterfaceAccesAbilityInput";
+    readonly interfaceInterfaceInput = "InterfaceInterfaceInput";
+    readonly interfaceDescriptionInput = "InterfaceDescriptionInput";
+    readonly interfaceNoteInput = "InterfaceNoteInput";
+    readonly interfaceDescriptionLinkInput = "InterfaceDescriptionLinkInput";
+    readonly interfaceDataInput = "InterfaceDataInput";
+    readonly interfaceDataTypeInput = "InterfaceDataTypeInput";
+    readonly interfaceDataTableInput = "InterfaceDataInput";
+    readonly interfaceNewRowButton = "InterfaceNewRowButton";
+
+
+    readonly interfaceSelectExhibit = "s2id_interface-exposed-by";
+    readonly interfaceSelectBelongs = "s2id_belongs-to";
+    readonly interfaceSelectAccess = "s2id_interface-access";
+    readonly interfaceSelectInterface = "s2id_interface-interface";
+    readonly interfaceSelectTableDataType = "s2id_interface-data-type";
+    
+
+
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
     readonly navigationSystemButton = "systemButton";
@@ -73,11 +102,12 @@ class Constants {
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
     readonly kendoSystemDeleteButton = "deleteSystemButton";
-
+    
     readonly kleStatusLabel = "KLEStatusLabel";
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
+
 }
 export = Constants;
 

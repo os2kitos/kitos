@@ -58,6 +58,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<HttpResponseMessage> SendRemoveUsageAsync(int systemUsageId, int organizationId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={organizationId}"), cookie);
+        }
+
         public static async Task<ItSystemUsageDTO> GetItSystemUsage(int itSystemUsageId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -71,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItSystemUsageDataWorkerRelationDTO> SetUsageDataWorkerAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
         {
-            using (var response = await SendSetUsageDataWorkerRequestAsync(systemUsageId,organizationId,optionalLogin))
+            using (var response = await SendSetUsageDataWorkerRequestAsync(systemUsageId, organizationId, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDataWorkerRelationDTO>();
@@ -177,7 +184,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})?$select=Id&$expand=AccessTypes");
 
-            using (var response = await HttpApi.GetWithCookieAsync(url,cookie))
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
@@ -194,9 +201,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendSetParentSystemRequestAsync(
-            int systemId, 
+            int systemId,
             int parentSystemId,
-            int organizationId, 
+            int organizationId,
             Cookie login)
         {
             var cookie = login;

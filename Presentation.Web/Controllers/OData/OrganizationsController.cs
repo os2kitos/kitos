@@ -7,7 +7,6 @@ using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using System.Linq;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;

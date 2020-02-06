@@ -8,6 +8,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
@@ -15,13 +16,21 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
 using Core.DomainModel.Constants;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Context;
+using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -39,6 +48,7 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
+using Infrastructure.Services.DomainEvents;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -99,8 +109,8 @@ namespace Presentation.Web
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
-
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
@@ -138,6 +148,19 @@ namespace Presentation.Web
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
+            RegisterOptions(kernel);
+        }
+
+        private static void RegisterDomainEventsEngine(IKernel kernel)
+        {
+            kernel.Bind<IDomainEvents>().To<DomainEvents>().InRequestScope();
+            kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<ExposingSystemChangedHandler>().InRequestScope();
+        }
+
+        private static void RegisterOptions(IKernel kernel)
+        {
+            kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
+                .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InRequestScope();
         }
 
         private static void RegisterKLE(IKernel kernel)
@@ -191,6 +214,20 @@ namespace Presentation.Web
                     return new UnauthenticatedUserContext();
                 })
                 .InRequestScope();
+
+            //Injecting it as a maybe since service calls and background processes do not have an active user
+            kernel.Bind<Maybe<ActiveUserContext>>()
+                .ToMethod(ctx =>
+                {
+                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
+                    if (authentication.Method == AuthenticationMethod.Anonymous)
+                    {
+                        return Maybe<ActiveUserContext>.None;
+                    }
+
+                    var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
+                    return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
+                });
 
             //Authorization context
             kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
