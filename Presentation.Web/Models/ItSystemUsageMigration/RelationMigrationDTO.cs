@@ -2,13 +2,12 @@
 {
     public class RelationMigrationDTO
     {
-        public NamedEntityDTO sourceSystem { get; set; }
+        public NamedEntityDTO SourceSystem { get; set; }
 
-        public NamedEntityDTO targetSystem { get; set; }
+        public NamedEntityDTO TargetSystem { get; set; }
 
-        public NamedEntityDTO itInterface { get; set; }
-        public bool itInterfaceToBeDeleted { get; set; }
+        public NamedEntityDTO RelationInterface { get; set; }
 
-        public NamedEntityDTO itContract { get; set; }
+        public NamedEntityDTO RelationContract { get; set; }
 }
 }

@@ -11,7 +11,7 @@ describe("Global Administrator is able to migrate from one system to another", (
     var constants = new Constants();
     var cssHelper = new CssHelper();
     var pageObject = new CatalogPage();
-    var EC = protractor.ExpectedConditions;
+    var ec = protractor.ExpectedConditions;
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -82,13 +82,13 @@ describe("Global Administrator is able to migrate from one system to another", (
 
     function waitForElement(name: string) {
         console.log(`waitForElement: ${name}`);
-        return browser.wait(EC.visibilityOf(element(cssHelper.byDataElementType(name))),
+        return browser.wait(ec.visibilityOf(element(cssHelper.byDataElementType(name))),
             20000);
     }
 
     function waitForSelect2DataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(EC.visibilityOf(element(by.className("select2-result-label"))), 20000)
+        return browser.wait(ec.visibilityOf(element(by.className("select2-result-label"))), 20000)
             .then(() => element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 

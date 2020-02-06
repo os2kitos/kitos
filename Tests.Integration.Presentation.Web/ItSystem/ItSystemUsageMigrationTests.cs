@@ -280,7 +280,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation_With_Interface()
+        public async Task GetMigration_When_Source_System_Is_Exposing_Interface()
         {
             //Arrange
             var sourceItSystem = await CreateSystemAsync();
@@ -301,17 +301,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
-                var dto = Assert.Single(result.AffectedRelations);
-                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
-                Assert.Equal(relation.ToUsage, dto?.targetSystem);
-                Assert.Equal(relation.Interface, dto?.itInterface);
-                Assert.False(dto?.itInterfaceToBeDeleted);
-                Assert.Null(dto?.itContract);
+                Assert.Empty(result.AffectedRelations);
             }
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Is_Target_Of_Relation_With_Interface()
+        public async Task GetMigration_When_Target_System_Is_Exposing_Interface()
         {
             //Arrange
             var sourceItSystem = await CreateSystemAsync();
@@ -333,16 +328,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedRelations);
-                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
-                Assert.Equal(relation.ToUsage, dto?.targetSystem);
-                Assert.Equal(relation.Interface, dto?.itInterface);
-                Assert.True(dto?.itInterfaceToBeDeleted);
-                Assert.Null(dto?.itContract);
+                Assert.Equal(relation.FromUsage, dto?.SourceSystem);
+                Assert.Equal(relation.ToUsage, dto?.TargetSystem);
+                Assert.Equal(relation.Interface, dto?.RelationInterface);
+                Assert.Null(dto?.RelationContract);
             }
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation()
+        public async Task GetMigration_When_System_Has_Relation_With_No_RelationInterface()
         {
             //Arrange
             var sourceItSystem = await CreateSystemAsync();
@@ -361,16 +355,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
-                var dto = Assert.Single(result.AffectedRelations);
-                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
-                Assert.Equal(relation.ToUsage, dto?.targetSystem);
-                Assert.Null(dto?.itInterface);
-                Assert.Null(dto?.itContract);
+                Assert.Empty(result.AffectedRelations);
             }
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation_With_Contract()
+        public async Task GetMigration_When_System_Has_Relation_With_Contract_And_No_RelationInterface()
         {
             //Arrange
             var sourceItSystem = await CreateSystemAsync();
@@ -390,11 +380,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
-                var dto = Assert.Single(result.AffectedRelations);
-                Assert.Equal(relation.FromUsage, dto?.sourceSystem);
-                Assert.Equal(relation.ToUsage, dto?.targetSystem);
-                Assert.Null(dto?.itInterface);
-                Assert.Equal(contract.Id, dto?.itContract.Id);
+                Assert.Empty(result.AffectedRelations);
             }
         }
 

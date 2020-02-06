@@ -320,8 +320,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.Equal(relation.Id, migration.AffectedRelations.First().Relation.Id);
+            Assert.Equal(0, migration.AffectedRelations.Count);
             Assert.Equal(0, migration.AffectedContracts.Count);
             Assert.Equal(0, migration.AffectedProjects.Count);
         }
@@ -356,9 +355,8 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.Equal(relation.Id, migration.AffectedRelations.First().Relation.Id);
-            Assert.True(migration.AffectedRelations.First().ItInterfaceToBeDeleted);
-            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().Relation.RelationInterfaceId);
+            Assert.Equal(relation.Id, migration.AffectedRelations.First().Id);
+            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().RelationInterfaceId);
             Assert.Equal(0, migration.AffectedContracts.Count);
             Assert.Equal(0, migration.AffectedProjects.Count);
         }
@@ -385,10 +383,9 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.Equal(contract.Id, migration.AffectedRelations.First().Relation.AssociatedContractId);
-            Assert.Equal(0, migration.AffectedContracts.Count);
-            Assert.Equal(0, migration.AffectedProjects.Count);
+            Assert.Empty(migration.AffectedRelations);
+            Assert.Empty(migration.AffectedContracts);
+            Assert.Empty(migration.AffectedProjects);
         }
 
         [Fact]

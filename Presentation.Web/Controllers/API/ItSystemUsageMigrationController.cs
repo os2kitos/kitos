@@ -115,54 +115,16 @@ namespace Presentation.Web.Controllers.API
         }
         
 
-        private static RelationMigrationDTO Map(SystemRelationMigration input)
+        private static RelationMigrationDTO Map(SystemRelation input)
         {
-            var relation = input.Relation;
-            if (relation.RelationInterfaceId == null)
+            return new RelationMigrationDTO()
             {
-                if (relation.AssociatedContractId == null)
-                {
-                    return new RelationMigrationDTO
-                    {
-                        sourceSystem = relation.FromSystemUsage.MapToNamedEntityDTO(),
-                        targetSystem = relation.ToSystemUsage.MapToNamedEntityDTO()
-                    };
-                }
-                return new RelationMigrationDTO
-                {
-                    sourceSystem = relation.FromSystemUsage.MapToNamedEntityDTO(),
-                    targetSystem = relation.ToSystemUsage.MapToNamedEntityDTO(),
-                    itContract = relation.AssociatedContract.MapToNamedEntityDTO()
-                };
-            }
-            if (relation.AssociatedContract == null)
-            {
-                return new RelationMigrationDTO
-                {
-                    sourceSystem = relation.FromSystemUsage.MapToNamedEntityDTO(),
-                    targetSystem = relation.ToSystemUsage.MapToNamedEntityDTO(),
-                    itInterface = relation.RelationInterface.MapToNamedEntityDTO(),
-                    itInterfaceToBeDeleted = input.ItInterfaceToBeDeleted
-                };
-            }
-            return new RelationMigrationDTO
-            {
-                sourceSystem = relation.FromSystemUsage.MapToNamedEntityDTO(),
-                targetSystem = relation.ToSystemUsage.MapToNamedEntityDTO(),
-                itInterface = relation.RelationInterface.MapToNamedEntityDTO(),
-                itInterfaceToBeDeleted = input.ItInterfaceToBeDeleted,
-                itContract = relation.AssociatedContract.MapToNamedEntityDTO()
+                SourceSystem = input.FromSystemUsage.MapToNamedEntityDTO(),
+                TargetSystem = input.ToSystemUsage.MapToNamedEntityDTO(),
+                RelationContract = input.AssociatedContract?.MapToNamedEntityDTO(),
+                RelationInterface = input.RelationInterface?.MapToNamedEntityDTO()
             };
-        }
-
-        private static NamedEntityDTO Map(ItInterfaceExhibitUsage interfaceExhibit)
-        {
-            return interfaceExhibit.ItInterfaceExhibit.ItInterface.MapToNamedEntityDTO();
-        }
-
-        private static NamedEntityDTO Map(ItInterfaceUsage interfaceUsage)
-        {
-            return interfaceUsage.ItInterface.MapToNamedEntityDTO();
+            
         }
     }
 }

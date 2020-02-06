@@ -114,7 +114,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             var contracts = itSystemUsage.Contracts.Select(x => x.ItContract);
 
             // Map relations
-            var relationMigrations = GetRelationMigrations(itSystemUsage.UsageRelations, itSystemUsage.UsedByRelations);
+            var relationMigrations = GetRelationMigrations(itSystemUsage.UsedByRelations);
 
             return new ItSystemUsageMigration(
                 systemUsage: itSystemUsage,
@@ -125,22 +125,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 affectedRelations: relationMigrations);
         }
 
-        private IEnumerable<SystemRelationMigration> GetRelationMigrations(IEnumerable<SystemRelation> sourceRelations, IEnumerable<SystemRelation> targetRelations)
+        private static IEnumerable<SystemRelation> GetRelationMigrations(IEnumerable<SystemRelation> relations)
         {
-            var sources = sourceRelations
+            return relations
                 .AsEnumerable()
-                .Select(
-                    relation => new SystemRelationMigration(false, relation))
+                .Where(x => x.RelationInterfaceId != null)
                 .ToList()
                 .AsReadOnly();
-
-            var targets = targetRelations
-                .AsEnumerable()
-                .Select(
-                    relation => new SystemRelationMigration(true, relation))
-                .ToList()
-                .AsReadOnly();
-            return sources.Concat(targets);
         }
 
         public Result<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
@@ -184,7 +175,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     // *************************
 
                     // Delete UsedByRelation interfaces
-                    var deletedRelationInterfaceStatus = DeleteUsedByRelationInterfaces(migration);
+                    var deletedRelationInterfaceStatus = PerformRelationMigrations(migration);
                     if (deletedRelationInterfaceStatus == false)
                     {
                         transaction.Rollback();
@@ -229,12 +220,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return _authorizationContext.HasPermission(new SystemUsageMigrationPermission());
         }
 
-        private bool DeleteUsedByRelationInterfaces(ItSystemUsageMigration migration)
+        private bool PerformRelationMigrations(ItSystemUsageMigration migration)
         {
-            var relationWithInterfaceToBeDeleted = migration.AffectedRelations
-                .Where(x => x.ItInterfaceToBeDeleted && x.Relation.RelationInterfaceId != null)
-                .Select(x => x.Relation);
-            foreach (var relation in relationWithInterfaceToBeDeleted)
+            foreach (var relation in migration.AffectedRelations)
             {
                 var modifyStatus = _itSystemUsageService.ModifyRelation(
                     relation.FromSystemUsageId, 
