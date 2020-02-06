@@ -64,6 +64,7 @@
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
+    <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
@@ -218,7 +219,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

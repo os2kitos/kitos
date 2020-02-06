@@ -163,6 +163,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task Changing_Exposing_System_On_Interface_Clears_InterfaceField_In_All_Relations_To_Old_Exposing_System()
+        {
+            //Arrange
+            var newExhibitor = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var input = await PrepareFullRelationAsync(false, false, true);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(newExhibitor.Id, input.InterfaceId.GetValueOrDefault()))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Interface);
+                }
+            }
+        }
+
         #region Helpers
 
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)

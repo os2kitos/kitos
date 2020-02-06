@@ -80,6 +80,9 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
     </Reference>
@@ -136,6 +139,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
     <Compile Include="ApplicationServices\KLE\KLEApplicationServiceTest.cs" />
@@ -146,6 +150,8 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="Infrastructure\DomainEventsTest.cs" />
+    <Compile Include="Model\ExposingSystemChangedHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />

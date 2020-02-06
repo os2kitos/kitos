@@ -3,10 +3,14 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
 
 namespace Core.ApplicationServices.Interface
@@ -14,22 +18,32 @@ namespace Core.ApplicationServices.Interface
     public class ItInterfaceService : IItInterfaceService
     {
         private readonly IGenericRepository<DataRow> _dataRowRepository;
+        private readonly IItSystemRepository _systemRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
+        private readonly IOperationClock _operationClock;
         private readonly IGenericRepository<ItInterface> _repository;
+
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
             IGenericRepository<DataRow> dataRowRepository,
+            IItSystemRepository systemRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IDomainEvents domainEvents,
+            IOperationClock operationClock)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
+            _systemRepository = systemRepository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
             _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
+            _operationClock = operationClock;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -81,10 +95,12 @@ namespace Core.ApplicationServices.Interface
                 return OperationFailure.Conflict;
             }
 
+            var now = _operationClock.Now;
             var user = _userContext.UserEntity;
 
             newInterface.ObjectOwner = user;
             newInterface.LastChangedByUser = user;
+            newInterface.LastChanged = now;
             newInterface.ItInterfaceId = newInterface.ItInterfaceId ?? "";
             newInterface.Uuid = Guid.NewGuid();
 
@@ -92,6 +108,7 @@ namespace Core.ApplicationServices.Interface
             {
                 dataRow.ObjectOwner = user;
                 dataRow.LastChangedByUser = user;
+                dataRow.LastChanged = now;
             }
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
@@ -103,6 +120,62 @@ namespace Core.ApplicationServices.Interface
             _repository.Save();
 
             return createdInterface;
+        }
+
+        public Result<ItInterface, OperationFailure> ChangeExposingSystem(int interfaceId, int? newSystemId)
+        {
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            {
+                var itInterface = _repository.GetByKey(interfaceId);
+
+                if (itInterface == null)
+                {
+                    return OperationFailure.NotFound;
+                }
+
+                if (!_authorizationContext.AllowModify(itInterface))
+                {
+                    return OperationFailure.Forbidden;
+                }
+
+                Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
+                Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
+                var newSystem = Maybe<ItSystem>.None;
+
+                if (newSystemId.HasValue)
+                {
+                    newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
+                    if (newSystem.IsNone)
+                    {
+                        return OperationFailure.BadInput;
+                    }
+
+                    if (!_authorizationContext.AllowReads(newSystem.Value))
+                    {
+                        return OperationFailure.Forbidden;
+                    }
+                }
+
+                var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
+
+                var changed = !oldExhibit.Equals(newExhibit);
+
+                if (changed)
+                {
+                    if (newExhibit.HasValue)
+                    {
+                        var exhibit = newExhibit.Value;
+                        exhibit.LastChangedByUser = _userContext.UserEntity;
+                        exhibit.LastChanged = _operationClock.Now;
+                    }
+                    _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
+
+                    _repository.Save();
+                    transaction.Commit();
+                }
+
+                return itInterface;
+            }
         }
 
         private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)

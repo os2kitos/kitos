@@ -7,5 +7,6 @@ namespace Core.ApplicationServices.Interface
     {
         Result<ItInterface, OperationFailure> Delete(int id);
         Result<ItInterface, OperationFailure> Create(ItInterface newInterface);
+        Result<ItInterface, OperationFailure> ChangeExposingSystem(int interfaceId, int? newSystemId);
     }
 }

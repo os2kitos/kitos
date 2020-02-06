@@ -10,6 +10,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
