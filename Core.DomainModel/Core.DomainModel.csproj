@@ -61,6 +61,7 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="IHasRelationshipWithOrganization.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />

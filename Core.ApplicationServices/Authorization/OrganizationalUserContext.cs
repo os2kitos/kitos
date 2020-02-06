@@ -49,6 +49,8 @@ namespace Core.ApplicationServices.Authorization
                 //Prefer match on hasOrganization first since it has static knowledge of organization relationship
                 case IHasOrganization hasOrg:
                     return IsActiveInOrganization(hasOrg.OrganizationId);
+                case IHasRelationshipWithOrganization organizationRelationship:
+                    return organizationRelationship.HasRelationshipWith(ActiveOrganizationId);
                 case IContextAware contextAware:
                     return contextAware.IsInContext(ActiveOrganizationId);
                 default:

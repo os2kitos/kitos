@@ -15,6 +15,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
@@ -203,11 +204,11 @@ namespace Presentation.Web
                 {
                     var factory = ctx.Kernel.Get<IUserContextFactory>();
                     var authentication = ctx.Kernel.Get<IAuthenticationContext>();
-                    bool canCreateContext = authentication.Method != AuthenticationMethod.Anonymous && authentication.ActiveOrganizationId.HasValue;
+                    var canCreateContext = authentication.Method != AuthenticationMethod.Anonymous;
 
                     if (canCreateContext)
                     {
-                        return factory.Create(authentication.UserId.GetValueOrDefault(), authentication.ActiveOrganizationId.GetValueOrDefault());
+                        return factory.Create(authentication.UserId.GetValueOrDefault(), authentication.ActiveOrganizationId.GetValueOrDefault(EntityConstants.InvalidActiveOrganizationId));
                     }
 
                     return new UnauthenticatedUserContext();
