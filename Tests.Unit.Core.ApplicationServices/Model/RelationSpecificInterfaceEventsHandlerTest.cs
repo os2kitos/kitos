@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Context;
+using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -17,26 +18,26 @@ using Xunit;
 
 namespace Tests.Unit.Core.Model
 {
-    public class RelationSpecificInterfaceEventsHandler : WithAutoFixture
+    public class RelationSpecificInterfaceEventsHandlerTest : WithAutoFixture
     {
-        private readonly global::Core.DomainServices.Model.EventHandlers.RelationSpecificInterfaceEventsHandler _sut;
+        private readonly RelationSpecificInterfaceEventsHandler _sut;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly ActiveUserContext _activeUserContext;
 
-        public RelationSpecificInterfaceEventsHandler()
+        public RelationSpecificInterfaceEventsHandlerTest()
         {
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _transactionManager = new Mock<ITransactionManager>();
             _activeUserContext = new ActiveUserContext(1337, new User());
-            _sut = new global::Core.DomainServices.Model.EventHandlers.RelationSpecificInterfaceEventsHandler(_systemUsageRepository.Object, _transactionManager.Object, _activeUserContext, Mock.Of<IOperationClock>(x => x.Now == DateTime.Now), Mock.Of<ILogger>());
+            _sut = new RelationSpecificInterfaceEventsHandler(_systemUsageRepository.Object, _transactionManager.Object, _activeUserContext, Mock.Of<IOperationClock>(x => x.Now == DateTime.Now), Mock.Of<ILogger>());
         }
 
         [Fact]
-        private void Handle_ExposingSystemChanged_GivenInterfaceAndPossibleSystemChange_WhenSystemInUse_ThenInterfaceOnSystemRelationsIsReset()
+        private void Handle_ExposingSystemChanged_Resets_Interface_On_Associated_Relations()
         {
             //Arrange
-            var affectedInterface = new ItInterface() { };
+            var affectedInterface = new ItInterface();
             affectedInterface.AssociatedSystemRelations = new List<SystemRelation>()
             {
                 CreateRelation(affectedInterface),
@@ -55,7 +56,7 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
-        private void Handle_InterfaceDeleted_GivenInterfaceAndPossibleSystemChange_WhenSystemInUse_ThenInterfaceOnSystemRelationsIsReset()
+        private void Handle_InterfaceDeleted_Resets_Interface_On_Associated_Relations()
         {
             //Arrange
             var affectedInterface = new ItInterface();
