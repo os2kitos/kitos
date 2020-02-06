@@ -74,6 +74,7 @@ namespace Core.ApplicationServices.Interface
                 _dataRowRepository.Save();
 
                 // delete it interface
+                _domainEvents.Raise(new InterfaceDeleted(itInterface));
                 _repository.DeleteWithReferencePreload(itInterface);
                 _repository.Save();
 
