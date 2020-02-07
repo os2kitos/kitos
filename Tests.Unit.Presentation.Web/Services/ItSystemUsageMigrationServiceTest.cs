@@ -299,7 +299,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_Ok_With_No_Affected_Relations_From_UsageRelations()
+        public void GetSystemUsageMigration_Returns_Ok_With_No_Affected_Relation_From_UsageRelations()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -320,11 +320,11 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Equal(0, migration.AffectedRelations.Count);
+            Assert.Empty(migration.AffectedRelations);
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_Ok_With_Affected_UsedByRelation_With_Interface()
+        public void GetSystemUsageMigration_Returns_Ok_With_Affected_Relation_From_UsedByRelation_With_Interface()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -355,12 +355,10 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(1, migration.AffectedRelations.Count);
             Assert.Equal(relation.Id, migration.AffectedRelations.First().Id);
             Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().RelationInterfaceId);
-            Assert.Equal(0, migration.AffectedContracts.Count);
-            Assert.Equal(0, migration.AffectedProjects.Count);
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_Ok_With_Affected_UsedByRelation_With_Contract()
+        public void GetSystemUsageMigration_Returns_Ok_With_No_Affected_Relation_From_UsedByRelation_With_Contract()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -382,8 +380,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Empty(migration.AffectedRelations);
-            Assert.Empty(migration.AffectedContracts);
-            Assert.Empty(migration.AffectedProjects);
         }
 
         [Fact]
@@ -457,7 +453,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void ExecuteMigration_Returns_Ok_And_Deletes_UsedByRelation_Interfaces()
+        public void ExecuteMigration_Returns_Ok_And_Resets_RelationInterface_From_UsedByRelation_With_Interface()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -488,13 +484,13 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            VerifyModifyRelationCalled(relation);
+            VerifyModifyRelationCalled(relation, Times.Once());
             Assert.Equal(relation.Id, migration.UsedByRelations.First().Id);
             VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
         }
 
         [Fact]
-        public void ExecuteMigration_Returns_Ok_With_Affected_Relation()
+        public void ExecuteMigration_Returns_Ok_With_No_RelationInterfaces_Reset_When_Own_Relation()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -502,9 +498,13 @@ namespace Tests.Unit.Presentation.Web.Services
             var targetSystemUsage = CreateSystemUsage();
             ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
             ExpectAllowModifyReturns(sourceSystemUsage, true);
+            var relation = new SystemRelation(sourceSystemUsage)
+            {
+                ToSystemUsageId = targetSystemUsage.Id,
+            };
             var usageRelations = new List<SystemRelation>
             {
-                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id}
+                relation
             };
             var usedByRelations = new List<SystemRelation>();
             sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
@@ -516,13 +516,13 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
+            VerifyModifyRelationCalled(relation, Times.Never());
             Assert.Equal(migration.UsageRelations.First().Id, usageRelations.First().Id);
-            
             VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
         }
 
         [Fact]
-        public void ExecuteMigration_Returns_Ok_With_Affected_UsedByRelation_With_Contract()
+        public void ExecuteMigration_Returns_Ok_With_No_RelationInterfaces_Reset_When_Others_Relation_Has_Only_Contract()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -531,10 +531,16 @@ namespace Tests.Unit.Presentation.Web.Services
             var contract = CreateItContract();
             ExpectAllowedGetMigration(sourceSystemUsage.Id, sourceSystemUsage, migrateToSystem);
             ExpectAllowModifyReturns(sourceSystemUsage, true);
+            var relation = new SystemRelation(sourceSystemUsage)
+            {
+                ToSystemUsageId = targetSystemUsage.Id,
+                AssociatedContractId = contract.Id,
+                AssociatedContract = contract
+            };
             var usageRelations = new List<SystemRelation>();
             var usedByRelations = new List<SystemRelation>
             {
-                new SystemRelation(sourceSystemUsage) {ToSystemUsageId = targetSystemUsage.Id, AssociatedContractId = contract.Id, AssociatedContract = contract}
+                relation
             };
             sourceSystemUsage = AddRelationsToSystemUsage(sourceSystemUsage, usageRelations, usedByRelations);
             var transaction = ExpectBeginTransaction();
@@ -545,13 +551,13 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
+            VerifyModifyRelationCalled(relation, Times.Never());
             Assert.Equal(migration.UsedByRelations.First().Id, usedByRelations.First().Id);
-            Assert.Equal(migration.UsedByRelations.First().AssociatedContractId, usedByRelations.First().AssociatedContractId);
             VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
         }
 
         [Fact]
-        public void ExecuteMigration_Returns_Ok_With_Affected_UsageRelation_With_Interface_Still_On_Relation()
+        public void ExecuteMigration_Returns_Ok_With_No_RelationInterfaces_Reset_When_Own_Relation_Has_Interface()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -580,8 +586,8 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
+            VerifyModifyRelationCalled(relation, Times.Never());
             Assert.Equal(relation.Id, migration.UsageRelations.First().Id);
-            Assert.Equal(relationInterface.Id, migration.UsageRelations.First().RelationInterfaceId);
             VerifySystemMigrationCommitted(sourceSystemUsage, migrateToSystem, transaction);
         }
 
@@ -624,7 +630,7 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
-        private void VerifyModifyRelationCalled(SystemRelation relation)
+        private void VerifyModifyRelationCalled(SystemRelation relation, Times numberOfTimesCalled)
         {
             _itSystemUsageService.Verify(x => x.ModifyRelation(
                 relation.FromSystemUsageId,
@@ -634,7 +640,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 relation.Reference,
                 null,
                 relation.AssociatedContractId,
-                relation.UsageFrequencyId), Times.Once);
+                relation.UsageFrequencyId), numberOfTimesCalled);
         }
 
 

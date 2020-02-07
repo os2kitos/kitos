@@ -121,8 +121,8 @@ namespace Presentation.Web.Controllers.API
             {
                 SourceSystem = input.FromSystemUsage.MapToNamedEntityDTO(),
                 TargetSystem = input.ToSystemUsage.MapToNamedEntityDTO(),
-                RelationContract = input.AssociatedContract?.MapToNamedEntityDTO(),
-                RelationInterface = input.RelationInterface?.MapToNamedEntityDTO()
+                Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
+                Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };
             
         }

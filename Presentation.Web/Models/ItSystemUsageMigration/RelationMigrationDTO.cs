@@ -6,8 +6,8 @@
 
         public NamedEntityDTO TargetSystem { get; set; }
 
-        public NamedEntityDTO RelationInterface { get; set; }
+        public NamedEntityDTO Interface { get; set; }
 
-        public NamedEntityDTO RelationContract { get; set; }
+        public NamedEntityDTO Contract { get; set; }
 }
 }
