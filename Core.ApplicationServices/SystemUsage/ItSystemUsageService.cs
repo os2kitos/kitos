@@ -9,12 +9,14 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage
@@ -28,6 +30,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IOptionsService<SystemRelation, RelationFrequencyType> _frequencyService;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<SystemRelation> _relationRepository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly ILogger _logger;
@@ -42,6 +45,7 @@ namespace Core.ApplicationServices.SystemUsage
             IGenericRepository<SystemRelation> relationRepository,
             IGenericRepository<ItInterface> interfaceRepository,
             ITransactionManager transactionManager,
+            IDomainEvents domainEvents,
             ILogger logger)
         {
             _usageRepository = usageRepository;
@@ -51,6 +55,7 @@ namespace Core.ApplicationServices.SystemUsage
             _frequencyService = frequencyService;
             _userContext = userContext;
             _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
             _relationRepository = relationRepository;
             _interfaceRepository = interfaceRepository;
             _logger = logger;
@@ -122,6 +127,7 @@ namespace Core.ApplicationServices.SystemUsage
             }
 
             // delete it system usage
+            _domainEvents.Raise(new SystemUsageDeleted(itSystemUsage));
             _usageRepository.DeleteByKeyWithReferencePreload(id);
             _usageRepository.Save();
             return itSystemUsage;
@@ -253,7 +259,7 @@ namespace Core.ApplicationServices.SystemUsage
         {
             var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters
             {
-                FromSystemUsageId = systemUsageId 
+                FromSystemUsageId = systemUsageId
             }, new SystemRelationOperationEntities());
 
             return
@@ -466,7 +472,7 @@ namespace Core.ApplicationServices.SystemUsage
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
-     
+
         private Result<SystemRelationOperationContext, OperationError> LoadToSystemUsage(SystemRelationOperationContext context)
         {
             var toSystemUsage = _usageRepository.GetByKey(context.Input.ToSystemUsageId);

@@ -9,12 +9,14 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -35,6 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
+        private readonly Mock<IDomainEvents> _domainEvents;
 
         public ItSystemUsageServiceTest()
         {
@@ -49,6 +52,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager = new Mock<ITransactionManager>();
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
+            _domainEvents = new Mock<IDomainEvents>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -59,6 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _relationRepositoryMock.Object,
                 _interfaceRepository.Object,
                 _transactionManager.Object,
+                _domainEvents.Object,
                 Mock.Of<ILogger>());
         }
 
@@ -244,6 +249,7 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(itSystemUsage, result.Value);
             _usageRepository.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
             _usageRepository.Verify(x => x.Save(), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<SystemUsageDeleted>(ev => ev.DeletedSystemUsage == itSystemUsage)));
         }
 
         [Fact]
