@@ -11,11 +11,12 @@ using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystemUsageMigration;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    public class ItSystemUsageMigrationTests : IAsyncLifetime
+    public class ItSystemUsageMigrationTests : WithAutoFixture, IAsyncLifetime
     {
         private ItSystemDTO _oldSystemInUse;
         private ItSystemUsageDTO _oldSystemUsage;
@@ -51,8 +52,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 var itSystems = response.ToList();
                 var dto = Assert.Single(itSystems);
-                Assert.Equal(itSystemName, dto?.Name);
-                Assert.Equal(itSystem.Id, dto?.Id);
+                Assert.Equal(itSystemName, dto.Name);
+                Assert.Equal(itSystem.Id, dto.Id);
             }
         }
 
@@ -172,7 +173,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 var itSystems = response.ToList();
                 var dto = Assert.Single(itSystems);
-                Assert.Equal(itSystem1.Id, dto?.Id);
+                Assert.Equal(itSystem1.Id, dto.Id);
             }
         }
 
@@ -259,7 +260,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedRelations);
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedItProjects);
-                Assert.Equal(project.Id, dto?.Id);
+                Assert.Equal(project.Id, dto.Id);
             }
         }
 
@@ -278,7 +279,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedRelations);
                 Assert.Empty(result.AffectedItProjects);
                 var resultContract = Assert.Single(result.AffectedContracts);
-                Assert.Equal(contract.Id, resultContract?.Id);
+                Assert.Equal(contract.Id, resultContract.Id);
             }
         }
 
@@ -295,7 +296,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(),exhibit.Id, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -321,7 +322,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, A<string>(), exhibit.Id, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -332,9 +333,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedRelations);
                 AssertEqualNamedEntities(relation.FromUsage, dto.ToSystemUsage);
-                AssertEqualNamedEntities(relation.ToUsage, dto?.FromSystemUsage);
-                AssertEqualNamedEntities(relation.Interface, dto?.Interface);
-                Assert.Null(dto?.Contract);
+                AssertEqualNamedEntities(relation.ToUsage, dto.FromSystemUsage);
+                Assert.Equal(relation.Description, dto.Description);
+                AssertEqualNamedEntities(relation.Interface, dto.Interface);
+                Assert.Null(dto.Contract);
             }
         }
 
@@ -349,7 +351,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -374,7 +376,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, contract.Id);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, contract.Id);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -481,7 +483,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdContract = await GetItContractAsync(contract.Id);
             
             var usageExhibit = await CreateExhibitAsync(createdInterface, toItSystem);
-            var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, usageExhibit.Id, contract.Id);
+            var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), usageExhibit.Id, contract.Id);
 
             var migrateToItSystem = await CreateSystemAsync();
 
@@ -543,7 +545,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.Id, null);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
@@ -567,7 +569,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.Id, null);
 
             //Act
             using (var response = await PostMigration(toItSystemUsage, migrateToItSystem))
@@ -589,7 +591,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
@@ -612,7 +614,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, contract.Id);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, contract.Id);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
@@ -706,23 +708,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             var relations = await SystemRelationHelper.GetRelationsAsync(usage.Id);
             var updatedRelation = Assert.Single(relations);
-            Assert.Equal(relation.Id, updatedRelation?.Id);
+            Assert.Equal(relation.Id, updatedRelation.Id);
+            Assert.Equal(relation.Description, updatedRelation.Description);
             if (hasInterface)
             {
-                AssertEqualNamedEntities(relation.Interface, updatedRelation?.Interface);
+                AssertEqualNamedEntities(relation.Interface, updatedRelation.Interface);
             }
             else
             {
-                Assert.Null(updatedRelation?.Interface);
+                Assert.Null(updatedRelation.Interface);
             }
 
             if (hasContract)
             {
-                AssertEqualNamedEntities(relation.Contract, updatedRelation?.Contract);
+                AssertEqualNamedEntities(relation.Contract, updatedRelation.Contract);
             }
             else
             {
-                Assert.Null(updatedRelation?.Contract);
+                Assert.Null(updatedRelation.Contract);
             }
         }
 
@@ -769,13 +772,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return ItSystemHelper.CreateItSystemInOrganizationAsync(name ?? CreateName(), organizationId, accessModifier);
         }
 
-        private static async Task<SystemRelationDTO> CreateSystemRelation(int fromSystemId, int toSystemId,
-            int? interfaceId, int? contractId)
+        private static async Task<SystemRelationDTO> CreateSystemRelation(
+            int fromSystemId, 
+            int toSystemId, 
+            string description,
+            int? interfaceId, 
+            int? contractId)
         {
             var relationDTO = new CreateSystemRelationDTO()
             {
                 FromUsageId = fromSystemId,
                 ToUsageId = toSystemId,
+                Description = description,
                 InterfaceId = interfaceId,
                 ContractId = contractId
             };

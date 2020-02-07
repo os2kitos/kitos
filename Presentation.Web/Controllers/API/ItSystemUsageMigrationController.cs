@@ -120,6 +120,7 @@ namespace Presentation.Web.Controllers.API
             {
                 ToSystemUsage = input.FromSystemUsage.MapToNamedEntityDTO(),
                 FromSystemUsage = input.ToSystemUsage.MapToNamedEntityDTO(),
+                Description = input.Description,
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
                 Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };

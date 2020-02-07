@@ -86,6 +86,7 @@
                                 <br />
                                 Til
                             </th>
+                            <th>Relationsbeskrivelse</th>
                             <th>Snitflade der fjernes fra relationen</th>
                             <th>Kontrakt</th>
                         </tr>
@@ -101,16 +102,19 @@
                                 Id: {{relation.targetSystem.id}}
                             </td>
                             <td>
-                                Navn: {{relation.relationInterface.name}}
-                                <br />
-                                Id:{{relation.relationInterface.id}}
+                                {{relation.description}}
                             </td>
-                            <td ng-if="relation.relationContract">
-                                Navn: {{relation.relationContract.name}}
+                            <td>
+                                Navn: {{relation.interface.name}}
                                 <br />
-                                Id: {{relation.relationContract.id}}
+                                Id:{{relation.interface.id}}
                             </td>
-                            <td ng-if="!relation.relationContract">Ingen kontrakt</td>
+                            <td ng-if="relation.contract">
+                                Navn: {{relation.contract.name}}
+                                <br />
+                                Id: {{relation.contract.id}}
+                            </td>
+                            <td ng-if="!relation.contract">Ingen kontrakt</td>
                         </tr>
                     </table>
                 </div>

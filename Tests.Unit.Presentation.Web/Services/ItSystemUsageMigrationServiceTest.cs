@@ -146,7 +146,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert Only the one that matches the naming criterion is returned
             Assert.True(result.Ok);
             var itSystem = Assert.Single(result.Value);
-            Assert.Equal(resultSet.First().Id, itSystem?.Id);
+            Assert.Equal(resultSet.First().Id, itSystem.Id);
         }
 
         [Fact]
@@ -335,7 +335,8 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 ToSystemUsageId = toSystemUsage.Id,
                 RelationInterfaceId = relationInterface.Id,
-                RelationInterface = relationInterface
+                RelationInterface = relationInterface,
+                Description = A<string>()
             };
 
             ExpectAllowedGetMigration(fromSystemUsage.Id, fromSystemUsage, migrateToSystem);
@@ -355,6 +356,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(1, migration.AffectedSystemRelations.Count);
             Assert.Equal(relation.Id, migration.AffectedSystemRelations.First().Id);
             Assert.Equal(relationInterface.Id, migration.AffectedSystemRelations.First().RelationInterfaceId);
+            Assert.Equal(relation.Description, migration.AffectedSystemRelations.First().Description);
         }
 
         [Fact]
@@ -464,7 +466,8 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 ToSystemUsageId = toSystemUsage.Id,
                 RelationInterfaceId = relationInterface.Id,
-                RelationInterface = relationInterface
+                RelationInterface = relationInterface,
+                Description = A<string>()
             };
 
             ExpectAllowedGetMigration(fromSystemUsage.Id, fromSystemUsage, migrateToSystem);

@@ -5,7 +5,8 @@
     export interface RelationMigrationDTO {
         sourceSystem: NamedEntityDTO;
         targetSystem: NamedEntityDTO;
-        relationInterface: NamedEntityDTO;
-        relationContract: NamedEntityDTO;
+        description: string;
+        interface: NamedEntityDTO;
+        contract: NamedEntityDTO;
     }
 }
