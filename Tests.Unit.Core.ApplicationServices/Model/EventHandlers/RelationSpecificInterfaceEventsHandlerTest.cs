@@ -16,7 +16,7 @@ using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.Model
+namespace Tests.Unit.Core.Model.EventHandlers
 {
     public class RelationSpecificInterfaceEventsHandlerTest : WithAutoFixture
     {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
@@ -14,7 +13,7 @@ using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.Model
+namespace Tests.Unit.Core.Model.EventHandlers
 {
     public class SystemUsageDeletedHandlerTest : WithAutoFixture
     {
