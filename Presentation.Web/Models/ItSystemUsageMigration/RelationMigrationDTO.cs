@@ -2,9 +2,9 @@
 {
     public class RelationMigrationDTO
     {
-        public NamedEntityDTO SourceSystem { get; set; }
+        public NamedEntityDTO ToSystemUsage { get; set; }
 
-        public NamedEntityDTO TargetSystem { get; set; }
+        public NamedEntityDTO FromSystemUsage { get; set; }
 
         public NamedEntityDTO Interface { get; set; }
 

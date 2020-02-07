@@ -118,8 +118,8 @@ namespace Presentation.Web.Controllers.API
         {
             return new RelationMigrationDTO
             {
-                SourceSystem = input.FromSystemUsage.MapToNamedEntityDTO(),
-                TargetSystem = input.ToSystemUsage.MapToNamedEntityDTO(),
+                ToSystemUsage = input.FromSystemUsage.MapToNamedEntityDTO(),
+                FromSystemUsage = input.ToSystemUsage.MapToNamedEntityDTO(),
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
                 Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };

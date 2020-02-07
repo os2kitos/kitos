@@ -283,22 +283,22 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation_With_Source_System_Exposing_Interface()
+        public async Task GetMigration_When_System_Has_Relation_With_From_System_Exposing_Interface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, toItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, exhibit.Id, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
 
             //Act
-            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
@@ -309,30 +309,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Has_Relation_With_Target_System_Exposing_Interface()
+        public async Task GetMigration_When_System_Has_Relation_With_To_System_Exposing_Interface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, sourceItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, fromItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(targetItSystemUsage.Id, sourceItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, exhibit.Id, null);
 
             //Act
-            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedRelations);
-                AssertEqualNamedEntities(relation.FromUsage, dto?.SourceSystem);
-                AssertEqualNamedEntities(relation.ToUsage, dto?.TargetSystem);
+                AssertEqualNamedEntities(relation.FromUsage, dto.ToSystemUsage);
+                AssertEqualNamedEntities(relation.ToUsage, dto?.FromSystemUsage);
                 AssertEqualNamedEntities(relation.Interface, dto?.Interface);
                 Assert.Null(dto?.Contract);
             }
@@ -342,17 +342,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Has_Relation_With_No_RelationInterface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, null);
 
             //Act
-            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
@@ -366,18 +366,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Has_Relation_With_Contract_And_No_RelationInterface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var contract = await CreateContractAsync();
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, contract.Id);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, contract.Id);
 
             //Act
-            using (var response = await GetMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
@@ -471,33 +471,33 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task PostMigration_Can_Migrate_All_Usage_Data()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var createdInterface = await CreateInterfaceAsync();
             var contract = await CreateContractAsync();
-            await AddItSystemUsageToContractAsync(contract, sourceItSystemUsage);
+            await AddItSystemUsageToContractAsync(contract, fromItSystemUsage);
             var createdContract = await GetItContractAsync(contract.Id);
             
-            var usageExhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
-            var usageRelation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, usageExhibit.Id, contract.Id);
+            var usageExhibit = await CreateExhibitAsync(createdInterface, toItSystem);
+            var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, usageExhibit.Id, contract.Id);
 
             var migrateToItSystem = await CreateSystemAsync();
 
             var project = await CreateProjectAsync();
-            await AddProjectSystemBindingAsync(project, sourceItSystemUsage);
+            await AddProjectSystemBindingAsync(project, fromItSystemUsage);
 
             //Act
-            using (var response = await PostMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertSystemUsageAssociationExistsInContract(createdContract, sourceItSystemUsage);
-                await AssertAssociatedProjectExists(sourceItSystemUsage, project);
+                await AssertSystemUsageAssociationExistsInContract(createdContract, fromItSystemUsage);
+                await AssertAssociatedProjectExists(fromItSystemUsage, project);
                 
-                await AssertRelationExists(usageRelation, sourceItSystemUsage, true, true);
-                await AssertRelationHasContract(usageRelation, sourceItSystemUsage);
+                await AssertRelationExists(usageRelation, fromItSystemUsage, true, true);
+                await AssertRelationHasContract(usageRelation, fromItSystemUsage);
 
             }
         }
@@ -531,72 +531,72 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
 
         [Fact]
-        public async Task PostMigration_When_System_Has_Relation_With_Source_System_Exposing_Interface()
+        public async Task PostMigration_When_System_Has_Relation_With_From_System_Exposing_Interface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, toItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
 
             //Act
-            using (var response = await PostMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, sourceItSystemUsage, true, false);
+                await AssertRelationExists(relation, fromItSystemUsage, true, false);
             }
         }
 
         [Fact]
-        public async Task PostMigration_When_System_Has_Relation_With_Target_System_Exposing_Interface()
+        public async Task PostMigration_When_System_Has_Relation_With_To_System_Exposing_Interface()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, targetItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, toItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, exhibit.Id, null);
 
             //Act
-            using (var response = await PostMigration(targetItSystemUsage, migrateToItSystem))
+            using (var response = await PostMigration(toItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, sourceItSystemUsage, false, false);
+                await AssertRelationExists(relation, fromItSystemUsage, false, false);
             }
         }
 
         [Fact]
-        public async Task PostMigration_When_System_Has_Relation_With_Target_System()
+        public async Task PostMigration_When_System_Has_Relation_With_To_System()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, null);
 
             //Act
-            using (var response = await PostMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, sourceItSystemUsage, false, false);
+                await AssertRelationExists(relation, fromItSystemUsage, false, false);
             }
         }
 
@@ -604,22 +604,22 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task PostMigration_When_System_Has_Relation_With_Contract()
         {
             //Arrange
-            var sourceItSystem = await CreateSystemAsync();
-            var sourceItSystemUsage = await TakeSystemIntoUseAsync(sourceItSystem);
-            var targetItSystem = await CreateSystemAsync();
-            var targetItSystemUsage = await TakeSystemIntoUseAsync(targetItSystem);
+            var fromItSystem = await CreateSystemAsync();
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem);
+            var toItSystem = await CreateSystemAsync();
+            var toItSystemUsage = await TakeSystemIntoUseAsync(toItSystem);
             var contract = await CreateContractAsync();
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(sourceItSystemUsage.Id, targetItSystemUsage.Id, null, contract.Id);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, null, contract.Id);
 
             //Act
-            using (var response = await PostMigration(sourceItSystemUsage, migrateToItSystem))
+            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, sourceItSystemUsage, false, true);
+                await AssertRelationExists(relation, fromItSystemUsage, false, true);
             }
         }
 
@@ -769,13 +769,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return ItSystemHelper.CreateItSystemInOrganizationAsync(name ?? CreateName(), organizationId, accessModifier);
         }
 
-        private static async Task<SystemRelationDTO> CreateSystemRelation(int sourceSystemId, int targetSystemId,
+        private static async Task<SystemRelationDTO> CreateSystemRelation(int fromSystemId, int toSystemId,
             int? interfaceId, int? contractId)
         {
             var relationDTO = new CreateSystemRelationDTO()
             {
-                FromUsageId = sourceSystemId,
-                ToUsageId = targetSystemId,
+                FromUsageId = fromSystemId,
+                ToUsageId = toSystemId,
                 InterfaceId = interfaceId,
                 ContractId = contractId
             };
