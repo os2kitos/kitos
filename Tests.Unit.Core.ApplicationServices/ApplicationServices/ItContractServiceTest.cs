@@ -106,11 +106,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private EconomyStream CreateEconomyStream()
         {
-            return new EconomyStream()
-            {
-                Id = A<int>()
-
-            };
+            return new EconomyStream { Id = A<int>() };
         }
 
         private void ExpectAllowDeleteReturns(ItContract itContract, bool value)
@@ -122,7 +118,5 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             _contractRepository.Setup(x => x.GetByKey(contractId)).Returns(itContract);
         }
-
-        //TODO: Remaining tests
     }
 }
