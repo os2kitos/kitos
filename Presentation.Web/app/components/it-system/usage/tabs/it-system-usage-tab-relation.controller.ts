@@ -37,7 +37,7 @@
                                 if ($scope.RelationExposedSystemData != null) {
                                     console.log("Data valid: " + $scope.RelationExposedSystemData.id + " - " + $scope.RelationExposedSystemData.text);
                                     $http.get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationExposedSystemData.id}`).success(result => {
-                                      checkIfValueIsStillPresent(result);
+                                        checkIfValueIsStillPresent(result);
 
                                     });
                                 }
@@ -109,7 +109,7 @@
                                             break;
                                         }
                                     }
-                                        $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
+                                    $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
 
                                 } else {
                                     $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
@@ -158,6 +158,48 @@
                 }
 
             }
+
+
+            $scope.openDescription = function (description: string, itSystem: string) {
+                var modalInstance = $modal.open({
+                    windowClass: "modal fade in",
+                    templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-description-modal-view.html",
+                    controller: ["$scope", "$uibModalInstance", "$window", function ($scope, $modalInstance, $window) {
+                        modalOpen = true;
+                        $scope.itSystem = itSystem;
+                        $scope.description = description;
+                        $scope.CloseView = function () {
+                            modalOpen = false;
+                            $scope.$close(true);
+                        }
+                        modalOpen = false;
+                    }],
+                    resolve: {
+                    }
+                });
+            }
+
+
+            $scope.expandParagraph = function (e) {
+                var element = angular.element(e.currentTarget);
+                var para = element.closest('tr').find('p')[0];
+                var btn = element[0];
+
+                console.log("para found is " + element);
+                if (para.getAttribute("style") != null) {
+                    console.log("Toggling overflow off");
+                    para.removeAttribute("style");
+                    btn.innerText = "Se mindre";
+                }
+                else {
+                    console.log("Toggling overflow on");
+                    para.setAttribute("style", "height: 3em;overflow: hidden;");
+                    btn.innerText = "Se mere";
+                }
+
+
+            }
+
 
             function reload() {
                 $state.go(".", null, { reload: true });

@@ -12,16 +12,16 @@
                         Snitflade
                     </th>
                     <th>
-                        Frekvens
+                        Beskrivelse
+                    </th>   
+                    <th>
+                        Reference
                     </th>
                     <th>
                         Kontrakt
                     </th>
                     <th>
-                        Reference
-                    </th>
-                    <th>
-                        Beskrivelse
+                        Frekvens
                     </th>
                 </tr>   
             </thead>
@@ -30,17 +30,20 @@
                 <tr ng-repeat="relation in relationTabledata">
                     <td><a href="#/system/usage/{{relation.toUsage.id}}/main">{{relation.toUsage.name}}</a></td>
                     <td><a href="#/system/edit/{{relation.interface.id}}/interface/main">{{relation.interface.name}}</a></td>
-                    <td>{{relation.frequencyType.name}}</td>
-                    <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
-                    <td>
-                        <span ng-if="validateReference(relation.reference)"><a ng-href="{{relation.reference}}">➤</a></span>
+                    <td style="max-width: 300px">
+                        <p ng-if="relation.description.length < 198"> {{relation.description}}</p>
+                        <p ng-if="relation.description.length > 199" style="height: 3em; overflow: hidden" id="readMoreParagraph"> {{relation.description}}</p>
+                        <button type="button" ng-if="relation.description.length > 199" ng-click="expandParagraph($event)">read more</button>
+                    </td>
+                    <td style="overflow-wrap: break-word; max-width: 150px">
+                        <span ng-if="validateReference(relation.reference)"><a href="" ng-click="relation.reference">➤</a></span>
                         <span ng-if="!validateReference(relation.reference)">{{relation.reference}}</span>
                     </td>
-                    <td>{{relation.description}}</td>
+                    <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
+                    <td>{{relation.frequencyType.name}}</td>
                 </tr>
             </tbody>
         </table>
         <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 5px">Opret relation</button>
     </div>
 </div>
-<ng-template #RefNoLink>{{relation.reference}}</ng-template>

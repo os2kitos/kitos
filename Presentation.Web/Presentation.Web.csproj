@@ -730,6 +730,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation-description-modal-view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation-modal-view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
