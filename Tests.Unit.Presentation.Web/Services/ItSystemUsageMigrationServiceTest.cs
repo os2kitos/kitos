@@ -146,7 +146,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert Only the one that matches the naming criterion is returned
             Assert.True(result.Ok);
             var itSystem = Assert.Single(result.Value);
-            Assert.Equal(resultSet.First().Id, itSystem.Id);
+            Assert.Equal(resultSet.First().Id, itSystem?.Id);
         }
 
         [Fact]
@@ -299,7 +299,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_Ok_With_Affected_Relation()
+        public void GetSystemUsageMigration_Returns_Ok_With_No_Affected_Relations_From_UsageRelations()
         {
             //Arrange
             var sourceSystemUsage = CreateSystemUsage();
@@ -321,8 +321,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(0, migration.AffectedRelations.Count);
-            Assert.Equal(0, migration.AffectedContracts.Count);
-            Assert.Equal(0, migration.AffectedProjects.Count);
         }
 
         [Fact]
