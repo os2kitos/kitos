@@ -43,9 +43,6 @@ namespace Core.DomainServices.Model.EventHandlers
                 throw new ArgumentNullException(nameof(domainEvent));
             }
 
-            if (domainEvent == null)
-                throw new ArgumentNullException(nameof(domainEvent));
-
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
                 var deletedContract = domainEvent.DeletedContract;

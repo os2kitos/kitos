@@ -190,6 +190,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task Changing_Exposing_System_To_Same_As_Existing_Does_Nothing()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(false, false, true);
+            var toUsage = await ItSystemHelper.GetItSystemUsage(input.ToUsageId);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(toUsage.ItSystemId, input.InterfaceId.GetValueOrDefault()))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.NotNull(relationAfterChange.Interface); //interface should not have been cleared since the same exhibitor was provided as the existing --> no change
+                }
+            }
+        }
+
+        [Fact]
         [Description("Even if we already get the reset from the Exhibit removal (exhibit blocks deletion of interfaces), we still want to make sure that delete works if this changes")]
         public async Task Deleting_Interface_Clears_InterfaceField_In_All_Relations_To_Old_Exposing_System()
         {
@@ -198,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act
             using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
-            
+
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -214,6 +239,32 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                     Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
                     var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                     Assert.Null(relationAfterChange.Interface);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Deleting_Contract_Clears_ContractField_In_All_AssociatedRelations()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, false, false);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Contract);
+
+                using (var deleteContractRequest = await ItContractHelper.SendDeleteContractRequestAsync(input.ContractId.GetValueOrDefault()))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.OK, deleteContractRequest.StatusCode);
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Contract);
                 }
             }
         }
