@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(contextResult, result);
         }
 
-        public interface IEntityWithOrganization : IEntity, IHasOrganization { }
+        public interface IEntityWithOrganization : IEntity, IOwnedByOrganization { }
 
         [Theory]
         [InlineData(true)]

@@ -17,7 +17,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization, IEntityWithExternalReferences
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences
     {
         public ItSystemUsage()
         {
@@ -471,7 +471,7 @@ namespace Core.DomainModel.ItSystemUsage
             int relationId,
             ItSystemUsage toSystemUsage,
             string changedDescription,
-            string changedFrequency,
+            string changedReference,
             Maybe<ItInterface> relationInterface,
             Maybe<ItContract.ItContract> toContract, 
             Maybe<RelationFrequencyType> toFrequency)
@@ -489,7 +489,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             var relation = relationResult.Value;
 
-            return UpdateRelation(relation, toSystemUsage, changedDescription, changedFrequency, relationInterface, toContract, toFrequency);
+            return UpdateRelation(relation, toSystemUsage, changedDescription, changedReference, relationInterface, toContract, toFrequency);
         }
 
         public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
@@ -531,7 +531,8 @@ namespace Core.DomainModel.ItSystemUsage
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
         }
 
-        private Result<SystemRelation, OperationError> UpdateRelation(SystemRelation relation,
+        private Result<SystemRelation, OperationError> UpdateRelation(
+            SystemRelation relation,
             ItSystemUsage toSystemUsage,
             string changedDescription,
             string changedReference,

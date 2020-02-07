@@ -78,9 +78,9 @@ namespace Core.DomainModel.Result
             if (!(obj is Maybe<T> other))
                 return false;
 
-            if (this == None)
+            if (IsNone || other.IsNone)
             {
-                return other == None;
+                return IsNone == other.IsNone;
             }
 
             return Equals(Value, other.Value);

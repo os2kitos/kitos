@@ -9,7 +9,7 @@ namespace Core.DomainModel.Organization
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IContextAware, IOrganizationModule, IHasOrganization
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IContextAware, IOrganizationModule, IOwnedByOrganization
     {
         public OrganizationUnit()
         {

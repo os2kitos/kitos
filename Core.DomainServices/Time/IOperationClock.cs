@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainServices.Repositories.KLE
+namespace Core.DomainServices.Time
 {
     public interface IOperationClock
     {

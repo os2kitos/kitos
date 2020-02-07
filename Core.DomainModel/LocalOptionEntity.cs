@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel
 {
-    public abstract class LocalOptionEntity<OptionType> : Entity, IHasOrganization, IContextAware
+    public abstract class LocalOptionEntity<OptionType> : Entity, IOwnedByOrganization, IContextAware
     {
         public string Description { get; set; }
 

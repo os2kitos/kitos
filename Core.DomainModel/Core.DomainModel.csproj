@@ -61,9 +61,13 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="IIsPartOfOrganization.cs" />
+    <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
+    <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
+    <Compile Include="ItSystem\DomainEvents\InterfaceDeleted.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
@@ -82,7 +86,7 @@
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItContract\ItContractAgreementElementTypes.cs" />
     <Compile Include="ItProject\Assignment.cs" />
-    <Compile Include="IHasOrganization.cs" />
+    <Compile Include="IOwnedByOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItProject\ItProjectStatusUpdate.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPR.cs" />
@@ -217,6 +221,12 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

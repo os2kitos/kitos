@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using ExpectedObjects;
 using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -35,15 +37,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                var relations = (await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId)).ToList();
-                var dto = Assert.Single(relations);
-                Assert.Equal(input.FromUsageId, dto.FromUsage.Id);
-                Assert.Equal(input.ToUsageId, dto.ToUsage.Id);
-                Assert.Equal(input.Description, dto.Description);
-                Assert.Equal(input.Reference, dto.Reference);
-                Assert.Equal(input.ContractId, dto.Contract?.Id);
-                Assert.Equal(input.InterfaceId, dto.Interface?.Id);
-                Assert.Equal(input.FrequencyTypeId, dto.FrequencyType?.Id);
+                var relationsFrom = (await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId)).ToList();
+                var relationsTo = (await SystemRelationHelper.SendGetRelationsToAsync(input.ToUsageId)).ToList();
+                var fromDto = Assert.Single(relationsFrom);
+                var toDto = Assert.Single(relationsTo);
+
+                fromDto.ToExpectedObject().ShouldMatch(toDto); //Same relation should yield same data at the dto level
+
+                Assert.Equal(input.FromUsageId, fromDto.FromUsage.Id);
+                Assert.Equal(input.ToUsageId, fromDto.ToUsage.Id);
+                Assert.Equal(input.Description, fromDto.Description);
+                Assert.Equal(input.Reference, fromDto.Reference);
+                Assert.Equal(input.ContractId, fromDto.Contract?.Id);
+                Assert.Equal(input.InterfaceId, fromDto.Interface?.Id);
+                Assert.Equal(input.FrequencyTypeId, fromDto.FrequencyType?.Id);
             }
         }
 
@@ -134,13 +141,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Contains(options.AvailableFrequencyTypes.Select(x => x.Id), x => x == input.FrequencyTypeId);
         }
 
-		[Fact]
+        [Fact]
         public async Task Can_Edit_SystemUsageWithRelations()
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, false, true);
             await SystemRelationHelper.SendPostRelationAsync(input);
-            var relations = await SystemRelationHelper.SendGetRelationsAsync(input.FromUsageId);
+            var relations = await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId);
             var edited = await PrepareEditedRelationAsync(relations.Single());
 
             //Act
@@ -154,6 +161,109 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(edited.Description, relationDTO.Description);
                 Assert.Equal(edited.Reference, relationDTO.Reference);
                 Assert.Equal(edited.Interface.Id, relationDTO.Interface.Id);
+            }
+        }
+
+        [Fact]
+        public async Task Changing_Exposing_System_On_Interface_Clears_InterfaceField_In_All_Relations_To_Old_Exposing_System()
+        {
+            //Arrange
+            var newExhibitor = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var input = await PrepareFullRelationAsync(false, false, true);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(newExhibitor.Id, input.InterfaceId.GetValueOrDefault()))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Interface);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Changing_Exposing_System_To_Same_As_Existing_Does_Nothing()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(false, false, true);
+            var toUsage = await ItSystemHelper.GetItSystemUsage(input.ToUsageId);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(toUsage.ItSystemId, input.InterfaceId.GetValueOrDefault()))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.NotNull(relationAfterChange.Interface); //interface should not have been cleared since the same exhibitor was provided as the existing --> no change
+                }
+            }
+        }
+
+        [Fact]
+        [Description("Even if we already get the reset from the Exhibit removal (exhibit blocks deletion of interfaces), we still want to make sure that delete works if this changes")]
+        public async Task Deleting_Interface_Clears_InterfaceField_In_All_Relations_To_Old_Exposing_System()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(false, false, true);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Interface);
+
+                using (var removeExhibitResponse = await InterfaceExhibitHelper.SendRemoveExhibitRequest(input.InterfaceId.GetValueOrDefault())) //Must remove exposition to allow deletion
+                using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(input.InterfaceId.GetValueOrDefault()))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.OK, removeExhibitResponse.StatusCode);
+                    Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Interface);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Deleting_Contract_Clears_ContractField_In_All_AssociatedRelations()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, false, false);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.NotNull(relation.Contract);
+
+                using (var deleteContractRequest = await ItContractHelper.SendDeleteContractRequestAsync(input.ContractId.GetValueOrDefault()))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.OK, deleteContractRequest.StatusCode);
+                    Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
+                    var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                    Assert.Null(relationAfterChange.Contract);
+                }
             }
         }
 
