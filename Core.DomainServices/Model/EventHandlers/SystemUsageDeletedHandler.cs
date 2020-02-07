@@ -47,6 +47,8 @@ namespace Core.DomainServices.Model.EventHandlers
                 var deletedSystemUsage = domainEvent.DeletedSystemUsage;
                 var updateTime = _clock.Now;
 
+                _logger.Debug("System usage with id {id} deleted. All relations TO from other usages will be removed", deletedSystemUsage.Id);
+
                 //Delete all relations which point TO the deleted system usage
                 var usedByRelationsByFromUsage =
                     deletedSystemUsage
@@ -65,7 +67,7 @@ namespace Core.DomainServices.Model.EventHandlers
                         var result = fromSystemUsage.RemoveUsageRelation(relationId);
                         if (result.Failed)
                         {
-                            throw new InvalidOperationException($"Failed to remove relation with id {relationId} from system usage with id {fromSystemUsage.Id}");
+                            throw new InvalidOperationException($"Failed to remove relation with id {relationId} from system usage with id {fromSystemUsage.Id}. Reported error:{result.Error:G}");
                         }
                         _systemRelationRepository.Delete(relationToBeRemoved);
                     }

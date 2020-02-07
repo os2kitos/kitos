@@ -5,8 +5,6 @@ using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Context;
