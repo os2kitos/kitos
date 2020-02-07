@@ -64,6 +64,7 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />

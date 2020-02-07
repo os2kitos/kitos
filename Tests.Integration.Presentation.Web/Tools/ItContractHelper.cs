@@ -33,6 +33,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<HttpResponseMessage> SendDeleteContractRequestAsync(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.DeleteWithCookieAsync(
+                TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId=-1"), cookie);
+        }
+
         public static async Task<ItContractDTO> GetItContract(int contractId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

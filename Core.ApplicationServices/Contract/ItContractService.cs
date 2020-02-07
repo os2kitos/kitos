@@ -1,52 +1,82 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.Contract
 {
     public class ItContractService : IItContractService
     {
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<ItContract> _repository;
 
         public ItContractService(
-            IGenericRepository<ItContract> repository, 
+            IGenericRepository<ItContract> repository,
             IGenericRepository<EconomyStream> economyStreamRepository,
+            ITransactionManager transactionManager,
+            IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
+            _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
             _authorizationContext = authorizationContext;
         }
         public Result<ItContract, OperationFailure> Delete(int id)
         {
-            var contract = _repository.GetByKey(id);
-
-            if (contract == null)
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                return OperationFailure.NotFound;
+                var contract = _repository.GetByKey(id);
+
+                if (contract == null)
+                {
+                    return OperationFailure.NotFound;
+                }
+
+                if (!_authorizationContext.AllowDelete(contract))
+                {
+                    return OperationFailure.Forbidden;
+                }
+
+                //Delete the economy streams to prevent them from being orphaned
+                foreach (var economyStream in GetEconomyStreams(contract))
+                {
+                    DeleteEconomyStream(economyStream);
+                }
+                _economyStreamRepository.Save();
+
+                //Delete the contract
+                _domainEvents.Raise(new ContractDeleted(contract));
+                _repository.DeleteWithReferencePreload(contract);
+                _repository.Save();
+
+                transaction.Commit();
+
+                return contract;
             }
+        }
 
-            if (!_authorizationContext.AllowDelete(contract))
-            {
-                return OperationFailure.Forbidden;
-            }
+        private static IEnumerable<EconomyStream> GetEconomyStreams(ItContract contract)
+        {
+            return contract
+                .ExternEconomyStreams
+                .ToList()
+                .Concat(contract.InternEconomyStreams.ToList());
+        }
 
-            // delete it interface
-            _repository.DeleteWithReferencePreload(contract);
-            _repository.Save();
-
-            // delete orphan economy streams
-            var orphanStreams = _economyStreamRepository.Get(x => x.InternPaymentForId == null && x.ExternPaymentForId == null);
-            foreach (var orphan in orphanStreams)
-            {
-                _economyStreamRepository.DeleteByKeyWithReferencePreload(orphan.Id);
-            }
-            _economyStreamRepository.Save();
-
-            return contract;
+        private void DeleteEconomyStream(EconomyStream economyStream)
+        {
+            _economyStreamRepository.DeleteWithReferencePreload(economyStream);
         }
     }
 }

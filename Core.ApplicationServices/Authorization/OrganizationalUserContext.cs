@@ -47,10 +47,10 @@ namespace Core.ApplicationServices.Authorization
             switch (entity)
             {
                 //Prefer match on hasOrganization first since it has static knowledge of organization relationship
-                case IHasOrganization hasOrg:
+                case IOwnedByOrganization hasOrg:
                     return IsActiveInOrganization(hasOrg.OrganizationId);
-                case IHasRelationshipWithOrganization organizationRelationship:
-                    return organizationRelationship.HasRelationshipWith(ActiveOrganizationId);
+                case IIsPartOfOrganization organizationRelationship:
+                    return organizationRelationship.IsPartOfOrganization(ActiveOrganizationId);
                 case IContextAware contextAware:
                     return contextAware.IsInContext(ActiveOrganizationId);
                 default:

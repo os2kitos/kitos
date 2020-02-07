@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.OData
                     entity.LastChangedByUserId = UserId;
                     entity.IsActive = true;
 
-                    if (entity is IHasOrganization entityWithOrganization)
+                    if (entity is IOwnedByOrganization entityWithOrganization)
                     {
                         entityWithOrganization.OrganizationId = orgId;
                     }
@@ -185,7 +185,7 @@ namespace Presentation.Web.Controllers.OData
                     entity.LastChangedByUserId = UserId;
                     entity.OptionId = key;
 
-                    if (entity is IHasOrganization entityWithOrganization)
+                    if (entity is IOwnedByOrganization entityWithOrganization)
                     {
                         entityWithOrganization.OrganizationId = orgId;
                     }
