@@ -23,7 +23,7 @@
                     <th>
                         Beskrivelse
                     </th>
-                </tr>
+                </tr>   
             </thead>
             <tbody>
                 <!--data-ng-repeat=""-->
@@ -33,7 +33,7 @@
                     <td>{{relation.frequencyType.name}}</td>
                     <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
                     <td>
-                        <span ng-if="validateReference(relation.reference)" style="text-align: center"><a ng-href="{{relation.reference}}">➤</a></span>
+                        <span ng-if="validateReference(relation.reference)"><a ng-href="{{relation.reference}}">➤</a></span>
                         <span ng-if="!validateReference(relation.reference)">{{relation.reference}}</span>
                     </td>
                     <td>{{relation.description}}</td>
