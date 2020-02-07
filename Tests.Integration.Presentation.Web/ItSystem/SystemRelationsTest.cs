@@ -223,7 +223,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act
             using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
-
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -251,7 +250,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act
             using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
-
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
