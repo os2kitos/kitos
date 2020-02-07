@@ -9,15 +9,15 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
 {
     public class ItSystemUsageMigration
     {
-        public DomainModel.ItSystemUsage.ItSystemUsage SystemUsage { get; }
+        public ItSystemUsage SystemUsage { get; }
         public ItSystem FromItSystem { get; }
         public ItSystem ToItSystem { get; }
         public IReadOnlyList<ItProject> AffectedProjects { get; }
         public IReadOnlyList<ItContract> AffectedContracts { get; }
-        public IReadOnlyList<SystemRelation> AffectedRelations { get; }
+        public IReadOnlyList<SystemRelation> AffectedSystemRelations { get; }
 
         public ItSystemUsageMigration(
-            DomainModel.ItSystemUsage.ItSystemUsage systemUsage,
+            ItSystemUsage systemUsage,
             ItSystem fromItSystem,
             ItSystem toItSystem,
             IEnumerable<ItProject> affectedProjects, 
@@ -29,7 +29,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
             ToItSystem = toItSystem;
             AffectedProjects = affectedProjects.ToList().AsReadOnly();
             AffectedContracts = affectedContracts.ToList().AsReadOnly();
-            AffectedRelations = affectedRelations.ToList().AsReadOnly();
+            AffectedSystemRelations = affectedRelations.ToList().AsReadOnly();
         }
     }
 }

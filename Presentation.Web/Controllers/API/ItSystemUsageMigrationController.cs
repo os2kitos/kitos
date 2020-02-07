@@ -108,23 +108,21 @@ namespace Presentation.Web.Controllers.API
                 TargetUsage = new NamedEntityDTO(input.SystemUsage.Id, input.FromItSystem.Name),
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
-                AffectedItProjects = input.AffectedProjects.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
-                AffectedContracts = input.AffectedContracts.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
-                AffectedRelations = input.AffectedRelations.Select(Map).ToList()
+                AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
+                AffectedContracts = input.AffectedContracts.MapToNamedEntityDTOs().ToList(),
+                AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList()
             };
         }
-        
 
         private static RelationMigrationDTO Map(SystemRelation input)
         {
-            return new RelationMigrationDTO()
+            return new RelationMigrationDTO
             {
                 SourceSystem = input.FromSystemUsage.MapToNamedEntityDTO(),
                 TargetSystem = input.ToSystemUsage.MapToNamedEntityDTO(),
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
                 Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };
-            
         }
     }
 }

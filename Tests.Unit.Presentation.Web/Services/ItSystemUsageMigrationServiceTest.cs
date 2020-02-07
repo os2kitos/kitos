@@ -252,7 +252,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var migration = result.Value;
             Assert.Empty(migration.AffectedContracts);
             Assert.Empty(migration.AffectedProjects);
-            Assert.Empty(migration.AffectedRelations);
+            Assert.Empty(migration.AffectedSystemRelations);
             Assert.Equal(systemUsage, migration.SystemUsage);
             Assert.Equal(systemUsage.ItSystem, migration.FromItSystem);
             Assert.Equal(newSystem, migration.ToItSystem);
@@ -320,7 +320,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Empty(migration.AffectedRelations);
+            Assert.Empty(migration.AffectedSystemRelations);
         }
 
         [Fact]
@@ -352,9 +352,9 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Equal(1, migration.AffectedRelations.Count);
-            Assert.Equal(relation.Id, migration.AffectedRelations.First().Id);
-            Assert.Equal(relationInterface.Id, migration.AffectedRelations.First().RelationInterfaceId);
+            Assert.Equal(1, migration.AffectedSystemRelations.Count);
+            Assert.Equal(relation.Id, migration.AffectedSystemRelations.First().Id);
+            Assert.Equal(relationInterface.Id, migration.AffectedSystemRelations.First().RelationInterfaceId);
         }
 
         [Fact]
@@ -379,7 +379,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Empty(migration.AffectedRelations);
+            Assert.Empty(migration.AffectedSystemRelations);
         }
 
         [Fact]
