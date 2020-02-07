@@ -4,7 +4,7 @@
         <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
 
         <table class="table table-striped table-condensed">
-            <thead data-ng-if="interfaceExposures.length > 0">
+            <thead ng-if="interfaceExposures.length > 0">
                 <tr>
                     <th>Ønske</th>
                     <th>Aktiv</th>
@@ -16,9 +16,9 @@
                 </tr>
             </thead>
             <tbody class="small">
-                <tr data-ng-repeat-start="exposure in interfaceExposures">
+                <tr ng-repeat-start="exposure in interfaceExposures">
                     <!-- wished to be used -->
-                    <td rowspan="{{exposure.numRows || 1}}">
+                    <td rowspan="{{exposure.dataRows.length || 1}}">
                         <input type="checkbox" data-ng-model="exposure.usage.isWishedFor"
                                data-ng-disabled="!hasWriteAccess"
                                data-field="isWishedFor"
@@ -27,53 +27,53 @@
                     </td>
 
                     <!-- active (depends on contract) -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <span data-ng-if="exposure.usage.itContract.isActive" class="text-success">
+                    <td rowspan="{{exposure.dataRows.length || 1}}">
+                        <span ng-if="exposure.usage.itContract.isActive" class="text-success">
                             <i class="glyphicon glyphicon-ok"></i>
                         </span>
                     </td>
 
                     <!-- name of the interface -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span data-ng-if="exposure.disabled">(Slettes)</span></a>
+                    <td rowspan="{{exposure.dataRows.length || 1}}">
+                        <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
                     </td>
 
                     <!-- contract id -->
-                    <td rowspan="{{exposure.numRows || 1}}">
-                        <a data-ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">
+                    <td rowspan="{{exposure.dataRows.length || 1}}">
+                        <a ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">
                             {{exposure.usage.itContract.itContractId}}
                         </a>
                     </td>
 
                     <!-- interface (grænseflade) -->
-                    <td rowspan="{{exposure.numRows || 1}}">{{exposure.interfaceName}}</td>
+                    <td rowspan="{{exposure.dataRows.length || 1}}">{{exposure.interfaceName}}</td>
 
                     <!-- data -->
                     <td rowspan="1">
-                        <span data-ng-if="exposure.dataRows.length > 0">
+                        <span ng-if="exposure.dataRows.length > 0">
                             {{exposure.dataRows[0].data}}
                         </span>
                     </td>
 
                     <!-- data type -->
                     <td>
-                        <span data-ng-if="exposure.dataRows.length > 0">
-                            {{exposure.dataRows[0].dataType.name}}
+                        <span ng-if="exposure.dataRows.length > 0">
+                            {{exposure.dataRows[0].dataTypeName}}
                         </span>
                     </td>
-                </tr>
-                <tr data-ng-repeat="dataRow in exposure.dataRows" data-ng-if="!$first" data-ng-repeat-end="">
-                    <!-- data -->
-                    <td rowspan="1">
-                        {{dataRow.data}}
-                    </td>
+            </tr>
+            <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
+                <!-- data -->
+                <td rowspan="1">
+                    {{dataRow.data}}
+                </td>
 
-                    <!-- data type -->
-                    <td>
-                        {{dataRow.dataType.name}}
-                    </td>
-                </tr>
-                <tr data-ng-if="interfaceExposures.length == 0">
+                <!-- data type -->
+                <td>
+                    {{dataRow.dataTypeName}}
+                </td>
+            </tr>
+                <tr ng-if="interfaceExposures.length == 0">
                     <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td>
                 </tr>
             </tbody>
