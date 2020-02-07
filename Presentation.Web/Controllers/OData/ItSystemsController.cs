@@ -52,5 +52,15 @@ namespace Presentation.Web.Controllers.OData
         {
             return base.Get();
         }
+
+        public override IHttpActionResult Delete(int key)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override IHttpActionResult Post(ItSystem entity)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
     }
 }
