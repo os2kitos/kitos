@@ -61,7 +61,7 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
-    <Compile Include="IHasRelationshipWithOrganization.cs" />
+    <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
@@ -86,7 +86,7 @@
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItContract\ItContractAgreementElementTypes.cs" />
     <Compile Include="ItProject\Assignment.cs" />
-    <Compile Include="IHasOrganization.cs" />
+    <Compile Include="IOwnedByOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItProject\ItProjectStatusUpdate.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPR.cs" />

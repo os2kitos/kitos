@@ -109,7 +109,7 @@ namespace Core.DomainModel.ItSystemUsage
             return this;
         }
 
-        private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IHasOrganization
+        private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IOwnedByOrganization
         {
             return other.Select(x => x.IsInSameOrganizationAs(FromSystemUsage));
         }

@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 5)]
         public IHttpActionResult GetByOrganizationKey(int key)
         {
-            if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
+            if (typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T)) == false)
             {
                 return BadRequest("Entity does not belong to an organization");
             }
@@ -105,7 +105,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
-            if (entity is IHasOrganization organization && organization.OrganizationId == 0)
+            if (entity is IOwnedByOrganization organization && organization.OrganizationId == 0)
             {
                 organization.OrganizationId = ActiveOrganizationId;
             }
