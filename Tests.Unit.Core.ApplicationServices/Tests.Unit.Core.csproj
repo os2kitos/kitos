@@ -139,6 +139,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
@@ -151,7 +152,8 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
-    <Compile Include="Model\RelationSpecificInterfaceEventsHandler.cs" />
+    <Compile Include="Model\ContractDeletedHandlerTest.cs" />
+    <Compile Include="Model\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />

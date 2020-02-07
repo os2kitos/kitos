@@ -13,7 +13,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IContextAware, IHasRelationshipWithOrganization
+    public class User : Entity, IContextAware, IIsPartOfOrganization
     {
         public User()
         {
@@ -121,7 +121,7 @@ namespace Core.DomainModel
             return $"{Id}:{Name} {LastName}";
         }
 
-        public bool HasRelationshipWith(int organizationId)
+        public bool IsPartOfOrganization(int organizationId)
         {
             return IsInContext(organizationId) || OrganizationRights.Any(x => x.OrganizationId == organizationId);
         }

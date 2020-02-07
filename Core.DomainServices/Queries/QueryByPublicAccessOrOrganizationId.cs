@@ -4,7 +4,7 @@ using Core.DomainModel;
 namespace Core.DomainServices.Queries
 {
     public class QueryByPublicAccessOrOrganizationId<T> : IDomainQuery<T>
-    where T : class, IHasAccessModifier, IHasOrganization
+    where T : class, IHasAccessModifier, IOwnedByOrganization
     {
         private readonly int _organizationId;
 

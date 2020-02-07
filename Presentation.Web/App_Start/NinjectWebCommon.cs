@@ -16,6 +16,7 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
 using Core.DomainModel.Constants;
+using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
@@ -156,6 +157,7 @@ namespace Presentation.Web
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InRequestScope();
             kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<RelationSpecificInterfaceEventsHandler>().InRequestScope();
             kernel.Bind<IDomainEventHandler<InterfaceDeleted>>().To<RelationSpecificInterfaceEventsHandler>().InRequestScope();
+            kernel.Bind<IDomainEventHandler<ContractDeleted>>().To<ContractDeletedHandler>().InRequestScope();
         }
 
         private static void RegisterOptions(IKernel kernel)
