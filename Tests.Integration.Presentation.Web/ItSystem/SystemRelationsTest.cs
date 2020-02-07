@@ -267,6 +267,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task Deleting_ToSystemUsage_Removes_Relation()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(false, false, false);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+
+                using (var deleteUsageResponse = await ItSystemHelper.SendRemoveUsageAsync(input.ToUsageId, TestEnvironment.DefaultOrganizationId))
+                {
+                    //Assert
+                    Assert.Equal(HttpStatusCode.OK, deleteUsageResponse.StatusCode);
+                    var relations = (await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId)).ToList();
+                    Assert.Empty(relations.Where(x => x.Id == relation.Id));
+                }
+            }
+        }
+
         #region Helpers
 
         private async Task<CreateSystemRelationDTO> PrepareFullRelationAsync(bool withContract, bool withFrequency, bool withInterface)
