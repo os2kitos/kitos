@@ -73,33 +73,27 @@
                     </table>
                 </div>
 
-                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedRelations.length > 0">Følgende system relationer berøres:</h4>
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedRelations.length > 0">Følgende systemrelationer berøres:</h4>
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedRelations.length > 0">
                     <table class="table">
                         <tr>
-                            <th>
-                                Relation
-                                <br />
-                                Fra
-                            </th>
-                            <th>
-                                <br />
-                                Til
-                            </th>
+                            <th>Anvendersystem</th>
+                            <th>Udstillersystem</th>
                             <th>Relationsbeskrivelse</th>
                             <th>Snitflade der fjernes fra relationen</th>
+                            <th>Frekvens</th>
                             <th>Kontrakt</th>
                         </tr>
                         <tr ng-repeat="relation in systemCatalogVm.migrationReportDTO.affectedRelations">
                             <td>
-                                Navn: {{relation.sourceSystem.name }}
+                                Navn: {{relation.toSystemUsage.name }}
                                 <br />
-                                Id: {{ relation.sourceSystem.id}}
+                                Id: {{ relation.toSystemUsage.id}}
                             </td>
                             <td>
-                                Navn: {{relation.targetSystem.name }}
+                                Navn: {{relation.fromSystemUsage.name }}
                                 <br />
-                                Id: {{relation.targetSystem.id}}
+                                Id: {{relation.fromSystemUsage.id}}
                             </td>
                             <td>
                                 {{relation.description}}
@@ -108,6 +102,9 @@
                                 Navn: {{relation.interface.name}}
                                 <br />
                                 Id:{{relation.interface.id}}
+                            </td>
+                            <td>
+                                {{relation.frequencyType.name}}
                             </td>
                             <td ng-if="relation.contract">
                                 Navn: {{relation.contract.name}}

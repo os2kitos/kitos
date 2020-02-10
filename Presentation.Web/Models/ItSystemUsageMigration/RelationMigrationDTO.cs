@@ -10,6 +10,8 @@
 
         public NamedEntityDTO Interface { get; set; }
 
+        public NamedEntityDTO FrequencyType { get; set; }
+
         public NamedEntityDTO Contract { get; set; }
 }
 }

@@ -3,10 +3,11 @@
     import NamedEntityDTO = Models.Generic.NamedEntity.NamedEntityDTO;
 
     export interface RelationMigrationDTO {
-        sourceSystem: NamedEntityDTO;
-        targetSystem: NamedEntityDTO;
+        toSystemUsage: NamedEntityDTO;
+        fromSystemUsage: NamedEntityDTO;
         description: string;
         interface: NamedEntityDTO;
+        frequencyType: NamedEntityDTO;
         contract: NamedEntityDTO;
     }
 }

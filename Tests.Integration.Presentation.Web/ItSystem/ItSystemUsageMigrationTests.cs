@@ -296,7 +296,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(),exhibit.Id, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(),exhibit.ItInterfaceId, null, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -322,7 +322,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, A<string>(), exhibit.Id, null);
+            var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -351,7 +351,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -376,7 +376,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, contract.Id);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, contract.Id);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -483,7 +483,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdContract = await GetItContractAsync(contract.Id);
             
             var usageExhibit = await CreateExhibitAsync(createdInterface, toItSystem);
-            var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), usageExhibit.Id, contract.Id);
+            var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), usageExhibit.ItInterfaceId, GetValidFrequencyTypeId(), contract.Id);
 
             var migrateToItSystem = await CreateSystemAsync();
 
@@ -498,8 +498,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 await AssertSystemUsageAssociationExistsInContract(createdContract, fromItSystemUsage);
                 await AssertAssociatedProjectExists(fromItSystemUsage, project);
                 
-                await AssertRelationExists(usageRelation, fromItSystemUsage, true, true);
-                await AssertRelationHasContract(usageRelation, fromItSystemUsage);
+                await AssertRelationExists(usageRelation, fromItSystemUsage, true, true, true);
 
             }
         }
@@ -545,14 +544,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage, true, false);
+                await AssertRelationExists(relation, fromItSystemUsage, hasInterface: true);
             }
         }
 
@@ -569,14 +568,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.Id, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
             using (var response = await PostMigration(toItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage, false, false);
+                await AssertRelationExists(relation, fromItSystemUsage);
             }
         }
 
@@ -591,14 +590,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, null);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage, false, false);
+                await AssertRelationExists(relation, fromItSystemUsage);
             }
         }
 
@@ -614,14 +613,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, contract.Id);
+            var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, contract.Id);
 
             //Act
             using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage, false, true);
+                await AssertRelationExists(relation, fromItSystemUsage, hasContract: true);
             }
         }
 
@@ -704,38 +703,38 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(exists ? 1 : 0, exhibitUsages.Count(x => x.ItSystemUsageId == exhibit.ItSystemUsageId && x.ItInterfaceExhibitItInterfaceId == exhibit.ItInterfaceExhibitItInterfaceId));
         }
 
-        private static async Task AssertRelationExists(SystemRelationDTO relation, ItSystemUsageDTO usage, bool hasInterface, bool hasContract)
+        private static async Task AssertRelationExists(SystemRelationDTO expectedRelation, ItSystemUsageDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
         {
-            var relations = await SystemRelationHelper.GetRelationsAsync(usage.Id);
-            var updatedRelation = Assert.Single(relations);
-            Assert.Equal(relation.Id, updatedRelation.Id);
-            Assert.Equal(relation.Description, updatedRelation.Description);
+            var response = await SystemRelationHelper.SendGetRelationAsync(usage.Id, expectedRelation.Id);
+            var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+            Assert.Equal(expectedRelation.Id, relation.Id);
+            Assert.Equal(expectedRelation.Description, relation.Description);
             if (hasInterface)
             {
-                AssertEqualNamedEntities(relation.Interface, updatedRelation.Interface);
+                AssertEqualNamedEntities(expectedRelation.Interface, relation.Interface);
             }
             else
             {
-                Assert.Null(updatedRelation.Interface);
+                Assert.Null(relation.Interface);
+            }
+
+            if (hasFrequency)
+            {
+                AssertEqualNamedEntities(expectedRelation.FrequencyType, relation.FrequencyType);
+            }
+            else
+            {
+                Assert.Null(relation.FrequencyType);
             }
 
             if (hasContract)
             {
-                AssertEqualNamedEntities(relation.Contract, updatedRelation.Contract);
+                AssertEqualNamedEntities(expectedRelation.Contract, relation.Contract);
             }
             else
             {
-                Assert.Null(updatedRelation.Contract);
+                Assert.Null(relation.Contract);
             }
-        }
-
-        private static async Task AssertRelationHasContract(SystemRelationDTO relation, ItSystemUsageDTO usage)
-        {
-            var relations = await SystemRelationHelper.GetRelationsAsync(usage.Id);
-            var updatedRelation = Assert.Single(relations);
-            Assert.Equal(relation.Id, updatedRelation?.Id);
-            AssertEqualNamedEntities(relation.Contract, updatedRelation?.Contract);
-           
         }
 
         private static async Task AssertInterfaceUsageSystemBinding(ItInterfaceUsageDTO interfaceUsage, int sysId)
@@ -777,6 +776,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             int toSystemId, 
             string description,
             int? interfaceId, 
+            int? frequencyTypeId,
             int? contractId)
         {
             var relationDTO = new CreateSystemRelationDTO()
@@ -785,6 +785,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 ToUsageId = toSystemId,
                 Description = description,
                 InterfaceId = interfaceId,
+                FrequencyTypeId = frequencyTypeId,
                 ContractId = contractId
             };
             var response = await SystemRelationHelper.SendPostRelationAsync(relationDTO);
@@ -852,6 +853,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private static string CreateName()
         {
             return $"{Guid.NewGuid():N}";
+        }
+
+        private static int GetValidFrequencyTypeId()
+        {
+            return new Random().Next(1, 4);
         }
     }
 }

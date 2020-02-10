@@ -331,11 +331,18 @@ namespace Tests.Unit.Presentation.Web.Services
             var migrateToSystem = CreateSystem();
             var toSystemUsage = CreateSystemUsage();
             var relationInterface = CreateInterface();
+            var relationFrequenceType = new RelationFrequencyType()
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
             var relation = new SystemRelation(fromSystemUsage)
             {
                 ToSystemUsageId = toSystemUsage.Id,
                 RelationInterfaceId = relationInterface.Id,
                 RelationInterface = relationInterface,
+                UsageFrequencyId = relationFrequenceType.Id,
+                UsageFrequency = relationFrequenceType,
                 Description = A<string>()
             };
 
@@ -357,6 +364,8 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(relation.Id, migration.AffectedSystemRelations.First().Id);
             Assert.Equal(relationInterface.Id, migration.AffectedSystemRelations.First().RelationInterfaceId);
             Assert.Equal(relation.Description, migration.AffectedSystemRelations.First().Description);
+            Assert.Equal(relationFrequenceType.Id, migration.AffectedSystemRelations.First().UsageFrequencyId);
+            Assert.Equal(relationFrequenceType.Name, migration.AffectedSystemRelations.First().UsageFrequency.Name);
         }
 
         [Fact]
@@ -462,11 +471,18 @@ namespace Tests.Unit.Presentation.Web.Services
             var migrateToSystem = CreateSystem();
             var toSystemUsage = CreateSystemUsage();
             var relationInterface = CreateInterface();
+            var relationFrequenceType = new RelationFrequencyType()
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
             var relation = new SystemRelation(fromSystemUsage)
             {
                 ToSystemUsageId = toSystemUsage.Id,
                 RelationInterfaceId = relationInterface.Id,
                 RelationInterface = relationInterface,
+                UsageFrequencyId = relationFrequenceType.Id,
+                UsageFrequency = relationFrequenceType,
                 Description = A<string>()
             };
 

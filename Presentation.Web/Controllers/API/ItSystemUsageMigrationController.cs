@@ -122,6 +122,7 @@ namespace Presentation.Web.Controllers.API
                 FromSystemUsage = input.ToSystemUsage.MapToNamedEntityDTO(),
                 Description = input.Description,
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
+                FrequencyType = input.UsageFrequency?.MapToNamedEntityDTO(),
                 Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };
         }
