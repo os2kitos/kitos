@@ -336,6 +336,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             return new SystemRelationDTO(
                 created.Id,
+                created.Uuid,
                 created.FromUsage,
                 new NamedEntityDTO(usage3.Id, usage3.LocalCallName),
                 new NamedEntityDTO(interfaceExhibitDTO.ItInterfaceId, interfaceExhibitDTO.ItInterfaceName),

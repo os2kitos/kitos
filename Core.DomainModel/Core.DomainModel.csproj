@@ -61,6 +61,7 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
