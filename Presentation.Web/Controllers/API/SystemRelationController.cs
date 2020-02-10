@@ -175,6 +175,7 @@ namespace Presentation.Web.Controllers.API
             return new SystemRelationDTO
             {
                 Id = relation.Id,
+                Uuid = relation.Uuid,
                 FromUsage = relation.FromSystemUsage.MapToNamedEntityDTO(),
                 ToUsage = relation.ToSystemUsage.MapToNamedEntityDTO(),
                 Description = relation.Description,
