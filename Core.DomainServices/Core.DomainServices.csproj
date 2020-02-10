@@ -66,6 +66,7 @@
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
+    <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

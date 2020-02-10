@@ -536,6 +536,10 @@
     <Compile Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.Designer.cs">
       <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002100739397_Relation_UUID.cs" />
+    <Compile Include="Migrations\202002100739397_Relation_UUID.Designer.cs">
+      <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -862,6 +866,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.resx">
       <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002100739397_Relation_UUID.resx">
+      <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
