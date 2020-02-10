@@ -323,6 +323,7 @@
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
@@ -342,7 +343,6 @@
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
-    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageContractMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
@@ -367,7 +367,7 @@
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-contract-it-system-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\system-relation-migration.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-migration.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
