@@ -1,15 +1,15 @@
 ﻿class LocalItSystemNavigation {
 
     public static mainPage() {
-        element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.mainPageSref}"`)).click();
+        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.mainPageSref}"`)).click();
     }
 
     public static exposedInterfacesPage() {
-        element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
+        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
     }
 
     public static relationsPage() {
-        element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.relationsSref}"`)).click();
+        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.relationsSref}"`)).click();
     }
     
     

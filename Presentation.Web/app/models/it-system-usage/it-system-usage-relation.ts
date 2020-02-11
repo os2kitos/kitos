@@ -59,7 +59,6 @@
 
         private mapSystemUsage(viewModel: IItSystemUsageRelationIdName, sourceModel: Models.Generic.NamedEntity.NamedEntityDTO) {
             if (sourceModel != null) {
-                //viewModel.Url = "#/system/usage/" + sourceModel.id + "/main";
                 this.mapNameAndId(viewModel, sourceModel);
             }
         }

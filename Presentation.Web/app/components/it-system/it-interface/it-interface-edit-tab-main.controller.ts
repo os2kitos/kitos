@@ -110,7 +110,7 @@
                             var url = `api/exhibit/${itInterface.id}?organizationId=${user.currentOrganizationId}`;
                             $http({ method: "PATCH", url: url, data: patchPayload })
                                 .success(() => {
-                                    msg.toSuccessMessage("Feltet er opdateret.");       
+                                    msg.toSuccessMessage("Feltet er opdateret.");
                                     reload();
                                 })
                                 .error(() => {

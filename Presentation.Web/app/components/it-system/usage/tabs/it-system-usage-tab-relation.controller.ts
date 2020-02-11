@@ -189,7 +189,6 @@
                     btn.innerText = "Se mindre";
                 }
                 else {
-                    console.log("Toggling overflow on");
                     para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
                     btn.innerText = "Se mere";
                 }

@@ -20,7 +20,7 @@ class RelationHelper {
         descriptionText: string) {
 
         console.log("Creating relation");
-        systemUsageHelper.openLocalSystem(fromSystemName)
+        return systemUsageHelper.openLocalSystem(fromSystemName)
             .then(() => localSystemNavigation.relationsPage())
             .then(() => relationPage.getCreateButton().click())
             .then(() => Select2.searchFor(toSystemName, this.exhibitSystemSelectId))
