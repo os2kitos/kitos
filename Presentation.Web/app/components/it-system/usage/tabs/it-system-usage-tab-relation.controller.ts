@@ -31,6 +31,18 @@
                 $scope.relationTableTestData = overviewData;
             });
 
+            $http.get(`api/v1/systemrelations/to/${usageId}`).success(result => {
+                var usedByOverviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+
+                for (let i = 0; i < result.response.length; i++) {
+
+                    const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
+                    usedByOverviewData.push(relationRow);
+                }
+
+                $scope.usedByRelations = usedByOverviewData;
+            });
+
             const reload = () => {
                 $state.go(".", null, { reload: true });
             };
