@@ -14,7 +14,7 @@ class InterfaceCatalogHelper {
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
             .then(() => this.interfacePage.getSaveInterfaceButton().click())
-            .then(() => console.log("Interface created"));;
+            .then(() => console.log("Interface created"));
     }
 
     public static bindInterfaceToSystem(systemName: string, interfaceName: string) {

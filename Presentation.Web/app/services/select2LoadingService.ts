@@ -10,7 +10,12 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        loadSelect2(url: string, allowClear: boolean, paramArray, checkResultsForDisabled) {
+        loadSelect2(
+            url: string,
+            allowClear: boolean,
+            paramArray,
+            checkResultsForDisabled,
+            nameContentQueryParamName = "q") {
             var self = this;
             return {
                 minimumInputLength: 1,
@@ -24,7 +29,7 @@
                     quietMillis: 500,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                        const res = self.$http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
+                        const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
                         return res;
                     },
 

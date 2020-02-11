@@ -108,6 +108,15 @@ class Constants {
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
 
+    //Local System Relations
+    readonly createRelationButton = "create-Relation";
+    readonly referenceInputField = "Reference";
+    readonly descriptionInputField = "description";
+    readonly saveButtonText = "Gem";
+
+    readonly relationDescriptionField = "relationDescription";
+    readonly relationReferenceField = "relationReference";
+    readonly relationFrequencyTypeField = "relationFrequencyType";
 }
 export = Constants;
 
