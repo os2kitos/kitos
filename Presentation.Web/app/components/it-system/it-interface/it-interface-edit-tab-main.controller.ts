@@ -119,7 +119,7 @@
                         } else {
                             // POST
                             var postPayload = {
-                                id: itInterface.id,
+                                itInterfaceId: itInterface.id,
                                 itSystemId: $scope.exposedByObj.id
                             };
                             $http.post("api/exhibit", postPayload).success(() => {

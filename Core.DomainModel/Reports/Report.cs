@@ -1,6 +1,6 @@
 namespace Core.DomainModel.Reports
 {
-    public class Report : Entity, IReportModule, IContextAware, IHasAccessModifier, IHasOrganization
+    public class Report : Entity, IReportModule, IContextAware, IHasAccessModifier, IOwnedByOrganization
     {
         public string Name { get; set; }
         public string Description { get; set; }

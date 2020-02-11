@@ -54,10 +54,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("from/{fromSystemUsageId}")]
-        public HttpResponseMessage GetRelationsFromSystem(int fromSystemUsageId)
+        [Route("from/{systemUsageId}")]
+        public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
         {
-            return _usageService.GetRelations(fromSystemUsageId)
+            return _usageService.GetRelationsFrom(systemUsageId)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -66,10 +66,22 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("from/{fromSystemUsageId}/{relationId}")]
-        public HttpResponseMessage GetRelationFromSystem(int fromSystemUsageId, int relationId)
+        [Route("to/{systemUsageId}")]
+        public HttpResponseMessage GetRelationsToSystem(int systemUsageId)
         {
-            return _usageService.GetRelation(fromSystemUsageId, relationId)
+            return _usageService.GetRelationsTo(systemUsageId)
+                .Match
+                (
+                    onSuccess: value => Ok(MapRelations(value)),
+                    onFailure: FromOperationError
+                );
+        }
+
+        [HttpGet]
+        [Route("from/{systemUsageId}/{relationId}")]
+        public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
+        {
+            return _usageService.GetRelationFrom(systemUsageId, relationId)
                 .Match
                 (
                     onSuccess: relation => Ok(MapRelation(relation)),
@@ -163,6 +175,7 @@ namespace Presentation.Web.Controllers.API
             return new SystemRelationDTO
             {
                 Id = relation.Id,
+                Uuid = relation.Uuid,
                 FromUsage = relation.FromSystemUsage.MapToNamedEntityDTO(),
                 ToUsage = relation.ToSystemUsage.MapToNamedEntityDTO(),
                 Description = relation.Description,

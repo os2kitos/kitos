@@ -9,12 +9,14 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -35,6 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
+        private readonly Mock<IDomainEvents> _domainEvents;
 
         public ItSystemUsageServiceTest()
         {
@@ -49,6 +52,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager = new Mock<ITransactionManager>();
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
+            _domainEvents = new Mock<IDomainEvents>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -59,6 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _relationRepositoryMock.Object,
                 _interfaceRepository.Object,
                 _transactionManager.Object,
+                _domainEvents.Object,
                 Mock.Of<ILogger>());
         }
 
@@ -244,6 +249,7 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(itSystemUsage, result.Value);
             _usageRepository.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
             _usageRepository.Verify(x => x.Save(), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<SystemUsageDeleted>(ev => ev.DeletedSystemUsage == itSystemUsage)));
         }
 
         [Fact]
@@ -419,16 +425,15 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Verify(x => x.Save(), Times.Once);
         }
 
-        #region Helpers
         [Fact]
-        public void GetRelations_Returns_NotFound()
+        public void GetRelationsFrom_Returns_NotFound()
         {
             //Arrange
             var id = A<int>();
             ExpectGetUsageByKeyReturns(id, null);
 
             //Act
-            var relations = _sut.GetRelations(id);
+            var relations = _sut.GetRelationsFrom(id);
 
             //Assert
             Assert.False(relations.Ok);
@@ -436,7 +441,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetRelations_Returns_Forbidden()
+        public void GetRelationsFrom_Returns_Forbidden()
         {
             //Arrange
             var id = A<int>();
@@ -445,7 +450,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowReadReturns(itSystemUsage, false);
 
             //Act
-            var relations = _sut.GetRelations(id);
+            var relations = _sut.GetRelationsFrom(id);
 
             //Assert
             Assert.False(relations.Ok);
@@ -453,7 +458,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetRelations_Returns_Ok()
+        public void GetRelationsFrom_Returns_Ok()
         {
             //Arrange
             var id = A<int>();
@@ -463,7 +468,57 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowReadReturns(itSystemUsage, true);
 
             //Act
-            var relations = _sut.GetRelations(id);
+            var relations = _sut.GetRelationsFrom(id);
+
+            //Assert
+            Assert.True(relations.Ok);
+            Assert.True(relations.Value.SequenceEqual(systemRelations));
+        }
+
+        [Fact]
+        public void GetRelationsTo_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetUsageByKeyReturns(id, null);
+
+            //Act
+            var relations = _sut.GetRelationsTo(id);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.NotFound, relations.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetRelationsTo_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var itSystemUsage = new ItSystemUsage();
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, false);
+
+            //Act
+            var relations = _sut.GetRelationsTo(id);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.Forbidden, relations.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetRelationsTo_Returns_Ok()
+        {
+            //Arrange
+            var id = A<int>();
+            var systemRelations = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            var itSystemUsage = new ItSystemUsage { UsedByRelations = systemRelations };
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, true);
+
+            //Act
+            var relations = _sut.GetRelationsTo(id);
 
             //Assert
             Assert.True(relations.Ok);
@@ -479,7 +534,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetUsageByKeyReturns(id, null);
 
             //Act
-            var relation = _sut.GetRelation(id, relationId);
+            var relation = _sut.GetRelationFrom(id, relationId);
 
             //Assert
             Assert.False(relation.Ok);
@@ -497,7 +552,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowReadReturns(itSystemUsage, false);
 
             //Act
-            var relation = _sut.GetRelation(id, relationId);
+            var relation = _sut.GetRelationFrom(id, relationId);
 
             //Assert
             Assert.False(relation.Ok);
@@ -517,7 +572,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowReadReturns(itSystemUsage, true);
 
             //Act
-            var relation = _sut.GetRelation(id, relationId);
+            var relation = _sut.GetRelationFrom(id, relationId);
 
             //Assert
             Assert.True(relation.Ok);
@@ -723,7 +778,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
 
-        #endregion
         private void ExpectAllowReadReturns(ItSystemUsage itSystemUsage, bool value)
         {
             _authorizationContext.Setup(x => x.AllowReads(itSystemUsage)).Returns(value);
