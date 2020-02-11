@@ -5,16 +5,20 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystemUsage
 {
-    public class SystemRelation : Entity
+    public class SystemRelation : Entity, IHasUuid
     {
         //NOTE: For EF
         protected SystemRelation() { }
 
         public SystemRelation(ItSystemUsage fromSystemUsage)
         {
+            Uuid = Guid.NewGuid();
             FromSystemUsage = fromSystemUsage ?? throw new ArgumentNullException(nameof(fromSystemUsage));
         }
-
+        /// <summary>
+        /// UUID for the relation
+        /// </summary>
+        public Guid Uuid { get; set; }
         /// <summary>
         /// Mandatory relation "from"
         /// </summary>
@@ -109,7 +113,7 @@ namespace Core.DomainModel.ItSystemUsage
             return this;
         }
 
-        private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IHasOrganization
+        private Maybe<bool> CheckSameOrganizationConstraint<T>(Maybe<T> other) where T : IOwnedByOrganization
         {
             return other.Select(x => x.IsInSameOrganizationAs(FromSystemUsage));
         }

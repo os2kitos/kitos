@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectStatusUpdate: Entity, IContextAware, IHasOrganization, IProjectModule
+    public class ItProjectStatusUpdate: Entity, IContextAware, IOwnedByOrganization, IProjectModule
     {
         public ItProjectStatusUpdate()
         {

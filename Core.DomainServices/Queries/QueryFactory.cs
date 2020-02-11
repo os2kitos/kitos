@@ -22,7 +22,7 @@ namespace Core.DomainServices.Queries
 
         public static IDomainQuery<T> ByOrganizationId<T>(int organizationId, OrganizationDataReadAccessLevel accessLevel)
         {
-            var hasOrganization = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            var hasOrganization = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
             if (!hasOrganization)
             {

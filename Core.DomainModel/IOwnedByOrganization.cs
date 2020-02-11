@@ -1,6 +1,6 @@
 namespace Core.DomainModel
 {
-    public interface IHasOrganization
+    public interface IOwnedByOrganization
     {
         /// <summary>
         ///     Gets or sets the organization identifier in which this project was created.
