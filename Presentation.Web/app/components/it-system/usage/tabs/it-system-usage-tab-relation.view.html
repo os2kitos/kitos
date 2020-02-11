@@ -47,10 +47,10 @@
                 </tr>
             </tbody>
         </table>
-        <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 10px">Opret relation</button>
+        <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 10px;">Opret relation</button>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default tableSplitter">
         <div class="panel-heading">Andre systemer har følgende relationer til {{usage.itSystem.name}}:</div>
         <table class="table table-condensed table-striped">
             <thead>
@@ -77,8 +77,8 @@
             </thead>
             <tbody>
                 <tr ng-repeat="relation in usedByRelations">
-                    <td style="overflow-wrap: break-word; padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.ToSystem.Id})" title="{{relation.FromSystem.Name}}">{{relation.FromSystem.Name}}</a></td>
-                    <td style="overflow-wrap: break-word"><a ng-if="usedByRelation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
+                    <td style="overflow-wrap: break-word; padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.FromSystem.Id})" title="{{relation.FromSystem.Name}}">{{relation.FromSystem.Name}}</a></td>
+                    <td style="overflow-wrap: break-word"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
                     <td style="width: 300px">
                         <p ng-if="relation.Description" ng-show="!relation.Description.LongText" data-element-type="usedByRelationDescription">{{relation.Description.Description}}</p>
                         <p ng-if="relation.Description" ng-show="relation.Description.LongText" style="height: {{relation.Description.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Description.Description}}</p>
