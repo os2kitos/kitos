@@ -15,7 +15,7 @@
             allowClear: boolean,
             paramArray,
             checkResultsForDisabled,
-            nameContentQueryParamName = "") {
+            nameContentQueryParamName = "q") {
             var self = this;
             return {
                 minimumInputLength: 1,
