@@ -1,7 +1,6 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
         <h3 class="modal-title pull-left">Opret relation</h3>
-        <!--<help-text class="pull-right" data-key="relation_create" data-default-title="Opret relation"></help-text>-->
     </div>
 </div>
 
@@ -11,7 +10,7 @@
             <div class="col-md-3">
 
             </div>
-            <!--Udstiller System-->
+            <!--Exposed System-->
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="RelationSystemExposed" class="control-label small">Udstillet af</label>
@@ -21,14 +20,12 @@
                            data-placeholder="Vælg udstiller system"
                            data-ng-model="RelationExposedSystemData"
                            data-ng-change="ExposedSystemSelected()"
-                           data-field="relatioExposediD">
+                           data-field="RelationExposedId">
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
-
-            </div>
+            <div class="col-md-3"></div>
             <div class="col-md-6">
                 <!--Interface-->
                 <div class="form-group">
@@ -63,7 +60,6 @@
         <div class="modal-footer">
             <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
             <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!RelationExposedSystemData">Gem</button>
-
         </div>
     </div>
 </form>
