@@ -44,7 +44,7 @@
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
                         controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
                             modalOpen = true;
-                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2WithNamedContent(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true);
+                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
                             $scope.interfaceOptions = "";
 
                             $scope.ExposedSystemSelected = () => {
