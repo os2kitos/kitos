@@ -10,7 +10,12 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        loadSelect2(url: string, allowClear: boolean, paramArray, checkResultsForDisabled) {
+        loadSelect2(
+            url: string,
+            allowClear: boolean,
+            paramArray,
+            checkResultsForDisabled,
+            nameContentQueryParamName = "") {
             var self = this;
             return {
                 minimumInputLength: 1,
@@ -24,7 +29,7 @@
                     quietMillis: 500,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                        const res = self.$http.get(url + "?=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
+                        const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
                         return res;
                     },
 
@@ -37,40 +42,6 @@
                                 self.handleResults(results, obj);
                             }
                             
-                        });
-                        return { results: results };
-                    }
-                }
-            };
-        }
-
-        loadSelect2WithNamedContent(url: string, allowClear: boolean, paramArray, checkResultsForDisabled) {
-            var self = this;
-            return {
-                minimumInputLength: 1,
-                initSelection(elem, callback) {
-                },
-                allowClear: allowClear,
-                ajax: {
-                    data(term, page) {
-                        return { query: term };
-                    },
-                    quietMillis: 500,
-                    transport(queryParams) {
-                        const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                        const res = self.$http.get(url + "?nameContent=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
-                        return res;
-                    },
-
-                    results(data, page) {
-                        var results = [];
-                        _.each(data.data.response, (obj) => {
-                            if (checkResultsForDisabled) {
-                                self.handleResultsWithDisabled(results, obj);
-                            } else {
-                                self.handleResults(results, obj);
-                            }
-
                         });
                         return { results: results };
                     }
