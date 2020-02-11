@@ -5,6 +5,7 @@ import RelationHelper = require("../../../Helpers/RelationHelper");
 import RelationPage = require("../../../PageObjects/it-system/Usage/Tabs/ItSystemUsageRelation.po");
 import InterfaceCatalogHelper = require("../../../Helpers/InterfaceCatalogHelper");
 import ContractHelper = require("../../../Helpers/ContractHelper");
+import LocalSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
 
 describe("User is able to create and view relation",
     () => {
@@ -57,7 +58,15 @@ describe("User is able to create and view relation",
                     .then(() => checkForRelationPart(contractName))
                     .then(() => checkForDescription(relationSystemName2, description))
                     .then(() => checkForReference(relationSystemName2, reference))
-                    .then(() => checkForFrequencyType(relationSystemName2, frequencyType));
+                    .then(() => checkForFrequencyType(relationSystemName2, frequencyType))
+                    .then(() => RelationPage.getRelationLink(relationSystemName2).click())
+                    .then(() => LocalSystemNavigation.relationsPage())
+                    .then(() => checkForRelationPart(relationSystemName1))
+                    .then(() => checkForRelationPart(interfaceName))
+                    .then(() => checkForRelationPart(contractName))
+                    .then(() => checkForUsedByDescription(relationSystemName1, description))
+                    .then(() => checkForUsedByReference(relationSystemName1, reference))
+                    .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType));
 
             });
 
@@ -89,4 +98,17 @@ function checkForReference(systemName: string, reference: string) {
 
 function checkForFrequencyType(systemName: string, frequencyType: string) {
     expect(RelationPage.getFrequencyType(systemName).getText()).toMatch(frequencyType);
+}
+
+
+function checkForUsedByDescription(systemName: string, description: string) {
+    expect(RelationPage.getUsedByDescription(systemName).getText()).toMatch(description);
+}
+
+function checkForUsedByReference(systemName: string, reference: string) {
+    expect(RelationPage.getUsedByReference(systemName).getText()).toMatch(reference);
+}
+
+function checkForUsedByFrequencyType(systemName: string, frequencyType: string) {
+    expect(RelationPage.getUsedByFrequencyType(systemName).getText()).toMatch(frequencyType);
 }

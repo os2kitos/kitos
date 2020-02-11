@@ -117,6 +117,10 @@ class Constants {
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";
     readonly relationFrequencyTypeField = "relationFrequencyType";
+
+    readonly usedByRelationDescriptionField = "usedByRelationDescription";
+    readonly usedByRelationReferenceField = "usedByRelationReference";
+    readonly usedByRelationFrequencyTypeField = "usedByRelationFrequencyType";
 }
 export = Constants;
 
