@@ -12,6 +12,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Project
@@ -156,19 +157,19 @@ namespace Core.ApplicationServices.Project
         {
             if (itProject == null)
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
             if (!_authorizationContext.AllowModify(itProject))
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
             if (user == null)
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
             if (itProject.Handover.Participants.Any(p => p.Id == user.Id))
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.Conflict);
+                return OperationFailure.Conflict;
             }
             return Maybe<OperationFailure>.None;
         }
@@ -196,22 +197,22 @@ namespace Core.ApplicationServices.Project
         {
             if (itProject == null)
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowModify(itProject))
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             if (user == null)
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
 
             if (itProject.Handover.Participants.Any(p => p.Id == user.Id) == false)
             {
-                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
             return Maybe<OperationFailure>.None;
         }

@@ -24,7 +24,7 @@
                     quietMillis: 500,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                        const res = self.$http.get(url + "?=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
+                        const res = self.$http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
                         return res;
                     },
 

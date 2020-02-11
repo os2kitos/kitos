@@ -2,7 +2,7 @@
 {
     public static class HasOrganizationExtensions
     {
-        public static bool IsInSameOrganizationAs(this IHasOrganization source, IHasOrganization destination)
+        public static bool IsInSameOrganizationAs(this IOwnedByOrganization source, IOwnedByOrganization destination)
         {
             return source.OrganizationId == destination.OrganizationId;
         }

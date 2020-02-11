@@ -27,6 +27,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
         }
 
+        public static async Task<HttpResponseMessage> SendDeleteInterfaceRequestAsync(int id)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/itinterface/{id}?organizationId=-1"); //Org id not used
+
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
+
         public static async Task<ItInterfaceDTO> CreateInterface(ItInterfaceDTO input)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

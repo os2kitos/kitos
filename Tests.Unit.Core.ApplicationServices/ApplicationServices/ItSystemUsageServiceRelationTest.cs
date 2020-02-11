@@ -12,6 +12,7 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -67,6 +68,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockSystemRelationRepository.Object,
                 _interfaceRepository.Object,
                 _mockTransactionManager.Object,
+                Mock.Of<IDomainEvents>(),
                 _mockLogger.Object);
         }
 

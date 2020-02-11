@@ -374,7 +374,7 @@ namespace Core.ApplicationServices
                         LastChangedByUserId = kitosUser.Id,
                         LastChanged = DateTime.UtcNow,
                         IsGlobalAdmin = false,
-                        Password = "mangler at blive indsat",
+                        Password = _cryptoService.Encrypt(Guid.NewGuid().ToString("N")),
                         Salt = _cryptoService.Encrypt(Guid.NewGuid().ToString("N"))
                     };
 

@@ -108,30 +108,23 @@ namespace Presentation.Web.Controllers.API
                 TargetUsage = new NamedEntityDTO(input.SystemUsage.Id, input.FromItSystem.Name),
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
-                AffectedItProjects = input.AffectedProjects.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
-                AffectedContracts = input.AffectedContracts.Select(Map).ToList()
+                AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
+                AffectedContracts = input.AffectedContracts.MapToNamedEntityDTOs().ToList(),
+                AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList()
             };
         }
 
-        private static ItSystemUsageContractMigrationDTO Map(ItContractMigration input)
+        private static RelationMigrationDTO Map(SystemRelation input)
         {
-            return new ItSystemUsageContractMigrationDTO
+            return new RelationMigrationDTO
             {
-                Contract = input.Contract.MapToNamedEntityDTO(),
-                SystemAssociatedInContract = input.SystemAssociatedInContract,
-                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(Map).ToList(),
-                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(Map).ToList()
+                ToSystemUsage = input.FromSystemUsage.MapToNamedEntityDTO(),
+                FromSystemUsage = input.ToSystemUsage.MapToNamedEntityDTO(),
+                Description = input.Description,
+                Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
+                FrequencyType = input.UsageFrequency?.MapToNamedEntityDTO(),
+                Interface = input.RelationInterface?.MapToNamedEntityDTO()
             };
-        }
-
-        private static NamedEntityDTO Map(ItInterfaceExhibitUsage interfaceExhibit)
-        {
-            return interfaceExhibit.ItInterfaceExhibit.ItInterface.MapToNamedEntityDTO();
-        }
-
-        private static NamedEntityDTO Map(ItInterfaceUsage interfaceUsage)
-        {
-            return interfaceUsage.ItInterface.MapToNamedEntityDTO();
         }
     }
 }
