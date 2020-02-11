@@ -14,7 +14,7 @@
             <!--Udstiller System-->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="RelationSystemExposed" class="control-label small">*Udstillet af</label>
+                    <label for="RelationSystemExposed" class="control-label small">Udstillet af</label>
                     <input type="hidden" id="RelationSystemExposed" class="form-control input-sm"
                            data-ui-select2="RelationExposedSystemDataCall"
                            data-ng-value="RelationExposedSelectedData"
@@ -30,17 +30,21 @@
 
             </div>
             <div class="col-md-6">
-                <!--Snitflade-->
+                <!--Interface-->
                 <div class="form-group">
                     <label for="relationInterfacesSelect"> Vælg Snitflade </label>
                     <select ng-model="relationInterfacesValue" id="relationInterfacesSelect" class="form-control input-sm"
                             ng-options="x.name for x in relationInterfaceOptions" ng-disabled="!RelationExposedSystemData"></select>
                 </div>
-                <!--frequency-->
+                <!--Description-->
                 <div class="form-group">
-                    <label for="relationPaymentFrequenciesSelect"> Vælg frekvens </label>
-                    <select ng-model="relationPaymentFrequenciesValue" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationPaymentFrequenciesOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <label class="control-label" for="description">Beskrivelse</label>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" data-ng-model="relationDescriptionValue" data-ng-disabled="!RelationExposedSystemData"></textarea>
+                </div>
+                <!--Reference-->
+                <div class="form-group">
+                    <label class="control-label" for="Reference">Reference</label>
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" data-ng-model="relationReferenceValue" data-ng-disabled="!RelationExposedSystemData">
                 </div>
                 <!--Contract-->
                 <div class="form-group">
@@ -48,22 +52,11 @@
                     <select ng-model="relationContractsValue" id="relationContractsSelect" class="form-control input-sm"
                             ng-options="x.name for x in relationContractsOptions" ng-disabled="!RelationExposedSystemData"></select>
                 </div>
+                <!--frequency-->
                 <div class="form-group">
-                    <!--Reference-->
-                    <label class="control-label" for="Reference">Reference</label>
-                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" data-ng-model="relationReferenceValue" data-ng-disabled="!RelationExposedSystemData">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <!--Description-->
-                    <label class="control-label" for="description">Beskrivelse</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" data-ng-model="relationDescriptionValue" data-ng-disabled="!RelationExposedSystemData"></textarea>
+                    <label for="relationPaymentFrequenciesSelect"> Vælg frekvens </label>
+                    <select ng-model="relationPaymentFrequenciesValue" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
+                            ng-options="x.name for x in relationPaymentFrequenciesOptions" ng-disabled="!RelationExposedSystemData"></select>
                 </div>
             </div>
         </div>
