@@ -52,18 +52,17 @@ app.config([
         $httpProvider.defaults.xsrfCookieName = "IGNORED-XSRF-TOKEN";
         $httpProvider.defaults.xsrfHeaderName = "IGNORED-XSRF-TOKEN";
 
+        // $window isn't ready yet, so fetch it ourself
+        var $window = $windowProvider.$get();
 
         function isRunningOnHost(partialHostName) {
-            return window.location.hostname.indexOf(partialHostName) !== -1;
+            return $window.location.hostname.indexOf(partialHostName) !== -1;
         }
 
         //Configure notifications - use lower ttl on integration environment
         var ttl = (isRunningOnHost("kitos-integration") || isRunningOnHost("localhost")) ? 500 : 5000;
         notifyProvider.globalTimeToLive(ttl);
         notifyProvider.onlyUniqueMessages(false);
-
-        // $window isn't ready yet, so fetch it ourself
-        var $window = $windowProvider.$get();
 
         $httpProvider.interceptors.push("csrfRequestInterceptor");
 
