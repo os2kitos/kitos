@@ -22,16 +22,26 @@ class ItSystemUsageRelation {
         return element(this.cssHelper.byDataElementType("relationSaveButton"));
     }
 
-    public static getRelationExhibitSystem(systemName: string) {
-        return element(by.linkText(systemName));
+    public static getRelationLink(name: string) {
+        return element(by.linkText(name));
     }
 
-    public static getRelationInterface(interfaceName: string) {
-        return element(by.linkText(interfaceName));
+    public static getDescription(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.relationDescriptionField);
     }
 
-    public static getRelationContract(interfaceName: string) {
-        return element(by.linkText(interfaceName));
+    public static getReference(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.relationReferenceField);
+    }
+
+    public static getFrequencyType(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.relationFrequencyTypeField);
+    }
+
+    private static getElementFromTable(rowLocator: string, columnLocator: string) {
+        const rowElement = this.getRelationLink(rowLocator);
+        const row = rowElement.element(by.xpath("../.."));
+        return row.element(this.cssHelper.byDataElementType(columnLocator));
     }
 
 }

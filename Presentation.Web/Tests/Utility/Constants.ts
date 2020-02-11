@@ -113,6 +113,10 @@ class Constants {
     readonly referenceInputField = "Reference";
     readonly descriptionInputField = "description";
     readonly saveButtonText = "Gem";
+
+    readonly relationDescriptionField = "relationDescription";
+    readonly relationReferenceField = "relationReference";
+    readonly relationFrequencyTypeField = "relationFrequencyType";
 }
 export = Constants;
 

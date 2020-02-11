@@ -31,16 +31,16 @@
                     <td><a href="#/system/usage/{{relation.toUsage.id}}/main">{{relation.toUsage.name}}</a></td>
                     <td><a href="#/system/edit/{{relation.interface.id}}/interface/main">{{relation.interface.name}}</a></td>
                     <td style="max-width: 300px">
-                        <p ng-if="relation.description.length < 198"> {{relation.description}}</p>
-                        <p ng-if="relation.description.length > 199" style="height: 3em; overflow: hidden" id="readMoreParagraph"> {{relation.description}}</p>
+                        <p ng-if="relation.description.length < 198" data-element-type="relationDescription">{{relation.description}}</p>
+                        <p ng-if="relation.description.length > 199" style="height: 3em; overflow: hidden" id="readMoreParagraph" data-element-type="relationDescription">{{relation.description}}</p>
                         <button type="button" ng-if="relation.description.length > 199" ng-click="expandParagraph($event)">read more</button>
                     </td>
                     <td style="overflow-wrap: break-word; max-width: 150px">
-                        <span ng-if="validateReference(relation.reference)"><a href="" ng-click="relation.reference">➤</a></span>
-                        <span ng-if="!validateReference(relation.reference)">{{relation.reference}}</span>
+                        <span ng-if="validateReference(relation.reference)" data-element-type="relationReference"><a href="" ng-click="relation.reference">➤</a></span>
+                        <span ng-if="!validateReference(relation.reference)" data-element-type="relationReference">{{relation.reference}}</span>
                     </td>
                     <td><a href="#/contract/edit/{{relation.contract.id}}/main">{{relation.contract.name}}</a></td>
-                    <td>{{relation.frequencyType.name}}</td>
+                    <td data-element-type="relationFrequencyType">{{relation.frequencyType.name}}</td>
                 </tr>
             </tbody>
         </table>

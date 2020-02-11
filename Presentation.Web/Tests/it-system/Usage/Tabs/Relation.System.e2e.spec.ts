@@ -11,6 +11,10 @@ describe("User is able to create and view relation",
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
 
+        var frequencyType = "Dagligt";
+        var description = "some description";
+        var reference = "some reference";
+
         var relationSystemName1 = createItSystemName() + "1";
         var relationSystemName2 = createItSystemName() + "2";
         var interfaceName = createInterfaceName();
@@ -44,13 +48,16 @@ describe("User is able to create and view relation",
                     .then(() => RelationHelper.createRelation(relationSystemName1,
                         relationSystemName2,
                         interfaceName,
-                        "Dagligt",
+                        frequencyType,
                         contractName,
-                        "testReference",
-                        "testDescription"))
-                    .then(() => expect(RelationPage.getRelationExhibitSystem(relationSystemName2).getText()).toMatch(relationSystemName2))
-                    .then(() => expect(RelationPage.getRelationInterface(interfaceName).getText()).toMatch(interfaceName))
-                    .then(() => expect(RelationPage.getRelationContract(contractName).getText()).toMatch(contractName));
+                        reference,
+                        description))
+                    .then(() => checkForRelationPart(relationSystemName2))
+                    .then(() => checkForRelationPart(interfaceName))
+                    .then(() => checkForRelationPart(contractName))
+                    .then(() => checkForDescription(relationSystemName2, description))
+                    .then(() => checkForReference(relationSystemName2, reference))
+                    .then(() => checkForFrequencyType(relationSystemName2, frequencyType));
 
             });
 
@@ -66,4 +73,20 @@ function createInterfaceName() {
 
 function createContractName() {
     return `ContractForRelation${new Date().getTime()}`;
+}
+
+function checkForRelationPart(name: string) {
+    expect(RelationPage.getRelationLink(name).getText()).toMatch(name);
+}
+
+function checkForDescription(systemName: string, description: string) {
+    expect(RelationPage.getDescription(systemName).getText()).toMatch(description);
+}
+
+function checkForReference(systemName: string, reference: string) {
+    expect(RelationPage.getReference(systemName).getText()).toMatch(reference);
+}
+
+function checkForFrequencyType(systemName: string, frequencyType: string) {
+    expect(RelationPage.getFrequencyType(systemName).getText()).toMatch(frequencyType);
 }
