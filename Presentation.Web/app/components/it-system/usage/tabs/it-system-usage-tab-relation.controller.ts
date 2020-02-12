@@ -140,6 +140,20 @@
 
                                 }
 
+
+                                $scope.delete = () => {
+                                    $http.delete(`api/v1/systemrelations/from/${usageId}/${$scope.RelationModalViewModel.id}`)
+                                        .success(_ => {
+                                            notify.addSuccessMessage("Relation slettet");
+                                            modalOpen = false;
+                                            $scope.$close(true);
+                                            reload();
+                                        }).error(_ => {
+                                            notify.addErrorMessage("Kunne ikke slette relation");
+                                        });
+                                }
+                                
+
                                 $scope.dismiss = () => {
                                     modalOpen = false;
                                     $scope.$close(true);
