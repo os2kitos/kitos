@@ -1,6 +1,6 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">Opret relation</h3>
+        <h3 class="modal-title pull-left">{{RelationModalState}}</h3>
     </div>
 </div>
 
@@ -18,8 +18,8 @@
                            data-ui-select2="RelationExposedSystemDataCall"
                            data-ng-value="RelationExposedSelectedData"
                            data-placeholder="Vælg udstiller system"
-                           data-ng-model="RelationExposedSystemData"
-                           data-ng-change="ExposedSystemSelected()"
+                           data-ng-model="RelationModalViewModel.toSystem"
+                           data-ng-change="ExposedSystemSelectedTrigger()"
                            data-field="RelationExposedId">
                 </div>
             </div>
@@ -30,36 +30,36 @@
                 <!--Interface-->
                 <div class="form-group">
                     <label for="relationInterfacesSelect"> Vælg Snitflade </label>
-                    <select ng-model="relationInterfacesValue" id="relationInterfacesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationInterfaceOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <select ng-model="RelationModalViewModel.interface.value" id="relationInterfacesSelect" class="form-control input-sm"
+                            ng-options="x.name for x in RelationModalViewModel.interface.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
                 </div>
                 <!--Description-->
                 <div class="form-group">
                     <label class="control-label" for="description">Beskrivelse</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" data-ng-model="relationDescriptionValue" data-ng-disabled="!RelationExposedSystemData"></textarea>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" ng-model="RelationModalViewModel.description.text" ng-disabled="!RelationModalViewModel.toSystem"></textarea>
                 </div>
                 <!--Reference-->
                 <div class="form-group">
                     <label class="control-label" for="Reference">Reference</label>
-                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" data-ng-model="relationReferenceValue" data-ng-disabled="!RelationExposedSystemData">
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" ng-model="RelationModalViewModel.reference.text" ng-disabled="!RelationModalViewModel.toSystem">
                 </div>
                 <!--Contract-->
                 <div class="form-group">
                     <label for="relationContractsSelect"> Vælg kontrakt </label>
-                    <select ng-model="relationContractsValue" id="relationContractsSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationContractsOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <select ng-model="RelationModalViewModel.contract.value" id="relationContractsSelect" class="form-control input-sm"
+                            ng-options="x.name for x in RelationModalViewModel.contract.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
                 </div>
                 <!--frequency-->
                 <div class="form-group">
                     <label for="relationPaymentFrequenciesSelect"> Vælg frekvens </label>
-                    <select ng-model="relationPaymentFrequenciesValue" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationPaymentFrequenciesOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <select ng-model="RelationModalViewModel.frequency.value" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
+                            ng-options="x.name for x in RelationModalViewModel.frequency.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
-            <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" data-ng-disabled="!RelationExposedSystemData">Gem</button>
+            <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>
 
         </div>
     </div>

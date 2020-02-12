@@ -2,7 +2,7 @@
     <h4> {{usage.itSystem.name}}<span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="panel-heading">{{usage.itSystem.name}} har følgende relationer til andre systemer/snitflader:</div>
-        <table class="table table-condensed table-striped">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th style="padding-left: 15px">
@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="relation in relationTableTestData">
+                <tr ng-repeat="relation in relationTableTestData">
                     <td style="overflow-wrap: break-word; padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
                     <td style="overflow-wrap: break-word"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
                     <td style="width: 300px">
@@ -40,9 +40,14 @@
                         <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
                     </td>
-                    <td ng-if="relation.Contract" style="overflow-wrap: break-word"><a data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
+                    <td  style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
                     <td>
                         <p ng-if="relation.Frequency" data-element-type="relationFrequencyType">{{relation.Frequency.Name}}</p>
+                    </td>
+                    <td>
+                        <div class="pull-right">
+                            <a class="btn btn-info btn-xs" ng-click="editRelation(relation.RelationId)"><i class="glyphicon glyphicon-pencil"></i></a>
+                        </div>
                     </td>
                 </tr>
             </tbody>

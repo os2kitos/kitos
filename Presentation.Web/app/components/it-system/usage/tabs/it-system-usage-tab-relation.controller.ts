@@ -12,28 +12,29 @@
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
+            $scope.editRelation = false;
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
 
-            $http.get(`api/v1/systemrelations/from/${usageId}`).success(result => {
-
-                $scope.relationTabledata = result.response;
-
-                var overviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
-
-                for (let i = 0; i < result.response.length; i++) {
-
-                    const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
-
-                    overviewData.push(relationRow);
-                }
-
-                $scope.relationTableTestData = overviewData;
-            });
-
             const reload = () => {
-                $state.go(".", null, { reload: true });
+                $http.get(`api/v1/systemrelations/from/${usageId}`).success(result => {
+
+                    $scope.relationTabledata = result.response;
+
+                    var overviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+
+                    for (let i = 0; i < result.response.length; i++) {
+
+                        const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
+
+                        overviewData.push(relationRow);
+                    }
+
+                    $scope.relationTableTestData = overviewData;
+                });
             };
+
+            reload();
 
             $scope.createRelation = () => {
                 if (modalOpen === false) {
@@ -45,114 +46,35 @@
                         controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
-                            $scope.interfaceOptions = "";
+                            $scope.RelationModalState = "Opret relation for  " + itSystemUsage.itSystem.name;
+                            $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
 
-                            $scope.ExposedSystemSelected = () => {
-                                const checkIfValueIsStillPresent = (result) => {
-
-                                    if ($scope.relationPaymentFrequenciesValue) {
-
-                                        for (let i = 0; i < result.response.availableFrequencyTypes.length; i++) {
-
-                                            if (result.response.availableFrequencyTypes[i].id === $scope.relationPaymentFrequenciesValue.id) {
-                                                $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
-                                                $scope.relationPaymentFrequenciesValue = result.response.availableFrequencyTypes[i];
-                                                break;
-                                            }
-                                        }
-                                        $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
-
-                                    } else {
-                                        $scope.relationPaymentFrequenciesOptions = result.response.availableFrequencyTypes;
-                                    }
-
-                                    if ($scope.relationInterfacesValue) {
-
-                                        for (let i = 0; i < result.response.availableInterfaces.length; i++) {
-
-                                            if (result.response.availableInterfaces[i].id === $scope.relationInterfacesValue.id) {
-                                                $scope.relationInterfaceOptions = result.response.availableInterfaces;
-                                                $scope.relationInterfacesValue = result.response.availableInterfaces[i];
-                                                break;
-                                            }
-                                        }
-                                        $scope.relationInterfaceOptions = result.response.availableInterfaces;
-
-                                    } else {
-                                        $scope.relationInterfaceOptions = result.response.availableInterfaces;
-                                    }
-
-                                    if ($scope.relationContractsValue) {
-
-                                        for (let i = 0; i < result.response.availableContracts.length; i++) {
-
-                                            if (result.response.availableContracts[i].id === $scope.relationContractsValue.id) {
-                                                $scope.relationContractsOptions = result.response.availableContracts;
-                                                $scope.relationContractsValue = result.response.availableContracts[i];
-                                                break;
-                                            }
-                                        }
-                                        $scope.relationContractsOptions = result.response.availableContracts;
-
-                                    } else {
-                                        $scope.relationContractsOptions = result.response.availableContracts;
-                                    }
-
-                                }
-                                if ($scope.RelationExposedSystemData != null) {
-                                    $http
-                                        .get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationExposedSystemData.id}`)
+                            const exposedSystemChanged = () => {
+                                if ($scope.RelationModalViewModel.toSystem != null) {
+                                    $http.get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationModalViewModel.toSystem.id}`)
                                         .success(result => {
-                                            checkIfValueIsStillPresent(result);
+                                            const updatedView = $scope.RelationModalViewModel;
+                                            updatedView.updateAvailableOptions(result);
+                                            $scope.RelationModalViewModel = updatedView;
                                         });
                                 }
                             }
 
+                            $scope.ExposedSystemSelectedTrigger = () => {
+                                exposedSystemChanged();
+                            }
+
                             $scope.save = () => {
-                                modalOpen = false;
-                                var interfaceId = null;
-                                var frequencyTypeId = null;
-                                var contractId = null;
-                                var reference = "";
-                                var description = "";
-
-                                if (!!$scope.relationInterfacesValue) {
-                                    interfaceId = $scope.relationInterfacesValue.id;
-                                }
-
-                                if (!!$scope.relationPaymentFrequenciesValue) {
-                                    frequencyTypeId = $scope.relationPaymentFrequenciesValue.id;
-                                }
-
-                                if (!!$scope.relationContractsValue) {
-                                    contractId = $scope.relationContractsValue.id;
-                                }
-                                if (!!$scope.relationDescriptionValue) {
-                                    description = $scope.relationDescriptionValue;
-                                }
-                                if (!!$scope.relationReferenceValue) {
-                                    reference = $scope.relationReferenceValue;
-                                }
-
-                                const relation = <Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO>{
-                                    FromUsageId: usageId,
-                                    ToUsageId: $scope.RelationExposedSystemData.id,
-                                    Description: description,
-                                    InterfaceId: interfaceId,
-                                    FrequencyTypeId: frequencyTypeId,
-                                    ContractId: contractId,
-                                    Reference: reference,
-                                }
-
+                            const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
                                 notify.addInfoMessage("Tilføjer relation ...", true);
-                                $http.post("api/v1/systemrelations", relation, { handleBusy: true }).success(_ => {
+                                $http.post("api/v1/systemrelations", postData , { handleBusy: true }).success(_ => {
                                     notify.addSuccessMessage("´Relation tilføjet");
+                                    modalOpen = false;
                                     $scope.$close(true);
                                     reload();
                                 }).error(_ => {
-                                    notify.addErrorMessage("er opstod en fejl! Kunne ikke tilføje relation");
+                                    notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relation");
                                 });
-
                             }
 
                             $scope.dismiss = () => {
@@ -165,6 +87,74 @@
                     });
                 }
 
+            }
+
+            $scope.editRelation = (relationId) => {
+                if (modalOpen === false) {  
+                    modalOpen = true;
+
+                    $modal.open({
+                        windowClass: "modal fade in",
+                        templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
+                        controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
+                            var relationData: Kitos.Models.ItSystemUsage.Relation.ISystemGetRelationDTO;
+                            $http.get(`api/v1/systemrelations/from/${usageId}/${relationId}`).success(result => {
+                                        console.log("GOT DATA");
+                                        console.log(result);
+                                        relationData = result;
+
+                            modalOpen = true;
+                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
+                            $scope.RelationModalState = "Redigere relation imellem " + relationData.fromUsage.name + " og " + relationData.toUsage.name;
+
+                            var modalModelView = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationModalViewModel = modalModelView;
+
+                            const exposedSystemChanged = () => {
+                                if ($scope.RelationModalViewModel.toSystem != null) {
+                                    $http.get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationModalViewModel.toSystem.id}`)
+                                        .success(result => {
+                                            const updatedView = $scope.RelationModalViewModel;
+                                            updatedView.updateAvailableOptions(result);
+                                            modalModelView.setValuesFrom(relationData);
+                                            $scope.RelationModalViewModel = updatedView;
+                                        });
+                                }
+                            }
+
+                            exposedSystemChanged();
+                            $scope.ExposedSystemSelectedTrigger = () => {
+                                exposedSystemChanged();
+                            }
+                            $scope.save = () => {
+                                //const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.relationModalViewModel);
+                                notify.addInfoMessage("Tilføjer relation ...", true);
+                                //$http.post("api/v1/systemrelations", postData, { handleBusy: true }).success(_ => {
+                                //    notify.addSuccessMessage("´Relation tilføjet");
+                                //    modalOpen = false;
+                                //    $scope.$close(true);
+                                //    reload();
+                                //}).error(_ => {
+                                //    notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relation");
+                                //});
+
+                            }
+
+                            $scope.dismiss = () => {
+                                modalOpen = false;
+                                $scope.$close(true);
+                            }
+
+                            modalOpen = false;
+                            });
+
+
+
+
+
+                        }],
+                    });
+                }
             }
 
             $scope.expandParagraph = (e) => {
