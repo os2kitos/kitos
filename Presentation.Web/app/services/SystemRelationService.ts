@@ -1,9 +1,13 @@
 ﻿module Kitos.Services {
     import IItSystemUsageRelationDTO = Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
+    import IItSystemUsageRelationOptionsDTO = Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO;
+    import IItSystemUsageCreateRelationDTO = Models.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO;
 
     export interface ISystemRelationService {
-        getFromRelations(systemUsageId: number): ng.IPromise<[IItSystemUsageRelationDTO]>;
-        getToRelations(systemUsageId: number): ng.IPromise<[IItSystemUsageRelationDTO]>;
+        getRelationsFrom(systemUsageId: number): ng.IPromise<[IItSystemUsageRelationDTO]>;
+        getRelationsTo(systemUsageId: number): ng.IPromise<[IItSystemUsageRelationDTO]>;
+        getAvailableRelationOptions(fromSystemUsageId: number, toSystemUsageId: number): ng.IPromise<[IItSystemUsageRelationOptionsDTO]>;
+        createSystemRelation(systemRelation: IItSystemUsageCreateRelationDTO): ng.IPromise<{}>;
     }
 
     export class SystemRelationService implements ISystemRelationService {
@@ -13,7 +17,7 @@
         }
 
 
-        getFromRelations(systemUsageId: number) {
+        getRelationsFrom(systemUsageId: number) {
             return this.$http.get(`api/v1/systemrelations/from/${systemUsageId}`)
                 .then(response => {
                     var kitosSystemRelationResponse = response.data as { msg: string, response: [IItSystemUsageRelationDTO] }
@@ -21,12 +25,24 @@
                 });
         }
 
-        getToRelations(systemUsageId: number) {
+        getRelationsTo(systemUsageId: number) {
             return this.$http.get(`api/v1/systemrelations/to/${systemUsageId}`)
                 .then(response => {
                     var kitosSystemRelationResponse = response.data as { msg: string, response: [IItSystemUsageRelationDTO] }
                     return kitosSystemRelationResponse.response;
                 });
+        }
+
+        getAvailableRelationOptions(fromSystemUsageId: number, toSystemUsageId: number) {
+            return this.$http.get(`api/v1/systemrelations/options/${fromSystemUsageId}/in-relation-to/${toSystemUsageId}`)
+                .then(response => {
+                    var kitosSystemRelationResponse = response.data as { msg: string, response: [IItSystemUsageRelationOptionsDTO] }
+                    return kitosSystemRelationResponse.response;
+                });
+        }
+
+        createSystemRelation(systemRelation: IItSystemUsageCreateRelationDTO) {
+            return this.$http.post("api/v1/systemrelations", systemRelation);
         }
     }
 

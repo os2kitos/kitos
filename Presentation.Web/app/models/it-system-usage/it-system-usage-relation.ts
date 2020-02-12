@@ -23,6 +23,12 @@
         reference: string;
     }
 
+    export interface IItSystemUsageRelationOptionsDTO {
+        availableInterfaces: [NamedEntityDTO];
+        availableContracts: [NamedEntityDTO];
+        availableFrequencyTypes: [NamedEntityDTO];
+    }
+
     export interface IItSystemUsageRelationReferenceDto {
         Reference: string;
         ValidUrl: boolean;

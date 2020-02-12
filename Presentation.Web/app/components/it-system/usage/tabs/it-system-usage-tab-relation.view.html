@@ -4,53 +4,59 @@
         <div class="panel-heading">{{usage.itSystem.name}} har følgende relationer til andre systemer/snitflader:</div>
         <table class="table table-condensed table-striped">
             <thead>
-                <tr>
-                    <th style="padding-left: 15px">
-                        IT System (udstiller)
-                    </th>
-                    <th>
-                        Snitflade
-                    </th>
-                    <th>
-                        Beskrivelse
-                    </th>
-                    <th>
-                        Reference
-                    </th>
-                    <th>
-                        Kontrakt
-                    </th>
-                    <th>
-                        Frekvens
-                    </th>
-                </tr>
+            <tr>
+                <th style="padding-left: 15px">
+                    IT System (udstiller)
+                </th>
+                <th>
+                    Snitflade
+                </th>
+                <th>
+                    Beskrivelse
+                </th>
+                <th>
+                    Reference
+                </th>
+                <th>
+                    Kontrakt
+                </th>
+                <th>
+                    Frekvens
+                </th>
+            </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="relation in relationTableTestData">
-                    <td style="overflow-wrap: break-word; padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
-                    <td style="overflow-wrap: break-word"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
-                    <td style="width: 300px">
-                        <p ng-if="relation.Description" ng-show="!relation.Description.LongText" data-element-type="relationDescription">{{relation.Description.Description}}</p>
-                        <p ng-if="relation.Description" ng-show="relation.Description.LongText" style="height: {{relation.Description.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Description.Description}}</p>
-                        <a ng-if="relation.Description" ng-show="relation.Description.LongText" ng-click="expandParagraph($event)">Se mere</a>
-                    </td>
-                    <td style="overflow-wrap: break-word; width: 150px">
-                        <a ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank"><img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
-                        <p ng-if="relation.Reference" ng-show="relation.Reference.LongText" style="height: {{relation.Reference.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Reference.Reference}}</p>
-                        <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
-                        <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
-                    </td>
-                    <td ng-if="relation.Contract" style="overflow-wrap: break-word"><a data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
-                    <td>
-                        <p ng-if="relation.Frequency" data-element-type="relationFrequencyType">{{relation.Frequency.Name}}</p>
-                    </td>
-                </tr>
+            <tr ng-repeat="relation in relationTableTestData">
+                <td style="overflow-wrap: break-word; padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
+                <td style="overflow-wrap: break-word"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
+                <td style="width: 300px">
+                    <p ng-if="relation.Description" ng-show="!relation.Description.LongText" data-element-type="relationDescription">{{relation.Description.Description}}</p>
+                    <p ng-if="relation.Description" ng-show="relation.Description.LongText" style="height: {{relation.Description.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Description.Description}}</p>
+                    <a ng-if="relation.Description" ng-show="relation.Description.LongText" ng-click="expandParagraph($event)">Se mere</a>
+                </td>
+                <td style="overflow-wrap: break-word; width: 150px">
+                    <a ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank"><img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
+                    <p ng-if="relation.Reference" ng-show="relation.Reference.LongText" style="height: {{relation.Reference.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Reference.Reference}}</p>
+                    <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
+                    <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
+                </td>
+                <td ng-if="relation.Contract" style="overflow-wrap: break-word"><a data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
+                <td>
+                    <p ng-if="relation.Frequency" data-element-type="relationFrequencyType">{{relation.Frequency.Name}}</p>
+                </td>
+            </tr>
             </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="10">
+                    <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()">Opret relation</button>
+                </td>
+            </tr>
+            </tfoot>
         </table>
-        <button id="create-Relation" class="btn btn-success btn-sm pull-right" data-ng-click="createRelation()" style="margin-top: 10px;">Opret relation</button>
     </div>
 
-    <div class="panel panel-default tableSplitter">
+    <div class="panel panel-default">
         <div class="panel-heading">Andre systemer har følgende relationer til {{usage.itSystem.name}}:</div>
         <table class="table table-condensed table-striped">
             <thead>
