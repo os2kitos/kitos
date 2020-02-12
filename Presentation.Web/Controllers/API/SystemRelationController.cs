@@ -14,7 +14,10 @@ using Presentation.Web.Models.SystemRelations;
 namespace Presentation.Web.Controllers.API
 {
 
-    [InternalApi]
+    /// <summary>
+    /// Relationer beskriver hvordan to lokale systemer er relateret til hinanden.
+    /// </summary>
+    [PublicApi]
     [RoutePrefix("api/v1/systemrelations")]
     public class SystemRelationController : BaseApiController
     {
@@ -25,6 +28,11 @@ namespace Presentation.Web.Controllers.API
             _usageService = usageService;
         }
 
+        /// <summary>
+        /// Opretter en ny systemrelation
+        /// </summary>
+        /// <param name="relation"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("")]
         public HttpResponseMessage PostRelation([FromBody] CreateSystemRelationDTO relation)
@@ -53,6 +61,11 @@ namespace Presentation.Web.Controllers.API
             );
         }
 
+        /// <summary>
+        /// Henter alle systemrelationer FRA systemanvendelsen specificeret af <see cref="systemUsageId"/>
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("from/{systemUsageId}")]
         public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
@@ -65,6 +78,11 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Henter alle systemrelationer TIL systemanvendelsen specificeret af <see cref="systemUsageId"/>
+        /// </summary>
+        /// <param name="systemUsageId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("to/{systemUsageId}")]
         public HttpResponseMessage GetRelationsToSystem(int systemUsageId)
@@ -77,6 +95,11 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Henter alle systemrelationer der er relateret til kontrakten specificeret af <see cref="contractId"/>
+        /// </summary>
+        /// <param name="contractId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("associated-with/contract/{contractId}")]
         public HttpResponseMessage GetRelationsAssociatedWithContract(int contractId)
@@ -89,6 +112,12 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Henter en enkelt systemrelation
+        /// </summary>
+        /// <param name="systemUsageId">Systemanvendelsen der ejer relation</param>
+        /// <param name="relationId">Id på systemrelationen</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("from/{systemUsageId}/{relationId}")]
         public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
@@ -101,6 +130,13 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Henter en liste over lokale it-systemer som systemet med id: <see cref="fromSystemUsageId"/> kan relateres til.
+        /// </summary>
+        /// <param name="fromSystemUsageId"></param>
+        /// <param name="nameContent">valgfri navnesøgning</param>
+        /// <param name="amount">Antal resultater der ønskers (maksimum 25)</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("options/{fromSystemUsageId}/systems-which-can-be-related-to")]
         public HttpResponseMessage GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, string nameContent, int amount)
@@ -119,6 +155,12 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Henter en liste over gyldige valgmuligheder til oprettelse af relationen.
+        /// </summary>
+        /// <param name="fromSystemUsageId"></param>
+        /// <param name="toSystemUsageId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("options/{fromSystemUsageId}/in-relation-to/{toSystemUsageId}")]
         public HttpResponseMessage GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
@@ -131,6 +173,12 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Sletter relationen
+        /// </summary>
+        /// <param name="fromSystemUsageId"></param>
+        /// <param name="relationId"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("from/{fromSystemUsageId}/{relationId}")]
         public HttpResponseMessage DeleteRelationFromSystem(int fromSystemUsageId, int relationId)
@@ -143,6 +191,11 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        /// <summary>
+        /// Opdaterer den eksisterende relation jf. værdierne i <see cref="relation"/>
+        /// </summary>
+        /// <param name="relation"></param>
+        /// <returns></returns>
         [HttpPatch]
         [Route("")]
         public HttpResponseMessage PatchRelation([FromBody] SystemRelationDTO relation)
