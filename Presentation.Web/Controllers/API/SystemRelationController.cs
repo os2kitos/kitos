@@ -78,6 +78,18 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
+        [Route("associated-with/contract/{contractId}")]
+        public HttpResponseMessage GetRelationsAssociatedWithContract(int contractId)
+        {
+            return _usageService.GetRelationsAssociatedWithContract(contractId)
+                .Match
+                (
+                    onSuccess: value => Ok(MapRelations(value)),
+                    onFailure: FromOperationError
+                );
+        }
+
+        [HttpGet]
         [Route("from/{systemUsageId}/{relationId}")]
         public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
         {

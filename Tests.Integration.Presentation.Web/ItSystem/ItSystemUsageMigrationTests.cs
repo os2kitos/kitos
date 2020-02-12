@@ -705,7 +705,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static async Task AssertRelationExists(SystemRelationDTO expectedRelation, ItSystemUsageDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
         {
-            var response = await SystemRelationHelper.SendGetRelationAsync(usage.Id, expectedRelation.Id);
+            var response = await SystemRelationHelper.SendGetRelationRequestAsync(usage.Id, expectedRelation.Id);
             var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
             Assert.Equal(expectedRelation.Id, relation.Id);
             Assert.Equal(expectedRelation.Description, relation.Description);
@@ -788,7 +788,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 FrequencyTypeId = frequencyTypeId,
                 ContractId = contractId
             };
-            var response = await SystemRelationHelper.SendPostRelationAsync(relationDTO);
+            var response = await SystemRelationHelper.SendPostRelationRequestAsync(relationDTO);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
         }

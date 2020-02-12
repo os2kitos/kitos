@@ -237,6 +237,20 @@ namespace Core.ApplicationServices.SystemUsage
                     );
         }
 
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsAssociatedWithContract(int contractId)
+        {
+            return _contractRepository
+                .GetById(contractId)
+                .FromNullable()
+                .Select(WithAuthorizedReadAccessToContract)
+                .GetValueOrFallback(new OperationError("Contract not found", OperationFailure.NotFound))
+                .Match<Result<IEnumerable<SystemRelation>, OperationError>>
+                (
+                    onSuccess: contract => contract.AssociatedSystemRelations.ToList(),
+                    onFailure: error => error
+                );
+        }
+
         public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsFrom(int systemUsageId)
         {
             var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = systemUsageId }, new SystemRelationOperationEntities());
@@ -449,6 +463,14 @@ namespace Core.ApplicationServices.SystemUsage
 
         #endregion Parameter Types
         #region helpers
+
+        private Result<ItContract, OperationError> WithAuthorizedReadAccessToContract(ItContract contract)
+        {
+            return _authorizationContext.AllowReads(contract) ?
+                Result<ItContract, OperationError>.Success(contract) :
+                new OperationError("Not allowed to read contract", OperationFailure.Forbidden);
+        }
+
         private Result<SystemRelationOperationContext, OperationError> LoadFromSystemUsage(SystemRelationOperationContext context)
         {
             var fromSystemUsage = _usageRepository.GetByKey(context.Input.FromSystemUsageId);
