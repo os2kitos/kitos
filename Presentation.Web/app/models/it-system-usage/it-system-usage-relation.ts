@@ -61,9 +61,9 @@
         Reference: string;
         FromUsage: IItSystemUsageRelationIdName;
         ToUsage: IItSystemUsageRelationIdName;
-        Interface: IItSystemUsageRelationIdName;
-        Contract: IItSystemUsageRelationIdName; 
-        FrequencyType: IItSystemUsageRelationIdName;
+        Interface?: IItSystemUsageRelationIdName;
+        Contract?: IItSystemUsageRelationIdName;
+        FrequencyType?: IItSystemUsageRelationIdName;
 
     }
 
@@ -197,21 +197,27 @@
             this.description = <ISystemRelationModalIdText>{};
         }
 
-        public setValuesFrom(relationData: ISystemGetRelationDTO) {
+        setValuesFrom(relationData: ISystemGetRelationDTO) {
             this.bindValue(this.frequency, relationData.frequencyType);
             this.bindValue(this.contract, relationData.contract);
             this.bindValue(this.interface, relationData.interface);
+            this.id = relationData.id;
+            this.uuid = relationData.uuid;
             this.description.text = relationData.description;
             this.reference.text = relationData.reference;
-            this.toSystem.id = relationData.toUsage.id;
-            this.toSystem.text = relationData.toUsage.name;
+
         }
 
-        public updateAvailableOptions(optionsResult: any /*TODO:not the any - use strong types*/) {
+        updateAvailableOptions(optionsResult: any /*TODO:not the any - use strong types*/) {
             // Build modal with data
             this.bindOptions(this.frequency, optionsResult.response.availableFrequencyTypes);
             this.bindOptions(this.interface, optionsResult.response.availableInterfaces);
             this.bindOptions(this.contract, optionsResult.response.availableContracts);
+        }
+
+        setTargetSystem(id: number, name: string) {
+            this.toSystem.id = id;
+            this.toSystem.text = name;
         }
 
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: ISystemRelationModalIdName) {
@@ -266,7 +272,7 @@
 
         private getIdFromValues(valuesToInsert: ISystemRelationSelectionModel) {
             if (valuesToInsert.value !== null) {
-                return  valuesToInsert.value.id;
+                return valuesToInsert.value.id;
             } else {
                 return null;
             }
@@ -280,13 +286,32 @@
         Reference: string;
         FromUsage: IItSystemUsageRelationIdName;
         ToUsage: IItSystemUsageRelationIdName;
-        Interface: IItSystemUsageRelationIdName;
-        Contract: IItSystemUsageRelationIdName;
-        FrequencyType: IItSystemUsageRelationIdName;
+        Interface?: IItSystemUsageRelationIdName;
+        Contract?: IItSystemUsageRelationIdName;
+        FrequencyType?: IItSystemUsageRelationIdName;
 
-        constructor(relationModelToCreate: ISystemRelationModalViewModel) {
+        constructor(data: SystemRelationModalViewModel) {
+
+            this.Id = data.id;
+            this.Uuid = data.uuid;
+            this.Description = data.description.text;
+            this.Reference = data.reference.text;
+            this.FromUsage = { Id: data.fromSystem.id, Name: data.fromSystem.name };
+            this.ToUsage = { Id: data.toSystem.id, Name: data.toSystem.text };
+            this.FrequencyType = this.setValuesOrNull(data.frequency.value);
+            this.Interface = this.setValuesOrNull(data.interface.value);
+            this.Contract = this.setValuesOrNull(data.contract.value);
 
         }
-    }
 
+        private setValuesOrNull(value: ISystemRelationModalIdName) {
+            if (value !== null) {
+                return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.name }
+            } else {
+                return null;
+            }
+        }
+
+
+    }
 }
