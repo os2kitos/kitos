@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
+using Tools.Test.Database.Model.Parameters;
 
 namespace Tools.Test.Database.Model.Tasks
 {
@@ -17,15 +18,20 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _salt;
         private readonly string[] _organizationNames;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role, string organizationNames, bool apiAccess = false)
-            : base(connectionString)
+        public CreateKitosUserTask(string email, string password, OrganizationRole role, string organizationNames, bool apiAccess = false)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _password = password ?? throw new ArgumentNullException(nameof(password));
-            _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
+            _role = role;
             _organizationNames = ParseOrganizationNames(organizationNames ?? throw new ArgumentNullException(nameof(organizationNames)));
             _apiAccess = apiAccess;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
+        }
+
+        public CreateKitosUserTask(Credentials credentials, OrganizationRole role, string organizationNames, bool apiAccess = false)
+        : this(credentials.Email, credentials.Password, role, organizationNames, apiAccess)
+        {
+
         }
 
 
@@ -33,21 +39,18 @@ namespace Tools.Test.Database.Model.Tasks
         /// Replicates the actions carried out by both org-user-create.controller.ts, UsersController::Post and UserService
         /// </summary>
         /// <returns></returns>
-        public override bool Execute()
+        public override bool Execute(KitosContext context)
         {
-            using (var context = CreateKitosContext())
+            var firstOrg = context.GetOrganization(_organizationNames[0]);
+
+            var newUser = CreateUser(firstOrg, context);
+
+            foreach (var orgName in _organizationNames)
             {
-                var firstOrg = context.GetOrganization(_organizationNames[0]);
-
-                var newUser = CreateUser(firstOrg, context);
-
-                foreach (var orgName in _organizationNames)
-                {
-                    AssignOrganizationRole(context, newUser, orgName);
-                }
-
-                context.SaveChanges();
+                AssignOrganizationRole(context, newUser, orgName);
             }
+
+            context.SaveChanges();
 
             return true;
         }
@@ -92,20 +95,14 @@ namespace Tools.Test.Database.Model.Tasks
             context.SaveChanges();
         }
 
-        private OrganizationRole ParseRole(string role)
-        {
-            var organizationRoles = Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>().ToDictionary(x => x.ToString("G"), StringComparer.OrdinalIgnoreCase);
-            if (!organizationRoles.TryGetValue(role, out var actualRole))
-            {
-                throw new ArgumentException($"{nameof(role)} must be one of [{string.Join(",", organizationRoles.Keys)}]");
-            }
-
-            return actualRole;
-        }
-
         private string[] ParseOrganizationNames(string organizationNames)
         {
             return organizationNames.Split(',');
+        }
+
+        public override string ToString()
+        {
+            return $"Task: {GetType().Name}. Role:{_role:G}. Email:{_email}. API Access:{_apiAccess}. Organizations: {string.Join(",", _organizationNames)}";
         }
     }
 }

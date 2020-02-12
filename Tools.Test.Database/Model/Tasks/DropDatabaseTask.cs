@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using Infrastructure.DataAccess;
 
 namespace Tools.Test.Database.Model.Tasks
 {
@@ -8,12 +9,11 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _connectionString;
 
         public DropDatabaseTask(string connectionString)
-        : base(connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public override bool Execute()
+        public override bool Execute(KitosContext context)
         {
             //Create a new connection string without initial catalog so that db can be dropped
             var connectionStringBuilder = new SqlConnectionStringBuilder(_connectionString);
