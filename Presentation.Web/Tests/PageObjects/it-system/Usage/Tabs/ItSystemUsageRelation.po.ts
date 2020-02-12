@@ -38,6 +38,18 @@ class ItSystemUsageRelation {
         return this.getElementFromTable(systemName, this.consts.relationFrequencyTypeField);
     }
 
+    public static getUsedByDescription(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.usedByRelationDescriptionField);
+    }
+
+    public static getUsedByReference(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.usedByRelationReferenceField);
+    }
+
+    public static getUsedByFrequencyType(systemName: string) {
+        return this.getElementFromTable(systemName, this.consts.usedByRelationFrequencyTypeField);
+    }
+
     private static getElementFromTable(rowLocator: string, columnLocator: string) {
         const rowElement = this.getRelationLink(rowLocator);
         const row = rowElement.element(by.xpath("../.."));

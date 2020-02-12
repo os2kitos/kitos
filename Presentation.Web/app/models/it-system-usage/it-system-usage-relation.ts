@@ -1,6 +1,5 @@
 ﻿module Kitos.Models.ItSystemUsage.Relation {
-    export interface IItSystemUsageRelationDTO {
-
+    export interface IItSystemUsageCreateRelationDTO {
         FromUsageId: number;
         ToUsageId: number;
         Description: string;
@@ -11,6 +10,24 @@
     }
 
     import NamedEntityDTO = Models.Generic.NamedEntity.NamedEntityDTO;
+
+    export interface IItSystemUsageRelationDTO {
+        id: number;
+        uuid: string;
+        fromUsage: NamedEntityDTO;
+        toUsage: NamedEntityDTO;
+        interface: NamedEntityDTO;
+        contract: NamedEntityDTO;
+        frequencyType: NamedEntityDTO;
+        description: string;
+        reference: string;
+    }
+
+    export interface IItSystemUsageRelationOptionsDTO {
+        availableInterfaces: [NamedEntityDTO];
+        availableContracts: [NamedEntityDTO];
+        availableFrequencyTypes: [NamedEntityDTO];
+    }
 
     export interface IItSystemUsageRelationReferenceDto {
         Reference: string;
