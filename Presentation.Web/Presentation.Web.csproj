@@ -380,6 +380,7 @@
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
+    <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />

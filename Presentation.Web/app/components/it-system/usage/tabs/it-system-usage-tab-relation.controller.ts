@@ -1,47 +1,43 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', ($stateProvider) => {
-        $stateProvider.state('it-system.usage.relation', {
-            url: '/relation',
-            templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-relation.view.html',
-            controller: 'system.EditRelation'
+    app.config(["$stateProvider", ($stateProvider) => {
+        $stateProvider.state("it-system.usage.relation", {
+            url: "/relation",
+            templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation.view.html",
+            controller: "system.EditRelation"
         });
     }]);
 
-    app.controller('system.EditRelation', ['$scope', '$http', '$state', 'itSystemUsage', 'notify', '$uibModal',
-        ($scope, $http, $state, itSystemUsage, notify, $modal) => {
+    app.controller("system.EditRelation", ["$scope", "$http", "$state", "itSystemUsage", "notify", "$uibModal", "systemRelationService",
+        ($scope, $http, $state, itSystemUsage, notify, $modal, systemRelationService) => {
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
 
-            $http.get(`api/v1/systemrelations/from/${usageId}`).success(result => {
 
-                $scope.relationTabledata = result.response;
+            systemRelationService.getFromRelations(usageId)
+                .then(systemRelations => {
+                    $scope.relationTableTestData = mapSystemRelations(systemRelations);
+                });
 
-                var overviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+            systemRelationService.getToRelations(usageId)
+                .then(systemRelations => {
+                    $scope.usedByRelations = mapSystemRelations(systemRelations);
+                });
 
-                for (let i = 0; i < result.response.length; i++) {
-
-                    const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
-
-                    overviewData.push(relationRow);
-                }
-
-                $scope.relationTableTestData = overviewData;
-            });
-
-            $http.get(`api/v1/systemrelations/to/${usageId}`).success(result => {
-                var usedByOverviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
-
-                for (let i = 0; i < result.response.length; i++) {
-
-                    const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
-                    usedByOverviewData.push(relationRow);
-                }
-
-                $scope.usedByRelations = usedByOverviewData;
-            });
+            function mapSystemRelations(systemRelations)
+            {
+                const usedByOverviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+                _.each(systemRelations,
+                    (systemRelation) => {
+                        usedByOverviewData.push(
+                            new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount,
+                                shortTextLineCount,
+                                systemRelation));
+                    });
+                return usedByOverviewData;
+            }
 
             const reload = () => {
                 $state.go(".", null, { reload: true });
@@ -54,7 +50,7 @@
                     $modal.open({
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
-                        controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
+                        controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
                             $scope.interfaceOptions = "";
@@ -146,7 +142,7 @@
                                     reference = $scope.relationReferenceValue;
                                 }
 
-                                const relation = <Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO>{
+                                const relation = <Kitos.Models.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO>{
                                     FromUsageId: usageId,
                                     ToUsageId: $scope.RelationExposedSystemData.id,
                                     Description: description,
@@ -181,7 +177,7 @@
 
             $scope.expandParagraph = (e) => {
                 var element = angular.element(e.currentTarget);
-                var para = element.closest('td').find(document.getElementsByClassName("readMoreParagraph"))[0];
+                var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
                 var btn = element[0];
 
                 if (para.getAttribute("style") != null) {
