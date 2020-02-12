@@ -142,7 +142,7 @@
                                     reference = $scope.relationReferenceValue;
                                 }
 
-                                const relation = {
+                                const relation = <Kitos.Models.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO>{
                                     FromUsageId: usageId,
                                     ToUsageId: $scope.RelationExposedSystemData.id,
                                     Description: description,
@@ -150,7 +150,7 @@
                                     FrequencyTypeId: frequencyTypeId,
                                     ContractId: contractId,
                                     Reference: reference,
-                                } as Kitos.Models.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO;
+                                };
 
                                 notify.addInfoMessage("Tilføjer relation ...", true);
                                 systemRelationService.createSystemRelation(relation).success(_ => {
