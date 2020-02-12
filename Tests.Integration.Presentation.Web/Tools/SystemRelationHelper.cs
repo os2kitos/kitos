@@ -11,7 +11,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class SystemRelationHelper
     {
-        public static async Task<IEnumerable<SystemRelationDTO>> SendGetRelationsFromAsync(int systemUsageId, Cookie login = null)
+        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsFromAsync(int systemUsageId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}");
@@ -23,7 +23,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<IEnumerable<SystemRelationDTO>> SendGetRelationsToAsync(int systemUsageId, Cookie login = null)
+        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsAssociatedWithContractAsync(int contractId, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/associated-with/contract/{contractId}");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
+            }
+        }
+
+        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsToAsync(int systemUsageId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/to/{systemUsageId}");
@@ -35,7 +47,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HttpResponseMessage> SendGetRelationAsync(int systemUsageId, int relationId, Cookie login = null)
+        public static async Task<HttpResponseMessage> SendGetRelationRequestAsync(int systemUsageId, int relationId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}/{relationId}");
@@ -43,7 +55,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.GetWithCookieAsync(url, login);
         }
         
-        public static async Task<HttpResponseMessage> SendPostRelationAsync(CreateSystemRelationDTO input, Cookie login = null)
+        public static async Task<HttpResponseMessage> SendPostRelationRequestAsync(CreateSystemRelationDTO input, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
@@ -51,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, login, input);
         }
 
-        public static async Task<HttpResponseMessage> SendDeleteRelationAsync(int systemUsageId, int relationId, Cookie login = null)
+        public static async Task<HttpResponseMessage> SendDeleteRelationRequestAsync(int systemUsageId, int relationId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}/{relationId}");
@@ -59,25 +71,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(url, login);
         }
 
-        public static async Task<HttpResponseMessage> SendPatchRelationAsync(SystemRelationDTO input, Cookie login = null)
+        public static async Task<HttpResponseMessage> SendPatchRelationRequestAsync(SystemRelationDTO input, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
 
             return await HttpApi.PatchWithCookieAsync(url, login, input);
-        }
-
-
-        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsAsync(int systemUsageId, Cookie login = null)
-        {
-            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/from/{systemUsageId}");
-
-            using (var response = await HttpApi.GetWithCookieAsync(url, login))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
-            }
         }
 
         public static async Task<IEnumerable<NamedEntityDTO>> GetAvailableDestinationSystemsAsync(int systemUsageId, string prefix, Cookie login = null)
