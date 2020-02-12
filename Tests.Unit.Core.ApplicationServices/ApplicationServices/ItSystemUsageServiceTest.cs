@@ -12,7 +12,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -526,6 +525,56 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void GetRelationsAssociatedWithContract_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            _contractRepository.Setup(x => x.GetById(id)).Returns(default(ItContract));
+
+            //Act
+            var relations = _sut.GetRelationsAssociatedWithContract(id);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.NotFound, relations.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetRelationsAssociatedWithContract_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var itContract = new ItContract();
+            _contractRepository.Setup(x => x.GetById(id)).Returns(itContract);
+            ExpectAllowReadReturns(itContract, false);
+
+            //Act
+            var relations = _sut.GetRelationsAssociatedWithContract(id);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.Forbidden, relations.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetRelationsAssociatedWithContract_Returns_Ok()
+        {
+            //Arrange
+            var id = A<int>();
+            var associatedSystemRelations = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            var itContract = new ItContract { AssociatedSystemRelations = associatedSystemRelations };
+            _contractRepository.Setup(x => x.GetById(id)).Returns(itContract);
+            ExpectAllowReadReturns(itContract, true);
+
+            //Act
+            var relations = _sut.GetRelationsAssociatedWithContract(id);
+
+            //Assert
+            Assert.True(relations.Ok);
+            Assert.True(relations.Value.SequenceEqual(associatedSystemRelations));
+        }
+
+        [Fact]
         public void GetRelation_Returns_NotFound()
         {
             //Arrange
@@ -778,9 +827,9 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
 
-        private void ExpectAllowReadReturns(ItSystemUsage itSystemUsage, bool value)
+        private void ExpectAllowReadReturns(IEntity entity, bool value)
         {
-            _authorizationContext.Setup(x => x.AllowReads(itSystemUsage)).Returns(value);
+            _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
         }
     }
 }

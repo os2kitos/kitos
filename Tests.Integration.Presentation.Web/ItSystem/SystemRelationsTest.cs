@@ -33,12 +33,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(withContract, withInterface, withFrequency);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                var relationsFrom = (await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId)).ToList();
-                var relationsTo = (await SystemRelationHelper.SendGetRelationsToAsync(input.ToUsageId)).ToList();
+                var relationsFrom = (await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId)).ToList();
+                var relationsTo = (await SystemRelationHelper.GetRelationsToAsync(input.ToUsageId)).ToList();
                 var fromDto = Assert.Single(relationsFrom);
                 var toDto = Assert.Single(relationsTo);
 
@@ -71,13 +71,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Reference = A<string>(),
             };
 
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var createdRelation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
 
                 //Act
-                using (var deleteResponse = await SystemRelationHelper.SendDeleteRelationAsync(usage1.Id, createdRelation.Id))
+                using (var deleteResponse = await SystemRelationHelper.SendDeleteRelationRequestAsync(usage1.Id, createdRelation.Id))
                 {
                     //Assert
                     Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
@@ -91,9 +91,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var input = await PrepareFullRelationAsync(false, false, false);
 
-            using (await SystemRelationHelper.SendPostRelationAsync(input))
+            using (await SystemRelationHelper.SendPostRelationRequestAsync(input))
             using (var deletionResponse = await ItSystemHelper.SendRemoveUsageAsync(input.FromUsageId, OrganizationId))
-            using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, OrganizationId))
+            using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationRequestAsync(input.FromUsageId, OrganizationId))
             {
                 Assert.Equal(HttpStatusCode.OK, deletionResponse.StatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
@@ -146,12 +146,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, false, true);
-            await SystemRelationHelper.SendPostRelationAsync(input);
-            var relations = await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var edited = await PrepareEditedRelationAsync(relations.Single());
 
             //Act
-            using (var response = await SystemRelationHelper.SendPatchRelationAsync(edited))
+            using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -172,7 +172,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(false, false, true);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(newExhibitor.Id, input.InterfaceId.GetValueOrDefault()))
             {
                 //Assert
@@ -180,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                 Assert.NotNull(relation.Interface);
-                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationRequestAsync(input.FromUsageId, relation.Id))
                 {
                     Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
                     var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -197,7 +197,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var toUsage = await ItSystemHelper.GetItSystemUsage(input.ToUsageId);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             using (var changeExposingSystem = await InterfaceExhibitHelper.SendCreateExhibitRequest(toUsage.ItSystemId, input.InterfaceId.GetValueOrDefault()))
             {
                 //Assert
@@ -205,7 +205,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.Created, changeExposingSystem.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                 Assert.NotNull(relation.Interface);
-                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationRequestAsync(input.FromUsageId, relation.Id))
                 {
                     Assert.Equal(HttpStatusCode.OK, getAfterDeleteResponse.StatusCode);
                     var relationAfterChange = await getAfterDeleteResponse.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -222,7 +222,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(false, false, true);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -230,7 +230,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
                 using (var removeExhibitResponse = await InterfaceExhibitHelper.SendRemoveExhibitRequest(input.InterfaceId.GetValueOrDefault())) //Must remove exposition to allow deletion
                 using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(input.InterfaceId.GetValueOrDefault()))
-                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationRequestAsync(input.FromUsageId, relation.Id))
                 {
                     //Assert
                     Assert.Equal(HttpStatusCode.OK, removeExhibitResponse.StatusCode);
@@ -249,14 +249,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(true, false, false);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
                 Assert.NotNull(relation.Contract);
 
                 using (var deleteContractRequest = await ItContractHelper.SendDeleteContractRequestAsync(input.ContractId.GetValueOrDefault()))
-                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationAsync(input.FromUsageId, relation.Id))
+                using (var getAfterDeleteResponse = await SystemRelationHelper.SendGetRelationRequestAsync(input.FromUsageId, relation.Id))
                 {
                     //Assert
                     Assert.Equal(HttpStatusCode.OK, deleteContractRequest.StatusCode);
@@ -274,7 +274,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input = await PrepareFullRelationAsync(false, false, false);
 
             //Act
-            using (var response = await SystemRelationHelper.SendPostRelationAsync(input))
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
@@ -283,9 +283,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 {
                     //Assert
                     Assert.Equal(HttpStatusCode.OK, deleteUsageResponse.StatusCode);
-                    var relations = (await SystemRelationHelper.SendGetRelationsFromAsync(input.FromUsageId)).ToList();
+                    var relations = (await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId)).ToList();
                     Assert.Empty(relations.Where(x => x.Id == relation.Id));
                 }
+            }
+        }
+
+        [Fact]
+        public async Task Can_Get_SystemRelations_AssociatedWithContract()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, false, false);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPostRelationRequestAsync(input))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var relationsToContract = (await SystemRelationHelper.GetRelationsAssociatedWithContractAsync(input.ContractId.GetValueOrDefault(-1))).ToList();
+                var originalRelations = (await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId)).ToList();
+                var relationFromContractResponse = Assert.Single(relationsToContract);
+                var relationFromOriginalResponse = Assert.Single(originalRelations);
+
+                relationFromContractResponse.ToExpectedObject().ShouldMatch(relationFromOriginalResponse); //Same relation should yield same data at the dto level
             }
         }
 
