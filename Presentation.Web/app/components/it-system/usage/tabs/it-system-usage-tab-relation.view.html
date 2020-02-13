@@ -46,14 +46,14 @@
                     </td>
                     <td>
                         <div class="pull-right" ng-if="hasWriteAccess">
-                            <a class="btn btn-info btn-xs" ng-click="editRelation(relation.RelationId)"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a style="margin-right:5px" class="btn btn-info btn-xs" ng-click="editRelation(relation.RelationId)"><i class="glyphicon glyphicon-pencil"></i></a>
                         </div>
                     </td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot ng-if="hasWriteAccess">
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <button id="create-Relation" class="btn btn-success btn-sm pull-right tFootButton" data-ng-click="createRelation()" ng-disabled="!hasWriteAccess">Opret relation</button>
                     </td>
                 </tr>

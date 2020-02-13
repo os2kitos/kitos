@@ -26,7 +26,7 @@
 
         select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
             return {
-                data: () => this.mapNamedEntitiesToSelect2(dataFn),
+                data: () => ({ "results": dataFn() }) ,
                 allowClear: true
             };
         }
@@ -34,7 +34,7 @@
         select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
             return {
                 minimumResultsForSearch: Infinity,
-                data: () => this.mapNamedEntitiesToSelect2(dataFn),
+                data: () => ({ "results": dataFn() }),
                 allowClear: true
             };
         }

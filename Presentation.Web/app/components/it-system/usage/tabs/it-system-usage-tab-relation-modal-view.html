@@ -1,6 +1,6 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">{{RelationModalState}}</h3>
+        <h3 class="modal-title pull-left">{{RelationModalViewModel.headerText}}</h3>
     </div>
 </div>
 
@@ -35,7 +35,7 @@
                            class="form-control input-sm"
                            ui-select2="InterfaceOptions"
                            placeholder="Vælg snitflade"
-                           ng-model="RelationModalViewModel.interface"
+                           ng-model="RelationModalViewModel.interface.value"
                            ng-disabled="!RelationModalViewModel.toSystem"
                            data-field="RelationContractId">
                 </div>
@@ -57,7 +57,7 @@
                            class="form-control input-sm"
                            ui-select2="ContractOptions"
                            placeholder="Vælg kontrakt"
-                           ng-model="RelationModalViewModel.contract"
+                           ng-model="RelationModalViewModel.contract.value"
                            ng-disabled="!RelationModalViewModel.toSystem"
                            data-field="RelationContractId">
                 </div>
@@ -69,14 +69,14 @@
                            class="form-control input-sm"
                            ui-select2="FrequencyOptions"
                            placeholder="Vælg frekvens"
-                           ng-model="RelationModalViewModel.frequency"
+                           ng-model="RelationModalViewModel.frequency.value"
                            ng-disabled="!RelationModalViewModel.toSystem"
                            data-field="RelationFrequencyId">
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-            <button type="submit" class="btn btn-danger pull-left" data-element-type="relationdeleteButton" ng-click="delete()">Slet</button>
+            <button type="submit" class="btn btn-danger pull-left" data-element-type="relationdeleteButton" ng-if="RelationModalViewModel.isEditDialog" ng-click="delete()">Slet</button>
             <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
             <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>
 

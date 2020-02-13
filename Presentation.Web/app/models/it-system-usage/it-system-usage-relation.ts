@@ -47,8 +47,8 @@
     }
 
     export interface ISystemRelationSelectionModel {
-        value?: NamedEntityDTO;
-        options: NamedEntityDTO[];
+        value?: ISystemRelationModalIdText;
+        options: ISystemRelationModalIdText[];
     }
 
     export interface ISystemRelationModalIdText {
@@ -177,6 +177,8 @@
 
     export class SystemRelationModalViewModel implements ISystemRelationModalViewModel {
         id: number;
+        headerText: string;
+        isEditDialog : boolean
         fromSystem: NamedEntityDTO;
         toSystem: ISystemRelationModalIdText;
         interface: ISystemRelationSelectionModel;
@@ -188,21 +190,30 @@
         constructor(fromSystemId: number, fromSystemName: string) {
             this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
             this.toSystem = null;
-            this.interface = <ISystemRelationSelectionModel>{};
-            this.contract = <ISystemRelationSelectionModel>{};
-            this.frequency = <ISystemRelationSelectionModel>{};
+            this.interface = <ISystemRelationSelectionModel>{value: null, options: []};
+            this.contract = <ISystemRelationSelectionModel>{ value: null, options: []};
+            this.frequency = <ISystemRelationSelectionModel>{ value: null, options: []};
             this.reference = <ISystemRelationModalIdText>{};
             this.description = <ISystemRelationModalIdText>{};
         }
 
-        setValuesFrom(relationData: IItSystemUsageRelationDTO) {
+        configureAsNewRelationDialog() {
+            this.headerText = "Opret relation";
+            this.isEditDialog = false;
+        }
+
+        configureAsEditRelationDialog(relationData: IItSystemUsageRelationDTO, optionsResult: IItSystemUsageRelationOptionsDTO) {
+            this.toSystem = <ISystemRelationModalIdText>{ id: relationData.toUsage.id, text: relationData.toUsage.name };
+            this.updateAvailableOptions(optionsResult);
+
             this.bindValue(this.frequency, relationData.frequencyType);
             this.bindValue(this.contract, relationData.contract);
             this.bindValue(this.interface, relationData.interface);
             this.id = relationData.id;
             this.description.text = relationData.description;
             this.reference.text = relationData.reference;
-
+            this.headerText = "Rediger relation";
+            this.isEditDialog = true;
         }
 
         updateAvailableOptions(optionsResult: IItSystemUsageRelationOptionsDTO) {
@@ -212,125 +223,26 @@
             this.bindOptions(this.contract, optionsResult.availableContracts);
         }
 
-        setTargetSystem(id: number, name: string) {
-            this.toSystem = <ISystemRelationModalIdText>{ id: id, text: name };
-        }
-
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO) {
             if (sourceData) {
-                targetData.value = <NamedEntityDTO>{ id: sourceData.id, name: sourceData.name };
+                targetData.value = <ISystemRelationModalIdText>{ id: sourceData.id, text: sourceData.name };
             } else {
                 targetData.value = null;
             }
-            this.bindOptions(targetData, targetData.options);
         }
 
-        private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: any) {
+        private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO[]) {
             let selectedValue = targetData.value;
-            targetData.options = sourceData;
+            targetData.options = _.map(sourceData, dto => <ISystemRelationModalIdText>{ id: dto.id, text: dto.name });
             targetData.value = null;
 
             //Set selected value to previously selected value if it was selected before
             if (selectedValue) {
-                targetData.options = sourceData;
-                for (let i = 0; i < sourceData.length; i++) {
+                for (let i = 0; i < targetData.options.length; i++) {
 
-                    let optionExists = selectedValue.id === sourceData[i].id;
+                    let optionExists = selectedValue.id === targetData.options[i].id;
                     if (optionExists) {
-                        targetData.value = sourceData[i];
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    export interface EditISystemRelationSelectionModel {
-        value?: NamedEntityDTO;
-        options: NamedEntityDTO[];
-    }
-
-    export interface EditISystemRelationModalViewModel {
-        fromSystem: NamedEntityDTO;
-        toSystem: ISystemRelationModalIdText;
-        interface: ISystemRelationModalIdText;
-        interfaceOptions: ISystemRelationSelectionModel,
-        contract: ISystemRelationModalIdText;
-        contractOptions: ISystemRelationSelectionModel,
-        frequency: ISystemRelationModalIdText;
-        frequencyOptions: ISystemRelationSelectionModel,
-        reference: ISystemRelationModalIdText;
-        description: ISystemRelationModalIdText;
-    }
-
-    export class EditSystemRelationModalViewModel implements EditISystemRelationModalViewModel {
-        id: number;
-        fromSystem: NamedEntityDTO;
-        toSystem: ISystemRelationModalIdText;
-        interface: ISystemRelationModalIdText;
-        interfaceOptions: ISystemRelationSelectionModel;
-        contract: ISystemRelationModalIdText;
-        contractOptions: ISystemRelationSelectionModel;
-        frequency: ISystemRelationModalIdText;
-        frequencyOptions: ISystemRelationSelectionModel;
-        reference: ISystemRelationModalIdText;
-        description: ISystemRelationModalIdText;
-
-        constructor(fromSystemId: number, fromSystemName: string) {
-            this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
-            this.toSystem = null;
-            this.interface = null;
-            this.contract = null;
-            this.frequency = null;
-            this.interfaceOptions = <ISystemRelationSelectionModel>{};
-            this.contractOptions = <ISystemRelationSelectionModel>{};
-            this.frequencyOptions = <ISystemRelationSelectionModel>{};
-            this.reference = <ISystemRelationModalIdText>{};
-            this.description = <ISystemRelationModalIdText>{};
-        }
-
-        setValuesFrom(relationData: IItSystemUsageRelationDTO) {
-            this.frequency = this.bindValue(relationData.frequencyType);
-            this.contract = this.bindValue(relationData.contract);
-            this.interface = this.bindValue(relationData.interface);
-            this.id = relationData.id;
-            this.description.text = relationData.description;
-            this.reference.text = relationData.reference;
-
-        }
-
-        updateAvailableOptions(optionsResult: IItSystemUsageRelationOptionsDTO) {
-            // Build modal with data
-            this.bindOptions(this.frequencyOptions, optionsResult.availableFrequencyTypes);
-            this.bindOptions(this.interfaceOptions, optionsResult.availableInterfaces);
-            this.bindOptions(this.contractOptions, optionsResult.availableContracts);
-        }
-
-        setTargetSystem(id: number, name: string) {
-            this.toSystem = <ISystemRelationModalIdText>{ id: id, text: name };
-        }
-
-        private bindValue(sourceData: NamedEntityDTO) {
-            if (sourceData) {
-                return <ISystemRelationModalIdText>{ id: sourceData.id, text: sourceData.name };
-            } else {
-                return null;
-            }
-        }
-
-        private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: any) {
-            let selectedValue = targetData.value;
-            targetData.options = sourceData;
-            targetData.value = null;
-
-            //Set selected value to previously selected value if it was selected before
-            if (selectedValue) {
-                targetData.options = sourceData;
-                for (let i = 0; i < sourceData.length; i++) {
-
-                    let optionExists = selectedValue.id === sourceData[i].id;
-                    if (optionExists) {
-                        targetData.value = sourceData[i];
+                        targetData.value = targetData.options[i];
                         break;
                     }
                 }
@@ -347,16 +259,16 @@
         ContractId?: number;
         Reference: string;
 
-        constructor(relationModelToCreate: EditISystemRelationModalViewModel) {
+        constructor(relationModelToCreate: ISystemRelationModalViewModel) {
 
             this.ToUsageId = relationModelToCreate.toSystem.id;
             this.FromUsageId = relationModelToCreate.fromSystem.id;
             this.Description = relationModelToCreate.description.text;
             this.Reference = relationModelToCreate.reference.text;
 
-            this.InterfaceId = relationModelToCreate.interface.id;
-            this.ContractId = relationModelToCreate.contract.id;
-            this.FrequencyTypeId = relationModelToCreate.frequency.id;
+            this.InterfaceId = this.getIdFromValues(relationModelToCreate.interface);
+            this.ContractId = this.getIdFromValues(relationModelToCreate.contract);
+            this.FrequencyTypeId = this.getIdFromValues(relationModelToCreate.frequency);
         }
 
         private getIdFromValues(valuesToInsert: ISystemRelationSelectionModel) {
@@ -378,22 +290,22 @@
         Contract?: IItSystemUsageRelationIdName;
         FrequencyType?: IItSystemUsageRelationIdName;
 
-        constructor(data: EditSystemRelationModalViewModel) {
+        constructor(data: SystemRelationModalViewModel) {
 
             this.Id = data.id;
             this.Description = data.description.text;
             this.Reference = data.reference.text;
             this.FromUsage = { Id: data.fromSystem.id, Name: data.fromSystem.name };
             this.ToUsage = { Id: data.toSystem.id, Name: data.toSystem.text };
-            this.FrequencyType = { Id: data.frequency.id, Name: data.frequency.text };
-            this.Interface = { Id: data.interface.id, Name: data.interface.text };
-            this.Contract = { Id: data.contract.id, Name: data.contract.text };
+            this.FrequencyType = this.setValuesOrNull(data.frequency.value);
+            this.Interface = this.setValuesOrNull(data.interface.value);
+            this.Contract = this.setValuesOrNull(data.contract.value);
 
         }
 
-        private setValuesOrNull(value: NamedEntityDTO) {
+        private setValuesOrNull(value: ISystemRelationModalIdText) {
             if (value !== null) {
-                return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.name }
+                return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.text }
             } else {
                 return null;
             }
