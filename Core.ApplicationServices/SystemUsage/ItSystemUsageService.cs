@@ -221,6 +221,7 @@ namespace Core.ApplicationServices.SystemUsage
                             var frequency = context.Entities.Frequency;
                             var contract = context.Entities.Contract;
                             var relationInterface = context.Entities.Interface;
+
                             return fromSystemUsage
                                 .ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
                                 .Match<Result<SystemRelation, OperationError>>
