@@ -51,9 +51,12 @@ class RelationHelper {
             .then(() => Select2.selectWithNoSearch(frequencyType, this.relationFrequencyTypeSelectId))
             .then(() => Select2.searchFor(contractName, this.relationContractSelectId))
             .then(() => Select2.waitForDataAndSelect())
+            .then(() => relationPage.getReferenceInputField().clear())
             .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
+            .then(() => relationPage.getDescriptionInputField().clear())
             .then(() => relationPage.getDescriptionInputField().sendKeys(descriptionText))
-            .then(() => relationPage.getSaveButton().click());
+            .then(() => relationPage.getSaveButton().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static deleteRelation(fromSystemName: string, toSystemName: string) {

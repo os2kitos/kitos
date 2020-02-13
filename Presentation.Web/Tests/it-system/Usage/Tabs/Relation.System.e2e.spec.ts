@@ -21,6 +21,17 @@ describe("User is able to create and view relation",
         var interfaceName = createInterfaceName();
         var contractName = createContractName();
 
+        // Data for edit test
+        var frequencyTypeEdited = "Kvartal";
+        var descriptionEdited = "some description edited";
+        var referenceEdited = "some reference edited";
+        var interfaceNameEdited = createInterfaceName();
+        var contractNameEdited = createContractName();
+
+
+
+
+
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
                 .then(() => ItSystemHelper.createSystem(relationSystemName1))
@@ -69,17 +80,17 @@ describe("User is able to create and view relation",
                     .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
                     .then(() => RelationHelper.editRelation(relationSystemName1,
                         relationSystemName2,
-                        interfaceName,
-                        frequencyType,
-                        contractName,
-                        reference,
-                        description))
+                        interfaceNameEdited,
+                        frequencyTypeEdited,
+                        contractNameEdited,
+                        referenceEdited,
+                        descriptionEdited))
                     .then(() => checkForRelationPart(relationSystemName2))
-                    .then(() => checkForRelationPart(interfaceName))
-                    .then(() => checkForRelationPart(contractName))
-                    .then(() => checkForDescription(relationSystemName2, description))
-                    .then(() => checkForReference(relationSystemName2, reference))
-                    .then(() => checkForFrequencyType(relationSystemName2, frequencyType))
+                    .then(() => checkForRelationPart(interfaceNameEdited))
+                    .then(() => checkForRelationPart(contractNameEdited))
+                    .then(() => checkForDescription(relationSystemName2, descriptionEdited))
+                    .then(() => checkForReference(relationSystemName2, referenceEdited))
+                    .then(() => checkForFrequencyType(relationSystemName2, frequencyTypeEdited))
                     .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
                     .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
 
