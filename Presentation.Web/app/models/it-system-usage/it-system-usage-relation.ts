@@ -189,7 +189,7 @@
 
         constructor(fromSystemId: number, fromSystemName: string) {
             this.fromSystem = <ISystemRelationModalIdName>{ id: fromSystemId, name: fromSystemName };
-            this.toSystem = <ISystemRelationModalIdText>{};
+            this.toSystem = null;
             this.interface = <ISystemRelationSelectionModel>{};
             this.contract = <ISystemRelationSelectionModel>{};
             this.frequency = <ISystemRelationSelectionModel>{};
@@ -216,8 +216,7 @@
         }
 
         setTargetSystem(id: number, name: string) {
-            this.toSystem.id = id;
-            this.toSystem.text = name;
+            this.toSystem = <ISystemRelationModalIdText>{ id: id, text: name };
         }
 
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: ISystemRelationModalIdName) {

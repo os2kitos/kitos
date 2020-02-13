@@ -7,15 +7,13 @@
         });
     }]);
 
-    app.controller('system.EditRelation', ['$scope', '$http', '$state', 'itSystemUsage', 'notify', '$uibModal',
-        ($scope, $http, $state, itSystemUsage, notify, $modal) => {
+    app.controller('system.EditRelation', ['$scope', '$http', 'itSystemUsage', 'notify', '$uibModal',
+        ($scope, $http, itSystemUsage, notify, $modal) => {
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
-            $scope.editRelation = false;
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
-
             const reload = () => {
                 $http.get(`api/v1/systemrelations/from/${usageId}`).success(result => {
 
@@ -33,13 +31,11 @@
                     $scope.relationTableTestData = overviewData;
                 });
             };
-
             reload();
 
             $scope.createRelation = () => {
                 if (modalOpen === false) {
                     modalOpen = true;
-
                     $modal.open({
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
@@ -97,14 +93,13 @@
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
                         controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
-                            var relationData: Kitos.Models.ItSystemUsage.Relation.ISystemGetRelationDTO;
+                            modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
+
                             $http.get(`api/v1/systemrelations/from/${usageId}/${relationId}`).success(result => {
-                                relationData = result.response as Kitos.Models.ItSystemUsage.Relation.ISystemGetRelationDTO;
-
-                                modalOpen = true;
-                                $scope.RelationModalState = "Redigere relation mellem " + relationData.fromUsage.name + " og " + relationData.toUsage.name;
-
+                                var relationData = result.response as Kitos.Models.ItSystemUsage.Relation.ISystemGetRelationDTO;
+                                
+                                $scope.RelationModalState = "Redigere relation";
                                 var modalModelView = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relationData.fromUsage.id, relationData.fromUsage.name);
                                 modalModelView.setTargetSystem(relationData.toUsage.id, relationData.toUsage.name);
                                 $scope.RelationModalViewModel = modalModelView;
@@ -121,50 +116,49 @@
                                     }
                                 }
 
-                                exposedSystemChanged();
                                 $scope.ExposedSystemSelectedTrigger = () => {
                                     exposedSystemChanged();
                                 }
-                                $scope.save = () => {
-                                    var data = $scope.RelationModalViewModel;
-                                    const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
-                                    notify.addInfoMessage("Tilføjer relation ...", true);
-                                    $http.patch("api/v1/systemrelations", postData, { handleBusy: true }).success(_ => {
-                                        notify.addSuccessMessage("Relation ændret");
+                                exposedSystemChanged();
+
+                            }).error(_ => {
+                                notify.addErrorMessage("Det var ikke muligt at redigere denne relation");
+                            });
+
+
+                            $scope.save = () => {
+                                var data = $scope.RelationModalViewModel;
+                                const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
+                                notify.addInfoMessage("Tilføjer relation ...", true);
+                                $http.patch("api/v1/systemrelations", postData, { handleBusy: true }).success(_ => {
+                                    notify.addSuccessMessage("Relation ændret");
+                                    modalOpen = false;
+                                    $scope.$close(true);
+                                    reload();
+                                }).error(_ => {
+                                    notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
+                                });
+
+                            }
+
+                            $scope.delete = () => {
+                                $http.delete(`api/v1/systemrelations/from/${usageId}/${$scope.RelationModalViewModel.id}`)
+                                    .success(_ => {
+                                        notify.addSuccessMessage("Relation slettet");
                                         modalOpen = false;
                                         $scope.$close(true);
                                         reload();
                                     }).error(_ => {
-                                        notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
+                                        notify.addErrorMessage("Kunne ikke slette relation");
                                     });
+                            }
 
-                                }
-
-
-                                $scope.delete = () => {
-                                    $http.delete(`api/v1/systemrelations/from/${usageId}/${$scope.RelationModalViewModel.id}`)
-                                        .success(_ => {
-                                            notify.addSuccessMessage("Relation slettet");
-                                            modalOpen = false;
-                                            $scope.$close(true);
-                                            reload();
-                                        }).error(_ => {
-                                            notify.addErrorMessage("Kunne ikke slette relation");
-                                        });
-                                }
-                                
-
-                                $scope.dismiss = () => {
-                                    modalOpen = false;
-                                    $scope.$close(true);
-                                }
-
+                            $scope.dismiss = () => {
                                 modalOpen = false;
-                            });
+                                $scope.$close(true);
+                            }
 
-
-
-
+                            modalOpen = false;
 
                         }],
                     });
