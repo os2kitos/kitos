@@ -68,6 +68,8 @@ class RelationHelper {
             .then(() => browser.switchTo().alert().accept())
             .then(() => browser.waitForAngular())
             .then(() => browser.refresh())
+            // Refreshing because of a bug when running in debug mode 
+            //which causes modal event listener to fire twice
             .then(() => browser.waitForAngular());
     }
 

@@ -28,10 +28,6 @@ describe("User is able to create and view relation",
         var interfaceNameEdited = createInterfaceName();
         var contractNameEdited = createContractName();
 
-
-
-
-
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
                 .then(() => ItSystemHelper.createSystem(relationSystemName1))
@@ -95,7 +91,6 @@ describe("User is able to create and view relation",
                     .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
 
             });
-
     });
 
 function createItSystemName() {
