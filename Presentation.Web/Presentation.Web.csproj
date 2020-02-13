@@ -527,7 +527,6 @@
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
     <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
     <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
@@ -543,7 +542,6 @@
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
-    <Compile Include="Models\SSOConfigDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />

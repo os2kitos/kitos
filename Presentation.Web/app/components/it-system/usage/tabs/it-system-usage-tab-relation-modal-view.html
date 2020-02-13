@@ -1,6 +1,6 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">Opret relation</h3>
+        <h3 class="modal-title pull-left">{{RelationModalState}}</h3>
     </div>
 </div>
 
@@ -18,8 +18,8 @@
                            ui-select2="RelationExposedSystemDataCall"
                            ng-value="RelationExposedSelectedData"
                            placeholder="Vælg udstiller system"
-                           ng-model="RelationExposedSystemData"
-                           ng-change="ExposedSystemSelected()"
+                           ng-model="RelationModalViewModel.toSystem"
+                           ng-change="ExposedSystemSelectedTrigger()"
                            data-field="RelationExposedId">
                 </div>
             </div>
@@ -29,51 +29,56 @@
             <div class="col-md-6">
                 <!--Interface-->
                 <div class="form-group">
-                    <label for="relationInterfacesSelect">Vælg Snitflade</label>
-                    <select ng-model="relationInterfacesValue"
-                            id="relationInterfacesSelect"
-                            class="form-control input-sm"
-                            placeholder="Vælg snitflade"
-                            ng-options="interface.name for interface in relationInterfaceOptions"
-                            ng-disabled="!RelationExposedSystemData"></select>
+                    <label for="RelationInterfacesSelect">Vælg snitflade</label>
+                    <input type="hidden"
+                           id="RelationInterfacesSelect"
+                           class="form-control input-sm"
+                           ui-select2="InterfaceOptions"
+                           placeholder="Vælg snitflade"
+                           ng-model="RelationModalViewModel.interface"
+                           ng-disabled="!RelationModalViewModel.toSystem"
+                           data-field="RelationContractId">
                 </div>
                 <!--Description-->
                 <div class="form-group">
                     <label class="control-label" for="description">Beskrivelse</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" ng-model="relationDescriptionValue" ng-disabled="!RelationExposedSystemData"></textarea>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" ng-model="RelationModalViewModel.description.text" ng-disabled="!RelationModalViewModel.toSystem"></textarea>
                 </div>
                 <!--Reference-->
                 <div class="form-group">
                     <label class="control-label" for="Reference">Reference</label>
-                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" ng-model="relationReferenceValue" ng-disabled="!RelationExposedSystemData">
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" ng-model="RelationModalViewModel.reference.text" ng-disabled="!RelationModalViewModel.toSystem">
                 </div>
                 <!--Contract-->
                 <div class="form-group">
-                    <label for="relationContractsSelect">Vælg kontrakt</label>
+                    <label for="RelationContractsSelect">Vælg kontrakt</label>
                     <input type="hidden"
-                           id="relationContractsSelect"
+                           id="RelationContractsSelect"
                            class="form-control input-sm"
-                           ui-select2="relationContractsOptions"
+                           ui-select2="ContractOptions"
                            placeholder="Vælg kontrakt"
-                           ng-model="relationContractsValue"
-                           ng-value="RelationContractSelectedData"
+                           ng-model="RelationModalViewModel.contract"
+                           ng-disabled="!RelationModalViewModel.toSystem"
                            data-field="RelationContractId">
                 </div>
                 <!--frequency-->
                 <div class="form-group">
-                    <label for="relationPaymentFrequenciesSelect">Vælg frekvens</label>
-                    <select ng-model="relationPaymentFrequenciesValue"
-                            id="relationPaymentFrequenciesSelect"
-                            class="form-control input-sm"
-                            placeholder="Vælg frekvens"
-                            ng-options="frequencyType.name for frequencyType in relationPaymentFrequenciesOptions"
-                            ng-disabled="!RelationExposedSystemData"></select>
+                    <label for="RelationPaymentFrequenciesSelect">Vælg frekvens</label>
+                    <input type="hidden"
+                           id="RelationPaymentFrequenciesSelect"
+                           class="form-control input-sm"
+                           ui-select2="FrequencyOptions"
+                           placeholder="Vælg frekvens"
+                           ng-model="RelationModalViewModel.frequency"
+                           ng-disabled="!RelationModalViewModel.toSystem"
+                           data-field="RelationFrequencyId">
                 </div>
             </div>
         </div>
         <div class="modal-footer">
+            <button type="submit" class="btn btn-danger pull-left" data-element-type="relationdeleteButton" ng-click="delete()">Slet</button>
             <button type="button" class="btn btn-warning" ng-click="dismiss()">Annuller</button>
-            <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" data-ng-disabled="!RelationExposedSystemData">Gem</button>
+            <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="relationSaveButton" ng-disabled="!RelationModalViewModel.toSystem">Gem</button>
 
         </div>
     </div>
