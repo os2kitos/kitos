@@ -30,7 +30,7 @@ describe("User is able to create and view relation",
                 .then(() => InterfaceCatalogHelper.createInterface(interfaceName))
                 .then(() => InterfaceCatalogHelper.bindInterfaceToSystem(relationSystemName2, interfaceName))
                 .then(() => ContractHelper.createContract(contractName));
-            
+
         }, testFixture.longRunningSetup());
 
         beforeEach(() => {
@@ -70,7 +70,29 @@ describe("User is able to create and view relation",
 
             });
 
+        it("User can delete a relation", () => {
+            loginHelper.loginAsGlobalAdmin()
+                .then(() => RelationHelper.createRelation(relationSystemName1,
+                    relationSystemName2,
+                    interfaceName,
+                    frequencyType,
+                    contractName,
+                    reference,
+                    description))
+                .then(() => checkForRelationPart(relationSystemName2))
+                .then(() => checkForRelationPart(interfaceName))
+                .then(() => checkForRelationPart(contractName))
+                .then(() => checkForDescription(relationSystemName2, description))
+                .then(() => checkForReference(relationSystemName2, reference))
+                .then(() => checkForFrequencyType(relationSystemName2, frequencyType))
+                .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
+                .then(() => expect(checkForRelationPart(relationSystemName2)).toBe(false)); 
+        });
+
     });
+
+
+
 
 function createItSystemName() {
     return `SystemWithRelation${new Date().getTime()}`;

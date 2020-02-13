@@ -33,5 +33,14 @@ class RelationHelper {
             .then(() => relationPage.getSaveButton().click());
     }
 
+    public static deleteRelation(fromSystemName: string, toSystemName: string) {
+        console.log("Deleting relation");
+        return systemUsageHelper.openLocalSystem(fromSystemName)
+            .then(() => localSystemNavigation.relationsPage())
+            .then(() => relationPage.getEditButton(toSystemName).click())
+            .then(() => relationPage.getDeleteButton().click())
+            .then(() => browser.switchTo().alert().accept());
+    }
+
 }
 export = RelationHelper;

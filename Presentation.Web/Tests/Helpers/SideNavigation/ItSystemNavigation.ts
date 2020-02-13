@@ -7,8 +7,6 @@
     public static exposedInterfacesPage() {
         element(by.css(`[data-ui-sref="${ItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
     }
-
-
 }
 
 export = ItSystemNavigation;
