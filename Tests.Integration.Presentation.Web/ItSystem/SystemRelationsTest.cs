@@ -142,13 +142,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task Can_Edit_SystemUsageWithRelations()
+        public async Task Can_Edit_SystemUsageWithRelations_Resets_Contract()
         {
             //Arrange
-            var input = await PrepareFullRelationAsync(true, false, true);
+            var input = await PrepareFullRelationAsync(true, true, true);
             await SystemRelationHelper.SendPostRelationRequestAsync(input);
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
-            var edited = await PrepareEditedRelationAsync(relations.Single());
+            var relationToEdit = relations.Single();
+            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, null, relationToEdit.FrequencyType, relationToEdit.Interface);
 
             //Act
             using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
@@ -161,6 +162,62 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(edited.Description, relationDTO.Description);
                 Assert.Equal(edited.Reference, relationDTO.Reference);
                 Assert.Equal(edited.Interface.Id, relationDTO.Interface.Id);
+                Assert.NotNull(relationDTO.Interface);
+                Assert.NotNull(relationDTO.FrequencyType);
+                Assert.Null(relationDTO.Contract);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Edit_SystemUsageWithRelations_Resets_Frequency()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, true, true);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
+            var relationToEdit = relations.Single();
+            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, null, relationToEdit.Interface);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var relationDTO = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.Equal(input.FromUsageId, relationDTO.FromUsage.Id);
+                Assert.Equal(edited.ToUsage.Id, relationDTO.ToUsage.Id);
+                Assert.Equal(edited.Description, relationDTO.Description);
+                Assert.Equal(edited.Reference, relationDTO.Reference);
+                Assert.Equal(edited.Interface.Id, relationDTO.Interface.Id);
+                Assert.NotNull(relationDTO.Interface);
+                Assert.NotNull(relationDTO.Contract);
+                Assert.Null(relationDTO.FrequencyType);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Edit_SystemUsageWithRelations_Resets_Interface()
+        {
+            //Arrange
+            var input = await PrepareFullRelationAsync(true, true, true);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
+            var relationToEdit = relations.Single();
+            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, relationToEdit.FrequencyType, null);
+
+            //Act
+            using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var relationDTO = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+                Assert.Equal(input.FromUsageId, relationDTO.FromUsage.Id);
+                Assert.Equal(edited.ToUsage.Id, relationDTO.ToUsage.Id);
+                Assert.Equal(edited.Description, relationDTO.Description);
+                Assert.Equal(edited.Reference, relationDTO.Reference);
+                Assert.NotNull(relationDTO.FrequencyType);
+                Assert.NotNull(relationDTO.Contract);
+                Assert.Null(relationDTO.Interface);
             }
         }
 
@@ -347,23 +404,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return input;
         }
 
-        private async Task<SystemRelationDTO> PrepareEditedRelationAsync(SystemRelationDTO created)
+        private async Task<SystemRelationDTO> PrepareEditedRelationAsync(SystemRelationDTO created, NamedEntityDTO usage, NamedEntityDTO contract, NamedEntityDTO frequency, NamedEntityDTO interfaceType)
         {
-            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), OrganizationId, AccessModifier.Public);
-            var usage3 = await ItSystemHelper.TakeIntoUseAsync(system3.Id, OrganizationId);
-            var targetInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
-            var interfaceExhibitDTO = await InterfaceExhibitHelper.CreateExhibit(system3.Id, targetInterface.Id);
-
             return new SystemRelationDTO(
                 created.Id,
                 created.Uuid,
                 created.FromUsage,
-                new NamedEntityDTO(usage3.Id, usage3.LocalCallName),
-                new NamedEntityDTO(interfaceExhibitDTO.ItInterfaceId, interfaceExhibitDTO.ItInterfaceName),
-                null, // contract
-                null, // frquencytype
-                "", // description
-                "" // reference
+                usage,
+                interfaceType,
+                contract, // contract
+                frequency, // frquencytype
+                A<string>(), // description
+                A<string>() // reference
                 );
         }
 

@@ -2,6 +2,7 @@
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -88,8 +89,10 @@ namespace Core.DomainModel.ItSystemUsage
                 return new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
             }
 
+            ToSystemUsage.Track();
             ToSystemUsage = toSystemUsage;
 
+            RelationInterface.Track();
             RelationInterface =
                 RelationInterface
                     .FromNullable()
@@ -109,6 +112,7 @@ namespace Core.DomainModel.ItSystemUsage
                 return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
             }
 
+            AssociatedContract.Track();
             AssociatedContract = contract.GetValueOrDefault();
             return this;
         }
@@ -135,6 +139,7 @@ namespace Core.DomainModel.ItSystemUsage
                 }
             }
 
+            RelationInterface.Track();
             RelationInterface = relationInterface.GetValueOrDefault();
 
             return this;
@@ -147,6 +152,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <returns></returns>
         public Result<SystemRelation, OperationError> SetFrequency(Maybe<RelationFrequencyType> toFrequency)
         {
+            UsageFrequency.Track();
             UsageFrequency = toFrequency.GetValueOrDefault();
 
             return this;
