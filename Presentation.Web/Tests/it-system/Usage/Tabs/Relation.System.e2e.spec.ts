@@ -66,33 +66,13 @@ describe("User is able to create and view relation",
                     .then(() => checkForRelationPart(contractName))
                     .then(() => checkForUsedByDescription(relationSystemName1, description))
                     .then(() => checkForUsedByReference(relationSystemName1, reference))
-                    .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType));
+                    .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
+                    .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
+                    .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
 
             });
 
-        it("User can delete a relation", () => {
-            loginHelper.loginAsGlobalAdmin()
-                .then(() => RelationHelper.createRelation(relationSystemName1,
-                    relationSystemName2,
-                    interfaceName,
-                    frequencyType,
-                    contractName,
-                    reference,
-                    description))
-                .then(() => checkForRelationPart(relationSystemName2))
-                .then(() => checkForRelationPart(interfaceName))
-                .then(() => checkForRelationPart(contractName))
-                .then(() => checkForDescription(relationSystemName2, description))
-                .then(() => checkForReference(relationSystemName2, reference))
-                .then(() => checkForFrequencyType(relationSystemName2, frequencyType))
-                .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
-                .then(() => expect(checkForRelationPart(relationSystemName2)).toBe(false)); 
-        });
-
     });
-
-
-
 
 function createItSystemName() {
     return `SystemWithRelation${new Date().getTime()}`;
@@ -104,6 +84,11 @@ function createInterfaceName() {
 
 function createContractName() {
     return `ContractForRelation${new Date().getTime()}`;
+}
+
+function checkIfRelationIsDeleted(name: string)
+{
+    expect(RelationPage.getRelationLink(name)).toBeUndefined();
 }
 
 function checkForRelationPart(name: string) {

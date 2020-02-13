@@ -58,6 +58,7 @@
     <Compile Include="DomainEvents\IDomainEvent.cs" />
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />
+    <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,5 +77,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
