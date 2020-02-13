@@ -47,8 +47,8 @@
     }
 
     export interface ISystemRelationSelectionModel {
-        value?: NamedEntityDTO;
-        options: NamedEntityDTO[];
+        value?: ISystemRelationModalIdText;
+        options: ISystemRelationModalIdText[];
     }
 
     export interface ISystemRelationModalIdText {
@@ -190,9 +190,9 @@
         constructor(fromSystemId: number, fromSystemName: string) {
             this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
             this.toSystem = null;
-            this.interface = <ISystemRelationSelectionModel>{};
-            this.contract = <ISystemRelationSelectionModel>{};
-            this.frequency = <ISystemRelationSelectionModel>{};
+            this.interface = <ISystemRelationSelectionModel>{value: null, options: []};
+            this.contract = <ISystemRelationSelectionModel>{ value: null, options: []};
+            this.frequency = <ISystemRelationSelectionModel>{ value: null, options: []};
             this.reference = <ISystemRelationModalIdText>{};
             this.description = <ISystemRelationModalIdText>{};
         }
@@ -225,26 +225,24 @@
 
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO) {
             if (sourceData) {
-                targetData.value = <NamedEntityDTO>{ id: sourceData.id, name: sourceData.name };
+                targetData.value = <ISystemRelationModalIdText>{ id: sourceData.id, text: sourceData.name };
             } else {
                 targetData.value = null;
             }
-            this.bindOptions(targetData, targetData.options);
         }
 
-        private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: any) {
+        private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO[]) {
             let selectedValue = targetData.value;
-            targetData.options = sourceData;
+            targetData.options = _.map(sourceData, dto => <ISystemRelationModalIdText>{ id: dto.id, text: dto.name });
             targetData.value = null;
 
             //Set selected value to previously selected value if it was selected before
             if (selectedValue) {
-                targetData.options = sourceData;
-                for (let i = 0; i < sourceData.length; i++) {
+                for (let i = 0; i < targetData.options.length; i++) {
 
-                    let optionExists = selectedValue.id === sourceData[i].id;
+                    let optionExists = selectedValue.id === targetData.options[i].id;
                     if (optionExists) {
-                        targetData.value = sourceData[i];
+                        targetData.value = targetData.options[i];
                         break;
                     }
                 }
@@ -305,9 +303,9 @@
 
         }
 
-        private setValuesOrNull(value: NamedEntityDTO) {
+        private setValuesOrNull(value: ISystemRelationModalIdText) {
             if (value !== null) {
-                return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.name }
+                return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.text }
             } else {
                 return null;
             }

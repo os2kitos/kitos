@@ -1,13 +1,42 @@
 ﻿module Kitos.Services {
 
     export interface ISelect2LoadingService {
-        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean)
+        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean);
+        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
+        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
 
         static $inject = ["$http"];
         constructor(private readonly $http: ng.IHttpService) {
+        }
+
+        mapNamedEntitiesToSelect2(data: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+            var mappedData = [];
+            _.each(data(),
+                (namedEntity) =>
+                mappedData.push({
+                    "id": namedEntity.id,
+                    "text": namedEntity.name
+                })
+            );
+            return {"results": mappedData}
+        }
+
+        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+            return {
+                data: () => ({ "results": dataFn() }) ,
+                allowClear: true
+            };
+        }
+
+        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+            return {
+                minimumResultsForSearch: Infinity,
+                data: () => ({ "results": dataFn() }),
+                allowClear: true
+            };
         }
 
         loadSelect2(

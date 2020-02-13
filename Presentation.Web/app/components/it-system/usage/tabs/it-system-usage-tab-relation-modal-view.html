@@ -13,13 +13,13 @@
             <!--Exposed System-->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="RelationSystemExposed" class="control-label small">Udstillet af</label>
+                    <label for="RelationSystemExposed">Udstillet af</label>
                     <input type="hidden" id="RelationSystemExposed" class="form-control input-sm"
-                           data-ui-select2="RelationExposedSystemDataCall"
-                           data-ng-value="RelationExposedSelectedData"
-                           data-placeholder="Vælg udstiller system"
-                           data-ng-model="RelationModalViewModel.toSystem"
-                           data-ng-change="ExposedSystemSelectedTrigger()"
+                           ui-select2="RelationExposedSystemDataCall"
+                           ng-value="RelationExposedSelectedData"
+                           placeholder="Vælg udstiller system"
+                           ng-model="RelationModalViewModel.toSystem"
+                           ng-change="ExposedSystemSelectedTrigger()"
                            data-field="RelationExposedId">
                 </div>
             </div>
@@ -29,9 +29,15 @@
             <div class="col-md-6">
                 <!--Interface-->
                 <div class="form-group">
-                    <label for="relationInterfacesSelect"> Vælg Snitflade </label>
-                    <select ng-model="RelationModalViewModel.interface.value" id="relationInterfacesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in RelationModalViewModel.interface.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
+                    <label for="RelationInterfacesSelect">Vælg snitflade</label>
+                    <input type="hidden"
+                           id="RelationInterfacesSelect"
+                           class="form-control input-sm"
+                           ui-select2="InterfaceOptions"
+                           placeholder="Vælg snitflade"
+                           ng-model="RelationModalViewModel.interface.value"
+                           ng-disabled="!RelationModalViewModel.toSystem"
+                           data-field="RelationContractId">
                 </div>
                 <!--Description-->
                 <div class="form-group">
@@ -45,15 +51,27 @@
                 </div>
                 <!--Contract-->
                 <div class="form-group">
-                    <label for="relationContractsSelect"> Vælg kontrakt </label>
-                    <select ng-model="RelationModalViewModel.contract.value" id="relationContractsSelect" class="form-control input-sm"
-                            ng-options="x.name for x in RelationModalViewModel.contract.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
+                    <label for="RelationContractsSelect">Vælg kontrakt</label>
+                    <input type="hidden"
+                           id="RelationContractsSelect"
+                           class="form-control input-sm"
+                           ui-select2="ContractOptions"
+                           placeholder="Vælg kontrakt"
+                           ng-model="RelationModalViewModel.contract.value"
+                           ng-disabled="!RelationModalViewModel.toSystem"
+                           data-field="RelationContractId">
                 </div>
                 <!--frequency-->
                 <div class="form-group">
-                    <label for="relationPaymentFrequenciesSelect"> Vælg frekvens </label>
-                    <select ng-model="RelationModalViewModel.frequency.value" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in RelationModalViewModel.frequency.options" ng-disabled="!RelationModalViewModel.toSystem"></select>
+                    <label for="RelationPaymentFrequenciesSelect">Vælg frekvens</label>
+                    <input type="hidden"
+                           id="RelationPaymentFrequenciesSelect"
+                           class="form-control input-sm"
+                           ui-select2="FrequencyOptions"
+                           placeholder="Vælg frekvens"
+                           ng-model="RelationModalViewModel.frequency.value"
+                           ng-disabled="!RelationModalViewModel.toSystem"
+                           data-field="RelationFrequencyId">
                 </div>
             </div>
         </div>

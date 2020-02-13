@@ -51,6 +51,10 @@
                             $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
                             $scope.RelationModalViewModel.configureAsNewRelationDialog();
 
+                            $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
+                            $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
+                            $scope.FrequencyOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.frequency.options);
+
                             const exposedSystemChanged = () => {
                                 if ($scope.RelationModalViewModel.toSystem != null) {
                                     systemRelationService
@@ -61,7 +65,7 @@
                                             $scope.RelationModalViewModel = updatedView;
                                         });
                                 }
-                            }
+                            };
 
                             $scope.ExposedSystemSelectedTrigger = exposedSystemChanged;
 
@@ -80,19 +84,19 @@
                                             notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relationen.");
                                         });
 
-                            }
+                            };
 
                             $scope.dismiss = () => {
                                 modalOpen = false;
                                 $scope.$close(true);
-                            }
+                            };
 
                             modalOpen = false;
                         }],
                     });
                 }
 
-            }
+            };
 
             $scope.editRelation = (relationId) => {
                 if (modalOpen === false) {
@@ -101,9 +105,15 @@
                     $modal.open({
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
-                        controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
+                        controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
+
+                            $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+
+                            $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
+                            $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
+                            $scope.FrequencyOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.frequency.options);
 
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
@@ -120,8 +130,6 @@
 
                                     var relation = response.data;
 
-                                    $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relation.fromUsage.id, relation.fromUsage.name);
-
                                     const loadOptions = (toUsage, onOptionsLoadedCallback) => {
                                         systemRelationService
                                             .getAvailableRelationOptions(usageId, toUsage.id)
@@ -134,7 +142,7 @@
                                         if (toSystem != null) {
                                             loadOptions(toSystem, options => $scope.RelationModalViewModel.updateAvailableOptions(options));
                                         }
-                                    }
+                                    };
                                     $scope.ExposedSystemSelectedTrigger = () => {
                                         exposedSystemChanged();
                                     }
@@ -174,16 +182,16 @@
                                         error => {
                                             notify.addErrorMessage("Kunne ikke slette relationen");
                                         });
-                            }
+                            };
                             $scope.dismiss = () => {
                                 modalOpen = false;
                                 $scope.$close(true);
-                            }
+                            };
                             modalOpen = false;
                         }],
                     });
                 }
-            }
+            };
 
             $scope.expandParagraph = (e) => {
                 var element = angular.element(e.currentTarget);
@@ -198,6 +206,6 @@
                     para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
                     btn.innerText = "Se mere";
                 }
-            }
+            };
         }]);
 })(angular, app);
