@@ -71,13 +71,13 @@
                                 systemRelationService.createSystemRelation(newRelation)
                                     .then(
                                         () => {
-                                            notify.addSuccessMessage("´Relation tilføjet");
+                                            notify.addSuccessMessage("Relation tilføjet");
                                             modalOpen = false;
                                             $scope.$close(true);
                                             reload();
                                         },
                                         error => {
-                                            notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relation");
+                                            notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relationen.");
                                         });
 
                             }
@@ -158,16 +158,16 @@
                                     });
                             }
 
-                            $scope.delete = () => {
+                            $scope.removeRelation = () => {
                                 systemRelationService.deleteSystemRelation(usageId, relationId)
                                     .then(success => {
-                                            notify.addSuccessMessage("Relation slettet");
+                                            notify.addSuccessMessage("Relationen er slettet");
                                             modalOpen = false;
                                             $scope.$close(true);
                                             reload();
                                         },
                                         error => {
-                                            notify.addErrorMessage("Kunne ikke slette relation");
+                                            notify.addErrorMessage("Kunne ikke slette relationen");
                                         });
                             }
                             $scope.dismiss = () => {
