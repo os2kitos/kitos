@@ -63,6 +63,8 @@ class RelationHelper {
             .then(() => relationPage.getEditButton(toSystemName).click())
             .then(() => relationPage.getDeleteButton().click())
             .then(() => browser.switchTo().alert().accept())
+            .then(() => browser.waitForAngular())
+            .then(() => browser.refresh())
             .then(() => browser.waitForAngular());
     }
 

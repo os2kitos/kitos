@@ -99,9 +99,8 @@ function createContractName() {
     return `ContractForRelation${new Date().getTime()}`;
 }
 
-function checkIfRelationIsDeleted(name: string)
-{
-    expect(RelationPage.getRelationLink(name)).toBeUndefined();
+function checkIfRelationIsDeleted(name: string) {
+    expect(RelationPage.getRelationLink(name).isPresent()).toBe(false);
 }
 
 function checkForRelationPart(name: string) {
