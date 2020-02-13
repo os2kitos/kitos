@@ -47,6 +47,11 @@ namespace Core.DomainModel
 
         public bool? HasApiAccess { get; set; }
 
+        public bool CanAuthenticate()
+        {
+            return IsGlobalAdmin || OrganizationRights.Any();
+        }
+
         /// <summary>
         ///     The organization the user will be automatically logged into.
         /// </summary>
