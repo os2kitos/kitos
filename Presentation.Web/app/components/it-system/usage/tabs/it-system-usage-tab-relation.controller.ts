@@ -108,8 +108,9 @@
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
                                     error: boolean,
-                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO}
-                                    ) => {
+                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO
+                                }
+                                ) => {
                                     if (response.error) {
                                         notify.addErrorMessage("Det var ikke muligt at redigere denne relation");
                                         modalOpen = false;
@@ -119,7 +120,7 @@
 
                                     var relation = response.data;
 
-                                    $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relation.fromUsage.id,relation.fromUsage.name);
+                                    $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relation.fromUsage.id, relation.fromUsage.name);
 
                                     const loadOptions = (toUsage, onOptionsLoadedCallback) => {
                                         systemRelationService
@@ -153,19 +154,23 @@
                                         $scope.$close(true);
                                         reload();
                                     },
-                                    error => {
-                                        notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
-                                    });
+                                        error => {
+                                            notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
+                                        });
                             }
 
                             $scope.removeRelation = () => {
+
+                                if (!confirm("Er du sikker på at du vil fjerne denne relation?")) {
+                                    return;
+                                }
                                 systemRelationService.deleteSystemRelation(usageId, relationId)
                                     .then(success => {
-                                            notify.addSuccessMessage("Relationen er slettet");
-                                            modalOpen = false;
-                                            $scope.$close(true);
-                                            reload();
-                                        },
+                                        notify.addSuccessMessage("Relationen er slettet");
+                                        modalOpen = false;
+                                        $scope.$close(true);
+                                        reload();
+                                    },
                                         error => {
                                             notify.addErrorMessage("Kunne ikke slette relationen");
                                         });
