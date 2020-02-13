@@ -67,6 +67,19 @@ describe("User is able to create and view relation",
                     .then(() => checkForUsedByDescription(relationSystemName1, description))
                     .then(() => checkForUsedByReference(relationSystemName1, reference))
                     .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
+                    .then(() => RelationHelper.editRelation(relationSystemName1,
+                        relationSystemName2,
+                        interfaceName,
+                        frequencyType,
+                        contractName,
+                        reference,
+                        description))
+                    .then(() => checkForRelationPart(relationSystemName2))
+                    .then(() => checkForRelationPart(interfaceName))
+                    .then(() => checkForRelationPart(contractName))
+                    .then(() => checkForDescription(relationSystemName2, description))
+                    .then(() => checkForReference(relationSystemName2, reference))
+                    .then(() => checkForFrequencyType(relationSystemName2, frequencyType))
                     .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
                     .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
 

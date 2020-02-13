@@ -34,6 +34,28 @@ class RelationHelper {
             .then(() => relationPage.getSaveButton().click());
     }
 
+    public static editRelation(
+        fromSystemName: string,
+        toSystemName: string,
+        interfaceName: string,
+        frequencyType: string,
+        contractName: string,
+        referenceText: string,
+        descriptionText: string) {
+
+        console.log("Editing relation");
+        return systemUsageHelper.openLocalSystem(fromSystemName)
+            .then(() => localSystemNavigation.relationsPage())
+            .then(() => relationPage.getEditButton(toSystemName).click())
+            .then(() => Select2.selectWithNoSearch(interfaceName, this.relationInterfaceSelectId))
+            .then(() => Select2.selectWithNoSearch(frequencyType, this.relationFrequencyTypeSelectId))
+            .then(() => Select2.searchFor(contractName, this.relationContractSelectId))
+            .then(() => Select2.waitForDataAndSelect())
+            .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
+            .then(() => relationPage.getDescriptionInputField().sendKeys(descriptionText))
+            .then(() => relationPage.getSaveButton().click());
+    }
+
     public static deleteRelation(fromSystemName: string, toSystemName: string) {
         console.log("Deleting relation " + toSystemName);
         return systemUsageHelper.openLocalSystem(fromSystemName)
