@@ -7,8 +7,8 @@
         });
     }]);
 
-    app.controller("system.EditRelation", ["$scope", "$http", "$state", "itSystemUsage", "notify", "$uibModal", "systemRelationService",
-        ($scope, $http, $state, itSystemUsage, notify, $modal, systemRelationService) => {
+    app.controller("system.EditRelation", ["$scope", "$http", "$state", "itSystemUsage", "notify", "$uibModal", "systemRelationService", "$",
+        ($scope, $http, $state, itSystemUsage, notify, $modal, systemRelationService, $) => {
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
@@ -55,6 +55,9 @@
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
                             $scope.interfaceOptions = "";
 
+                            $scope.relationAvailableContracts = [];
+                            $scope.relationContractsOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.relationAvailableContracts);
+
                             $scope.ExposedSystemSelected = () => {
                                 const checkIfValueIsStillPresent = (relationOptions: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
 
@@ -90,29 +93,40 @@
                                         $scope.relationInterfaceOptions = relationOptions.availableInterfaces;
                                     }
 
-                                    if ($scope.relationContractsValue) {
+                                    //_.each(relationOptions.availableContracts,
+                                    //    (contract) => {
+                                    //        var newOption = new Option(contract.name, contract.id.toString(), false, false);
+                                    //        $("#relationContractsSelect").append(newOption).trigger("change");
+                                    //    });
+                                    
+                                    $scope.relationAvailableContracts = relationOptions.availableContracts;
 
-                                        for (let i = 0; i < relationOptions.availableContracts.length; i++) {
+                                    //if ($scope.relationContractsValue) {
 
-                                            if (relationOptions.availableContracts[i].id === $scope.relationContractsValue.id) {
-                                                $scope.relationContractsOptions = relationOptions.availableContracts;
-                                                $scope.relationContractsValue = relationOptions.availableContracts[i];
-                                                break;
-                                            }
-                                        }
-                                        $scope.relationContractsOptions = relationOptions.availableContracts;
+                                    //    for (let i = 0; i < relationOptions.availableContracts.length; i++) {
 
-                                    } else {
-                                        $scope.relationContractsOptions = relationOptions.availableContracts;
-                                    }
+                                    //        if (relationOptions.availableContracts[i].id === $scope.relationContractsValue.id) {
+                                    //            $scope.relationContractsOptions = relationOptions.availableContracts;
+                                    //            $scope.relationContractsValue = relationOptions.availableContracts[i];
+                                    //            break;
+                                    //        }
+                                    //    }
+                                    //    $scope.relationContractsOptions = relationOptions.availableContracts;
+
+                                    //} else {
+                                    //    $scope.relationContractsOptions = relationOptions.availableContracts;
+                                    //}
 
                                 }
                                 if ($scope.RelationExposedSystemData != null) {
                                     systemRelationService
                                         .getAvailableRelationOptions(usageId, $scope.RelationExposedSystemData.id)
-                                        .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
+                                        .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.
+                                            IItSystemUsageRelationOptionsDTO) => {
                                             checkIfValueIsStillPresent(relationOptions);
                                         });
+                                } else {
+                                    $scope.relationAvailableContracts = [];
                                 }
                             }
 

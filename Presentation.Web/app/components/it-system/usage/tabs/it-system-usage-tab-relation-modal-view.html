@@ -13,13 +13,13 @@
             <!--Exposed System-->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="RelationSystemExposed" class="control-label small">Udstillet af</label>
+                    <label for="RelationSystemExposed">Udstillet af</label>
                     <input type="hidden" id="RelationSystemExposed" class="form-control input-sm"
-                           data-ui-select2="RelationExposedSystemDataCall"
-                           data-ng-value="RelationExposedSelectedData"
-                           data-placeholder="Vælg udstiller system"
-                           data-ng-model="RelationExposedSystemData"
-                           data-ng-change="ExposedSystemSelected()"
+                           ui-select2="RelationExposedSystemDataCall"
+                           ng-value="RelationExposedSelectedData"
+                           placeholder="Vælg udstiller system"
+                           ng-model="RelationExposedSystemData"
+                           ng-change="ExposedSystemSelected()"
                            data-field="RelationExposedId">
                 </div>
             </div>
@@ -29,31 +29,45 @@
             <div class="col-md-6">
                 <!--Interface-->
                 <div class="form-group">
-                    <label for="relationInterfacesSelect"> Vælg Snitflade </label>
-                    <select ng-model="relationInterfacesValue" id="relationInterfacesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationInterfaceOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <label for="relationInterfacesSelect">Vælg Snitflade</label>
+                    <select ng-model="relationInterfacesValue"
+                            id="relationInterfacesSelect"
+                            class="form-control input-sm"
+                            placeholder="Vælg snitflade"
+                            ng-options="interface.name for interface in relationInterfaceOptions"
+                            ng-disabled="!RelationExposedSystemData"></select>
                 </div>
                 <!--Description-->
                 <div class="form-group">
                     <label class="control-label" for="description">Beskrivelse</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" data-ng-model="relationDescriptionValue" data-ng-disabled="!RelationExposedSystemData"></textarea>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" ng-model="relationDescriptionValue" ng-disabled="!RelationExposedSystemData"></textarea>
                 </div>
                 <!--Reference-->
                 <div class="form-group">
                     <label class="control-label" for="Reference">Reference</label>
-                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" data-ng-model="relationReferenceValue" data-ng-disabled="!RelationExposedSystemData">
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" ng-model="relationReferenceValue" ng-disabled="!RelationExposedSystemData">
                 </div>
                 <!--Contract-->
                 <div class="form-group">
-                    <label for="relationContractsSelect"> Vælg kontrakt </label>
-                    <select ng-model="relationContractsValue" id="relationContractsSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationContractsOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <label for="relationContractsSelect">Vælg kontrakt</label>
+                    <input type="hidden"
+                           id="relationContractsSelect"
+                           class="form-control input-sm"
+                           ui-select2="relationContractsOptions"
+                           placeholder="Vælg kontrakt"
+                           ng-model="relationContractsValue"
+                           ng-value="RelationContractSelectedData"
+                           data-field="RelationContractId">
                 </div>
                 <!--frequency-->
                 <div class="form-group">
-                    <label for="relationPaymentFrequenciesSelect"> Vælg frekvens </label>
-                    <select ng-model="relationPaymentFrequenciesValue" id="relationPaymentFrequenciesSelect" class="form-control input-sm"
-                            ng-options="x.name for x in relationPaymentFrequenciesOptions" ng-disabled="!RelationExposedSystemData"></select>
+                    <label for="relationPaymentFrequenciesSelect">Vælg frekvens</label>
+                    <select ng-model="relationPaymentFrequenciesValue"
+                            id="relationPaymentFrequenciesSelect"
+                            class="form-control input-sm"
+                            placeholder="Vælg frekvens"
+                            ng-options="frequencyType.name for frequencyType in relationPaymentFrequenciesOptions"
+                            ng-disabled="!RelationExposedSystemData"></select>
                 </div>
             </div>
         </div>
