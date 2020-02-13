@@ -48,8 +48,8 @@
                         controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
-                            $scope.RelationModalState = "Opret relation for  " + itSystemUsage.itSystem.name;
                             $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationModalViewModel.configureAsNewRelationDialog();
 
                             const exposedSystemChanged = () => {
                                 if ($scope.RelationModalViewModel.toSystem != null) {
@@ -63,9 +63,7 @@
                                 }
                             }
 
-                            $scope.ExposedSystemSelectedTrigger = () => {
-                                exposedSystemChanged();
-                            }
+                            $scope.ExposedSystemSelectedTrigger = exposedSystemChanged;
 
                             $scope.save = () => {
                                 const newRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
@@ -106,14 +104,12 @@
                         controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
-                            $scope.RelationModalState = "Redigere relation";
-
 
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
                                     error: boolean,
-                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO
-                                }) => {
+                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO}
+                                    ) => {
                                     if (response.error) {
                                         notify.addErrorMessage("Det var ikke muligt at redigere denne relation");
                                         modalOpen = false;
@@ -123,38 +119,33 @@
 
                                     var relation = response.data;
 
-                                    var modalModelView =
-                                        new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(
-                                            relation.fromUsage.id,
-                                            relation.fromUsage.name);
+                                    $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relation.fromUsage.id,relation.fromUsage.name);
 
-                                    modalModelView.setTargetSystem(relation.toUsage.id, relation.toUsage.name);
-                                    $scope.RelationModalViewModel = modalModelView;
+                                    const loadOptions = (toUsage, onOptionsLoadedCallback) => {
+                                        systemRelationService
+                                            .getAvailableRelationOptions(usageId, toUsage.id)
+                                            .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.
+                                                IItSystemUsageRelationOptionsDTO) => onOptionsLoadedCallback(relationOptions));
+                                    }
 
                                     const exposedSystemChanged = () => {
-                                        if ($scope.RelationModalViewModel.toSystem != null) {
-                                            systemRelationService
-                                                .getAvailableRelationOptions(usageId,
-                                                    $scope.RelationModalViewModel.toSystem.id)
-                                                .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.
-                                                    IItSystemUsageRelationOptionsDTO) => {
-                                                    const updatedView = $scope.RelationModalViewModel;
-                                                    updatedView.updateAvailableOptions(relationOptions);
-                                                    modalModelView.setValuesFrom(relation);
-                                                    $scope.RelationModalViewModel = updatedView;
-                                                });
+                                        var toSystem = $scope.RelationModalViewModel.toSystem;
+                                        if (toSystem != null) {
+                                            loadOptions(toSystem, options => $scope.RelationModalViewModel.updateAvailableOptions(options));
                                         }
                                     }
                                     $scope.ExposedSystemSelectedTrigger = () => {
                                         exposedSystemChanged();
                                     }
-                                    exposedSystemChanged();
+
+                                    //Preload initial options
+                                    loadOptions(relation.toUsage, options => $scope.RelationModalViewModel.configureAsEditRelationDialog(relation, options));
                                 });
 
                             $scope.save = () => {
                                 var data = $scope.RelationModalViewModel;
                                 const patchRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
-                                notify.addInfoMessage("Tilføjer relation ...", true);
+                                notify.addInfoMessage("Ændrer relation ...", true);
                                 systemRelationService.patchSystemRelation(patchRelation)
                                     .then(success => {
                                         notify.addSuccessMessage("Relation ændret");
@@ -168,7 +159,7 @@
                             }
 
                             $scope.delete = () => {
-                                systemRelationService.deleteSystemRelation(usageId, $scope.RelationModalViewModel.id)
+                                systemRelationService.deleteSystemRelation(usageId, relationId)
                                     .then(success => {
                                             notify.addSuccessMessage("Relation slettet");
                                             modalOpen = false;

@@ -177,6 +177,8 @@
 
     export class SystemRelationModalViewModel implements ISystemRelationModalViewModel {
         id: number;
+        headerText: string;
+        isEditDialog : boolean
         fromSystem: NamedEntityDTO;
         toSystem: ISystemRelationModalIdText;
         interface: ISystemRelationSelectionModel;
@@ -195,14 +197,23 @@
             this.description = <ISystemRelationModalIdText>{};
         }
 
-        setValuesFrom(relationData: IItSystemUsageRelationDTO) {
+        configureAsNewRelationDialog() {
+            this.headerText = "Opret relation";
+            this.isEditDialog = false;
+        }
+
+        configureAsEditRelationDialog(relationData: IItSystemUsageRelationDTO, optionsResult: IItSystemUsageRelationOptionsDTO) {
+            this.toSystem = <ISystemRelationModalIdText>{ id: relationData.toUsage.id, text: relationData.toUsage.name };
+            this.updateAvailableOptions(optionsResult);
+
             this.bindValue(this.frequency, relationData.frequencyType);
             this.bindValue(this.contract, relationData.contract);
             this.bindValue(this.interface, relationData.interface);
             this.id = relationData.id;
             this.description.text = relationData.description;
             this.reference.text = relationData.reference;
-
+            this.headerText = "Rediger relation";
+            this.isEditDialog = true;
         }
 
         updateAvailableOptions(optionsResult: IItSystemUsageRelationOptionsDTO) {
@@ -210,10 +221,6 @@
             this.bindOptions(this.frequency, optionsResult.availableFrequencyTypes);
             this.bindOptions(this.interface, optionsResult.availableInterfaces);
             this.bindOptions(this.contract, optionsResult.availableContracts);
-        }
-
-        setTargetSystem(id: number, name: string) {
-            this.toSystem = <ISystemRelationModalIdText>{ id: id, text: name };
         }
 
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO) {
