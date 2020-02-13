@@ -21,6 +21,13 @@ describe("User is able to create and view relation",
         var interfaceName = createInterfaceName();
         var contractName = createContractName();
 
+        // Data for edit test
+        var frequencyTypeEdited = "Kvartal";
+        var descriptionEdited = "some description edited";
+        var referenceEdited = "some reference edited";
+        var interfaceNameEdited = createInterfaceName();
+        var contractNameEdited = createContractName();
+
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
                 .then(() => ItSystemHelper.createSystem(relationSystemName1))
@@ -30,7 +37,7 @@ describe("User is able to create and view relation",
                 .then(() => InterfaceCatalogHelper.createInterface(interfaceName))
                 .then(() => InterfaceCatalogHelper.bindInterfaceToSystem(relationSystemName2, interfaceName))
                 .then(() => ContractHelper.createContract(contractName));
-            
+
         }, testFixture.longRunningSetup());
 
         beforeEach(() => {
@@ -66,10 +73,24 @@ describe("User is able to create and view relation",
                     .then(() => checkForRelationPart(contractName))
                     .then(() => checkForUsedByDescription(relationSystemName1, description))
                     .then(() => checkForUsedByReference(relationSystemName1, reference))
-                    .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType));
+                    .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
+                    .then(() => RelationHelper.editRelation(relationSystemName1,
+                        relationSystemName2,
+                        interfaceNameEdited,
+                        frequencyTypeEdited,
+                        contractNameEdited,
+                        referenceEdited,
+                        descriptionEdited))
+                    .then(() => checkForRelationPart(relationSystemName2))
+                    .then(() => checkForRelationPart(interfaceNameEdited))
+                    .then(() => checkForRelationPart(contractNameEdited))
+                    .then(() => checkForDescription(relationSystemName2, descriptionEdited))
+                    .then(() => checkForReference(relationSystemName2, referenceEdited))
+                    .then(() => checkForFrequencyType(relationSystemName2, frequencyTypeEdited))
+                    .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
+                    .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
 
             });
-
     });
 
 function createItSystemName() {
@@ -82,6 +103,10 @@ function createInterfaceName() {
 
 function createContractName() {
     return `ContractForRelation${new Date().getTime()}`;
+}
+
+function checkIfRelationIsDeleted(name: string) {
+    expect(RelationPage.getRelationLink(name).isPresent()).toBe(false);
 }
 
 function checkForRelationPart(name: string) {

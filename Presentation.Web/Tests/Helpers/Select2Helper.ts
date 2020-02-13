@@ -26,9 +26,28 @@ class Select2Helper {
             .then(this.waitForDataAndSelect);
     }
 
+    public static selectWithNoSearch(name: string, elementId: string) {
+        element(by.id(elementId)).element(by.className(Select2Helper.selectChoice)).click()
+            .then(() => this.findResult(name).first().click());
+    }
+
     public static getData(elementId: string) {
         console.log(`Finding value in ${elementId}`);
         return element(by.xpath(`//div[@id  = "${elementId}"]/child::*//span[@class = "select2-chosen"]`));
+    }
+
+    private static findResult(name: string) {
+        console.log(`Finding ${name} in select2 result list`);
+        return element(by.id("select2-drop"))
+            .element(by.tagName("ul"))
+            .all(by.tagName("li"))
+            .filter((elem) => {
+                return elem.element(by.tagName("div")).getText().then((val) => {
+                    if (val === name) {
+                        return elem;
+                    }
+                });
+            });
     }
 }
 export = Select2Helper;

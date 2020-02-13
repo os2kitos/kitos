@@ -10,6 +10,14 @@ class ItSystemUsageRelation {
         return element(by.id(this.consts.createRelationButton));
     }
 
+    public static getEditButton(systemName: string) {
+        return this.getElementFromTable(systemName, "relationEditButton");
+    }
+
+    public static getDeleteButton() {
+        return element(this.cssHelper.byDataElementType("relationDeleteButton"));
+    }
+
     public static getReferenceInputField() {
         return element(by.id(this.consts.referenceInputField));
     }
