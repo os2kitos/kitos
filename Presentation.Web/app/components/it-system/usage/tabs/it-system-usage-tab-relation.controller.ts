@@ -1,37 +1,43 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', ($stateProvider) => {
-        $stateProvider.state('it-system.usage.relation', {
-            url: '/relation',
-            templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-relation.view.html',
-            controller: 'system.EditRelation'
+    app.config(["$stateProvider", ($stateProvider) => {
+        $stateProvider.state("it-system.usage.relation", {
+            url: "/relation",
+            templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation.view.html",
+            controller: "system.EditRelation"
         });
     }]);
 
-    app.controller('system.EditRelation', ['$scope', '$http', 'itSystemUsage', 'notify', '$uibModal',
-        ($scope, $http, itSystemUsage, notify, $modal) => {
+    app.controller("system.EditRelation", ["$scope", "itSystemUsage", "notify", "$uibModal", "systemRelationService",
+        ($scope, itSystemUsage, notify, $modal, systemRelationService) => {
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
             const reload = () => {
-                $http.get(`api/v1/systemrelations/from/${usageId}`).success(result => {
+                systemRelationService.getRelationsFrom(usageId)
+                    .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                        $scope.usageRelations = mapSystemRelations(systemRelations);
+                    });
 
-                    $scope.relationTabledata = result.response;
-
-                    var overviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
-
-                    for (let i = 0; i < result.response.length; i++) {
-
-                        const relationRow = new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, result.response[i]);
-
-                        overviewData.push(relationRow);
-                    }
-
-                    $scope.relationTableTestData = overviewData;
-                });
+                systemRelationService.getRelationsTo(usageId)
+                    .then(systemRelations => {
+                        $scope.usedByRelations = mapSystemRelations(systemRelations);
+                    });
             };
             reload();
+
+            function mapSystemRelations(systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) {
+                const usedByOverviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+                _.each(systemRelations,
+                    (systemRelation) => {
+                        usedByOverviewData.push(
+                            new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount,
+                                shortTextLineCount,
+                                systemRelation));
+                    });
+                return usedByOverviewData;
+            }
 
             $scope.createRelation = () => {
                 if (modalOpen === false) {
@@ -39,7 +45,7 @@
                     $modal.open({
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
-                        controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
+                        controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
                             $scope.RelationModalState = "Opret relation for  " + itSystemUsage.itSystem.name;
@@ -47,10 +53,11 @@
 
                             const exposedSystemChanged = () => {
                                 if ($scope.RelationModalViewModel.toSystem != null) {
-                                    $http.get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationModalViewModel.toSystem.id}`)
-                                        .success(result => {
+                                    systemRelationService
+                                        .getAvailableRelationOptions(usageId, $scope.RelationModalViewModel.toSystem.id)
+                                        .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
                                             const updatedView = $scope.RelationModalViewModel;
-                                            updatedView.updateAvailableOptions(result);
+                                            updatedView.updateAvailableOptions(relationOptions);
                                             $scope.RelationModalViewModel = updatedView;
                                         });
                                 }
@@ -61,16 +68,20 @@
                             }
 
                             $scope.save = () => {
-                                const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
+                                const newRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
                                 notify.addInfoMessage("Tilføjer relation ...", true);
-                                $http.post("api/v1/systemrelations", postData, { handleBusy: true }).success(_ => {
-                                    notify.addSuccessMessage("´Relation tilføjet");
-                                    modalOpen = false;
-                                    $scope.$close(true);
-                                    reload();
-                                }).error(_ => {
-                                    notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relation");
-                                });
+                                systemRelationService.createSystemRelation(newRelation)
+                                    .then(
+                                        () => {
+                                            notify.addSuccessMessage("´Relation tilføjet");
+                                            modalOpen = false;
+                                            $scope.$close(true);
+                                            reload();
+                                        },
+                                        error => {
+                                            notify.addErrorMessage("Der opstod en fejl! Kunne ikke tilføje relation");
+                                        });
+
                             }
 
                             $scope.dismiss = () => {
@@ -95,71 +106,84 @@
                         controller: ["$scope", 'select2LoadingService', ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
+                            $scope.RelationModalState = "Redigere relation";
 
-                            $http.get(`api/v1/systemrelations/from/${usageId}/${relationId}`).success(result => {
-                                var relationData = result.response as Kitos.Models.ItSystemUsage.Relation.ISystemGetRelationDTO;
-                                
-                                $scope.RelationModalState = "Redigere relation";
-                                var modalModelView = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(relationData.fromUsage.id, relationData.fromUsage.name);
-                                modalModelView.setTargetSystem(relationData.toUsage.id, relationData.toUsage.name);
-                                $scope.RelationModalViewModel = modalModelView;
 
-                                const exposedSystemChanged = () => {
-                                    if ($scope.RelationModalViewModel.toSystem != null) {
-                                        $http.get(`api/v1/systemrelations/options/${usageId}/in-relation-to/${$scope.RelationModalViewModel.toSystem.id}`)
-                                            .success(result => {
-                                                const updatedView = $scope.RelationModalViewModel;
-                                                updatedView.updateAvailableOptions(result);
-                                                modalModelView.setValuesFrom(relationData);
-                                                $scope.RelationModalViewModel = updatedView;
-                                            });
+                            systemRelationService.getRelation(usageId, relationId)
+                                .then((response: {
+                                    error: boolean,
+                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO
+                                }) => {
+                                    if (response.error) {
+                                        notify.addErrorMessage("Det var ikke muligt at redigere denne relation");
+                                        modalOpen = false;
+                                        $scope.$close(true);
+                                        return;
                                     }
-                                }
 
-                                $scope.ExposedSystemSelectedTrigger = () => {
+                                    var relation = response.data;
+
+                                    var modalModelView =
+                                        new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(
+                                            relation.fromUsage.id,
+                                            relation.fromUsage.name);
+
+                                    modalModelView.setTargetSystem(relation.toUsage.id, relation.toUsage.name);
+                                    $scope.RelationModalViewModel = modalModelView;
+
+                                    const exposedSystemChanged = () => {
+                                        if ($scope.RelationModalViewModel.toSystem != null) {
+                                            systemRelationService
+                                                .getAvailableRelationOptions(usageId,
+                                                    $scope.RelationModalViewModel.toSystem.id)
+                                                .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.
+                                                    IItSystemUsageRelationOptionsDTO) => {
+                                                    const updatedView = $scope.RelationModalViewModel;
+                                                    updatedView.updateAvailableOptions(relationOptions);
+                                                    modalModelView.setValuesFrom(relation);
+                                                    $scope.RelationModalViewModel = updatedView;
+                                                });
+                                        }
+                                    }
+                                    $scope.ExposedSystemSelectedTrigger = () => {
+                                        exposedSystemChanged();
+                                    }
                                     exposedSystemChanged();
-                                }
-                                exposedSystemChanged();
-
-                            }).error(_ => {
-                                notify.addErrorMessage("Det var ikke muligt at redigere denne relation");
-                            });
-
+                                });
 
                             $scope.save = () => {
                                 var data = $scope.RelationModalViewModel;
-                                const postData = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
+                                const patchRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
                                 notify.addInfoMessage("Tilføjer relation ...", true);
-                                $http.patch("api/v1/systemrelations", postData, { handleBusy: true }).success(_ => {
-                                    notify.addSuccessMessage("Relation ændret");
-                                    modalOpen = false;
-                                    $scope.$close(true);
-                                    reload();
-                                }).error(_ => {
-                                    notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
-                                });
-
-                            }
-
-                            $scope.delete = () => {
-                                $http.delete(`api/v1/systemrelations/from/${usageId}/${$scope.RelationModalViewModel.id}`)
-                                    .success(_ => {
-                                        notify.addSuccessMessage("Relation slettet");
+                                systemRelationService.patchSystemRelation(patchRelation)
+                                    .then(success => {
+                                        notify.addSuccessMessage("Relation ændret");
                                         modalOpen = false;
                                         $scope.$close(true);
                                         reload();
-                                    }).error(_ => {
-                                        notify.addErrorMessage("Kunne ikke slette relation");
+                                    },
+                                    error => {
+                                        notify.addErrorMessage("Der opstod en fejl! Kunne ikke redigere relation");
                                     });
                             }
 
+                            $scope.delete = () => {
+                                systemRelationService.deleteSystemRelation(usageId, $scope.RelationModalViewModel.id)
+                                    .then(success => {
+                                            notify.addSuccessMessage("Relation slettet");
+                                            modalOpen = false;
+                                            $scope.$close(true);
+                                            reload();
+                                        },
+                                        error => {
+                                            notify.addErrorMessage("Kunne ikke slette relation");
+                                        });
+                            }
                             $scope.dismiss = () => {
                                 modalOpen = false;
                                 $scope.$close(true);
                             }
-
                             modalOpen = false;
-
                         }],
                     });
                 }
@@ -167,7 +191,7 @@
 
             $scope.expandParagraph = (e) => {
                 var element = angular.element(e.currentTarget);
-                var para = element.closest('td').find(document.getElementsByClassName("readMoreParagraph"))[0];
+                var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
                 var btn = element[0];
 
                 if (para.getAttribute("style") != null) {

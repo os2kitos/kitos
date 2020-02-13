@@ -380,6 +380,7 @@
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
+    <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
@@ -526,7 +527,6 @@
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
     <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
     <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
@@ -542,7 +542,6 @@
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
-    <Compile Include="Models\SSOConfigDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />

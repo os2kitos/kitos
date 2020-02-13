@@ -1,4 +1,4 @@
-﻿<div data-ng-if="organizations.length > 0">
+﻿<div data-element-type="selectWorkingOrganizationDialog" data-ng-if="organizations.length > 0">
     <div class="modal-header">
         <div class="clearfix">
             <h3 class="modal-title pull-left">Vælg organisation</h3>
@@ -8,14 +8,14 @@
     <div class="modal-body">
         <p>Du er medlem er flere organisationer. Vælg, hvilken en du vil arbejde i:</p>
 
-        <select class="form-control" autofocus data-ng-model="orgChooser.selectedId" data-ng-options="org.id as org.name for org in organizations">
+        <select id="selectWorkingOrganizationOptions" class="form-control" autofocus data-ng-model="orgChooser.selectedId" data-ng-options="org.id as org.name for org in organizations">
             <option value='' disabled>Vælg organisation</option>
         </select>
 
     </div>
     <div class="modal-footer">
         <button class="btn btn-warning" data-ng-click="$dismiss()" data-ng-if="changingOrganization">Annuller</button>
-        <button class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="orgChooser.selectedId == undefined">OK</button>
+        <button data-element-type="selectWorkingOrganizationButton" class="btn btn-primary" data-ng-click="ok()" data-ng-disabled="orgChooser.selectedId == undefined">OK</button>
     </div>
 </div>
 <div data-ng-if="organizations.length == 0">

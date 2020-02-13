@@ -31,9 +31,7 @@ class RelationHelper {
             .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
             .then(() => relationPage.getDescriptionInputField().sendKeys(descriptionText))
             .then(() => relationPage.getSaveButton().click());
-
     }
-
 
 }
 export = RelationHelper;

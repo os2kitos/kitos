@@ -1,7 +1,5 @@
 ﻿module Kitos.Models.ItSystemUsage.Relation {
-
-    export interface IItSystemUsageRelationDTO {
-
+    export interface IItSystemUsageCreateRelationDTO {
         FromUsageId: number;
         ToUsageId: number;
         Description: string;
@@ -9,6 +7,25 @@
         FrequencyTypeId?: number;
         ContractId?: number;
         Reference: string;
+    }
+
+    import NamedEntityDTO = Models.Generic.NamedEntity.NamedEntityDTO;
+
+    export interface IItSystemUsageRelationDTO {
+        id: number;
+        fromUsage: NamedEntityDTO;
+        toUsage: NamedEntityDTO;
+        interface: NamedEntityDTO;
+        contract: NamedEntityDTO;
+        frequencyType: NamedEntityDTO;
+        description: string;
+        reference: string;
+    }
+
+    export interface IItSystemUsageRelationOptionsDTO {
+        availableInterfaces: [NamedEntityDTO];
+        availableContracts: [NamedEntityDTO];
+        availableFrequencyTypes: [NamedEntityDTO];
     }
 
     export interface IItSystemUsageRelationReferenceDto {
@@ -29,14 +46,9 @@
         Name: string;
     }
 
-    export interface ISystemRelationModalIdName {
-        id: number;
-        name: string;
-    }
-
     export interface ISystemRelationSelectionModel {
-        value?: ISystemRelationModalIdName;
-        options: ISystemRelationModalIdName[];
+        value?: NamedEntityDTO;
+        options: NamedEntityDTO[];
     }
 
     export interface ISystemRelationModalIdText {
@@ -45,7 +57,7 @@
     }
 
     export interface ISystemRelationModalViewModel {
-        fromSystem: ISystemRelationModalIdName;
+        fromSystem: NamedEntityDTO;
         toSystem: ISystemRelationModalIdText;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
@@ -56,7 +68,6 @@
 
     export interface ISystemRelationPatchDTO {
         Id: number;
-        Uuid: string;
         Description: string;
         Reference: string;
         FromUsage: IItSystemUsageRelationIdName;
@@ -76,18 +87,6 @@
         Reference: IItSystemUsageRelationReferenceDto;
         Contract?: IItSystemUsageRelationIdName;
         Frequency?: IItSystemUsageRelationIdName;
-    }
-
-    export interface ISystemGetRelationDTO {
-        id: number;
-        uuid: string;
-        fromUsage: ISystemRelationModalIdName;
-        toUsage: ISystemRelationModalIdName;
-        interface?: ISystemRelationModalIdName;
-        contract?: ISystemRelationModalIdName;
-        frequencyType?: ISystemRelationModalIdName;
-        description: string;
-        reference: string;
     }
 
     export class SystemRelationViewModel implements ISystemRelationViewModel {
@@ -178,8 +177,7 @@
 
     export class SystemRelationModalViewModel implements ISystemRelationModalViewModel {
         id: number;
-        uuid: string;
-        fromSystem: ISystemRelationModalIdName;
+        fromSystem: NamedEntityDTO;
         toSystem: ISystemRelationModalIdText;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
@@ -188,7 +186,7 @@
         description: ISystemRelationModalIdText;
 
         constructor(fromSystemId: number, fromSystemName: string) {
-            this.fromSystem = <ISystemRelationModalIdName>{ id: fromSystemId, name: fromSystemName };
+            this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
             this.toSystem = null;
             this.interface = <ISystemRelationSelectionModel>{};
             this.contract = <ISystemRelationSelectionModel>{};
@@ -197,31 +195,30 @@
             this.description = <ISystemRelationModalIdText>{};
         }
 
-        setValuesFrom(relationData: ISystemGetRelationDTO) {
+        setValuesFrom(relationData: IItSystemUsageRelationDTO) {
             this.bindValue(this.frequency, relationData.frequencyType);
             this.bindValue(this.contract, relationData.contract);
             this.bindValue(this.interface, relationData.interface);
             this.id = relationData.id;
-            this.uuid = relationData.uuid;
             this.description.text = relationData.description;
             this.reference.text = relationData.reference;
 
         }
 
-        updateAvailableOptions(optionsResult: any /*TODO:not the any - use strong types*/) {
+        updateAvailableOptions(optionsResult: IItSystemUsageRelationOptionsDTO) {
             // Build modal with data
-            this.bindOptions(this.frequency, optionsResult.response.availableFrequencyTypes);
-            this.bindOptions(this.interface, optionsResult.response.availableInterfaces);
-            this.bindOptions(this.contract, optionsResult.response.availableContracts);
+            this.bindOptions(this.frequency, optionsResult.availableFrequencyTypes);
+            this.bindOptions(this.interface, optionsResult.availableInterfaces);
+            this.bindOptions(this.contract, optionsResult.availableContracts);
         }
 
         setTargetSystem(id: number, name: string) {
             this.toSystem = <ISystemRelationModalIdText>{ id: id, text: name };
         }
 
-        private bindValue(targetData: ISystemRelationSelectionModel, sourceData: ISystemRelationModalIdName) {
+        private bindValue(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO) {
             if (sourceData) {
-                targetData.value = <ISystemRelationModalIdName>{ id: sourceData.id, name: sourceData.name };
+                targetData.value = <NamedEntityDTO>{ id: sourceData.id, name: sourceData.name };
             } else {
                 targetData.value = null;
             }
@@ -248,7 +245,7 @@
         }
     }
 
-    export class SystemRelationModelPostDataObject implements IItSystemUsageRelationDTO {
+    export class SystemRelationModelPostDataObject implements IItSystemUsageCreateRelationDTO {
         ToUsageId: number;
         FromUsageId: number;
         Description: string;
@@ -280,7 +277,6 @@
 
     export class SystemRelationModelPatchDataObject implements ISystemRelationPatchDTO {
         Id: number;
-        Uuid: string;
         Description: string;
         Reference: string;
         FromUsage: IItSystemUsageRelationIdName;
@@ -292,7 +288,6 @@
         constructor(data: SystemRelationModalViewModel) {
 
             this.Id = data.id;
-            this.Uuid = data.uuid;
             this.Description = data.description.text;
             this.Reference = data.reference.text;
             this.FromUsage = { Id: data.fromSystem.id, Name: data.fromSystem.name };
@@ -303,7 +298,7 @@
 
         }
 
-        private setValuesOrNull(value: ISystemRelationModalIdName) {
+        private setValuesOrNull(value: NamedEntityDTO) {
             if (value !== null) {
                 return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.name }
             } else {

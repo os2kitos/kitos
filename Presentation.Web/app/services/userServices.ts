@@ -261,15 +261,6 @@
             return deferred.promise;
         };
 
-        loginSSO = (token) => {
-            var deferred = this.$q.defer();
-            var data = {
-                "token": token
-            };
-            deferred.resolve(this.loadUser(data));
-            return deferred.promise;
-        };
-
         logout = () => {
 
             this.clearSavedOrgId();
@@ -309,7 +300,7 @@
         };
 
         successfulUserAuth = (user) => {
-            this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, "organizationId").length > 1;
+            this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, "organizationId").length > 1 || user.isGlobalAdmin;
 
             this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
                 this.saveUserInfo(user, orgAndDefaultUnit);

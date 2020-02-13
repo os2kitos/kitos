@@ -7,7 +7,6 @@ class Select2Helper {
     private static readonly selectDrop = "select2-drop";
     private static readonly selectChoice = "select2-choice";
     private static readonly selectResult = "select2-result-label";
-    private static readonly selectData = "select2-chosen";
 
     public static waitForDataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
@@ -18,9 +17,13 @@ class Select2Helper {
     public static searchFor(name: string, elementId: string) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId}`);
         return element(by.id(elementId)).element(by.className(Select2Helper.selectChoice)).click()
-            .then(() => console.log("next"))
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).click())
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
+    }
+
+    public static select(name: string, elementId: string) {
+        return this.searchFor(name, elementId)
+            .then(this.waitForDataAndSelect);
     }
 
     public static getData(elementId: string) {

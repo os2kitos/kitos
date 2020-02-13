@@ -79,5 +79,11 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="toFrequencyTypeId">Id of the specific "to" system frequency type to replace the existing system relation value</param>
         /// <returns></returns>
         Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference, int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
+        /// <summary>
+        /// Gets a list of relations which are associated with the provided contract
+        /// </summary>
+        /// <param name="contractId"></param>
+        /// <returns></returns>
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsAssociatedWithContract(int contractId);
     }
 }
