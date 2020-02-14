@@ -101,7 +101,7 @@
                         <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="usedByRelationReference">{{relation.Reference.Reference}}</p>
                     </td>
-                    <td ng-if="relation.Contract" style="overflow-wrap: break-word"><a data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
+                    <td style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
                     <td>
                         <p ng-if="relation.Frequency" data-element-type="usedByRelationFrequencyType">{{relation.Frequency.Name}}</p>
                     </td>

@@ -42,12 +42,12 @@
                 <!--Description-->
                 <div class="form-group">
                     <label class="control-label" for="description">Beskrivelse</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" ng-model="RelationModalViewModel.description.text" ng-disabled="!RelationModalViewModel.toSystem"></textarea>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="Beskrivelse" style="max-width: 100%; min-width: 100%;" ng-model="RelationModalViewModel.description.text" ng-disabled="!RelationModalViewModel.toSystem"></textarea>
                 </div>
                 <!--Reference-->
                 <div class="form-group">
                     <label class="control-label" for="Reference">Reference</label>
-                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" style="max-width: 100%" ng-model="RelationModalViewModel.reference.text" ng-disabled="!RelationModalViewModel.toSystem">
+                    <input type="text" class="form-control" name="Reference" id="Reference" placeholder="Reference" ng-model="RelationModalViewModel.reference.text" ng-disabled="!RelationModalViewModel.toSystem">
                 </div>
                 <!--Contract-->
                 <div class="form-group">
