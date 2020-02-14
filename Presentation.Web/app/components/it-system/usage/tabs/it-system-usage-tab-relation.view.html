@@ -2,7 +2,7 @@
     <h4> {{usage.itSystem.name}}<span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="panel-heading">'{{usage.itSystem.name}}' har følgende relationer til andre systemer/snitflader:</div>
-        <table class="table table-condensed table-striped">
+        <table class="table table-condensed table-striped table-fixed relation">
             <thead>
                 <tr>
                     <th style="padding-left: 15px">
@@ -22,6 +22,9 @@
                     </th>
                     <th>
                         Frekvens
+                    </th>
+                    <th class="buttonColumn">
+
                     </th>
                 </tr>
             </thead>
@@ -63,7 +66,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">Andre systemer har følgende relationer til '{{usage.itSystem.name}}':</div>
-        <table class="table table-condensed table-striped">
+        <table class="table table-condensed table-striped table-fixed relation">
             <thead>
                 <tr>
                     <th style="padding-left: 15px">
@@ -84,6 +87,9 @@
                     <th>
                         Frekvens
                     </th>
+                    <th class="buttonColumn">
+
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -102,8 +108,11 @@
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="usedByRelationReference">{{relation.Reference.Reference}}</p>
                     </td>
                     <td style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
-                    <td>
+                    <td >
                         <p ng-if="relation.Frequency" data-element-type="usedByRelationFrequencyType">{{relation.Frequency.Name}}</p>
+                    </td>
+                    <td>
+
                     </td>
                 </tr>
             </tbody>
