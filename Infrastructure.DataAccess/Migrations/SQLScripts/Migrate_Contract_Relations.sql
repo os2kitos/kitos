@@ -22,7 +22,7 @@ BEGIN
     (
         OrganizationId as int null,
         FromSystemUsageId as int,
-        ToSystemUsageId as int null, -- if null, we cannot migrate it and we bail out later
+        ToSystemUsageId as int null,
         ExposingSystemId as int null,
         ItInterfaceId as int,
         ItContractId as int,
