@@ -16,8 +16,6 @@ use Kitos;
 - for each organization, collect
 */
 
-
-
 BEGIN
     -- Build an operation context - the from-to context needed to migrate the relation
     DECLARE @MigrationContext TABLE
@@ -84,5 +82,5 @@ BEGIN
 
     -- TODO: Delete source data by PK ([ItSystemUsageId] [ItSystemId] [ItInterfaceId])
 
-    -- TODO: Should we add the "migrated to" relation Id?.. in that way we can reverse the opration... just requires an additional field an a type which we are going to nuke anyways
+    -- TODO - consider!: Should we add the "migrated to" relation Id?.. in that way we can reverse the opration... just requires an additional field an a type which we are going to nuke anyways
 END
