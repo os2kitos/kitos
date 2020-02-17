@@ -881,6 +881,7 @@
     <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
     <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
     <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
