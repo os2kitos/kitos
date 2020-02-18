@@ -844,12 +844,12 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(relations.Ok);
-            Assert.Same(relationsFromFirst.OrderBy(x=>x.Id).Last(),relations.Value.Single());
+            Assert.Same(relationsFromFirst.OrderBy(x => x.Id).Last(), relations.Value.Single());
         }
 
         private static ItSystemUsage CreateSystemUsageWithRelations(List<SystemRelation> relationsFromFirst, int organizationId)
         {
-            return new ItSystemUsage()
+            return new ItSystemUsage
             {
                 UsageRelations = relationsFromFirst,
                 OrganizationId = organizationId
