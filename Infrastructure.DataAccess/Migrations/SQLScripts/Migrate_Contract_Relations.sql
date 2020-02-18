@@ -52,7 +52,7 @@ BEGIN
 			TO_USAGE.OrganizationId = FROM_USAGE.OrganizationId
         WHERE ItContractId IS NOT NULL -- if null, the user has actively deleted the relation from the UI.. an operation which only "nulls" the contract on the created relation in the backend
 
-
+    -- Delete all circular references, which are invalid in the systemrelations model but possible in the old model due to lack of validation rules
     DELETE FROM @MigrationContext
     WHERE FromSystemUsageId = ToSystemUsageId;
 
