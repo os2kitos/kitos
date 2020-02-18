@@ -5,13 +5,10 @@ User story reference:
 Content:
  Migrates existing contract relations according to the following logic
 
- If an ItInterfaceUse points to an ItInterface for which the exposing system is in use in the organization, THEN the interface useage is migrated to a system relation 
- between the "Using" system usage and the usage of the "interface exhibitor". If data is migrated, the old data is removed.
-*/
-
-/*
-- Get all organizations for which itinterface usage has been created!
-- for each organization, collect
+ If an ItInterfaceUse points to an ItInterface for which the exposing system IS IN USE in the organization 
+    AND that system is not the same as the using system, 
+    THEN the interface useage is migrated to a system relation 
+    between the "Using" system usage and the local usage of the exposing system. If data is migrated, the old data is marked with a reference to the new rows in the SystemRelations table.
 */
 
 BEGIN
