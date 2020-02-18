@@ -23,6 +23,7 @@ BEGIN
         OrganizationId int,
         FromSystemUsageId int,
         ToSystemUsageId int,
+        UsingSystemId int,
         ExposingSystemId int,
         ItInterfaceId int,
         ItContractId int,
@@ -38,6 +39,7 @@ BEGIN
             FROM_USAGE.OrganizationId	AS OrganizationId,
             RELATION.ItSystemUsageId	AS FromSystemUsageId,
             TO_USAGE.Id					AS ToSystemUsageId,
+            FROM_USAGE.ItSystemId       AS UsingSystemId,
             EXH.ItSystemId				AS ExposingSystemId,
             RELATION.ItInterfaceId      AS ItInterfaceId,
             RELATION.ItContractId		AS ItContractId,
@@ -60,7 +62,7 @@ BEGIN
     WHERE FromSystemUsageId = ToSystemUsageId;
 
     -- Insert system relations
-    INSERT INTO SystemRelation
+    INSERT INTO SystemRelations
         SELECT
            FromSystemUsageId AS FromSystemUsageId
            ,ToSystemUsageId AS ToSystemUsageId
@@ -73,7 +75,15 @@ BEGIN
            ,NULL AS UsageFrequencyId
            ,NULL AS Reference
            ,MigratedToUuid AS Uuid
-     FROM @MigrationContext;
+    FROM @MigrationContext;
 
-     -- TODO: Mark all migrated entities as migrated
+    -- Patch a reference to where the data was migrated to in the original table
+    MERGE INTO ItInterfaceUsage
+        USING @MigrationContext
+            ON  [@MigrationContext].FromSystemUsageId = ItInterfaceUsage.ItSystemUsageId AND
+                [@MigrationContext].UsingSystemId = ItInterfaceUsage.ItSystemId AND
+                [@MigrationContext].ItInterfaceId = ItInterfaceUsage.ItInterfaceId
+    WHEN MATCHED THEN
+        UPDATE
+            SET [ItInterfaceUsage].MigratedToUuid = [@MigrationContext].MigratedToUuid;
 END
