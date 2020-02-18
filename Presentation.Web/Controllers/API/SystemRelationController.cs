@@ -123,7 +123,7 @@ namespace Presentation.Web.Controllers.API
         ///     Resultaterne er sorteret på Id og forkudt ihht. (<see cref="pageNumber"/> * <see cref="pageSize"/>)
         /// </returns>
         [HttpGet]
-        [Route("defined-in/organization/{organizationId}?pageNumber={pageNumber}&pageSize={pageSize}")]
+        [Route("defined-in/organization/{organizationId}")]
         public HttpResponseMessage GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
         {
             return _usageService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
