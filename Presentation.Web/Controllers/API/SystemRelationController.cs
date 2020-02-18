@@ -117,7 +117,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="pageNumber">Sidenummer. Interval: [0,int.MaxValue] </param>
-        /// <param name="pageSize">Sidestørrelse = antal resultater pr. forespørgsel. Interval: [1,100]</param>
+        /// <param name="pageSize">Sidestørrelse dvs. antal resultater pr. forespørgsel. Interval: [1,100]</param>
         /// <returns>
         ///     Et array af <see cref="SystemRelationDTO"/>.
         ///     Resultaterne er sorteret på Id og forkudt ihht. (<see cref="pageNumber"/> * <see cref="pageSize"/>)
@@ -126,7 +126,12 @@ namespace Presentation.Web.Controllers.API
         [Route("defined-in/organization/{organizationId}?pageNumber={pageNumber}&pageSize={pageSize}")]
         public HttpResponseMessage GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            return _usageService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
+                .Match
+                (
+                    onSuccess: value => Ok(MapRelations(value)),
+                    onFailure: FromOperationError
+                );
         }
 
         /// <summary>
