@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -99,6 +100,11 @@ namespace Core.DomainModel.ItSystem
         /// The ExternalReferences.
         /// </value>
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
+        public ReferenceRootType GetRootType()
+        {
+            return ReferenceRootType.System;
+        }
 
         public int? ReferenceId { get; set; }
 

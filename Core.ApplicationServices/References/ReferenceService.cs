@@ -1,14 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 
-namespace Core.ApplicationServices.System
+namespace Core.ApplicationServices.References
 {
     public class ReferenceService : IReferenceService
     {
@@ -16,10 +23,11 @@ namespace Core.ApplicationServices.System
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
+        
 
         public ReferenceService(
-            IReferenceRepository referenceRepository, 
-            IItSystemRepository itSystemRepository, 
+            IReferenceRepository referenceRepository,
+            IItSystemRepository itSystemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager)
         {
@@ -27,6 +35,19 @@ namespace Core.ApplicationServices.System
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
+        }
+
+
+        public Result<ExternalReference, OperationError> Create(
+            int referenceOwnerId,
+            ReferenceRootType referenceOwnerType,
+            string title,
+            string externalReferenceId,
+            string url,
+            Display display)
+        {
+            //TODO:
+            return null;
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
@@ -37,7 +58,7 @@ namespace Core.ApplicationServices.System
                 return OperationFailure.NotFound;
             }
 
-            if (! _authorizationContext.AllowModify(system))
+            if (!_authorizationContext.AllowModify(system))
             {
                 return OperationFailure.Forbidden;
             }
@@ -58,7 +79,7 @@ namespace Core.ApplicationServices.System
                 transaction.Commit();
                 return systemExternalReferences;
             }
-            
+
         }
 
     }

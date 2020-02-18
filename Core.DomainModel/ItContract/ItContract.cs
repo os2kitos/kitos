@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.References;
+
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItContract
@@ -575,6 +577,10 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        public ReferenceRootType GetRootType()
+        {
+            return ReferenceRootType.Contract;
+        }
 
         #endregion
 
