@@ -1,12 +1,12 @@
 ﻿<div class="object-section-container">
-    <h4>{{system.name}} <span data-ng-if="system.disabled">(Slettes)</span></h4>
+    <h4>{{system.name}} - data i IT systemkatalog<span data-ng-if="system.disabled"> (Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="row">
             <!-- Left side -->
             <div class="col-xs-8">
                 <div class="row">
                     <div class="col-xs-6">
-                        <!--Name-->
+                        <!--System name-->
                         <div class="form-group">
                             <label for="system-name" class="control-label small">IT System</label>
                             <input type="text" id="system-name" class="form-control input-sm" required
@@ -15,18 +15,25 @@
                                    data-field="name"
                                    data-ng-model="system.name">
                         </div>
-                        <!-- Usage type -->
+                        <!--Parent system name-->
                         <div class="form-group">
-                            <select-option data-id="system-business-type"
-                                           data-label="Forretningstype"
-                                           data-placeholder="Vælg forretningstype"
-                                           data-selected-text="{{ system.businessTypeName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="system.businessTypeId"
-                                           data-options="businessTypes"
-                                           data-auto-save-url="{{ system.updateUrl }}"
-                                           data-field="businessTypeId">
-                            </select-option>
+                            <label for="system-parent" class="control-label small">Overordnet system</label>
+                            <input type="hidden" id="system-parent" class="form-control input-sm"
+                                   data-ui-select2="itSystemsSelectOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="parentId"
+                                   data-placeholder="Vælg system"
+                                   data-ng-model="system.parent">
+                        </div>
+                        <!--Previous system name-->
+                        <div class="form-group">
+                            <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>
+                            <input type="text" id="system-previousname" class="form-control input-sm"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="previousname"
+                                   data-ng-model="system.previousName">
                         </div>
                         <!-- belongs to -->
                         <div class="form-group">
@@ -49,8 +56,8 @@
                                    data-ng-model="system.accessModifier"
                                    data-select-access-modifier="">
                         </div>
-                        <!--Data level-->
-                        <div class="form-group">
+                        <!--Data level Slettes TODO: -->
+                        <!--<div class="form-group">
                             <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
                             <select class="form-control input-sm"
                                     ui-select2="{minimumResultsForSearch: -1}"
@@ -61,8 +68,10 @@
                                 <option value="1">Persondata</option>
                                 <option value="2">Persondata og følsomme persondata</option>
                             </select>
-                        </div>
+                        </div>-->
                     </div>
+
+                    <!-- TODO: Check om den ikke skal rykkes ud på niveau med "left side" og "right side" -->
                     <div class="col-xs-6">
                         <!-- Description -->
                         <div class="form-group">
@@ -73,6 +82,9 @@
                                       data-ng-disabled="!hasWriteAccess"
                                       data-ng-model="system.description"></textarea>
                         </div>
+
+                        <!-- Reference TODO:(NEW) -->
+
                     </div>
                 </div>
             </div>
@@ -81,9 +93,24 @@
             <div class="col-xs-4">
                 <div class="row">
                     <div class="col-xs-12">
+                        <!-- Business type -->
+                        <div class="form-group">
+                            <select-option data-id="system-business-type"
+                                           data-label="Forretningstype"
+                                           data-placeholder="Vælg forretningstype"
+                                           data-selected-text="{{ system.businessTypeName }}"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="system.businessTypeId"
+                                           data-options="businessTypes"
+                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-field="businessTypeId">
+                            </select-option>
+                        </div>
+
+                        <!-- KLE ID and Name TODO:(NEW) -->
                         <!-- Archive duty -->
                         <div class="form-group">
-                            <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
+                            <label for="archiveDuty" class="control-label small">Rigsarkivets vejledning</label>
                             <select class="form-control input-sm" id="archiveDuty"
                                     ui-select2="{minimumResultsForSearch: -1}"
                                     data-ng-model="system.archiveDuty"
@@ -94,29 +121,17 @@
                                 <option value="2">K</option>
                                 <option value="3">Ved ikke</option>
                             </select>
+                            <!-- TODO: check layout -->
+                            <p>Læs mere hos <a href="https://www.sa.dk/da/offentlig-forvaltning/kommuner-og-regioner/bevaring-kassation-it-systemer/">Rigsarkivet</a></p>
                         </div>
-                        <!--PreviousName-->
+                        <!-- UUID -->
                         <div class="form-group">
-                            <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>
-                            <input type="text" id="system-previousname" class="form-control input-sm"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
-                                   data-field="previousname"
-                                   data-ng-model="system.previousName">
+                            <label class="control-label small">UUID</label>
+                            <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
                         </div>
-                        <!--Parent system-->
-                        <div class="form-group">
-                            <label for="system-parent" class="control-label small">Overordnet system</label>
-                            <input type="hidden" id="system-parent" class="form-control input-sm"
-                                   data-ui-select2="itSystemsSelectOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
-                                   data-field="parentId"
-                                   data-placeholder="Vælg system"
-                                   data-ng-model="system.parent">
-                        </div>
-                        <!--AppTypeOption-->
-                        <div class="form-group">
+
+                        <!--AppTypeOption TODO: SLETTES-->
+                        <!--<div class="form-group">
                             <select-option data-id="system-type"
                                            data-label="Applikationstype"
                                            data-placeholder="Vælg applikationstype"
@@ -127,17 +142,14 @@
                                            data-auto-save-url="{{ system.updateUrl }}"
                                            data-field="appTypeOptionId">
                             </select-option>
-                        </div>
-                        <!-- Object owner -->
-                        <div class="form-group">
+                        </div>-->
+                        <!-- Object owner TODO: SLETTES-->
+                        <!--<div class="form-group">
                             <label class="control-label small">Oprettet af</label>
                             <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
-                        </div>
-                        <!-- UUID -->
-                        <div class="form-group">
-                            <label class="control-label small">UUID</label>
-                            <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
-                        </div>
+                        </div>-->
+                        v>
+
                     </div>
                 </div>
             </div>
