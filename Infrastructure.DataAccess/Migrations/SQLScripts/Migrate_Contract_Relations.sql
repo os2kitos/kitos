@@ -20,49 +20,44 @@ BEGIN
     -- Build an operation context - the from-to context needed to migrate the relation
     DECLARE @MigrationContext TABLE
     (
-        OrganizationId as int null,
-        FromSystemUsageId as int,
-        ToSystemUsageId as int null,
-        ExposingSystemId as int null,
-        ItInterfaceId as int,
-        ItContractId as int,
-        ObjectOwnerId as int,
-        LastChanged as datetime,
-        LastChangedByUserId as int
+        OrganizationId int,
+        FromSystemUsageId int,
+        ToSystemUsageId int,
+        ExposingSystemId int,
+        ItInterfaceId int,
+        ItContractId int,
+        ObjectOwnerId int,
+        LastChanged datetime,
+        LastChangedByUserId int,
+        MigratedToUuid uniqueidentifier
     );
     
     -- Scrape candidate data from
     INSERT INTO @MigrationContext
         SELECT
-            NULL AS OrganizationId,
-            ItSystemUsageId AS FromSystemUsageId,
-            NULL AS ToSystemUsageId,
-            NULL AS ExposingSystemId,
-            ItInterfaceId,
-            ItContractId,
-            ObjectOwnerId,
-            LastChanged,
-            LastChangedByUserId
-        FROM ItInterfaceUsage
-        WHERE ItContractId IS NOT NULL; -- if null, the user has actively deleted the relation from the UI.. an operation which only "nulls" the contract on the created relation in the backend
+            FROM_USAGE.OrganizationId	AS OrganizationId,
+            RELATION.ItSystemUsageId	AS FromSystemUsageId,
+            TO_USAGE.Id					AS ToSystemUsageId,
+            EXH.ItSystemId				AS ExposingSystemId,
+            RELATION.ItInterfaceId      AS ItInterfaceId,
+            RELATION.ItContractId		AS ItContractId,
+            FROM_USAGE.ObjectOwnerId	AS ObjectOwnerId,
+            GETUTCDATE()				AS LastChanged,
+            FROM_USAGE.ObjectOwnerId	AS LastChangedByUserId,
+            NEWID()						AS MigratedToUuid
+        FROM ItInterfaceUsage RELATION
+		INNER JOIN ItSystemUsage FROM_USAGE ON
+			FROM_USAGE.Id = RELATION.ItSystemUsageId
+		INNER JOIN Exhibit EXH ON
+			EXH.Id = RELATION.ItInterfaceId
+		INNER JOIN ItSystemUsage TO_USAGE ON
+			TO_USAGE.ItSystemId = EXH.ItSystemId AND 
+			TO_USAGE.OrganizationId = FROM_USAGE.OrganizationId
+        WHERE ItContractId IS NOT NULL -- if null, the user has actively deleted the relation from the UI.. an operation which only "nulls" the contract on the created relation in the backend
 
-    -- Patch Exposing system Id
-    UPDATE @MigrationContext
-        SET 
-            ExposingSystemId = (SELECT top(1) ItSystemId FROM Exhibit WHERE Id = ItInterfaceId),
-            OrganizationId = (SELECT top(1) OrganizationId FROM ItSystemUsage WHERE Id = FromSystemUsageId);
 
-    -- Delete all where exposing system id is still NULL (the relation was invalid since no logical IT system was marked as exhibitor)
-    DELETE from @MigrationContext
-    where ExposingSystemId IS NULL;
-    
-    -- Patch "ToSystemUsageId" by binding to local system usage Id of the exposing system
-    UPDATE @MigrationContext
-        SET ToSystemUsageId = (SELECT top(1) Id FROM ItSystemUsage WHERE ItSystemId = ExposingSystemId AND OrganizationId = OrganizationId);
-
-    -- Delete all all rows wgere ToSystemUsageId could not be derived - that is - where no local usage of the exposing system exists
-    DELETE from @MigrationContext
-    where ToSystemUsageId IS NULL;
+    DELETE FROM @MigrationContext
+    WHERE FromSystemUsageId = ToSystemUsageId;
 
     -- Insert system relations
     INSERT INTO SystemRelation
@@ -77,10 +72,8 @@ BEGIN
            ,ItInterfaceId AS RelationInterfaceId
            ,NULL AS UsageFrequencyId
            ,NULL AS Reference
-           ,NEWID() AS Uuid
+           ,MigratedToUuid AS Uuid
      FROM @MigrationContext;
 
-    -- TODO: Delete source data by PK ([ItSystemUsageId] [ItSystemId] [ItInterfaceId])
-
-    -- TODO - consider!: Should we add the "migrated to" relation Id?.. in that way we can reverse the opration... just requires an additional field an a type which we are going to nuke anyways
+     -- TODO: Mark all migrated entities as migrated
 END

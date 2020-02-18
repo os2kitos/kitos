@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 
@@ -49,5 +49,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
+
+        /// <summary>
+        /// Temporary migration column used while data is migrated and before the tables are removed
+        /// </summary>
+        public Guid? MigratedToUuid { get; set; }
     }
 }
