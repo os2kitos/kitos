@@ -9,8 +9,6 @@ Content:
  between the "Using" system usage and the usage of the "interface exhibitor". If data is migrated, the old data is removed.
 */
 
-use Kitos;
-
 /*
 - Get all organizations for which itinterface usage has been created!
 - for each organization, collect
