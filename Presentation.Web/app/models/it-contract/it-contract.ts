@@ -112,10 +112,8 @@
 
         /** The (local usages of) it systems, that this contract is associated to. */
         AssociatedSystemUsages: Array<IItContractItSystemUsage>;
-        /** The interface usages that the contract is associated to. */
-        AssociatedInterfaceUsages: Array<ItSystemUsage.IInterfaceUsage>;
-        /** Gets or sets the associated interface exposures. */
-        AssociatedInterfaceExposures: Array<ItSystemUsage.IItInterfaceExhibitUsage>;
+        /** Gets or sets the associated relations. */
+        AssociatedSystemRelations: Array<ItSystemUsage.Relation.IItSystemRelation>;
 
         /** Gets or sets the intern economy streams. */
         InternEconomyStreams: Array<IEconomyStream>;

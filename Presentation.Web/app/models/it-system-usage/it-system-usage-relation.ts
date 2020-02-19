@@ -1,4 +1,16 @@
 ﻿module Kitos.Models.ItSystemUsage.Relation {
+
+    export interface IItSystemRelation {
+        FromSystemUsageId: number;
+        Uuid: string;
+        ToSystemUsageId: number;
+        RelationInterfaceId: number;
+        Description: string;
+        Reference: string;
+        UsageFrequencyId: number;
+        AssociatedContractId: number;
+    }
+
     export interface IItSystemUsageCreateRelationDTO {
         FromUsageId: number;
         ToUsageId: number;
