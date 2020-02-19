@@ -896,6 +896,7 @@
       <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>

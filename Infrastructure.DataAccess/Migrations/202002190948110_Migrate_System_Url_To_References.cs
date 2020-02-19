@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Infrastructure.DataAccess.Migrations
 {
     using System;
@@ -7,7 +9,9 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            //TODO: Add conversion logic here
+            //Migrate before changing the schema
+            SqlResource(GetType().Assembly.GetManifestResourceNames().First(x => x.Contains("Migrate_System_Url.sql")));
+
             DropColumn("dbo.ItSystem", "Url");
         }
         
