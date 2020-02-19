@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -104,6 +106,17 @@ namespace Core.DomainModel.ItSystem
         public ReferenceRootType GetRootType()
         {
             return ReferenceRootType.System;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
         }
 
         public int? ReferenceId { get; set; }

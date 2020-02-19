@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Result;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -194,6 +195,17 @@ namespace Core.DomainModel.ItProject
         public ReferenceRootType GetRootType()
         {
             return ReferenceRootType.Project;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
         }
 
         public int? ReferenceId { get; set; }

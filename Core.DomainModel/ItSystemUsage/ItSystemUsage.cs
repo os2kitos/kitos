@@ -297,6 +297,17 @@ namespace Core.DomainModel.ItSystemUsage
             return ReferenceRootType.SystemUsage;
         }
 
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
+        }
+
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }
         public virtual ICollection<AccessType> AccessTypes { get; set; }

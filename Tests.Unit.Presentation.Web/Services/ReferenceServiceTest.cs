@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
@@ -7,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -35,7 +37,9 @@ namespace Tests.Unit.Presentation.Web.Services
                 _referenceRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
-                _transactionManager.Object
+                _transactionManager.Object,
+                new Mock<IOrganizationalUserContext>().Object,
+                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
             );
         }
 
@@ -127,7 +131,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystem CreateSystem()
         {
-            return new ItSystem {Id = A<int>()};
+            return new ItSystem { Id = A<int>() };
         }
         private ExternalReference CreateReference()
         {
