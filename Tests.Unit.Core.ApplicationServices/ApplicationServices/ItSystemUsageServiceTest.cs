@@ -788,10 +788,12 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var organizationId = A<int>();
+            const int pageNumber = 0;
+            const int pageSize = 100;
             ExpectGetOrganizationReadAccessReturns(organizationId, accessLevelInOrganization);
 
             //Act
-            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, 1, 1);
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize);
 
             //Assert
             Assert.False(relations.Ok);
@@ -803,8 +805,12 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var organizationId = A<int>();
+            var differentOrganizationId = organizationId + 1;
+
             var relationsFromFirst = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
             var relationsFromSecond = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            const int pageNumber = 0;
+            const int pageSize = 100;
 
             ExpectGetOrganizationReadAccessReturns(organizationId, OrganizationDataReadAccessLevel.All);
             _usageRepository.Setup(x => x.AsQueryable()).Returns(new[]
@@ -813,12 +819,11 @@ namespace Tests.Unit.Core.ApplicationServices
                 CreateSystemUsageWithRelations(relationsFromSecond, organizationId),
 
                 //This one should be excluded from the results - invalid organization
-                CreateSystemUsageWithRelations(new List<SystemRelation> {CreateRelation()}, organizationId + 1)
+                CreateSystemUsageWithRelations(new List<SystemRelation> {CreateRelation()}, differentOrganizationId)
             }.AsQueryable());
 
-
             //Act
-            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, 0, 100);
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize);
 
             //Assert
             Assert.True(relations.Ok);
@@ -831,6 +836,8 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var organizationId = A<int>();
             var relationsFromFirst = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            const int pageTwoPageNumber = 1;
+            const int pageSize = 1;
 
             ExpectGetOrganizationReadAccessReturns(organizationId, OrganizationDataReadAccessLevel.All);
             _usageRepository.Setup(x => x.AsQueryable()).Returns(new[]
@@ -838,9 +845,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 CreateSystemUsageWithRelations(relationsFromFirst, organizationId),
             }.AsQueryable());
 
-
             //Act
-            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, 1, 1); //skips first page 
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageTwoPageNumber, pageSize); //skips first page 
 
             //Assert
             Assert.True(relations.Ok);
