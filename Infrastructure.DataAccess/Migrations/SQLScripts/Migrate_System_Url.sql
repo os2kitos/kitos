@@ -49,7 +49,7 @@ BEGIN
             ObjectOwnerId   AS ObjectOwnerId,
             ObjectOwnerId   AS LastChangedByUserId,
             2               AS Display,
-            ItSystemId		AS ItSystem_Id
+            ItSystemId      AS ItSystem_Id
         FROM @MigrationContext;
 
     -- SET MASTER REFERENCE
