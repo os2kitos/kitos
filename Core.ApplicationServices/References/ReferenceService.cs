@@ -52,7 +52,13 @@ namespace Core.ApplicationServices.References
                 .Match
                 (
                     onValue: root =>
-                        root
+                    {
+                        if (!_authorizationContext.AllowModify(root))
+                        {
+                            return new OperationError("Not allowed to modify root entity",OperationFailure.Forbidden);
+                        }
+
+                        return root
                             .AddExternalReference(new ExternalReference
                             {
                                 Title = title,
@@ -72,7 +78,8 @@ namespace Core.ApplicationServices.References
                                     return createdReference;
                                 },
                                 onFailure: error => error
-                            ),
+                            );
+                    },
                     onNone: () => new OperationError("Root entity could not be found", OperationFailure.NotFound)
                 );
         }
