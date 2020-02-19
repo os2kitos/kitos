@@ -155,6 +155,7 @@
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
+    <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
