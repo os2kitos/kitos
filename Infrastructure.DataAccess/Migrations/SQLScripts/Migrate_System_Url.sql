@@ -11,5 +11,59 @@ Content:
 */
 
 BEGIN
-  
+    DECLARE @MigrationContext TABLE
+    (
+        ItSystemId int,
+        ObjectOwnerId int,
+        OldUrlData varchar(MAX)
+    );
+
+    -- MIGRATE FROM URL TO REFERENCES
+    INSERT INTO @MigrationContext
+        SELECT
+            Id            AS ItSystemId,
+            [Url]         AS OldUrlData,
+            ObjectOwnerId AS ObjectOwnerId
+        FROM ItSystem
+        WHERE 
+            [Url] IS NOT NULL AND
+            [Url] <> '' AND
+            Id NOT IN (select ItSystem_Id from ExternalReferences where ItSystem_Id IS NOT NULL);
+
+    INSERT INTO ExternalReferences
+        SELECT
+            'Reference'     AS Title,
+            'Reference'     AS ExternalReferenceId,
+            OldUrlData      AS [Url],
+            GETUTCDATE()    AS LastChanged,
+            GETUTCDATE()    AS Created,
+            ObjectOwnerId   AS ObjectOwnerId,
+            ObjectOwnerId   AS LastChangedByUserId,
+            2               AS Display
+        FROM @MigrationContext;
+
+    -- SET MASTER REFERENCE
+    DECLARE @SetMasterReferenceContext TABLE
+    (
+        ItSystemId int,
+        ReferenceId int
+    );
+    
+    INSERT INTO @SetMasterReferenceContext
+        SELECT
+            ItSystem.Id             AS ItSystemId,
+            ExternalReferences.Id   AS ReferenceId
+        FROM ItSystem
+        INNER JOIN ExternalReferences ON
+            ExternalReferences.ItSystem_Id = ItSystem.Id
+        WHERE 
+            Id IN (SELECT ItSystemId AS Id FROM @MigrationContext);
+
+    -- Patch a reference to where the data was migrated to in the original table
+    MERGE INTO ItSystem
+        USING @SetMasterReferenceContext
+            ON  @SetMasterReferenceContext.ItSystemId = ItSystem.Id
+    WHEN MATCHED THEN
+        UPDATE
+            SET [ItSystem].ReferenceId = [@SetMasterReferenceContext].ReferenceId;
 END
