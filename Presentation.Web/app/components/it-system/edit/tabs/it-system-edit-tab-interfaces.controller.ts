@@ -24,7 +24,6 @@
             $scope.system = itSystem;
             
             $scope.interfaceExposures = exhibits;
-            
         }
     ]);
 })(angular, app);

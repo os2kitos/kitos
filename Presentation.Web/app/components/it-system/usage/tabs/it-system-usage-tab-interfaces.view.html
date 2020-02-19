@@ -6,10 +6,7 @@
         <table class="table table-striped table-condensed">
             <thead ng-if="interfaceExposures.length > 0">
                 <tr>
-                    <th>Ønske</th>
-                    <th>Aktiv</th>
                     <th class="col-xs-2">Snitflade</th>
-                    <th class="col-xs-2">Kontrakt ID</th>
                     <th class="col-xs-1">Grænseflade</th>
                     <th class="col-xs-1">Data</th>
                     <th class="col-xs-1">Datatype</th>
@@ -17,32 +14,9 @@
             </thead>
             <tbody class="small">
                 <tr ng-repeat-start="exposure in interfaceExposures">
-                    <!-- wished to be used -->
-                    <td rowspan="{{exposure.dataRows.length || 1}}">
-                        <input type="checkbox" data-ng-model="exposure.usage.isWishedFor"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="isWishedFor"
-                               data-appendurl="{{exposure.urlParams}}"
-                               data-autosave="{{exposure.updateUrl}}" />
-                    </td>
-
-                    <!-- active (depends on contract) -->
-                    <td rowspan="{{exposure.dataRows.length || 1}}">
-                        <span ng-if="exposure.usage.itContract.isActive" class="text-success">
-                            <i class="glyphicon glyphicon-ok"></i>
-                        </span>
-                    </td>
-
                     <!-- name of the interface -->
                     <td rowspan="{{exposure.dataRows.length || 1}}">
                         <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
-                    </td>
-
-                    <!-- contract id -->
-                    <td rowspan="{{exposure.dataRows.length || 1}}">
-                        <a ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">
-                            {{exposure.usage.itContract.itContractId}}
-                        </a>
                     </td>
 
                     <!-- interface (grænseflade) -->
@@ -61,18 +35,18 @@
                             {{exposure.dataRows[0].dataTypeName}}
                         </span>
                     </td>
-            </tr>
-            <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
-                <!-- data -->
-                <td rowspan="1">
-                    {{dataRow.data}}
-                </td>
+                </tr>
+                <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
+                    <!-- data -->
+                    <td rowspan="1">
+                        {{dataRow.data}}
+                    </td>
 
-                <!-- data type -->
-                <td>
-                    {{dataRow.dataTypeName}}
-                </td>
-            </tr>
+                    <!-- data type -->
+                    <td>
+                        {{dataRow.dataTypeName}}
+                    </td>
+                </tr>
                 <tr ng-if="interfaceExposures.length == 0">
                     <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td>
                 </tr>
