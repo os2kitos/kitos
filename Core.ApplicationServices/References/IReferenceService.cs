@@ -7,7 +7,7 @@ namespace Core.ApplicationServices.References
 {
     public interface IReferenceService
     {
-        Result<ExternalReference, OperationError> Create(int referenceOwnerId, ReferenceRootType referenceOwnerType, string title, string externalReferenceId, string url, Display display);
+        Result<ExternalReference, OperationError> AddReference(int rootId, ReferenceRootType rootType, string title, string externalReferenceId, string url, Display display);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId);
     }
 }

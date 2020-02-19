@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API
                     .Match
                     (
                         onValue: typeAndId => _referenceService
-                            .Create
+                            .AddReference
                             (
                                 typeAndId.Value,
                                 typeAndId.Key,

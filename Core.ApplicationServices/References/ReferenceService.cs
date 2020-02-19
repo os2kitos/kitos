@@ -39,16 +39,16 @@ namespace Core.ApplicationServices.References
         }
 
 
-        public Result<ExternalReference, OperationError> Create(
-            int referenceOwnerId,
-            ReferenceRootType referenceOwnerType,
+        public Result<ExternalReference, OperationError> AddReference(
+            int rootId,
+            ReferenceRootType rootType,
             string title,
             string externalReferenceId,
             string url,
             Display display)
         {
             return _referenceRepository
-                .GetRootEntity(referenceOwnerId, referenceOwnerType)
+                .GetRootEntity(rootId, rootType)
                 .Match
                 (
                     onValue: root =>
