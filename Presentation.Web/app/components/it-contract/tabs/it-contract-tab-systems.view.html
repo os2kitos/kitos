@@ -10,7 +10,7 @@
                     <table class="table table-condensed table-striped small">
                         <thead>
                             <tr>
-                                <th class="col-xs-8">
+                                <th class="col-xs-8" style="padding-left: 15px">
                                     IT System
                                 </th>
                                 <th class="col-xs-3">
@@ -20,10 +20,9 @@
                             </tr>
                         </thead>
                         <tbody>
-
                             <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
                                 <!-- the system -->
-                                <td>
+                                <td style="padding-left: 15px">
                                     <a data-ui-sref="it-system.usage.main({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Slettes)</span></a>
                                 </td>
 
@@ -68,132 +67,11 @@
             <div class="col-xs-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        IT Kontrakten gælder flg. snitfladerelationer
-                    </div>
-                    <table class="table table-condensed table-striped small">
-                        <thead>
-                            <tr>
-                                <th class="col-xs-4">
-                                    IT System
-                                </th>
-
-                                <th class="col-xs-4">
-                                    Relation
-                                </th>
-
-                                <th class="col-xs-4">
-                                    Snitflade
-                                </th>
-
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="exhibit in exhibitedInterfaces">
-
-                                <!-- the system -->
-                                <td>
-                                    <a data-ui-sref="it-system.usage.main({ id: exhibit.itSystemUsageId })">{{ exhibit.itInterfaceExhibitItSystemName }} <span data-ng-if="exhibit.itInterfaceExhibitItSystemDisabled">(Slettes)</span></a>
-                                </td>
-
-                                <!-- relation -->
-                                <td>
-                                    Udstiller
-                                </td>
-
-                                <!-- interface -->
-                                <td>
-                                    <a data-ui-sref="it-system.interface-edit.main({ id: exhibit.itInterfaceExhibitItInterfaceId })">{{ exhibit.itInterfaceExhibitItInterfaceName }} <span data-ng-if="exhibit.itInterfaceExhibitItInterfaceDisabled">(Slettes)</span></a>
-                                </td>
-
-                                <td>
-
-                                    <div class="pull-right" data-ng-show="hasWriteAccess">
-                                        <a class="btn btn-danger btn-xs delete-interface-exhibit"
-                                           data-confirmed-click="deleteExhibit({{exhibit.itInterfaceExhibitId}}, {{exhibit.itSystemUsageId}})"
-                                           data-confirm-click="Er du sikker på at du vil slette?">
-                                            <i class="glyphicon glyphicon-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tbody>
-                            <tr data-ng-repeat="used in usedInterfaces">
-                                <!-- the system -->
-                                <td>
-                                    <a data-ui-sref="it-system.usage.main({ id: used.itSystemUsageId })">{{ used.itSystemUsage.itSystemName }} <span data-ng-if="used.itSystemUsage.itSystemDisabled">(Slettes)</span></a>
-                                </td>
-
-                                <!-- relation -->
-                                <td>
-                                    Anvender
-                                </td>
-
-                                <!-- interface -->
-                                <td>
-                                    <a data-ui-sref="it-system.interface-edit.main({ id: used.itInterfaceId })">{{ used.itInterfaceItInterfaceName }} <span data-ng-if="used.itInterfaceItInterfaceDisabled">(Slettes)</span></a>
-                                </td>
-
-                                <td>
-
-                                    <div class="pull-right" data-ng-show="hasWriteAccess">
-                                        <a class="btn btn-danger btn-xs delete-interface-usage"
-                                           data-confirmed-click="deleteUsed({{used.itSystemUsageId}}, {{used.itSystemId}}, {{used.itInterfaceId}})"
-                                           data-confirm-click="Er du sikker på at du vil slette?">
-                                            <i class="glyphicon glyphicon-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot data-ng-show="hasWriteAccess">
-                            <!-- new row -->
-                            <tr>
-                                <td>
-                                    <input type="hidden"
-                                           id="new-interface-system-usage"
-                                           class="form-control input-sm"
-                                           data-ui-select2="itSystemUsagesSelectOptions"
-                                           data-placeholder="Vælg IT system"
-                                           data-ng-model="newAssociatedInterfaceSelectedSystemUsage">
-                                </td>
-
-                                <td>
-                                    <select id="new-interface-usage-type"
-                                            class="form-control input-sm"
-                                            data-ui-select2=""
-                                            data-ng-model="newAssociatedInterfaceRelation"
-                                            data-placeholder="Vælg relation">
-                                        <option value=""></option>
-                                        <option value="exhibit">Udstiller</option>
-                                        <option value="using">Anvender</option>
-                                    </select>
-                                </td>
-                                <td colspan="2">
-                                    <input type="hidden"
-                                           id="new-interface-interface-usage"
-                                           class="form-control input-sm"
-                                           data-ui-select2="itInterfaceUsagesSelectOptions"
-                                           data-ng-model="newAssociatedInterfaceSelectedInterfaceUsage"
-                                           data-ng-disabled="!newAssociatedInterfaceSelectedSystemUsage || !newAssociatedInterfaceRelation"
-                                           data-placeholder="{{newAssociatedInterface.placeholder}}"
-                                           data-ng-change="newAssociatedInterfaceSave()">
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
                         IT Kontrakten omfatter flg. aftaleelementer
                     </div>
                     <!-- Agreement elements -->
-                    <div class="form-group">
+                    <div class="form-group" style="padding: 0 10px 0 10px">
+
                         <select-multiple-option data-id="agreement-elements"
                                                 data-placeholder="Vælg aftaleelementer"
                                                 data-selected-texts="selectedAgreementElementNames"
@@ -204,6 +82,63 @@
                                                 data-field="elemId">
                         </select-multiple-option>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        IT-Kontrakten gælder flg. relationer
+                    </div>
+                    <table class="table table-condensed table-striped">
+                        <thead>
+                            <tr>
+                                <th style="padding-left: 15px">
+                                    IT System (anvender)
+                                </th>
+                                <th>
+                                    IT System (udstiller)
+                                </th>
+                                <th>
+                                    Snitflade
+                                </th>
+                                <th>
+                                    Beskrivelse
+                                </th>
+                                <th>
+                                    Reference
+                                </th>
+                                <th>
+                                    Frekvens
+                                </th>
+                                <th class="buttonColumn">
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="relation in usageRelations">
+                                <td style="overflow-wrap: break-word;padding-left: 15px"><a data-ui-sref="it-system.usage.relation({ id: relation.FromSystem.Id})" title="{{relation.FromSystem.Name}}">{{relation.FromSystem.Name}}</a></td>
+                                <td style="overflow-wrap: break-word"><a data-ui-sref="it-system.usage.relation({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
+                                <td style="overflow-wrap: break-word;max-width: 200px"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
+                                <td style="width: 300px">
+                                    <p ng-if="relation.Description" ng-show="!relation.Description.LongText" data-element-type="relationDescription">{{relation.Description.Description}}</p>
+                                    <p ng-if="relation.Description" ng-show="relation.Description.LongText" style="height: {{relation.Description.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Description.Description}}</p>
+                                    <a ng-if="relation.Description" ng-show="relation.Description.LongText" ng-click="expandParagraph($event)">Se mere</a>
+                                </td>
+                                <td style="overflow-wrap: break-word; width: 150px">
+                                    <a ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank"><img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
+                                    <p ng-if="relation.Reference" ng-show="relation.Reference.LongText" style="height: {{relation.Reference.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Reference.Reference}}</p>
+                                    <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
+                                    <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
+                                </td>
+                                <td>
+                                    <p ng-if="relation.Frequency" data-element-type="relationFrequencyType">{{relation.Frequency.Name}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

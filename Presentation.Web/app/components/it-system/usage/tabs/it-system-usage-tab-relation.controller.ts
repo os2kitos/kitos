@@ -15,29 +15,22 @@
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
             const reload = () => {
+                const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(systemRelations, maxTextFieldCharCount, shortTextLineCount);
+                }
+
                 systemRelationService.getRelationsFrom(usageId)
                     .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                        $scope.usageRelations = mapSystemRelations(systemRelations);
+                        $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                     });
 
                 systemRelationService.getRelationsTo(usageId)
-                    .then(systemRelations => {
-                        $scope.usedByRelations = mapSystemRelations(systemRelations);
+                    .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                        $scope.usedByRelations = mapDataToViewmodelArray(systemRelations);
                     });
             };
-            reload();
 
-            function mapSystemRelations(systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) {
-                const usedByOverviewData: Kitos.Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
-                _.each(systemRelations,
-                    (systemRelation) => {
-                        usedByOverviewData.push(
-                            new Kitos.Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount,
-                                shortTextLineCount,
-                                systemRelation));
-                    });
-                return usedByOverviewData;
-            }
+            reload();
 
             $scope.createRelation = () => {
                 if (modalOpen === false) {
@@ -194,18 +187,7 @@
             };
 
             $scope.expandParagraph = (e) => {
-                var element = angular.element(e.currentTarget);
-                var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
-                var btn = element[0];
-
-                if (para.getAttribute("style") != null) {
-                    para.removeAttribute("style");
-                    btn.innerText = "Se mindre";
-                }
-                else {
-                    para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
-                    btn.innerText = "Se mere";
-                }
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, shortTextLineCount);
             };
         }]);
 })(angular, app);

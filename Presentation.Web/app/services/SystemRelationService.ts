@@ -6,6 +6,7 @@
     export interface ISystemRelationService {
         getRelationsFrom(systemUsageId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
         getRelationsTo(systemUsageId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
+        getRelationWithContract(contractId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
         getAvailableRelationOptions(fromSystemUsageId: number, toSystemUsageId: number): ng.IPromise<IItSystemUsageRelationOptionsDTO[]>;
         createSystemRelation(systemRelation: IItSystemUsageCreateRelationDTO): ng.IPromise<{}>;
     }
@@ -27,6 +28,14 @@
 
         getRelationsTo(systemUsageId: number) {
             return this.$http.get(`api/v1/systemrelations/to/${systemUsageId}`)
+                .then(response => {
+                    var kitosSystemRelationResponse = response.data as { msg: string, response: IItSystemUsageRelationDTO[] }
+                    return kitosSystemRelationResponse.response;
+                });
+        }
+
+        getRelationWithContract(contractId: number) {
+            return this.$http.get(`api/v1/systemrelations/associated-with/contract/${contractId}`)
                 .then(response => {
                     var kitosSystemRelationResponse = response.data as { msg: string, response: IItSystemUsageRelationDTO[] }
                     return kitosSystemRelationResponse.response;

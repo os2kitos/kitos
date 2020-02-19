@@ -190,7 +190,7 @@
     export class SystemRelationModalViewModel implements ISystemRelationModalViewModel {
         id: number;
         headerText: string;
-        isEditDialog : boolean
+        isEditDialog: boolean;
         fromSystem: NamedEntityDTO;
         toSystem: ISystemRelationModalIdText;
         interface: ISystemRelationSelectionModel;
@@ -202,9 +202,9 @@
         constructor(fromSystemId: number, fromSystemName: string) {
             this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
             this.toSystem = null;
-            this.interface = <ISystemRelationSelectionModel>{value: null, options: []};
-            this.contract = <ISystemRelationSelectionModel>{ value: null, options: []};
-            this.frequency = <ISystemRelationSelectionModel>{ value: null, options: []};
+            this.interface = <ISystemRelationSelectionModel>{ value: null, options: [] };
+            this.contract = <ISystemRelationSelectionModel>{ value: null, options: [] };
+            this.frequency = <ISystemRelationSelectionModel>{ value: null, options: [] };
             this.reference = <ISystemRelationModalIdText>{};
             this.description = <ISystemRelationModalIdText>{};
         }
@@ -260,6 +260,7 @@
                 }
             }
         }
+
     }
 
     export class SystemRelationModelPostDataObject implements IItSystemUsageCreateRelationDTO {
@@ -325,4 +326,16 @@
 
 
     }
+
+    export class SystemRelationMapper {
+
+        static mapSystemRelationToViewModel(systemRelation: IItSystemUsageRelationDTO, maxTextFieldCharCount, shortTextLineCount) {
+            return new SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, systemRelation);
+        }
+
+        static mapSystemRelationsToViewModels(systemRelations: [IItSystemUsageRelationDTO], maxTextFieldCharCount, shortTextLineCount) {
+            return _.map(systemRelations, relation => SystemRelationMapper.mapSystemRelationToViewModel(relation, maxTextFieldCharCount, shortTextLineCount));
+        }
+    }
+
 }
