@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
             }
 
             return
-                GetOwnerTypeAnId(dto)
+                GetOwnerTypeAndId(dto)
                     .Match
                     (
                         onValue: typeAndId => _referenceService
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API
                     );
         }
 
-        private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAnId(ExternalReferenceDTO dto)
+        private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAndId(ExternalReferenceDTO dto)
         {
             return GetOwnerTypeAndIdOrFallback(ReferenceRootType.Contract, dto.ItContract_Id,
                 fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.System, dto.ItSystem_Id,
