@@ -69,7 +69,6 @@ BEGIN
         WHERE 
             ItSystem.Id IN (SELECT ItSystemId AS Id FROM @MigrationContext);
 
-    -- Patch a reference to where the data was migrated to in the original table
     MERGE INTO ItSystem
         USING @SetMasterReferenceContext
             ON  [@SetMasterReferenceContext].ItSystemId = ItSystem.Id
