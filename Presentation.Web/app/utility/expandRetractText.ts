@@ -1,8 +1,8 @@
 ﻿module Kitos.Utility {
 
-    export class RelationTableManipulation {
+    export class TableManipulation {
 
-        static expandRetractRelationParagraph(e, shortTextLineCount) {
+        static expandRetractParagraphCell(e, shortTextLineCount) {
             var element = angular.element(e.currentTarget);
             var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
             var btn = element[0];

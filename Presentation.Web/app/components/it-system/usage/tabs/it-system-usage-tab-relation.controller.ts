@@ -187,7 +187,7 @@
             };
 
             $scope.expandParagraph = (e) => {
-                Kitos.Utility.RelationTableManipulation.expandRetractRelationParagraph(e, shortTextLineCount);
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, shortTextLineCount);
             };
         }]);
 })(angular, app);

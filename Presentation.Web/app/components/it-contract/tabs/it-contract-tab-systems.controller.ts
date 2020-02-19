@@ -107,7 +107,7 @@
             formatAssociatedSystems(contract.associatedSystemUsages);
 
             $scope.expandParagraph = (e) => {
-                Kitos.Utility.RelationTableManipulation.expandRetractRelationParagraph(e, shortTextLineCount);
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, shortTextLineCount);
             };
 
             $scope.itSystemUsagesSelectOptions = {
