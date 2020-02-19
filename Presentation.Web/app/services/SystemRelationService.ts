@@ -6,6 +6,7 @@
     export interface ISystemRelationService {
         getRelationsFrom(systemUsageId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
         getRelationsTo(systemUsageId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
+        getRelationWithContract(contractId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;
         getAvailableRelationOptions(fromSystemUsageId: number, toSystemUsageId: number): ng.IPromise<IItSystemUsageRelationOptionsDTO[]>;
         createSystemRelation(systemRelation: IItSystemUsageCreateRelationDTO): ng.IPromise<{}>;
     }
@@ -27,6 +28,14 @@
 
         getRelationsTo(systemUsageId: number) {
             return this.$http.get(`api/v1/systemrelations/to/${systemUsageId}`)
+                .then(response => {
+                    var kitosSystemRelationResponse = response.data as { msg: string, response: IItSystemUsageRelationDTO[] }
+                    return kitosSystemRelationResponse.response;
+                });
+        }
+
+        getRelationWithContract(contractId: number) {
+            return this.$http.get(`api/v1/systemrelations/associated-with/contract/${contractId}`)
                 .then(response => {
                     var kitosSystemRelationResponse = response.data as { msg: string, response: IItSystemUsageRelationDTO[] }
                     return kitosSystemRelationResponse.response;
@@ -62,6 +71,30 @@
 
         deleteSystemRelation(systemUsageId: number, relationId: number) {
             return this.$http.delete(`api/v1/systemrelations/from/${systemUsageId}/${relationId}`);
+        }
+
+        mapSystemRelationToArray(systemRelations: [Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO], maxTextFieldCharCount, shortTextLineCount) {
+            const usedByOverviewData: Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
+            _.each(systemRelations,
+                (systemRelation) => {
+                    usedByOverviewData.push(
+                        new Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, systemRelation));
+                });
+            return usedByOverviewData;
+        }
+
+        expandParagraph(e, shortTextLineCount) {
+            var element = angular.element(e.currentTarget);
+            var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
+            var btn = element[0];
+
+            if (para.getAttribute("style") != null) {
+                para.removeAttribute("style");
+                btn.innerText = "Se mindre";
+            } else {
+                para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
+                btn.innerText = "Se mere";
+            }
         }
     }
 
