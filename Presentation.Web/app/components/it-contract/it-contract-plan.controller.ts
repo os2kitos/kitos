@@ -235,7 +235,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures,Reference`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations,Reference`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -388,12 +388,6 @@
                     <uib-tab index="0" heading="Systemer">
                         <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                    <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" data-odata-query="odata/ItInterfaceExhibits?$select=ItInterface&$expand=ItInterface($select=Name, Disabled)&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
-                    </uib-tab>
-                    <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" data-odata-query="odata/ItContracts?$select=AssociatedInterfaceUsages&$expand=AssociatedInterfaceUsages($select=ItInterface;$expand=ItInterface($select=Name, Disabled))&$filter=AssociatedInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
-                    </uib-tab>
                 </uib-tabset>`;
 
                 },
@@ -511,7 +505,7 @@
                     {
                         field: "AssociatedSystemUsages",
                         title: "Antal systemer",
-                        width: 50,
+                        width: 60,
                         persistId: "numOfItSystems", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             return dataItem.AssociatedSystemUsages.length.toString();
@@ -521,24 +515,24 @@
                         filterable: false
                     },
                     {
-                        field: "AssociatedInterfaceUsages",
-                        title: "Antal udstillede snitflader",
-                        width: 50,
-                        persistId: "numOfItInterfacesExhibit", // DON'T YOU DARE RENAME!
+                        field: "AssociatedInterfaces",
+                        title: "Antal snitflader",
+                        width: 60,
+                        persistId: "numberOfInterfaces", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return dataItem.AssociatedInterfaceExposures.length.toString();
+                            return _.uniqBy(dataItem.AssociatedSystemRelations.filter(x => x.RelationInterfaceId != null), x => x.RelationInterfaceId).length.toString();
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
                     {
-                        field: "AssociatedInterfaceExposures",
-                        title: "Antal anvendte snitflader",
-                        width: 50,
-                        persistId: "numOfItInterfacesUsages", // DON'T YOU DARE RENAME!
+                        field: "AssociatedRelations",
+                        title: "Antal relationer",
+                        width: 60,
+                        persistId: "numberOfRelations", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return dataItem.AssociatedInterfaceUsages.length.toString();
+                            return dataItem.AssociatedSystemRelations.length.toString();
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
