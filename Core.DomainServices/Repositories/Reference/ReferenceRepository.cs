@@ -51,7 +51,7 @@ namespace Core.DomainServices.Repositories.Reference
             return ResolveRepositoryOperations(rootType).Get(id);
         }
 
-        public void Save(IEntityWithExternalReferences root)
+        public void SaveRootEntity(IEntityWithExternalReferences root)
         {
             if (root == null)
             {

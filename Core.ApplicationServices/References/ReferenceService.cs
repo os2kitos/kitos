@@ -74,7 +74,7 @@ namespace Core.ApplicationServices.References
                             (
                                 onSuccess: createdReference =>
                                 {
-                                    _referenceRepository.Save(root);
+                                    _referenceRepository.SaveRootEntity(root);
                                     return createdReference;
                                 },
                                 onFailure: error => error

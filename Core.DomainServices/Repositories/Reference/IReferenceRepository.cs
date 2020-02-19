@@ -7,7 +7,7 @@ namespace Core.DomainServices.Repositories.Reference
     public interface IReferenceRepository
     {
         Maybe<IEntityWithExternalReferences> GetRootEntity(int id, ReferenceRootType rootType);
-        void Save(IEntityWithExternalReferences root);
+        void SaveRootEntity(IEntityWithExternalReferences root);
         void Delete(ExternalReference reference);
     }
 }
