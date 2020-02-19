@@ -37,12 +37,18 @@
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, "name");
 
+            const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(systemRelations,maxTextFieldCharCount,shortTextLineCount);
+            }
+
             systemRelationService.getRelationWithContract(contract.id)
                 .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                    $scope.usageRelations =
-                        systemRelationService.mapSystemRelationToArray(systemRelations,
-                            maxTextFieldCharCount,
-                            shortTextLineCount);
+                    $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
+                });
+
+            systemRelationService.getRelationWithContract(contract.id)
+                .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                 });
 
             function formatAssociatedSystems(associatedSystemUsages) {
@@ -97,10 +103,11 @@
                 };
             }
 
+
             formatAssociatedSystems(contract.associatedSystemUsages);
 
             $scope.expandParagraph = (e) => {
-                systemRelationService.expandParagraph(e, shortTextLineCount);
+                Kitos.Utility.RelationTableManipulation.expandRetractRelationParagraph(e, shortTextLineCount);
             };
 
             $scope.itSystemUsagesSelectOptions = {

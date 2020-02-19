@@ -15,20 +15,21 @@
             const maxTextFieldCharCount = 199;
             const shortTextLineCount = 4;
             const reload = () => {
+                const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(systemRelations, maxTextFieldCharCount, shortTextLineCount);
+                }
+
                 systemRelationService.getRelationsFrom(usageId)
                     .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                        $scope.usageRelations = systemRelationService.mapSystemRelationToArray(systemRelations,
-                            maxTextFieldCharCount,
-                            shortTextLineCount);
+                        $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                     });
 
                 systemRelationService.getRelationsTo(usageId)
                     .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                        $scope.usedByRelations = systemRelationService.mapSystemRelationToArray(systemRelations,
-                            maxTextFieldCharCount,
-                            shortTextLineCount);
+                        $scope.usedByRelations = mapDataToViewmodelArray(systemRelations);
                     });
             };
+
             reload();
 
             $scope.createRelation = () => {
@@ -186,7 +187,7 @@
             };
 
             $scope.expandParagraph = (e) => {
-                systemRelationService.expandParagraph(e, shortTextLineCount);
+                Kitos.Utility.RelationTableManipulation.expandRetractRelationParagraph(e, shortTextLineCount);
             };
         }]);
 })(angular, app);

@@ -72,30 +72,6 @@
         deleteSystemRelation(systemUsageId: number, relationId: number) {
             return this.$http.delete(`api/v1/systemrelations/from/${systemUsageId}/${relationId}`);
         }
-
-        mapSystemRelationToArray(systemRelations: [Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO], maxTextFieldCharCount, shortTextLineCount) {
-            const usedByOverviewData: Models.ItSystemUsage.Relation.ISystemRelationViewModel[] = new Array();
-            _.each(systemRelations,
-                (systemRelation) => {
-                    usedByOverviewData.push(
-                        new Models.ItSystemUsage.Relation.SystemRelationViewModel(maxTextFieldCharCount, shortTextLineCount, systemRelation));
-                });
-            return usedByOverviewData;
-        }
-
-        expandParagraph(e, shortTextLineCount) {
-            var element = angular.element(e.currentTarget);
-            var para = element.closest("td").find(document.getElementsByClassName("readMoreParagraph"))[0];
-            var btn = element[0];
-
-            if (para.getAttribute("style") != null) {
-                para.removeAttribute("style");
-                btn.innerText = "Se mindre";
-            } else {
-                para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
-                btn.innerText = "Se mere";
-            }
-        }
     }
 
     app.service("systemRelationService", SystemRelationService);
