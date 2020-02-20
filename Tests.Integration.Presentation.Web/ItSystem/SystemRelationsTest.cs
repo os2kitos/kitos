@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using ExpectedObjects;
 using Presentation.Web.Models;
@@ -364,6 +365,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
                 relationFromContractResponse.ToExpectedObject().ShouldMatch(relationFromOriginalResponse); //Same relation should yield same data at the dto level
             }
+        }
+
+        [Fact]
+        public async Task Can_Get_SystemRelations_Defined_In_Organization()
+        {
+            //Arrange
+            var input1 = await PrepareFullRelationAsync(false, false, false);
+            var input2 = await PrepareFullRelationAsync(false, false, false);
+            var input3 = await PrepareFullRelationAsync(false, false, false);
+
+            //Make sure there are not relations before performing the paging test
+            DatabaseAccess.MutateEntitySet<SystemRelation>(repository =>
+            {
+                var systemRelations = repository.AsQueryable().ToList();
+                repository.RemoveRange(systemRelations);
+                repository.Save();
+            });
+
+            var relation1 = await SystemRelationHelper.PostRelationAsync(input1);
+            var relation2 = await SystemRelationHelper.PostRelationAsync(input2);
+            var relation3 = await SystemRelationHelper.PostRelationAsync(input3);
+
+            var expectedSequence = new[] { relation1.Id, relation2.Id, relation3.Id }.OrderBy(id => id).ToList();
+            const int pageSize = 2;
+            const int firstPageNumber = 0;
+            const int secondPageNumber = firstPageNumber + 1;
+
+            //Act
+            var firstPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize);
+            var secondPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, secondPageNumber, pageSize);
+
+            //Assert - first page with 2 items
+            Assert.Equal(expectedSequence.Take(pageSize), firstPage.Select(x => x.Id));
+
+            //Assert - second page with 1 item since there are only 3 in total
+            const int expectedSecondPageSize = 1;
+            Assert.Equal(expectedSequence.Skip(pageSize).Take(expectedSecondPageSize), secondPage.Select(x => x.Id));
         }
 
         #region Helpers

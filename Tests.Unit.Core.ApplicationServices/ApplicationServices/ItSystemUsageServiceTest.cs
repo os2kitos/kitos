@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -12,6 +13,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -760,6 +762,109 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(new[] { includedSystemUsage1.Id, includedSystemUsage2.Id }.OrderBy(x => x), result.Value.Select(x => x.Id).OrderBy(x => x));
+        }
+
+        [Theory]
+        [InlineData(-1, 1)]
+        [InlineData(0, 0)]
+        [InlineData(0, 101)]
+        public void GetRelationsDefinedInOrganization_Returns_BadInput(int pageNumber, int pageSize)
+        {
+            //Arrange
+            var organizationId = A<int>();
+
+            //Act
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.BadInput, relations.Error.FailureType);
+        }
+
+        [Theory, Description("Full organization access is required to access local data")]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        public void GetRelationsDefinedInOrganization_Returns_Forbidden(OrganizationDataReadAccessLevel accessLevelInOrganization)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            const int pageNumber = 0;
+            const int pageSize = 100;
+            ExpectGetOrganizationReadAccessReturns(organizationId, accessLevelInOrganization);
+
+            //Act
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize);
+
+            //Assert
+            Assert.False(relations.Ok);
+            Assert.Equal(OperationFailure.Forbidden, relations.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetRelationsDefinedInOrganization_Returns_Ok()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var differentOrganizationId = organizationId + 1;
+
+            var relationsFromFirst = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            var relationsFromSecond = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            const int pageNumber = 0;
+            const int pageSize = 100;
+
+            ExpectGetOrganizationReadAccessReturns(organizationId, OrganizationDataReadAccessLevel.All);
+            _usageRepository.Setup(x => x.AsQueryable()).Returns(new[]
+            {
+                CreateSystemUsageWithRelations(relationsFromFirst, organizationId),
+                CreateSystemUsageWithRelations(relationsFromSecond, organizationId),
+
+                //This one should be excluded from the results - invalid organization
+                CreateSystemUsageWithRelations(new List<SystemRelation> {CreateRelation()}, differentOrganizationId)
+            }.AsQueryable());
+
+            //Act
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize);
+
+            //Assert
+            Assert.True(relations.Ok);
+            Assert.True(relations.Value.OrderBy(x => x.Id).SequenceEqual(relationsFromFirst.Concat(relationsFromSecond).OrderBy(x => x.Id)));
+        }
+
+        [Fact]
+        public void GetRelationsDefinedInOrganization_Returns_Ok_With_Paging()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var relationsFromFirst = new List<SystemRelation>() { CreateRelation(), CreateRelation() };
+            const int pageTwoPageNumber = 1;
+            const int pageSize = 1;
+
+            ExpectGetOrganizationReadAccessReturns(organizationId, OrganizationDataReadAccessLevel.All);
+            _usageRepository.Setup(x => x.AsQueryable()).Returns(new[]
+            {
+                CreateSystemUsageWithRelations(relationsFromFirst, organizationId),
+            }.AsQueryable());
+
+            //Act
+            var relations = _sut.GetRelationsDefinedInOrganization(organizationId, pageTwoPageNumber, pageSize); //skips first page 
+
+            //Assert
+            Assert.True(relations.Ok);
+            Assert.Same(relationsFromFirst.OrderBy(x => x.Id).Last(), relations.Value.Single());
+        }
+
+        private static ItSystemUsage CreateSystemUsageWithRelations(List<SystemRelation> relationsFromFirst, int organizationId)
+        {
+            return new ItSystemUsage
+            {
+                UsageRelations = relationsFromFirst,
+                OrganizationId = organizationId
+            };
+        }
+
+        private void ExpectGetOrganizationReadAccessReturns(int organizationId, OrganizationDataReadAccessLevel accessLevelInOrganization)
+        {
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(accessLevelInOrganization);
         }
 
         private ItSystemUsage CreateSystemUsage(int organizationId, ItSystem itSystem)
