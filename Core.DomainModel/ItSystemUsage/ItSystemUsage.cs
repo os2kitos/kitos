@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -14,7 +17,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization, IEntityWithExternalReferences
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences
     {
         public ItSystemUsage()
         {
@@ -31,6 +34,8 @@ namespace Core.DomainModel.ItSystemUsage
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
+            UsageRelations = new List<SystemRelation>();
+            UsedByRelations = new List<SystemRelation>();
         }
 
         public bool IsActive
@@ -303,7 +308,7 @@ namespace Core.DomainModel.ItSystemUsage
             return OrganizationId == organizationId;
         }
 
-        
+
         public int? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }
@@ -340,9 +345,9 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ItSystemCategoriesId { get; set; }
 
-        public virtual ItSystemCategories ItSystemCategories  { get; set; }
+        public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-        public string GeneralPurpose { get; set;}
+        public string GeneralPurpose { get; set; }
         public DataOptions isBusinessCritical { get; set; }
         public DataOptions ContainsLegalInfo { get; set; }
         public DataSensitivityLevel DataLevel { get; set; }
@@ -357,7 +362,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? lastControl { get; set; }
 
         public string noteUsage { get; set; }
-        
+
         public int precautions { get; set; }
 
         public int riskAssessment { get; set; }
@@ -400,7 +405,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
-        
+
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
@@ -416,5 +421,132 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public bool? ArchiveFromSystem { get; set; }
+        /// <summary>
+        /// Defines how this system uses other systems.
+        /// </summary>
+        public virtual ICollection<SystemRelation> UsageRelations { get; set; }
+        /// <summary>
+        /// Defines how this system is used by other systems
+        /// </summary>
+        public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
+
+        public Result<SystemRelation, OperationError> AddUsageRelationTo(
+            User activeUser,
+            ItSystemUsage toSystemUsage,
+            Maybe<ItInterface> relationInterface,
+            string description,
+            string reference,
+            Maybe<RelationFrequencyType> targetFrequency,
+            Maybe<ItContract.ItContract> targetContract)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (toSystemUsage == null)
+                throw new ArgumentNullException(nameof(toSystemUsage));
+
+            var newRelation = new SystemRelation(this)
+            {
+                ObjectOwner = ObjectOwner,
+                LastChangedByUser = activeUser,
+                LastChanged = DateTime.Now
+            };
+
+            var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, description, reference, relationInterface, targetContract, targetFrequency);
+
+            if (updateRelationResult.Failed)
+            {
+                return updateRelationResult.Error;
+            }
+
+            UsageRelations.Add(newRelation);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newRelation;
+        }
+
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser,
+            int relationId,
+            ItSystemUsage toSystemUsage,
+            string changedDescription,
+            string changedReference,
+            Maybe<ItInterface> relationInterface,
+            Maybe<ItContract.ItContract> toContract, 
+            Maybe<RelationFrequencyType> toFrequency)
+        {
+            if (activeUser == null)
+            {
+                throw new ArgumentNullException(nameof(activeUser));
+            }
+
+            var relationResult = GetUsageRelation(relationId);
+            if (relationResult.IsNone)
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.BadInput);
+            }
+
+            var relation = relationResult.Value;
+
+            return UpdateRelation(relation, toSystemUsage, changedDescription, changedReference, relationInterface, toContract, toFrequency);
+        }
+
+        public Result<SystemRelation, OperationFailure> RemoveUsageRelation(int relationId)
+        {
+            var relationResult = GetUsageRelation(relationId);
+
+            if (!relationResult.HasValue)
+            {
+                return OperationFailure.NotFound;
+            }
+
+            var relation = relationResult.Value;
+            UsageRelations.Remove(relation);
+            return relation;
+        }
+
+        public IEnumerable<ItInterface> GetExposedInterfaces()
+        {
+            return ItSystem
+                .FromNullable()
+                .Select(system => system.ItInterfaceExhibits)
+                .Select(interfaceExhibits => interfaceExhibits.Select(interfaceExhibit => interfaceExhibit.ItInterface))
+                .Select(interfaces => interfaces.ToList())
+                .GetValueOrFallback(new List<ItInterface>());
+        }
+
+        public Maybe<ItInterface> GetExposedInterface(int interfaceId)
+        {
+            return GetExposedInterfaces().FirstOrDefault(x => x.Id == interfaceId);
+        }
+
+        public bool HasExposedInterface(int interfaceId)
+        {
+            return GetExposedInterface(interfaceId).HasValue;
+        }
+
+        public Maybe<SystemRelation> GetUsageRelation(int relationId)
+        {
+            return UsageRelations.FirstOrDefault(r => r.Id == relationId);
+        }
+
+        private Result<SystemRelation, OperationError> UpdateRelation(
+            SystemRelation relation,
+            ItSystemUsage toSystemUsage,
+            string changedDescription,
+            string changedReference,
+            Maybe<ItInterface> relationInterface,
+            Maybe<ItContract.ItContract> toContract, 
+            Maybe<RelationFrequencyType> toFrequency)
+        {
+            return relation
+                .SetRelationTo(toSystemUsage)
+                .Select(_ => _.SetDescription(changedDescription))
+                .Select(_ => _.SetRelationInterface(relationInterface))
+                .Select(_ => _.SetContract(toContract))
+                .Select(_ => _.SetFrequency(toFrequency))
+                .Select(_ => _.SetReference(changedReference));
+        }
     }
 }

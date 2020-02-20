@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public abstract class ItSystemBase : Entity, IContextAware, ISystemModule, IHasOrganization, IHasAccessModifier, IHasName
+    public abstract class ItSystemBase : Entity, IContextAware, ISystemModule, IOwnedByOrganization, IHasAccessModifier, IHasName
     {
         public string Name { get; set; }
         public Guid Uuid { get; set; }

@@ -1,0 +1,57 @@
+﻿<div class="object-section-container">
+    <h4>{{system.name}} <span ng-if="system.disabled">(Slettes)</span></h4>
+    <div class="panel panel-default">
+        <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
+
+        <table class="table table-striped table-condensed">
+            <thead ng-if="interfaceExposures.length > 0">
+                <tr>
+                    <th class="col-xs-2">Snitflade</th>
+                    <th class="col-xs-1">Grænseflade</th>
+                    <th class="col-xs-1">Data</th>
+                    <th class="col-xs-1">Datatype</th>
+                </tr>
+            </thead>
+            <tbody class="small">
+                <tr ng-repeat-start="exposure in interfaceExposures">
+
+                    <!-- name of the interface -->
+                    <td rowspan="{{exposure.dataRows.length || 1}}">
+                        <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
+                    </td>
+
+                    <!-- interface (grænseflade) -->
+                    <td rowspan="{{exposure.dataRows.length || 1}}">{{exposure.interfaceName}}</td>
+
+                    <!-- data -->
+                    <td rowspan="1">
+                        <span ng-if="exposure.dataRows.length > 0">
+                            {{exposure.dataRows[0].data}}
+                        </span>
+                    </td>
+
+                    <!-- data type -->
+                    <td>
+                        <span ng-if="exposure.dataRows.length > 0">
+                            {{exposure.dataRows[0].dataTypeName}}
+                        </span>
+                    </td>
+                </tr>
+            <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
+                <!-- data -->
+                <td rowspan="1">
+                    {{dataRow.data}}
+                </td>
+
+                <!-- data type -->
+                <td>
+                    {{dataRow.dataTypeName}}
+                </td>
+            </tr>
+                <tr data-ng-if="interfaceExposures.length == 0">
+                    <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

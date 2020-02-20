@@ -57,25 +57,22 @@ class Login {
         var ec = protractor.ExpectedConditions;
 
         return homePage.getPage()
+            .then(() => browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds))
+            .then(() => homePage.emailField.sendKeys(credentials.username))
+            .then(() => homePage.pwdField.sendKeys(credentials.password))
+            .then(() => homePage.loginButton.click())
+            .then(() => browser.waitForAngular())
             .then(() => {
-                return browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
+                if (credentials.username === this.getCredentialsMap().globalAdmin.username) {
+                    console.log("User is global admin - must select organization before proceeding");
+                    return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)
+                        .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
+                        .then(() => homePage.selectWorkingOrganizationButton.click());
+                } else {
+                    return true;
+                }
             })
-            .then(() => {
-                return homePage.emailField.sendKeys(credentials.username);
-            })
-            .then(() => {
-                return homePage.pwdField.sendKeys(credentials.password);
-            })
-            .then(() => {
-                return homePage.loginButton.click();
-            })
-            .then(() => {
-                return browser.waitForAngular();
-            })
-            .then(() => {
-                //Await login completed before completing command
-                return browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
-            });
+            .then(() => browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds));
     }
 
     private parseStringAsArrayAndGetIndex(input: string, index: number) {

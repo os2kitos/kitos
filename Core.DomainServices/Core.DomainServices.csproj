@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,8 +55,8 @@
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
+    <Compile Include="Context\ActiveUserContext.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
-    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
@@ -57,10 +64,11 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
+    <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
-    <Compile Include="Model\Result\Maybe.cs" />
-    <Compile Include="Model\Result\Result.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
@@ -77,6 +85,17 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Time\IOperationClock.cs" />
+    <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
+    <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />
+    <Compile Include="Repositories\KLE\IKLEStandardRepository.cs" />
+    <Compile Include="Repositories\KLE\IKLEUpdateHistoryItemRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEConverterHelper.cs" />
+    <Compile Include="Repositories\KLE\KLEParentHelper.cs" />
+    <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEStatus.cs" />
+    <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
+    <Compile Include="Time\OperationClock.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />
@@ -85,15 +104,21 @@
     <Compile Include="Repositories\SystemUsage\ItSystemUsageRepository.cs" />
     <Compile Include="Repositories\System\IItSystemRepository.cs" />
     <Compile Include="Repositories\System\ItSystemRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEUpdateHistoryItemRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

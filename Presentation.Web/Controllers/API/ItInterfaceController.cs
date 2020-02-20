@@ -31,10 +31,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var result = _itInterfaceService.Delete(id);
-                return result.Ok ?
-                    Ok() :
-                    FromOperationFailure(result.Error);
+                return _itInterfaceService
+                    .Delete(id)
+                    .Match(_ => Ok(), FromOperationFailure);
             }
             catch (Exception e)
             {

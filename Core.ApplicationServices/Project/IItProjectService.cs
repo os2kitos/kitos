@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItProject;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Project
 {
@@ -17,5 +16,9 @@ namespace Core.ApplicationServices.Project
         Result<ItProject, OperationFailure> DeleteProject(int id);
 
         IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null);
+
+        Result<Handover, OperationFailure> AddHandoverParticipant(int projectId, int participantId);
+
+        Result<Handover, OperationFailure> DeleteHandoverParticipant(int projectId, int participantId);
     }
 }

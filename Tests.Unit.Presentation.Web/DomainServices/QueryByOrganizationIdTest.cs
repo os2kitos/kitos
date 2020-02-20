@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
+using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -25,8 +26,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.Equal(2, result.Count);
-            Assert.True(result.Contains(included1));
-            Assert.True(result.Contains(included2));
+            Assert.Contains(included1, result);
+            Assert.Contains(included2, result);
 
         }
 

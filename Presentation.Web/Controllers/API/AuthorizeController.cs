@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -11,7 +10,15 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Web;
+using System.Web.Helpers;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel.Result;
+using Infrastructure.Services.Cryptography;
+using Newtonsoft.Json;
+using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -23,15 +30,18 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
+        private readonly ICryptoService _cryptoService;
 
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            ICryptoService cryptoService)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
+            _cryptoService = cryptoService;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
@@ -66,7 +76,11 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetOrganization(int orgId)
         {
             var user = KitosUser;
-            var org = _organizationService.GetOrganizations(user).Single(o => o.Id == orgId);
+            var org = _organizationService.GetOrganizations(user).SingleOrDefault(o => o.Id == orgId);
+            if (org == null)
+            {
+                return BadRequest("User is not associated with organization");
+            }
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
             var dto = new OrganizationAndDefaultUnitDTO
             {
@@ -76,38 +90,6 @@ namespace Presentation.Web.Controllers.API
             return Ok(dto);
         }
 
-        private User LoginWithToken(string token)
-        {
-            User user = null;
-            var principal = new TokenValidator().Validate(token);
-            if (principal == null || !principal.Identity.IsAuthenticated)
-            {
-                Logger.Info($"Uservalidation: Could not validate token.");
-                throw new ArgumentException();
-            }
-
-            if (principal.Claims.Any(c => c.Type == ClaimTypes.Email || c.Type == ClaimTypes.NameIdentifier))
-            {
-
-                var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
-                var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                if (uuidClaim != null && !String.IsNullOrEmpty(uuidClaim.Value))
-                {
-                    user = _userRepository.GetByUuid(uuidClaim.Value);
-                }
-                if (user == null && emailClaim != null)
-                {
-                    user = _userRepository.GetByEmail(emailClaim.Value);
-                    if (user != null && !String.IsNullOrEmpty(uuidClaim.Value))
-                    {
-                        user.UniqueId = uuidClaim.Value;
-                        _userRepository.Update(user);
-                        _userRepository.Save();
-                    }
-                }
-            }
-            return user;
-        }
         //Post api/authorize/gettoken
         [HttpPost]
         [AllowAnonymous]
@@ -115,6 +97,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<GetTokenResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [IgnoreCSRFProtection]
         public HttpResponseMessage GetToken(LoginDTO loginDto)
         {
             if (loginDto == null)
@@ -128,23 +111,33 @@ namespace Presentation.Web.Controllers.API
             }
             try
             {
-                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                var result = AuthenticateUser(loginDto);
+
+                if (result.Failed)
                 {
-                    Logger.Info("Attempt to login with bad credentials");
-                    return Unauthorized("Bad credentials");
+                    return result.Error;
                 }
 
-                var user = _userRepository.GetByEmail(loginDto.Email);
-                if (user == null)
-                {
-                    Logger.Error("User found during membership validation but could not be found by email: {email}", loginDto.Email);
-                    return BadRequest();
-                }
+                var user = result.Value;
 
-                if (!user.HasApiAccess.GetValueOrDefault())
+                if (user.HasApiAccess == false)
                 {
                     Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
                     return Forbidden();
+                }
+
+                if (user.DefaultOrganization == null)
+                {
+                    //Make sure user is associated with the org they belong to
+                    var distinctOrgMemberships = user.OrganizationRights.Select(x => x.OrganizationId).Distinct().ToList();
+                    var firstOrgId = distinctOrgMemberships.First();
+                    if (distinctOrgMemberships.Count > 1)
+                    {
+                        Logger.Warn("API user {userId} without selected default org is a member of multiple organizations. The first one is selected {orgId}", user.Id, firstOrgId);
+                    }
+
+                    user.DefaultOrganizationId = firstOrgId;
+                    _userRepository.Save();
                 }
 
                 var token = new TokenValidator().CreateToken(user);
@@ -178,47 +171,28 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest();
             }
 
-            var loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
+            var loginInfo = new { UserId = -1, LoginSuccessful = false };
 
             try
             {
-                User user;
-                if (!string.IsNullOrEmpty(loginDto.Token))
-                {
-                    user = LoginWithToken(loginDto.Token);
-                    if (user == null)
-                    {
-                        Logger.Info($"Uservalidation: Unsuccessful login with token. {loginInfo}");
-                        return Unauthorized("Invalid token");
-                    }
-                }
-                else
-                {
-                    if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
-                    {
-                        Logger.Info($"Uservalidation: Unsuccessful login with credentials. {loginInfo}");
-                        return Unauthorized("Bad credentials");
-                    }
+                var result = AuthenticateUser(loginDto);
 
-                    user = _userRepository.GetByEmail(loginDto.Email);
-                    if (user == null)
-                    {
-                        Logger.Error($"User found during membership validation but could not be found by email: {loginDto.Email}");
-                        return BadRequest();
-                    }
+                if (result.Failed)
+                {
+                    return result.Error;
                 }
+
+                var user = result.Value;
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
-                loginInfo = new { loginDto.Email, LoginSuccessful = true };
+                loginInfo = new { UserId = user.Id, LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
             }
             catch (Exception e)
             {
-                Logger.Info($"Uservalidation: Error. {loginInfo}");
-
                 return LogError(e);
             }
         }
@@ -252,6 +226,69 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/authorize/antiforgery")]
+        public HttpResponseMessage GetAntiForgeryToken()
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+            var cookie = HttpContext.Current.Request.Cookies[Constants.CSRFValues.CookieName];
+
+            AntiForgery.GetTokens(cookie == null ? "" : cookie.Value, out var cookieToken, out var formToken);
+
+            response.Content = new StringContent(JsonConvert.SerializeObject(formToken), Encoding.UTF8, "application/json");
+
+            if (CookieAlreadySet(cookieToken))
+            {
+                response.Headers.AddCookies(new[]
+                {
+                    new CookieHeaderValue(Constants.CSRFValues.CookieName, cookieToken)
+                    {
+                        Path = "/",
+                        Secure = true,
+                    }
+                });
+            }
+
+            return response;
+        }
+
+        private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto)
+        {
+            if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+            {
+                Logger.Info("Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(loginDto.Email ?? ""));
+                {
+                    return Unauthorized();
+                }
+            }
+
+            var user = _userRepository.GetByEmail(loginDto.Email);
+            if (user == null)
+            {
+                Logger.Error("User found during membership validation but could not be found by email: {hashEmail}", _cryptoService.Encrypt(loginDto.Email));
+                {
+                    return Unauthorized();
+                }
+            }
+
+            if (user.CanAuthenticate())
+            {
+                return user;
+            }
+
+            Logger.Info("'Non-global admin' User with id {userId} and no organization rights denied access", user.Id);
+            {
+                return Unauthorized();
+            }
+        }
+
+        private static bool CookieAlreadySet(string cookieToken)
+        {
+            return !string.IsNullOrEmpty(cookieToken);
         }
     }
 }

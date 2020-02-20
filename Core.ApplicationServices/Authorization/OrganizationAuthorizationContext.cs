@@ -98,7 +98,7 @@ namespace Core.ApplicationServices.Authorization
         {
             if (IsReadOnly())
             {
-                return false;
+                return IsGlobalAdmin(); //Global admin negates readonly
             }
 
             if (MatchType<T, ItSystem>())
@@ -333,7 +333,9 @@ namespace Core.ApplicationServices.Authorization
 
         private static bool IsContextBound(Type entityType)
         {
-            return typeof(IContextAware).IsAssignableFrom(entityType) || typeof(IHasOrganization).IsAssignableFrom(entityType);
+            return typeof(IContextAware).IsAssignableFrom(entityType) || 
+                   typeof(IOwnedByOrganization).IsAssignableFrom(entityType) ||
+                   typeof(IIsPartOfOrganization).IsAssignableFrom(entityType);
         }
 
         private bool ActiveContextIsEntityContext(IEntity entity)

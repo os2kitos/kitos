@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<KLE-Emneplan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://skemaer.kle-online.dk/rest/KLE-REST-Emneplan-fuld-version-1-2.xsd">
+  <UdgivelsesDato>2019-11-01</UdgivelsesDato>
+  <Hovedgruppe>
+    <HovedgruppeNr>00</HovedgruppeNr>
+    <HovedgruppeTitel>Kommunens styrelse</HovedgruppeTitel>
+    <HovedgruppeAdministrativInfo>
+      <RettetDato>2011-05-01</RettetDato>
+    </HovedgruppeAdministrativInfo>
+    <UUID>4eba8818-da19-4e37-b3e1-b9b6be2f2f13</UUID>
+    <Gruppe>
+      <GruppeNr>00.01</GruppeNr>
+      <GruppeTitel>Kommunens styrelse</GruppeTitel>
+      <UUID>4da28ac8-fbb4-4f04-a81d-0af336eab752</UUID>
+      <Emne>
+        <EmneNr>00.01.00</EmneNr>
+        <EmneTitel>Kommunens styrelse i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>2004-02-01</OprettetDato>
+          <RettetDato>2011-05-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>15b97b4f-08c6-42fc-9a37-3ec048d8d01b</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>00.03</GruppeNr>
+      <GruppeTitel>International virksomhed og EU</GruppeTitel>
+      <UUID>d4160818-9977-4cee-bdc6-c6290effd69e</UUID>
+      <Emne>
+        <EmneNr>00.03.00</EmneNr>
+        <EmneTitel>HAS BEEN RENAMED</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>2003-08-01</OprettetDato>
+          <RettetDato>1996-01-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>f8d6e719-e050-48d8-89e2-977d0eaba6bb</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>00.05</GruppeNr>
+      <GruppeTitel>Besøg, repræsentation mv.</GruppeTitel>
+      <GruppeAdministrativInfo>
+        <OprettetDato>1988-01-01</OprettetDato>
+      </GruppeAdministrativInfo>
+      <UUID>aa720548-7faa-4856-babc-9f560a663b24</UUID>
+      <Emne>
+        <EmneNr>00.05.00</EmneNr>
+        <EmneTitel>Besøg, repræsentation mv. i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+        </EmneAdministrativInfo>
+        <UUID>0cc253a9-163f-4563-acdf-b34a477f3ad1</UUID>
+      </Emne>
+    </Gruppe>
+  </Hovedgruppe>
+  <Hovedgruppe>
+    <HovedgruppeNr>01</HovedgruppeNr>
+    <HovedgruppeTitel>Fysisk planlægning og naturbeskyttelse</HovedgruppeTitel>
+    <HovedgruppeAdministrativInfo>
+      <RettetDato>2011-05-01</RettetDato>
+    </HovedgruppeAdministrativInfo>
+    <UUID>c8353dca-1e61-4484-b53e-302e75bb7f33</UUID>
+    <Gruppe>
+      <GruppeNr>01.00</GruppeNr>
+      <GruppeTitel>Fysisk planlægning og naturbeskyttelse</GruppeTitel>
+      <GruppeAdministrativInfo>
+        <OprettetDato>1988-01-01</OprettetDato>
+        <RettetDato>2007-08-01</RettetDato>
+      </GruppeAdministrativInfo>
+      <UUID>c22d13a8-c23d-4db7-855a-16760af67886</UUID>
+      <Emne>
+        <EmneNr>01.00.00</EmneNr>
+        <EmneTitel>Fysisk planlægning og naturbeskyttelse i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+          <RettetDato>2007-08-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>b5e659f3-9c8a-412a-998f-e25d011d56bd</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>01.01</GruppeNr>
+      <GruppeTitel>Landsplandirektiver mv. og regional udviklingsplanlægning</GruppeTitel>
+      <GruppeAdministrativInfo>
+        <OprettetDato>1988-01-01</OprettetDato>
+        <RettetDato>2008-02-01</RettetDato>
+      </GruppeAdministrativInfo>
+      <UUID>c48d0334-37c9-4c88-aa5c-1837354c09de</UUID>
+      <Emne>
+        <EmneNr>01.01.00</EmneNr>
+        <EmneTitel>Landsplandirektiver mv. og regional udviklingsplanlægning i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+          <RettetDato>2008-02-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>8249a43e-7c76-4ab8-9cd1-ba45040099f6</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>01.02</GruppeNr>
+      <GruppeTitel>Kommuneplanlægning og lokalplanlægning</GruppeTitel>
+      <GruppeAdministrativInfo>
+        <OprettetDato>1988-01-01</OprettetDato>
+        <RettetDato>2005-02-01</RettetDato>
+      </GruppeAdministrativInfo>
+      <UUID>0582c4f0-4aa5-41e8-bd50-9c6ed8f6140f</UUID>
+      <Emne>
+        <EmneNr>01.02.00</EmneNr>
+        <EmneTitel>Kommuneplanlægning og lokalplanlægning i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+        </EmneAdministrativInfo>
+        <UUID>208aac3c-e479-49f6-95be-3244eca725a3</UUID>
+      </Emne>
+    </Gruppe>
+  </Hovedgruppe>
+  <Hovedgruppe>
+    <HovedgruppeNr>02</HovedgruppeNr>
+    <HovedgruppeTitel>Byggeri</HovedgruppeTitel>
+    <HovedgruppeAdministrativInfo>
+      <OprettetDato>1988-01-01</OprettetDato>
+      <RettetDato>2011-05-01</RettetDato>
+    </HovedgruppeAdministrativInfo>
+    <UUID>ff756ae7-65b3-4946-b94b-cc75ce771f62</UUID>
+    <Gruppe>
+      <GruppeNr>02.00</GruppeNr>
+      <GruppeTitel>Byggeri</GruppeTitel>
+      <UUID>ba432df8-c68f-4188-9d50-cf1abb484f9f</UUID>
+      <Emne>
+        <EmneNr>02.00.00</EmneNr>
+        <EmneTitel>Byggeri i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+          <RettetDato>2011-05-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>601699b5-048a-42ae-bc7c-9e9679dad4ff</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>02.01</GruppeNr>
+      <GruppeTitel>Grundes udnyttelse til bebyggelse</GruppeTitel>
+      <UUID>db66f1da-479a-43ae-8e8a-108bdbf88e03</UUID>
+      <Emne>
+        <EmneNr>02.01.00</EmneNr>
+        <EmneTitel>Grundes udnyttelse til bebyggelse i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+        </EmneAdministrativInfo>
+        <UUID>e8d323f2-8c35-4fb3-b2bb-c8c47aacbe07</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>02.02</GruppeNr>
+      <GruppeTitel>Bebyggelsens højde- og afstandsforhold</GruppeTitel>
+      <UUID>b1eaff7e-12e7-425e-8f33-4d4a7f689d67</UUID>
+      <Emne>
+        <EmneNr>02.02.00</EmneNr>
+        <EmneTitel>Bebyggelsens højde- og afstandsforhold i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+        </EmneAdministrativInfo>
+        <UUID>f0820080-181a-4ea4-9587-02b86aa13898</UUID>
+      </Emne>
+    </Gruppe>
+  </Hovedgruppe>
+</KLE-Emneplan>

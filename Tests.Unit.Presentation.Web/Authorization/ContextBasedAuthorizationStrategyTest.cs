@@ -1,10 +1,9 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization

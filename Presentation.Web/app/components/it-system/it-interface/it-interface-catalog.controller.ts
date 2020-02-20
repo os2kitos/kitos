@@ -33,7 +33,8 @@
             "gridStateService",
             "$uibModal",
             "$http",
-            "needsWidthFixService"
+            "needsWidthFixService",
+            "exportGridToExcelService"
         ];
 
         constructor(
@@ -49,7 +50,8 @@
             private gridStateService: Services.IGridStateFactory,
             private $modal,
             private $http,
-            private needsWidthFixService) {
+            private needsWidthFixService,
+            private exportGridToExcelService) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -87,7 +89,7 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,BelongsTo,Organization,ExhibitedBy($expand=ItSystem),LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
             this.canCreate = !this.user.isReadOnly;
 
             this.mainGridOptions = {
@@ -131,9 +133,7 @@
                                 if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
                                 if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
                                 if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
-                                if (!ItInterface.Tsa) { ItInterface.Tsa = { Name: "" }; }
                                 if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
-                                if (!ItInterface.Method) { ItInterface.Method = { Name: "" }; }
                                 if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
                             });
                             return response;
@@ -270,19 +270,6 @@
                         }
                     },
                     {
-                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
-                        persistId: "inftype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
@@ -336,36 +323,9 @@
                         }
                     },
                     {
-                        field: "Tsa.Name", title: "TSA", width: 90,
-                        persistId: "tsa", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "Interface.Name", title: "Grænseflade", width: 150,
                         persistId: "infname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Interface ? dataItem.Interface.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "Method.Name", title: "Metode", width: 150,
-                        persistId: "method", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Method ? dataItem.Method.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -654,73 +614,8 @@
             });
         }
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItInterface>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                var sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
-
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loadingbar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-                this.needsWidthFixService.fixWidth();
-            }
-        }
-
-        private getTemplateMethod(column) {
-            var template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = <Function>column.template;
-            } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
-            } else {
-                template = t => t;
-            }
-
-            return template;
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
     }
 

@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization, IHasName, IEntityWithExternalReferences
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
     {
         public ItContract()
         {
@@ -578,7 +578,7 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-
+        public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
 
     }
 }

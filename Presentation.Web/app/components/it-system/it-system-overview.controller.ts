@@ -35,7 +35,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "needsWidthFixService"
+            "needsWidthFixService",
+            "exportGridToExcelService"
         ];
 
         constructor(
@@ -53,7 +54,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: Array<any>,
-            private needsWidthFixService) {
+            private needsWidthFixService,
+            private exportGridToExcelService) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -162,10 +164,12 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
+
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
         };
+
         private activate() {
             // overview grid options
             var mainGridOptions: Kitos.IKendoGridOptions<IItSystemUsageOverview> = {
@@ -175,7 +179,19 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BelongsTo,BusinessType,Parent,TaskRefs),\
+ArchivePeriods,\
+Reference,\
+Organization,\
+ResponsibleUsage($expand=OrganizationUnit),\
+MainContract($expand=ItContract($expand=Supplier)),\
+Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),\
+Rights($expand=User,Role),\
+ArchiveType,\
+SensitiveDataType,\
+ObjectOwner,\
+LastChangedByUser,\
+ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -325,7 +341,7 @@
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        persistId: "isActive", 
                         template: dataItem => {
                             if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
@@ -342,7 +358,7 @@
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
-                        persistId: "localid", // DON'T YOU DARE RENAME!
+                        persistId: "localid", 
                         excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
                         hidden: true,
                         filterable: {
@@ -357,7 +373,7 @@
                     },
                     {
                         field: "ItSystem.Uuid", title: "UUID", width: 150,
-                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        persistId: "uuid", 
                         excelTemplate: dataItem => dataItem.ItSystem.Uuid,
                         hidden: true,
                         filterable: {
@@ -371,7 +387,7 @@
                     },
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
-                        persistId: "parentsysname", // DON'T YOU DARE RENAME!
+                        persistId: "parentsysname", 
                         template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
                         hidden: true,
                         filterable: {
@@ -385,7 +401,7 @@
                     },
                     {
                         field: "SystemName", title: "IT System", width: 320, 
-                        persistId: "sysname", // DON'T YOU DARE RENAME!
+                        persistId: "sysname", 
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
@@ -419,7 +435,7 @@
                     },
                     {
                         field: "Version", title: "Version", width: 150,
-                        persistId: "version", // DON'T YOU DARE RENAME!
+                        persistId: "version", 
                         excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
@@ -433,7 +449,7 @@
                     },
                     {
                         field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
-                        persistId: "localname", // DON'T YOU DARE RENAME!
+                        persistId: "localname", 
                         excelTemplate: dataItem => dataItem && dataItem.LocalCallName || "",
                         hidden: true,
                         filterable: {
@@ -447,7 +463,7 @@
                     },
                     {
                         field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 190,
-                        persistId: "orgunit", // DON'T YOU DARE RENAME!
+                        persistId: "orgunit", 
                         template: dataItem => dataItem.ResponsibleUsage ? dataItem.ResponsibleUsage.OrganizationUnit.Name : "",
                         filterable: {
                             cell: {
@@ -458,7 +474,7 @@
                     },
                     {
                         field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
-                        persistId: "busitype", // DON'T YOU DARE RENAME!
+                        persistId: "busitype", 
                         template: dataItem => dataItem.ItSystem.BusinessType ? dataItem.ItSystem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -472,7 +488,7 @@
                     },
                     {
                         field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", // DON'T YOU DARE RENAME!
+                        persistId: "apptype", 
                         template: dataItem => dataItem.ItSystem.AppTypeOption ? dataItem.ItSystem.AppTypeOption.Name : "",
                         hidden: true,
                         filterable: {
@@ -486,7 +502,7 @@
                     },
                     {
                         field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
-                        persistId: "taskkey", // DON'T YOU DARE RENAME!
+                        persistId: "taskkey", 
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -502,7 +518,7 @@
                     },
                     {
                         field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
-                        persistId: "klename", // DON'T YOU DARE RENAME!
+                        persistId: "klename", 
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -517,7 +533,7 @@
                     },
                     {
                         field: "Reference.Title", title: "Reference", width: 150,
-                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        persistId: "ReferenceId", 
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
@@ -541,7 +557,7 @@
                     },
                     {
                         field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
-                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        persistId: "folderref", 
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
@@ -570,7 +586,7 @@
                     },
                     {
                         field: "DataLevel", title: "Datatype", width: 150,
-                        persistId: "dataLevel", // DON'T YOU DARE RENAME!
+                        persistId: "dataLevel", 
                         template: dataItem => {
                             switch (dataItem.DataLevel) {
                                 case "PERSONALDATA":
@@ -599,7 +615,7 @@
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
-                        persistId: "contract", // DON'T YOU DARE RENAME!
+                        persistId: "contract", 
                         template: dataItem => {
                             if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
@@ -623,7 +639,7 @@
                     },
                     {
                         field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 175,
-                        persistId: "supplier", // DON'T YOU DARE RENAME!
+                        persistId: "supplier", 
                         template: dataItem =>
                             dataItem.MainContract &&
                             dataItem.MainContract.ItContract &&
@@ -639,8 +655,27 @@
                         }
                     },
                     {
+                        field: "ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 210,
+                        persistId: "belongsto",
+                        template: dataItem => dataItem.ItSystem.BelongsTo ? dataItem.ItSystem.BelongsTo.Name: "",
+                        attributes: {
+                            "data-element-type": "systemRightsOwnerObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "systemRightsOwnerHeader"
+                        },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        },
+                    },
+                    {
                         field: "ItProjects", title: "IT Projekt", width: 150,
-                        persistId: "sysusage", // DON'T YOU DARE RENAME!
+                        persistId: "sysusage", 
                         template: dataItem => dataItem.ItProjects.length > 0 ? this._.first(dataItem.ItProjects).Name : "",
                         hidden: true,
                         filterable: {
@@ -654,7 +689,7 @@
                     },
                     {
                         field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
+                        persistId: "ownername", 
                         template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
@@ -668,7 +703,7 @@
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
-                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangedname", 
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
@@ -682,7 +717,7 @@
                     },
                     {
                         field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "changed", // DON'T YOU DARE RENAME!
+                        persistId: "changed", 
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.LastChanged) {
                                 return "";
@@ -699,8 +734,14 @@
                     },
                     {
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
+                        persistId: "concludedSystemFrom", 
                         hidden: false,
+                        excelTemplate: dataItem => {
+                            if (!dataItem || !dataItem.Concluded) {
+                                return "";
+                            }
+                            return dataItem.Concluded.toLocaleDateString("da-DK");
+                        },
                         filterable: 
                         {
                             operators: {
@@ -714,7 +755,7 @@
                     },
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
-                        persistId: "ArchiveDuty", // DON'T YOU DARE RENAME!
+                        persistId: "ArchiveDuty", 
                         template: dataItem => {
                             switch (dataItem.ArchiveDuty) {
                                 case 1:
@@ -756,7 +797,7 @@
                     },
                     {
                         field: "Registertype", title: "Er dokumentbærende", width: 160,
-                        persistId: "Registertype", // DON'T YOU DARE RENAME!
+                        persistId: "Registertype", 
                         template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
                         hidden: false,
                         filterable: {
@@ -775,7 +816,7 @@
                     },
                     {
                         field: "EndDate", title: "Journalperiode slutdato", format: "{0:dd-MM-yyyy}", width: 180,
-                        persistId: "ArchivePeriodsEndDate", // DON'T YOU DARE RENAME!
+                        persistId: "ArchivePeriodsEndDate", 
                         template: dataItem => {
                             if (!dataItem || !dataItem.ArchivePeriods) {
                                 return "";
@@ -801,7 +842,7 @@
                     },
                     {
                         field: "RiskSupervisionDocumentationUrlName", title: "Risikovurdering", width: 150,
-                        persistId: "riskSupervisionDocumentationUrlName", // DON'T YOU DARE RENAME!
+                        persistId: "riskSupervisionDocumentationUrlName", 
                         template: dataItem => 
                         {
                             if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
@@ -829,7 +870,7 @@
                     },
                     {
                         field: "LinkToDirectoryUrlName", title: "Fortegnelse", width: 150,
-                        persistId: "LinkToDirectoryUrlName", // DON'T YOU DARE RENAME!
+                        persistId: "LinkToDirectoryUrlName", 
                         template: dataItem => {
                             if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
                                 return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
@@ -856,7 +897,7 @@
                     },
                     {
                         field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
-                        persistId: "ItContractDataHandler", // DON'T YOU DARE RENAME!
+                        persistId: "ItContractDataHandler", 
                         template: dataItem => {
                             if (dataItem.Contracts != null) {
                                 if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {
@@ -944,22 +985,6 @@
             }
 
             return concatRoles;
-        }
-
-        private getTemplateMethod(column) {
-            var template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = <Function>column.template;
-            } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
-            } else {
-                template = t => t;
-            }
-
-            return template;
         }
 
         private isContractActive(dataItem) {
@@ -1112,57 +1137,8 @@
             }
         };
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItSystemUsageOverview>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                var sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
-
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loadingbar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-                this.needsWidthFixService.fixWidth();
-            }
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
     }
 

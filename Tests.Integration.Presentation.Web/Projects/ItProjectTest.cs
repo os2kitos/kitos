@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Projects
@@ -298,6 +300,21 @@ namespace Tests.Integration.Presentation.Web.Projects
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Fact, Description("KITOSUDV - 452")]
+        public async Task Can_Delete_Project_With_HandoverTrial()
+        {
+            //Arrange
+            var handoverId = _project.Id; //NOTE: handoverId == project id
+            await ItProjectHelper.AddHandoverResponsibleAsync(handoverId, TestEnvironment.DefaultUserId);
+
+            //Act
+            using (var responseMessage = await ItProjectHelper.SendDeleteProjectAsync(_project.Id))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
             }
         }
     }

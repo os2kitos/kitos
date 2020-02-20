@@ -108,11 +108,15 @@
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
+    <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\OptionsService.cs" />
+    <Compile Include="TaskRefs\IKLEApplicationService.cs" />
     <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
-    <Compile Include="Model\Result\OperationFailure.cs" />
+    <Compile Include="TaskRefs\KLEApplicationService.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
@@ -124,7 +128,6 @@
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
-    <Compile Include="Model\SystemUsage\Migration\ItContractMigration.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="IExcelHandler.cs" />
     <Compile Include="IExcelService.cs" />
@@ -165,7 +168,9 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Model\TaskRefs\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

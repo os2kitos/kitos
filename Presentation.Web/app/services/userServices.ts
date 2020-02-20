@@ -83,7 +83,7 @@
             var isReadOnly = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.ReadOnly && userRight.organizationId == currOrg.id;
             });
-            
+
 
             // the current org unit is the default org unit for this organization if the user has selected one
             // otherwise it's the root of this organization
@@ -123,7 +123,7 @@
                 isContractAdmin: isContractAdmin,
                 isReportAdmin: isReportAdmin,
                 isReadOnly: isReadOnly,
-                
+
 
                 orgAndDefaultUnit: orgAndDefaultUnit,
 
@@ -142,7 +142,7 @@
             this.$rootScope.user = this._user;
 
             return this._user;
-        }
+        };
 
         patchUser = (payload) => {
             var deferred = this.$q.defer();
@@ -166,45 +166,45 @@
                 });
             }
             return deferred.promise;
-        }
+        };
 
         // the object returned contains the user, user rights and user organizations
         getUser = () => {
             return this.reAuthorize();
-        }
+        };
 
         reAuthorize = () => {
             var deferred = this.$q.defer();
             // loadUser(null) triggers a re-auth
             deferred.resolve(this.loadUser(null));
             return deferred.promise;
-        }
+        };
 
         getOrganizations = () => {
             //returns the organizations for the user whos credentials have been authorized
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize/GetOrganizations");
-        }
+        };
 
         getOrganizationWithDefault = (orgId) => {
             //returns the organizational context for the specific org
             return this.$http.get(`api/authorize/GetOrganization(${orgId})`).then((result: any) => { return result.data.response; });
-        }
+        };
 
         getCurrentUserIfAuthorized = () => {
             //returns the organizational context for the user whos credentials have been authorized
             //triggers a re-auth like reAuthorize
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
-        }
+        };
 
         authorizeUser = (userLoginInfo) => {
             //returns the organizational context for the user whos credentials have been authorized
             return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo);
-        }
+        };
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
             this.saveUser(user, orgAndDefaultUnit);
             this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
-        }
+        };
 
         auth = (adminRoles) => {
 
@@ -219,24 +219,24 @@
                 return true;
 
             });
-        }
+        };
 
         getSavedOrgId = () => {
             var orgId = localStorage.getItem("currentOrgId");
             return orgId != null && JSON.parse(orgId);
-        }
+        };
 
         setSavedOrgId = (orgId) => {
             localStorage.setItem("currentOrgId", JSON.stringify(orgId));
-        }
+        };
 
         clearSavedOrgId = () => {
             localStorage.setItem("currentOrgId", null);
-        }
+        };
 
         setDefaultOrganizationInBackend = (organizationId) => {
             this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
-        }
+        };
 
         login = (email: string, password: string, rememberMe: boolean) => {
 
@@ -252,23 +252,14 @@
                 };
 
                 this.loadUser(data).then((resp) => {
-                    deferred.resolve(resp)
+                    deferred.resolve(resp);
                 }, (resp) => {
-                    deferred.reject(resp)
+                    deferred.reject(resp);
                 });
             }
 
             return deferred.promise;
-        }
-
-        loginSSO = (token) => {
-            var deferred = this.$q.defer();
-            var data = {
-                "token": token
-            }
-            deferred.resolve(this.loadUser(data));
-            return deferred.promise;
-        }
+        };
 
         logout = () => {
 
@@ -278,7 +269,7 @@
             this.$rootScope.user = null;
 
             return this.$http.post("api/authorize?logout", undefined);
-        }
+        };
 
         loadUser = (userLoginInfo) => {
 
@@ -286,35 +277,46 @@
 
                 this._loadUserDeferred = this.$q.defer();
                 // login or re-auth? If userLoginInfo is null then re-auth otherwise login
-                var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getCurrentUserIfAuthorized();
 
-                httpDeferred.then(result => {
+                if (userLoginInfo) {
+                    this.authorizeUser(userLoginInfo).then(
+                        result => {
+                            this.$http.get("api/authorize/antiforgery")
+                                .then(res =>
+                                    (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value = res.data.toString());
+                            this.successfulUserAuth(result.data.response);
+                        },
+                        result => this.failedUserAuth(result));
 
-                    var user = result.data.response;
-                    this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, 'organizationId').length > 1;
-
-                    this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
-                        this.saveUserInfo(user, orgAndDefaultUnit);
-                        this._loadUserDeferred.resolve(this._user);
-                        this._loadUserDeferred = null;
-
-                    }, () => {
-
-                        this._loadUserDeferred.reject("No organization selected");
-                        this._loadUserDeferred = null;
-
-                    });
-
-                }, result => {
-
-                    this._loadUserDeferred.reject(result.data);
-                    this._loadUserDeferred = null;
-                    this.clearSavedOrgId();
-
-                });
+                } else {
+                    this.getCurrentUserIfAuthorized()
+                        .then(
+                            result => this.successfulUserAuth(result.data.response),
+                            result => this.failedUserAuth(result));
+                }
             }
 
             return this._loadUserDeferred.promise;
+        };
+
+        successfulUserAuth = (user) => {
+            this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, "organizationId").length > 1 || user.isGlobalAdmin;
+
+            this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
+                this.saveUserInfo(user, orgAndDefaultUnit);
+                this._loadUserDeferred.resolve(this._user);
+                this._loadUserDeferred = null;
+
+            }, () => {
+                this._loadUserDeferred.reject("No organization selected");
+                this._loadUserDeferred = null;
+            });
+        }
+
+        failedUserAuth = (result) => {
+            this._loadUserDeferred.reject(result.data);
+            this._loadUserDeferred = null;
+            this.clearSavedOrgId();
         }
 
         determineLoginProcedure = () => {
@@ -335,7 +337,7 @@
             }
 
             return deferred.promise;
-        }
+        };
 
         currentlyLoggedIn() {
             return this.getSavedOrgId();
@@ -347,7 +349,7 @@
             this.setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
 
             return firstOrgAndDefaultUnit;
-        }
+        };
 
         lastChosenOrganization = (orgsAndDefaultUnits, storedOrgId) => {
 
@@ -365,7 +367,7 @@
             // so clear it
             this.clearSavedOrgId();
 
-        }
+        };
 
         chooseOrganization = () => {
 
@@ -400,7 +402,7 @@
                 });
             });
             return deferred.promise;
-        }
+        };
 
         showOrganizationsModal = (orgsAndDefaultUnits) => {
 
@@ -425,7 +427,7 @@
             });
 
             return modal;
-        }
+        };
 
         // change organizational context
         changeOrganization = () => {
@@ -466,7 +468,7 @@
 
             return deferred.promise;
 
-        }
+        };
 
         // updates the users default org unit in the current organization
         updateDefaultOrgUnit = (newDefaultOrgUnitId) => {
@@ -476,7 +478,7 @@
             };
 
             return this.$http.post("api/user?updateDefaultOrgUnit", payload);
-        }
+        };
     }
     app.service("userService", UserService);
 }

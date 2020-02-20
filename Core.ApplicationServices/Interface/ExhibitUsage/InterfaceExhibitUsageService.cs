@@ -1,8 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Model.Result;
 using Serilog;
 
 namespace Core.ApplicationServices.Interface.ExhibitUsage
@@ -30,17 +29,17 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             if (interfaceExhibitUsageToBeDeleted == null)
             {
                 _logger.Error($"Could not find interface exhibit usage with key {key}");
-                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!AllowDelete(interfaceExhibitUsageToBeDeleted))
             {
-                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
             _itInterfaceExhibitUsageRepository.Save();
-            return Result<ItInterfaceExhibitUsage, OperationFailure>.Success(interfaceExhibitUsageToBeDeleted);
+            return interfaceExhibitUsageToBeDeleted;
         }
 
         private bool AllowDelete(ItInterfaceExhibitUsage interfaceExhibitUsageToBeDeleted)

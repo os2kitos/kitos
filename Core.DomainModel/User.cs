@@ -13,7 +13,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IContextAware
+    public class User : Entity, IContextAware, IIsPartOfOrganization
     {
         public User()
         {
@@ -46,6 +46,11 @@ namespace Core.DomainModel
         public string DefaultUserStartPreference { get; set; }
 
         public bool? HasApiAccess { get; set; }
+
+        public bool CanAuthenticate()
+        {
+            return IsGlobalAdmin || OrganizationRights.Any();
+        }
 
         /// <summary>
         ///     The organization the user will be automatically logged into.
@@ -119,6 +124,11 @@ namespace Core.DomainModel
         public override string ToString()
         {
             return $"{Id}:{Name} {LastName}";
+        }
+
+        public bool IsPartOfOrganization(int organizationId)
+        {
+            return IsInContext(organizationId) || OrganizationRights.Any(x => x.OrganizationId == organizationId);
         }
 
         #region Authentication

@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -287,7 +288,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.User, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.User, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.User, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -299,7 +299,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -311,7 +310,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -320,22 +318,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.User, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -347,7 +332,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -359,7 +343,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
@@ -371,7 +354,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, false, false)]
@@ -383,7 +365,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.User, false, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
-        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.OrganizationModuleAdmin, false, false)]
@@ -409,7 +390,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         [InlineData(true, false, true)]
-        [InlineData(true, true, false)]
+        [InlineData(true, true, true)] //Global admin cannot be readonly
         [InlineData(false, false, false)]
         public void Allow_Create_ItSystem_Returns(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {

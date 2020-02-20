@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Model.Result;
 
 namespace Core.DomainServices.Queries
 {
@@ -21,7 +21,7 @@ namespace Core.DomainServices.Queries
         {
             _crossOrganizationAccess = crossOrganizationAccess;
             _activeOrganizationId = activeOrganizationId;
-            _hasOrganization = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            _hasOrganization = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
             _hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
         }
 
@@ -60,7 +60,7 @@ namespace Core.DomainServices.Queries
                 return false;
             }
 
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            var hasOrg = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
             var contextAware = typeof(IContextAware).IsAssignableFrom(typeof(T));
 
             //Unsupported by db query since object does not have org reference but has access modifier and is context aware (belongs in an organization)

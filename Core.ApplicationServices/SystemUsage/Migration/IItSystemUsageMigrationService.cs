@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {

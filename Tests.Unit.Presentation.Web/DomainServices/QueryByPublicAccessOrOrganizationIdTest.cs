@@ -2,7 +2,7 @@
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.DomainServices
@@ -32,8 +32,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.Equal(2, systems.Count);
-            Assert.True(systems.Contains(includedWithOrgMatch));
-            Assert.True(systems.Contains(includedWithAccessMatch));
+            Assert.Contains(includedWithOrgMatch, systems);
+            Assert.Contains(includedWithAccessMatch, systems);
         }
 
         private ItSystem CreateItSystem(int organizationId, AccessModifier accessModifier)
