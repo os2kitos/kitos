@@ -315,7 +315,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.ItSystemName, opt => opt.MapFrom(src => src.Object.ItSystem.Name))
                .ForMember(dto => dto.ItSystemUuid, opt => opt.MapFrom(src => src.Object.ItSystem.Uuid))
                .ForMember(dto => dto.ItSystemDescription, opt => opt.MapFrom(src => src.Object.ItSystem.Description))
-               .ForMember(dto => dto.ItSystemUrl, opt => opt.MapFrom(src => src.Object.ItSystem.Url))
                .ForMember(dto => dto.ItSystemAccessModifier, opt => opt.MapFrom(src => src.Object.ItSystem.AccessModifier))
                .ForMember(dto => dto.ItSystemOrganizationId, opt => opt.MapFrom(src => src.Object.ItSystem.OrganizationId))
                .ForMember(dto => dto.ItSystemBelongsToId, opt => opt.MapFrom(src => src.Object.ItSystem.BelongsToId))
