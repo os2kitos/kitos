@@ -461,6 +461,12 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${
                             dataItem.Name}</a>`,
+                        attributes: {
+                            "data-element-type": "contractNameObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "contractNameHeader"
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
@@ -515,18 +521,6 @@
                         filterable: false
                     },
                     {
-                        field: "AssociatedInterfaces",
-                        title: "Antal snitflader",
-                        width: 60,
-                        persistId: "numberOfInterfaces", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            return _.uniqBy(dataItem.AssociatedSystemRelations.filter(x => x.RelationInterfaceId != null), x => x.RelationInterfaceId).length.toString();
-                        },
-                        attributes: { "class": "text-center" },
-                        sortable: false,
-                        filterable: false
-                    },
-                    {
                         field: "AssociatedRelations",
                         title: "Antal relationer",
                         width: 60,
@@ -534,7 +528,10 @@
                         template: dataItem => {
                             return dataItem.AssociatedSystemRelations.length.toString();
                         },
-                        attributes: { "class": "text-center" },
+                        attributes: {
+                            "class": "text-center",
+                            "data-element-type": "relationCountObject"
+                        },
                         sortable: false,
                         filterable: false
                     },

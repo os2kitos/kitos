@@ -260,7 +260,6 @@
                 }
             }
         }
-
     }
 
     export class SystemRelationModelPostDataObject implements IItSystemUsageCreateRelationDTO {
@@ -323,8 +322,6 @@
                 return null;
             }
         }
-
-
     }
 
     export class SystemRelationMapper {

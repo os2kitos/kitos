@@ -1,4 +1,4 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config(["$stateProvider", ($stateProvider) => {
         $stateProvider.state("it-system.usage.relation", {
             url: "/relation",
@@ -12,11 +12,12 @@
             var usageId = itSystemUsage.id;
             $scope.usage = itSystemUsage;
             var modalOpen = false;
-            const maxTextFieldCharCount = 199;
-            const shortTextLineCount = 4;
             const reload = () => {
                 const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                    return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(systemRelations, maxTextFieldCharCount, shortTextLineCount);
+                    return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
+                        systemRelations,
+                        Kitos.Configs.ParagraphSizeConfig.maxTextFieldCharCount,
+                        Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
                 }
 
                 systemRelationService.getRelationsFrom(usageId)
@@ -110,7 +111,7 @@
 
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
-                                    error: boolean,
+                                    error: boolean;
                                     data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO
                                 }
                                 ) => {
@@ -187,7 +188,7 @@
             };
 
             $scope.expandParagraph = (e) => {
-                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, shortTextLineCount);
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
             };
         }]);
 })(angular, app);

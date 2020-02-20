@@ -11,7 +11,7 @@
                 para.removeAttribute("style");
                 btn.innerText = "Se mindre";
             } else {
-                para.setAttribute("style", "height: " + shortTextLineCount + "em;overflow: hidden;");
+                para.setAttribute("style", `height: ${shortTextLineCount}em;overflow: hidden;`);
                 btn.innerText = "Se mere";
             }
         }

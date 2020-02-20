@@ -364,6 +364,7 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
@@ -660,7 +661,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <TypeScriptCompile Include="app\utility\expandRetractText.ts" />
+    <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -670,6 +671,7 @@
     <TypeScriptCompile Include="Tests\Helpers\RelationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SelectHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
@@ -691,6 +693,8 @@
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
