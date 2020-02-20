@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
 using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Time;
 using Infrastructure.Services.KLEDataBridge;
 using Moq;
 using Xunit;
