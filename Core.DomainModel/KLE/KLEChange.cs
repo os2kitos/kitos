@@ -10,5 +10,7 @@ namespace Core.DomainModel.KLE
         public string TaskKey { get; set; }
         public string UpdatedDescription { get; set; }
         public string ChangeDetails { get; set; }
+        public DateTime? ActiveFrom { get; set; }
+        public DateTime? ActiveTo { get; set; }
     }
 }
