@@ -46,7 +46,7 @@ type ColumnObjects = {
     userApi: protractor.ElementArrayFinder,
     UserEmail: protractor.ElementArrayFinder,
     systemRightsOwner: protractor.ElementArrayFinder,
-    activationToggle: protractor.ElementArrayFinder
+    activationToggle: protractor.ElementArrayFinder,
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;

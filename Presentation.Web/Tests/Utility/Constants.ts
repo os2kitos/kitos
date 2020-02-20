@@ -36,6 +36,8 @@ class Constants {
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
+    readonly kendoRelationCountObject = "relationCountObject";
+
     //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
