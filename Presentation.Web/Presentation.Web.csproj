@@ -364,18 +364,21 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
+    <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\system-relation-migration.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-migration.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-relation.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\system-relation-odata-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -660,6 +663,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -669,6 +673,7 @@
     <TypeScriptCompile Include="Tests\Helpers\RelationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SelectHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
@@ -690,6 +695,8 @@
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
@@ -1054,7 +1061,7 @@
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />
     <TypeScriptCompile Include="app\directiveFactory.ts" />
-    <TypeScriptCompile Include="app\models\api\organization-role.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization-role.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
@@ -1123,7 +1130,7 @@
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
-    <TypeScriptCompile Include="app\models\api\api-wrapper.ts" />
+    <TypeScriptCompile Include="app\models\Api\api-wrapper.ts" />
     <TypeScriptCompile Include="app\models\user.ts" />
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />

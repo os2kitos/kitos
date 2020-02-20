@@ -6,6 +6,8 @@ import RelationPage = require("../../../PageObjects/it-system/Usage/Tabs/ItSyste
 import InterfaceCatalogHelper = require("../../../Helpers/InterfaceCatalogHelper");
 import ContractHelper = require("../../../Helpers/ContractHelper");
 import LocalSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
+import ContractNavigation = require("../../../Helpers/SideNavigation/ContractNavigation");
+import ContractSystemPage = require("../../../PageObjects/It-contract/Tabs/ContractItSystem.po");
 
 describe("User is able to create and view relation",
     () => {
@@ -27,6 +29,8 @@ describe("User is able to create and view relation",
         var referenceEdited = "some reference edited";
         var interfaceNameEdited = createInterfaceName();
         var contractNameEdited = createContractName();
+
+        var expectedRelationCount = "1";
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
@@ -74,6 +78,15 @@ describe("User is able to create and view relation",
                     .then(() => checkForUsedByDescription(relationSystemName1, description))
                     .then(() => checkForUsedByReference(relationSystemName1, reference))
                     .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
+                    .then(() => checkContractTimeOverviewToShowRelationCount(contractName, expectedRelationCount))
+                    .then(() => ContractHelper.openContract(contractName))
+                    .then(() => ContractNavigation.openSystemsPage())
+                    .then(() => checkContractForRelationPart(relationSystemName1))
+                    .then(() => checkContractForRelationPart(relationSystemName2))
+                    .then(() => checkContractForRelationPart(interfaceName))
+                    .then(() => checkContractForDescription(relationSystemName1, description))
+                    .then(() => checkContractForReference(relationSystemName1, reference))
+                    .then(() => checkContractForFrequencyType(relationSystemName1, frequencyType))
                     .then(() => RelationHelper.editRelation(relationSystemName1,
                         relationSystemName2,
                         interfaceNameEdited,
@@ -88,7 +101,7 @@ describe("User is able to create and view relation",
                     .then(() => checkForReference(relationSystemName2, referenceEdited))
                     .then(() => checkForFrequencyType(relationSystemName2, frequencyTypeEdited))
                     .then(() => RelationHelper.deleteRelation(relationSystemName1, relationSystemName2))
-                    .then(() => checkIfRelationIsDeleted(relationSystemName2)); 
+                    .then(() => checkIfRelationIsDeleted(relationSystemName2));
 
             });
     });
@@ -125,7 +138,6 @@ function checkForFrequencyType(systemName: string, frequencyType: string) {
     expect(RelationPage.getFrequencyType(systemName).getText()).toMatch(frequencyType);
 }
 
-
 function checkForUsedByDescription(systemName: string, description: string) {
     expect(RelationPage.getUsedByDescription(systemName).getText()).toMatch(description);
 }
@@ -136,4 +148,24 @@ function checkForUsedByReference(systemName: string, reference: string) {
 
 function checkForUsedByFrequencyType(systemName: string, frequencyType: string) {
     expect(RelationPage.getUsedByFrequencyType(systemName).getText()).toMatch(frequencyType);
+}
+
+function checkContractForRelationPart(name: string) {
+    expect(ContractSystemPage.getElementByLink(name).getText()).toMatch(name);
+}
+
+function checkContractForDescription(systemName: string, description: string) {
+    expect(ContractSystemPage.getDescription(systemName).getText()).toMatch(description);
+}
+
+function checkContractForReference(systemName: string, reference: string) {
+    expect(ContractSystemPage.getReference(systemName).getText()).toMatch(reference);
+}
+
+function checkContractForFrequencyType(systemName: string, frequencyType: string) {
+    expect(ContractSystemPage.getFrequencyType(systemName).getText()).toMatch(frequencyType);
+}
+
+function checkContractTimeOverviewToShowRelationCount(contractName: string, expectedCount: string) {
+    expect(ContractHelper.getRelationCountFromContractName(contractName)).toBe(expectedCount);
 }
