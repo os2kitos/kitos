@@ -4,7 +4,8 @@ using System.Linq;
 using System.Xml.Linq;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
+using Core.DomainServices.Time;
 
 namespace Core.DomainServices.Repositories.KLE
 {
