@@ -201,7 +201,9 @@ namespace Tests.Unit.Presentation.Web.Services
             Display display, Result<ExternalReference, OperationError> result)
         {
             entity.Setup(x => x.AddExternalReference(It.Is<ExternalReference>(er =>
-                    er.Title == title && er.ExternalReferenceId == externalReferenceId && er.URL == url &&
+                    er.Title == title &&
+                    er.ExternalReferenceId == externalReferenceId &&
+                    er.URL == url &&
                     er.Display == display)))
                 .Returns(result);
         }

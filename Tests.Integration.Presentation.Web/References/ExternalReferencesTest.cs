@@ -32,13 +32,15 @@ namespace Tests.Integration.Presentation.Web.References
             var systemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
 
-            //Act
-            var createdReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystem_Id = systemDto.Id);
+            //Act - create two similar references... we expect the first one to be the master
+            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystem_Id = systemDto.Id);
+            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystem_Id = systemDto.Id);
 
             //Assert
-            AssertCreatedReference(_title, createdReference, _externalReferenceId, _referenceUrl, _display);
+            AssertCreatedReference(_title, expectedMasterReference, _externalReferenceId, _referenceUrl, _display);
             systemDto = await ItSystemHelper.GetSystemAsync(systemDto.Id);
-            Assert.Equal(createdReference.Id, systemDto.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
+            Assert.Equal(2, systemDto.ExternalReferences.Count);
+            Assert.Equal(expectedMasterReference.Id, systemDto.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
         }
 
         [Fact]
@@ -48,13 +50,15 @@ namespace Tests.Integration.Presentation.Web.References
             var systemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var usageDTO = await ItSystemHelper.TakeIntoUseAsync(systemDto.Id, TestEnvironment.DefaultOrganizationId);
 
-            //Act
-            var createdReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystemUsage_Id = usageDTO.Id);
+            //Act - create two similar references... we expect the first one to be the master
+            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystemUsage_Id = usageDTO.Id);
+            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItSystemUsage_Id = usageDTO.Id);
 
             //Assert
-            AssertCreatedReference(_title, createdReference, _externalReferenceId, _referenceUrl, _display);
+            AssertCreatedReference(_title, expectedMasterReference, _externalReferenceId, _referenceUrl, _display);
             usageDTO = await ItSystemHelper.GetItSystemUsage(usageDTO.Id);
-            Assert.Equal(createdReference.Id, usageDTO.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
+            Assert.Equal(2, usageDTO.ExternalReferences.Count);
+            Assert.Equal(expectedMasterReference.Id, usageDTO.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
         }
 
         [Fact]
@@ -63,13 +67,15 @@ namespace Tests.Integration.Presentation.Web.References
             //Arrange
             var contract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
 
-            //Act
-            var createdReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItContract_Id = contract.Id);
+            //Act - create two similar references... we expect the first one to be the master
+            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItContract_Id = contract.Id);
+            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItContract_Id = contract.Id);
 
             //Assert
-            AssertCreatedReference(_title, createdReference, _externalReferenceId, _referenceUrl, _display);
+            AssertCreatedReference(_title, expectedMasterReference, _externalReferenceId, _referenceUrl, _display);
             contract = await ItContractHelper.GetItContract(contract.Id);
-            Assert.Equal(createdReference.Id, contract.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
+            Assert.Equal(2, contract.ExternalReferences.Count);
+            Assert.Equal(expectedMasterReference.Id, contract.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
         }
 
         [Fact]
@@ -78,13 +84,15 @@ namespace Tests.Integration.Presentation.Web.References
             //Arrange
             var project = await ItProjectHelper.CreateProject(A<string>(), TestEnvironment.DefaultOrganizationId);
 
-            //Act
-            var createdReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItProject_Id = project.Id);
+            //Act - create two similar references... we expect the first one to be the master
+            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItProject_Id = project.Id);
+            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.ItProject_Id = project.Id);
 
             //Assert
-            AssertCreatedReference(_title, createdReference, _externalReferenceId, _referenceUrl, _display);
+            AssertCreatedReference(_title, expectedMasterReference, _externalReferenceId, _referenceUrl, _display);
             project = await ItProjectHelper.GetProjectAsync(project.Id);
-            Assert.Equal(createdReference.Id, project.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
+            Assert.Equal(2, project.ExternalReferences.Count);
+            Assert.Equal(expectedMasterReference.Id, project.ReferenceId.GetValueOrDefault(-1)); //First reference must be marked as "the reference"
         }
 
         private static void AssertCreatedReference(string title, ExternalReferenceDTO createdReference, string externalReferenceId, string referenceUrl, Display display)
