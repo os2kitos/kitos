@@ -241,5 +241,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
+
+        public static async Task<ItSystemDTO> GetSystemAsync(int systemId, Cookie optionalLogin = null)
+        {
+            using (var response = await SendGetSystemRequestAsync(systemId, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
+            }
+        }
     }
 }
