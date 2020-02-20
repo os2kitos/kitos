@@ -1,7 +1,7 @@
 ﻿module Kitos.Services {
-    import IItSystemUsageRelationDTO = Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
-    import IItSystemUsageRelationOptionsDTO = Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO;
-    import IItSystemUsageCreateRelationDTO = Models.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO;
+    import IItSystemUsageRelationDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
+    import IItSystemUsageRelationOptionsDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO;
+    import IItSystemUsageCreateRelationDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageCreateRelationDTO;
 
     export interface ISystemRelationService {
         getRelationsFrom(systemUsageId: number): ng.IPromise<IItSystemUsageRelationDTO[]>;

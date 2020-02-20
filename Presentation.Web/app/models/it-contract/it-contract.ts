@@ -113,7 +113,7 @@
         /** The (local usages of) it systems, that this contract is associated to. */
         AssociatedSystemUsages: Array<IItContractItSystemUsage>;
         /** Gets or sets the associated relations. */
-        AssociatedSystemRelations: Array<ItSystemUsage.Relation.IItSystemRelation>;
+        AssociatedSystemRelations: Array<Odata.ItSystemUsage.Relation.IItSystemRelationOdataDTO>;
 
         /** Gets or sets the intern economy streams. */
         InternEconomyStreams: Array<IEconomyStream>;

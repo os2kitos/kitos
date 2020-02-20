@@ -80,7 +80,7 @@ describe("User is able to create and view relation",
                     .then(() => checkForUsedByFrequencyType(relationSystemName1, frequencyType))
                     .then(() => checkContractTimeOverviewToShowRelationCount(contractName, expectedRelationCount))
                     .then(() => ContractHelper.openContract(contractName))
-                    .then(() => ContractNavigation.systemsPage())
+                    .then(() => ContractNavigation.openSystemsPage())
                     .then(() => checkContractForRelationPart(relationSystemName1))
                     .then(() => checkContractForRelationPart(relationSystemName2))
                     .then(() => checkContractForRelationPart(interfaceName))

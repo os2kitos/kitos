@@ -13,20 +13,20 @@
             $scope.usage = itSystemUsage;
             var modalOpen = false;
             const reload = () => {
-                const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                    return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
+                const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    return Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
                         systemRelations,
-                        Kitos.Configs.ParagraphSizeConfig.maxTextFieldCharCount,
-                        Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
+                        Kitos.Configs.RelationTableCellParagraphSizeConfig.maxTextFieldCharCount,
+                        Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
                 }
 
                 systemRelationService.getRelationsFrom(usageId)
-                    .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
                         $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                     });
 
                 systemRelationService.getRelationsTo(usageId)
-                    .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
                         $scope.usedByRelations = mapDataToViewmodelArray(systemRelations);
                     });
             };
@@ -42,7 +42,7 @@
                         controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
-                            $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
                             $scope.RelationModalViewModel.configureAsNewRelationDialog();
 
                             $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
@@ -53,7 +53,7 @@
                                 if ($scope.RelationModalViewModel.toSystem != null) {
                                     systemRelationService
                                         .getAvailableRelationOptions(usageId, $scope.RelationModalViewModel.toSystem.id)
-                                        .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
+                                        .then((relationOptions: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO) => {
                                             const updatedView = $scope.RelationModalViewModel;
                                             updatedView.updateAvailableOptions(relationOptions);
                                             $scope.RelationModalViewModel = updatedView;
@@ -64,7 +64,7 @@
                             $scope.ExposedSystemSelectedTrigger = exposedSystemChanged;
 
                             $scope.save = () => {
-                                const newRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
+                                const newRelation = new Kitos.Models.Api.ItSystemUsage.Relation.SystemRelationModelPostDataObject($scope.RelationModalViewModel);
                                 notify.addInfoMessage("Tilføjer relation ...", true);
                                 systemRelationService.createSystemRelation(newRelation)
                                     .then(
@@ -103,7 +103,7 @@
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
 
-                            $scope.RelationModalViewModel = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
 
                             $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
                             $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
@@ -112,7 +112,7 @@
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
                                     error: boolean;
-                                    data: Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO
+                                    data: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO
                                 }
                                 ) => {
                                     if (response.error) {
@@ -127,7 +127,7 @@
                                     const loadOptions = (toUsage, onOptionsLoadedCallback) => {
                                         systemRelationService
                                             .getAvailableRelationOptions(usageId, toUsage.id)
-                                            .then((relationOptions: Kitos.Models.ItSystemUsage.Relation.
+                                            .then((relationOptions: Kitos.Models.Api.ItSystemUsage.Relation.
                                                 IItSystemUsageRelationOptionsDTO) => onOptionsLoadedCallback(relationOptions));
                                     }
 
@@ -147,7 +147,7 @@
 
                             $scope.save = () => {
                                 var data = $scope.RelationModalViewModel;
-                                const patchRelation = new Kitos.Models.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
+                                const patchRelation = new Kitos.Models.Api.ItSystemUsage.Relation.SystemRelationModelPatchDataObject(data);
                                 notify.addInfoMessage("Ændrer relation ...", true);
                                 systemRelationService.patchSystemRelation(patchRelation)
                                     .then(success => {
@@ -188,7 +188,7 @@
             };
 
             $scope.expandParagraph = (e) => {
-                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
             };
         }]);
 })(angular, app);

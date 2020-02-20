@@ -28,20 +28,20 @@
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, "name");
 
-            const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                return Kitos.Models.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
+            const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                return Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
                     systemRelations,
-                    Kitos.Configs.ParagraphSizeConfig.maxTextFieldCharCount,
-                    Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.maxTextFieldCharCount,
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
             }
 
             systemRelationService.getRelationWithContract(contract.id)
-                .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
                     $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                 });
 
             systemRelationService.getRelationWithContract(contract.id)
-                .then((systemRelations: [Kitos.Models.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
                     $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                 });
 
@@ -104,7 +104,7 @@
             formatAssociatedSystems(contract.associatedSystemUsages);
 
             $scope.expandParagraph = (e) => {
-                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.ParagraphSizeConfig.shortTextLineCount);
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
             };
 
             $scope.itSystemUsagesSelectOptions = {

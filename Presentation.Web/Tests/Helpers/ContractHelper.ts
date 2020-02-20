@@ -22,7 +22,7 @@ class ContractHelper {
     }
 
     public static openContract(name: string) {
-        console.log(`open details for local system: ${name}`);
+        console.log(`open details for contract: ${name}`);
         return this.contractPage.getPage()
             .then(() => this.contractPage.waitForKendoGrid())
             .then(() => this.findCatalogColumnsFor(name).first().click());
