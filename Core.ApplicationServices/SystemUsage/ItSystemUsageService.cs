@@ -12,6 +12,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
@@ -250,6 +251,27 @@ namespace Core.ApplicationServices.SystemUsage
                     onSuccess: contract => contract.AssociatedSystemRelations.ToList(),
                     onFailure: error => error
                 );
+        }
+
+        public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
+        {
+            if(pageNumber < 0)
+                return new OperationError("Page number must be equal to or greater than 0",OperationFailure.BadInput);
+
+            if (pageSize < 1 || pageSize > 100)
+                return new OperationError("Page number be within the interval [1,100]", OperationFailure.BadInput);
+
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError("Denied access to view local data in organization", OperationFailure.Forbidden);
+
+            return _usageRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .SelectMany(systemUsage => systemUsage.UsageRelations)
+                .OrderBy(relation => relation.Id)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
 
         public Result<IEnumerable<SystemRelation>, OperationError> GetRelationsFrom(int systemUsageId)
