@@ -47,7 +47,6 @@ namespace Presentation.Web.Models
         public AccessModifier AccessModifier { get; set; }
 
         public string Description { get; set; }
-        public string Url { get; set; }
 
         /// <summary>
         /// Gets or sets the task reference ids.

@@ -14,7 +14,7 @@ namespace Core.DomainModel.ItSystem
             InterfaceLocalUsages = new List<ItInterfaceUsage>();
             InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
         }
-
+        public string Url { get; set; }
         /// <summary>
         ///     Gets or sets the version.
         /// </summary>
