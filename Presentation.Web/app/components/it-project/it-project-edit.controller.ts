@@ -22,6 +22,7 @@
         public selectedData: Array<IDropdownOption>;
         public selectTranslation: ISelectTranslation;
         public selectSettings: ISelectSettings;
+        public hasWriteAccess: boolean;
 
         public static $inject: Array<string> = [
             "$scope",
@@ -31,7 +32,7 @@
             "project",
             "projectTypes",
             "user",
-            "hasWriteAccess"
+            "userAccessRights"
         ];
 
         constructor(
@@ -42,10 +43,11 @@
             public project,
             public projectTypes,
             private user,
-            public hasWriteAccess) {
+            
+            public userAccessRights: Models.Generic.Authorization.EntityAccessRightsDTO) {
             this.autosaveUrl = `api/itproject/${this.project.id}`;
-
-            if (!hasWriteAccess) {
+            this.hasWriteAccess = userAccessRights.canEdit;
+            if (!userAccessRights.canDelete) {
                 _.remove($rootScope.page.subnav.buttons, function (o:any) {
                     return o.text === "Slet IT Projekt";
                 });
@@ -73,6 +75,12 @@
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ],
+                        userAccessRights: ['$http', '$stateParams', function ($http, $stateParams) {
+                            return $http.get("api/itproject?id=" + $stateParams.id + "&getEntityAccessRights=true")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }],
                         project: [
                             "$http", "$stateParams", ($http: ng.IHttpService, $stateParams) => {
                                 return $http.get("api/itproject/" + $stateParams.id)

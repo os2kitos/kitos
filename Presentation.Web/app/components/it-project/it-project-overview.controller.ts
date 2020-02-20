@@ -44,7 +44,8 @@
             "economyCalc",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -65,7 +66,8 @@
             private economyCalc,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Generic.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -175,11 +177,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
-
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -250,7 +248,7 @@
                 return regexp.test(Url.toLowerCase());
         };
         private activate() {
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -361,7 +359,6 @@
                 },
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
                         template:
@@ -1148,7 +1145,13 @@
                         orgUnits: [
                             "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                        ]
+                        ],
+                        userAccessRights: ["$http", function ($http) {
+                            return $http.get("api/itproject/?getEntitiesAccessRights=true")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }],
                     }
                 });
             }
