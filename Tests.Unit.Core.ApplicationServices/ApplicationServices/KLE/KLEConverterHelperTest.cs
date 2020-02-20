@@ -16,7 +16,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var mockKLEDataBridge = new Mock<IKLEDataBridge>();
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-single-item.xml");
             mockKLEDataBridge.Setup(b => b.GetKLEXMLData()).Returns(document);
-            var sut = new KLEConverterHelper();
+            var sut = new KLEConverterHelper(Mock.Of<IOperationClock>(x=>x.Now == DateTime.MinValue));
 
             //Act
             var result = sut.ConvertToTaskRefs(document);
