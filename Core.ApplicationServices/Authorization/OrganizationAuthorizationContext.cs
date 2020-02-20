@@ -2,9 +2,7 @@
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -17,17 +15,20 @@ namespace Core.ApplicationServices.Authorization
         private readonly IEntityTypeResolver _typeResolver;
         private readonly IAuthorizationPolicy<IEntity> _moduleLevelAccessPolicy;
         private readonly IAuthorizationPolicy<Type> _globalReadAccessPolicy;
+        private readonly IAuthorizationPolicy<Type> _typeCreationPolicy;
 
         public OrganizationAuthorizationContext(
             IOrganizationalUserContext activeUserContext,
             IEntityTypeResolver typeResolver,
             IAuthorizationPolicy<IEntity> moduleLevelAccessPolicy,
-            IAuthorizationPolicy<Type> globalReadAccessPolicy)
+            IAuthorizationPolicy<Type> globalReadAccessPolicy,
+            IAuthorizationPolicy<Type> typeCreationPolicy)
         {
             _activeUserContext = activeUserContext;
             _typeResolver = typeResolver;
             _moduleLevelAccessPolicy = moduleLevelAccessPolicy;
             _globalReadAccessPolicy = globalReadAccessPolicy;
+            _typeCreationPolicy = typeCreationPolicy;
         }
 
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
@@ -98,45 +99,7 @@ namespace Core.ApplicationServices.Authorization
 
         public bool AllowCreate<T>()
         {
-            if (IsGlobalAdmin())
-            {
-                return true;
-            }
-
-            if (IsReadOnly())
-            {
-                return false;
-            }
-
-            if (MatchType<T, ItSystem>())
-            {
-                return IsGlobalAdmin();
-            }
-            if (MatchType<T, ItInterface>())
-            {
-                return IsGlobalAdmin();
-            }
-            if (MatchType<T, ItSystemUsage>())
-            {
-                return IsGlobalAdmin() || 
-                       IsLocalAdmin() || 
-                       IsSystemModuleAdmin();
-            }
-            if (MatchType<T, ItProject>())
-            {
-                return IsGlobalAdmin() || 
-                       IsLocalAdmin() || 
-                       IsProjectModuleAdmin();
-            }
-            if (MatchType<T, ItContract>())
-            {
-                return IsGlobalAdmin() ||
-                       IsLocalAdmin() ||
-                       IsContractModuleAdmin();
-            }
-
-            //NOTE: Once we migrate more types, this will be extended.
-            return true;
+            return _typeCreationPolicy.Allow(typeof(T));
         }
 
         public bool AllowCreate<T>(IEntity entity)
@@ -390,16 +353,6 @@ namespace Core.ApplicationServices.Authorization
         private bool IsLocalAdmin()
         {
             return _activeUserContext.HasRole(OrganizationRole.LocalAdmin);
-        }
-
-        private bool IsSystemModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.SystemModuleAdmin);
-        }
-
-        private bool IsProjectModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.ProjectModuleAdmin);
         }
 
         private bool EntityEqualsActiveUser(IEntity entity)

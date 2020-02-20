@@ -23,6 +23,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private readonly OrganizationAuthorizationContext _sut;
         private readonly Mock<IAuthorizationPolicy<IEntity>> _moduleLevelAccessPolicy;
         private readonly Mock<IAuthorizationPolicy<Type>> _globalAccessPolicy;
+        private readonly Mock<IAuthorizationPolicy<Type>> _creationPolicy;
 
         public OrganizationAuthorizationContextTest()
         {
@@ -31,7 +32,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _globalAccessPolicy = new Mock<IAuthorizationPolicy<Type>>();
             var typeResolver = new Mock<IEntityTypeResolver>();
             typeResolver.Setup(x => x.Resolve(It.IsAny<Type>())).Returns<Type>(t => t);
-            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object,_moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object);
+            _creationPolicy = new Mock<IAuthorizationPolicy<Type>>();
+            _creationPolicy.Setup(x => x.Allow(It.IsAny<Type>())).Returns(true);
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object,_moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object,_creationPolicy.Object);
         }
 
         [Theory]
@@ -389,60 +392,59 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, true)]
-        [InlineData(true, true, true)] //Global admin cannot be readonly
-        [InlineData(false, false, false)]
-        public void Allow_Create_ItSystem_Returns(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_ItSystem_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<ItSystem>(isGlobalAdmin, isReadOnly, expectedResult);
+            Allow_Create_Returns<ItSystem>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_ItContract_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_ItContract_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<ItContract>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<ItContract>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_ItSystemUsage_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_ItSystemUsage_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<ItSystemUsage>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<ItSystemUsage>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_ItProject_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_ItProject_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<ItProject>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<ItProject>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_ItInterface_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_ItInterface_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<ItInterface>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<ItInterface>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_Organization_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_Organization_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<Organization>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<Organization>(expectedResult);
         }
 
         [Theory]
-        [InlineData(false, true)]
-        [InlineData(true, false)]
-        public void Allow_Create_User_Returns(bool isReadOnly, bool expectedResult)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Create_User_Returns(bool expectedResult)
         {
-            Allow_Create_Returns<User>(false, isReadOnly, expectedResult);
+            Allow_Create_Returns<User>(expectedResult);
         }
 
         [Theory]
@@ -651,11 +653,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
-        private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
+        private void Allow_Create_Returns<T>(bool expectedResult)
         {
             //Arrange
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
+            _creationPolicy.Setup(x => x.Allow(typeof(T))).Returns(expectedResult);
 
             //Act
             var result = _sut.AllowCreate<T>();

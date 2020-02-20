@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Authorization
             //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
             return userContext is UnauthenticatedUserContext
                 ? new UnauthenticatedAuthorizationContext()
-                : (IAuthorizationContext)new OrganizationAuthorizationContext(userContext, _typeResolver, new ModuleLevelAccessPolicy(userContext), GlobalReadAccessPolicy);
+                : (IAuthorizationContext)new OrganizationAuthorizationContext(userContext, _typeResolver, new ModuleModificationPolicy(userContext), GlobalReadAccessPolicy, new ModuleModificationPolicy(userContext));
         }
     }
 }
