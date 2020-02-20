@@ -119,8 +119,8 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="relation in usageRelations">
-                                <td style="overflow-wrap: break-word;padding-left: 15px"><a data-ui-sref="it-system.usage.relation({ id: relation.FromSystem.Id})" title="{{relation.FromSystem.Name}}">{{relation.FromSystem.Name}}</a></td>
-                                <td style="overflow-wrap: break-word"><a data-ui-sref="it-system.usage.relation({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
+                                <td style="overflow-wrap: break-word;padding-left: 15px"><a data-ui-sref="it-system.usage.main({ id: relation.FromSystem.Id})" title="{{relation.FromSystem.Name}}">{{relation.FromSystem.Name}}</a></td>
+                                <td style="overflow-wrap: break-word"><a data-ui-sref="it-system.usage.main({ id: relation.ToSystem.Id})" title="{{relation.ToSystem.Name}}">{{relation.ToSystem.Name}}</a></td>
                                 <td style="overflow-wrap: break-word;max-width: 200px"><a ng-if="relation.Interface" data-ui-sref="it-system.interface-edit.main({ id: relation.Interface.Id })" title="{{relation.Interface.Name}}">{{relation.Interface.Name}}</a></td>
                                 <td style="width: 300px">
                                     <p ng-if="relation.Description" ng-show="!relation.Description.LongText" data-element-type="relationDescription">{{relation.Description.Description}}</p>
