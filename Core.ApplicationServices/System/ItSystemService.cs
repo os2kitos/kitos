@@ -164,7 +164,7 @@ namespace Core.ApplicationServices.System
                 return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
+            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(SortedMapToUsingOrganization(itSystem.Usages));
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
@@ -175,6 +175,18 @@ namespace Core.ApplicationServices.System
                     new NamedEntity(
                         itSystemUsage.Organization.Id,
                         itSystemUsage.Organization.Name)))
+                .ToList()
+                .AsReadOnly();
+        }
+
+        private static IReadOnlyList<UsingOrganization> SortedMapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
+        {
+            return itSystemUsages.Select(
+                    itSystemUsage => new UsingOrganization(
+                        itSystemUsage.Id,
+                        new NamedEntity(
+                            itSystemUsage.Organization.Id,
+                            itSystemUsage.Organization.Name))).OrderBy(item => item.Organization.Name)
                 .ToList()
                 .AsReadOnly();
         }
