@@ -10,9 +10,9 @@ namespace Core.DomainModel
         /// <summary>
         /// Determines which value to be shown in GUI
         /// </summary>
-        Title,
-        ExternalId,
-        Url
+        Title = 0,
+        ExternalId = 1,
+        Url = 2
     }
     public class ExternalReference : Entity, IProjectModule, ISystemModule, IContractModule
     {

@@ -94,7 +94,6 @@ namespace Presentation.Web.Models
         public string ItSystemName { get; set; }
         public string ItSystemUuid { get; set; }
         public string ItSystemDescription { get; set; }
-        public string ItSystemUrl { get; set; }
         public int ItSystemAccessModifier { get; set; }
         public int ItSystemOrganizationId { get; set; }
         public int ItSystemBelongsToId { get; set; }
