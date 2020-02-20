@@ -164,7 +164,7 @@ namespace Core.ApplicationServices.System
                 return OperationFailure.Forbidden;
             }
 
-            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
+            return MapToUsingOrganization(itSystem.Usages).ToList();
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
