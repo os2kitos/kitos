@@ -56,7 +56,8 @@
             "ecoStreamData",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -77,7 +78,8 @@
             private ecoStreamData,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Generic.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -174,10 +176,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -255,7 +254,7 @@
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
 
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -954,6 +953,12 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
+                        userAccessRights: ["$http", function ($http) {
+                            return $http.get("api/itcontract/?getEntitiesAccessRights=true")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }],
                         orgUnits: [
                             "$http", "user", "_",
                             ($http, user, _) => $http

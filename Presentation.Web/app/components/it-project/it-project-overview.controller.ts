@@ -1151,7 +1151,7 @@
                                 .then(function (result) {
                                     return result.data.response;
                                 });
-                        }],
+                        }]
                     }
                 });
             }

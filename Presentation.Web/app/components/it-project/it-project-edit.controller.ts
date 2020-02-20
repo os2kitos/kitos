@@ -65,7 +65,8 @@
                         userAccessRights: ["$http", "$stateParams",
                             ($http, $stateParams) => $http
                                 .get("api/itproject?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                                .then(result => result.data.response)],
+                                .then(result => result.data.response)
+                        ],
                         hasWriteAccess: [
                             "userAccessRights", (userAccessRights: Models.Generic.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                         ],
