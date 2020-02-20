@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItSystem
         public string Name { get; set; }
         public Guid Uuid { get; set; }
         public string Description { get; set; }
-        public string Url { get; set; }
+        
         public AccessModifier AccessModifier { get; set; }
 
         public int OrganizationId { get; set; }

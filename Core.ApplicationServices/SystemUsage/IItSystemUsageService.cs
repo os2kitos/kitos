@@ -85,5 +85,15 @@ namespace Core.ApplicationServices.SystemUsage
         /// <param name="contractId"></param>
         /// <returns></returns>
         Result<IEnumerable<SystemRelation>, OperationError> GetRelationsAssociatedWithContract(int contractId);
+
+        /// <summary>
+        /// Gets a list of relations which are defined within the organization defined by <paramref name="organizationId"/>
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        Result<IEnumerable<SystemRelation>, OperationError> GetRelationsDefinedInOrganization(int organizationId,
+            int pageNumber, int pageSize);
     }
 }

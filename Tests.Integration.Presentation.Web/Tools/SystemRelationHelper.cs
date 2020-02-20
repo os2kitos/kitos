@@ -35,6 +35,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/systemrelations/defined-in/organization/{organizationId}?pageNumber={pageNumber}&pageSize={pageSize}");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, login))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<SystemRelationDTO>>();
+            }
+        }
+
         public static async Task<IEnumerable<SystemRelationDTO>> GetRelationsToAsync(int systemUsageId, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -54,13 +66,25 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.GetWithCookieAsync(url, login);
         }
-        
+
         public static async Task<HttpResponseMessage> SendPostRelationRequestAsync(CreateSystemRelationDTO input, Cookie login = null)
         {
             login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
 
             return await HttpApi.PostWithCookieAsync(url, login, input);
+        }
+
+        public static async Task<SystemRelationDTO> PostRelationAsync(CreateSystemRelationDTO input, Cookie login = null)
+        {
+            login = login ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("api/v1/systemrelations");
+
+            using (var response = await HttpApi.PostWithCookieAsync(url, login, input))
+            {
+                Assert.Equal(HttpStatusCode.Created,response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+            }
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRelationRequestAsync(int systemUsageId, int relationId, Cookie login = null)

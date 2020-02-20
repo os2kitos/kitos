@@ -540,6 +540,14 @@
     <Compile Include="Migrations\202002100739397_Relation_UUID.Designer.cs">
       <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs" />
+    <Compile Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.Designer.cs">
+      <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002190948110_Migrate_System_Url_To_References.cs" />
+    <Compile Include="Migrations\202002190948110_Migrate_System_Url_To_References.Designer.cs">
+      <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -881,6 +889,14 @@
     <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
     <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
     <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
+    <EmbeddedResource Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.resx">
+      <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002190948110_Migrate_System_Url_To_References.resx">
+      <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>

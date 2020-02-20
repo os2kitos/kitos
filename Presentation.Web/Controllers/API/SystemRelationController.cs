@@ -113,6 +113,28 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
+        /// Henter alle systemrelationer der er defineret i organisationen.
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="pageNumber">Sidenummer. Interval: [0,int.MaxValue] </param>
+        /// <param name="pageSize">Sidestørrelse dvs. antal resultater pr. forespørgsel. Interval: [1,100]</param>
+        /// <returns>
+        ///     Et array af <see cref="SystemRelationDTO"/>.
+        ///     Resultaterne er sorteret på Id og forkudt ihht. (<see cref="pageNumber"/> * <see cref="pageSize"/>)
+        /// </returns>
+        [HttpGet]
+        [Route("defined-in/organization/{organizationId}")]
+        public HttpResponseMessage GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
+        {
+            return _usageService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
+                .Match
+                (
+                    onSuccess: value => Ok(MapRelations(value)),
+                    onFailure: FromOperationError
+                );
+        }
+
+        /// <summary>
         /// Henter en enkelt systemrelation
         /// </summary>
         /// <param name="systemUsageId">Systemanvendelsen der ejer relation</param>
