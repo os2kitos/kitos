@@ -928,7 +928,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => response.response
+                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name)
                 },
                 serverPaging: true,
                 serverSorting: true,
