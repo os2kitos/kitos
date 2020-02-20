@@ -1,11 +1,12 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.References;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Presentation.Web.Models;
-using Core.DomainServices.Repositories.Contract;
-using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Repositories.System;
-using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
@@ -14,23 +15,14 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
-        private readonly IItProjectRepository _projectRepository;
-        private readonly IItContractRepository _contractRepository;
-        private readonly IItSystemRepository _systemRepository;
-        private readonly IItSystemUsageRepository _systemUsageRepository;
+        private readonly IReferenceService _referenceService;
 
         public ReferenceController(
             IGenericRepository<ExternalReference> repository,
-            IItProjectRepository projectRepository,
-            IItContractRepository contractRepository,
-            IItSystemRepository systemRepository,
-            IItSystemUsageRepository systemUsageRepository)
+            IReferenceService referenceService)
             : base(repository)
         {
-            _projectRepository = projectRepository;
-            _contractRepository = contractRepository;
-            _systemRepository = systemRepository;
-            _systemUsageRepository = systemUsageRepository;
+            _referenceService = referenceService;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
@@ -41,35 +33,46 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Post(ExternalReferenceDTO dto)
         {
-            if (dto.ItContract_Id.HasValue ||
-                dto.ItSystem_Id.HasValue ||
-                dto.ItSystemUsage_Id.HasValue ||
-                dto.ItProject_Id.HasValue)
+            if (dto == null)
             {
-                return base.Post(dto);
+                return BadRequest();
             }
-            return BadRequest("Target object must be specified");
+
+            return
+                GetOwnerTypeAndId(dto)
+                    .Match
+                    (
+                        onValue: typeAndId => _referenceService
+                            .AddReference
+                            (
+                                typeAndId.Value,
+                                typeAndId.Key,
+                                dto.Title,
+                                dto.ExternalReferenceId,
+                                dto.URL,
+                                dto.Display
+                            )
+                            .Match
+                            (
+                                onSuccess: NewObjectCreated,
+                                onFailure: FromOperationError
+                            ),
+                        onNone: () => BadRequest("Target owner Id must be defined")
+                    );
         }
 
-        protected override void PrepareNewObject(ExternalReference item)
+        private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAndId(ExternalReferenceDTO dto)
         {
-            if (item.ItProject_Id.HasValue)
-            {
-                item.ItProject = _projectRepository.GetById(item.ItProject_Id.Value);
-            }
-            if (item.Itcontract_Id.HasValue)
-            {
-                item.ItContract = _contractRepository.GetById(item.Itcontract_Id.Value);
-            }
-            if (item.ItSystem_Id.HasValue)
-            {
-                item.ItSystem = _systemRepository.GetSystem(item.ItSystem_Id.Value);
-            }
-            if (item.ItSystemUsage_Id.HasValue)
-            {
-                item.ItSystemUsage = _systemUsageRepository.GetSystemUsage(item.ItSystemUsage_Id.Value);
-            }
-            base.PrepareNewObject(item);
+            return GetOwnerTypeAndIdOrFallback(ReferenceRootType.Contract, dto.ItContract_Id,
+                fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.System, dto.ItSystem_Id,
+                    fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.SystemUsage, dto.ItSystemUsage_Id,
+                        fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.Project, dto.ItProject_Id,
+                            fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None))));
+        }
+
+        private static Maybe<KeyValuePair<ReferenceRootType, int>> GetOwnerTypeAndIdOrFallback(ReferenceRootType ownerType, int? ownerId, Func<Maybe<KeyValuePair<ReferenceRootType, int>>> fallback)
+        {
+            return ownerId.HasValue ? new KeyValuePair<ReferenceRootType, int>(ownerType, ownerId.Value) : fallback();
         }
     }
 }

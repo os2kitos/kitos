@@ -151,10 +151,12 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
+    <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
