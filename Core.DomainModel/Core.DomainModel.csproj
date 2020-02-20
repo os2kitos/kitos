@@ -207,6 +207,8 @@
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Organization\TaskUsage.cs" />
+    <Compile Include="References\AddReferenceCommand.cs" />
+    <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />

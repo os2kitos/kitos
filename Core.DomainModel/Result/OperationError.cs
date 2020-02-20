@@ -28,6 +28,27 @@
 
         }
 
+        protected bool Equals(OperationError other)
+        {
+            return Equals(Message, other.Message) && FailureType == other.FailureType;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((OperationError) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Message != null ? Message.GetHashCode() : 0) * 397) ^ (int) FailureType;
+            }
+        }
+
         public override string ToString()
         {
             return $"{FailureType:G}{Message.GetValueOrFallback(string.Empty)}";

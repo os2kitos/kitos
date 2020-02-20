@@ -31,6 +31,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<ItProjectDTO> GetProjectAsync(int projectId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itproject/{projectId}"), cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItProjectDTO>();
+            }
+        }
+
         public static async Task<HttpResponseMessage> SendDeleteProjectAsync(int id, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

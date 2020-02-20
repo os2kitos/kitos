@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystemUsage
@@ -291,6 +292,21 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        public ReferenceRootType GetRootType()
+        {
+            return ReferenceRootType.SystemUsage;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
+        }
 
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }

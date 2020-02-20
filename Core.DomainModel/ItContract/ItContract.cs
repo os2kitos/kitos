@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.References;
+using Core.DomainModel.Result;
+
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItContract
@@ -575,6 +578,21 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        public ReferenceRootType GetRootType()
+        {
+            return ReferenceRootType.Contract;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
+        }
 
         #endregion
 
