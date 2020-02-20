@@ -26,5 +26,9 @@ class HomePagePo implements IPageObject {
     public selectDefaultOrganizationAsWorkingOrg() {
         return SelectHelper.openAndSelect("selectWorkingOrganizationOptions","Fælles Kommune");
     }
+
+    public selectSpecificOrganizationAsWorkingOrg(org: string) {
+        return SelectHelper.openAndSelect("selectWorkingOrganizationOptions", org);
+    }
 }
 export = HomePagePo;
