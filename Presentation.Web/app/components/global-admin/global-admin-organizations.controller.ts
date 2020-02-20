@@ -44,7 +44,7 @@
                         {
                             name: "opretOrganisation",
                             text: "Opret Organisation",
-                            template: "<a ui-sref='global-admin.organizations.create' class='btn btn-success pull-right'>#: text #</a>"
+                            template: "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
                         },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
                 ],

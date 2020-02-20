@@ -10,7 +10,7 @@
             </label>
             <div class="col-xs-8">
                 <input type="text" data-ng-model="ctrl.org.name" id="name" name="name" class="form-control" ng-required="true" ng-maxlength="50" autocomplete="false"
-                       ng-minlength="1" data-disabled-on-busy autofocus>
+                       ng-minlength="1" data-disabled-on-busy autofocus data-element-type="orgModalNameInput">
                 <div ng-messages="form.name.$error" ng-if="form.name.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Organisationen skal have et navn.</div>
                     <div ng-message="minlength" style="margin:5px 0">Det valgte navn er for kort.</div>
@@ -37,7 +37,7 @@
         <div class="form-group">
             <div class="col-xs-8 col-xs-offset-3" ng-init="ctrl.org.typeId=3">
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.typeId" value="1"> Kommune
+                    <input type="radio" data-ng-model="ctrl.org.typeId" data-element-type="orgModalRadioButton" value="1"> Kommune
                 </label>
                 <label class="radio-inline">
                     <input type="radio" data-ng-model="ctrl.org.typeId" value="2"> Interessefællesskab
@@ -52,7 +52,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-success" data-ng-disabled="form.$invalid || form.$pristine || ctrl.buttonDisabled" data-disabled-on-busy="">Gem</button>
+        <button type="submit" class="btn btn-success" data-ng-disabled="form.$invalid || form.$pristine || ctrl.buttonDisabled" data-disabled-on-busy="" data-element-type="orgModalSaveButton">Gem</button>
         <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
     </div>
 </form>

@@ -928,7 +928,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => response.response
+                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name)
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -943,9 +943,9 @@
                         var orgName = dataItem.organization.name;
                         var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${orgName} <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
+                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p> <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {
-                            return orgName;
+                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p>`;
                         }
                     },
                 }
