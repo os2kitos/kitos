@@ -16,15 +16,10 @@
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$http",
             "$timeout",
-            "$window",
             "$state",
-            "$",
             "_",
-            "moment",
             "notify",
-            "user",
             "gridStateService",
             "exportGridToExcelService"
         ];
@@ -32,15 +27,10 @@
         constructor(
             private $rootScope: IRootScope,
             private $scope: ng.IScope,
-            private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
-            private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
-            private $: JQueryStatic,
             private _: ILoDashWithMixins,
-            private moment: moment.MomentStatic,
             private notify,
-            private user,
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService) {
             $rootScope.page.title = "Org overblik";
