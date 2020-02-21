@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.Result;
@@ -34,7 +35,7 @@ namespace Core.ApplicationServices.Authorization
                     .FirstOrDefault(gc => gc.key == GlobalConfigKeys.OnlyGlobalAdminMayEditReports);
 
             //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
-            var onlyGlobalAdminMayEditReports = globalConfig.Select(x => bool.TrueString.Equals(x.value)).GetValueOrFallback(false);
+            var onlyGlobalAdminMayEditReports = globalConfig.Select(x => bool.TrueString.Equals(x.value,StringComparison.OrdinalIgnoreCase)).GetValueOrFallback(false);
             var moduleLevelAccessPolicy = new ModuleModificationPolicy(userContext, onlyGlobalAdminMayEditReports);
 
             return new OrganizationAuthorizationContext(
