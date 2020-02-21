@@ -4,6 +4,6 @@ namespace Infrastructure.Services.KLEDataBridge
 {
     public interface IKLEDataBridge
     {
-        XDocument GetKLEXMLData();
+        XDocument GetAllActiveKleNumbers();
     }
 }
