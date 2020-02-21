@@ -52,7 +52,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             //Arrange
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-only-published-date.xml");
             var expectedPublishDate = DateTime.Parse(document.Descendants("UdgivelsesDato").First().Value, CultureInfo.GetCultureInfo("da-DK"));
-            _mockKleDataBridge.Setup(r => r.GetKLEXMLData()).Returns(document);
+            _mockKleDataBridge.Setup(r => r.GetAllActiveKleNumbers()).Returns(document);
             
             //Act
             var result = _sut.GetKLEStatus(DateTime.Parse(lastUpdatedString, CultureInfo.GetCultureInfo("da-DK")));
@@ -67,7 +67,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             //Arrange
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-sample-changes.xml");
-            _mockKleDataBridge.Setup(r => r.GetKLEXMLData()).Returns(document);
+            _mockKleDataBridge.Setup(r => r.GetAllActiveKleNumbers()).Returns(document);
             // Removed item examples
             _stubTaskRefRepository.Insert(SetupTaskRef(1, "KLE-Hovedgruppe", "03"));
             _stubTaskRefRepository.Insert(SetupTaskRef(2, "KLE-Gruppe", "00.02" ));
@@ -268,7 +268,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             TaskRef renamedTaskRef) SetupUpdateObjects()
         {
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-sample-changes.xml");
-            _mockKleDataBridge.Setup(r => r.GetKLEXMLData()).Returns(document);
+            _mockKleDataBridge.Setup(r => r.GetAllActiveKleNumbers()).Returns(document);
             var removedTaskRef = SetupTaskRef(1, "KLE-Emne", "00.03.01", "Dummy");
             var renamedTaskRef = SetupTaskRef(2, "KLE-Emne", "00.03.00", "International virksomhed og EU");
             _stubTaskRefRepository.Insert(removedTaskRef);

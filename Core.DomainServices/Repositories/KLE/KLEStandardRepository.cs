@@ -52,7 +52,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         public KLEStatus GetKLEStatus(DateTime lastUpdated)
         {
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var publishedDate = GetPublishedDate(kleXmlData);
             return new KLEStatus
             {
@@ -70,7 +70,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         public IOrderedEnumerable<KLEChange> GetKLEChangeSummary()
         {
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
 
             var kleChangeSummary = GetKLEChangeSummary(kleXmlData);
 
@@ -145,7 +145,7 @@ namespace Core.DomainServices.Repositories.KLE
         {
             _logger.Debug("UpdateKLE: Begin");
 
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var changes = GetKLEChangeSummary(kleXmlData);
             _logger.Debug($"Changes: {changes.Count}");
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
