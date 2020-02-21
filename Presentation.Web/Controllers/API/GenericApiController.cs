@@ -144,6 +144,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new EntityAccessRightsDTO
             {
+                Id = item.Id,
                 CanDelete = AllowDelete(item),
                 CanEdit = AllowModify(item),
                 CanView = AllowRead(item)
@@ -156,7 +157,7 @@ namespace Presentation.Web.Controllers.API
         /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
         /// </summary>
         /// <param name="ids">The ids of the objects</param>
-        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]string[] ids, bool? getEntityListAccessRights)
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]int[] ids, bool? getEntityListAccessRights)
         {
             if (ids == null || ids.Length == 0)
             {
@@ -168,11 +169,7 @@ namespace Presentation.Web.Controllers.API
                     .Distinct()
                     .Select(id => Repository.GetByKey(id))
                     .Where(entity => entity != null)
-                    .Select(entity => new
-                    {
-                        Id = entity.Id,
-                        AccessRights = GetAccessRightsForEntity(entity)
-                    })
+                    .Select(GetAccessRightsForEntity)
                     .ToList()
             );
         }

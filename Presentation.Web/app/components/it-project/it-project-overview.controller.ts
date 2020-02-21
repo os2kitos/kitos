@@ -25,6 +25,7 @@
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
+        public projectIdToAccessLookup = {};
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -234,7 +235,7 @@
         }
 
         public toggleLock(dataItem) {
-            if (dataItem.hasWriteAccess) {
+            if (this.projectIdToAccessLookup[dataItem.Id]) {
                 dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked;
             }
         }
@@ -309,9 +310,11 @@
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
 
                             // iterrate each project
-                            this._.forEach(response.value,
-                                project => {
-                                    project.roles = [];
+                            let projectIds = [];
+                            this._.forEach(response.value, project => {
+                                projectIds.push(project.Id);
+                                this.projectIdToAccessLookup[project.Id] = false;
+                                project.roles = [];
                                     // iterrate each right
                                     this._.forEach(project.Rights,
                                         right => {
@@ -327,15 +330,7 @@
                                     var phase = `Phase${project.CurrentPhase}`;
                                     project.CurrentPhaseObj = project[phase];
 
-                                    //NOTE: HACK - to prevent request nightmare continue with this rights duplication and this is the only place where this property can be edited - cannot be viewed on the details page
-                                    if (this.user.isGlobalAdmin ||
-                                        this.user.isLocalAdmin ||
-                                        this.user.isProjectAdmin ||
-                                        this._.find(project.Rights, { 'userId': this.user.id })) {
-                                        project.hasWriteAccess = true;
-                                    } else {
-                                        project.hasWriteAccess = false;
-                                    }
+                                    project.accessControl = false;
 
                                     if (!project.Parent) {
                                         project.Parent = { Name: "" };
@@ -352,6 +347,14 @@
                                     if (!project.GoalStatus) {
                                         project.GoalStatus = { Status: "" };
                                     }
+                                });
+
+                            //Lazy load access rights in a batch
+                            this.$http.post("api/itproject/?getEntityListAccessRights=true", projectIds)
+                                .then((rightsResponse) => {
+                                    let accessControlResults = rightsResponse.data as { msg: string, response: Models.Api.Authorization.EntityAccessRightsDTO[] }
+                                    this._.forEach(accessControlResults.response,
+                                        rights => this.projectIdToAccessLookup[rights.id] = rights.canEdit);
                                 });
 
                             return response;
@@ -898,7 +901,8 @@
                         width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
                         template: () =>
-                            `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">
+                            //TODO: The data field actually gets the right value, but for some reason the disabled="disabled" does not tag along
+                            `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="{{dataItem.IsPriorityLocked || !projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
@@ -924,13 +928,16 @@
                         title: "Prioritet: Portefølje",
                         width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
-                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.hasWriteAccess">
+                        template: () => 
+                            //TODO: The data field actually gets the right value, but for some reason the disabled="disabled" does not tag along
+                            //TODO: Also it seems the hasWriteAccess is required for the changes to propagate - it does not change even if the icon is there
+                            `<div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !projectOverviewVm.projectIdToAccessLookup[dataItem.Id] }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="{{!projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
                                                 </div>
-                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="!dataItem.hasWriteAccess">
+                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="{{dataItem.IsPriorityLocked || !projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>

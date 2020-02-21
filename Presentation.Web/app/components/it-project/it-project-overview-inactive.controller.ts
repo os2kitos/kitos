@@ -214,13 +214,6 @@
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
 
                             // iterrate each project
-
-                            const projectIds = this._.map(response.value, (project: any) => project.Id);
-
-                            //TODO: Create a dictionary of project to id and use that to perform the updates
-                            //TODO: Return a new promise with the result below enriched with access rights
-                            //TODO: If data binding to the field works then maybe we just update it afterwards
-
                             this._.forEach(response.value, project => {
                                 project.roles = [];
                                 // iterrate each right
@@ -236,14 +229,13 @@
                                 var phase = `Phase${project.CurrentPhase}`;
                                 project.CurrentPhaseObj = project[phase];
 
-                                project.hasWriteAccess = false; //writeAccessIsSetAfterwards
-
                                 if (!project.Parent) { project.Parent = { Name: "" }; }
                                 if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
                                 if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
                                 if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                                 if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
                             });
+
                             return response;
                         }
                     }
