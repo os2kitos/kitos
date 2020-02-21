@@ -367,8 +367,8 @@
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
-    <TypeScriptCompile Include="app\models\generic\EntityAccessRightsDTO.ts" />
-    <TypeScriptCompile Include="app\models\generic\EntitiesAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />

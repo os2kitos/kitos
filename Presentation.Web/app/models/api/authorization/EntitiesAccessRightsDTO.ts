@@ -1,4 +1,4 @@
-﻿module Kitos.Models.Generic.Authorization {
+﻿module Kitos.Models.Api.Authorization {
 
     export interface EntitiesAccessRightsDTO {
         canCreate: boolean;

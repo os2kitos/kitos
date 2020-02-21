@@ -67,7 +67,7 @@
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
-            private userAccessRights: Models.Generic.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {

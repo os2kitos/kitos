@@ -38,7 +38,7 @@
             public project,
             public projectTypes,
             public hasWriteAccess,
-            public userAccessRights: Models.Generic.Authorization.EntityAccessRightsDTO) {
+            public userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) {
             this.autosaveUrl = `api/itproject/${this.project.id}`;
             if (!userAccessRights.canDelete) {
                 _.remove($rootScope.page.subnav.buttons, function (o: any) {
@@ -68,7 +68,7 @@
                                 .then(result => result.data.response)
                         ],
                         hasWriteAccess: [
-                            "userAccessRights", (userAccessRights: Models.Generic.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
+                            "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                         ],
                         project: [
                             "$http", "$stateParams", ($http: ng.IHttpService, $stateParams) => {

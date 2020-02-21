@@ -16,14 +16,14 @@
                         .get("api/itcontract?id=" + $stateParams.id + "&getEntityAccessRights=true")
                         .then(result => result.data.response)
                     ],
-                    hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Generic.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit]
+                    hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit]
                 }
             });
         }
     ]);
 
     app.controller("contract.EditCtrl", ["$scope", "$rootScope", "contract", "hasWriteAccess","userAccessRights",
-        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Generic.Authorization.EntityAccessRightsDTO) => {
+        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.allowClearOption = {
                 allowClear: true
