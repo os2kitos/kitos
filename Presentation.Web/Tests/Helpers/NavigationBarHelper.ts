@@ -3,7 +3,7 @@
 class NavigationBarHelper {
     private navigationBar = new NavigationBarWrapper();
     public dropDownExpand() {
-        return  this.navigationBar.dropDownMenu.dropDownElement.click();
+        return this.navigationBar.dropDownMenu.dropDownElement.click();
     }
 
     public logout() {
@@ -20,6 +20,10 @@ class NavigationBarHelper {
 
     public isLocalAdminDisplayed(): webdriver.promise.Promise<Boolean> {
         return this.navigationBar.dropDownMenu.localAdmin.isPresent();
+    }
+
+    public changeOrg() {
+        return this.navigationBar.dropDownMenu.changeOrg.click();
     }
 }
 export = NavigationBarHelper;

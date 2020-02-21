@@ -14,7 +14,6 @@
             </thead>
             <tbody class="small">
                 <tr ng-repeat-start="exposure in interfaceExposures">
-
                     <!-- name of the interface -->
                     <td rowspan="{{exposure.dataRows.length || 1}}">
                         <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
@@ -37,18 +36,18 @@
                         </span>
                     </td>
                 </tr>
-            <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
-                <!-- data -->
-                <td rowspan="1">
-                    {{dataRow.data}}
-                </td>
+                <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
+                    <!-- data -->
+                    <td rowspan="1">
+                        {{dataRow.data}}
+                    </td>
 
-                <!-- data type -->
-                <td>
-                    {{dataRow.dataTypeName}}
-                </td>
-            </tr>
-                <tr data-ng-if="interfaceExposures.length == 0">
+                    <!-- data type -->
+                    <td>
+                        {{dataRow.dataTypeName}}
+                    </td>
+                </tr>
+                <tr ng-if="interfaceExposures.length == 0">
                     <td colspan="8" class="text-center">Systemet udstiller ingen snitflader</td>
                 </tr>
             </tbody>

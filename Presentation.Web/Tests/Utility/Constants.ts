@@ -36,6 +36,8 @@ class Constants {
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
+    readonly kendoRelationCountObject = "relationCountObject";
+
     //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
@@ -52,6 +54,7 @@ class Constants {
     readonly invalidUrl = "invalidUrl";
     readonly refId = "1337";
     readonly refTitle = "STRONGMINDS";
+    readonly migrationOrgNameToMove = "MigrationMoveOrgName";
 
     //interfaceInoputConstants
     readonly interfaceNameInput = "InterfaceNameInput";

@@ -11,6 +11,7 @@ class SystemCatalogHelper {
     private static pageObject = new CatalogPage();
     private static systemPage = new SystemPage();
     private static waitUpTo = new WaitTimers();
+    private static readonly visibilitySelect2 = "s2id_system-access";
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
@@ -49,6 +50,15 @@ class SystemCatalogHelper {
             .then(() => SystemCatalogHelper.findCatalogColumnsFor(childSystemName).first().click())
             .then(() => Select2.searchFor(mainSystemName, "s2id_system-parent"))
             .then(() => Select2.waitForDataAndSelect());
+    }
+
+    public static setSystemToPublic(system: string) {
+        console.log(`Setting system: ${system} to Public`);
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.findCatalogColumnsFor(system).first().click())
+            .then(() => Select2.selectWithNoSearch("Offentlig", this.visibilitySelect2));
+
     }
 
     public static createLocalSystem(name: string) {
