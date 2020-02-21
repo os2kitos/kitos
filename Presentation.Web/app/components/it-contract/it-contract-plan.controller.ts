@@ -43,7 +43,8 @@
             "orgUnits",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -63,7 +64,8 @@
             private orgUnits: Array<any>,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights : Models.Api.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -158,10 +160,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -225,7 +224,7 @@
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
 
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -1061,6 +1060,12 @@
                     itContractRoles: [
                         "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                     ],
+                    userAccessRights: ["$http", function ($http) {
+                        return $http.get("api/itcontract/?getEntitiesAccessRights=true")
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                     ]
