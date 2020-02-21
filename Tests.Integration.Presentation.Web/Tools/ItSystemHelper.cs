@@ -98,20 +98,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendSetDataWorkerRequestAsync(int systemId, int organizationId, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("/api/Dataworker/");
-
-            var body = new
-            {
-                ItSystemId = systemId,
-                DataWorkerId = organizationId
-            };
-
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
-        }
-
         public static async Task<WishDTO> CreateWishAsync(int systemUsageId, string text, Cookie optionalLogin = null, int? userId = null)
         {
             using (var response = await SendCreateWishRequestAsync(systemUsageId, text, optionalLogin, userId))
