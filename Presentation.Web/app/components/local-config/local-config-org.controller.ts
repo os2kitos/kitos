@@ -9,12 +9,13 @@
     // Here be dragons! Thou art forewarned.
     // Or perhaps it's samurais, because it's kendos terrible terrible framework that's the cause...
     export class OrganizationController implements IOverviewController {
+
         private storageKey = "local-org-overview-options";
         private orgUnitStorageKey = "local-org-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-
         public mainGrid: Kitos.IKendoGrid<Models.IOrganization>;
         public mainGridOptions: kendo.ui.GridOptions;
+
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -28,7 +29,6 @@
             "notify",
             "user",
             "gridStateService",
-            "needsWidthFixService",
             "exportGridToExcelService"
         ];
 
@@ -45,7 +45,6 @@
             private notify,
             private user,
             private gridStateService: Services.IGridStateFactory,
-            private needsWidthFixService,
             private exportGridToExcelService) {
             $rootScope.page.title = "Org overblik";
 
@@ -68,7 +67,6 @@
             this.activate();
         }
 
-
         // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
@@ -81,18 +79,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
-
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
         }
@@ -183,6 +173,11 @@
                         text: "Slet filter",
                         template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='orgCtrl.clearGridProfile()' data-ng-disabled='!orgCtrl.doesGridProfileExist()' data-element-type='removeFilterButton'>#: text #</button>"
                     },
+                    {
+                        name: "excel",
+                        text: "Eksportér til Excel",
+                        className: "pull-right"
+                    }
                 ],
                 excel: {
                     fileName: "Organisationer.xlsx",
