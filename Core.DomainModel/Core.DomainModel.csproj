@@ -73,7 +73,6 @@
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
-    <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
     <Compile Include="KLE\KLEChange.cs" />
     <Compile Include="KLE\KLEChangeType.cs" />

@@ -162,7 +162,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -941,9 +941,7 @@
         private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
-                organizationId: this.user.currentOrganizationId,
-                containsLegalInfo: dataItem.ContainsLegalInfo,
-                AssociatedDataWorkers: dataItem.AssociatedDataWorkers
+                organizationId: this.user.currentOrganizationId
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));

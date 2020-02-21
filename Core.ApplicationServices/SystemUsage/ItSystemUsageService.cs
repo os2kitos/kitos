@@ -101,8 +101,7 @@ namespace Core.ApplicationServices.SystemUsage
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
             usage.DataLevel = DataSensitivityLevel.NONE;
-            usage.ContainsLegalInfo = newSystemUsage.ContainsLegalInfo;
-            usage.AssociatedDataWorkers = newSystemUsage.AssociatedDataWorkers;
+            usage.ContainsLegalInfo = DataOptions.NO;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 

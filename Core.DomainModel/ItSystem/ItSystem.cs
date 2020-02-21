@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
@@ -7,7 +6,6 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystem
 {
-    using DataTypes;
 
     /// <summary>
     /// Represents an it system.
@@ -16,15 +14,14 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
-            this.ArchivePeriods = new List<ArchivePeriod>();
-            this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
-            this.Children = new List<ItSystem>();
-            this.TaskRefs = new List<TaskRef>();
-            this.AccessTypes = new List<AccessType>();
-            this.Wishes = new List<Wish>();
-            this.Usages = new List<ItSystemUsage.ItSystemUsage>();
+            ArchivePeriods = new List<ArchivePeriod>();
+            ItInterfaceExhibits = new List<ItInterfaceExhibit>();
+            Children = new List<ItSystem>();
+            TaskRefs = new List<TaskRef>();
+            AccessTypes = new List<AccessType>();
+            Wishes = new List<Wish>();
+            Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
-            this.AssociatedDataWorkers = new List<ItSystemDataWorkerRelation>();
 
         }
 
@@ -119,18 +116,8 @@ namespace Core.DomainModel.ItSystem
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
-        //GDPR
-        public string GeneralPurpose { get; set; }
-
-        public DataOptions ContainsLegalInfo { get; set; }
-
-        public bool IsDataTransferedToThirdCountries { get; set; }
-
-        public string DataIsTransferedTo { get; set; }
 
         public int ArchiveDuty { get; set; }
-
-        public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
         public string LinkToDirectoryAdminUrl { get; set; }
         public string LinkToDirectoryAdminUrlName { get; set; }

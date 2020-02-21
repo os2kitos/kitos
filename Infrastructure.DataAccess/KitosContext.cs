@@ -131,7 +131,6 @@ namespace Infrastructure.DataAccess
         public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
-        public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
         public DbSet<DataResponsible> DataResponsibles { get; set; }
         public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
         public DbSet<RegisterType> RegisterTypes { get; set; }
@@ -218,7 +217,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
             modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
-            modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());

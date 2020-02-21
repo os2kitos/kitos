@@ -360,7 +360,6 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
@@ -403,7 +402,6 @@
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\HealthCheckController.cs" />
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
-    <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
@@ -539,7 +537,6 @@
     <Compile Include="Models\EntitiesAccessRightsDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
     <Compile Include="Models\EntityAccessRightsDTO.cs" />
-    <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
@@ -728,7 +725,6 @@
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
     <Content Include="app\components\it-contract\tabs\it-contract-gdpr-editlink-modal.view.html" />
-    <Content Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
