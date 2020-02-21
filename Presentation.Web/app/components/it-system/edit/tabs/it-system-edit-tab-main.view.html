@@ -56,22 +56,9 @@
                                    data-ng-model="system.accessModifier"
                                    data-select-access-modifier="">
                         </div>
-                        <!--Data level Slettes TODO: -->
-                        <!--<div class="form-group">
-                            <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
-                            <select class="form-control input-sm"
-                                    ui-select2="{minimumResultsForSearch: -1}"
-                                    data-ng-model="system.dataLevel"
-                                    data-ng-change="submitDataLevel()"
-                                    data-ng-disabled="!hasWriteAccess">
-                                <option value="0">Ingen persondata</option>
-                                <option value="1">Persondata</option>
-                                <option value="2">Persondata og følsomme persondata</option>
-                            </select>
-                        </div>-->
                     </div>
 
-                    <!-- TODO: Check om den ikke skal rykkes ud på niveau med "left side" og "right side" -->
+                    <!-- Middle -->
                     <div class="col-xs-6">
                         <!-- Description -->
                         <div class="form-group">
@@ -82,9 +69,19 @@
                                       data-ng-disabled="!hasWriteAccess"
                                       data-ng-model="system.description"></textarea>
                         </div>
+                        <!-- Reference -->
+                        <div class="form-group">
+                            <label for="system-referencer" class="control-label small">Referencer vedr. systemet</label>
+                            <div id="system-referencer">
+                                <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.externalReferences.length == 0">
+                                    <p>Ingen referencer</p>
+                                </div>
+                                <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="reference in system.externalReferences">
+                                    <a class="handleOverflow" href="{{reference.url}}">{{reference.url}}</a>
+                                </div>
+                            </div>
 
-                        <!-- Reference TODO:(NEW) -->
-
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,7 +104,37 @@
                             </select-option>
                         </div>
 
-                        <!-- KLE ID and Name TODO:(NEW) -->
+                        <!-- KLE ID and Name -->
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                    <label for="system-kle-id" class="control-label small">KLE ID</label>
+                                    <div id="system-kle-id">
+                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.taskRefs.length == 0">
+                                            <p> - </p>
+                                        </div>
+                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="kle in system.taskRefs">
+                                            <p>{{kle.taskKey}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-9">
+                                <div class="form-group">
+                                    <label for="system-kle-navn" class="control-label small">KLE Navn</label>
+                                    <div id="system-kle-navn">
+                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.taskRefs.length == 0">
+                                            <p>Ingen KLE</p>
+                                        </div>
+                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="kle in system.taskRefs">
+                                            <p class="handleOverflow">{{kle.description}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Archive duty -->
                         <div class="form-group">
                             <label for="archiveDuty" class="control-label small">Rigsarkivets vejledning</label>
@@ -121,35 +148,13 @@
                                 <option value="2">K</option>
                                 <option value="3">Ved ikke</option>
                             </select>
-                            <!-- TODO: check layout -->
                             <p>Læs mere hos <a href="https://www.sa.dk/da/offentlig-forvaltning/kommuner-og-regioner/bevaring-kassation-it-systemer/">Rigsarkivet</a></p>
                         </div>
                         <!-- UUID -->
                         <div class="form-group">
-                            <label class="control-label small">UUID</label>
-                            <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
+                            <label for="system-uuid" class="control-label small">UUID</label>
+                            <input id="system-uuid" type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
                         </div>
-
-                        <!--AppTypeOption TODO: SLETTES-->
-                        <!--<div class="form-group">
-                            <select-option data-id="system-type"
-                                           data-label="Applikationstype"
-                                           data-placeholder="Vælg applikationstype"
-                                           data-selected-text="{{ system.appTypeOptionName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="system.appTypeOptionId"
-                                           data-options="appTypeOptions"
-                                           data-auto-save-url="{{ system.updateUrl }}"
-                                           data-field="appTypeOptionId">
-                            </select-option>
-                        </div>-->
-                        <!-- Object owner TODO: SLETTES-->
-                        <!--<div class="form-group">
-                            <label class="control-label small">Oprettet af</label>
-                            <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
-                        </div>-->
-                        
-
                     </div>
                 </div>
             </div>

@@ -162,7 +162,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -441,20 +441,6 @@
                         }
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
@@ -516,20 +502,6 @@
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
-                        template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
