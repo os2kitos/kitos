@@ -54,7 +54,6 @@ namespace Tools.Test.Database.Model.Tasks
                 OrganizationId = organization.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id,
-                DataLevel = itSystem.DataLevel,
                 ContainsLegalInfo = itSystem.ContainsLegalInfo,
                 AssociatedDataWorkers = itSystem.AssociatedDataWorkers.Select(x => new ItSystemUsageDataWorkerRelation
                 {

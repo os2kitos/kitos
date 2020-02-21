@@ -93,7 +93,6 @@ namespace Presentation.Web.Models
         public int ArchiveDuty { get; set; }
         //GDPR
         public string GeneralPurpose { get; set; }
-        public DataSensitivityLevel DataLevel { get; set; }
         public DataOptions ContainsLegalInfo { get; set; }
         public bool IsDataTransferedToThirdCountries { get; set; }
         public string DataIsTransferedTo { get; set; }

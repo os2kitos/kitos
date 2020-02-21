@@ -38,18 +38,6 @@
             
                 $scope.hasWriteAccess = hasWriteAccess;
 
-                $scope.submitDataLevel = () => {
-                    var data = {
-                        DataLevel: $scope.system.dataLevel
-                    };
-                    $http.patch(`api/itsystem/${itSystem.id}?organizationId=${itSystem.organizationId}`, data).success(result => {
-                        notify.addSuccessMessage("Feltet er opdateret.");
-
-                    }).error(result => {
-                        notify.addErrorMessage("Fejl!");
-                    });
-                };
-
 
                 function selectLazyLoading(url: any, allowClear: any, paramAry: any);
                 function selectLazyLoading(url, allowClear, paramAry) {

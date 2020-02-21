@@ -125,8 +125,6 @@ namespace Core.DomainModel.ItSystem
         //GDPR
         public string GeneralPurpose { get; set; }
 
-        public DataSensitivityLevel DataLevel { get; set; }
-
         public DataOptions ContainsLegalInfo { get; set; }
 
         public bool IsDataTransferedToThirdCountries { get; set; }

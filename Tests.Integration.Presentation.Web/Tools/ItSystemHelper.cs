@@ -44,7 +44,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 itSystemId = itSystemId,
                 organizationId = orgId,
-                dataLevel = "NONE",
             };
 
             using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itSystemUsage"), cookie, itSystem))

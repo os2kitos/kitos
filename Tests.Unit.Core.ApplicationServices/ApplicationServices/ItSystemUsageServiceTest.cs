@@ -166,7 +166,6 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 ItSystemId = A<int>(),
                 OrganizationId = A<int>(),
-                DataLevel = A<DataSensitivityLevel>(),
                 ContainsLegalInfo = A<DataOptions>(),
                 AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation> { new ItSystemUsageDataWorkerRelation(), new ItSystemUsageDataWorkerRelation() }
 

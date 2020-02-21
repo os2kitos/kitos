@@ -945,7 +945,7 @@
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
                 organizationId: this.user.currentOrganizationId,
-                dataLevel: dataItem.DataLevel,
+                dataLevel: 0, //Creating with default dataLevel
                 containsLegalInfo: dataItem.ContainsLegalInfo,
                 AssociatedDataWorkers: dataItem.AssociatedDataWorkers
             })
