@@ -45,8 +45,8 @@ namespace Presentation.Web.Controllers.API
 
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
-                var refinement = entityAccessLevel == EntityReadAccessLevel.All ? 
-                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.None : 
+                var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.None :
                     Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
 
                 var mainQuery = Repository.AsQueryable();
@@ -55,9 +55,9 @@ namespace Presentation.Web.Controllers.API
                     .Select(x => x.Apply(mainQuery))
                     .GetValueOrFallback(mainQuery);
 
-                var requiresPostFiltering = 
+                var requiresPostFiltering =
                     refinement
-                        .Select(x=>x.RequiresPostFiltering())
+                        .Select(x => x.RequiresPostFiltering())
                         .GetValueOrFallback(false);
 
                 if (requiresPostFiltering)
@@ -137,12 +137,44 @@ namespace Presentation.Web.Controllers.API
             {
                 return NotFound();
             }
-            return Ok(new EntityAccessRightsDTO
+            return Ok(GetAccessRightsForEntity(item));
+        }
+
+        private EntityAccessRightsDTO GetAccessRightsForEntity(TModel item)
+        {
+            return new EntityAccessRightsDTO
             {
                 CanDelete = AllowDelete(item),
                 CanEdit = AllowModify(item),
                 CanView = AllowRead(item)
-            });
+            };
+        }
+
+        /// <summary>
+        /// POST api/T/idListAsCsv?getEntityListAccessRights
+        /// Uses POST verb to allow use of body for potentially long list of ids
+        /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
+        /// </summary>
+        /// <param name="ids">The ids of the objects</param>
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]string[] ids, bool? getEntityListAccessRights)
+        {
+            if (ids == null || ids.Length == 0)
+            {
+                return BadRequest();
+            }
+
+            return Ok(
+                ids
+                    .Distinct()
+                    .Select(id => Repository.GetByKey(id))
+                    .Where(entity => entity != null)
+                    .Select(entity => new
+                    {
+                        Id = entity.Id,
+                        AccessRights = GetAccessRightsForEntity(entity)
+                    })
+                    .ToList()
+            );
         }
 
         protected virtual TModel PostQuery(TModel item)
