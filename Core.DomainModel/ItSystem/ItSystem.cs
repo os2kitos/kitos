@@ -41,9 +41,6 @@ namespace Core.DomainModel.ItSystem
 
         public string PreviousName { get; set; }
 
-        public int? AppTypeOptionId { get; set; }
-        public virtual ItSystemType AppTypeOption { get; set; }
-
         /// <summary>
         /// Gets or sets exhibited interfaces for this instance.
         /// </summary>

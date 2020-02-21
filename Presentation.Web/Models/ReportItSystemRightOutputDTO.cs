@@ -88,7 +88,6 @@ namespace Presentation.Web.Models
 
         public int ItSystemId { get; set; }
         public int ItSystemItSystemId { get; set; }
-        public int ItSystemAppTypeOptionId { get; set; }
         public int ItSystemParentId { get; set; }
         public int ItSystemBusinessTypeId { get; set; }
         public string ItSystemName { get; set; }

@@ -84,7 +84,6 @@
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\ItSystemTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
     <Compile Include="Mapping\ItInterfaceMap.cs" />

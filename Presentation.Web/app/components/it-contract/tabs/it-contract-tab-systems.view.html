@@ -13,9 +13,6 @@
                                 <th class="col-xs-8" style="padding-left: 15px">
                                     IT System
                                 </th>
-                                <th class="col-xs-3">
-                                    Applikationstype
-                                </th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -24,11 +21,6 @@
                                 <!-- the system -->
                                 <td style="padding-left: 15px">
                                     <a data-ui-sref="it-system.usage.main({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Slettes)</span></a>
-                                </td>
-
-                                <!-- app type (read only) -->
-                                <td>
-                                    {{ associatedSystemUsage.itSystemAppTypeName }}
                                 </td>
 
                                 <td>

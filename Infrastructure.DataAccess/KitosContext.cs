@@ -70,7 +70,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemCategories> ItSystemCategories { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<ItSystemType> ItSystemTypes { get; set; }
         public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationType> OrganizationTypes { get; set; }
@@ -113,7 +112,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
         public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
-        public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
         public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
         public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
@@ -192,7 +190,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
-            modelBuilder.Configurations.Add(new ItSystemTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationTypeMap());

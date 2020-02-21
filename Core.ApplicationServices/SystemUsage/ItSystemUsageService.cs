@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.Result;
@@ -99,7 +100,7 @@ namespace Core.ApplicationServices.SystemUsage
             usage.OrganizationId = newSystemUsage.OrganizationId;
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
-            usage.DataLevel = newSystemUsage.DataLevel;
+            usage.DataLevel = DataSensitivityLevel.NONE;
             usage.ContainsLegalInfo = newSystemUsage.ContainsLegalInfo;
             usage.AssociatedDataWorkers = newSystemUsage.AssociatedDataWorkers;
             _usageRepository.Insert(usage);

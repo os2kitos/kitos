@@ -222,9 +222,6 @@
                                     if (!system.BusinessType) {
                                         system.BusinessType = { Name: "" };
                                     }
-                                    if (!system.AppTypeOption) {
-                                        system.AppTypeOption = { Name: "" };
-                                    }
                                     if (!system.BelongsTo) {
                                         system.BelongsTo = { Name: "" };
                                     }
@@ -945,7 +942,6 @@
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
                 organizationId: this.user.currentOrganizationId,
-                dataLevel: 0, //Creating with default dataLevel
                 containsLegalInfo: dataItem.ContainsLegalInfo,
                 AssociatedDataWorkers: dataItem.AssociatedDataWorkers
             })

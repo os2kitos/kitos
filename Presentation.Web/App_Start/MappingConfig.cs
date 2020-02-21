@@ -110,10 +110,6 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItSystemType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<OrganizationUnitRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
@@ -309,7 +305,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.OrganizationTypeId, opt => opt.MapFrom(src => src.Object.Organization.TypeId))
                .ForMember(dto => dto.ItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.Id))
                .ForMember(dto => dto.ItSystemItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.ItSystemId))
-               .ForMember(dto => dto.ItSystemAppTypeOptionId, opt => opt.MapFrom(src => src.Object.ItSystem.AppTypeOptionId))
                .ForMember(dto => dto.ItSystemParentId, opt => opt.MapFrom(src => src.Object.ItSystem.ParentId))
                .ForMember(dto => dto.ItSystemBusinessTypeId, opt => opt.MapFrom(src => src.Object.ItSystem.BusinessTypeId))
                .ForMember(dto => dto.ItSystemName, opt => opt.MapFrom(src => src.Object.ItSystem.Name))

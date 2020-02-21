@@ -466,7 +466,6 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentFrequencyTypesController.cs" />
@@ -496,7 +495,6 @@
     <Compile Include="Controllers\OData\OptionControllers\ItProjectTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PaymentFrequencyTypesController.cs" />
@@ -1117,7 +1115,6 @@
     <TypeScriptCompile Include="app\models\organization\organization-type.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit.ts" />
     <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\it-system-type-option.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-base.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-it-system-usage.ts" />

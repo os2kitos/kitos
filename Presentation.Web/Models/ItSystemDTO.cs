@@ -61,9 +61,6 @@ namespace Presentation.Web.Models
         public IEnumerable<int> TaskRefIds { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
-        public int? AppTypeOptionId { get; set; }
-        public string AppTypeOptionName { get; set; }
-
         public int? BusinessTypeId { get; set; }
         public string BusinessTypeName { get; set; }
 

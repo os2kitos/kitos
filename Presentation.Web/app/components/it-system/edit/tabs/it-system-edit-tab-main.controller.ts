@@ -18,8 +18,8 @@
 
     app.controller("system.SystemMainCtrl",
         [
-            "$rootScope", "$scope", "$http", "notify", "itSystem", "businessTypes", "user", "autofocus", "hasWriteAccess",
-            ($rootScope, $scope, $http, notify, itSystem, businessTypes, user, autofocus, hasWriteAccess) => {
+            "$rootScope", "$scope", "$http", "itSystem", "businessTypes", "user", "autofocus", "hasWriteAccess",
+            ($rootScope, $scope, $http, itSystem, businessTypes, user, autofocus, hasWriteAccess) => {
                 $rootScope.page.title = "IT System - Rediger system";
                 autofocus();
 
