@@ -16,6 +16,7 @@
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
         roles: Array<any>;
         Rights: Array<any>;
+        OriginalEntity : any;
     }
 
     export class OverviewController implements IOverviewController {
@@ -235,7 +236,7 @@
         }
 
         public toggleLock(dataItem) {
-            if (this.projectIdToAccessLookup[dataItem.Id]) {
+            if (dataItem.OriginalEntity.hasWriteAccess) {
                 dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked;
             }
         }
@@ -311,10 +312,11 @@
 
                             // iterrate each project
                             let projectIds = [];
-                            this._.forEach(response.value, project => {
-                                projectIds.push(project.Id);
-                                this.projectIdToAccessLookup[project.Id] = false;
-                                project.roles = [];
+                            this._.forEach(response.value,
+                                project => {
+                                    projectIds.push(project.Id);
+                                    this.projectIdToAccessLookup[project.Id] = { project: project }
+                                    project.roles = [];
                                     // iterrate each right
                                     this._.forEach(project.Rights,
                                         right => {
@@ -330,7 +332,7 @@
                                     var phase = `Phase${project.CurrentPhase}`;
                                     project.CurrentPhaseObj = project[phase];
 
-                                    project.accessControl = false;
+                                    project.hasWriteAccess = true;
 
                                     if (!project.Parent) {
                                         project.Parent = { Name: "" };
@@ -352,9 +354,12 @@
                             //Lazy load access rights in a batch
                             this.$http.post("api/itproject/?getEntityListAccessRights=true", projectIds)
                                 .then((rightsResponse) => {
-                                    let accessControlResults = rightsResponse.data as { msg: string, response: Models.Api.Authorization.EntityAccessRightsDTO[] }
+                                    let accessControlResults = rightsResponse.data as {
+                                        msg: string,
+                                        response: Models.Api.Authorization.EntityAccessRightsDTO[]
+                                    }
                                     this._.forEach(accessControlResults.response,
-                                        rights => this.projectIdToAccessLookup[rights.id] = rights.canEdit);
+                                        rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
                                 });
 
                             return response;
@@ -900,14 +905,16 @@
                         title: "Prioritet: Projekt",
                         width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: () =>
-                            //TODO: The data field actually gets the right value, but for some reason the disabled="disabled" does not tag along
-                            `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="{{dataItem.IsPriorityLocked || !projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
+                        template: (dataItem) =>
+                        {
+                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                            return `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
-                                                </select>`,
+                                                </select>`;
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.Priority.toString() || "",
                         filterable: {
                             cell: {
@@ -928,21 +935,22 @@
                         title: "Prioritet: Portefølje",
                         width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: () => 
-                            //TODO: The data field actually gets the right value, but for some reason the disabled="disabled" does not tag along
-                            //TODO: Also it seems the hasWriteAccess is required for the changes to propagate - it does not change even if the icon is there
-                            `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !projectOverviewVm.projectIdToAccessLookup[dataItem.Id] }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
-                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="{{!projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
+                        template: (dataItem) =>
+                        {
+                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                            return `<div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.OriginalEntity.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.OriginalEntity.hasWriteAccess">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
                                                 </div>
-                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="{{dataItem.IsPriorityLocked || !projectOverviewVm.projectIdToAccessLookup[dataItem.Id]}}">
+                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="!dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
-                                                </select>`,
+                                                </select>`;
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.PriorityPf.toString() || "",
                         hidden: true,
                         filterable: {
