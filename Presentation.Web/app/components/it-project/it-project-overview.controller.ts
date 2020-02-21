@@ -327,10 +327,11 @@
                                     var phase = `Phase${project.CurrentPhase}`;
                                     project.CurrentPhaseObj = project[phase];
 
+                                    //NOTE: HACK - to prevent request nightmare continue with this rights duplication and this is the only place where this property can be edited - cannot be viewed on the details page
                                     if (this.user.isGlobalAdmin ||
                                         this.user.isLocalAdmin ||
-                                        this._.find(project.Rights, { 'userId': this.user.id }) ||
-                                        this.user.id === project.ObjectOwnerId) {
+                                        this.user.isProjectAdmin ||
+                                        this._.find(project.Rights, { 'userId': this.user.id })) {
                                         project.hasWriteAccess = true;
                                     } else {
                                         project.hasWriteAccess = false;
