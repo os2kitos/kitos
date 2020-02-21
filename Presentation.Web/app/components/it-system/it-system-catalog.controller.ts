@@ -16,6 +16,7 @@
         clearOptions(): void;
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
+        allowToggleUsage : boolean;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -34,6 +35,7 @@
         public canCreate = this.userAccessRights.canCreate;
         public canMigrate = this.userMigrationRights.canExecuteMigration;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
+        public allowToggleUsage = false;
 
         public static $inject:
             Array<string> = [
@@ -52,8 +54,8 @@
                 "userMigrationRights",
                 "gridStateService",
                 "$uibModal",
-                "needsWidthFixService",
-                "exportGridToExcelService"
+                "exportGridToExcelService",
+                "systemUsageUserAccessRights"
             ];
 
         constructor(
@@ -72,8 +74,8 @@
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
-            private needsWidthFixService,
             private exportGridToExcelService,
+            private systemUsageUserAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
@@ -81,6 +83,7 @@
             private municipalityId,
             private municipalityName,
             public migrationConsequenceText) {
+            this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -312,12 +315,12 @@
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
                             "data-element-type": "catalogUsageObject"
@@ -1058,18 +1061,15 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", function ($http) {
-                            return $http.get("api/itsystem/?getEntitiesAccessRights=true")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
-                        userMigrationRights: ["$http", function ($http) {
-                            return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
+                        userAccessRights: ["$http", $http => $http.get("api/itsystem/?getEntitiesAccessRights=true")
+                            .then(result => result.data.response)
+                        ],
+                        systemUsageUserAccessRights: ["$http", $http => $http.get("api/itsystemusage/?getEntitiesAccessRights=true")
+                            .then(result => result.data.response)
+                        ],
+                        userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
+                            .then(result => result.data.response)
+                        ],
                     }
                 });
 
