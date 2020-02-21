@@ -546,6 +546,10 @@
     <Compile Include="Migrations\202002190948110_Migrate_System_Url_To_References.Designer.cs">
       <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs" />
+    <Compile Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.Designer.cs">
+      <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -892,6 +896,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002190948110_Migrate_System_Url_To_References.resx">
       <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.resx">
+      <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
