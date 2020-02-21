@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -21,19 +22,19 @@ namespace Tests.Unit.Presentation.Web.Authorization
     {
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly OrganizationAuthorizationContext _sut;
-        private readonly Mock<IAuthorizationPolicy<IEntity>> _moduleLevelAccessPolicy;
-        private readonly Mock<IAuthorizationPolicy<Type>> _globalAccessPolicy;
-        private readonly Mock<IAuthorizationPolicy<Type>> _creationPolicy;
+        private readonly Mock<IModuleModificationPolicy> _moduleLevelAccessPolicy;
+        private readonly Mock<IGlobalReadAccessPolicy> _globalAccessPolicy;
+        private readonly Mock<IModuleCreationPolicy> _creationPolicy;
 
         public OrganizationAuthorizationContextTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _moduleLevelAccessPolicy = new Mock<IAuthorizationPolicy<IEntity>>();
-            _globalAccessPolicy = new Mock<IAuthorizationPolicy<Type>>();
+            _moduleLevelAccessPolicy = new Mock<IModuleModificationPolicy>();
+            _globalAccessPolicy = new Mock<IGlobalReadAccessPolicy>();
             var typeResolver = new Mock<IEntityTypeResolver>();
             typeResolver.Setup(x => x.Resolve(It.IsAny<Type>())).Returns<Type>(t => t);
-            _creationPolicy = new Mock<IAuthorizationPolicy<Type>>();
-            _creationPolicy.Setup(x => x.Allow(It.IsAny<Type>())).Returns(true);
+            _creationPolicy = new Mock<IModuleCreationPolicy>();
+            _creationPolicy.Setup(x => x.AllowCreation(It.IsAny<Type>())).Returns(true);
             _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object,_moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object,_creationPolicy.Object);
         }
 
@@ -135,30 +136,26 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         //Checks not bound to context condition
-        [InlineData(true, false, false, false, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, false, false, false, true)]
-        [InlineData(false, false, true, true, false, false, false, false, true)]
+        [InlineData(true, false, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, true)]
+        [InlineData(false, false, true, true, false, false, true)]
 
         //Same organization - positive matches
-        [InlineData(false, false, false, true, true, false, false, false, true)]
-        [InlineData(false, false, false, true, false, true, false, false, true)]
-        [InlineData(false, false, false, true, false, false, false, true, true)]
+        [InlineData(false, false, false, true, true, false, true)]
 
         //Same organization - negative matches
-        [InlineData(false, false, false, true, false, false, false, false, false)]
-        [InlineData(false, false, false, true, false, false, true, true, false)]
+        [InlineData(false, false, false, true, false, false, false)]
+        [InlineData(false, false, false, true, false, true, false)]
 
         //Different organization for context bound object
-        [InlineData(false, false, false, false, true, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
         public void AllowUpdates_For_Context_Dependent_Object_Returns(
             bool isGlobalAdmin,
             bool inputIsActiveUser,
             bool hasAssignedWriteAccess,
             bool isInSameOrganization,
-            bool isLocalAdmin,
             bool hasModuleLevelAccess,
             bool inputIsAUser,
-            bool hasOwnership,
             bool expectedResult)
         {
             //Arrange
@@ -169,9 +166,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectGetUserIdReturns(userId);
             ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
             ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
-            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
             var allowUpdates = _sut.AllowModify(inputEntity);
@@ -181,16 +176,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, false, true)]
-        [InlineData(false, true, false, false, true)]
-        [InlineData(false, false, true, false, true)]
-        [InlineData(false, false, false, true, true)]
-        [InlineData(false, false, false, false, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(false, true, false, true)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, false, false)]
         public void AllowUpdates_For_Context_Independent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
            bool hasModuleLevelAccess,
-           bool hasOwnership,
            bool expectedResult)
         {
             //Arrange
@@ -200,7 +193,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
-            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
             var allowUpdates = _sut.AllowModify(inputEntity);
@@ -449,30 +441,26 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         //Checks not bound to context condition
-        [InlineData(true, false, false, false, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, false, false, false, true)]
-        [InlineData(false, false, true, true, false, false, false, false, true)]
+        [InlineData(true, false, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, true)]
+        [InlineData(false, false, true, true,  false, false, true)]
 
         //Same organization - positive matches
-        [InlineData(false, false, false, true, true, false, false, false, true)]
-        [InlineData(false, false, false, true, false, true, false, false, true)]
-        [InlineData(false, false, false, true, false, false, false, true, true)]
+        [InlineData(false, false, false, true,  true, false, true)]
 
         //Same organization - negative matches
-        [InlineData(false, false, false, true, false, false, false, false, false)]
-        [InlineData(false, false, false, true, false, false, true, true, false)]
+        [InlineData(false, false, false, true, false, false, false)]
+        [InlineData(false, false, false, true, false, true, false)]
 
         //Different organization for context bound object
-        [InlineData(false, false, false, false, true, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
         public void AllowDelete_For_Context_Dependent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
            bool hasAssignedWriteAccess,
            bool isInSameOrganization,
-           bool isLocalAdmin,
            bool hasModuleLevelAccess,
            bool inputIsAUser,
-           bool hasOwnership,
            bool expectedResult)
         {
             //Arrange
@@ -483,9 +471,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectGetUserIdReturns(userId);
             ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
             ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
-            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
             var allowUpdates = _sut.AllowDelete(inputEntity);
@@ -495,16 +481,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, false, true)]
-        [InlineData(false, true, false, false, true)]
-        [InlineData(false, false, true, false, true)]
-        [InlineData(false, false, false, true, true)]
-        [InlineData(false, false, false, false, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(false, true, false, true)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, false, false)]
         public void AllowDelete_For_Context_Independent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
            bool hasModuleLevelAccess,
-           bool hasOwnership,
            bool expectedResult)
         {
             //Arrange
@@ -514,7 +498,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
-            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
             var allowUpdates = _sut.AllowDelete(inputEntity);
@@ -524,17 +507,15 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(false, true, false, false, true)]
-        [InlineData(false, false, true, true, true)]
-        [InlineData(true, true, false, false, true)]
-        [InlineData(true, false, true, true, false)]
-        [InlineData(false, false, false, true, false)]
-        [InlineData(false, false, true, false, false)]
+        [InlineData(false, true, false, true)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, false)]
+        [InlineData(false, false, false, false)]
+        [InlineData(false, false, true, false)]
         public void AllowDelete_For_ItSystem_Object_Returns(
            bool isReadOnly,
            bool isGlobalAdmin,
            bool isInSameOrganization,
-           bool isLocalAdmin,
            bool expectedResult)
         {
             //Arrange
@@ -545,7 +526,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
             ExpectGetUserIdReturns(userId);
             ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
 
             //Act
             var allowUpdates = _sut.AllowDelete(inputEntity);
@@ -607,7 +587,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationTypeKeys.Virksomhed, false, true, false, true)]
         [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true, false)]
         [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true, false)]
-        public void AllowCreateOrganizationOfType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool readOnly, bool expectedResult)
+        public void AllowCreateOrganizationOfType_Returns(
+            OrganizationTypeKeys organizationType, 
+            bool globalAdmin, 
+            bool localAdmin, 
+            bool readOnly, 
+            bool expectedResult)
         {
             //Arrange
             var organization = new Organization { TypeId = (int)organizationType };
@@ -616,6 +601,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
             ExpectIsActiveInSameOrganizationAsReturns(organization, localAdmin); //local admin test - always in same org in this scope
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
+            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(organization)).Returns(localAdmin);
 
             //Act
             var result = _sut.AllowCreate<Organization>(organization);
@@ -656,7 +642,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void Allow_Create_Returns<T>(bool expectedResult)
         {
             //Arrange
-            _creationPolicy.Setup(x => x.Allow(typeof(T))).Returns(expectedResult);
+            _creationPolicy.Setup(x => x.AllowCreation(typeof(T))).Returns(expectedResult);
 
             //Act
             var result = _sut.AllowCreate<T>();
@@ -665,14 +651,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
-        private void ExpectHasOwnershipReturns(IEntity inputEntity, bool value)
-        {
-            _userContextMock.Setup(x => x.HasOwnership(inputEntity)).Returns(value);
-        }
-
         private void ExpectHasModuleLevelAccessReturns(IEntity inputEntity, bool hasModuleLevelAccess)
         {
-            _moduleLevelAccessPolicy.Setup(x => x.Allow(inputEntity)).Returns(hasModuleLevelAccess);
+            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(inputEntity)).Returns(hasModuleLevelAccess);
         }
 
         private void ExpectHasAssignedWriteAccessReturns(IEntity inputEntity, bool value)

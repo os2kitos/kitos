@@ -1,7 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -12,13 +12,17 @@ using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices.Authorization
 {
-    public class ModuleModificationPolicy : IAuthorizationPolicy<IEntity>, IAuthorizationPolicy<Type>
+    public class ModuleModificationPolicy : 
+        IModuleModificationPolicy, 
+        IModuleCreationPolicy
     {
         private readonly IOrganizationalUserContext _userContext;
+        private readonly bool _onlyGlobalAdminMayEditReports;
 
-        public ModuleModificationPolicy(IOrganizationalUserContext userContext)
+        public ModuleModificationPolicy(IOrganizationalUserContext userContext, bool onlyGlobalAdminMayEditReports)
         {
             _userContext = userContext;
+            _onlyGlobalAdminMayEditReports = onlyGlobalAdminMayEditReports;
         }
 
         /// <summary>
@@ -26,9 +30,18 @@ namespace Core.ApplicationServices.Authorization
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public bool Allow(IEntity target)
+        public bool AllowModification(IEntity target)
         {
-            var possibleConditions = GetPossibleConditions(target).ToList();
+            if (target is ItInterface)
+            {
+                return IsGlobalAdmin();
+            }
+
+            if (_onlyGlobalAdminMayEditReports && target is IReportModule)
+            {
+                return IsGlobalAdmin();
+            }
+            var possibleConditions = GetPossibleModificationConditions(target).ToList();
             if (!possibleConditions.Any())
             {
                 //Unknown module
@@ -43,7 +56,7 @@ namespace Core.ApplicationServices.Authorization
             return possibleConditions.Any(condition => condition.Invoke());
         }
 
-        private IEnumerable<Func<bool>> GetPossibleConditions(IEntity target)
+        private IEnumerable<Func<bool>> GetPossibleModificationConditions(IEntity target)
         {
             //An entity may be marked for several different modules (e.g. Advice), so we must check each
             //Must not be converted to switch since that will only match on the first option. We must check all
@@ -64,7 +77,7 @@ namespace Core.ApplicationServices.Authorization
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public bool Allow(Type target)
+        public bool AllowCreation(Type target)
         {
             if (IsGlobalAdmin())
             {
@@ -85,6 +98,11 @@ namespace Core.ApplicationServices.Authorization
             if (MatchType<ItInterface>(target))
             {
                 return false; //Only global admin so far
+            }
+
+            if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)
+            {
+                return false;
             }
 
             //If local admin, all types from this point on are allowed
@@ -117,6 +135,11 @@ namespace Core.ApplicationServices.Authorization
             if (MatchType<User>(target))
             {
                 return IsOrganizationModuleAdmin();
+            }
+
+            if (MatchType<Report>(target))
+            {
+                return IsReportModuleAdmin();
             }
 
             //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system

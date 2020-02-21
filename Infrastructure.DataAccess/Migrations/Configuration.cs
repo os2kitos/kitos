@@ -705,9 +705,9 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 #region Global Config
 
-                if (!context.GlobalConfigs.Any(x => x.key == "CanGlobalAdminOnlyEditReports"))
+                if (!context.GlobalConfigs.Any(x => x.key == GlobalConfigKeys.OnlyGlobalAdminMayEditReports))
                 {
-                    var globalConfig = new GlobalConfig { key = "CanGlobalAdminOnlyEditReports", value = "true" };
+                    var globalConfig = new GlobalConfig { key = GlobalConfigKeys.OnlyGlobalAdminMayEditReports, value = "true" };
                     context.GlobalConfigs.AddOrUpdate(globalConfig);
 
                     context.SaveChanges();

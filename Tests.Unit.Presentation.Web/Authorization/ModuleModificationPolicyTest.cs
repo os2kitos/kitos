@@ -21,7 +21,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public ModuleModificationPolicyTest()
         {
             _userContext = new Mock<IOrganizationalUserContext>();
-            _sut = new ModuleModificationPolicy(_userContext.Object);
+            _sut = new ModuleModificationPolicy(_userContext.Object,false);
         }
 
         public interface IContractElement : IEntity, IContractModule { }
@@ -95,7 +95,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             var entity = (IEntity)MoqTools.MockOf(entityType);
 
             //Act
-            var allow = _sut.Allow(entity);
+            var allow = _sut.AllowModification(entity);
 
             //Assert
             Assert.Equal(expectedResult, allow);
@@ -159,7 +159,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             SetupUserContext(isLocalAdmin, isGlobalAdmin, otherRole);
 
             //Act
-            var allow = _sut.Allow(entityType);
+            var allow = _sut.AllowCreation(entityType);
 
             //Assert
             Assert.Equal(expectedResult, allow);
