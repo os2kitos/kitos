@@ -2,8 +2,8 @@
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-project.edit.status-project.modal', {
             url: '/modal/:type/:activityId',
-            onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'usersWithRoles', 'user',
-                function ($state, $stateParams, $modal, project, usersWithRoles, user) {
+            onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'usersWithRoles', 'user',"hasWriteAccess",
+                function ($state, $stateParams, $modal, project, usersWithRoles, user, hasWriteAccess) {
                     $modal.open({
                         templateUrl: "app/components/it-project/tabs/it-project-tab-status-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
@@ -43,24 +43,9 @@
                                     }
                                 }
                                 return null;
-                            }],
-                            hasWriteAccess: ["$http", function ($http) {
-                                var id = $stateParams.activityId;
-                                if (id) {
-                                    if ($stateParams.type == "assignment") {
-                                        return $http.get("api/assignment/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                            .then(function(result) {
-                                                return result.data.response;
-                                            });
-                                    } else if ($stateParams.type == "milestone") {
-                                        return $http.get("api/milestone/" + $stateParams.activityId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                            .then(function (result) {
-                                                return result.data.response;
-                                            });
-                                    }
-                                }
-                                return false;
                             }]
+                            ,
+                            hasWriteAccess: () => hasWriteAccess
                         },
                         controller: "project.statusModalCtrl"
                     }).result.then(function () {

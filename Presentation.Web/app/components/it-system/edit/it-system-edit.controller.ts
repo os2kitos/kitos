@@ -1,33 +1,18 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+﻿((ng, app) => {
+    app.config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
         $stateProvider.state('it-system.edit', {
             url: '/edit/{id:[0-9]+}',
             templateUrl: 'app/components/it-system/edit/it-system-edit.view.html',
             controller: 'system.EditCtrl',
             resolve: {
-                itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id) 
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
+                itSystem: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/itsystem/" + $stateParams.id) 
+                    .then(result => result.data.response)],
                 user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
+                    'userService', userService => userService.getUser()
                 ],
-                hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                    return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }],
-                userAccessRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
+                userAccessRights: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/itsystem?id=" + $stateParams.id + "&getEntityAccessRights=true")
+                    .then(result => result.data.response)],
+                hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit],
             }
         });
     }]);
@@ -35,7 +20,7 @@
     app.controller('system.EditCtrl',
         [
             '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','SystemDeletedErrorResponseTranslationService',
-            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) {
+            ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) => {
 
                 $scope.hasWriteAccess = hasWriteAccess;
                
@@ -46,17 +31,11 @@
                     }
                 }
                 else {
-                    _.remove($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Slet IT System";
-                    });
+                    _.remove($rootScope.page.subnav.buttons, o => o.text === "Slet IT System");
                 }
                 if (userAccessRights.canEdit) {
-                    _.remove($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Deaktivér IT System";
-                    });
-                    _.remove($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Aktivér IT System";
-                    });
+                    _.remove($rootScope.page.subnav.buttons, o => o.text === "Deaktivér IT System");
+                    _.remove($rootScope.page.subnav.buttons, o => o.text === "Aktivér IT System");
 
                     if (!itSystem.disabled) {
                         $rootScope.page.subnav.buttons.push(
@@ -78,11 +57,11 @@
 
                     var msg = notify.addInfoMessage('Deaktiverer IT System...', false);
                     $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
-                        .success(function (result) {
+                        .success(result => {
                             msg.toSuccessMessage('IT System er deaktiveret!');
                             $state.reload();
                         })
-                        .error(function (data, status) {
+                        .error((data, status) => {
                             msg.toErrorMessage('Fejl! Kunne ikke deaktivere IT System!');
                         });
                 }
@@ -96,11 +75,11 @@
 
                     var msg = notify.addInfoMessage('Aktiverer IT System...', false);
                     $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
-                        .success(function (result) {
+                        .success(result => {
                             msg.toSuccessMessage('IT System er aktiveret!');
                             $state.reload();
                         })
-                        .error(function (data, status) {
+                        .error((data, status) => {
                             msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
                         });
                 }
@@ -112,11 +91,11 @@
                     var systemId = $state.params.id;
                     var msg = notify.addInfoMessage('Sletter IT System...', false);
                     $http.delete('api/itsystem/' + systemId + '?organizationId=' + user.currentOrganizationId)
-                        .success(function (result) {
+                        .success(result => {
                             msg.toSuccessMessage('IT System  er slettet!');
                             $state.go('it-system.catalog');
                         })
-                        .error(function (data, status) {
+                        .error((data, status) => {
                             msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(status , data.response));
                         });
                 }

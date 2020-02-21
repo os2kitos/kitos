@@ -33,8 +33,8 @@
             "gridStateService",
             "$uibModal",
             "$http",
-            "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -50,8 +50,8 @@
             private gridStateService: Services.IGridStateFactory,
             private $modal,
             private $http,
-            private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -90,7 +90,7 @@
             }
 
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,BelongsTo,Organization,ExhibitedBy($expand=ItSystem),LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = userAccessRights.canCreate;
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -513,10 +513,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -631,6 +628,9 @@
                     resolve: {
                         user: [
                             "userService", userService => userService.getUser()
+                        ],
+                        userAccessRights: ["$http", $http => $http.get("api/itinterface/?getEntitiesAccessRights=true")
+                            .then(result => result.data.response)
                         ]
                     }
                 });

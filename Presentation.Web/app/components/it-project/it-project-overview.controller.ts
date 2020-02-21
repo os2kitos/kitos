@@ -1146,12 +1146,9 @@
                             "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                         ],
-                        userAccessRights: ["$http", function ($http) {
-                            return $http.get("api/itproject/?getEntitiesAccessRights=true")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }]
+                        userAccessRights: ["$http", $http => $http.get("api/itproject/?getEntitiesAccessRights=true")
+                            .then(result => result.data.response)
+                        ]
                     }
                 });
             }

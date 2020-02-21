@@ -790,7 +790,6 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-advice.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />

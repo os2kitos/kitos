@@ -10,13 +10,13 @@
                         return userService.getUser();
                     }
                 ],
+                userAccessRights: ["$http", "$stateParams",
+                    ($http, $stateParams) => $http
+                        .get("api/itSystemUsage?id=" + $stateParams.id + "&getEntityAccessRights=true")
+                    .then(result => result.data.response)
+                ],
                 hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        return $http.get('api/itSystemUsage/' + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
+                    "userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                 ],
                 itSystemUsage: [
                     '$http', '$stateParams', function ($http, $stateParams) {

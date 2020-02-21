@@ -74,13 +74,10 @@
                     user: [
                         "userService", userService => userService.getUser()
                     ],
-                hasWriteAccess: [
-                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }
+                    userAccessRights: ["$http", "user", ($http, user) => $http.get("api/Organization?id=" + user.currentOrganizationId + "&getEntityAccessRights=true")
+                        .then(result => result.data.response)
+                    ],
+                    hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ],
                     organization: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
                         return $http.get('api/Organization/' + user.currentOrganizationId)

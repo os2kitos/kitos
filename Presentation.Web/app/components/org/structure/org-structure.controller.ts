@@ -1,42 +1,27 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config([
-        "$stateProvider", function ($stateProvider) {
+        "$stateProvider", $stateProvider => {
             $stateProvider.state("organization.structure", {
                 url: "/structure",
                 templateUrl: "app/components/org/structure/org-structure.view.html",
                 controller: "org.StructureCtrl",
                 resolve: {
                     orgUnits: [
-                        "$http", "user", function ($http: ng.IHttpService, user) {
-                            return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
-                                return result.data.response;
-                            });
-                        }
+                        "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
+                            return result.data.response;
+                        })
                     ],
-                    localOrgUnitRoles: ['$http', function ($http) {
-                        return $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }],
-                    orgUnitRoles: ['$http', function ($http) {
-                        return $http.get("odata/OrganizationUnitRoles")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }],
+                    localOrgUnitRoles: ['$http', $http => $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        .then(result => result.data.value)],
+                    orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
+                        .then(result => result.data.value)],
                     user: [
-                        "userService", function (userService) {
-                            return userService.getUser();
-                        }
+                        "userService", userService => userService.getUser()
                     ],
-                    hasWriteAccess: [
-                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }
+                    userAccessRights: ["$http", "user", ($http, user) => $http.get("api/Organization?id=" + user.currentOrganizationId + "&getEntityAccessRights=true")
+                        .then(result => result.data.response)
+                    ],
+                    hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
                 }
             });
@@ -85,11 +70,11 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" + orgUnit.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId).then((result) => {
-                        orgUnit.hasWriteAccess = result.data.response;
+                    $http.get<Kitos.API.Models.IApiWrapper<any>>(`api/organizationUnit?id=${orgUnit.id}&getEntityAccessRights=true`).then((result) => {
+                        orgUnit.hasWriteAccess = result.data.response.canEdit;
 
-                        _.each(orgUnit.children, function (u) {
-                            flattenAndSave(u, result.data.response, orgUnit);
+                        _.each(orgUnit.children, u => {
+                            flattenAndSave(u, result.data.response.canEdit, orgUnit);
                         });
 
                     });
@@ -127,7 +112,7 @@
 
             $scope.chosenOrgUnit = null;
 
-            $scope.chooseOrgUnit = function (node, event) {
+            $scope.chooseOrgUnit = (node, event) => {
                 if (event) {
                     var isDiv = angular.element(event.target)[0].tagName === "DIV";
                     if (!isDiv) {
@@ -328,16 +313,16 @@
             $scope.rightSortReverse = false;
             $scope.rightSort = function (right) {
                 switch ($scope.rightSortBy) {
-                    case "orgUnitName":
-                        return $scope.orgUnits[right.objectId].name;
-                    case "roleName":
-                        return $scope.orgRoles[right.roleId].Priority;
-                    case "userName":
-                        return right.user.name;
-                    case "userEmail":
-                        return right.user.email;
-                    default:
-                        return $scope.orgUnits[right.objectId].name;
+                case "orgUnitName":
+                    return $scope.orgUnits[right.objectId].name;
+                case "roleName":
+                    return $scope.orgRoles[right.roleId].Priority;
+                case "userName":
+                    return right.user.name;
+                case "userEmail":
+                    return right.user.email;
+                default:
+                    return $scope.orgUnits[right.objectId].name;
                 }
             };
 

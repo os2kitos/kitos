@@ -109,30 +109,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// GET api/T/id?hasWriteAccess
-        /// Returns whether the current authenticated user has write access
-        /// to the object with the given id
-        /// </summary>
-        /// <param name="id">The id of the object</param>
-        /// <param name="organizationId"></param>
-        /// <param name="hasWriteAccess">Route qualifier</param>
-        /// <returns>True or false</returns>
-        public HttpResponseMessage GetHasWriteAccess(int id, int organizationId, bool? hasWriteAccess)
-        {
-            try
-            {
-                var entity = Repository.GetByKey(id);
-                var allowWriteAccess = AllowModify(entity);
-
-                return Ok(allowWriteAccess);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
         /// GET api/T/GetAccessRights
         /// Checks what access rights the user has for the given entities
         /// </summary>
