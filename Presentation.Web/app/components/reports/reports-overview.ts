@@ -14,7 +14,7 @@
 
     export class ReportsOverviewController {
         public title: string;
-        public mainGrid: Kitos.IKendoGrid<any>;
+        public mainGrid: IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
         private canCreate: boolean;
         private storageKey = "report-overview-options";
@@ -24,55 +24,38 @@
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$http",
             "$timeout",
-            "$window",
             "$state",
             "$",
             "_",
-            "moment",
             "notify",
             "user",
             "reports",
             "$confirm",
-            "globalConfig",
             "gridStateService",
             "reportCategoryTypes",
-            "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
             private $scope: ng.IScope,
-            private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
-            private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
             private _: Kitos.ILoDashWithMixins,
-            private moment: moment.MomentStatic,
             private notify,
             private user: Services.IUser,
             public reports,
             private $confirm,
-            private globalConfigs,
             private gridStateService: Services.IGridStateFactory,
             private reportCategoryTypes,
-            private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights : Models.Api.Authorization.EntitiesAccessRightsDTO) {
             
             this.$rootScope.page.title = "Rapport Oversigt";
 
-            var canGlobalAdminOnlyEditReports = _.find(this.globalConfigs, function (g: any) {
-                return g.key === "CanGlobalAdminOnlyEditReports";
-            });
-
-            //TODO: Extend the security model... this is a state which must be embraced by the auth context
-            this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
-
-            if (!user.isGlobalAdmin && user.isReadOnly){
-                this.canCreate = false;
-            }
+            this.canCreate = userAccessRights.canCreate;
 
             this.categoryTypeValues = [];
             var self = this;
@@ -122,13 +105,6 @@
                     this.mainGrid.dataSource.remove(dataItem);
                     this.mainGrid.dataSource.sync();
                 });
-        }
-
-        private getAccessModifier = () => {
-            return [
-                { Id: 0, Name: "Lokal" },
-                { Id: 1, Name: "Offentlig" }
-            ];
         }
 
         private setupGrid() {
@@ -530,13 +506,15 @@
                     controller: ReportsOverviewController,
                     controllerAs: "vm",
                     resolve: {
-                        user: ["userService", userService => userService.getUser()],
-                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)],
-                        globalConfig: [
-                            "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
+                        user: ["userService", userService => userService.getUser()
+                        ],
+                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)
                         ],
                         reportCategoryTypes: [
                             "reportService", reportService => reportService.getReportCategories().then(result => result.data.value)
+                        ],
+                        userAccessRights: ["$http", $http => $http.get("api/report/?getEntitiesAccessRights=true")
+                            .then(result => result.data.response)
                         ]
                     }
                 });

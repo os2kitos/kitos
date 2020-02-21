@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Controllers\API\ReportController.cs" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
