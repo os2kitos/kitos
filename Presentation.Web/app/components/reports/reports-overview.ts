@@ -67,6 +67,7 @@
                 return g.key === "CanGlobalAdminOnlyEditReports";
             });
 
+            //TODO: Extend the security model... this is a state which must be embraced by the auth context
             this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
 
             if (!user.isGlobalAdmin && user.isReadOnly){
@@ -419,10 +420,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
