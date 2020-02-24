@@ -19,7 +19,7 @@ class ItContractOverview implements PageObject {
     }
 
     getCreateContractButton() {
-        return element(this.cssHelper.byDataElementType("createContractButton"));
+        return this.kendoToolbarWrapper.headerButtons().createContract;
     }
 
     getSaveContractButton() {

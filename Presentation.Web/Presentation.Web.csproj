@@ -669,6 +669,7 @@
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
+    <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
