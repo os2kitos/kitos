@@ -354,12 +354,14 @@
                                 });
 
                             //Lazy load access rights in a batch
-                            this.authorizationServiceFactory
-                                .createProjectAuthorization()
-                                .getAuthorizationForItems(projectIds)
-                                .then(accessRights => {
-                                    this._.forEach(accessRights, rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
-                                });
+                            if (projectIds.length > 0) {
+                                this.authorizationServiceFactory
+                                    .createProjectAuthorization()
+                                    .getAuthorizationForItems(projectIds)
+                                    .then(accessRights => {
+                                        this._.forEach(accessRights, rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
+                                    });
+                            }
 
                             return response;
                         }
