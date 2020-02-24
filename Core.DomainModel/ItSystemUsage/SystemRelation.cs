@@ -109,7 +109,7 @@ namespace Core.DomainModel.ItSystemUsage
             //IF contract is defined it MUST be in the same organization
             if (!CheckSameOrganizationConstraint(contract).GetValueOrFallback(true))
             {
-                return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
+                return new OperationError("Attempt to create relation to it contract in a different organization", OperationFailure.BadInput);
             }
 
             AssociatedContract.Track();
