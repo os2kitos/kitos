@@ -72,14 +72,18 @@
                         <!-- Reference -->
                         <div class="form-group">
                             <label for="system-referencer" class="control-label small">Referencer vedr. systemet</label>
-                            <div id="system-referencer">
-                                <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.externalReferences.length == 0">
-                                    <p>Ingen referencer</p>
-                                </div>
-                                <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="reference in system.externalReferences">
-                                    <a class="handleOverflow" href="{{reference.url}}">{{reference.url}}</a>
-                                </div>
-                            </div>
+                            <table id="system-referencer" class="table table-condensed table-striped table-fixed table-bordered">
+                                <tr ng-if="system.externalReferences.length == 0">
+                                    <td>
+                                        <p>Ingen referencer</p>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="reference in system.externalReferences">
+                                    <td>
+                                        <a href="{{reference.url}}">{{reference.title}}</a>
+                                    </td>
+                                </tr>
+                            </table>
 
                         </div>
                     </div>
@@ -106,31 +110,38 @@
 
                         <!-- KLE ID and Name -->
                         <div class="row">
-                            <div class="col-xs-3">
+                            <div class="col-xs-12">
                                 <div class="form-group">
-                                    <label for="system-kle-id" class="control-label small">KLE ID</label>
-                                    <div id="system-kle-id">
-                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.taskRefs.length == 0">
-                                            <p> - </p>
-                                        </div>
-                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="kle in system.taskRefs">
-                                            <p>{{kle.taskKey}}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xs-9">
-                                <div class="form-group">
-                                    <label for="system-kle-navn" class="control-label small">KLE Navn</label>
-                                    <div id="system-kle-navn">
-                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-if="system.taskRefs.length == 0">
-                                            <p>Ingen KLE</p>
-                                        </div>
-                                        <div class="form-control asInput multipleInputSpacing" disabled="disabled" ng-repeat="kle in system.taskRefs">
-                                            <p class="handleOverflow">{{kle.description}}</p>
-                                        </div>
-                                    </div>
+                                    <table id="system-kle" class="table table-condensed table-striped table-fixed table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-xs-2">
+                                                    KLE ID
+                                                </th>
+                                                <th class="col-xs-10">
+                                                    KLE Navn
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-if="system.taskRefs.length == 0">
+                                                <td>
+                                                    <p>-</p>
+                                                </td>
+                                                <td>
+                                                    <p>Ingen KLE valgt</p>
+                                                </td>
+                                            </tr>
+                                        <tr ng-repeat="kle in system.taskRefs">
+                                            <td>
+                                                <p>{{kle.taskKey}}</p>
+                                            </td>
+                                            <td>
+                                                <p>{{kle.description}}</p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
