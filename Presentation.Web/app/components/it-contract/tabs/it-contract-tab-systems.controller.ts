@@ -40,11 +40,6 @@
                     $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
                 });
 
-            systemRelationService.getRelationWithContract(contract.id)
-                .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
-                    $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
-                });
-
             function formatAssociatedSystems(associatedSystemUsages: any);
             function formatAssociatedSystems(associatedSystemUsages) {
 
