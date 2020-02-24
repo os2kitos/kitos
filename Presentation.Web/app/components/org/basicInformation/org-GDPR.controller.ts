@@ -76,8 +76,11 @@
                     user: [
                         "userService", userService => userService.getUser()
                     ],
-                    userAccessRights: ["$http", "user", ($http, user) => $http.get("api/Organization?id=" + user.currentOrganizationId + "&getEntityAccessRights=true")
-                        .then(result => result.data.response)
+                    userAccessRights: ["authorizationServiceFactory", "user",
+                        (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
+                        authorizationServiceFactory
+                        .createOrganizationAuthorization()
+                                .getAuthorizationForItem(user.currentOrganizationId)
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ],

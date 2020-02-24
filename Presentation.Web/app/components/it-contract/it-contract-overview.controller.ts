@@ -232,7 +232,7 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
-        
+
 
         public parseOptionEnum(enumName: string): string {
             switch (enumName) {
@@ -245,7 +245,7 @@
                 default:
                     return "";
             }
-        }      
+        }
 
         private activate() {
 
@@ -341,9 +341,9 @@
 
                                     contract.status = {
                                         max: totalWhiteStatuses +
-                                        totalRedStatuses +
-                                        totalYellowStatuses +
-                                        totalGreenStatuses,
+                                            totalRedStatuses +
+                                            totalYellowStatuses +
+                                            totalGreenStatuses,
                                         white: totalWhiteStatuses,
                                         red: totalRedStatuses,
                                         yellow: totalYellowStatuses,
@@ -381,31 +381,31 @@
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
-                        "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
+                            "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                        "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
+                            "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                        "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewVm.saveGridProfile()'>#: text #</button>"
+                            "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewVm.saveGridProfile()'>#: text #</button>"
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                        "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewVm.loadGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewVm.loadGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                        "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -596,7 +596,7 @@
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
-                                        reference.Title + 
+                                        reference.Title +
                                         "</a>";
                                 } else {
                                     return reference.Title;
@@ -766,7 +766,7 @@
                     }
                 }
             };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole); 
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -953,12 +953,11 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", function ($http) {
-                            return $http.get("api/itcontract/?getEntitiesAccessRights=true")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                                .createContractAuthorization()
+                                .getOverviewAuthorization()
+                        ],
                         orgUnits: [
                             "$http", "user", "_",
                             ($http, user, _) => $http

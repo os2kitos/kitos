@@ -11,22 +11,23 @@ module Kitos.Reports {
 
         emptyreport = { "ReportVersion": "2016.1.28", "ReportGuid": "9ad83767ecc3b68cb62c086805556fce", "ReportName": "Report", "ReportAlias": "Report", "ReportAuthor": "", "ReportDescription": "", "ReportCreated": "/Date(1472651877000+0200)/", "ReportChanged": "/Date(1472651877000+0200)/", "EngineVersion": "EngineV2", "CalculationMode": "Interpretation", "Dictionary": { "Variables": { "0": { "Name": "CurrentOrganizationName", "DialogInfo": { "DateTimeType": "DateAndTime" }, "Alias": "CurrentOrganizationName", "Type": "System.String", "ReadOnly": true } } }, "Pages": { "0": { "Ident": "StiPage", "Name": "Page1", "Guid": "a4875a4e-cd43-da99-360b-a7560ca0b913", "Interaction": { "Ident": "StiInteraction" }, "Border": ";;2;;;;;solid:Black", "Brush": "solid:Transparent", "Components": { "0": { "Ident": "StiText", "Name": "Text1", "MinSize": "0,0", "MaxSize": "0,0", "ClientRectangle": "0.6,4.8,17.4,4.2", "Interaction": { "Ident": "StiInteraction" }, "Text": { "Value": "Rapporten er tom og venter på at blive designet." }, "HorAlignment": "Center", "Font": "Verdana;28;;", "Border": ";;;;;;;solid:Black", "Brush": "solid:Transparent", "TextBrush": "solid:Black", "TextOptions": { "WordWrap": true }, "Type": "Expression" } }, "PageWidth": 21.01, "PageHeight": 29.69, "Watermark": { "TextBrush": "solid:50,0,0,0" }, "Margins": { "Left": 1, "Right": 1, "Top": 1, "Bottom": 1 } } } }
 
-        public static $inject = ["stimulsoftService", "reportService", "$window", "notify", "userService", "$http", "_"];
+        public static $inject = ["stimulsoftService", "reportService", "$window", "notify", "userService", "_", "authorizationServiceFactory"];
         constructor(private stimulsoftService: Kitos.Services.StimulsoftService,
             private reportService: Kitos.Services.ReportService,
             private $window: ng.IWindowService,
             private notify,
             private userService: Services.IUserService,
-            private $http,
-            private _) {
+            private _,
+            private authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) {
             let self = this;
 
             let reportId = this.getReportId();
             if (reportId !== null) {
-                $http
-                    .get("api/report?id=" + reportId + "&getEntityAccessRights=true")
+                authorizationServiceFactory
+                    .createReportAuthorization()
+                    .getAuthorizationForItem(reportId)
                     .then(accessRightsResponse => {
-                        self.canDesignReport = accessRightsResponse.data.response.canEdit;
+                        self.canDesignReport = accessRightsResponse.canEdit;
 
                         this.userService.getUser()
                             .then((user: Services.IUser) => {

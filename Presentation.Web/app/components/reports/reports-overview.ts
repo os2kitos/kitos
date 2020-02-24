@@ -513,9 +513,11 @@
                         reportCategoryTypes: [
                             "reportService", reportService => reportService.getReportCategories().then(result => result.data.value)
                         ],
-                        userAccessRights: ["$http", $http => $http.get("api/report/?getEntitiesAccessRights=true")
-                            .then(result => result.data.response)
-                        ]
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createReportAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

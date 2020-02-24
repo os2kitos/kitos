@@ -62,10 +62,11 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", "$stateParams",
-                            ($http, $stateParams) => $http
-                                .get("api/itproject?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                                .then(result => result.data.response)
+                        userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                            (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                            authorizationServiceFactory
+                            .createProjectAuthorization()
+                            .getAuthorizationForItem($stateParams.id)
                         ],
                         hasWriteAccess: [
                             "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit

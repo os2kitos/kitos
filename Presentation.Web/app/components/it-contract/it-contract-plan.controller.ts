@@ -1060,12 +1060,11 @@
                     itContractRoles: [
                         "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                     ],
-                    userAccessRights: ["$http", function ($http) {
-                        return $http.get("api/itcontract/?getEntitiesAccessRights=true")
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }],
+                    userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                        authorizationServiceFactory
+                        .createContractAuthorization()
+                        .getOverviewAuthorization()
+                    ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                     ]

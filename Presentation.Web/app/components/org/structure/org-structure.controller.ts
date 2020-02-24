@@ -18,8 +18,11 @@
                     user: [
                         "userService", userService => userService.getUser()
                     ],
-                    userAccessRights: ["$http", "user", ($http, user) => $http.get("api/Organization?id=" + user.currentOrganizationId + "&getEntityAccessRights=true")
-                        .then(result => result.data.response)
+                    userAccessRights: ["authorizationServiceFactory", "user",
+                        (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
+                            authorizationServiceFactory
+                                .createOrganizationAuthorization()
+                                .getAuthorizationForItem(user.currentOrganizationId)
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
@@ -29,8 +32,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -70,14 +73,18 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get<Kitos.API.Models.IApiWrapper<any>>(`api/organizationUnit?id=${orgUnit.id}&getEntityAccessRights=true`).then((result) => {
-                        orgUnit.hasWriteAccess = result.data.response.canEdit;
 
-                        _.each(orgUnit.children, u => {
-                            flattenAndSave(u, result.data.response.canEdit, orgUnit);
+                    authorizationServiceFactory
+                        .createOrganizationUnitAuthorization()
+                        .getAuthorizationForItem(orgUnit.id)
+                        .then(response => {
+                            orgUnit.hasWriteAccess = response.canEdit;
+
+                            _.each(orgUnit.children,
+                                u => {
+                                    flattenAndSave(u, response.canEdit, orgUnit);
+                                });
                         });
-
-                    });
                 } else {
                     orgUnit.hasWriteAccess = true;
 
@@ -167,7 +174,7 @@
                         if (right.show)
                             count++;
                     });
-                    
+
                     $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
                 });
 
@@ -313,16 +320,16 @@
             $scope.rightSortReverse = false;
             $scope.rightSort = function (right) {
                 switch ($scope.rightSortBy) {
-                case "orgUnitName":
-                    return $scope.orgUnits[right.objectId].name;
-                case "roleName":
-                    return $scope.orgRoles[right.roleId].Priority;
-                case "userName":
-                    return right.user.name;
-                case "userEmail":
-                    return right.user.email;
-                default:
-                    return $scope.orgUnits[right.objectId].name;
+                    case "orgUnitName":
+                        return $scope.orgUnits[right.objectId].name;
+                    case "roleName":
+                        return $scope.orgRoles[right.roleId].Priority;
+                    case "userName":
+                        return right.user.name;
+                    case "userEmail":
+                        return right.user.email;
+                    default:
+                        return $scope.orgUnits[right.objectId].name;
                 }
             };
 

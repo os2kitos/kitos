@@ -629,9 +629,11 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", $http => $http.get("api/itinterface/?getEntitiesAccessRights=true")
-                            .then(result => result.data.response)
-                        ]
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createInterfaceAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

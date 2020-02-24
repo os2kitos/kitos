@@ -11,10 +11,11 @@
                     ],
                     user: ["userService", userService => userService.getUser().then(user => user)
                     ],
-                    userAccessRights: ["$http", "$stateParams",
-                        ($http, $stateParams) => $http
-                        .get("api/itcontract?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                        .then(result => result.data.response)
+                    userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                        (authorizationServiceFactory : Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                            authorizationServiceFactory
+                                .createContractAuthorization()
+                                .getAuthorizationForItem($stateParams.id)
                     ],
                     hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit]
                 }

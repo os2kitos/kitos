@@ -116,18 +116,23 @@
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",
                             resolve: {
-                                hasWriteAccess: ["$http", "$stateParams",
-                                    ($http, $stateParams) =>
-                                        $stateParams.id ?
+                                hasWriteAccess: ["authorizationServiceFactory", "$stateParams",
+                                    (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory, $stateParams) => {
+                                        return $stateParams.id
+                                            ?
                                             // Edit dialog - get edit rights
-                                            $http
-                                                .get("api/report?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                                                .then(result => result.data.response.canEdit === true) :
+                                            authorizationServiceFactory
+                                                .createReportAuthorization()
+                                                .getAuthorizationForItem($stateParams.id)
+                                                .then(accessRightsDto => accessRightsDto.canEdit)
 
-                                            // "Add" dialog - get creation rights
-                                            $http
-                                                .get("api/report/?getEntitiesAccessRights=true")
-                                                .then(result => result.data.response.canCreate === true)
+                                            // When used as an "Add" dialog
+                                            : authorizationServiceFactory
+                                                .createReportAuthorization()
+                                                .getOverviewAuthorization()
+                                                .then(accessRightsDto => accessRightsDto.canCreate);
+
+                                    }
                                 ],
                             },
                             controller: EditReportController,

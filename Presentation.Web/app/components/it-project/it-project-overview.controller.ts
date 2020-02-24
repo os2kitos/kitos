@@ -47,7 +47,8 @@
             "$uibModal",
             "needsWidthFixService",
             "exportGridToExcelService",
-            "userAccessRights"
+            "userAccessRights",
+            "authorizationServiceFactory"
         ];
 
         constructor(
@@ -69,7 +70,8 @@
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
-            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private authorizationServiceFactory : Services.Authorization.IAuthorizationServiceFactory) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -352,14 +354,11 @@
                                 });
 
                             //Lazy load access rights in a batch
-                            this.$http.post("api/itproject/?getEntityListAccessRights=true", projectIds)
-                                .then((rightsResponse) => {
-                                    let accessControlResults = rightsResponse.data as {
-                                        msg: string,
-                                        response: Models.Api.Authorization.EntityAccessRightsDTO[]
-                                    }
-                                    this._.forEach(accessControlResults.response,
-                                        rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
+                            this.authorizationServiceFactory
+                                .createProjectAuthorization()
+                                .getAuthorizationForItems(projectIds)
+                                .then(accessRights => {
+                                    this._.forEach(accessRights, rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
                                 });
 
                             return response;
@@ -1162,9 +1161,11 @@
                             "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
                         ],
-                        userAccessRights: ["$http", $http => $http.get("api/itproject/?getEntitiesAccessRights=true")
-                            .then(result => result.data.response)
-                        ]
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createProjectAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

@@ -1061,11 +1061,15 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", $http => $http.get("api/itsystem/?getEntitiesAccessRights=true")
-                            .then(result => result.data.response)
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createSystemAuthorization()
+                            .getOverviewAuthorization()
                         ],
-                        systemUsageUserAccessRights: ["$http", $http => $http.get("api/itsystemusage/?getEntitiesAccessRights=true")
-                            .then(result => result.data.response)
+                        systemUsageUserAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createSystemUsageAuthorization()
+                            .getOverviewAuthorization()
                         ],
                         userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
                             .then(result => result.data.response)
