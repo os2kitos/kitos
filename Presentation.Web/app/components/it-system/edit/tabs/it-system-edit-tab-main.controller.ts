@@ -43,6 +43,13 @@
                     true);
             
                 $scope.hasWriteAccess = hasWriteAccess;
+
+                $scope.isValidUrl = (ref: string) => {
+                    if(ref !== null) {
+                        return Kitos.Utility.Validation.validateUrl(ref);
+                    }
+                    return false;
+                }
             }
         ]);
 })(angular, app);

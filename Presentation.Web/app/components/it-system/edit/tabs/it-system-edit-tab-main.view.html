@@ -75,12 +75,13 @@
                             <table id="system-referencer" class="table table-condensed table-striped table-fixed table-bordered">
                                 <tr ng-if="system.externalReferences.length == 0">
                                     <td>
-                                        <p>Ingen referencer</p>
+                                        <p class="noMargin">Ingen referencer</p>
                                     </td>
                                 </tr>
                                 <tr ng-repeat="reference in system.externalReferences">
                                     <td>
-                                        <a href="{{reference.url}}">{{reference.title}}</a>
+                                        <p class="noMargin" ng-show="!isValidUrl(reference.url)">{{reference.title}}</p>
+                                        <a ng-show="isValidUrl(reference.url)" href="{{reference.url}}">{{reference.title}}</a>
                                     </td>
                                 </tr>
                             </table>
@@ -126,18 +127,18 @@
                                         <tbody>
                                             <tr ng-if="system.taskRefs.length == 0">
                                                 <td>
-                                                    <p>-</p>
+                                                    <p class="noMargin">-</p>
                                                 </td>
                                                 <td>
-                                                    <p>Ingen KLE valgt</p>
+                                                    <p class="noMargin">Ingen KLE valgt</p>
                                                 </td>
                                             </tr>
                                         <tr ng-repeat="kle in system.taskRefs">
                                             <td>
-                                                <p>{{kle.taskKey}}</p>
+                                                <p class="noMargin">{{kle.taskKey}}</p>
                                             </td>
                                             <td>
-                                                <p>{{kle.description}}</p>
+                                                <p class="noMargin">{{kle.description}}</p>
                                             </td>
                                         </tr>
                                         </tbody>
