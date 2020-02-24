@@ -2,16 +2,16 @@
     "use strict";
 
     export class EditReportController {
-        public title: string
-        public name: string
-        public description: string
-        public categoryTypeId: number
-        public accessModifier: string
-        public categories: any
-        public selectedCategory: any
-        reportId: number
+        public title: string;
+        public name: string;
+        public description: string;
+        public categoryTypeId: number;
+        public accessModifier: string;
+        public categories: any;
+        public selectedCategory: any;
+        reportId: number;
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "$state", "$window", "notify", "reportService", "_", "user", "globalConfigs"];
+        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "$state", "$window", "notify", "reportService", "_", "hasWriteAccess"];
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $stateParams: ng.ui.IStateParamsService,
             private $http: ng.IHttpService,
@@ -21,42 +21,37 @@
             private notify,
             private reportService: Services.ReportService,
             private _: ILoDashWithMixins,
-            private user,
-            private globalConfigs) {
+            private hasWriteAccess: boolean) {
 
-            var canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g: any) {
-                return g.key === "CanGlobalAdminOnlyEditReports";
-            });
-
-            var hasPermission = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
+            var hasPermission = hasWriteAccess;
 
             if (!hasPermission) {
                 $state.go("^");
                 $window.location.reload();
             }
 
-            this.init($stateParams["id"])
+            this.init($stateParams["id"]);
         }
 
         init = (id: number) => {
             this.reportId = id;
             if (id === 0) {
-                this.title = "Opret rapport"
-                this.accessModifier = "Local"
+                this.title = "Opret rapport";
+                this.accessModifier = "Local";
             }
             else {
-                this.title = "Redigér rapport"
+                this.title = "Redigér rapport";
             }
             this.reportService.getReportCategories().then((result) => {
                 this.categories = result.data.value;
 
                 if (id > 0) {
                     this.reportService.GetById(id).then((result) => {
-                        let rpt = result.data
-                        this.name = rpt.Name
-                        this.description = rpt.Description
-                        this.categoryTypeId = rpt.CategoryTypeId
-                        this.accessModifier = rpt.AccessModifier
+                        let rpt = result.data;
+                        this.name = rpt.Name;
+                        this.description = rpt.Description;
+                        this.categoryTypeId = rpt.CategoryTypeId;
+                        this.accessModifier = rpt.AccessModifier;
                         if (this.categoryTypeId == 0) {
                             this.selectedCategory = this.categories[0];
                         }
@@ -121,17 +116,18 @@
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",
                             resolve: {
-                                user: [
-                                    'userService', function (userService) {
-                                        return userService.getUser();
-                                    }
-                                ],
-                                globalConfigs: [
-                                    '$http', function ($http) {
-                                        return $http.get('odata/GlobalConfigs').then(function (result) {
-                                            return result.data.value;
-                                        });
-                                    }
+                                hasWriteAccess: ["$http", "$stateParams",
+                                    ($http, $stateParams) =>
+                                        $stateParams.id ?
+                                            // Edit dialog - get edit rights
+                                            $http
+                                                .get("api/report?id=" + $stateParams.id + "&getEntityAccessRights=true")
+                                                .then(result => result.data.response.canEdit === true) :
+
+                                            // "Add" dialog - get creation rights
+                                            $http
+                                                .get("api/report/?getEntitiesAccessRights=true")
+                                                .then(result => result.data.response.canCreate === true)
                                 ],
                             },
                             controller: EditReportController,

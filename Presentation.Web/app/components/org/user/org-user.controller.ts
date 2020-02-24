@@ -17,19 +17,15 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess","exportGridToExcelService"];
+        public static $inject: string[] = ["_", "$", "$state", "notify", "user", "hasWriteAccess"];
 
         constructor(
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private $scope,
             private notify,
             private user,
-            private hasWriteAccess,
-            private exportGridToExcelService) {
+            private hasWriteAccess) {
             this.hasWriteAccess = hasWriteAccess;
             this.mainGridOptions = {
                 dataSource: {
@@ -88,14 +84,7 @@
                         parse: response => {
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
-                                // set if the user can edit
-                                if (this.user.isGlobalAdmin || ((this.user.isLocalAdmin || this.user.isOrgAdmin) && !this.user.isReadOnly)) {
-                                    usr.canEdit = true;
-                                } else if (this.user.id === usr.Id && !this.user.isReadOnly) {
-                                    usr.canEdit = true;
-                                } else {
-                                    usr.canEdit = false;
-                                }
+                                usr.canEdit = this.hasWriteAccess;
 
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);

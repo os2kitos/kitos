@@ -37,28 +37,30 @@
             this.updateOrgUrl = 'api/Organization/' + this.organization.id;
             this.updatedataProtectionAdvisorUrl = 'api/dataProtectionAdvisor/' + this.dataProtectionAdvisor.id;
             this.updatedataResponsibleUrl = 'api/dataResponsible/' + this.dataResponsible.id;
-            this.updateContactPersonUrl = 'api/contactPerson/' + this.contactPerson.id
+            this.updateContactPersonUrl = 'api/contactPerson/' + this.contactPerson.id;
 
             this._$scope._emailExists = emailExists;
 
             this._contactPerson = contactPerson;
             this._user = user;
 
-            this._$scope.$watch("_emailExists", ((newValue, oldValue) => {
-                if (newValue) {
-                    this.$http.get<any>('odata/GetUserByEmail(email=\'' + this.contactPerson.email + '\')')
-                        .then((result) => {
-                            this._contactPerson.name = result.data.Name;
-                            this._contactPerson.lastName = result.data.LastName;
-                            this._contactPerson.phoneNumber = result.data.PhoneNumber;
-                            //patch
-                            this.$http.patch<any>('api/contactPerson/' + this._contactPerson.id + "?organizationId= " + this._user.currentOrganizationId, this._contactPerson)
-                                .catch((err) => {
-                                    console.log(err);
-                                });
-                        });
-                }
+            if (this.hasWriteAccess) {
+                this._$scope.$watch("_emailExists", ((newValue, oldValue) => {
+                    if (newValue) {
+                        this.$http.get<any>('odata/GetUserByEmail(email=\'' + this.contactPerson.email + '\')')
+                            .then((result) => {
+                                this._contactPerson.name = result.data.Name;
+                                this._contactPerson.lastName = result.data.LastName;
+                                this._contactPerson.phoneNumber = result.data.PhoneNumber;
+                                //patch
+                                this.$http.patch<any>('api/contactPerson/' + this._contactPerson.id + "?organizationId= " + this._user.currentOrganizationId, this._contactPerson)
+                                    .catch((err) => {
+                                        console.log(err);
+                                    });
+                            });
+                    }
                 }));
+            }
         }
     }
 
@@ -79,33 +81,33 @@
                     ],
                     hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ],
-                    organization: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                    organization: ['$http', 'user', function ($http, user) {
                         return $http.get('api/Organization/' + user.currentOrganizationId)
                             .then(function (result) {
                                 return result.data.response;
                             });
                 }],
-                    dataResponsible: ['$http', '$stateParams', 'organization', function ($http, $stateParams, organization) {
+                    dataResponsible: ['$http', 'organization', function ($http, organization) {
                         return $http.get('api/dataResponsible/' + organization.id)
                         .then(function (result) {
                             return result.data.response;
                         });
                     }],
-                    dataProtectionAdvisor: ['$http', '$stateParams', 'organization', function ($http, $stateParams, organization) {
+                    dataProtectionAdvisor: ['$http', 'organization', function ($http, organization) {
                         //get by org id
                         return $http.get('api/dataProtectionAdvisor/' + organization.id)
                             .then(function (result) {
                                 return result.data.response;
                             });
                     }],
-                    contactPerson: ['$http', '$stateParams', 'organization', function ($http, $stateParams, organization) {
+                    contactPerson: ['$http', 'organization', function ($http, organization) {
                         //get by org id
                         return $http.get('api/contactPerson/' + organization.id)
                             .then(function (result) {
                                 return result.data.response;
                             });
                     }],
-                    emailExists: ['$http', '$stateParams', 'organization', 'contactPerson', function ($http, $stateParams, organization, contactPerson) {
+                    emailExists: ['$http', 'contactPerson', function ($http, contactPerson) {
                         //get by org id
                         if (contactPerson != null) {
                             return $http.get('/odata/Users/Users.IsEmailAvailable(email=\'' + contactPerson.email + '\')')
