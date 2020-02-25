@@ -7,6 +7,8 @@ import ReportOverview = require("../PageObjects/report/ReportOverview.po");
 import SystemUsageHelper = require("../Helpers/SystemUsageHelper");
 import Constants = require("../Utility/Constants");
 import ItSystemUsageCommon = require("../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
+import UsersPage = require("../PageObjects/Organization/UsersPage.po");
+import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
 var loginHelper = new Login();
 var itContractPage = new ItContractOverview();
@@ -15,12 +17,18 @@ var systemUsagePage = new ItSystemUsageCommon();
 var projectPage = new ItProjectOverview();
 var interfacePage = new ItSystemInterfaceCatalog();
 var reportPage = new ReportOverview();
+var usersPage = new UsersPage();
 var consts = new Constants();
+var testFixture = new TestFixtureWrapper();
 
 describe("For user without additional roles", () => {
 
     beforeAll(() => {
         loginHelper.loginAsRegularUser();
+    });
+
+    afterAll(() => {
+        testFixture.cleanupState();
     });
 
     it("Create IT contract is disabled", () => {
@@ -48,7 +56,85 @@ describe("For user without additional roles", () => {
     });
 
     it("Create User is disabled", () => {
-        //TODO
+        checkUsersAccessibility(false, true);
+    });
+});
+
+describe("For Local Administrator", () => {
+
+    beforeAll(() => {
+        loginHelper.loginAsLocalAdmin();
+    });
+
+    afterAll(() => {
+        testFixture.cleanupState();
+    });
+
+    it("Create IT contract is enabled", () => {
+        checkContractAccessibility(true, true);
+    });
+
+    it("Create IT system is disabled", () => {
+        checkSystemAccessibility(false, true);
+    });
+
+    it("Delete System Usage is enabled", () => {
+        checkSystemUsageAccessibility(true, true);
+    });
+
+    it("Create IT interface is disabled", () => {
+        checkInterfaceAccessibility(false, true);
+    });
+
+    it("Create IT project is enabled", () => {
+        checkProjectAccessibility(true, true);
+    });
+
+    it("Create IT report is disabled", () => {
+        checkReportAccessibility(false, true);
+    });
+
+    it("Create User is enabled", () => {
+        checkUsersAccessibility(true, true);
+    });
+});
+
+describe("For Global Administrator", () => {
+
+    beforeAll(() => {
+        loginHelper.loginAsGlobalAdmin();
+    });
+
+    afterAll(() => {
+        testFixture.cleanupState();
+    });
+
+    it("Create IT contract is enabled", () => {
+        checkContractAccessibility(true, true);
+    });
+
+    it("Create IT system is enabled", () => {
+        checkSystemAccessibility(true, true);
+    });
+
+    it("Delete System Usage is enabled", () => {
+        checkSystemUsageAccessibility(true, true);
+    });
+
+    it("Create IT interface is enabled", () => {
+        checkInterfaceAccessibility(true, true);
+    });
+
+    it("Create IT project is enabled", () => {
+        checkProjectAccessibility(true, true);
+    });
+
+    it("Create IT report is enabled", () => {
+        checkReportAccessibility(true, true);
+    });
+
+    it("Create User is enabled", () => {
+        checkUsersAccessibility(true, true);
     });
 });
 
@@ -71,42 +157,37 @@ function checkSystemUsageAccessibility(enabled: boolean, present: boolean) {
         .then(() => expect(systemUsagePage.getDeleteButton().isEnabled()).toBe(enabled));
 }
 
+function checkUsersAccessibility(enabled: boolean, visible: boolean) {
+    return performAccessibilityCheck(() => usersPage.getPage(), () => usersPage.getCreateUserButton(), visible, enabled);
+}
+
 function checkReportAccessibility(enabled: boolean, visible: boolean) {
-    logExpectations(enabled, visible);
-    return reportPage.getPage()
-        .then(() => reportPage.waitForKendoGrid())
-        .then(() => expect(reportPage.getCreateReportButton().isEnabled()).toBe(enabled))
-        .then(() => expect(reportPage.getCreateReportButton().isDisplayed()).toBe(visible));
+    return performAccessibilityCheck(() => reportPage.getPage(), () => reportPage.getCreateReportButton(), visible, enabled);
 }
 
 function checkInterfaceAccessibility(enabled: boolean, visible: boolean) {
-    logExpectations(enabled, visible);
-    return interfacePage.getPage()
-        .then(() => interfacePage.waitForKendoGrid())
-        .then(() => expect(interfacePage.getCreateInterfaceButton().isEnabled()).toBe(enabled))
-        .then(() => expect(interfacePage.getCreateInterfaceButton().isDisplayed()).toBe(visible));
+    return performAccessibilityCheck(() => interfacePage.getPage(), () => interfacePage.getCreateInterfaceButton(), visible, enabled);
 }
 
 function checkProjectAccessibility(enabled: boolean, visible: boolean) {
-    logExpectations(enabled, visible);
-    return projectPage.getPage()
-        .then(() => projectPage.waitForKendoGrid())
-        .then(() => expect(projectPage.getCreateProjectButton().isEnabled()).toBe(enabled))
-        .then(() => expect(projectPage.getCreateProjectButton().isDisplayed()).toBe(visible));
+    return performAccessibilityCheck(() => projectPage.getPage(), () => projectPage.getCreateProjectButton(), visible, enabled);
 }
 
 function checkSystemAccessibility(enabled: boolean, visible: boolean) {
-    logExpectations(enabled, visible);
-    return systemPage.getPage()
-        .then(() => systemPage.waitForKendoGrid())
-        .then(() => expect(systemPage.getCreateSystemButton().isEnabled()).toBe(enabled))
-        .then(() => expect(systemPage.getCreateSystemButton().isDisplayed()).toBe(visible));
+    return performAccessibilityCheck(() => systemPage.getPage(), () => systemPage.getCreateSystemButton(), visible, enabled);
 }
 
 function checkContractAccessibility(enabled: boolean, visible: boolean) {
-    logExpectations(enabled, visible);
-    return itContractPage.getPage()
-        .then(() => itContractPage.waitForKendoGrid())
-        .then(() => expect(itContractPage.getCreateContractButton().isEnabled()).toBe(enabled))
-        .then(() => expect(itContractPage.getCreateContractButton().isDisplayed()).toBe(visible));
+    return performAccessibilityCheck(() => itContractPage.getPage(), () => itContractPage.getCreateContractButton(), visible, enabled);
+}
+function performAccessibilityCheck(
+    loadFunc,
+    getButtonFunc,
+    isVisible: boolean,
+    isEnabled: boolean) {
+
+    logExpectations(isEnabled, isVisible);
+    return loadFunc()
+        .then(() => expect(getButtonFunc().isDisplayed()).toBe(isVisible))
+        .then(() => expect(getButtonFunc().getAttribute('disabled').valueOf()).toBe(isEnabled ? null : 'true')); //isEnabled does not work for sub nav anchors so we use a more precise assertion
 }

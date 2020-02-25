@@ -17,7 +17,7 @@
                 hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                 ],
             },
-            controller: ['$rootScope', '$scope', '$uibModal', '$state', 'user', 'hasWriteAccess', '$timeout', function ($rootScope, $scope, $modal, $state, user, hasWriteAccess,$timeout) {
+            controller: ['$rootScope', '$scope', '$state', 'user', 'hasWriteAccess', ($rootScope, $scope, $state, user, hasWriteAccess) => {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -33,17 +33,17 @@
                 $rootScope.page.subnav = subnav;
 
                 $rootScope.page.subnav.buttons = [
-                    { func: createUser, text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
+                    { func: createUser, dataElementType:'createUserButton', text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
                 ];
                 $rootScope.subnavPositionCenter = false;
 
                 function createUser() {
-                    if (hasWriteAccess == true) {
+                    if (hasWriteAccess === true) {
                         $state.go("organization.user.create");}
                     
                 };
 
-                $scope.$on('$viewContentLoaded', function () {
+                $scope.$on('$viewContentLoaded', () => {
                     $rootScope.positionSubnav();
                 });
             }]
