@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Parameters;
@@ -47,6 +46,7 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateItSystemTask("SecondOrganizationDefaultTestItSystem",SecondOrganizationName,1),
                 new CreateItContractTask("DefaultTestItContract"),
                 new CreateItProjectTask("DefaultTestItProject"),
+                new CreateItReportTask("DefaultTestReport"),
                 new CreateTaskRefTask(DefaultOrganizationName)
             }.AsReadOnly();
         }

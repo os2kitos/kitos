@@ -222,7 +222,7 @@
                     {
                         name: "createReport",
                         template:
-                            `<button type="button" class="btn btn-success pull-right" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
+                            `<button data-element-type='createReportButton' type="button" class="btn btn-success pull-right" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     },
                     {
                         name: "clearFilter",
@@ -279,6 +279,9 @@
                         persistId: "name",
                         title: "Navn",
                         width: 150,
+                        attributes: {
+                            "data-element-type": "reportNameKendoObject"
+                        },
                         template: dataItem => dataItem.Id
                             ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>`
                             : "",
