@@ -4,13 +4,18 @@ import SystemOverview = require("../PageObjects/it-system/Catalog/ItSystemCatalo
 import ItProjectOverview = require("../PageObjects/It-project/ItProjectOverview.po");
 import ItSystemInterfaceCatalog = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
 import ReportOverview = require("../PageObjects/report/ReportOverview.po");
+import SystemUsageHelper = require("../Helpers/SystemUsageHelper");
+import Constants = require("../Utility/Constants");
+import ItSystemUsageCommon = require("../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
 
 var loginHelper = new Login();
 var itContractPage = new ItContractOverview();
 var systemPage = new SystemOverview();
+var systemUsagePage = new ItSystemUsageCommon();
 var projectPage = new ItProjectOverview();
 var interfacePage = new ItSystemInterfaceCatalog();
 var reportPage = new ReportOverview();
+var consts = new Constants();
 
 describe("For user without additional roles", () => {
 
@@ -26,8 +31,8 @@ describe("For user without additional roles", () => {
         checkSystemAccessibility(false, true);
     });
 
-    it("Delete System Usage not available", () => {
-        //TODO
+    it("Delete System Usage not visible", () => {
+        checkSystemUsageAccessibility(false, false);
     });
 
     it("Create IT interface is disabled", () => {
@@ -51,6 +56,20 @@ function logExpectations(enabled: boolean, visible: boolean) {
     console.log(`Expecting: enabled: ${enabled}, visible: ${visible}`);
 }
 
+function checkSystemUsageAccessibility(enabled: boolean, present: boolean) {
+
+    var promise = SystemUsageHelper.openLocalSystem(consts.defaultSystemUsageName);
+
+    if (present === false) {
+        //Not present - check if it is not there
+        return promise.then(() => expect(systemUsagePage.getDeleteButtons().count()).toBe(0));;
+    }
+
+    //If expected check the state
+    return promise
+        .then(() => expect(systemUsagePage.getDeleteButton().isDisplayed()).toBe(true))
+        .then(() => expect(systemUsagePage.getDeleteButton().isEnabled()).toBe(enabled));
+}
 
 function checkReportAccessibility(enabled: boolean, visible: boolean) {
     logExpectations(enabled, visible);
@@ -59,6 +78,7 @@ function checkReportAccessibility(enabled: boolean, visible: boolean) {
         .then(() => expect(reportPage.getCreateReportButton().isEnabled()).toBe(enabled))
         .then(() => expect(reportPage.getCreateReportButton().isDisplayed()).toBe(visible));
 }
+
 function checkInterfaceAccessibility(enabled: boolean, visible: boolean) {
     logExpectations(enabled, visible);
     return interfacePage.getPage()
