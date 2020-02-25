@@ -145,7 +145,6 @@ namespace Presentation.Web.Controllers.API
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
-                    sysUsage.DataLevel = dto.DataLevel;
 
                     //copy attached options from system to systemusage
                     var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);

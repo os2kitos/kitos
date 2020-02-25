@@ -49,11 +49,6 @@ namespace Infrastructure.DataAccess.Mapping
                 //No cascading delete in order to avoid causing cycles or multiple cascade paths
                 .WillCascadeOnDelete(false);
 
-            this.HasMany(t => t.AssociatedDataWorkers)
-                .WithRequired(t => t.ItSystem)
-                .HasForeignKey(t => t.ItSystemId)
-                .WillCascadeOnDelete(true);
-
             TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }
     }

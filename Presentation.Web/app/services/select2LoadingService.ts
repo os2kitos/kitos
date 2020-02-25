@@ -12,18 +12,6 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        mapNamedEntitiesToSelect2(data: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
-            var mappedData = [];
-            _.each(data(),
-                (namedEntity) =>
-                mappedData.push({
-                    "id": namedEntity.id,
-                    "text": namedEntity.name
-                })
-            );
-            return {"results": mappedData}
-        }
-
         select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
             return {
                 data: () => ({ "results": dataFn() }) ,

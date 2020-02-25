@@ -153,9 +153,6 @@ namespace Presentation.Web
             itSystems.HasManyBinding(i => i.Children, entitySetItSystems);
             itSystems.HasRequiredBinding(i => i.Parent, entitySetItSystems);
 
-            var itSystemType = BindEntitySet<ItSystemType, ItSystemTypesController>(builder);
-            itSystemType.HasManyBinding(i => i.References, entitySetItSystems);
-
             var businessTypes = BindEntitySet<BusinessType, BusinessTypesController>(builder);
             businessTypes.HasManyBinding(b => b.References, entitySetItSystems);
 
@@ -359,9 +356,6 @@ namespace Presentation.Web
 
             var localItSystemRole = BindEntitySet<LocalItSystemRole, LocalItSystemRolesController>(builder);
             localItSystemRole.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localItSystemType = BindEntitySet<LocalItSystemType, LocalItSystemTypesController>(builder);
-            localItSystemType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localOptionExtendType = BindEntitySet<LocalOptionExtendType, LocalOptionExtendTypesController>(builder);
             localOptionExtendType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);

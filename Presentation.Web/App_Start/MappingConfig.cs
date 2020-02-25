@@ -41,11 +41,7 @@ namespace Presentation.Web
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Description
-            Mapper.CreateMap<ItSystemDataWorkerRelation, ItSystemDataWorkerRelationDTO>()
-                  .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
-                  .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
-                  .ReverseMap();
-
+            
             Mapper.CreateMap<ContactPerson, ContactPersonDTO>()
                  .ReverseMap();
 
@@ -107,10 +103,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContractRole, RoleDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<ItSystemType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -309,7 +301,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.OrganizationTypeId, opt => opt.MapFrom(src => src.Object.Organization.TypeId))
                .ForMember(dto => dto.ItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.Id))
                .ForMember(dto => dto.ItSystemItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.ItSystemId))
-               .ForMember(dto => dto.ItSystemAppTypeOptionId, opt => opt.MapFrom(src => src.Object.ItSystem.AppTypeOptionId))
                .ForMember(dto => dto.ItSystemParentId, opt => opt.MapFrom(src => src.Object.ItSystem.ParentId))
                .ForMember(dto => dto.ItSystemBusinessTypeId, opt => opt.MapFrom(src => src.Object.ItSystem.BusinessTypeId))
                .ForMember(dto => dto.ItSystemName, opt => opt.MapFrom(src => src.Object.ItSystem.Name))

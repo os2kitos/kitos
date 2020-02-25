@@ -177,7 +177,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BelongsTo,BusinessType,Parent,TaskRefs),\
+                                var urlParameters = `?$expand=ItSystem($expand=BelongsTo,BusinessType,Parent,TaskRefs),\
 ArchivePeriods,\
 Reference,\
 Organization,\
@@ -272,7 +272,6 @@ ItProjects($select=Name)`;
                                 if (!usage.ItSystem.Parent) { usage.ItSystem.Parent = { Name: "" }; }
                                 if (!usage.ResponsibleUsage) { usage.ResponsibleUsage = { OrganizationUnit: { Name: "" } }; }
                                 if (!usage.ItSystem.BusinessType) { usage.ItSystem.BusinessType = { Name: "" }; }
-                                if (!usage.ItSystem.AppTypeOption) { usage.ItSystem.AppTypeOption = { Name: "" }; }
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
@@ -475,20 +474,6 @@ ItProjects($select=Name)`;
                         persistId: "busitype", 
                         template: dataItem => dataItem.ItSystem.BusinessType ? dataItem.ItSystem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", 
-                        template: dataItem => dataItem.ItSystem.AppTypeOption ? dataItem.ItSystem.AppTypeOption.Name : "",
-                        hidden: true,
                         filterable: {
                             cell: {
                                 template: customFilter,

@@ -74,7 +74,6 @@
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
-    <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
     <Compile Include="KLE\KLEChange.cs" />
     <Compile Include="KLE\KLEChangeType.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="LocalOptions\LocalDataType.cs" />
     <Compile Include="LocalOptions\LocalInterfaceType.cs" />
     <Compile Include="LocalOptions\LocalItSystemCategories.cs" />
-    <Compile Include="LocalOptions\LocalItSystemType.cs" />
     <Compile Include="LocalOptions\LocalGoalType.cs" />
     <Compile Include="LocalOptions\LocalItProjectRole.cs" />
     <Compile Include="LocalOptions\LocalItProjectType.cs" />
@@ -164,7 +162,6 @@
     <Compile Include="ItSystem\ItSystemBase.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageOrgUnitUsage.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsage.cs" />
-    <Compile Include="ItSystem\ItSystemType.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
     <Compile Include="Organization\IOrganizationModule.cs" />
     <Compile Include="Organization\OrganizationType.cs" />

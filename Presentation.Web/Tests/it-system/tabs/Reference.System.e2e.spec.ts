@@ -4,7 +4,7 @@ import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
-describe("Local Admin can",
+describe("Global Admin can",
     () => {
         var loginHelper = new login();
         var itSystemReference = new ItSystemReferenceHelper();
@@ -36,7 +36,7 @@ describe("Local Admin can",
                 var referenceId = createReferenceId();
                 var validUrl = generateValidUrl();
 
-                loginHelper.loginAsLocalAdmin()
+                loginHelper.loginAsGlobalAdmin()
                     .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
@@ -50,7 +50,7 @@ describe("Local Admin can",
                 var validUrl = generateValidUrl();
                 var invalidUrl = generateInvalidUrl();
 
-                loginHelper.loginAsLocalAdmin()
+                loginHelper.loginAsGlobalAdmin()
                     .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => expect(getEditButtonFromReference(referenceName).isPresent()).toBe(true))
@@ -67,7 +67,7 @@ describe("Local Admin can",
                 var referenceId = createReferenceId();
                 var validUrl = generateValidUrl();
 
-                loginHelper.loginAsLocalAdmin()
+                loginHelper.loginAsGlobalAdmin()
                     .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => getDeleteButtonFromReference(referenceName).click())

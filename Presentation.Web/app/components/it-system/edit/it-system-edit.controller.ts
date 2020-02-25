@@ -21,17 +21,22 @@
         });
     }]);
 
-    app.controller('system.EditCtrl',
+    app.controller("system.EditCtrl",
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','SystemDeletedErrorResponseTranslationService',
+            "$rootScope", "$scope", "itSystem", "user", "hasWriteAccess", "$state", "notify", "$http", "_", "userAccessRights","SystemDeletedErrorResponseTranslationService",
             ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) => {
 
+                $scope.showKLE = user.isGlobalAdmin;
+                $scope.showReference = user.isGlobalAdmin;
+
+                $scope.systemNameHeader = itSystem.disabled ? itSystem.name + " - data i IT systemkatalog (Slettes)" : itSystem.name + " - data i IT systemkatalog";
+				
                 $scope.hasWriteAccess = hasWriteAccess;
                
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
-                        $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
+                        $rootScope.page.subnav.buttons.push({ func: removeSystem, text: "Slet IT System", style: "btn-danger", showWhen: "it-system.edit" });
                     }
                 }
                 else {
@@ -43,61 +48,62 @@
 
                     if (!itSystem.disabled) {
                         $rootScope.page.subnav.buttons.push(
-                            { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                            { func: disableSystem, text: "Deaktivér IT System", style: "btn-danger", showWhen: "it-system.edit" }
                         );
                     } else {
                         $rootScope.page.subnav.buttons.push(
-                            { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                            { func: enableSystem, text: "Aktivér IT System", style: "btn-success", showWhen: "it-system.edit" }
                         );
                     }
                 }
                 function disableSystem() {
-                    if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
+                    if (!confirm("Er du sikker på du vil deaktivere systemet?")) {
                         return;
                     }
 
                     var payload: any = {};
                     payload.Disabled = true;
 
-                    var msg = notify.addInfoMessage('Deaktiverer IT System...', false);
-                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                    var msg = notify.addInfoMessage("Deaktiverer IT System...", false);
+                    $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
                         .success(result => {
-                            msg.toSuccessMessage('IT System er deaktiveret!');
+                            msg.toSuccessMessage("IT System er deaktiveret!");
                             $state.reload();
                         })
                         .error((data, status) => {
-                            msg.toErrorMessage('Fejl! Kunne ikke deaktivere IT System!');
+                            msg.toErrorMessage("Fejl! Kunne ikke deaktivere IT System!");
                         });
                 }
 
                 function enableSystem() {
-                    if (!confirm('Er du sikker på du vil aktivere systemet?')) {
+                    if (!confirm("Er du sikker på du vil aktivere systemet?")) {
                         return;
                     }
                     var payload: any = {};
                     payload.Disabled = false;
 
-                    var msg = notify.addInfoMessage('Aktiverer IT System...', false);
-                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                    var msg = notify.addInfoMessage("Aktiverer IT System...", false);
+                    $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
                         .success(result => {
-                            msg.toSuccessMessage('IT System er aktiveret!');
+                            msg.toSuccessMessage("IT System er aktiveret!");
                             $state.reload();
                         })
                         .error((data, status) => {
-                            msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
+                            msg.toErrorMessage("Fejl! Kunne ikke aktivere IT System!");
                         });
                 }
 
                 function removeSystem() {
-                    if (!confirm('Er du sikker på du vil slette systemet?')) {
+                    if (!confirm("Er du sikker på du vil slette systemet?")) {
                         return;
                     }
                     var systemId = $state.params.id;
-                    var msg = notify.addInfoMessage('Sletter IT System...', false);
-                    $http.delete('api/itsystem/' + systemId + '?organizationId=' + user.currentOrganizationId)
+
+                    var msg = notify.addInfoMessage("Sletter IT System...", false);
+                    $http.delete("api/itsystem/" + systemId + "?organizationId=" + user.currentOrganizationId)
                         .success(result => {
-                            msg.toSuccessMessage('IT System  er slettet!');
-                            $state.go('it-system.catalog');
+                            msg.toSuccessMessage("IT System  er slettet!");
+                            $state.go("it-system.catalog");
                         })
                         .error((data, status) => {
                             msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(status , data.response));
