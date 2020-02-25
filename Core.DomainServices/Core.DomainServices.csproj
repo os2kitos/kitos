@@ -58,6 +58,7 @@
     <Compile Include="Context\ActiveUserContext.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
+    <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Core.DomainModel.ItProject;
+using Core.DomainServices.Factories;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
 
@@ -27,15 +27,9 @@ namespace Tools.Test.Database.Model.Tasks
                 return false;
             }
 
-            var itProject = new ItProject
-            {
-                Name = _name,
-                ObjectOwnerId = globalAdmin.Id,
-                OrganizationId = commonOrg.Id,
-                LastChangedByUserId = globalAdmin.Id,
-            };
+            var project = ItProjectFactory.Create(_name,commonOrg.Id,globalAdmin,DateTime.Now);
 
-            context.ItProjects.Add(itProject);
+            context.ItProjects.Add(project);
             context.SaveChanges();
 
             return true;
