@@ -22,10 +22,6 @@ describe("Regular user has access to features in the contract overview", () => {
             .then(() => browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds));
     });
 
-    it("Create IT contract is clickable", () => {
-        expect(headerButtons.createContract.isEnabled()).toBe(true);
-    });
-
     it("Reset Filter is clickable", () => {
         expect(headerButtons.resetFilter.isEnabled()).toBe(true);
     });

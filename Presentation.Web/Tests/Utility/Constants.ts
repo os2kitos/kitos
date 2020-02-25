@@ -6,6 +6,8 @@
 class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoReportNameObjects = "reportNameKendoObject";
+    readonly kendoProjectNameObjects = "projectNameKendoObject";
     readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
     readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
@@ -16,6 +18,8 @@ class Constants {
     readonly kendoButtonUseFilter = "useFilterButton";
     readonly kendoButtonDeleteFilter = "removeFilterButton";
     readonly kendoContractButtonCreateContract = "createContractButton";
+    readonly kendoProjectButtonCreateProject = "createProjectButton";
+    readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
@@ -39,6 +43,7 @@ class Constants {
     readonly kendoRelationCountObject = "relationCountObject";
 
     //Environmental variables
+    readonly defaultSystemUsageName = "DefaultTestItSystem";
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
     readonly nameOfSystemInput = "nameOfItSystemInput";
@@ -78,12 +83,11 @@ class Constants {
     readonly interfaceSelectAccess = "s2id_interface-access";
     readonly interfaceSelectInterface = "s2id_interface-interface";
     readonly interfaceSelectTableDataType = "s2id_interface-data-type";
-    
-
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
     readonly navigationSystemButton = "systemButton";
+    readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
     readonly navigationReportsButton = "reportButton";
 

@@ -57,6 +57,7 @@
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
+    <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />

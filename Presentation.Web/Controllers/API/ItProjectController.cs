@@ -497,7 +497,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         protected override ItProject PostQuery(ItProject item)
         {
-            var result = _itProjectService.AddProject(item);
+            var result = _itProjectService.AddProject(item.Name, item.OrganizationId);
             if (result.Ok)
                 return result.Value;
 

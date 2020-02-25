@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -9,11 +6,10 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
-using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Time;
-using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Project
 {
@@ -22,7 +18,6 @@ namespace Core.ApplicationServices.Project
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItProjectRepository _itProjectRepository;
-        private readonly ITransactionManager _transactionManager;
         private readonly IUserRepository _userRepository;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
@@ -31,7 +26,6 @@ namespace Core.ApplicationServices.Project
             IGenericRepository<ItProject> projectRepository,
             IAuthorizationContext authorizationContext,
             IItProjectRepository itProjectRepository,
-            ITransactionManager transactionManager,
             IUserRepository userRepository,
             IOrganizationalUserContext userContext,
             IOperationClock operationClock)
@@ -39,63 +33,23 @@ namespace Core.ApplicationServices.Project
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
             _itProjectRepository = itProjectRepository;
-            _transactionManager = transactionManager;
             _userRepository = userRepository;
             _userContext = userContext;
             _operationClock = operationClock;
         }
 
-        public Result<ItProject, OperationFailure> AddProject(ItProject project)
+        public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
         {
-            if (project == null)
-            {
-                throw new ArgumentNullException(nameof(project));
-            }
+            var project = ItProjectFactory.Create(name, organizationId, _userContext.UserEntity, _operationClock.Now);
 
             if (!_authorizationContext.AllowCreate<ItProject>(project))
             {
                 return OperationFailure.Forbidden;
             }
 
-            PrepareNewObject(project);
-
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
-            {
-                _projectRepository.Insert(project);
-                _projectRepository.Save();
-
-                AddEconomyYears(project);
-
-                project.Handover = new Handover
-                {
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                };
-
-                project.GoalStatus = new GoalStatus
-                {
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                };
-
-                _projectRepository.Save();
-                transaction.Commit();
-            }
-
+            _projectRepository.Insert(project);
+            _projectRepository.Save();
             return project;
-        }
-
-        private static void PrepareNewObject(ItProject project)
-        {
-            project.AccessModifier = AccessModifier.Local; //Force set to local
-
-            //Setup all project phases and select initial "current".
-            project.CurrentPhase = 1;
-            project.Phase1 = new ItProjectPhase { Name = PhaseNames.Phase1 };
-            project.Phase2 = new ItProjectPhase { Name = PhaseNames.Phase2 };
-            project.Phase3 = new ItProjectPhase { Name = PhaseNames.Phase3 };
-            project.Phase4 = new ItProjectPhase { Name = PhaseNames.Phase4 };
-            project.Phase5 = new ItProjectPhase { Name = PhaseNames.Phase5 };
         }
 
         public Result<ItProject, OperationFailure> DeleteProject(int id)
@@ -215,49 +169,6 @@ namespace Core.ApplicationServices.Project
                 return OperationFailure.BadInput;
             }
             return Maybe<OperationFailure>.None;
-        }
-
-        private static void AddEconomyYears(ItProject project)
-        {
-            project.EconomyYears = new List<EconomyYear>
-            {
-                new EconomyYear
-                {
-                    YearNumber = 0,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                },
-                new EconomyYear
-                {
-                    YearNumber = 1,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                },
-                new EconomyYear
-                {
-                    YearNumber = 2,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                },
-                new EconomyYear
-                {
-                    YearNumber = 3,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                },
-                new EconomyYear
-                {
-                    YearNumber = 4,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                },
-                new EconomyYear
-                {
-                    YearNumber = 5,
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                }
-            };
         }
     }
 }

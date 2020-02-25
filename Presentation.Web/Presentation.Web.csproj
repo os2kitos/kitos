@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Controllers\API\ReportController.cs" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
@@ -348,7 +349,6 @@
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
     <Compile Include="Models\KLEStatusDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
-    <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
@@ -366,6 +366,8 @@
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
+    <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
@@ -382,6 +384,7 @@
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
+    <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
@@ -661,6 +664,7 @@
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
+    <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
@@ -694,15 +698,17 @@
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageExposedInterfaces.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemReference.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\report\ReportOverview.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
@@ -782,7 +788,6 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-advice.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />

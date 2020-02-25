@@ -44,11 +44,6 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
-        public bool HasOwnership(IEntity entity)
-        {
-            return false;
-        }
-
         public bool CanChangeVisibilityOf(IEntity entity)
         {
             return false;

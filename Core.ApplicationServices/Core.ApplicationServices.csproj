@@ -88,10 +88,12 @@
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
-    <Compile Include="Authorization\IAuthorizationPolicy.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
-    <Compile Include="Authorization\Policies\ModuleLevelAccessPolicy.cs" />
+    <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
+    <Compile Include="Authorization\Policies\IModuleCreationPolicy.cs" />
+    <Compile Include="Authorization\Policies\IModuleModificationPolicy.cs" />
+    <Compile Include="Authorization\Policies\ModuleModificationPolicy.cs" />
     <Compile Include="Authorization\OrganizationalUserContext.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContext.cs" />
     <Compile Include="Authorization\IPermissionVisitor.cs" />

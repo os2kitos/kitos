@@ -21,32 +21,6 @@ describe("ITSystem Catalog accessibility tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Local Admin cannot create items in It-system catalog", () => {
-        loginHelper.loginAsLocalAdmin()
-            .then(() => {
-                return loadPage();
-            })
-            .then(() => {
-                return waitForKendoGrid();
-            })
-            .then(() => {
-                return expectCreateButtonVisibility(false);
-            });
-    });
-
-    it("Regular user cannot create items in IT-system catalog", () => {
-        loginHelper.loginAsRegularUser()
-            .then(() => {
-                return loadPage();
-            })
-            .then(() => {
-                return waitForKendoGrid();
-            })
-            .then(() => {
-                return expectCreateButtonVisibility(false);
-            });
-    });
-
     it("Local Admin can still delete IT-system Catalogs that have been created locally", () => {
         const systemName = createSystemName();
         loginHelper.loginAsGlobalAdmin()

@@ -7,6 +7,8 @@ type HeaderButtons = {
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
+    createProject: protractor.ElementFinder,
+    createReport: protractor.ElementFinder,
     systemCatalogCreate: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
     deleteReference: protractor.ElementFinder,
@@ -19,7 +21,7 @@ type InputFields =
     referenceDocTitle: protractor.ElementFinder,
     referenceDocId: protractor.ElementFinder,
     referenceDocUrl: protractor.ElementFinder,
-    referenceCreator: protractor.ElementFinder
+    referenceCreator: protractor.ElementFinder,
 };
 
 type ColumnHeaders = {
@@ -32,11 +34,13 @@ type ColumnHeaders = {
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
-    systemRightsOwner: protractor.ElementFinder
+    systemRightsOwner: protractor.ElementFinder,
 };
 
 type ColumnObjects = {
+    projectName: protractor.ElementArrayFinder,
     systemName: protractor.ElementArrayFinder,
+    reportName: protractor.ElementArrayFinder,
     referenceName: protractor.ElementArrayFinder,
     referenceId: protractor.ElementArrayFinder,
     contractName: protractor.ElementArrayFinder,
@@ -50,7 +54,6 @@ type ColumnObjects = {
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
-var byDataField = new CSSLocator().byDataField;
 var consts = new Constants();
 
 class kendoToolbarWrapper {
@@ -65,6 +68,8 @@ class kendoToolbarWrapper {
             useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
             deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
+            createProject: element(byDataElementType(consts.kendoProjectButtonCreateProject)),
+            createReport: element(byDataElementType(consts.kendoReportButtonCreateReport)),
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
             deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton))
@@ -107,7 +112,9 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnObjects = {
+            projectName: kendo.getColumnItemLinks(consts.kendoProjectNameObjects),
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
+            reportName: kendo.getColumnItemLinks(consts.kendoReportNameObjects),
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),
             catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
