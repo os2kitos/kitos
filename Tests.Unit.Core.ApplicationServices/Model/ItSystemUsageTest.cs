@@ -85,7 +85,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.AddUsageRelationTo(new User(), destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
-            AssertErrorResult(result, "Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
+            AssertErrorResult(result, "Attempt to create relation to it contract in a different organization", OperationFailure.BadInput);
         }
 
         [Fact]

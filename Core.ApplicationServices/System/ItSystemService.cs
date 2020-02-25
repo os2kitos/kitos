@@ -178,6 +178,5 @@ namespace Core.ApplicationServices.System
                 .ToList()
                 .AsReadOnly();
         }
-
     }
 }
