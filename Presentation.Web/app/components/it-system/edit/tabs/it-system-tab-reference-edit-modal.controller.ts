@@ -1,36 +1,27 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.edit.references.edit', {
-            url: '/editReference/:refId/:orgId',
-            onEnter: ['$state', '$stateParams', '$uibModal','$http',
-                function ($state, $stateParams, $modal, $http) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
+        $stateProvider.state("it-system.edit.references.edit", {
+            url: "/editReference/:refId/:orgId",
+            onEnter: ["$state", "$stateParams", "$uibModal", "referenceServiceFactory",
+                ($state, $stateParams, $modal, referenceServiceFactory) => {
+                    var referenceService = referenceServiceFactory.createSystemReference();
                     $modal.open({
                         templateUrl: "app/components/it-reference/it-reference-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
                         controller: "system.referenceEditModalCtrl",
-                       resolve: {
-                           reference: ["$http", function ($http) {
-
-                                return $http.get("api/Reference/" + $stateParams.refId)
-                                    .then(function (result) {
-                                        return result.data.response;
-                                   });
-                           }],
-                            user: [
-                                'userService', function (userService) {
-                                    return userService.getUser().then(function (user) {
-                                        return user;
-                                    });
-                                }
+                        resolve: {
+                            referenceService: [() => referenceService],
+                            reference: [() => referenceService.getReference($stateParams.refId)
+                                .then(result => result.data.response)
                             ]
                         }
-                    }).result.then(function () {
+                    }).result.then(() => {
                         // OK
                         // GOTO parent state and reload
                         $state.go("^", null, { reload: true });
-                    }, function () {
+                    }, () => {
                         // Cancel
                         // GOTO parent state
                         $state.go("^");
@@ -41,34 +32,30 @@
     }]);
 
     app.controller("system.referenceEditModalCtrl",
-        ["$scope", "$http", "reference","$stateParams","notify",
-            function ($scope, $http, reference, $stateParams,notify) {
-
+        ["$scope", "reference", "$stateParams", "notify", "referenceService",
+            ($scope, reference, $stateParams, notify, referenceService) => {
                 $scope.reference = reference;
 
-                $scope.dismiss = function () {
+                $scope.dismiss = () => {
                     $scope.$dismiss();
                 };
 
-                    $scope.save = function () {
-                        
-                        var data = {
-                            Title: $scope.reference.title,
-                            ExternalReferenceId: $scope.reference.externalReferenceId,
-                            URL: $scope.reference.url,
-                            Display: $scope.reference.display
-                        };
+                $scope.save = () => {
+                    var msg = notify.addInfoMessage("Gemmer række", false);
 
-                        var msg = notify.addInfoMessage("Gemmer række", false);
+                    referenceService.patchReference(
+                        $stateParams.refId,
+                        $stateParams.orgId,
+                        $scope.reference.title,
+                        $scope.reference.externalReferenceId,
+                        $scope.reference.url,
+                        $scope.reference.display)
+                        .then(success => {
+                            msg.toSuccessMessage("Referencen er gemt");
+                            $scope.$close(true);
+                        },
+                            error => msg.toErrorMessage("Fejl! Prøv igen"));
 
-                        $http.patch("api/Reference/" + $stateParams.refId + "?organizationId=" + $stateParams.orgId, data)
-                            .success(function (result) {
-                                msg.toSuccessMessage("Referencen er gemt");
-                                $scope.$close(true);
-                            })
-                            .error(function () {
-                                msg.toErrorMessage("Fejl! Prøv igen");
-                            });
                 };
             }]);
 })(angular, app);

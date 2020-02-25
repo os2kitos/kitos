@@ -5,44 +5,39 @@
             templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "system.EditReference",
             resolve: {
-                theSystem: ["$http", "itSystem", ($http, itSystem) => $http.get(`odata/ItSystems(${itSystem.id})?$expand=ExternalReferences($expand=ObjectOwner)`).then(result => result.data)]
+                theSystem: ["$http", "itSystem", ($http, itSystem) => $http.get(`odata/ItSystems(${itSystem.id})?$expand=ExternalReferences($expand=ObjectOwner)`).then(result => result.data)],
+                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createSystemReference()],
             }
         });
     }]);
 
-    app.controller("system.EditReference", ["$scope", "$http", "$state", "notify", "hasWriteAccess", "theSystem",
-        ($scope, $http, $state, notify, hasWriteAccess, theSystem) => {
+    app.controller("system.EditReference", ["$scope", "$state", "notify", "hasWriteAccess", "theSystem", "referenceService",
+        ($scope, $state, notify, hasWriteAccess, theSystem, referenceService) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.referenceName = theSystem.Name;
 
             $scope.setChosenReference = id => {
                 var referenceId = (id === theSystem.ReferenceId) ? null : id;
 
-                var data = {
-                    ReferenceId: referenceId
-                };
-
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
-                $http.patch("api/itSystem/" + theSystem.Id + "?organizationId=" + theSystem.OrganizationId, data)
-                    .success(result => {
+                referenceService.setOverviewReference(theSystem.Id, theSystem.OrganizationId, referenceId)
+                    .then(success => {
                         msg.toSuccessMessage("Feltet er opdateret!");
                         reload();
-                    })
-                    .error(() => {
-                        msg.toErrorMessage("Fejl! Prøv igen.");
-                    });
+                    },
+                        error => msg.toErrorMessage("Fejl! Prøv igen."));
             };
 
             $scope.deleteReference = referenceId => {
                 var msg = notify.addInfoMessage("Sletter...");
 
-                $http.delete("api/Reference/" + referenceId + "?organizationId=" + theSystem.OrganizationId).success(() => {
-                    msg.toSuccessMessage("Slettet!");
-                }).error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                });
-                reload();
+                referenceService.deleteReference(referenceId, theSystem.OrganizationId)
+                    .then(success => {
+                        msg.toSuccessMessage("Slettet!");
+                        reload();
+                    },
+                        error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
             };
 
             $scope.edit = refId => {
@@ -75,7 +70,7 @@
                         "data-element-type": "referenceObject"
                     },
                     template: data => {
-                        if (Kitos.Utility.Validation.validateUrl(data.URL) ) {
+                        if (Kitos.Utility.Validation.validateUrl(data.URL)) {
                             return `<a target="_blank" href="${data.URL}">${data.Title}</a>`;
                         } else {
                             return data.Title;
@@ -107,7 +102,7 @@
                     template: dataItem => {
                         var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
-                        
+
 
                         if (Kitos.Utility.Validation.validateUrl(dataItem.URL)) {
                             if (dataItem.Id === theSystem.ReferenceId) {
