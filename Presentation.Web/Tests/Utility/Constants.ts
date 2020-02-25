@@ -6,6 +6,7 @@
 class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoProjectNameObjects = "projectNameKendoObject";
     readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
     readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
@@ -16,6 +17,7 @@ class Constants {
     readonly kendoButtonUseFilter = "useFilterButton";
     readonly kendoButtonDeleteFilter = "removeFilterButton";
     readonly kendoContractButtonCreateContract = "createContractButton";
+    readonly kendoContractButtonCreateProject = "createProjectButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";

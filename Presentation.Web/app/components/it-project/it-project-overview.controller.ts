@@ -372,7 +372,7 @@
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
                         template:
-                            "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
+                            "<button data-element-type='createProjectButton' ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
@@ -474,6 +474,9 @@
                     {
                         field: "Name",
                         title: "IT Projekt",
+                        attributes: {
+                            "data-element-type": "projectNameKendoObject"
+                        },
                         width: 340,
                         persistId: "projname", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem
