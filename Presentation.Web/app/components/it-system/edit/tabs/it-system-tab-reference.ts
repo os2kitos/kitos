@@ -1,5 +1,5 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-system.edit.references", {
             url: "/reference",
             templateUrl: "app/components/it-reference/it-reference.view.html",
@@ -10,12 +10,12 @@
         });
     }]);
 
-    app.controller("system.EditReference", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess", "theSystem",
-        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, theSystem) {
+    app.controller("system.EditReference", ["$scope", "$http", "$state", "notify", "hasWriteAccess", "theSystem",
+        ($scope, $http, $state, notify, hasWriteAccess, theSystem) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.referenceName = theSystem.Name;
 
-            $scope.setChosenReference = function (id) {
+            $scope.setChosenReference = id => {
                 var referenceId = (id === theSystem.ReferenceId) ? null : id;
 
                 var data = {
@@ -25,16 +25,16 @@
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
                 $http.patch("api/itSystem/" + theSystem.Id + "?organizationId=" + theSystem.OrganizationId, data)
-                    .success(function (result) {
+                    .success(result => {
                         msg.toSuccessMessage("Feltet er opdateret!");
                         reload();
                     })
-                    .error(function () {
+                    .error(() => {
                         msg.toErrorMessage("Fejl! Prøv igen.");
                     });
             };
 
-            $scope.deleteReference = function (referenceId) {
+            $scope.deleteReference = referenceId => {
                 var msg = notify.addInfoMessage("Sletter...");
 
                 $http.delete("api/Reference/" + referenceId + "?organizationId=" + theSystem.OrganizationId).success(() => {
@@ -45,20 +45,12 @@
                 reload();
             };
 
-            $scope.edit = function (refId) {
+            $scope.edit = refId => {
                 $state.go(".edit", { refId: refId, orgId: theSystem.OrganizationId });
             };
 
             function reload() {
                 $state.go(".", null, { reload: true });
-            };
-
-            $scope.isValidUrl = function (url) {
-                if (url) {
-                    var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                    return regexp.test(url.toLowerCase());
-                }
-                return false;
             };
 
             $scope.mainGridOptions = {
@@ -84,7 +76,7 @@
                     },
                     template: data => {
                         if (Kitos.Utility.Validation.validateUrl(data.URL) ) {
-                            return "<a target=\"_blank\" href=\"" + data.URL + "\">" + data.Title + "</a>";
+                            return `<a target="_blank" href="${data.URL}">${data.Title}</a>`;
                         } else {
                             return data.Title;
                         }
@@ -92,7 +84,7 @@
                     width: 240
                 }, {
                     field: "ExternalReferenceId",
-                        title: "Evt. dokumentID/Sagsnr./anden referenceContact",
+                    title: "Evt. dokumentID/Sagsnr./anden referenceContact",
                     headerAttributes: {
                         "data-element-type": "referenceHeaderId"
                     },
@@ -114,9 +106,8 @@
                     title: "Rediger",
                     template: dataItem => {
                         var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
-                        if (dataItem.Id != theSystem.ReferenceId) {
-                            HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
-                        }
+                        HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
+                        
 
                         if (Kitos.Utility.Validation.validateUrl(dataItem.URL)) {
                             if (dataItem.Id === theSystem.ReferenceId) {
