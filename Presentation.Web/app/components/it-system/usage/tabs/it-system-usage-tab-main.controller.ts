@@ -29,13 +29,6 @@
                             });
                     }
                 ],
-                appTypeOptions: [
-                    '$http', function ($http) {
-                        return $http.get("odata/LocalItSystemTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                            return result.data.value;
-                        });
-                    }
-                ],
                 systemCategories: [
                     "$http", $http => $http.get("odata/LocalItSystemCategories?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                     .then(result => result.data.value)
@@ -45,8 +38,8 @@
     }]);
 
     app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'user', 'systemCategories',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess', 'appTypeOptions',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, user, systemCategories, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess', 
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, user, systemCategories, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess) {
             $rootScope.page.title = 'IT System - Anvendelse';
             $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
             $scope.autosaveUrl2 = 'api/itsystemusage/' + $scope.usage.id;
@@ -56,7 +49,6 @@
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-            $scope.appTypeOptions = appTypeOptions;
             $scope.hasViewAccess = user.currentOrganizationId == itSystemUsage.organizationId;
             $scope.systemCategories = systemCategories;
             autofocus();

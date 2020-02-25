@@ -13,18 +13,18 @@
                 <li data-ui-sref-active="active">
                     <a data-ui-sref="it-system.edit.interfaces"><img src="/Content/img/Snitflader.svg"></img> Udstillede snitflader</a>
                 </li>
-                <li data-ui-sref-active="active">
+                <li data-ui-sref-active="active" ng-if="showKLE">
                     <a data-ui-sref="it-system.edit.kle"><img src="/Content/img/KLE.svg"></img> KLE</a>
                 </li>
-                <li data-ui-sref-active="active">
-                    <a data-ui-sref="it-system.edit.access-control"><img src="/Content/img/Accesscontrol.svg"></img> Adgangsstyring</a>
-                </li>
-                <li data-ui-sref-active="active">
+                <li data-ui-sref-active="active" ng-if="showReference">
                     <a data-ui-sref="it-system.edit.references" data-element-type="ReferenceTabButton"><img src="/Content/img/References.svg"></img> Referencer</a>
                 </li>
-                <li data-ui-sref-active="active">
-                    <a data-ui-sref="it-system.edit.gdpr"><img src="/Content/img/folder-lock.svg"></img> GDPR</a>
-                </li>
+
+                <!-- TODO: Not to be deleted yet KITOSUDV-526-->
+                <!--<li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.edit.access-control"><img src="/Content/img/Accesscontrol.svg"></img> Adgangsstyring</a>
+                </li>-->
+
             </ul>
         </div>
     </div>

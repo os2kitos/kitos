@@ -44,7 +44,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 itSystemId = itSystemId,
                 organizationId = orgId,
-                dataLevel = "NONE",
             };
 
             using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itSystemUsage"), cookie, itSystem))
@@ -93,29 +92,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new
             {
                 ItSystemUsageId = systemUsageId,
-                DataWorkerId = organizationId
-            };
-
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
-        }
-
-        public static async Task<ItSystemDataWorkerRelationDTO> SetDataWorkerAsync(int systemId, int organizationId, Cookie optionalLogin = null)
-        {
-            using (var response = await SendSetDataWorkerRequestAsync(systemId, organizationId, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDataWorkerRelationDTO>();
-            }
-        }
-
-        public static async Task<HttpResponseMessage> SendSetDataWorkerRequestAsync(int systemId, int organizationId, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("/api/Dataworker/");
-
-            var body = new
-            {
-                ItSystemId = systemId,
                 DataWorkerId = organizationId
             };
 
