@@ -5,24 +5,23 @@
             templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "system.EditReference",
             resolve: {
-                theSystem: ["$http", "itSystem", ($http, itSystem) => $http.get(`odata/ItSystems(${itSystem.id})?$expand=ExternalReferences($expand=ObjectOwner)`).then(result => result.data)],
                 referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createSystemReference()],
             }
         });
     }]);
 
-    app.controller("system.EditReference", ["$scope", "$state", "notify", "hasWriteAccess", "theSystem", "referenceService",
-        ($scope, $state, notify, hasWriteAccess, theSystem, referenceService) => {
+    app.controller("system.EditReference", ["$scope", "$state", "notify", "hasWriteAccess", "referenceService", "itSystem",
+        ($scope, $state, notify, hasWriteAccess, referenceService, itSystem) => {
             $scope.hasWriteAccess = hasWriteAccess;
 
-            $scope.referenceName = theSystem.Disabled ? theSystem.Name + " - data i IT systemkatalog (Slettes)" : theSystem.Name + " - data i IT systemkatalog";
+            $scope.referenceName = itSystem.disabled ? itSystem.name + " - data i IT systemkatalog (Slettes)" : itSystem.name + " - data i IT systemkatalog";
 
             $scope.setChosenReference = id => {
-                var referenceId = (id === theSystem.ReferenceId) ? null : id;
+                var referenceId = (id === itSystem.referenceId) ? null : id;
 
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
-                referenceService.setOverviewReference(theSystem.Id, theSystem.OrganizationId, referenceId)
+                referenceService.setOverviewReference(itSystem.id, itSystem.organizationId, referenceId)
                     .then(success => {
                         msg.toSuccessMessage("Feltet er opdateret!");
                         reload();
@@ -33,7 +32,7 @@
             $scope.deleteReference = referenceId => {
                 var msg = notify.addInfoMessage("Sletter...");
 
-                referenceService.deleteReference(referenceId, theSystem.OrganizationId)
+                referenceService.deleteReference(referenceId, itSystem.organizationId)
                     .then(success => {
                         msg.toSuccessMessage("Slettet!");
                         reload();
@@ -42,7 +41,7 @@
             };
 
             $scope.edit = refId => {
-                $state.go(".edit", { refId: refId, orgId: theSystem.OrganizationId });
+                $state.go(".edit", { refId: refId, orgId: itSystem.organizationId });
             };
 
             function reload() {
@@ -51,7 +50,7 @@
 
             $scope.mainGridOptions = {
                 dataSource: {
-                    data: theSystem.ExternalReferences,
+                    data: itSystem.externalReferences,
                     pageSize: 10
                 },
                 sortable: true,
@@ -61,7 +60,7 @@
                     buttonCount: 5
                 },
                 columns: [{
-                    field: "Title",
+                    field: "title",
                     title: "Dokumenttitel",
                     headerAttributes: {
                         "data-element-type": "referenceHeader"
@@ -71,15 +70,15 @@
                         "data-element-type": "referenceObject"
                     },
                     template: data => {
-                        if (Kitos.Utility.Validation.validateUrl(data.URL)) {
-                            return `<a target="_blank" href="${data.URL}">${data.Title}</a>`;
+                        if (Kitos.Utility.Validation.validateUrl(data.url)) {
+                            return `<a target="_blank" href="${data.url}">${data.title}</a>`;
                         } else {
-                            return data.Title;
+                            return data.title;
                         }
                     },
                     width: 240
                 }, {
-                    field: "ExternalReferenceId",
+                    field: "externalReferenceId",
                     title: "Evt. dokumentID/Sagsnr./anden referenceContact",
                     headerAttributes: {
                         "data-element-type": "referenceHeaderId"
@@ -89,27 +88,26 @@
                         "data-element-type": "referenceIdObject"
                     },
                 }, {
-                    field: "Created",
+                    field: "created",
                     title: "Oprettet",
-                    template: "#= kendo.toString(kendo.parseDate(Created, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
+                    template: "#= kendo.toString(kendo.parseDate(created, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
 
                 }, {
-                    field: "ObjectOwner.Name",
+                    field: "objectOwner.fullName",
                     title: "Oprettet af",
-                    template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                     width: 150
                 }, {
                     title: "Rediger",
                     template: dataItem => {
-                        var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
-                        HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
+                        var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+                        HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
 
 
-                        if (Kitos.Utility.Validation.validateUrl(dataItem.URL)) {
-                            if (dataItem.Id === theSystem.ReferenceId) {
-                                HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.Id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
+                        if (Kitos.Utility.Validation.validateUrl(dataItem.url)) {
+                            if (dataItem.id === itSystem.referenceId) {
+                                HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                             } else {
-                                HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.Id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
+                                HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
 
                             }
                         }
@@ -123,7 +121,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (hasWriteAccess) {
-                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" data-element-type=\"createReferenceButton\" href=\"\\#/system/edit/" + theSystem.Id + "/reference/createReference/" + theSystem.Id + "\"'>Tilføj reference</a>";
+                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" data-element-type=\"createReferenceButton\" href=\"\\#/system/edit/" + itSystem.id + "/reference/createReference/" + itSystem.id + "\"'>Tilføj reference</a>";
                             } else {
                                 return "";
                             }

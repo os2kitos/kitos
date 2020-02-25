@@ -1,5 +1,6 @@
 ﻿module Kitos.Services {
     import IReference = Models.IReference;
+    import BaseReference = Models.BaseReference;
 
     export interface IReferenceService {
         getReference(referenceId: number): ng.IPromise<IReference>;
@@ -12,7 +13,23 @@
     export class ReferenceService implements IReferenceService {
         constructor(
             private readonly $http: ng.IHttpService,
-            private readonly entityType: string) {
+            private readonly entityType: string,
+            private readonly creationTypeFunc: Function) {
+        }
+
+        private createReferenceModel(
+            entityId: number,
+            title: string,
+            externalReferenceId: string,
+            url: string): BaseReference {
+            let referenceModel = {
+                Title: title,
+                ExternalReferenceId: externalReferenceId,
+                URL: url,
+                Created: new Date()
+            };
+            referenceModel = this.creationTypeFunc(referenceModel, entityId);
+            return referenceModel;
         }
 
         private referenceBasePath = "api/Reference";
@@ -33,13 +50,8 @@
             title: string,
             externalReferenceId: string,
             url: string) {
-            const data = {
-                ItSystem_Id: entityId,
-                Title: title,
-                ExternalReferenceId: externalReferenceId,
-                URL: url,
-                Created: new Date()
-            };
+
+            const data = this.createReferenceModel(entityId, title, externalReferenceId, url);
             return this.$http.post(this.referenceBasePath, data);
         }
 
@@ -70,21 +82,48 @@
 
     export interface IReferenceServiceFactory {
         createSystemReference(): IReferenceService;
+        createSystemUsageReference(): IReferenceService;
+        createContractReference(): IReferenceService;
+        createProjectReference(): IReferenceService;
     }
 
     export class ReferenceServiceFactory implements IReferenceServiceFactory {
+
         static $inject = ["$http"];
         constructor(private readonly $http: ng.IHttpService) {
 
         }
 
-        private createFor(entityType: string) {
-            return new ReferenceService(this.$http, entityType);
+        private createFor(entityType: string, creationTypeFunc: Function) {
+            return new ReferenceService(this.$http, entityType, creationTypeFunc);
         }
 
         createSystemReference(): IReferenceService {
-            return this.createFor("itSystem");
+            return this.createFor("itSystem", (reference, id) => {
+                reference.ItSystem_Id = id;
+                return reference;
+            });
         }
+
+        createSystemUsageReference(): IReferenceService {
+            return this.createFor("itSystemUsage", (reference, id) => {
+                reference.ItSystemUsage_Id = id;
+                return reference;
+            });
+        }
+
+
+        createContractReference(): IReferenceService {
+            return this.createFor("itContract", (reference, id) => {
+                reference.ItContract_Id = id;
+                return reference;
+            }); }
+
+        createProjectReference(): IReferenceService {
+            return this.createFor("itProject", (reference, id) => {
+                reference.ItProject_Id = id;
+                return reference;
+            }); }
     }
 
     app.service("referenceServiceFactory", ReferenceServiceFactory);

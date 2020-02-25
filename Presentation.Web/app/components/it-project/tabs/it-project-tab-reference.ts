@@ -1,59 +1,47 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-project.edit.references", {
             url: "/reference",
             templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "project.EditReference",
+            resolve: {
+                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createProjectReference()],
+            },
             controllerAs: "Vm"
         });
     }]);
 
     app.controller("project.EditReference",
-        ["$scope", "$http", "$timeout", "$state", "$stateParams", "project", "$confirm", "notify", "$", "hasWriteAccess",
-            function ($scope, $http, $timeout, $state, $stateParams, project, $confirm, notify, $, hasWriteAccess) {
+        ["$scope", "$state", "project", "notify", "hasWriteAccess", "referenceService",
+            ($scope, $state, project, notify, hasWriteAccess, referenceService) => {
                 $scope.hasWriteAccess = hasWriteAccess;
-                $scope.reference = project;
-
-                $scope.deleteReference = function (id) {
-                    var msg = notify.addInfoMessage("Sletter...");
-                    $http.delete('api/Reference/' + id + '?organizationId=' + project.organizationId).success(() => {
-                        msg.toSuccessMessage("Slettet!");
-                    }).error(() => {
-                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                        });
-                    reload();
-                };
                 $scope.referenceName = project.name;
 
-                $scope.setChosenReference = function (id) {
+                $scope.setChosenReference = id => {
                     var referenceId = (id === project.referenceId) ? null : id;
-
-                    var data = {
-                        referenceId: referenceId
-                    };
 
                     var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
-                    $http.patch("api/itProject/" + project.id + "?organizationId=" + project.organizationId, data)
-                        .success(function (result) {
-                         //   $scope.chosenReference = id;
-                            msg.toSuccessMessage("Feltet er opdateret!");
-                            reload();
-                        })
-                        .error(function () {
-                            msg.toErrorMessage("Fejl! Prøv igen.");
-                        });
+                    referenceService.setOverviewReference(project.id, project.organizationId, referenceId)
+                        .then(success => {
+                                msg.toSuccessMessage("Feltet er opdateret!");
+                                reload();
+                            },
+                            error => msg.toErrorMessage("Fejl! Prøv igen."));
                 };
 
-                $scope.isValidUrl = function (url) {
-                    if (url) {
-                        var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                    return regexp.test(url.toLowerCase());
-                    }
-                    return false;
+                $scope.deleteReference = referenceId => {
+                    var msg = notify.addInfoMessage("Sletter...");
+
+                    referenceService.deleteReference(referenceId, project.organizationId)
+                        .then(success => {
+                                msg.toSuccessMessage("Slettet!");
+                                reload();
+                            },
+                            error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
                 };
 
-                $scope.edit = function (id) {
+                $scope.edit = id => {
                     $state.go(".edit", { refId: id, orgId: project.organizationId });
                 };
 
@@ -76,7 +64,7 @@
                         field: "title",
                         title: "Dokumenttitel",
                         template: data => {
-                            if (data.url) {
+                            if (Kitos.Utility.Validation.validateUrl(data.url)) {
                                 return "<a target=\"_blank\" href=\"" + data.url + "\">" + data.title + "</a>";
                             } else {
                                 return data.title;
@@ -102,7 +90,7 @@
                             HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
                             
 
-                            if (dataItem.url) {
+                            if (Kitos.Utility.Validation.validateUrl(dataItem.url)) {
                                 if (dataItem.id === project.referenceId) {
                                     HTML = HTML + "<button data-ng-disabled='" + !$scope.hasWriteAccess +"' data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {
@@ -125,7 +113,7 @@
                                     return "";
                                 }
                             }
-                            }]
+                        }]
                 };
             }]);
 })(angular, app);
