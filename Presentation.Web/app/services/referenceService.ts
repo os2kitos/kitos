@@ -1,57 +1,63 @@
 ﻿module Kitos.Services {
+    import IReference = Models.IReference;
 
     export interface IReferenceService {
-        getReference(referenceId: number);
-        createReference(entityId: number, title: string, externalReferenceId: string, url: string, display: any);
+        getReference(referenceId: number): ng.IPromise<IReference>;
+        createReference(entityId: number, title: string, externalReferenceId: string, url: string);
         deleteReference(referenceId: number, orgId: number);
-        patchReference(referenceId: number, orgId: number, title: string, externalReferenceId: string, url: string, display: any);
+        updateReference(referenceId: number, orgId: number, title: string, externalReferenceId: string, url: string);
         setOverviewReference(entityId: number, orgId: number, referenceId: number);
     }
 
-    export class ReferenceService implements IReferenceService{
+    export class ReferenceService implements IReferenceService {
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly entityType: string) {
-
         }
+
+        private referenceBasePath = "api/Reference";
 
         private getBasePath() {
             return `api/${this.entityType}`;
         }
 
         getReference(referenceId: number) {
-            return this.$http.get(`api/Reference/${referenceId}`);
+            return this.$http.get(`${this.referenceBasePath}/${referenceId}`)
+                .then(success => {
+                    var result = success.data as { msg: string, response: IReference }
+                    return result.response;
+                });
         }
 
-        createReference(entityId: number, title: string, externalReferenceId: string, url: string, display) {
+        createReference(entityId: number,
+            title: string,
+            externalReferenceId: string,
+            url: string) {
             const data = {
                 ItSystem_Id: entityId,
                 Title: title,
                 ExternalReferenceId: externalReferenceId,
                 URL: url,
-                Display: display,
                 Created: new Date()
             };
-            return this.$http.post("api/Reference", data);
+            return this.$http.post(this.referenceBasePath, data);
         }
 
-        patchReference(referenceId: number,
+        updateReference(referenceId: number,
             orgId: number,
             title: string,
             externalReferenceId: string,
-            url: string,
-            display) {
+            url: string) {
             const data = {
                 Title: title,
                 ExternalReferenceId: externalReferenceId,
-                URL: url,
-                Display: display
+                URL: url
             };
-            return this.$http.patch(`api/Reference/${referenceId}?organizationId=${orgId}`, data);
+            return this.$http.patch(`${this.referenceBasePath}/${referenceId}?organizationId=${orgId}`, data);
         }
 
         deleteReference(referenceId: number, orgId: number) {
-            return this.$http.delete(`api/Reference/${referenceId}?organizationId=${orgId}`);
+            return this.$http.delete(`${this.referenceBasePath}/${referenceId}?organizationId=${orgId}`);
         }
 
         setOverviewReference(entityId: number, orgId: number, referenceId: number) {

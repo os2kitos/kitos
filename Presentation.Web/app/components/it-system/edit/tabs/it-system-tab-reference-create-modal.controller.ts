@@ -42,8 +42,7 @@
                         itSystem.id,
                         $scope.reference.title,
                         $scope.reference.externalReferenceId,
-                        $scope.reference.url,
-                        $scope.reference.display)
+                        $scope.reference.url)
                     .then(success => {
                             msg.toSuccessMessage("Referencen er gemt");
                             $scope.$close(true);

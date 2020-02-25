@@ -14,7 +14,7 @@
                         resolve: {
                             referenceService: [() => referenceService],
                             reference: [() => referenceService.getReference($stateParams.refId)
-                                .then(result => result.data.response)
+                                .then(result => result)
                             ]
                         }
                     }).result.then(() => {
@@ -43,13 +43,12 @@
                 $scope.save = () => {
                     var msg = notify.addInfoMessage("Gemmer række", false);
 
-                    referenceService.patchReference(
+                    referenceService.updateReference(
                         $stateParams.refId,
                         $stateParams.orgId,
                         $scope.reference.title,
                         $scope.reference.externalReferenceId,
-                        $scope.reference.url,
-                        $scope.reference.display)
+                        $scope.reference.url)
                         .then(success => {
                             msg.toSuccessMessage("Referencen er gemt");
                             $scope.$close(true);
