@@ -70,7 +70,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemCategories> ItSystemCategories { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
-        public DbSet<ItSystemType> ItSystemTypes { get; set; }
         public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationType> OrganizationTypes { get; set; }
@@ -113,7 +112,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
         public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
-        public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
         public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
         public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
@@ -133,7 +131,6 @@ namespace Infrastructure.DataAccess
         public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
-        public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
         public DbSet<DataResponsible> DataResponsibles { get; set; }
         public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
         public DbSet<RegisterType> RegisterTypes { get; set; }
@@ -192,7 +189,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
-            modelBuilder.Configurations.Add(new ItSystemTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationTypeMap());
@@ -221,7 +217,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
             modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
-            modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
