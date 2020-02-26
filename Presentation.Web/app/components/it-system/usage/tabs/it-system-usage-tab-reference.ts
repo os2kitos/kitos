@@ -14,7 +14,7 @@
         ($scope, $state, itSystemUsage, notify, hasWriteAccess, referenceService) => {
             $scope.objectId = itSystemUsage.id;
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.referenceName = itSystemUsage.itSystem.name;
+            $scope.referenceName = $scope.systemUsageName;
 
 
             $scope.setChosenReference = id => {
