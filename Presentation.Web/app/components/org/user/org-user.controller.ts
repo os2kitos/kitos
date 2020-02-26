@@ -22,7 +22,7 @@
     export class OrganizationUserController implements IOverviewController {
 
         private storageKey = "org-overview";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 

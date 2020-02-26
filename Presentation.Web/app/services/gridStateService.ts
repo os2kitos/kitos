@@ -7,7 +7,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string) => IGridStateService;
+        getService: (storageKey: string, userId: string) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -42,12 +42,12 @@
 
         return factory;
 
-        function getService(storageKey: string): IGridStateService {
+        function getService(storageKey: string, userId: string): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
+            storageKey = userId+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,

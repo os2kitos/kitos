@@ -129,7 +129,6 @@ app.run([
                 $rootScope.changingOrganization = false;
                 $state.go("index");
                 $cookies.remove(Kitos.Constants.CSRF.CSRFCookie);
-                localStorage.clear();
             });
         };
 

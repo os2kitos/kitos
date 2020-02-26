@@ -9,7 +9,7 @@
     export class OrganizationController implements IOverviewController {
 
         private storageKey = "local-org-overview-options";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey,this.user.id);
         public mainGrid: Kitos.IKendoGrid<Models.IOrganization>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -21,7 +21,8 @@
             "_",
             "notify",
             "gridStateService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "user"
         ];
 
         constructor(
@@ -32,7 +33,8 @@
             private _: ILoDashWithMixins,
             private notify,
             private gridStateService: Services.IGridStateFactory,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private user) {
             $rootScope.page.title = "Org overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
