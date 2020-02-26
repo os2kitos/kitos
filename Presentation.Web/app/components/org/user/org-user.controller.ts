@@ -10,7 +10,6 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
-        isReadOnly: boolean;
     }
 
     class OrganizationUserController {
@@ -95,8 +94,6 @@
                                 usr.isSystemAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.SystemModuleAdmin) !== undefined;
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
-                                usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
-                                
                             });
                             return response;
                         }
@@ -273,15 +270,6 @@
                         persistId: "reportadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: (dataItem) => dataItem.isReportAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isReadOnly", title: "Bruger med læserettigheder", width: 112,
-                        persistId: "readonlyRole", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isReadOnly ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
                         hidden: false,
                         filterable: false,
                         sortable: false
