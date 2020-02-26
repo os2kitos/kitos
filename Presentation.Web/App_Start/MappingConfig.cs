@@ -178,11 +178,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null));
 
-            Mapper.CreateMap<Wish, WishDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.User, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
-
             Mapper.CreateMap<Organization, OrganizationDTO>()
                 .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
                 .ReverseMap();
