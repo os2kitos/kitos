@@ -10,13 +10,14 @@
                         return userService.getUser();
                     }
                 ],
+                userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                    (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                    authorizationServiceFactory
+                    .createSystemUsageAuthorization()
+                    .getAuthorizationForItem($stateParams.id)
+                ],
                 hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        return $http.get('api/itSystemUsage/' + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
+                    "userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                 ],
                 itSystemUsage: [
                     '$http', '$stateParams', function ($http, $stateParams) {
@@ -37,6 +38,7 @@
             $scope.allowClearOption = {
                 allowClear: true
             };
+
 
             if (!$scope.hasWriteAccess) {
                 _.remove($rootScope.page.subnav.buttons, function (o:any) {

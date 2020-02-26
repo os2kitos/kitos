@@ -14,7 +14,7 @@
 
     export class ReportsOverviewController {
         public title: string;
-        public mainGrid: Kitos.IKendoGrid<any>;
+        public mainGrid: IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
         private canCreate: boolean;
         private storageKey = "report-overview-options";
@@ -24,54 +24,38 @@
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$http",
             "$timeout",
-            "$window",
             "$state",
             "$",
             "_",
-            "moment",
             "notify",
             "user",
             "reports",
             "$confirm",
-            "globalConfig",
             "gridStateService",
             "reportCategoryTypes",
-            "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
             private $scope: ng.IScope,
-            private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
-            private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
             private $: JQueryStatic,
             private _: Kitos.ILoDashWithMixins,
-            private moment: moment.MomentStatic,
             private notify,
             private user: Services.IUser,
             public reports,
             private $confirm,
-            private globalConfigs,
             private gridStateService: Services.IGridStateFactory,
             private reportCategoryTypes,
-            private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights : Models.Api.Authorization.EntitiesAccessRightsDTO) {
             
             this.$rootScope.page.title = "Rapport Oversigt";
 
-            var canGlobalAdminOnlyEditReports = _.find(this.globalConfigs, function (g: any) {
-                return g.key === "CanGlobalAdminOnlyEditReports";
-            });
-
-            this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
-
-            if (!user.isGlobalAdmin && user.isReadOnly){
-                this.canCreate = false;
-            }
+            this.canCreate = userAccessRights.canCreate;
 
             this.categoryTypeValues = [];
             var self = this;
@@ -121,13 +105,6 @@
                     this.mainGrid.dataSource.remove(dataItem);
                     this.mainGrid.dataSource.sync();
                 });
-        }
-
-        private getAccessModifier = () => {
-            return [
-                { Id: 0, Name: "Lokal" },
-                { Id: 1, Name: "Offentlig" }
-            ];
         }
 
         private setupGrid() {
@@ -245,7 +222,7 @@
                     {
                         name: "createReport",
                         template:
-                            `<button type="button" class="btn btn-success pull-right" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
+                            `<button data-element-type='createReportButton' type="button" class="btn btn-success pull-right" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     },
                     {
                         name: "clearFilter",
@@ -302,6 +279,9 @@
                         persistId: "name",
                         title: "Navn",
                         width: 150,
+                        attributes: {
+                            "data-element-type": "reportNameKendoObject"
+                        },
                         template: dataItem => dataItem.Id
                             ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>`
                             : "",
@@ -419,10 +399,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -532,14 +509,18 @@
                     controller: ReportsOverviewController,
                     controllerAs: "vm",
                     resolve: {
-                        user: ["userService", userService => userService.getUser()],
-                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)],
-                        globalConfig: [
-                            "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
+                        user: ["userService", userService => userService.getUser()
+                        ],
+                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)
                         ],
                         reportCategoryTypes: [
                             "reportService", reportService => reportService.getReportCategories().then(result => result.data.value)
-                        ]
+                        ],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createReportAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

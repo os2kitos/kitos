@@ -8,7 +8,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
@@ -24,7 +23,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItProjectRepository> _specificProjectRepo;
         private readonly ItProjectService _sut;
-        private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IOrganizationalUserContext> _userContext;
 
@@ -33,34 +31,31 @@ namespace Tests.Unit.Presentation.Web.Services
             _itProjectRepo = new Mock<IGenericRepository<ItProject>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _specificProjectRepo = new Mock<IItProjectRepository>();
-            _transactionManager = new Mock<ITransactionManager>();
             _userRepository = new Mock<IUserRepository>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
                 _specificProjectRepo.Object,
-                _transactionManager.Object,
                 _userRepository.Object,
                 _userContext.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
         }
 
         [Fact]
-        public void Add_Throws_If_Newproject_Is_Null()
+        public void Add_Throws_If_Name_Is_Null()
         {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddProject(null));
+            Assert.Throws<ArgumentNullException>(() => _sut.AddProject(null,0));
         }
 
         [Fact]
         public void Add_Returns_Forbidden()
         {
             //Arrange
-            var itProject = new ItProject();
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(itProject)).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(false);
 
             //Act
-            var result = _sut.AddProject(itProject);
+            var result = _sut.AddProject(A<string>(),A<int>());
 
             //Assert
             Assert.False(result.Ok);
@@ -72,24 +67,17 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var objectOwner = new User();
-            var itProject = new ItProject()
-            {
-                ObjectOwner = objectOwner
-            };
-            var transaction = new Mock<IDatabaseTransaction>();
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(itProject)).Returns(true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _userContext.Setup(x => x.UserEntity).Returns(objectOwner);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(true);
 
             //Act
-            var result = _sut.AddProject(itProject);
+            var result = _sut.AddProject(A<string>(),A<int>());
 
             //Assert
             Assert.True(result.Ok);
-            _itProjectRepo.Verify(x => x.Insert(itProject), Times.Once);
-            _itProjectRepo.Verify(x => x.Save(), Times.Exactly(2));
-            transaction.Verify(x => x.Commit(), Times.Once);
+            _itProjectRepo.Verify(x => x.Insert(It.IsAny<ItProject>()), Times.Once);
+            _itProjectRepo.Verify(x => x.Save(), Times.Exactly(1));
             var resultValue = result.Value;
-            Assert.Same(itProject, resultValue);
             Assert.Equal(AccessModifier.Local, resultValue.AccessModifier); //access modifier must be forced to local
             Assert.NotNull(resultValue.Handover);
             Assert.Equal(objectOwner, resultValue.Handover.ObjectOwner);
@@ -97,12 +85,12 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.NotNull(resultValue.GoalStatus);
             Assert.Equal(objectOwner, resultValue.GoalStatus.ObjectOwner);
             Assert.Equal(objectOwner, resultValue.GoalStatus.LastChangedByUser);
-            Assert.True(new[] { PhaseNames.Phase1, PhaseNames.Phase2, PhaseNames.Phase3, PhaseNames.Phase4, PhaseNames.Phase5 }.SequenceEqual(new[] { itProject.Phase1, itProject.Phase2, itProject.Phase3, itProject.Phase4, itProject.Phase5 }.Select(x => x.Name)));
-            Assert.Equal(1, itProject.CurrentPhase);
-            Assert.Equal(6, itProject.EconomyYears.Count);
-            for (var i = 0; i < itProject.EconomyYears.Count; i++)
+            Assert.True(new[] { PhaseNames.Phase1, PhaseNames.Phase2, PhaseNames.Phase3, PhaseNames.Phase4, PhaseNames.Phase5 }.SequenceEqual(new[] { resultValue.Phase1, resultValue.Phase2, resultValue.Phase3, resultValue.Phase4, resultValue.Phase5 }.Select(x => x.Name)));
+            Assert.Equal(1, resultValue.CurrentPhase);
+            Assert.Equal(6, resultValue.EconomyYears.Count);
+            for (var i = 0; i < resultValue.EconomyYears.Count; i++)
             {
-                var year = itProject.EconomyYears.ToList()[i];
+                var year = resultValue.EconomyYears.ToList()[i];
                 Assert.Equal(i, year.YearNumber);
                 Assert.Same(objectOwner, year.ObjectOwner);
                 Assert.Same(objectOwner, year.LastChangedByUser);

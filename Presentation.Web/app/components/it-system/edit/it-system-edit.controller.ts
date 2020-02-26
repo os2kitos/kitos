@@ -1,19 +1,22 @@
 ﻿((ng, app) => {
-    app.config(["$stateProvider", "$urlRouterProvider", ($stateProvider, $urlRouterProvider) => {
-        $stateProvider.state("it-system.edit", {
-            url: "/edit/{id:[0-9]+}",
-            templateUrl: "app/components/it-system/edit/it-system-edit.view.html",
-            controller: "system.EditCtrl",
+    app.config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
+        $stateProvider.state('it-system.edit', {
+            url: '/edit/{id:[0-9]+}',
+            templateUrl: 'app/components/it-system/edit/it-system-edit.view.html',
+            controller: 'system.EditCtrl',
             resolve: {
-                itSystem: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/itsystem/" + $stateParams.id) 
+                itSystem: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/itsystem/" + $stateParams.id) 
                     .then(result => result.data.response)],
                 user: [
-                    "userService", userService => userService.getUser()
+                    'userService', userService => userService.getUser()
                 ],
-                hasWriteAccess: ["$http", "$stateParams", "user", ($http, $stateParams, user) => $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                    .then(result => result.data.response)],
-                userAccessRights: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/itsystem?id=" + $stateParams.id + "&getEntityAccessRights=true")
-                    .then(result => result.data.response)]
+                userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                    (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                    authorizationServiceFactory
+                    .createSystemAuthorization()
+                    .getAuthorizationForItem($stateParams.id)
+                ],
+                hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit],
             }
         });
     }]);
@@ -27,7 +30,7 @@
                 $scope.showReference = user.isGlobalAdmin;
 
                 $scope.systemNameHeader = itSystem.disabled ? itSystem.name + " - data i IT systemkatalog (Slettes)" : itSystem.name + " - data i IT systemkatalog";
-
+				
                 $scope.hasWriteAccess = hasWriteAccess;
                
 
@@ -95,6 +98,7 @@
                         return;
                     }
                     var systemId = $state.params.id;
+
                     var msg = notify.addInfoMessage("Sletter IT System...", false);
                     $http.delete("api/itsystem/" + systemId + "?organizationId=" + user.currentOrganizationId)
                         .success(result => {

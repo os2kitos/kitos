@@ -10,7 +10,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies
 {
-    public class GlobalReadAccessPolicy : IAuthorizationPolicy<Type>
+    public class GlobalReadAccessPolicy : IGlobalReadAccessPolicy
     {
         //NOTE: For types which cannot be bound to a scoped context (lack of knowledge) and has shared read access
         private static readonly ISet<Type> TypesWithGlobalReadAccess;

@@ -31,11 +31,10 @@
     }]);
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
-        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _) {
+        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_","hasWriteAccess",
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
 
-            // in order to have write access the user and the contract must belong to the same organization and the user must either own the object or have a valid role in the organization
-            $scope.hasWriteAccess = user.currentOrganizationId === contract.organizationId && (user.id === contract.objectOwnerId || user.isGlobalAdmin || user.isLocalAdmin || user.isContractAdmin);
+            $scope.hasWriteAccess = hasWriteAccess;
 
             if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
                 notify.addInfoMessage("Du har ikke lov til at se disse informationer. Kontakt venligst din lokale administrator eller kontrakt administrator.");
@@ -106,8 +105,6 @@
                                 });
                         }
 
-                    } else {
-                        notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
                     }
                 }
 

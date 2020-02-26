@@ -17,19 +17,15 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess","exportGridToExcelService"];
+        public static $inject: string[] = ["_", "$", "$state", "notify", "user", "hasWriteAccess"];
 
         constructor(
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private $scope,
             private notify,
             private user,
-            private hasWriteAccess,
-            private exportGridToExcelService) {
+            private hasWriteAccess) {
             this.hasWriteAccess = hasWriteAccess;
             this.mainGridOptions = {
                 dataSource: {
@@ -88,14 +84,7 @@
                         parse: response => {
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
-                                // set if the user can edit
-                                if (this.user.isGlobalAdmin || ((this.user.isLocalAdmin || this.user.isOrgAdmin) && !this.user.isReadOnly)) {
-                                    usr.canEdit = true;
-                                } else if (this.user.id === usr.Id && !this.user.isReadOnly) {
-                                    usr.canEdit = true;
-                                } else {
-                                    usr.canEdit = false;
-                                }
+                                usr.canEdit = this.hasWriteAccess;
 
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
@@ -316,21 +305,6 @@
             this.$state.go("organization.user.edit", { id: entityId });
         }
 
-        private roleTemplate = (dataItem: IGridModel) => {
-            var roleNames = this._.map(dataItem.OrganizationRights, "Role");
-            this._.forEach(roleNames, (roleName, index) => {
-                switch (roleName) {
-                    case Models.OrganizationRole.LocalAdmin: roleNames[index] = "Lokal Admin"; break;
-                    case Models.OrganizationRole.OrganizationModuleAdmin: roleNames[index] = "Organisations Admin"; break;
-                    case Models.OrganizationRole.ProjectModuleAdmin: roleNames[index] = "Projekt Admin"; break;
-                    case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
-                    case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
-                    case Models.OrganizationRole.ReportModuleAdmin: roleNames[index] = "Rapport Admin"; break;
-                }
-            });
-            return roleNames.join(",");
-        }
-
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
             if (column == 'ObjectOwner.Name') {
@@ -340,15 +314,11 @@
         }
 
         public onDelete(entityId) {
-            if (this.hasWriteAccess == true) {
+            if (this.hasWriteAccess === true) {
                 this.$state.go("organization.user.delete", { id: entityId });
             } else {
                 this.notify.addErrorMessage("Brugeren har ikke rettigheder til at ændre i organisationen");
             }
-        }
-
-        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
         public curOrgCheck: boolean;
@@ -366,13 +336,13 @@
                     user: [
                         "userService", userService => userService.getUser()
                     ],
-                    hasWriteAccess: [
-                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }
+                    userAccessRights: ["authorizationServiceFactory", "user",
+                        (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
+                        authorizationServiceFactory
+                        .createOrganizationAuthorization()
+                        .getAuthorizationForItem(user.currentOrganizationId)
+                    ],
+                    hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
                 }
             });

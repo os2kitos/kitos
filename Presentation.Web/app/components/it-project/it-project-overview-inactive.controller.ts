@@ -102,10 +102,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -232,15 +229,13 @@
                                 var phase = `Phase${project.CurrentPhase}`;
                                 project.CurrentPhaseObj = project[phase];
 
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
-                                    project.hasWriteAccess = true;
-                                }
                                 if (!project.Parent) { project.Parent = { Name: "" }; }
                                 if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
                                 if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
                                 if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                                 if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
                             });
+
                             return response;
                         }
                     }
