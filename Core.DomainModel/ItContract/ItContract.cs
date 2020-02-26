@@ -598,5 +598,7 @@ namespace Core.DomainModel.ItContract
 
         public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
 
+        public int AssociatedSystemRelationsCount => AssociatedSystemRelations.Count;
+
     }
 }

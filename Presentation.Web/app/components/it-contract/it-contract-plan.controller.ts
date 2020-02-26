@@ -234,7 +234,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations,Reference`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelationsCount,Reference`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -520,18 +520,18 @@
                         filterable: false
                     },
                     {
-                        field: "AssociatedRelations",
+                        field: "AssociatedSystemRelationsCount",
                         title: "Antal relationer",
                         width: 60,
                         persistId: "numberOfRelations", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return dataItem.AssociatedSystemRelations.length.toString();
+                            return dataItem.AssociatedSystemRelationsCount.toString();
                         },
                         attributes: {
                             "class": "text-center",
                             "data-element-type": "relationCountObject"
                         },
-                        sortable: false,
+                        sortable: true,
                         filterable: false
                     },
                     {
