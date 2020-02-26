@@ -13,25 +13,112 @@
         isReadOnly: boolean;
     }
 
-    class OrganizationUserController {
+
+    export interface IOverviewController {
+        mainGrid: IKendoGrid<IGridModel>;
+        mainGridOptions: IKendoGridOptions<IGridModel>;
+    }
+
+    export class OrganizationUserController implements IOverviewController {
+
+        private storageKey = "org-user-overview";
+        private gridState = this.gridStateService.getService(this.storageKey);
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess","exportGridToExcelService"];
+        public static $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$state",
+            "_",
+            "$",
+            "user",
+            "hasWriteAccess",
+            "notify",
+            "gridStateService",
+            "exportGridToExcelService"
+        ];
 
         constructor(
+            private $rootScope: IRootScope,
+            private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
+            private $state: ng.ui.IStateService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
-            private $scope,
-            private notify,
             private user,
             private hasWriteAccess,
+            private notify,
+            private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService) {
-            this.hasWriteAccess = hasWriteAccess;
-            this.mainGridOptions = {
+
+
+            $scope.$on("kendoWidgetCreated", (event, widget) => {
+                if (widget === this.mainGrid) {
+                    this.loadGridOptions();
+                    this.mainGrid.dataSource.read();
+                }
+            });
+
+            this.activate();
+        }
+
+        private saveGridOptions = () => {
+            this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
+        }
+
+        private loadGridOptions() {
+            this.gridState.loadGridOptions(this.mainGrid);
+        }
+
+        public saveGridProfile() {
+            this.gridState.saveGridProfile(this.mainGrid);
+            this.notify.addSuccessMessage("Filtre og sortering gemt");
+        }
+
+        public loadGridProfile() {
+            this.gridState.loadGridProfile(this.mainGrid);
+            this.mainGrid.dataSource.read();
+            this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
+        }
+
+        public clearGridProfile() {
+            this.gridState.removeProfile();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Filtre og sortering slettet");
+            this.reload();
+        }
+
+        public doesGridProfileExist() {
+            return this.gridState.doesGridProfileExist();
+        }
+
+        public clearOptions() {
+            this.gridState.removeProfile();
+            this.gridState.removeLocal();
+            this.gridState.removeSession();
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            this.reload();
+        };
+
+        public generateExcel() {
+            kendo.ui.progress(this.mainGrid.element, true);
+        }
+
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
+
+        private activate() {
+            var mainGridOptions: IKendoGridOptions<IGridModel> = {
+                autoBind: false,
                 dataSource: {
                     type: "odata-v4",
                     transport: {
@@ -43,7 +130,7 @@
                             }
                         },
                         destroy: {
-                            url: (entity) => {
+                            url: () => {
                                 return `/odata/Organizations(${this.user.currentOrganizationId})/RemoveUser()`;
                             },
                             dataType: "json",
@@ -107,7 +194,7 @@
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
                                 usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
-                                
+
                             });
                             return response;
                         }
@@ -126,7 +213,7 @@
                 sortable: {
                     mode: "single"
                 },
-                editable: false,    
+                editable: false,
                 reorderable: true,
                 resizable: true,
                 filterable: {
@@ -141,14 +228,20 @@
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                 </uib-tabset>`,
-
+                dataBound: this.saveGridOptions,
+                columnResize: this.saveGridOptions,
+                columnHide: this.saveGridOptions,
+                columnShow: this.saveGridOptions,
+                columnReorder: this.saveGridOptions,
+                excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 230,
                         persistId: "fullname", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
-                        hidden: false, 
+                        hidden: false,
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -167,7 +260,7 @@
                             "data-element-type": "userHeaderEmail"
                         },
                         attributes: {
-                             "data-element-type": "userEmailObject"
+                            "data-element-type": "userEmailObject"
                         },
                         hidden: false,
                         filterable: {
@@ -207,9 +300,9 @@
                         persistId: "role", // DON'T YOU DARE RENAME!
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
-                            this.curOrgCheck = dataItem.OrganizationUnitRights.ObjectId == this.user.currentOrganizationId;
+                            this.curOrgCheck = dataItem.OrganizationUnitRights.ObjectId === this.user.currentOrganizationId;
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights | filter: { ObjectId: '${this.user.currentOrganizationId}' }"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
-                            },
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -222,13 +315,13 @@
                     },
                     {
 
-                        field: "hasApi", title: "API adgang", width: 96, 
+                        field: "hasApi", title: "API adgang", width: 96,
                         persistId: "apiaccess", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center", "data-element-type": "userObject"},
+                        attributes: { "class": "text-center", "data-element-type": "userObject" },
                         headerAttributes: {
                             "data-element-type": "userHeader"
                         },
-                        template: (dataItem) => dataItem.HasApiAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.HasApiAccess),
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -238,7 +331,7 @@
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
                         persistId: "localadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isLocalAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isLocalAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -247,7 +340,7 @@
                         field: "isOrgAdmin", title: "Organisations Admin", width: 104,
                         persistId: "orgadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isOrgAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isOrgAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -256,7 +349,7 @@
                         field: "isProjectAdmin", title: "Projekt Admin", width: 109,
                         persistId: "projectadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isProjectAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isProjectAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -265,7 +358,7 @@
                         field: "isSystemAdmin", title: "System Admin", width: 104,
                         persistId: "systemadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isSystemAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isSystemAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -274,7 +367,7 @@
                         field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
                         persistId: "contractadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isContractAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isContractAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -283,7 +376,7 @@
                         field: "isReportAdmin", title: "Rapport Admin", width: 112,
                         persistId: "reportadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isReportAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isReportAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -292,7 +385,7 @@
                         field: "isReadOnly", title: "Bruger med læserettigheder", width: 112,
                         persistId: "readonlyRole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => dataItem.isReadOnly ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        template: (dataItem) => setBoolField(dataItem.isReadOnly),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -305,30 +398,24 @@
                     }
                 ]
             };
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
                 });
             }
+
+            function setBoolField(bool) {
+                return bool
+                    ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>`
+                    : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`;
+            }
+
+            this.mainGridOptions = mainGridOptions;
         }
 
         public onEdit(entityId) {
             this.$state.go("organization.user.edit", { id: entityId });
-        }
-
-        private roleTemplate = (dataItem: IGridModel) => {
-            var roleNames = this._.map(dataItem.OrganizationRights, "Role");
-            this._.forEach(roleNames, (roleName, index) => {
-                switch (roleName) {
-                    case Models.OrganizationRole.LocalAdmin: roleNames[index] = "Lokal Admin"; break;
-                    case Models.OrganizationRole.OrganizationModuleAdmin: roleNames[index] = "Organisations Admin"; break;
-                    case Models.OrganizationRole.ProjectModuleAdmin: roleNames[index] = "Projekt Admin"; break;
-                    case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
-                    case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
-                    case Models.OrganizationRole.ReportModuleAdmin: roleNames[index] = "Rapport Admin"; break;
-                }
-            });
-            return roleNames.join(",");
         }
 
         private fixNameFilter(filterUrl, column) {
