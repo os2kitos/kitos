@@ -25,24 +25,24 @@
         });
     }]);
 
-    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "$stateParams", "notify", "itSystemUsage", "user", "systemCategories",
-        "businessTypes", "archiveTypes", "sensitiveDataTypes", "autofocus", "hasWriteAccess", 
-        ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, user, systemCategories, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess) => {
+    app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories",
+        "businessTypes", "archiveTypes", "sensitiveDataTypes", "autofocus",
+        ($rootScope, $scope, $http, notify, user, systemCategories, businessTypes, archiveTypes, sensitiveDataTypes, autofocus) => {
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${$scope.usage.id}`;
-            $scope.usage = itSystemUsage;
-            $scope.usageId = $stateParams.id;
-            $scope.hasWriteAccess = hasWriteAccess;
+            $scope.usageId = $scope.usage.id;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-            $scope.hasViewAccess = user.currentOrganizationId == itSystemUsage.organizationId;
+            $scope.hasViewAccess = user.currentOrganizationId == $scope.usage.organizationId;
             $scope.systemCategories = systemCategories;
-            $scope.system = itSystemUsage.itSystem;
+            $scope.system = new Kitos.Models.ViewModel.ItSystem.SystemViewModel($scope.usage.itSystem);
             autofocus();
+
+
             var today = new Date();
-            if (!itSystemUsage.active) {
-                if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
+            if (!$scope.usage.active) {
+                if ($scope.usage.concluded < today && today < $scope.usage.expirationDate) {
                     $scope.displayActive = true;
                 } else {
                     $scope.displayActive = false;
@@ -51,10 +51,10 @@
                 $scope.displayActive = false;
             }
 
-            if (itSystemUsage.overviewId) {
+            if ($scope.usage.overviewId) {
                 $scope.usage.overview = {
-                    id: itSystemUsage.overviewId,
-                    text: itSystemUsage.overviewItSystemName
+                    id: $scope.usage.overviewId,
+                    text: $scope.usage.overviewItSystemName
                 };
             }
             $scope.datepickerOptions = {
@@ -62,9 +62,9 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.orgUnits = itSystemUsage.usedBy;
+            $scope.orgUnits = $scope.usage.usedBy;
 
-            $scope.itSytemUsagesSelectOptions = selectLazyLoading("api/itSystemUsage", false, ["organizationId=" + itSystemUsage.organizationId]);
+            $scope.itSytemUsagesSelectOptions = selectLazyLoading("api/itSystemUsage", false, ["organizationId=" + $scope.usage.organizationId]);
 
             function selectLazyLoading(url: any, excludeSelf: any, paramAry: any);
             function selectLazyLoading(url, excludeSelf, paramAry) {

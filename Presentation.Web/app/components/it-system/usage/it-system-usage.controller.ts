@@ -25,9 +25,10 @@
         });
     }]);
 
-    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "user", "hasWriteAccess",
-        ($rootScope, $scope, itSystemUsage, user, hasWriteAccess) => {
+    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess",
+        ($rootScope, $scope, itSystemUsage, hasWriteAccess) => {
             $scope.hasWriteAccess = hasWriteAccess;
+
             $scope.usage = itSystemUsage;
 
             $scope.systemUsageName = itSystemUsage.itSystem.disabled ? itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name + " (Slettes)" : itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name;
@@ -35,7 +36,6 @@
             $scope.allowClearOption = {
                 allowClear: true
             };
-
 
             if (!$scope.hasWriteAccess) {
                 _.remove($rootScope.page.subnav.buttons, (o:any) => o.text === "Fjern anvendelse");
