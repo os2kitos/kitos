@@ -84,12 +84,6 @@ namespace Core.ApplicationServices.Authorization
                 return true;
             }
 
-            if (IsReadOnly())
-            {
-                //Negates all elevated roles
-                return false;
-            }
-
             if (MatchType<ItSystem>(target))
             {
                 return false; //Only global admin so far
@@ -184,11 +178,6 @@ namespace Core.ApplicationServices.Authorization
         private bool IsGlobalAdmin()
         {
             return _userContext.HasRole(OrganizationRole.GlobalAdmin);
-        }
-
-        private bool IsReadOnly()
-        {
-            return _userContext.HasRole(OrganizationRole.ReadOnly);
         }
     }
 }
