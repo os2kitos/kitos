@@ -203,7 +203,6 @@ namespace Core.ApplicationServices.Authorization
                 result = HasModuleLevelWriteAccess(entity);
             }
 
-            //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result;
         }
 
