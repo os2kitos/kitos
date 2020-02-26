@@ -21,7 +21,6 @@ class UsersPage implements IPageObject {
     public inputPhone = element(by.model("ctrl.vm.phoneNumber"));
     public boolApi = element(by.model("ctrl.vm.hasApi"));
     public boolLocalAdmin = element(by.model("ctrl.vm.isLocalAdmin"));
-    public boolReadOnly = element(by.model("ctrl.vm.isReadOnly"));
     public createUserButton = element(by.buttonText("Opret bruger"));
     public editUserButton = element(by.buttonText("Gem ændringer"));
     public cancelEditUserButton = element(by.buttonText("Annuller"));

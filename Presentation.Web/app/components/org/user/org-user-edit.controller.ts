@@ -13,9 +13,6 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
-        isReadOnly: boolean;
-        
-
     }
 
     class EditOrganizationUserController {
@@ -27,7 +24,6 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
-        public isUserReadOnly = false;
         public hasApi = false;
 
         private userId: number;
@@ -55,7 +51,6 @@
                 isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
                 isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
-                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined
             };
             this.originalVm = _.clone(userVm);
 
@@ -68,28 +63,25 @@
             this.isUserSystemAdmin = currentUser.isSystemAdmin;
             this.isUserContractAdmin = currentUser.isContractAdmin;
             this.isUserReportAdmin = currentUser.isReportAdmin;
-            this.isUserReadOnly = currentUser.isReadOnly;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
             // check if the requested property exsists in the diff
-            if (Object.keys(diffRights).indexOf(property) === -1)
+            if (Object.keys(diffRights).indexOf(property) !== -1)
             {
-                return; // if it doesn't then it wasn't changed and we abort
-            }
-
-            if (diffRights[property]) {
-                // add role to user
-                let payload: Models.IOrganizationRight = {
-                    UserId: this.userId,
-                    Role: role,
-                    OrganizationId: this.currentUser.currentOrganizationId
-                };
-                return this.$http.post(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights`, payload);
-            } else {
-                // remove role from user
-                let rightsObj = this._.find(this.user.OrganizationRights, { Role: role });
-                return this.$http.delete(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights(${rightsObj.Id})`);
+                if (diffRights[property]) {
+                    // add role to user
+                    let payload: Models.IOrganizationRight = {
+                        UserId: this.userId,
+                        Role: role,
+                        OrganizationId: this.currentUser.currentOrganizationId
+                    };
+                    return this.$http.post(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights`, payload);
+                } else {
+                    // remove role from user
+                    let rightsObj = this._.find(this.user.OrganizationRights, { Role: role });
+                    return this.$http.delete(`/odata/Organizations(${this.currentUser.currentOrganizationId})/Rights(${rightsObj.Id})`);
+                }
             }
         }
 
@@ -104,7 +96,6 @@
             promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
-            promises.push(this.changeRight(diffRights, "isReadOnly", Models.OrganizationRole.ReadOnly));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,
