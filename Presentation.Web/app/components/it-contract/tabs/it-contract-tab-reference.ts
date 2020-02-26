@@ -5,7 +5,7 @@
             templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "contract.EditReference",
             resolve: {
-                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createContractReference()],
+                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createContractReference()]
             }
         });
     }]);

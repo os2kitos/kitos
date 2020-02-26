@@ -27,7 +27,7 @@
         });
     }]);
 
-    app.controller("system.referenceCreateModalCtrl", ["$scope", "notify", "referenceService", "$stateParams",
+    app.controller("system.referenceCreateModalCtrl", ["$scope", "notify", "referenceService", "$stateParams", 
         ($scope, notify, referenceService, $stateParams) => {
 
             $scope.dismiss = () => {

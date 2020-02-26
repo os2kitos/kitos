@@ -2,7 +2,7 @@
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-project.edit.references.edit", {
             url: "/editReference/:refId/:orgId",
-            onEnter: ["$state", "$stateParams", "$uibModal","$http",
+            onEnter: ["$state", "$stateParams", "$uibModal", "referenceServiceFactory",
                 ($state, $stateParams, $modal, referenceServiceFactory) => {
                     var referenceService = referenceServiceFactory.createProjectReference();
                     $modal.open({
@@ -45,15 +45,15 @@
                     var msg = notify.addInfoMessage("Gemmer række", false);
 
                     referenceService.updateReference(
-                            $stateParams.refId,
-                            $stateParams.orgId,
-                            $scope.reference.title,
-                            $scope.reference.externalReferenceId,
-                            $scope.reference.url)
+                        $stateParams.refId,
+                        $stateParams.orgId,
+                        $scope.reference.title,
+                        $scope.reference.externalReferenceId,
+                        $scope.reference.url)
                         .then(success => {
-                                msg.toSuccessMessage("Referencen er gemt");
-                                $scope.$close(true);
-                            },
+                            msg.toSuccessMessage("Referencen er gemt");
+                            $scope.$close(true);
+                        },
                             error => msg.toErrorMessage("Fejl! Prøv igen"));
                 };
             }]);

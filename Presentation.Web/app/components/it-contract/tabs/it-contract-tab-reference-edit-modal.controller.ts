@@ -2,7 +2,7 @@
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-contract.edit.references.edit", {
             url: "/editReference/:refId/:orgId",
-            onEnter: ["$state", "$stateParams", "$uibModal", "$http",
+            onEnter: ["$state", "$stateParams", "$uibModal", "referenceServiceFactory",
                 ($state, $stateParams, $modal, referenceServiceFactory) => {
                     var referenceService = referenceServiceFactory.createContractReference();
                     $modal.open({
