@@ -12,7 +12,7 @@ namespace Tools.SSOWithKombitSts
             if (args.Length != 1)
             {
                 WriteUsageExplanation();
-                Environment.Exit(-1);
+                return 1;
             }
 
             var certificateFilename = args[0];
