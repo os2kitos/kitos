@@ -59,9 +59,11 @@
     <Compile Include="Model\Parameters\Credentials.cs" />
     <Compile Include="Model\Tasks\CreateFullTestDatabaseTask.cs" />
     <Compile Include="Model\Tasks\CreateItContractTask.cs" />
+    <Compile Include="Model\Tasks\CreateItReportTask.cs" />
     <Compile Include="Model\Tasks\CreateItSystemTask.cs" />
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
     <Compile Include="Model\Tasks\CreateOrganizationTask.cs" />
+    <Compile Include="Model\Tasks\CreateItProjectTask.cs" />
     <Compile Include="Model\Tasks\CreateTaskRefTask.cs" />
     <Compile Include="Model\Tasks\DatabaseTask.cs" />
     <Compile Include="Model\Tasks\DropDatabaseTask.cs" />

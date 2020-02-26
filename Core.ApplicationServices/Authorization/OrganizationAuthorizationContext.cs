@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -13,19 +14,22 @@ namespace Core.ApplicationServices.Authorization
     {
         private readonly IOrganizationalUserContext _activeUserContext;
         private readonly IEntityTypeResolver _typeResolver;
-        private readonly IAuthorizationPolicy<IEntity> _moduleLevelAccessPolicy;
-        private readonly IAuthorizationPolicy<Type> _globalReadAccessPolicy;
+        private readonly IModuleModificationPolicy _moduleLevelAccessPolicy;
+        private readonly IGlobalReadAccessPolicy _globalReadAccessPolicy;
+        private readonly IModuleCreationPolicy _typeCreationPolicy;
 
         public OrganizationAuthorizationContext(
             IOrganizationalUserContext activeUserContext,
             IEntityTypeResolver typeResolver,
-            IAuthorizationPolicy<IEntity> moduleLevelAccessPolicy,
-            IAuthorizationPolicy<Type> globalReadAccessPolicy)
+            IModuleModificationPolicy moduleLevelAccessPolicy,
+            IGlobalReadAccessPolicy globalReadAccessPolicy,
+            IModuleCreationPolicy typeCreationPolicy)
         {
             _activeUserContext = activeUserContext;
             _typeResolver = typeResolver;
             _moduleLevelAccessPolicy = moduleLevelAccessPolicy;
             _globalReadAccessPolicy = globalReadAccessPolicy;
+            _typeCreationPolicy = typeCreationPolicy;
         }
 
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
@@ -96,18 +100,7 @@ namespace Core.ApplicationServices.Authorization
 
         public bool AllowCreate<T>()
         {
-            if (IsReadOnly())
-            {
-                return IsGlobalAdmin(); //Global admin negates readonly
-            }
-
-            if (MatchType<T, ItSystem>())
-            {
-                return IsGlobalAdmin();
-            }
-
-            //NOTE: Once we migrate more types, this will be extended
-            return true;
+            return _typeCreationPolicy.AllowCreation(typeof(T));
         }
 
         public bool AllowCreate<T>(IEntity entity)
@@ -127,7 +120,7 @@ namespace Core.ApplicationServices.Authorization
                 return EntityReadAccessLevel.All;
             }
 
-            if (IsContextBound(entityType))
+            if (IsOrganizationSpecificData(entityType))
             {
                 return GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public
                     ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
@@ -200,40 +193,22 @@ namespace Core.ApplicationServices.Authorization
                 ignoreReadOnlyRole = true;
                 result = true;
             }
-            else if (IsContextBound(entity))
+            else if (IsOrganizationSpecificData(entity))
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
                     result =
-                        IsLocalAdmin() ||
-                        AllowWritesToEntity(entity) ||
+                        HasModuleLevelWriteAccess(entity) ||
                         HasAssignedWriteAccess(entity);
                 }
             }
             else
             {
-                result = AllowWritesToEntity(entity);
+                result = HasModuleLevelWriteAccess(entity);
             }
-
-            //Specific type policy may revoke existing result so AND it
-            result = result && CheckSpecificTypeModificationPolicies(entity);
 
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
-        }
-
-        private bool CheckSpecificTypeModificationPolicies(IEntity entity)
-        {
-            var result = true;
-
-            switch (entity)
-            {
-                case ItInterface _:
-                    result = IsGlobalAdmin();
-                    break;
-            }
-
-            return result || IsGlobalAdmin();
         }
 
         public bool AllowDelete(IEntity entity)
@@ -274,25 +249,9 @@ namespace Core.ApplicationServices.Authorization
             return permission.Accept(this);
         }
 
-        private bool AllowWritesToEntity(IEntity entity)
-        {
-            var result = false;
-
-            if (HasModuleLevelWriteAccess(entity))
-            {
-                result = true;
-            }
-            else if (IsUserEntity(entity) == false && HasOwnership(entity))
-            {
-                result = true;
-            }
-
-            return result;
-        }
-
         private bool HasModuleLevelWriteAccess(IEntity entity)
         {
-            return _moduleLevelAccessPolicy.Allow(entity);
+            return _moduleLevelAccessPolicy.AllowModification(entity);
         }
 
         private bool IsOrganizationModuleAdmin()
@@ -326,12 +285,12 @@ namespace Core.ApplicationServices.Authorization
             return _activeUserContext.HasAssignedWriteAccess(entity);
         }
 
-        private bool IsContextBound(IEntity entity)
+        private bool IsOrganizationSpecificData(IEntity entity)
         {
-            return IsContextBound(_typeResolver.Resolve(entity.GetType()));
+            return IsOrganizationSpecificData(_typeResolver.Resolve(entity.GetType()));
         }
 
-        private static bool IsContextBound(Type entityType)
+        private static bool IsOrganizationSpecificData(Type entityType)
         {
             return typeof(IContextAware).IsAssignableFrom(entityType) || 
                    typeof(IOwnedByOrganization).IsAssignableFrom(entityType) ||
@@ -341,11 +300,6 @@ namespace Core.ApplicationServices.Authorization
         private bool ActiveContextIsEntityContext(IEntity entity)
         {
             return _activeUserContext.IsActiveInSameOrganizationAs(entity);
-        }
-
-        private bool HasOwnership(IEntity ownedEntity)
-        {
-            return _activeUserContext.HasOwnership(ownedEntity);
         }
 
         private bool IsGlobalAdmin()

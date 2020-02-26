@@ -25,7 +25,7 @@ namespace Core.DomainServices.Repositories.KLE
             var mainGroups = document.Descendants("Hovedgruppe").Select(mainGroup =>
                 new TaskRef
                 {
-                    Uuid = TryParseUUID(mainGroup).GetValueOrFallback(Guid.Empty),
+                    Uuid = ParseUUID(mainGroup),
                     TaskKey = mainGroup.Elements("HovedgruppeNr").First().Value,
                     Description = mainGroup.Elements("HovedgruppeTitel").First().Value,
                     Type = "KLE-Hovedgruppe",
@@ -36,7 +36,7 @@ namespace Core.DomainServices.Repositories.KLE
             var subGroups = document.Descendants("Gruppe").Select(@group =>
                 new TaskRef
                 {
-                    Uuid = TryParseUUID(@group).GetValueOrFallback(Guid.Empty),
+                    Uuid = ParseUUID(@group),
                     TaskKey = @group.Elements("GruppeNr").First().Value,
                     Description = @group.Elements("GruppeTitel").First().Value,
                     Type = "KLE-Gruppe",
@@ -47,7 +47,7 @@ namespace Core.DomainServices.Repositories.KLE
             var subjects = document.Descendants("Emne").Select(item =>
                 new TaskRef
                 {
-                    Uuid = TryParseUUID(item).GetValueOrFallback(Guid.Empty),
+                    Uuid = ParseUUID(item),
                     TaskKey = item.Elements("EmneNr").First().Value,
                     Description = item.Elements("EmneTitel").First().Value,
                     Type = "KLE-Emne",
@@ -126,12 +126,9 @@ namespace Core.DomainServices.Repositories.KLE
             return date == null ? default(DateTime?) : DateTime.Parse(date);
         }
 
-        private static Maybe<Guid> TryParseUUID(XElement element)
+        private static Guid ParseUUID(XElement element)
         {
-            //Some times the UUID is empty from KL so we cannot count on it being valid
-            return Guid.TryParse(element.Elements("UUID").FirstOrDefault()?.Value ?? string.Empty, out var uuid)
-                ? Maybe<Guid>.Some(uuid)
-                : Maybe<Guid>.None;
+            return Guid.Parse(element.Elements("UUID").First().Value);
         }
     }
 }

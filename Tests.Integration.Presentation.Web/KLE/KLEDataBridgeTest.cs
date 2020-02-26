@@ -11,7 +11,7 @@ namespace Tests.Integration.Presentation.Web.KLE
         private void GetKLEXMLData_Returns_Valid_XML()
         {
             var sut = new KLEDataBridge();
-            var result = sut.GetKLEXMLData();
+            var result = sut.GetAllActiveKleNumbers();
             var publishingDateXElement = result.Descendants("UdgivelsesDato");
             DateTime.Parse(publishingDateXElement.First().Value);
         }

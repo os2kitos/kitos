@@ -150,7 +150,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await SystemRelationHelper.SendPostRelationRequestAsync(input);
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
-            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, null, relationToEdit.FrequencyType, relationToEdit.Interface);
+            var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, null, relationToEdit.FrequencyType, relationToEdit.Interface);
 
             //Act
             using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
@@ -177,7 +177,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await SystemRelationHelper.SendPostRelationRequestAsync(input);
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
-            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, null, relationToEdit.Interface);
+            var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, null, relationToEdit.Interface);
 
             //Act
             using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
@@ -204,7 +204,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await SystemRelationHelper.SendPostRelationRequestAsync(input);
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
-            var edited = await PrepareEditedRelationAsync(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, relationToEdit.FrequencyType, null);
+            var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, relationToEdit.FrequencyType, null);
 
             //Act
             using (var response = await SystemRelationHelper.SendPatchRelationRequestAsync(edited))
@@ -442,7 +442,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return input;
         }
 
-        private async Task<SystemRelationDTO> PrepareEditedRelationAsync(SystemRelationDTO created, NamedEntityDTO usage, NamedEntityDTO contract, NamedEntityDTO frequency, NamedEntityDTO interfaceType)
+        private SystemRelationDTO PrepareEditedRelation(SystemRelationDTO created, NamedEntityDTO usage, NamedEntityDTO contract, NamedEntityDTO frequency, NamedEntityDTO interfaceType)
         {
             return new SystemRelationDTO(
                 created.Id,

@@ -165,11 +165,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var input = new ItSystemUsage
             {
                 ItSystemId = A<int>(),
-                OrganizationId = A<int>(),
-                DataLevel = A<DataSensitivityLevel>(),
-                ContainsLegalInfo = A<DataOptions>(),
-                AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation> { new ItSystemUsageDataWorkerRelation(), new ItSystemUsageDataWorkerRelation() }
-
+                OrganizationId = A<int>()
             };
             var associatedItSystem = new ItSystem
             {
@@ -193,10 +189,10 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(usageCreatedByRepo, createdUsage);
             Assert.Same(objectOwner, createdUsage.ObjectOwner);
             Assert.Equal(input.OrganizationId, createdUsage.OrganizationId);
-            Assert.Equal(input.DataLevel, createdUsage.DataLevel);
+            Assert.Equal(DataSensitivityLevel.NONE, createdUsage.DataLevel);
+            Assert.Equal(DataOptions.NO, createdUsage.ContainsLegalInfo);
+            Assert.Empty(createdUsage.AssociatedDataWorkers);
             Assert.Equal(input.ItSystemId, createdUsage.ItSystemId);
-            Assert.Equal(input.ContainsLegalInfo, createdUsage.ContainsLegalInfo);
-            Assert.Equal(input.AssociatedDataWorkers, createdUsage.AssociatedDataWorkers);
             _usageRepository.Verify(x => x.Insert(usageCreatedByRepo), Times.Once);
             _usageRepository.Verify(x => x.Save(), Times.Once);
         }

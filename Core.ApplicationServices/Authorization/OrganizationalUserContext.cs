@@ -62,10 +62,5 @@ namespace Core.ApplicationServices.Authorization
         {
             return entity.HasUserWriteAccess(UserEntity);
         }
-
-        public bool HasOwnership(IEntity entity)
-        {
-            return entity.ObjectOwnerId == UserId;
-        }
     }
 }

@@ -1,31 +1,31 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.interface-edit', {
-            url: '/edit/{id:[0-9]+}/interface',
-            templateUrl: 'app/components/it-system/it-interface/it-interface-edit.view.html',
-            controller: 'system.interfaceEditCtrl',
+﻿((ng, app) => {
+    const activateInterfaceBtnText = "Aktivér snitflade";
+    const deactivateInterfaceBtnText = "Deaktivér snitflade";
+    const deleteInterfaceBtnText = "Slet Snitflade";
+
+    app.config(["$stateProvider", $stateProvider => {
+        $stateProvider.state("it-system.interface-edit", {
+            url: "/edit/{id:[0-9]+}/interface",
+            templateUrl: "app/components/it-system/it-interface/it-interface-edit.view.html",
+            controller: "system.interfaceEditCtrl",
             resolve: {
                 user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
+                    "userService", userService => userService.getUser()
+                ],
+                userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                    (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                    authorizationServiceFactory
+                    .createInterfaceAuthorization()
+                    .getAuthorizationForItem($stateParams.id)
                 ],
                 hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + interfaceId + '?hasWriteAccess=true&organizationId=' + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
+                    "userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                 ],
                 itInterface: [
-                    '$http', '$stateParams', function ($http, $stateParams) {
+                    "$http", "$stateParams", ($http, $stateParams) => {
                         var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + interfaceId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
+                        return $http.get("api/itInterface/" + interfaceId)
+                            .then(result => result.data.response);
                     }
                 ]
             }
@@ -33,82 +33,81 @@
     }]);
 
     app.controller('system.interfaceEditCtrl',
-    [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user', '$stateParams', '_',
-        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user, $stateParams, _) {
-            $rootScope.page.title = 'Snitflade - Rediger';
-            autofocus();
-            $scope.stateId = $stateParams.id;
-            itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
-            itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
-            $scope.interface = itInterface;
-            $scope.hasWriteAccess = hasWriteAccess;
-            $scope.select2AllowClearOpt = {
-                allowClear: true
-            };
+        [
+            "$rootScope", "$scope", "$http", "$state", "notify", "itInterface", "hasWriteAccess", "autofocus", "$stateParams", "_", "userAccessRights",
+            ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, $stateParams, _, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => {
+                $rootScope.page.title = "Snitflade - Rediger";
+                autofocus();
+                $scope.stateId = $stateParams.id;
+                itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
+                itInterface.updateUrl = "api/itInterface/" + itInterface.id;
+                $scope.interface = itInterface;
+                $scope.hasWriteAccess = hasWriteAccess;
+                $scope.select2AllowClearOpt = {
+                    allowClear: true
+                };
 
-            if (!$scope.hasWriteAccess) {
-                _.remove($rootScope.page.subnav.buttons, function (o: any) {
-                    return o.text === "Slet Snitflade";
-                });
-            } else if (user.isGlobalAdmin) {
-                _.remove($rootScope.page.subnav.buttons, function (o) {
-                    return o.text === "Deaktivér snitflade";
-                });
+                const removeButton = (text: string) => _.remove($rootScope.page.subnav.buttons, (o: any) => o.text === text);
 
-                _.remove($rootScope.page.subnav.buttons, function (o) {
-                    return o.text === "Aktivér snitflade";
-                });
+                removeButton(deactivateInterfaceBtnText);
+                removeButton(activateInterfaceBtnText);
 
-                if (itInterface.accessModifier === 1) {
-                    if (!itInterface.disabled) {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: disableInterface, text: 'Deaktivér snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
-                        );
-                    } else {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: enableInterface, text: 'Aktivér snitflade', style: 'btn-success', showWhen: 'it-system.interface-edit' }
-                        );
+                if (!userAccessRights.canDelete) {
+                    removeButton(deleteInterfaceBtnText);
+                }
+
+                //Enabled/disabled is only interactive for shared interfaces
+                if (userAccessRights.canEdit) {
+                    const isShared = itInterface.accessModifier === 1;
+                    if (isShared) {
+                        if (!itInterface.disabled) {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: disableInterface, text: deactivateInterfaceBtnText, style: "btn-danger", showWhen: "it-system.interface-edit" }
+                            );
+                        } else {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: enableInterface, text: activateInterfaceBtnText, style: "btn-success", showWhen: "it-system.interface-edit" }
+                            );
+                        }
                     }
                 }
-            }
 
-            function disableInterface() {
-                if (!confirm('Er du sikker på du vil deaktivere snitfladen?')) {
-                    return;
+                function disableInterface() {
+                    if (!confirm("Er du sikker på du vil deaktivere snitfladen?")) {
+                        return;
+                    }
+
+                    var payload: any = {};
+                    payload.Disabled = true;
+
+                    var msg = notify.addInfoMessage("Deaktiverer snitflade...", false);
+                    $http.patch("odata/ItInterfaces(" + itInterface.id + ")", payload)
+                        .success(result => {
+                            msg.toSuccessMessage("Snitflade er deaktiveret!");
+                            $state.reload();
+                        })
+                        .error((data, status) => {
+                            msg.toErrorMessage("Fejl! Kunne ikke deaktivere snitflade!");
+                        });
                 }
 
-                var payload: any = {};
-                payload.Disabled = true;
+                function enableInterface() {
+                    if (!confirm("Er du sikker på du vil aktivere snitflade?")) {
+                        return;
+                    }
+                    var payload: any = {};
+                    payload.Disabled = false;
 
-                var msg = notify.addInfoMessage('Deaktiverer snitflade...', false);
-                $http.patch('odata/ItInterfaces(' + itInterface.id + ')', payload)
-                    .success(function (result) {
-                        msg.toSuccessMessage('Snitflade er deaktiveret!');
-                        $state.reload();
-                    })
-                    .error(function (data, status) {
-                        msg.toErrorMessage('Fejl! Kunne ikke deaktivere snitflade!');
-                    });
-            }
-
-            function enableInterface() {
-                if (!confirm('Er du sikker på du vil aktivere snitflade?')) {
-                    return;
+                    var msg = notify.addInfoMessage("Aktiverer snitflade...", false);
+                    $http.patch("odata/ItInterfaces(" + itInterface.id + ")", payload)
+                        .success(result => {
+                            msg.toSuccessMessage("Snitflade er aktiveret!");
+                            $state.reload();
+                        })
+                        .error((data, status) => {
+                            msg.toErrorMessage("Fejl! Kunne ikke aktivere snitflade!");
+                        });
                 }
-                var payload: any = {};
-                payload.Disabled = false;
-
-                var msg = notify.addInfoMessage('Aktiverer snitflade...', false);
-                $http.patch('odata/ItInterfaces(' + itInterface.id + ')', payload)
-                    .success(function (result) {
-                        msg.toSuccessMessage('Snitflade er aktiveret!');
-                        $state.reload();
-                    })
-                    .error(function (data, status) {
-                        msg.toErrorMessage('Fejl! Kunne ikke aktivere snitflade!');
-                    });
             }
-        }
-    ]);
+        ]);
 })(angular, app);

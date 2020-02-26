@@ -16,6 +16,7 @@
         clearOptions(): void;
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
+        allowToggleUsage : boolean;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -34,6 +35,7 @@
         public canCreate = this.userAccessRights.canCreate;
         public canMigrate = this.userMigrationRights.canExecuteMigration;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
+        public allowToggleUsage = false;
 
         public static $inject:
             Array<string> = [
@@ -52,8 +54,8 @@
                 "userMigrationRights",
                 "gridStateService",
                 "$uibModal",
-                "needsWidthFixService",
-                "exportGridToExcelService"
+                "exportGridToExcelService",
+                "systemUsageUserAccessRights"
             ];
 
         constructor(
@@ -72,8 +74,8 @@
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
-            private needsWidthFixService,
             private exportGridToExcelService,
+            private systemUsageUserAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
@@ -81,6 +83,7 @@
             private municipalityId,
             private municipalityName,
             public migrationConsequenceText) {
+            this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -162,7 +165,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -221,9 +224,6 @@
                                     }
                                     if (!system.BusinessType) {
                                         system.BusinessType = { Name: "" };
-                                    }
-                                    if (!system.AppTypeOption) {
-                                        system.AppTypeOption = { Name: "" };
                                     }
                                     if (!system.BelongsTo) {
                                         system.BelongsTo = { Name: "" };
@@ -312,12 +312,12 @@
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
                             "data-element-type": "catalogUsageObject"
@@ -441,20 +441,6 @@
                         }
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
@@ -516,20 +502,6 @@
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
-                        template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
@@ -736,10 +708,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -972,10 +941,7 @@
         private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
-                organizationId: this.user.currentOrganizationId,
-                dataLevel: dataItem.DataLevel,
-                containsLegalInfo: dataItem.ContainsLegalInfo,
-                AssociatedDataWorkers: dataItem.AssociatedDataWorkers
+                organizationId: this.user.currentOrganizationId
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));
@@ -1061,18 +1027,19 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", function ($http) {
-                            return $http.get("api/itsystem/?getEntitiesAccessRights=true")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
-                        userMigrationRights: ["$http", function ($http) {
-                            return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createSystemAuthorization()
+                            .getOverviewAuthorization()
+                        ],
+                        systemUsageUserAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createSystemUsageAuthorization()
+                            .getOverviewAuthorization()
+                        ],
+                        userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
+                            .then(result => result.data.response)
+                        ],
                     }
                 });
 

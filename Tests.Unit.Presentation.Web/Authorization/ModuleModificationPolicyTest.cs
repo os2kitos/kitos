@@ -4,6 +4,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Moq;
@@ -12,15 +13,15 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
 {
-    public class ModuleLevelAccessPolicyTest
+    public class ModuleModificationPolicyTest
     {
         private readonly Mock<IOrganizationalUserContext> _userContext;
-        private readonly ModuleLevelAccessPolicy _sut;
+        private readonly ModuleModificationPolicy _sut;
 
-        public ModuleLevelAccessPolicyTest()
+        public ModuleModificationPolicyTest()
         {
             _userContext = new Mock<IOrganizationalUserContext>();
-            _sut = new ModuleLevelAccessPolicy(_userContext.Object);
+            _sut = new ModuleModificationPolicy(_userContext.Object,false);
         }
 
         public interface IContractElement : IEntity, IContractModule { }
@@ -86,20 +87,79 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ReadOnly, false)]
-        public void Allow_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
+        public void Allow_With_Entity_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
-            if (isLocalAdmin)
-                ExpectUserHasRole(OrganizationRole.LocalAdmin);
-            if (isGlobalAdmin)
-                ExpectUserHasRole(OrganizationRole.GlobalAdmin);
-            if (otherRole.HasValue)
-                ExpectUserHasRole(otherRole.Value);
+            SetupUserContext(isLocalAdmin, isGlobalAdmin, otherRole);
 
             var entity = (IEntity)MoqTools.MockOf(entityType);
 
             //Act
-            var allow = _sut.Allow(entity);
+            var allow = _sut.AllowModification(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, allow);
+        }
+
+        [Theory]
+        // UNKNOWN ENTITY FALLBACK
+        [InlineData(typeof(Entity), false, false, null, true)]//Unrestricted entity type always returns true from the creation perspective
+        // GLOBAL ADMIN
+        [InlineData(typeof(ItSystem), false, true, null, true)]
+        [InlineData(typeof(ItInterface), false, true, null, true)]
+        [InlineData(typeof(ItSystemUsage), false, true, null, true)]
+        [InlineData(typeof(ItProject), false, true, null, true)]
+        [InlineData(typeof(ItContract), false, true, null, true)]
+        [InlineData(typeof(Organization), false, true, null, true)]
+        [InlineData(typeof(User), false, true, null, true)]
+        // LOCAL ADMIN
+        [InlineData(typeof(ItSystem), true, false, null, false)]
+        [InlineData(typeof(ItInterface), true, false, null, false)]
+        [InlineData(typeof(ItSystemUsage), true, false, null, true)]
+        [InlineData(typeof(ItProject), true, false, null, true)]
+        [InlineData(typeof(ItContract), true, false, null, true)]
+        [InlineData(typeof(Organization), true, false, null, true)]
+        [InlineData(typeof(User), true, false, null, true)]
+        // SYSTEM ADMIN
+        [InlineData(typeof(ItSystem), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(ItInterface), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.SystemModuleAdmin, true)]
+        [InlineData(typeof(ItProject), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(ItContract), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(Organization), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(User), false, false, OrganizationRole.SystemModuleAdmin, false)]
+        // PROJECT ADMIN
+        [InlineData(typeof(ItSystem), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(ItInterface), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(ItProject), false, false, OrganizationRole.ProjectModuleAdmin, true)]
+        [InlineData(typeof(ItContract), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(Organization), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(User), false, false, OrganizationRole.ProjectModuleAdmin, false)]
+        // CONTRACT ADMIN
+        [InlineData(typeof(ItSystem), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ItInterface), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ItProject), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ItContract), false, false, OrganizationRole.ContractModuleAdmin, true)]
+        [InlineData(typeof(Organization), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(User), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        // ORGANIZATION ADMIN
+        [InlineData(typeof(ItSystem), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ItInterface), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ItProject), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ItContract), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(Organization), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(User), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
+
+        public void Allow_With_Type_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
+        {
+            //Arrange
+            SetupUserContext(isLocalAdmin, isGlobalAdmin, otherRole);
+
+            //Act
+            var allow = _sut.AllowCreation(entityType);
 
             //Assert
             Assert.Equal(expectedResult, allow);
@@ -108,6 +168,16 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void ExpectUserHasRole(OrganizationRole organizationRole)
         {
             _userContext.Setup(x => x.HasRole(organizationRole)).Returns(true);
+        }
+
+        private void SetupUserContext(bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole)
+        {
+            if (isLocalAdmin)
+                ExpectUserHasRole(OrganizationRole.LocalAdmin);
+            if (isGlobalAdmin)
+                ExpectUserHasRole(OrganizationRole.GlobalAdmin);
+            if (otherRole.HasValue)
+                ExpectUserHasRole(otherRole.Value);
         }
     }
 }

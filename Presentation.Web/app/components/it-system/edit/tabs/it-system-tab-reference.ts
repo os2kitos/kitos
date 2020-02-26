@@ -13,7 +13,8 @@
     app.controller("system.EditReference", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess", "theSystem",
         function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, theSystem) {
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.referenceName = theSystem.Name;
+
+            $scope.referenceName = theSystem.Disabled ? theSystem.Name + " - data i IT systemkatalog (Slettes)" : theSystem.Name + " - data i IT systemkatalog";
 
             $scope.setChosenReference = function (id) {
                 var referenceId = (id === theSystem.ReferenceId) ? null : id;
