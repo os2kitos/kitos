@@ -54,8 +54,7 @@
             private notify,
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService) {
-
-
+            this.hasWriteAccess = hasWriteAccess;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
@@ -175,14 +174,7 @@
                         parse: response => {
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
-                                // set if the user can edit
-                                if (this.user.isGlobalAdmin || ((this.user.isLocalAdmin || this.user.isOrgAdmin) && !this.user.isReadOnly)) {
-                                    usr.canEdit = true;
-                                } else if (this.user.id === usr.Id && !this.user.isReadOnly) {
-                                    usr.canEdit = true;
-                                } else {
-                                    usr.canEdit = false;
-                                }
+                                usr.canEdit = this.hasWriteAccess;
 
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
@@ -453,13 +445,13 @@
                     user: [
                         "userService", userService => userService.getUser()
                     ],
-                    hasWriteAccess: [
-                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }
+                    userAccessRights: ["authorizationServiceFactory", "user",
+                        (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
+                        authorizationServiceFactory
+                        .createOrganizationAuthorization()
+                        .getAuthorizationForItem(user.currentOrganizationId)
+                    ],
+                    hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
                 }
             });
