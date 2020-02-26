@@ -247,8 +247,6 @@ namespace Presentation.Web
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage)).AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActive)));
 
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
-            contracts.EntityType.Ignore(x=>x.AssociatedSystemRelations);//TODO
-
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
