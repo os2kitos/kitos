@@ -53,8 +53,11 @@
             }
 
             $scope.SSOLogin = () => {
-                notify.addInfoMessage("Should do redirect to OS2SSO...");
-                $auth.signIn();
+                // KITOSUDV-629: TODO: Redirect to new SSO endpoint
+                $http({
+                    method: "POST",
+                    url: "/SSO/Login"
+                });
             };
 
             // login

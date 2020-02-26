@@ -70,6 +70,9 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="dk.nita.saml20, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.2.0.1\lib\net45\dk.nita.saml20.dll</HintPath>
+    </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
@@ -321,6 +324,10 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="Controllers\SSO\LoggedIn.html" />
+    <Content Include="Controllers\SSO\LoggedOut.html" />
+    <Content Include="Controllers\SSO\Logout.ashx" />
+    <None Include="Controllers\SSO\Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
@@ -1234,6 +1241,7 @@
     <Content Include="Content\notify\notify.less" />
     <Content Include="Content\kendo.default.min.css" />
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
+    <Content Include="Controllers\SSO\Metadata.ashx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
