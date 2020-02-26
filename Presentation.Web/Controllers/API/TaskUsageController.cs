@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route("api/taskUsage/")]
-        public HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
+        public override HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
         {
             try
             {

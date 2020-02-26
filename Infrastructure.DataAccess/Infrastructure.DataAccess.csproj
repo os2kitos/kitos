@@ -550,12 +550,17 @@
     <Compile Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.Designer.cs">
       <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.cs" />
+    <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.Designer.cs">
+      <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
     <Compile Include="Services\WithinAmbienTransaction.cs" />
     <Compile Include="Services\TransactionManager.cs" />
+    <Compile Include="Tools\SqlMigrationScriptRepository.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
@@ -900,8 +905,12 @@
     <EmbeddedResource Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.resx">
       <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002260819505_Remove_ReadOnly_Roles.resx">
+      <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>

@@ -41,7 +41,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IContractElement), false, false, OrganizationRole.ReadOnly, false)]
         [InlineData(typeof(IOrganizationElement), true, false, null, true)]
         [InlineData(typeof(IOrganizationElement), false, true, null, true)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -50,7 +49,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
-        [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ReadOnly, false)]
         [InlineData(typeof(IProjectElement), true, false, null, true)]
         [InlineData(typeof(IProjectElement), false, true, null, true)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -59,7 +57,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ReadOnly, false)]
         [InlineData(typeof(ISystemElement), true, false, null, true)]
         [InlineData(typeof(ISystemElement), false, true, null, true)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -68,7 +65,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ReadOnly, false)]
         [InlineData(typeof(IReportElement), true, false, null, true)]
         [InlineData(typeof(IReportElement), false, true, null, true)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -77,7 +73,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.ReadOnly, false)]
         [InlineData(typeof(ICrossCuttingElement), true, false, null, true)]
         [InlineData(typeof(ICrossCuttingElement), false, true, null, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ContractModuleAdmin, true)]
@@ -86,7 +81,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
-        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ReadOnly, false)]
         public void Allow_With_Entity_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
