@@ -313,7 +313,7 @@
                         headerAttributes: {
                             "data-element-type": "userHeader"
                         },
-                        template: (dataItem) => setBoolField(dataItem.HasApiAccess),
+                        template: (dataItem) => setBooleanValue(dataItem.HasApiAccess),
                         hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
@@ -323,7 +323,7 @@
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
                         persistId: "localadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isLocalAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isLocalAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -332,7 +332,7 @@
                         field: "isOrgAdmin", title: "Organisations Admin", width: 104,
                         persistId: "orgadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isOrgAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isOrgAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -341,7 +341,7 @@
                         field: "isProjectAdmin", title: "Projekt Admin", width: 109,
                         persistId: "projectadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isProjectAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isProjectAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -350,7 +350,7 @@
                         field: "isSystemAdmin", title: "System Admin", width: 104,
                         persistId: "systemadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isSystemAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isSystemAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -359,7 +359,7 @@
                         field: "isContractAdmin", title: "Kontrakt Admin", width: 112,
                         persistId: "contractadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isContractAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -368,7 +368,7 @@
                         field: "isReportAdmin", title: "Rapport Admin", width: 112,
                         persistId: "reportadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isReportAdmin),
+                        template: (dataItem) => setBooleanValue(dataItem.isReportAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -377,7 +377,7 @@
                         field: "isReadOnly", title: "Bruger med læserettigheder", width: 112,
                         persistId: "readonlyRole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: (dataItem) => setBoolField(dataItem.isReadOnly),
+                        template: (dataItem) => setBooleanValue(dataItem.isReadOnly),
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -397,8 +397,8 @@
                 });
             }
 
-            function setBoolField(bool) {
-                return bool
+            function setBooleanValue(value) {
+                return value
                     ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>`
                     : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`;
             }

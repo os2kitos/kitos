@@ -7,7 +7,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string, userId: string) => IGridStateService;
+        getService: (storageKey: string, userId: number) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -42,7 +42,7 @@
 
         return factory;
 
-        function getService(storageKey: string, userId: string): IGridStateService {
+        function getService(storageKey: string, userId: number): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
