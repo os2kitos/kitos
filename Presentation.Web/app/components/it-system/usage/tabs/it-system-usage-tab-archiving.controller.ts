@@ -151,14 +151,14 @@
                 }
             };
 
-            $scope.translateArchiveDuty = (dutyAsInteger: number) => {
+            $scope.translateArchiveDuty = (dutyAsInteger: number, isRecommendation : boolean) => {
                 switch (dutyAsInteger) {
                     case 1:
                         return "B";
                     case 2:
                         return "K";
                     case 3:
-                        return "Ved ikke";
+                        return isRecommendation ? "Ingen vejledning" : "Ved ikke";
                     default:
                         return "Ukendt";
                 }

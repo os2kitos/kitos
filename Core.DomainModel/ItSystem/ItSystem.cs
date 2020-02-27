@@ -118,7 +118,7 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ExternalReference Reference { get; set; }
 
-        public ArchiveDutyTypes? ArchiveDuty { get; set; }
+        public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
 
         public string ArchiveDutyComment { get; set; }
 

@@ -154,13 +154,14 @@
                                     data-field="ArchiveDuty"
                                     data-ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
+                                <option value="0">&nbsp;</option>
                                 <option value="1">B</option>
                                 <option value="2">K</option>
-                                <option value="3">Ved ikke</option>
+                                <option value="3">Ingen vejledning</option>
                             </select>
-                            <p ng-if="!system.archiveDuty">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
+                            <p ng-if="!system.archiveDuty || system.archiveDuty < 1">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
-                        <div class="form-group" ng-if="system.archiveDuty">
+                        <div class="form-group" ng-if="system.archiveDuty && system.archiveDuty > 0">
                             <input placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave="{{system.updateUrl}}"
