@@ -277,6 +277,7 @@ ItProjects($select=Name)`;
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                                 if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!usage.MainContract.ItContract.Supplier) { usage.MainContract.ItContract.Supplier = { Name: "" }; }
+                                if (!usage.ItSystem.BelongsTo) { usage.ItSystem.BelongsTo = { Name: "" }; }
                             });
                             return response;
                         }
