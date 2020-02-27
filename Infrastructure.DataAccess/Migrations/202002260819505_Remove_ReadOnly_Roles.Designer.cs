@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Removed_Wishes : IMigrationMetadata
+    public sealed partial class Remove_ReadOnly_Roles : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Removed_Wishes));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Remove_ReadOnly_Roles));
         
         string IMigrationMetadata.Id
         {
-            get { return "202002261457388_Removed_Wishes"; }
+            get { return "202002260819505_Remove_ReadOnly_Roles"; }
         }
         
         string IMigrationMetadata.Source
