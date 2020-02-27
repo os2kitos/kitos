@@ -12,6 +12,7 @@ using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -329,6 +330,12 @@ namespace Presentation.Web.Controllers.API
                         var enumValue = Enum.Parse(t, value, true);
                         propRef.SetValue(item, enumValue);
                     }
+                    else if (t.IsNullableEnum())
+                    {
+                        var value = valuePair.Value.Value<string>();
+                        var enumValue = Enum.Parse(Nullable.GetUnderlyingType(t), value, true);
+                        propRef.SetValue(item, enumValue);
+                    }
                     // parse null values properly
                     else if (t.IsEquivalentTo(typeof(int?)))
                     {
@@ -364,8 +371,9 @@ namespace Presentation.Web.Controllers.API
                             // update the entity
                             propRef.SetValue(item, value);
                         }
-                        catch
+                        catch (Exception e)
                         {
+                            Logger.ErrorException("Failed to update entity", e);
                             // ignore any errors with setting the value
                             // this should only happen when trying to set values,
                             // that aren't ment to be set via the API

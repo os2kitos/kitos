@@ -85,7 +85,7 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
-        public int ArchiveDuty { get; set; }
+        public ArchiveDutyTypes? ArchiveDuty { get; set; }
 
         public string LinkToDirectoryAdminUrlName { get; set; }
         public string LinkToDirectoryAdminUrl { get; set; }

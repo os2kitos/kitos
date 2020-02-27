@@ -554,6 +554,10 @@
     <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.Designer.cs">
       <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002270736306_Archive_Duty_Nullable.cs" />
+    <Compile Include="Migrations\202002270736306_Archive_Duty_Nullable.Designer.cs">
+      <DependentUpon>202002270736306_Archive_Duty_Nullable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -907,6 +911,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002260819505_Remove_ReadOnly_Roles.resx">
       <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002270736306_Archive_Duty_Nullable.resx">
+      <DependentUpon>202002270736306_Archive_Duty_Nullable.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
