@@ -36,6 +36,7 @@
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.hasViewAccess = user.currentOrganizationId == $scope.usage.organizationId;
             $scope.systemCategories = systemCategories;
+            $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = new Kitos.Models.ViewModel.ItSystem.SystemViewModel($scope.usage.itSystem);
             autofocus();
 
