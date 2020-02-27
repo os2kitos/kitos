@@ -189,6 +189,28 @@
                         }
                     }
                 } as kendo.data.DataSourceOptions,
+                toolbar: [
+                    {
+                        name: "clearFilter",
+                        text: "Nulstil",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='ctrl.clearOptions()' data-element-type='resetFilterButton'>#: text #</button>"
+                    },
+                    {
+                        name: "saveFilter",
+                        text: "Gem filter",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='ctrl.saveGridProfile()' data-element-type='saveFilterButton'>#: text #</button>"
+                    },
+                    {
+                        name: "useFilter",
+                        text: "Anvend filter",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='ctrl.loadGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-element-type='useFilterButton'>#: text #</button>"
+                    },
+                    {
+                        name: "deleteFilter",
+                        text: "Slet filter",
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='ctrl.clearGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-element-type='removeFilterButton'>#: text #</button>"
+                    },
+                ],
                 excel: {
                     fileName: "Brugere.xlsx",
                     filterable: true,
