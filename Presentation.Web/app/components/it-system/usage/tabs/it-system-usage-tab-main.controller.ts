@@ -40,6 +40,12 @@
             $scope.system = new Kitos.Models.ViewModel.ItSystem.SystemViewModel($scope.usage.itSystem);
             autofocus();
 
+            $scope.isValidUrl = (ref: string) => {
+                if (ref !== null) {
+                    return Kitos.Utility.Validation.validateUrl(ref);
+                }
+                return false;
+            }
 
             var today = new Date();
             if (!$scope.usage.active) {
