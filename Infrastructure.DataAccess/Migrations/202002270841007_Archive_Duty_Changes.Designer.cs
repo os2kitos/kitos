@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Archive_Duty_Nullable : IMigrationMetadata
+    public sealed partial class Archive_Duty_Changes : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Archive_Duty_Nullable));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Archive_Duty_Changes));
         
         string IMigrationMetadata.Id
         {
-            get { return "202002270736306_Archive_Duty_Nullable"; }
+            get { return "202002270841007_Archive_Duty_Changes"; }
         }
         
         string IMigrationMetadata.Source
