@@ -327,8 +327,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
 
-        public bool? Archived { get; set; }
-
         public bool? ReportedToDPA { get; set; }
 
         public string DocketNo { get; set; }

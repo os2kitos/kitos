@@ -554,9 +554,9 @@
     <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.Designer.cs">
       <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202002270841007_Archive_Duty_Changes.cs" />
-    <Compile Include="Migrations\202002270841007_Archive_Duty_Changes.Designer.cs">
-      <DependentUpon>202002270841007_Archive_Duty_Changes.cs</DependentUpon>
+    <Compile Include="Migrations\202002270950519_Archive_Duty_Changes.cs" />
+    <Compile Include="Migrations\202002270950519_Archive_Duty_Changes.Designer.cs">
+      <DependentUpon>202002270950519_Archive_Duty_Changes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -912,8 +912,8 @@
     <EmbeddedResource Include="Migrations\202002260819505_Remove_ReadOnly_Roles.resx">
       <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202002270841007_Archive_Duty_Changes.resx">
-      <DependentUpon>202002270841007_Archive_Duty_Changes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202002270950519_Archive_Duty_Changes.resx">
+      <DependentUpon>202002270950519_Archive_Duty_Changes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

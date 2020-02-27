@@ -69,7 +69,6 @@ namespace Presentation.Web.Models
         public DateTime ItSystemUsageTerminated { get; set; }
         public int ItSystemUsageTerminationDeadlineInSystem_Id { get; set; }
         public bool ItSystemUsageArchiveDuty { get; set; }
-        public bool ItSystemUsageArchived { get; set; }
         public bool ItSystemUsageReportedToDPA { get; set; }
         public string ItSystemUsageDocketNo { get; set; }
         public DateTime ItSystemUsageArchivedDate { get; set; }

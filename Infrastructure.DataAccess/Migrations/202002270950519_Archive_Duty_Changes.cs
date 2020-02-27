@@ -9,10 +9,12 @@ namespace Infrastructure.DataAccess.Migrations
         {
             AddColumn("dbo.ItSystem", "ArchiveDutyComment", c => c.String());
             AlterColumn("dbo.ItSystem", "ArchiveDuty", c => c.Int());
+            DropColumn("dbo.ItSystemUsage", "Archived");
         }
         
         public override void Down()
         {
+            AddColumn("dbo.ItSystemUsage", "Archived", c => c.Boolean());
             AlterColumn("dbo.ItSystem", "ArchiveDuty", c => c.Int(nullable: false));
             DropColumn("dbo.ItSystem", "ArchiveDutyComment");
         }

@@ -284,7 +284,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.ItSystemUsageTerminated, opt => opt.MapFrom(src => src.Object.Terminated))
                .ForMember(dto => dto.ItSystemUsageTerminationDeadlineInSystem_Id, opt => opt.MapFrom(src => src.Object.TerminationDeadlineInSystem.Id))
                .ForMember(dto => dto.ItSystemUsageArchiveDuty, opt => opt.MapFrom(src => src.Object.ArchiveDuty))
-               .ForMember(dto => dto.ItSystemUsageArchived, opt => opt.MapFrom(src => src.Object.Archived))
                .ForMember(dto => dto.ItSystemUsageReportedToDPA, opt => opt.MapFrom(src => src.Object.ReportedToDPA))
                .ForMember(dto => dto.ItSystemUsageDocketNo, opt => opt.MapFrom(src => src.Object.DocketNo))
                .ForMember(dto => dto.ItSystemUsageArchivedDate, opt => opt.MapFrom(src => src.Object.ArchivedDate))

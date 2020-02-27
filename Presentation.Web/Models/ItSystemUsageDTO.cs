@@ -122,7 +122,6 @@ namespace Presentation.Web.Models
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 
-        public bool? Archived { get; set; }
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool? ReportedToDPA { get; set; }
         public string DocketNo { get; set; }

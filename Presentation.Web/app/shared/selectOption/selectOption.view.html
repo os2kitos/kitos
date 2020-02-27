@@ -1,6 +1,6 @@
 ﻿<label data-ng-if="label" for="{{ id }}" class="control-label small">{{ label }}</label>
 <select id="{{ id }}" class="form-control input-sm"
-        data-ng-disabled="{{ disabled() }}"
+        ng-disabled="disabled"
         data-ui-select2="{ allowClear: true }"
         data-placeholder="{{ placeholder }}"
         data-ng-model="selectedId"
@@ -10,7 +10,6 @@
         data-ng-required="required">
     <option></option>
     <option data-ng-repeat="option in options" value="{{ option.Id }}">{{ option.Name }}</option>
-    <!-- {{option.HasWriteAccess && "(skriv)"}} {{option.HasReadAccess && "(læs)"}} -->
 </select>
 
 <span ng-if="optionDescription" class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ optionDescription }}</span>

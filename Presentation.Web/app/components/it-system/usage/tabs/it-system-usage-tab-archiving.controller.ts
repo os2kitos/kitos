@@ -88,63 +88,7 @@
                 });
                 $scope.archivePeriods = dateList;
             }
-            $scope.patchArchivedNo = () => {
-                var cnfrm = confirm('Bekræft at alle de indtastede data i Arkivering vil blive slettet hvis der fortsættes');
-                if (!cnfrm) {
-                    notify.addInfoMessage("Feltet blev ikke opdateret!");
-                    $scope.systemUsage.Archived = true;
-                } else {
-                    resetParameters();
-                }
-            }
-            function resetPeriodes() {
-                _.each($scope.archivePeriods, (x) => {
-                    $http.delete(`odata/ArchivePeriods(${x.Id})`).then(() => {
-                        notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
-                        reload();
-                    });
-                });
-            }
 
-            function resetParameters() {
-                var payload = {};
-                var url = `api/itSystemUsage/${$stateParams.id}?organizationId=${user.currentOrganizationId}`;
-                payload["Archived"] = false;
-                payload["ArchiveDuty"] = null;
-                payload["ReportedToDPA"] = null;
-                payload["DocketNo"] = "";
-                payload["ArchiveNotes"] = "";
-                payload["ArchiveFreq"] = 0;
-                payload["Registertype"] = null;
-                payload["ArchiveFromSystem"] = null;
-                payload["archiveTypeId"] = null;
-                payload["archiveLocationId"] = null;
-                payload["SupplierId"] = null;
-                payload["archiveTestLocationId"] = null;
-                $http.patch(url, payload)
-                    .then(() => {
-                        $scope.Archived = false;
-                        $scope.ArchiveDuty = null;
-                        $scope.systemUsage.ReportedToDPA = null;
-                        $scope.systemUsage.DocketNo = "";
-                        $scope.systemUsage.ArchiveNotes = "";
-                        $scope.systemUsage.ArchiveFreq = 0;
-                        $scope.systemUsage.Registertype = null;
-                        $scope.systemUsage.ArchiveFromSystem = null;
-                        $scope.usage.archiveTypeId = null;
-                        $scope.usage.archiveLocationId = null;
-                        $scope.usage.SupplierId = null;
-                        $scope.usage.archiveTestLocationId = null;
-                        if ($scope.archivePeriods.length < 1) {
-                            notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
-                            reload();
-                        } else {
-                            resetPeriodes();
-                        }
-                        },
-                        () => { () => { notify.addErrorMessage("Dataen for arkivering kunne ikke slettes!") } }
-                    );
-            }
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
