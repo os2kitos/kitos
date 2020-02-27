@@ -32,7 +32,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         private roleSelectorDataSource;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;

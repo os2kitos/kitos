@@ -16,7 +16,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
         private orgUnitStorageKey = "it-system-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey,this.user.id);
 
         public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
