@@ -23,6 +23,7 @@
 
                 $rootScope.page.title = "IT System - Rediger system";
                 autofocus();
+                $scope.readMoreArchiveLinkUrl = "https://www.sa.dk/da/offentlig-forvaltning/kommuner-og-regioner/bevaring-kassation-it-systemer/";
 
                 itSystem.updateUrl = `api/itsystem/${itSystem.id}`;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
