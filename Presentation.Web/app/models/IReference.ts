@@ -10,4 +10,11 @@
         Display: string;
         Created: Date;
     }
+
+    export interface BaseReference {
+        Title: string;
+        ExternalReferenceId: string;
+        URL: string;
+        Created: Date;
+    }
 }

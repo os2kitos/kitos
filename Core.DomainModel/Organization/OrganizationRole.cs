@@ -6,39 +6,35 @@
         /// Has read access to everything within the organization,
         /// but not write access
         /// </summary>
-        User,
+        User = 0,
         /// <summary>
         /// Has write access to everything within the organization
         /// </summary>
-        LocalAdmin,
+        LocalAdmin = 1,
         /// <summary>
         /// Has write access to everything within the organization module
         /// </summary>
-        OrganizationModuleAdmin,
+        OrganizationModuleAdmin = 2,
         /// <summary>
         /// Has write access to everything within the project module
         /// </summary>
-        ProjectModuleAdmin,
+        ProjectModuleAdmin = 3,
         /// <summary>
         /// Has write access to everything within the system module
         /// </summary>
-        SystemModuleAdmin,
+        SystemModuleAdmin = 4,
         /// <summary>
         /// Has write access to everything within the contract module
         /// </summary>
-        ContractModuleAdmin,
+        ContractModuleAdmin = 5,
         /// <summary>
         /// Has write access to organization reports.
         /// </summary>
-        ReportModuleAdmin,
-        /// <summary>
-        /// Has only read access.
-        /// </summary>
-        ReadOnly,
+        ReportModuleAdmin = 6,
         /// <summary>
         /// God mode
         /// </summary>
-        GlobalAdmin
+        GlobalAdmin = 7
 
     }
 }

@@ -181,16 +181,12 @@ namespace Core.ApplicationServices.Authorization
         {
             var result = false;
 
-            var ignoreReadOnlyRole = false;
-
             if (IsGlobalAdmin())
             {
-                ignoreReadOnlyRole = true; //Global admin cannot be locally read-ony
                 result = true;
             }
             else if (EntityEqualsActiveUser(entity))
             {
-                ignoreReadOnlyRole = true;
                 result = true;
             }
             else if (IsOrganizationSpecificData(entity))
@@ -207,8 +203,7 @@ namespace Core.ApplicationServices.Authorization
                 result = HasModuleLevelWriteAccess(entity);
             }
 
-            //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
-            return result && (ignoreReadOnlyRole || IsReadOnly() == false);
+            return result;
         }
 
         public bool AllowDelete(IEntity entity)
@@ -307,11 +302,6 @@ namespace Core.ApplicationServices.Authorization
             return _activeUserContext.HasRole(OrganizationRole.GlobalAdmin);
         }
 
-        private bool IsReadOnly()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.ReadOnly);
-        }
-
         private bool IsLocalAdmin()
         {
             return _activeUserContext.HasRole(OrganizationRole.LocalAdmin);
@@ -335,7 +325,7 @@ namespace Core.ApplicationServices.Authorization
         #region PERMISSIONS
         bool IPermissionVisitor.Visit(BatchImportPermission permission)
         {
-            return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+            return IsGlobalAdmin() || IsLocalAdmin();
         }
 
         bool IPermissionVisitor.Visit(SystemUsageMigrationPermission permission)
@@ -351,9 +341,9 @@ namespace Core.ApplicationServices.Authorization
                 switch (target)
                 {
                     case IContractModule _:
-                        return IsGlobalAdmin() || ((IsLocalAdmin() || IsContractModuleAdmin()) && IsReadOnly() == false);
+                        return IsGlobalAdmin() || IsLocalAdmin() || IsContractModuleAdmin();
                     case IOrganizationModule _:
-                        return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+                        return IsGlobalAdmin() || IsLocalAdmin();
                 }
 
                 return IsGlobalAdmin();
@@ -379,14 +369,14 @@ namespace Core.ApplicationServices.Authorization
             // Only local and global admins can make users local admins
             else if (right.Role == OrganizationRole.LocalAdmin)
             {
-                if (IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false))
+                if (IsGlobalAdmin() || IsLocalAdmin())
                 {
                     result = true;
                 }
             }
             else
             {
-                result = IsGlobalAdmin() || ((IsLocalAdmin() || IsOrganizationModuleAdmin()) && IsReadOnly() == false);
+                result = IsGlobalAdmin() || IsLocalAdmin() || IsOrganizationModuleAdmin();
             }
 
             return result;
@@ -401,7 +391,7 @@ namespace Core.ApplicationServices.Authorization
                     return IsGlobalAdmin();
                 case OrganizationTypeKeys.Interessefællesskab:
                 case OrganizationTypeKeys.Virksomhed:
-                    return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+                    return IsGlobalAdmin() || IsLocalAdmin();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType), permission.TargetOrganizationType, "Unmapped organization type");
             }

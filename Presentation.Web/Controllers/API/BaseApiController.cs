@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected virtual HttpResponseMessage BadRequest(string message = "")
+        protected new virtual HttpResponseMessage BadRequest(string message = "")
         {
             return CreateResponse(HttpStatusCode.BadRequest, message);
         }
@@ -149,12 +149,12 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.Forbidden, msg);
         }
 
-        protected new HttpResponseMessage FromOperationFailure(OperationFailure failure)
+        protected HttpResponseMessage FromOperationFailure(OperationFailure failure)
         {
             return FromOperationError(failure);
         }
 
-        protected new HttpResponseMessage FromOperationError(OperationError failure)
+        protected HttpResponseMessage FromOperationError(OperationError failure)
         {
             HttpStatusCode statusCode;
             switch (failure.FailureType)

@@ -1,8 +1,7 @@
-using System.Linq;
+using Infrastructure.DataAccess.Tools;
 
 namespace Infrastructure.DataAccess.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
     
     public partial class Migrate_System_Url_To_References : DbMigration
@@ -10,7 +9,7 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             //Migrate before changing the schema
-            SqlResource(GetType().Assembly.GetManifestResourceNames().First(x => x.Contains("Migrate_System_Url.sql")));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_System_Url.sql"));
 
             DropColumn("dbo.ItSystem", "Url");
         }

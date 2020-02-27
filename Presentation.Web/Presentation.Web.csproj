@@ -378,11 +378,11 @@
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
-    <TypeScriptCompile Include="app\models\Odata\it-system-usage\system-relation-odata-DTOs.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
+    <TypeScriptCompile Include="app\services\referenceService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
