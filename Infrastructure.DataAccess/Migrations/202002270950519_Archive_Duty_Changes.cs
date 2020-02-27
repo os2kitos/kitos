@@ -1,3 +1,5 @@
+using Infrastructure.DataAccess.Tools;
+
 namespace Infrastructure.DataAccess.Migrations
 {
     using System;
@@ -10,6 +12,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.ItSystem", "ArchiveDutyComment", c => c.String());
             AlterColumn("dbo.ItSystem", "ArchiveDuty", c => c.Int());
             DropColumn("dbo.ItSystemUsage", "Archived");
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Clear_ArchiveDuty_On_ItSystem.sql"));
         }
         
         public override void Down()
