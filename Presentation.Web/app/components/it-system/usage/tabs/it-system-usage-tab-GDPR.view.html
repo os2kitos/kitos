@@ -71,6 +71,51 @@
                     </ul>
                     <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
                 </div>
+                <!-- Data processors -->
+                <label class="control-label small">Databehandlere</label>
+                <table class="table table-striped table-bordered">
+                    <thead >
+                        <tr>
+                            <th class="GDPRHeaderPadding"><label class="control-label small">Navn</label></th>
+                            <th class="GDPRHeaderPadding"><label class="control-label small">CVR</label></th>
+                            <th class="GDPRHeaderPadding"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
+                        <td>
+                            {{ dataWorker.dataWorkerName }}
+                        </td>
+                        <td>
+                            {{ dataWorker.dataWorkerCvr }}
+                        </td>
+                        <td class="text-right" style="width: 20px;">
+                            <button type="button"
+                                    class="btn btn-danger btn-xs delete-project"
+                                    data-confirmed-click="delete({{ dataWorker.id }})"
+                                    data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                    data-ng-show="hasWriteAccess">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot data-ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                        <tr >
+                            <td colspan="3" style="padding: 0">
+                                <input type="hidden"
+                                       id="dataWorker-selector"
+                                       class="form-control input-sm"
+                                       data-ui-select2="dataWorkerSelectOptions"
+                                       data-ng-model="selectedDataWorker"
+                                       data-ng-change="save()"
+                                       data-placeholder="Vælg Databehandler"
+                                        style="padding: 5px 0"
+                                       />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
                 <!-- Data processor control -->
                 <div class="form-group">
                     <label class="control-label small">Tilsyn/kontrol af databehandleren</label><br>
@@ -617,7 +662,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="object-section-container">
+                <!--<div class="object-section-container">
                     <div class="panel panel-default">
                         <div class="panel-heading">Databehandlere</div>
                         <table class="table table-striped">
@@ -662,7 +707,7 @@
                             </tfoot>
                         </table>
                     </div>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>
