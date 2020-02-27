@@ -65,7 +65,7 @@
 
             $scope.orgUnits = $scope.usage.usedBy;
 
-            $scope.itSytemUsagesSelectOptions = selectLazyLoading("api/itSystemUsage", false, ["organizationId=" + $scope.usage.organizationId]);
+            $scope.itSytemUsagesSelectOptions = selectLazyLoading("api/itSystemUsage", false, [`organizationId=${$scope.usage.organizationId}`]);
 
             function selectLazyLoading(url: any, excludeSelf: any, paramAry: any);
             function selectLazyLoading(url, excludeSelf, paramAry) {
@@ -81,7 +81,7 @@
                         },
                         quietMillis: 500,
                         transport(queryParams) {
-                            var extraParams = paramAry ? "&" + paramAry.join("&") : "";
+                            var extraParams = paramAry ? `&${paramAry.join("&")}` : "";
                             var res = $http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
                             res.abort = () => null;
 

@@ -684,6 +684,7 @@
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Relation.System.e2e.spec.ts" />
@@ -700,7 +701,6 @@
     <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
@@ -721,7 +721,7 @@
     <TypeScriptCompile Include="Tests\Object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
     <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />

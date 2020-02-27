@@ -1,4 +1,4 @@
-﻿import ItSystemOverview = require("../PageObjects/It-system/ItSystemOverview.po");
+﻿import ItSystemOverview = require("../PageObjects/it-system/Usage/ItSystemUsageOverview.po");
 import WaitTimers = require("../Utility/WaitTimers");
 
 class SystemUsageHelper {
