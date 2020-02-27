@@ -1,10 +1,8 @@
 ﻿import constants = require("../../../../Utility/Constants");
-import CssHelper = require("../../../../Object-wrappers/CSSLocatorHelper");
 
 class ItSystemUsageMain {
 
     private static consts = new constants();
-    private static cssHelper = new CssHelper();
 
     static getHeaderName() {
         return element(by.id(this.consts.systemUsageHeaderName));
@@ -66,8 +64,13 @@ class ItSystemUsageMain {
         return element(by.id(this.consts.mainUUID));
     }
 
+    static getReferences() {
+        return element(by.id(this.consts.mainReferences)).all(by.tagName("td"));
+    }
 
-    
+    static getKLE() {
+        return element(by.id(this.consts.mainKLE)).all(by.tagName("td"));
+    }
 
 }
 

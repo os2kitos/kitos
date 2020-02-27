@@ -115,7 +115,7 @@ class Constants {
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
 
-    //Local System Relations
+    //Local System 
     readonly createRelationButton = "create-Relation";
     readonly referenceInputField = "Reference";
     readonly descriptionInputField = "description";
@@ -148,6 +148,10 @@ class Constants {
     readonly usedByRelationReferenceField = "usedByRelationReference";
     readonly usedByRelationFrequencyTypeField = "usedByRelationFrequencyType";
 
+
+    //Local admin
+
+    readonly itProjectIncludeModuleInput = "project-include";
     
 }
 export = Constants;
