@@ -158,7 +158,7 @@
                                 <option value="2">K</option>
                                 <option value="3">Ved ikke</option>
                             </select>
-                            <p ng-if="!system.archiveDuty">Læs mere hos <a href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
+                            <p ng-if="!system.archiveDuty">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
                         <div class="form-group" ng-if="system.archiveDuty">
                             <input placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm"
@@ -166,7 +166,7 @@
                                    data-autosave="{{system.updateUrl}}"
                                    data-field="archiveDutyComment"
                                    data-ng-model="system.archiveDutyComment">
-                            <p>Læs mere hos <a href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
+                            <p>Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
                         <!-- UUID -->
                         <div class="form-group">

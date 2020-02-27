@@ -14,11 +14,19 @@
                         data-field="ArchiveDuty"
                         data-ng-disabled="!hasWriteAccess">
                     <option hidden selected value />
-                    <option value="1">B</option>
-                    <option value="2">K</option>
-                    <option value="3">Ved ikke</option>
+                    <option value="1">{{translateArchiveDuty(1)}}</option>
+                    <option value="2">{{translateArchiveDuty(2)}}</option>
+                    <option value="3">{{translateArchiveDuty(3)}}</option>
                 </select>
             </div>
+            <!-- ArchiveDuty recommendation -->
+            <span class="help-block small" ng-if="usage.itSystem.archiveDuty">
+                <i class="fa fa-info-circle" aria-hidden="true" />
+                Rigsarkivets anbefaling: <strong>{{translateArchiveDuty(usage.itSystem.archiveDuty)}}</strong><span ng-if="usage.itSystem.archiveDutyComment"> - {{usage.itSystem.archiveDutyComment}}</span>
+            </span>
+            <span class="help-block small" ng-if="usage.itSystem.archiveDuty">
+                Læs mere hos <a target="_blank" href="{{archiveReadMoreLink}}">Rigsarkivet</a>
+            </span>
             <!-- ArchivedType -->
             <div class="form-group">
                 <select-option data-id="archive"

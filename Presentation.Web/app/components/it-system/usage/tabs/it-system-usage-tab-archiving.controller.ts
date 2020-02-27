@@ -44,6 +44,7 @@
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
+            $scope.archiveReadMoreLink = Kitos.Constants.Archiving.ReadMoreUri;
 
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
@@ -149,6 +150,19 @@
                     $http.post(`odata/ArchivePeriods`, payload).finally(reload);
                 }
             };
+
+            $scope.translateArchiveDuty = (dutyAsInteger: number) => {
+                switch (dutyAsInteger) {
+                    case 1:
+                        return "B";
+                    case 2:
+                        return "K";
+                    case 3:
+                        return "Ved ikke";
+                    default:
+                        return "Ukendt";
+                }
+            }
 
             function reload() {
                 return $state.transitionTo($state.current, $stateParams, {
