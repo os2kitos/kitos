@@ -77,8 +77,8 @@
                     <thead >
                         <tr>
                             <th class="GDPRHeaderPadding"><label class="control-label small">Navn</label></th>
-                            <th class="GDPRHeaderPadding"><label class="control-label small">CVR</label></th>
-                            <th class="GDPRHeaderPadding"></th>
+                            <th class="GDPRHeaderPadding noRightBorder"><label class="control-label small">CVR</label></th>
+                            <th class="GDPRHeaderPadding noLeftBorder"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,10 +86,10 @@
                         <td>
                             {{ dataWorker.dataWorkerName }}
                         </td>
-                        <td>
+                        <td class="noRightBorder">
                             {{ dataWorker.dataWorkerCvr }}
                         </td>
-                        <td class="text-right" style="width: 20px;">
+                        <td class="text-right noLeftBorder" style="width: 20px;">
                             <button type="button"
                                     class="btn btn-danger btn-xs delete-project"
                                     data-confirmed-click="delete({{ dataWorker.id }})"
