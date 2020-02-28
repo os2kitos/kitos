@@ -403,7 +403,7 @@ namespace Presentation.Web.Controllers.API
                 Repository
                     .AsQueryable()
                     .ByOrganizationId(orgId)
-                    .ByPartOfName(name);
+                    .ByNameExact(name);
 
             return !system.Any();
         }

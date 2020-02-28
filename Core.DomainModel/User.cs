@@ -23,7 +23,6 @@ namespace Core.DomainModel
             ItProjectRights = new List<ItProjectRight>();
             ItSystemRights = new List<ItSystemRight>();
             ItContractRights = new List<ItContractRight>();
-            Wishes = new List<Wish>();
             ItProjectStatuses = new List<ItProjectStatus>();
             ResponsibleForRisks = new List<Risk>();
             ResponsibleForCommunications = new List<Communication>();
@@ -90,11 +89,6 @@ namespace Core.DomainModel
         ///     Passwords reset request issued for the user
         /// </summary>
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
-
-        /// <summary>
-        ///     Wishes created by this user
-        /// </summary>
-        public virtual ICollection<Wish> Wishes { get; set; }
 
         /// <summary>
         ///     Gets or sets the <see cref="Assignment" /> or <see cref="Milestone" /> associated with this user

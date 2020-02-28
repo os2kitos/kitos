@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default">
     <div class="row">
         <!-- 1st column -->
@@ -168,7 +168,7 @@
                     <tbody>
                     <tr data-ng-repeat="archive in archivePeriods">
                         <td>
-                            <input type="text" class="form-control" style="height: 35px"
+                            <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
@@ -177,7 +177,7 @@
                                    data-field="startDate">
                         </td>
                         <td>
-                            <input type="text" class="form-control" style="height: 35px"
+                            <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
@@ -215,7 +215,7 @@
                     <tr>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <input type="text" style="height: 35px"
+                                <input type="text"
                                        name="start"
                                        class="form-control"
                                        required
@@ -227,7 +227,7 @@
                         </td>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <input type="text" style="height: 35px" 
+                                <input type="text" 
                                        name="end"
                                        class="form-control"
                                        required

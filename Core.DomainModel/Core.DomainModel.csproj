@@ -194,7 +194,6 @@
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
-    <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="Organization\OrganizationCategory.cs" />
     <Compile Include="Organization\TaskRef.cs" />
