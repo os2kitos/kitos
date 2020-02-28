@@ -1,11 +1,14 @@
 ﻿import login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
+import ItSystemReference = require("../../PageObjects/it-system/Tabs/ItSystemFrontpage.po");
 
 describe("Global Admin can",
     () => {
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
+        var pageObject = new ItSystemReference();
+
         var itSystemName = `ItSystemMainTabTest${new Date().getTime()}`;
 
         beforeAll(() => {
@@ -26,7 +29,11 @@ describe("Global Admin can",
             var comment = `Comment${new Date().getTime()}`;
 
             const verifyCommentAvailability = (available: boolean) => {
-
+                if (available) {
+                    expect(pageObject.getArchiveDutyCommentAsList()).toBeArrayOfSize(1);
+                } else {
+                     expect(pageObject.getArchiveDutyCommentAsList()).toBeEmptyArray();
+                }
             };
 
             const selectArchiveDuty = (selection: string) => {
@@ -34,7 +41,7 @@ describe("Global Admin can",
             };
 
             const enterComment = (newComment: string) => {
-
+                return pageObject.getArchiveDutyCommentInput().sendKeys(newComment);
             };
 
             return loginHelper.loginAsGlobalAdmin()
