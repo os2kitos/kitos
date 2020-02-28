@@ -10,8 +10,7 @@ describe("Global Admin can",
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
-                .then(() => ItSystemHelper.createSystem(itSystemName))
-                .then(() => testFixture.cleanupState());
+                .then(() => ItSystemHelper.createSystem(itSystemName));
         });
 
         beforeEach(() => {
@@ -24,8 +23,27 @@ describe("Global Admin can",
         });
 
         it("Edit Recommended ArchiveDuty and add comment", () => {
+            var comment = `Comment${new Date().getTime()}`;
+
+            const verifyCommentAvailability = (available: boolean) => {
+
+            };
+
+            const selectArchiveDuty = (selection: string) => {
+
+            };
+
+            const enterComment = (newComment: string) => {
+
+            };
+
             return loginHelper.loginAsGlobalAdmin()
-                .then(() => ItSystemHelper.openSystem(itSystemName));
-            //TODO: Test it
+                .then(() => ItSystemHelper.openSystem(itSystemName))
+                .then(() => verifyCommentAvailability(false))
+                .then(() => selectArchiveDuty("B"))
+                .then(() => verifyCommentAvailability(true))
+                .then(() => enterComment(comment))
+                .then(() => selectArchiveDuty(null))
+                .then(() => verifyCommentAvailability(false));
         });
     });

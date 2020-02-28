@@ -23,7 +23,6 @@ class ItSystemReference implements IPageObject {
     public getDeleteButton(): protractor.ElementFinder {
         return element.all(by.css("[class='btn btn-sm ng-binding btn-danger']")).first();
     }
-
 }
 
 export = ItSystemReference;

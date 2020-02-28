@@ -152,7 +152,8 @@
                                     data-ng-model="system.archiveDuty"
                                     data-autosave="{{system.updateUrl}}"
                                     data-field="ArchiveDuty"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    data-ng-disabled="!hasWriteAccess"
+                                    data-element-type="archiveDutyRecommendation">
                                 <option hidden selected value />
                                 <option ng-repeat="recommendation in archiveRecommendations" value="{{recommendation.value}}" ng-bind-html="recommendation.name" />
                             </select>
@@ -163,7 +164,8 @@
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave="{{system.updateUrl}}"
                                    data-field="archiveDutyComment"
-                                   data-ng-model="system.archiveDutyComment">
+                                   data-ng-model="system.archiveDutyComment"
+                                   data-element-type="archiveDutyRecommendationComment">
                             <p>Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
                         <!-- UUID -->
