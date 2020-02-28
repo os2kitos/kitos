@@ -71,6 +71,49 @@
                     </ul>
                     <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
                 </div>
+                <!-- Data processors -->
+                <p class="small boldParagraph">Databehandlere</p>
+                <table class="table table-striped table-bordered">
+                    <thead >
+                        <tr>
+                            <th class="GDPRHeaderPadding"><p class="small">Navn</p></th>
+                            <th class="GDPRHeaderPadding noRightBorder"><p class="small">CVR</p></th>
+                            <th class="GDPRHeaderPadding noLeftBorder"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
+                        <td>
+                            {{ dataWorker.dataWorkerName }}
+                        </td>
+                        <td class="noRightBorder">
+                            {{ dataWorker.dataWorkerCvr }}
+                        </td>
+                        <td class="text-right noLeftBorder" style="width: 20px;">
+                            <button type="button"
+                                    class="btn btn-danger btn-xs delete-project"
+                                    data-confirmed-click="delete({{ dataWorker.id }})"
+                                    data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                    data-ng-show="hasWriteAccess">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot data-ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                        <tr >
+                            <td colspan="3" style="padding: 0">
+                                <input type="hidden"
+                                       id="dataWorker-selector"
+                                       class="form-control input-sm"
+                                       data-ui-select2="dataWorkerSelectOptions"
+                                       data-ng-model="selectedDataWorker"
+                                       data-ng-change="save()"
+                                       data-placeholder="Vælg Databehandler"/>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
                 <!-- Data processor control -->
                 <div class="form-group">
                     <label class="control-label small">Tilsyn/kontrol af databehandleren</label><br>
@@ -557,112 +600,59 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="well">
-                    <!-- Answering data DPIA -->
-                    <div class="form-group">
-                        <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
-                        <input type="radio" id="answeringDataDPIAYes"
-                               data-ng-model="systemUsage.answeringDataDPIA"
-                               ng-value="1"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('answeringDataDPIA', 1)"
-                               data-field="answeringDataDPIA">
-                        <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
-                        &nbsp;
-                        <input type="radio" id="answeringDataDPIANo"
-                               data-ng-model="systemUsage.answeringDataDPIA"
-                               ng-value="0"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('answeringDataDPIA', 0)"
-                               data-field="answeringDataDPIA">
-                        <label class="control-label small" for="answeringDataDPIANo">Nej</label>
-                        &nbsp;
-                        <input type="radio" id="answeringDataDPIADunno"
-                               data-ng-model="systemUsage.answeringDataDPIA"
-                               ng-value="2"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('answeringDataDPIA', 2)"
-                               data-field="answeringDataDPIA">
-                        <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
                     </div>
-                    <div data-ng-show="systemUsage.answeringDataDPIA == 1">
-                        <!-- Date of next delete of data DPIA -->
+                    <div class="well">
+                        <!-- Answering data DPIA -->
                         <div class="form-group">
-                            <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>
-                            <input type="text" id="DPIAdeleteDate" class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
+                            <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
+                            <input type="radio" id="answeringDataDPIAYes"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="1"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.DPIAdeleteDate"
-                                   ng-blur="patchDate('DPIAdeleteDate', systemUsage.DPIAdeleteDate)"
-                                   data-field="DPIAdeleteDate">
-                            <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "25-04-2017"</span>
+                                   ng-click="patch('answeringDataDPIA', 1)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
+                            &nbsp;
+                            <input type="radio" id="answeringDataDPIANo"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="0"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('answeringDataDPIA', 0)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIANo">Nej</label>
+                            &nbsp;
+                            <input type="radio" id="answeringDataDPIADunno"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="2"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('answeringDataDPIA', 2)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
                         </div>
-                        <div class="form-group">
-                            <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
-                            <input type="number" step="1" min="0" class="form-control input-sm"
-                                   ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
-                                   data-field="numberDPIA"
-                                   data-ng-model="systemUsage.numberDPIA"
-                                   data-ng-disabled="!hasWriteAccess" />
+                        <div data-ng-show="systemUsage.answeringDataDPIA == 1">
+                            <!-- Date of next delete of data DPIA -->
+                            <div class="form-group">
+                                <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>
+                                <input type="text" id="DPIAdeleteDate" class="form-control"
+                                       data-kendo-date-picker
+                                       data-k-options="datepickerOptions"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="systemUsage.DPIAdeleteDate"
+                                       ng-blur="patchDate('DPIAdeleteDate', systemUsage.DPIAdeleteDate)"
+                                       data-field="DPIAdeleteDate">
+                                <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "25-04-2017"</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
+                                <input type="number" step="1" min="0" class="form-control input-sm"
+                                       ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
+                                       data-field="numberDPIA"
+                                       data-ng-model="systemUsage.numberDPIA"
+                                       data-ng-disabled="!hasWriteAccess" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="object-section-container">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Databehandlere</div>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Navn</th>
-                                <th>CVR</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
-                                <td>
-                                    {{ dataWorker.dataWorkerName }}
-                                </td>
-                                <td>
-                                    {{ dataWorker.dataWorkerCvr }}
-                                </td>
-                                <td class="text-right">
-                                    <button type="button"
-                                            class="btn btn-danger btn-xs delete-project"
-                                            data-confirmed-click="delete({{ dataWorker.id }})"
-                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                            data-ng-show="hasWriteAccess">
-                                        <i class="glyphicon glyphicon-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot data-ng-show="hasWriteAccess">
-                            <tr>
-                                <td colspan="3">
-                                    <input type="hidden"
-                                           id="dataWorker-selector"
-                                           class="form-control input-sm"
-                                           data-ui-select2="dataWorkerSelectOptions"
-                                           data-ng-model="selectedDataWorker"
-                                           data-ng-change="save()"
-                                           data-placeholder="Vælg Databehandler" />
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
