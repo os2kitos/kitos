@@ -179,7 +179,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var initialValues = await ItSystemHelper.GetItSystemUsage(usage.Id);
 
             //Act
-            using (var changeDutyResponse = await ItSystemHelper.SendChangeSystemUsageArchiveDutyRequestAsync(system.Id, duty))
+            using (var changeDutyResponse = await ItSystemHelper.SendChangeSystemUsageArchiveDutyRequestAsync(usage.Id, duty))
             {
                 //Assert - initial and changed values
                 Assert.Equal(HttpStatusCode.OK, changeDutyResponse.StatusCode);
