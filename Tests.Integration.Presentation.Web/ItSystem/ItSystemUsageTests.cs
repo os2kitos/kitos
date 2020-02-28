@@ -164,5 +164,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
         }
+
+        [Theory]
+        [InlineData(ArchiveDutyTypes.B)]
+        [InlineData(ArchiveDutyTypes.K)]
+        [InlineData(ArchiveDutyTypes.Undecided)]
+        [InlineData(ArchiveDutyTypes.Unknown)]
+        public async Task CanModifyArchiveDutyValues(ArchiveDutyTypes duty)
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var initialValues = await ItSystemHelper.GetItSystemUsage(usage.Id);
+
+            //Act
+            using (var changeDutyResponse = await ItSystemHelper.SendChangeSystemUsageArchiveDutyRequestAsync(system.Id, duty))
+            {
+                //Assert - initial and changed values
+                Assert.Equal(HttpStatusCode.OK, changeDutyResponse.StatusCode);
+                Assert.Null(initialValues.ArchiveDuty);
+
+                var changedValues = await ItSystemHelper.GetItSystemUsage(usage.Id);
+                Assert.Equal(duty, changedValues.ArchiveDuty);
+            }
+        }
     }
 }
