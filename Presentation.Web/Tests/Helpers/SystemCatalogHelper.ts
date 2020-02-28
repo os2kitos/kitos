@@ -26,37 +26,28 @@ class SystemCatalogHelper {
 
     public static deleteSystem(name: string) {
         console.log(`Deleting system: ${name}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
-            .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds))
-            .then(() => SystemCatalogHelper.systemPage.getDeleteButton().click())
+        return SystemCatalogHelper.getDeleteButtonForSystem(name)
+            .then((button) => button.click())
             .then(() => browser.switchTo().alert().accept());
     }
 
     public static getDeleteButtonForSystem(name: string) {
         console.log(`Getting button for system: ${name}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
+        return SystemCatalogHelper.openSystem(name)
             .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(),SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => SystemCatalogHelper.systemPage.getDeleteButton());
     }
 
     public static setMainSystem(mainSystemName: string, childSystemName: string) {
         console.log(`Deleting system: ${childSystemName}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(childSystemName).first().click())
+        return SystemCatalogHelper.openSystem(childSystemName)
             .then(() => Select2.searchFor(mainSystemName, "s2id_system-parent"))
             .then(() => Select2.waitForDataAndSelect());
     }
 
     public static setSystemToPublic(system: string) {
         console.log(`Setting system: ${system} to Public`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(system).first().click())
+        return SystemCatalogHelper.openSystem(system)
             .then(() => Select2.selectWithNoSearch("Offentlig", this.visibilitySelect2));
 
     }
@@ -70,7 +61,7 @@ class SystemCatalogHelper {
     }
 
     public static openSystem(name: string) {
-        console.log(`open details for local system: ${name}`);
+        console.log(`open details for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click());
