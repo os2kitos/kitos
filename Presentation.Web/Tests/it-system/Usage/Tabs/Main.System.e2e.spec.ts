@@ -63,7 +63,7 @@ function checkItProjectHidden() {
 }
 
 function checkDefaultValues(mainSystemName: string) {
-    expect(ItSystemUsageMainPage.getHeaderName().getText()).toBe(mainSystemName + " i Fælles Kommune");
+    expect(ItSystemUsageMainPage.getHeaderName().getText()).toBe(mainSystemName + " - i Fælles Kommune");
     expect(ItSystemUsageMainPage.getLocalId().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getLocalCallName().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getNote().getAttribute("value")).toBe("");
