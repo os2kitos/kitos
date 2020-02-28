@@ -72,12 +72,12 @@
                     <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
                 </div>
                 <!-- Data processors -->
-                <label class="control-label small">Databehandlere</label>
+                <p class="small boldParagraph">Databehandlere</p>
                 <table class="table table-striped table-bordered">
                     <thead >
                         <tr>
-                            <th class="GDPRHeaderPadding"><label class="control-label small">Navn</label></th>
-                            <th class="GDPRHeaderPadding noRightBorder"><label class="control-label small">CVR</label></th>
+                            <th class="GDPRHeaderPadding"><p class="small">Navn</p></th>
+                            <th class="GDPRHeaderPadding noRightBorder"><p class="small">CVR</p></th>
                             <th class="GDPRHeaderPadding noLeftBorder"></th>
                         </tr>
                     </thead>
@@ -109,9 +109,7 @@
                                        data-ui-select2="dataWorkerSelectOptions"
                                        data-ng-model="selectedDataWorker"
                                        data-ng-change="save()"
-                                       data-placeholder="Vælg Databehandler"
-                                        style="padding: 5px 0"
-                                       />
+                                       data-placeholder="Vælg Databehandler"/>
                             </td>
                         </tr>
                     </tfoot>
