@@ -39,18 +39,7 @@
             this.uuid = itSystem.uuid;
 
             this.archiveDuty = this.mapArchiveDuty(itSystem.archiveDuty);
-            this.accessModifier = this.mapAccessModifier(itSystem.accessModifier);
-        }
-
-        private mapAccessModifier(accessModifier) {
-            switch (accessModifier) {
-                case 0:
-                    return "Lokal";
-                case 1:
-                    return "Offentlig";
-                default:
-                    return null;
-            }
+            this.accessModifier = Mappers.AccessModifierMapper.mapAccessModifier(itSystem.accessModifier);
         }
 
         private mapArchiveDuty(archiveDuty) {
