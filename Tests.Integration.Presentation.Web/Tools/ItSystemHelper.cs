@@ -98,30 +98,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<WishDTO> CreateWishAsync(int systemUsageId, string text, Cookie optionalLogin = null, int? userId = null)
-        {
-            using (var response = await SendCreateWishRequestAsync(systemUsageId, text, optionalLogin, userId))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<WishDTO>();
-            }
-        }
-
-        public static async Task<HttpResponseMessage> SendCreateWishRequestAsync(int systemUsageId, string text, Cookie optionalLogin = null, int? userId = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl("api/wish/");
-            var body = new
-            {
-                userId = userId ?? TestEnvironment.DefaultUserId,
-                text = text,
-                itSystemUsageId = systemUsageId
-            };
-
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
-        }
-
         public static async Task<AccessType> CreateAccessTypeAsync(int id, string name, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

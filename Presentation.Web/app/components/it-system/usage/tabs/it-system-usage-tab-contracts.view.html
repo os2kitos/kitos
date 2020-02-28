@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default">
         <div class="panel-heading">IT Systemet har følgende IT kontrakter tilknyttet:</div>
         <table class="table table-condensed table-striped">
@@ -56,7 +56,7 @@
 
                     <!-- concluded ("indgået") -->
                     <td>
-                       <span data-ng-model="contract.concluded" data-datereader=""></span>
+                        <span data-ng-model="contract.concluded" data-datereader=""></span>
                     </td>
                     <!-- expiration -->
                     <td>

@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4> {{usage.itSystem.name}}<span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default">
         <div class="panel-heading">'{{usage.itSystem.name}}' har følgende relationer til andre systemer/snitflader:</div>
         <table class="table table-condensed table-striped table-fixed relation">
@@ -43,7 +43,7 @@
                         <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
                     </td>
-                    <td  style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
+                    <td style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
                     <td>
                         <p ng-if="relation.Frequency" data-element-type="relationFrequencyType">{{relation.Frequency.Name}}</p>
                     </td>
@@ -108,12 +108,10 @@
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="usedByRelationReference">{{relation.Reference.Reference}}</p>
                     </td>
                     <td style="overflow-wrap: break-word"><a ng-if="relation.Contract" data-ui-sref="it-contract.edit.main({ id: relation.Contract.Id })" title="{{relation.Contract.Name}}">{{relation.Contract.Name}}</a></td>
-                    <td >
+                    <td>
                         <p ng-if="relation.Frequency" data-element-type="usedByRelationFrequencyType">{{relation.Frequency.Name}}</p>
                     </td>
-                    <td>
-
-                    </td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>

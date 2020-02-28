@@ -125,44 +125,5 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
         }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.LocalAdmin)]
-        public async Task Can_Add_SystemUsage_Wish(OrganizationRole role)
-        {
-            //Arrange
-            var login = await HttpApi.GetCookieAsync(role);
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-            var text = A<string>();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-
-            //Act - perform the action with the actual role
-            var result = await ItSystemHelper.CreateWishAsync(usage.Id, text, optionalLogin: login);
-
-            //Assert
-            Assert.Equal(usage.Id, result.ItSystemUsageId);
-            Assert.Equal(text, result.Text);
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.User)]
-        public async Task Cannot_Add_SystemUsage_Wish(OrganizationRole role)
-        {
-            //Arrange
-            var login = await HttpApi.GetCookieAsync(role);
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-            var text = A<string>();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-
-            //Act
-            using (var result = await ItSystemHelper.SendCreateWishRequestAsync(usage.Id, text, optionalLogin: login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
-        }
     }
 }
