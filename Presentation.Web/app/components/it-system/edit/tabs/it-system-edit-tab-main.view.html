@@ -154,10 +154,7 @@
                                     data-field="ArchiveDuty"
                                     data-ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
-                                <option value="0">&nbsp;</option>
-                                <option value="1">B</option>
-                                <option value="2">K</option>
-                                <option value="3">Ingen vejledning</option>
+                                <option ng-repeat="recommendation in archiveRecommendations" value="{{recommendation.value}}" ng-bind-html="recommendation.name" />
                             </select>
                             <p ng-if="!system.archiveDuty || system.archiveDuty < 1">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>

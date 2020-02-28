@@ -372,8 +372,10 @@
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\archiveDuty.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\system-relation-migration.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-migration.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archiveDutyRecommendation.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />

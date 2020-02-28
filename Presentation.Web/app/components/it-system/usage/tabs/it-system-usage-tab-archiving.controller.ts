@@ -45,6 +45,8 @@
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
             $scope.archiveReadMoreLink = Kitos.Constants.Archiving.ReadMoreUri;
+            $scope.translateArchiveDutyRecommendation = (value: number) => Kitos.Models.ItSystem.ArchiveDutyRecommendationFactory.mapFromNumeric(value).name;
+            $scope.archiveDutyOptions = Kitos.Models.ItSystemUsage.ArchiveDutyOptions.getAll();
 
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
@@ -150,19 +152,6 @@
                     $http.post(`odata/ArchivePeriods`, payload).finally(reload);
                 }
             };
-
-            $scope.translateArchiveDuty = (dutyAsInteger: number, isRecommendation : boolean) => {
-                switch (dutyAsInteger) {
-                    case 1:
-                        return "B";
-                    case 2:
-                        return "K";
-                    case 3:
-                        return isRecommendation ? "Ingen vejledning" : "Ved ikke";
-                    default:
-                        return "Ukendt";
-                }
-            }
 
             function reload() {
                 return $state.transitionTo($state.current, $stateParams, {
