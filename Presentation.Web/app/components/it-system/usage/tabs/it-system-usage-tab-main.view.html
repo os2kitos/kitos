@@ -55,7 +55,7 @@
                     <textarea id="note" class="form-control input-sm" rows="6"
                               data-ng-model="usage.note"
                               data-ng-disabled="!hasWriteAccess"
-                              data-field="note" 
+                              data-field="note"
                               data-autosave="{{autoSaveUrl}}"></textarea>
                 </div>
             </div>
@@ -123,11 +123,12 @@
                            data-autosave="{{autoSaveUrl}}"
                            data-field="active"
                            data-ng-change="checkSystemValidity()" />
-                    <label for="system-int-signed"  style="padding-left:0px;">
+                    <label for="system-int-signed" style="padding-left:0px;">
                         <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
                         <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
                         <span class='label-content'>
-                            Gyldig: </span>
+                            Gyldig:
+                        </span>
                     </label>
                     <i ng-show="usage.isActive || usage.active" class="fa fa-check" aria-hidden="true"></i>
                 </div>
@@ -136,7 +137,7 @@
     </div>
 </div>
 <div class="object-section-container">
-    <h4>Data fra IT System kataloget</h4>
+    <h4>Data fra IT Systemkataloget</h4>
     <div class="panel panel-default">
         <div class="row">
             <!-- Left side -->
@@ -226,18 +227,18 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <div class="form-group">
-                                    <table id="system-kle" class="table table-condensed table-disabled-color table-fixed table-bordered">
+                                    <table id="system-kle" class="table table-condensed table-fixed">
                                         <thead>
                                             <tr>
-                                                <th class="col-xs-2">
+                                                <th class="KleIdColumn small Kle">
                                                     KLE ID
                                                 </th>
-                                                <th class="col-xs-10">
+                                                <th class="small Kle">
                                                     KLE Navn
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="disabledColor bordered">
                                             <tr ng-if="system.taskRefs.length == 0">
                                                 <td colspan="2">
                                                     <p class="noMargin">Ingen KLE valgt</p>

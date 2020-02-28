@@ -28,10 +28,10 @@
     app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess", "user",
         ($rootScope, $scope, itSystemUsage, hasWriteAccess, user) => {
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.user = user;
+            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule;
             $scope.usage = itSystemUsage;
 
-            $scope.systemUsageName = itSystemUsage.itSystem.disabled ? itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name + " (Slettes)" : itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name;
+            $scope.systemUsageName = itSystemUsage.itSystem.disabled ? itSystemUsage.itSystem.name + " - i " + itSystemUsage.organization.name + " (Slettes)" : itSystemUsage.itSystem.name + " - i " + itSystemUsage.organization.name;
 
             $scope.allowClearOption = {
                 allowClear: true
