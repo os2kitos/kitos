@@ -7,7 +7,9 @@
         constructor(private $rootScope, private $scope, private $http, private notify, public org, private user) {
             $rootScope.page.title = 'Rediger organisation';
             $scope.title = 'Rediger organisation';
+            $scope.org = org;
         }
+
 
         public dismiss() {
             this.$scope.$dismiss();
