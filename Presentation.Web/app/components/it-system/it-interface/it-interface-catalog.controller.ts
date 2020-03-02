@@ -287,11 +287,10 @@
                         field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (!dataItem.Url) {
-                                return "";
+                            if (Utility.Validation.validateUrl(dataItem.Url)) {
+                                return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
                             }
-
-                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
+                            return "";
                         },
                         excelTemplate: dataItem => dataItem && dataItem.Url || "",
                         attributes: { "class": "text-center" },
