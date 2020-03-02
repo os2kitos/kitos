@@ -7,6 +7,7 @@ class Select2Helper {
     private static readonly selectDrop = "select2-drop";
     private static readonly selectChoice = "select2-choice";
     private static readonly selectResult = "select2-result-label";
+    private static readonly disabledSelect2Class = "container-disabled";
 
     public static waitForDataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
@@ -53,9 +54,9 @@ class Select2Helper {
 
     public static assertIsEnabled(findElement: () => protractor.ElementFinder, expectedState: boolean) {
         if (expectedState) {
-            expect(findElement().getAttribute("class")).not.toContain("container-disabled");
+            expect(findElement().getAttribute("class")).not.toContain(Select2Helper.disabledSelect2Class);
         } else {
-            expect(findElement().getAttribute("class")).toContain("container-disabled");
+            expect(findElement().getAttribute("class")).toContain(Select2Helper.disabledSelect2Class);
         }
     }
 }
