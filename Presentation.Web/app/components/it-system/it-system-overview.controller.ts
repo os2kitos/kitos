@@ -529,6 +529,9 @@ ItProjects($select=Name)`;
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return dataItem.Reference.Title;
+                        },
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
@@ -556,6 +559,9 @@ ItProjects($select=Name)`;
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return dataItem.Reference.Title;
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -841,6 +847,15 @@ ItProjects($select=Name)`;
                                 return "";
                             }
                         },
+                        excelTemplate: dataItem => {
+                            if (dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return dataItem.RiskSupervisionDocumentationUrlName;
+                            }
+                            if (dataItem.RiskSupervisionDocumentationUrl != null) {
+                                return dataItem.RiskSupervisionDocumentationUrl;
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-left" },
                         hidden: true,
                         filterable: {
@@ -867,6 +882,15 @@ ItProjects($select=Name)`;
                             } else {
                                 return "";
                             }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.LinkToDirectoryUrlName != null) {
+                                return dataItem.LinkToDirectoryUrlName;
+                            }
+                            if (dataItem.LinkToDirectoryUrl != null) {
+                                return dataItem.LinkToDirectoryUrl;
+                            }
+                            return "";
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
