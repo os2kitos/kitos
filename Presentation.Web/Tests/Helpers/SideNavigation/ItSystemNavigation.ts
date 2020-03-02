@@ -1,11 +1,15 @@
 ﻿class ItSystemNavigation {
 
+    private static  getSubMenuElement(srefName: string) {
+        return element(by.css(`[data-ui-sref="${srefName}"`));
+    }
+
     public static mainPage() {
-        element(by.css(`[data-ui-sref="${ItSystemNavigationSrefs.mainPageSref}"`)).click();
+        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.mainPageSref);
     }
 
     public static exposedInterfacesPage() {
-        element(by.css(`[data-ui-sref="${ItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
+        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref);
     }
 }
 
