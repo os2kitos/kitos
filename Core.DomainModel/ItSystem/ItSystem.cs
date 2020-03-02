@@ -20,7 +20,6 @@ namespace Core.DomainModel.ItSystem
             Children = new List<ItSystem>();
             TaskRefs = new List<TaskRef>();
             AccessTypes = new List<AccessType>();
-            Wishes = new List<Wish>();
             Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
 
@@ -72,8 +71,7 @@ namespace Core.DomainModel.ItSystem
         /// The type of the business.
         /// </value>
         public virtual BusinessType BusinessType { get; set; }
-
-        public virtual ICollection<Wish> Wishes { get; set; }
+        
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }

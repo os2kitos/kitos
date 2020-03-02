@@ -15,7 +15,6 @@
         BusinessTypeId: number;
         /** Gets or sets the type of the business option. */
         BusinessType: IBusinessType;
-        Wishes: Array<IWish>;
         TaskRefs: Array<ITaskRef>;
         /** Gets or sets the usages. */
         Usages: Array<ItSystemUsage.IItSystemUsage>;

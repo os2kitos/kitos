@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -23,7 +22,6 @@ namespace Core.DomainModel.ItSystemUsage
         public ItSystemUsage()
         {
             this.Contracts = new List<ItContractItSystemUsage>();
-            this.Wishes = new List<Wish>();
             this.ArchivePeriods = new List<ArchivePeriod>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
@@ -237,13 +235,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The contracts.
         /// </value>
         public virtual ICollection<ItContractItSystemUsage> Contracts { get; set; }
-        /// <summary>
-        /// Gets or sets the wishes associated with this instance.
-        /// </summary>
-        /// <value>
-        /// Wishes.
-        /// </value>
-        public virtual ICollection<Wish> Wishes { get; set; }
         /// <summary>
         /// Gets or sets the organization units associated with this instance.
         /// </summary>

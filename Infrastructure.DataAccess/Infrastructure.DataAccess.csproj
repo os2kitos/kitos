@@ -137,7 +137,6 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\ArchivePeriodMap.cs" />
-    <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201607110712126_Initial.cs" />
     <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
       <DependentUpon>201607110712126_Initial.cs</DependentUpon>
@@ -557,6 +556,9 @@
     <Compile Include="Migrations\202002270950519_Archive_Duty_Changes.cs" />
     <Compile Include="Migrations\202002270950519_Archive_Duty_Changes.Designer.cs">
       <DependentUpon>202002270950519_Archive_Duty_Changes.cs</DependentUpon>
+    <Compile Include="Migrations\202002270832001_Removed_Wishes.cs" />
+    <Compile Include="Migrations\202002270832001_Removed_Wishes.Designer.cs">
+      <DependentUpon>202002270832001_Removed_Wishes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -914,6 +916,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002270950519_Archive_Duty_Changes.resx">
       <DependentUpon>202002270950519_Archive_Duty_Changes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202002270832001_Removed_Wishes.resx">
+      <DependentUpon>202002270832001_Removed_Wishes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

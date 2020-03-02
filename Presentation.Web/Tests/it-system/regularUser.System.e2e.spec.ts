@@ -1,5 +1,5 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import ItSystemOverviewPo = require("../PageObjects/it-system/ItSystemOverview.po");
+import ItSystemOverviewPo = require("../PageObjects/it-system/Usage/ItSystemUsageOverview.po");
 import WaitTimers = require("../Utility/waitTimers");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 

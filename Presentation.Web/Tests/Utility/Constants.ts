@@ -115,11 +115,30 @@ class Constants {
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
 
-    //Local System Relations
+    //Local System 
     readonly createRelationButton = "create-Relation";
     readonly referenceInputField = "Reference";
     readonly descriptionInputField = "description";
     readonly saveButtonText = "Gem";
+
+    readonly systemUsageHeaderName = "systemUsageHeaderName";
+
+    readonly mainLocalId = "sysId";
+    readonly mainCallName = "localcallname";
+    readonly mainNote = "note";
+    readonly mainVersion = "version";
+    readonly mainOwner = "usage-owner";
+    readonly mainSystemName = "system-name";
+    readonly mainParentName = "system-parent";
+    readonly mainPreviousName = "system-previousname";
+    readonly mainBelongsTo = "system-belongs-to";
+    readonly mainAccess = "system-access";
+    readonly mainDescription = "system-description";
+    readonly mainReferences = "system-referencer";
+    readonly mainKLE = "system-kle";
+    readonly mainBusinessType = "system-business-type";
+    readonly mainArchive = "archiveDuty";
+    readonly mainUUID = "system-uuid";
 
     readonly relationDescriptionField = "relationDescription";
     readonly relationReferenceField = "relationReference";
@@ -128,6 +147,12 @@ class Constants {
     readonly usedByRelationDescriptionField = "usedByRelationDescription";
     readonly usedByRelationReferenceField = "usedByRelationReference";
     readonly usedByRelationFrequencyTypeField = "usedByRelationFrequencyType";
+
+
+    //Local admin
+
+    readonly itProjectIncludeModuleInput = "project-include";
+    
 }
 export = Constants;
 

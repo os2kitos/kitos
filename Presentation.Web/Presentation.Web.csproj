@@ -367,6 +367,7 @@
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
+    <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
@@ -381,7 +382,9 @@
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -599,7 +602,6 @@
     <Compile Include="Models\HandoverDTO.cs" />
     <Compile Include="Models\ItInterfaceExposureDTO.cs" />
     <Compile Include="Models\RiskDTO.cs" />
-    <Compile Include="Controllers\API\WishController.cs" />
     <Compile Include="Models\AssignmentDTO.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
@@ -656,7 +658,6 @@
     <Compile Include="Models\UserDTO.cs" />
     <Compile Include="Models\UserOrganizationsDTO.cs" />
     <Compile Include="Models\UserOverviewDTO.cs" />
-    <Compile Include="Models\WishDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -690,6 +691,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Relation.System.e2e.spec.ts" />
@@ -709,7 +711,9 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalProject.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
@@ -728,7 +732,7 @@
     <TypeScriptCompile Include="Tests\Object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
     <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
@@ -1026,7 +1030,6 @@
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-hierarchy.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.view.html" />
-    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.view.html" />
     <Content Include="app\components\it-system\usage\it-system-usage.view.html" />
     <Content Include="app\components\local-config\import\local-config-import-template.view.html" />
     <Content Include="app\components\local-config\local-config-contract.view.html" />
@@ -1118,7 +1121,6 @@
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\wish.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-type.ts" />
@@ -1160,7 +1162,6 @@
     <TypeScriptCompile Include="app\components\it-project\it-project-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-system-subnav.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\local-config-import-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\local-config-import-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\import\local-config-import-users.controller.ts" />

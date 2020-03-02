@@ -17,6 +17,10 @@ class ItSystemUsageCommon {
     getDeleteButtons() {
         return element.all(this.deleteButtonFinder);
     }
+
+    getSideNavigationItProject() {
+        return element(by.css("[data-ui-sref='it-system.usage.proj']"));
+    }
 }
 
 export = ItSystemUsageCommon;
