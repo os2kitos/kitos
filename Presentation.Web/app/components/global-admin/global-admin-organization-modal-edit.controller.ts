@@ -5,26 +5,24 @@
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'org', 'user'];
 
         constructor(private $rootScope, private $scope, private $http, private notify, public org, private user) {
-            $rootScope.page.title = 'Rediger organisation';
-            $scope.title = 'Rediger organisation';
+            var orgViewModel = new Models.ViewModel.GlobalAdmin.Organization.OrganizationModalViewModel();
+            orgViewModel.configureAsEditOrganizationDialog(org.name, org.accessmodifier, org.cvr, org.typeId, org.foreignCvr);
+            $rootScope.page.title = orgViewModel.title;
+            $scope.title = orgViewModel.title;
+            $scope.org = orgViewModel.data;
         }
+
 
         public dismiss() {
             this.$scope.$dismiss();
         };
 
         public submit() {
-            var payload = {
-                name: this.org.name,
-                accessModifier: this.org.accessModifier,
-                cvr: this.org.cvr,
-                typeId: this.org.typeId,
-                foreignCvr: this.org.foreignCvr
-            };
+            var payload = this.$scope.org;
 
             this.$http({
                 method: 'PATCH',
-                url: 'api/organization/' + this.org.id + '?organizationId=' + this.user.currentOrganizationId,
+                url: `api/organization/${this.org.id}?organizationId=${this.user.currentOrganizationId}`,
                 data: payload
             }).then((success) => {
                 this.notify.addSuccessMessage("Ændringerne er blevet gemt!");
@@ -53,9 +51,7 @@
                                 resolve: {
                                     org: [
                                         '$http', function ($http) {
-                                            return $http.get('api/organization/' + $stateParams['id']).then(function (result) {
-                                                return result.data.response;
-                                            });
+                                            return $http.get(`api/organization/${$stateParams['id']}`).then(result => result.data.response);
                                         }
                                     ],
                                     user: [
