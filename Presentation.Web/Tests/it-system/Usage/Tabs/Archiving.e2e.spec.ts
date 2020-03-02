@@ -48,9 +48,6 @@ describe("On the archiving page the user can",
         const setArchivingFrequency = (frequency: number) => po.getArchiveFrequencyInput().sendKeys(frequency.toString());
         const toggleRegisterType = () => po.getRegisterTypeCheckbox().click();
         const selectArchiveFromSystemToYes = () => po.getArchiveFromSystemYesRadioButton().click();
-        const reload = () =>
-            LocalItSystemNavigation.mainPage()
-                .then(() => LocalItSystemNavigation.openArchivingPage());
 
         const validateValues = (
             duty: string,

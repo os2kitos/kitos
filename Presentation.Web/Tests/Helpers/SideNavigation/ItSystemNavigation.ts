@@ -5,11 +5,11 @@
     }
 
     public static mainPage() {
-        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.mainPageSref);
+        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.mainPageSref).click();
     }
 
     public static exposedInterfacesPage() {
-        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref);
+        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref).click();
     }
 }
 
