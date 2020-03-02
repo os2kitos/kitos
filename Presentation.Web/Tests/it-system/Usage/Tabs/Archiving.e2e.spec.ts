@@ -66,9 +66,9 @@ describe("On the archiving page the user can",
             expect(po.getArchiveFrequencyInput().getAttribute('value')).toBe(frequency.toString());
             expect(po.getArchiveFromSystemYesRadioButton().isSelected()).toBe(archiveFromSystemYesState);
             expect(po.getRegisterTypeCheckbox().isSelected()).toBe(registerType);
-            //TODO: Type
-            //TODO: Place
-            //TODO: Supplier
+            expect(Select2Helper.getData(po.pageIds.archiveDutySelection).getText()).toEqual(duty);
+            expect(Select2Helper.getData(po.pageIds.archiveType).getText()).toEqual(type);
+            expect(Select2Helper.getData(po.pageIds.archiveSupplier).getText()).toEqual(supplier);
         }
 
         it("Edit archiving for local IT-system usage",
@@ -80,7 +80,7 @@ describe("On the archiving page the user can",
                     place: "Aalborg",
                     supplier: "Fælles Kommune",
                     comment: `testComment${new Date().getTime()}`,
-                    frequency: 7
+                    frequency: Math.floor(Math.random() * 26) // Range: [0,25]
                 }
 
                 return LocalItSystemNavigation.openArchivingPage()
