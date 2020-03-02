@@ -9,13 +9,17 @@
             $window.localStorage.setItem(orgUnitStorageKey + "-profile", currentOrgUnitId);
         }
 
-        static saveProfileSessionStorageData($window, orgUnitStorageKey) {
+        static saveProfileSessionStorageData($window, $, orgUnitStorageKey, dataField) {
             const orgUnitId = $window.localStorage.getItem(orgUnitStorageKey + "-profile");
-            if (orgUnitId == null) {
-                return null;
+            if (orgUnitId != null) {
+               $window.sessionStorage.setItem(orgUnitStorageKey, orgUnitId);
+               // find the org unit filter row section
+                var orgUnitFilterRow = $(".k-filter-row [data-field='" + dataField +"']");
+               // find the access modifier kendo widget
+               var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
+               orgUnitFilterWidget.select(dataItem => (dataItem.Id === orgUnitId));
             }
-            $window.sessionStorage.setItem(orgUnitStorageKey, orgUnitId);
-            return orgUnitId;
+
         }
     }
 }
