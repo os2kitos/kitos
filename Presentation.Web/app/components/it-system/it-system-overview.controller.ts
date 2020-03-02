@@ -111,9 +111,7 @@
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -122,14 +120,7 @@
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
 
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-            // find the kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
 
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
