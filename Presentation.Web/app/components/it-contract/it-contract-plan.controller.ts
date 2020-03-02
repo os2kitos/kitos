@@ -173,15 +173,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
             Utility.ProfileDataHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleOrganizationUnit.Name");
-            //if (orgUnitId != null) {
-            //    // find the org unit filter row section
-            //    var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleOrganizationUnit.Name']");
-            //    // find the access modifier kendo widget
-            //    var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            //    orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
-            //}
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
