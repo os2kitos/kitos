@@ -1,7 +1,6 @@
-using Infrastructure.DataAccess.Tools;
-
 namespace Infrastructure.DataAccess.Migrations
 {
+    using Infrastructure.DataAccess.Tools;
     using System;
     using System.Data.Entity.Migrations;
     

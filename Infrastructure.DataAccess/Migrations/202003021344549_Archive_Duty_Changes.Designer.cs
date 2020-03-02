@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202002270950519_Archive_Duty_Changes"; }
+            get { return "202003021344549_Archive_Duty_Changes"; }
         }
         
         string IMigrationMetadata.Source
