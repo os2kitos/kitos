@@ -16,7 +16,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
         private orgUnitStorageKey = "it-system-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey,this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
 
         public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
@@ -81,7 +81,7 @@
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
-              }
+        }
 
         private fixKleIdFilter(filterUrl, column) {
             var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
@@ -111,9 +111,7 @@
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -122,14 +120,7 @@
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
 
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-            // find the kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
 
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
@@ -255,7 +246,7 @@ ItProjects($select=Name)`;
                         },
                         parse: response => {
                             // HACK to flattens the Rights on usage so they can be displayed as single columns
-                            
+
                             // iterrate each usage
                             this._.forEach(response.value, usage => {
                                 usage.roles = [];
@@ -335,11 +326,11 @@ ItProjects($select=Name)`;
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
-                page:this.onPaging,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
-                        persistId: "isActive", 
+                        persistId: "isActive",
                         template: dataItem => {
                             if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
@@ -356,7 +347,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
-                        persistId: "localid", 
+                        persistId: "localid",
                         excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
                         hidden: true,
                         filterable: {
@@ -371,7 +362,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItSystem.Uuid", title: "UUID", width: 150,
-                        persistId: "uuid", 
+                        persistId: "uuid",
                         excelTemplate: dataItem => dataItem.ItSystem.Uuid,
                         hidden: true,
                         filterable: {
@@ -385,7 +376,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
-                        persistId: "parentsysname", 
+                        persistId: "parentsysname",
                         template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
                         hidden: true,
                         filterable: {
@@ -398,8 +389,8 @@ ItProjects($select=Name)`;
                         }
                     },
                     {
-                        field: "SystemName", title: "IT System", width: 320, 
-                        persistId: "sysname", 
+                        field: "SystemName", title: "IT System", width: 320,
+                        persistId: "sysname",
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
@@ -433,7 +424,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "Version", title: "Version", width: 150,
-                        persistId: "version", 
+                        persistId: "version",
                         excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
@@ -447,7 +438,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
-                        persistId: "localname", 
+                        persistId: "localname",
                         excelTemplate: dataItem => dataItem && dataItem.LocalCallName || "",
                         hidden: true,
                         filterable: {
@@ -461,7 +452,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 190,
-                        persistId: "orgunit", 
+                        persistId: "orgunit",
                         template: dataItem => dataItem.ResponsibleUsage ? dataItem.ResponsibleUsage.OrganizationUnit.Name : "",
                         filterable: {
                             cell: {
@@ -472,7 +463,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
-                        persistId: "busitype", 
+                        persistId: "busitype",
                         template: dataItem => dataItem.ItSystem.BusinessType ? dataItem.ItSystem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -486,7 +477,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
-                        persistId: "taskkey", 
+                        persistId: "taskkey",
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -502,7 +493,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
-                        persistId: "klename", 
+                        persistId: "klename",
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -517,15 +508,22 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "Reference.Title", title: "Reference", width: 150,
-                        persistId: "ReferenceId", 
+                        persistId: "ReferenceId",
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (Utility.Validation.validateUrl(reference.URL)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
+                            }
+                            return "";
+                        },
+                        excelTemplate: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                return reference.Title;
                             }
                             return "";
                         },
@@ -541,11 +539,11 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
-                        persistId: "folderref", 
+                        persistId: "folderref",
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.ExternalReferenceId) {
+                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
@@ -554,6 +552,13 @@ ItProjects($select=Name)`;
                                 } else {
                                     return reference.Title;
                                 }
+                            }
+                            return "";
+                        },
+                        excelTemplate: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                return reference.Title;
                             }
                             return "";
                         },
@@ -570,15 +575,15 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "DataLevel", title: "Datatype", width: 150,
-                        persistId: "dataLevel", 
+                        persistId: "dataLevel",
                         template: dataItem => {
                             switch (dataItem.DataLevel) {
                                 case "PERSONALDATA":
                                     return "Persondata";
                                 case "PERSONALDATANDSENSITIVEDATA":
                                     return "Persondata og følsomme persondata";
-                            default:
-                                return "Ingen persondata";
+                                default:
+                                    return "Ingen persondata";
                             }
                         },
                         attributes: { "class": "might-overflow" },
@@ -599,7 +604,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
-                        persistId: "contract", 
+                        persistId: "contract",
                         template: dataItem => {
                             if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
@@ -623,7 +628,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 175,
-                        persistId: "supplier", 
+                        persistId: "supplier",
                         template: dataItem =>
                             dataItem.MainContract &&
                             dataItem.MainContract.ItContract &&
@@ -641,7 +646,7 @@ ItProjects($select=Name)`;
                     {
                         field: "ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto",
-                        template: dataItem => dataItem.ItSystem.BelongsTo ? dataItem.ItSystem.BelongsTo.Name: "",
+                        template: dataItem => dataItem.ItSystem.BelongsTo ? dataItem.ItSystem.BelongsTo.Name : "",
                         attributes: {
                             "data-element-type": "systemRightsOwnerObject"
                         },
@@ -659,7 +664,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItProjects", title: "IT Projekt", width: 150,
-                        persistId: "sysusage", 
+                        persistId: "sysusage",
                         template: dataItem => dataItem.ItProjects.length > 0 ? this._.first(dataItem.ItProjects).Name : "",
                         hidden: true,
                         filterable: {
@@ -673,7 +678,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
-                        persistId: "ownername", 
+                        persistId: "ownername",
                         template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
@@ -687,7 +692,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
-                        persistId: "lastchangedname", 
+                        persistId: "lastchangedname",
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
@@ -701,7 +706,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "changed", 
+                        persistId: "changed",
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.LastChanged) {
                                 return "";
@@ -718,7 +723,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "concludedSystemFrom", 
+                        persistId: "concludedSystemFrom",
                         hidden: false,
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.Concluded) {
@@ -726,7 +731,7 @@ ItProjects($select=Name)`;
                             }
                             return dataItem.Concluded.toLocaleDateString("da-DK");
                         },
-                        filterable: 
+                        filterable:
                         {
                             operators: {
                                 date: {
@@ -739,7 +744,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
-                        persistId: "ArchiveDuty", 
+                        persistId: "ArchiveDuty",
                         template: dataItem => {
                             switch (dataItem.ArchiveDuty) {
                                 case 1:
@@ -765,7 +770,7 @@ ItProjects($select=Name)`;
                             }
                         },
                         hidden: false,
-                        filterable:{
+                        filterable: {
                             cell: {
                                 template: function (args) {
                                     args.element.kendoDropDownList({
@@ -781,7 +786,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "Registertype", title: "Er dokumentbærende", width: 160,
-                        persistId: "Registertype", 
+                        persistId: "Registertype",
                         template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
                         hidden: false,
                         filterable: {
@@ -800,7 +805,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "EndDate", title: "Journalperiode slutdato", format: "{0:dd-MM-yyyy}", width: 180,
-                        persistId: "ArchivePeriodsEndDate", 
+                        persistId: "ArchivePeriodsEndDate",
                         template: dataItem => {
                             if (!dataItem || !dataItem.ArchivePeriods) {
                                 return "";
@@ -811,14 +816,14 @@ ItProjects($select=Name)`;
                                     if (!dateList || dateList.StartDate > x.StartDate) {
                                         dateList = x;
                                     }
-                                } 
+                                }
                             });
                             if (!dateList) {
                                 return "";
                             } else {
                                 return this.moment(dateList.EndDate).format("DD-MM-YYYY");
                             }
-                            
+
                         },
                         hidden: true,
                         filterable: false,
@@ -826,9 +831,8 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "RiskSupervisionDocumentationUrlName", title: "Risikovurdering", width: 150,
-                        persistId: "riskSupervisionDocumentationUrlName", 
-                        template: dataItem => 
-                        {
+                        persistId: "riskSupervisionDocumentationUrlName",
+                        template: dataItem => {
                             if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
                                 return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
                             }
@@ -840,6 +844,15 @@ ItProjects($select=Name)`;
                             } else {
                                 return "";
                             }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return dataItem.RiskSupervisionDocumentationUrlName;
+                            }
+                            if (dataItem.RiskSupervisionDocumentationUrl != null) {
+                                return dataItem.RiskSupervisionDocumentationUrl;
+                            }
+                            return "";
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
@@ -854,7 +867,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "LinkToDirectoryUrlName", title: "Fortegnelse", width: 150,
-                        persistId: "LinkToDirectoryUrlName", 
+                        persistId: "LinkToDirectoryUrlName",
                         template: dataItem => {
                             if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
                                 return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
@@ -867,6 +880,15 @@ ItProjects($select=Name)`;
                             } else {
                                 return "";
                             }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.LinkToDirectoryUrlName != null) {
+                                return dataItem.LinkToDirectoryUrlName;
+                            }
+                            if (dataItem.LinkToDirectoryUrl != null) {
+                                return dataItem.LinkToDirectoryUrl;
+                            }
+                            return "";
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
@@ -881,7 +903,7 @@ ItProjects($select=Name)`;
                     },
                     {
                         field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
-                        persistId: "ItContractDataHandler", 
+                        persistId: "ItContractDataHandler",
                         template: dataItem => {
                             if (dataItem.Contracts != null) {
                                 if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {
