@@ -14,7 +14,7 @@
 
 
         public dismiss() {
-            this.$scope.$dismiss(); 
+            this.$scope.$dismiss();
         };
 
         public submit() {
