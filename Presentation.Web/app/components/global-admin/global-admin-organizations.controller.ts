@@ -152,6 +152,9 @@
             }
         }
 
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
@@ -169,8 +172,8 @@
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
 
             if (this.$window.confirm("Er du sikker på at slette " + dataItem["Name"] + "?")) {
-                this.mainGrid.dataSource.remove(dataItem);
-                this.mainGrid.dataSource.sync();
+                this.$http.delete(`odata/Organizations(${dataItem["Id"]})`);
+                this.reload();
             }
         }
     }
