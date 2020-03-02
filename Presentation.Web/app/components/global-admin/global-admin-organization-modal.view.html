@@ -9,7 +9,7 @@
                 Organisationens navn
             </label>
             <div class="col-xs-8">
-                <input type="text" data-ng-model="ctrl.org.name" id="name" name="name" class="form-control" ng-required="true" ng-maxlength="50" autocomplete="false"
+                <input type="text" ng-model="org.name" id="name" name="name" class="form-control" ng-required="true" ng-maxlength="50" autocomplete="false"
                        ng-minlength="1" data-disabled-on-busy autofocus data-element-type="orgModalNameInput">
                 <div ng-messages="form.name.$error" ng-if="form.name.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Organisationen skal have et navn.</div>
@@ -23,7 +23,7 @@
                 CVR nummer
             </label>
             <div class="col-xs-8">
-                <input type="text" data-ng-model="ctrl.org.cvr" id="cvr" class="form-control" data-ng-required="false" data-ng-pattern="/[0-9]{8}/">
+                <input type="text" ng-model="org.cvr" id="cvr" class="form-control" ng-required="false" ng-pattern="/[0-9]{8}/">
             </div>
         </div>
         <div class="form-group">
@@ -31,39 +31,23 @@
                 Udenlandsk virksomhed
             </label>
             <div class="col-xs-8">
-                <input type="text" data-ng-model="ctrl.org.foreignCvr" id="foreignCvr" class="form-control" data-ng-required="false">
+                <input type="text" ng-model="org.foreignCvr" id="foreignCvr" class="form-control" ng-required="false">
             </div>
         </div>
         <div class="form-group">
-            <div class="col-xs-8 col-xs-offset-3" ng-if="!org" ng-init="ctrl.org.typeId=3">
+            <div class="col-xs-8 col-xs-offset-3" ng-init="org.typeId">
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.typeId" data-element-type="orgModalRadioButton" value="1"> Kommune
+                    <input type="radio" ng-model="org.typeId" data-element-type="orgModalRadioButton" value="1"> Kommune
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.typeId" value="2"> Interessefællesskab
+                    <input type="radio" ng-model="org.typeId" value="2"> Interessefællesskab
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.typeId" value="3"> Virksomhed
+                    <input type="radio" ng-model="org.typeId" value="3"> Virksomhed
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.typeId" value="4"> Anden offentlig myndighed
+                    <input type="radio" ng-model="org.typeId" value="4"> Anden offentlig myndighed
                 </label>
-            </div>
-            <div class="form-group">
-                <div class="col-xs-8 col-xs-offset-3" ng-if="org" ng-init="ctrl.org.typeId=org.typeId">
-                    <label class="radio-inline">
-                        <input type="radio" ng-model="ctrl.org.typeId" data-element-type="orgModalRadioButton" value="1"> Kommune
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" ng-model="ctrl.org.typeId" value="2"> Interessefællesskab
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" ng-model="ctrl.org.typeId" value="3"> Virksomhed
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" ng-model="ctrl.org.typeId" value="4"> Anden offentlig myndighed
-                    </label>
-                </div>
             </div>
         </div>
     </div>
