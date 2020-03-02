@@ -7,17 +7,17 @@
             resolve: {
                 archiveTypes: [
                     "$http", $http =>
-                    $http.get("odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        $http.get("odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then(result => result.data.value)
                 ],
                 archiveLocations: [
                     "$http", $http =>
-                    $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then(result => result.data.value)
                 ],
                 archiveTestLocations: [
                     "$http", $http =>
-                    $http.get("odata/LocalArchiveTestlocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        $http.get("odata/LocalArchiveTestlocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then(result => result.data.value)
                 ],
                 systemUsage: [
@@ -27,13 +27,13 @@
                 ],
                 archivePeriod: ["$http", "$stateParams", ($http, $stateParams) =>
                     $http.get(`odata/ArchivePeriods?$filter=ItSystemUsageId eq ${$stateParams.id}&$orderby=StartDate`)
-                            .then(result => result.data.value)]
+                        .then(result => result.data.value)]
             }
         });
     }]);
 
-    app.controller("system.EditArchiving", ["$scope", "_", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "archiveTestLocations", "systemUsage", "archivePeriod", "moment", "notify",
-        ($scope, _, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, archiveTestLocations, systemUsage, archivePeriod, moment, notify) => {
+    app.controller("system.EditArchiving", ["$scope", "_", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "archiveTestLocations", "systemUsage", "archivePeriod", "moment", "notify", "select2LoadingService",
+        ($scope, _, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, archiveTestLocations, systemUsage, archivePeriod, moment, notify, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             $scope.usage = itSystemUsage;
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
@@ -100,7 +100,7 @@
                         .then(() => {
                             notify.addSuccessMessage("Feltet er opdateret!");
                             reload();
-                            },
+                        },
                             () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
                 else if (field === "ArchiveFreq" && (value < 0 || value.length === 0)) {
@@ -123,7 +123,7 @@
                     text: systemUsage.ArchiveSupplier
                 };
             }
-            
+
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
                 var formatString = "DD-MM-YYYY";
@@ -167,7 +167,15 @@
                 notify.addSuccessMessage("Slettet!");
             };
 
-            $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public=true', 'orgId=' + user.currentOrganizationId]);
+            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['public=true', 'orgId=' + user.currentOrganizationId], (item,
+                items) => {
+                items.push({
+                    id: item.id,
+                    text: item.name ? item.name : 'Unavngiven',
+                    cvr: item.cvr
+                });
+            }, "q", formatSupplier);
+
             function formatSupplier(supplier) {
                 var result = '<div>' + supplier.text + '</div>';
                 if (supplier.cvr) {
@@ -176,44 +184,6 @@
                 return result;
             }
 
-            function selectLazyLoading(url, excludeSelf, format, paramAry) {
-                return {
-                    minimumInputLength: 1,
-                    allowClear: true,
-                    placeholder: ' ',
-                    formatResult: format,
-                    initSelection: function (elem, callback) {
-                    },
-                    ajax: {
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-                        quietMillis: 500,
-                        transport: function (queryParams) {
-                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                            res.abort = function () {
-                                return null;
-                            };
-
-                            return res;
-                        },
-
-                        results: function (data, page) {
-                            var results = [];
-
-                            _.each(data.data.response, function (obj: { id; name; cvr; }) {
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.name ? obj.name : 'Unavngiven',
-                                    cvr: obj.cvr
-                                });
-                            });
-                            return { results: results };
-                        }
-                    }
-                };
-            }
             $scope.patchDatePeriode = (field, value, id) => {
                 var formatString = "DD-MM-YYYY";
                 var formatDateString = "YYYY-MM-DD";
