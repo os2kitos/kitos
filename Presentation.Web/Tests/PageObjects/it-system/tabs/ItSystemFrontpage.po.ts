@@ -26,13 +26,19 @@ class ItSystemReference implements IPageObject {
         return element.all(by.css("[class='btn btn-sm ng-binding btn-danger']")).first();
     }
 
-    public getArchiveDutyCommentAsList(): protractor.ElementArrayFinder {
+    public getArchiveDutyCommentInputAsArray(): protractor.ElementArrayFinder {
         return element.all(this.cssHelper.byDataElementType("archiveDutyRecommendationComment"));
     }
 
     public getArchiveDutyCommentInput(): protractor.ElementFinder {
-        return this.getArchiveDutyCommentAsList().first();
+        return this.getArchiveDutyCommentInputAsArray().first();
     }
+
+    public getArchiveDutyInput(): protractor.ElementFinder {
+        return element(this.cssHelper.byDataElementType("archiveDutyRecommendation"));
+    }
+
+    public getArchiveDutyRecommendationElementId = () => "s2id_archiveDuty";
 }
 
 export = ItSystemReference;

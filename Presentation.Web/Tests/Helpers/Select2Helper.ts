@@ -42,11 +42,9 @@ class Select2Helper {
             .element(by.tagName("ul"))
             .all(by.tagName("li"))
             .filter((elem) => {
-                return elem.element(by.tagName("div")).getText().then((val) => {
-                    if (val === name) {
-                        return elem;
-                    }
-                });
+                return elem.element(by.tagName("div"))
+                    .getText()
+                    .then((val) => val === name);
             });
     }
 }
