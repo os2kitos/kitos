@@ -1,5 +1,5 @@
 ﻿module Kitos.Utility {
-    export class ProfileDataHelper {
+    export class KendoFilterProfileHelper {
 
         static saveProfileLocalStorageData($window, orgUnitStorageKey) {
             const currentOrgUnitId = $window.sessionStorage.getItem(orgUnitStorageKey);

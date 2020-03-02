@@ -186,7 +186,7 @@
         }
 
         public saveGridProfile() {
-            Utility.ProfileDataHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -194,7 +194,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-            Utility.ProfileDataHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
