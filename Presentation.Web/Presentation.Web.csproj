@@ -366,11 +366,13 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
+    <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\Select2OptionViewModel.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />

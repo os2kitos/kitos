@@ -570,14 +570,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference == null) {
-                                return "";
-                            }
-                            if (Utility.Validation.validateUrl(reference.URL)) {
-                                return reference.URL;
-                            }
-                            return reference.Title;
+                            return Helpers.ExcelExportHelper.renderReference(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -608,14 +601,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference == null) {
-                                return "";
-                            }
-                            if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
-                                return reference.ExternalReferenceId;
-                            }
-                            return reference.Title;
+                            return Helpers.ExcelExportHelper.renderExternalReference(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
