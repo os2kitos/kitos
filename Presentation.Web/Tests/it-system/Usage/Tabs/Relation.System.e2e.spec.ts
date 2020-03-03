@@ -45,7 +45,6 @@ describe("User is able to create and view relation",
         }, testFixture.longRunningSetup());
 
         beforeEach(() => {
-            testFixture.cleanupState();
             testFixture.enableLongRunningTest();
         });
 
@@ -56,14 +55,13 @@ describe("User is able to create and view relation",
 
         it("User can create relations ",
             () => {
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => RelationHelper.createRelation(relationSystemName1,
-                        relationSystemName2,
-                        interfaceName,
-                        frequencyType,
-                        contractName,
-                        reference,
-                        description))
+                RelationHelper.createRelation(relationSystemName1,
+                    relationSystemName2,
+                    interfaceName,
+                    frequencyType,
+                    contractName,
+                    reference,
+                    description)
                     .then(() => checkForRelationPart(relationSystemName2))
                     .then(() => checkForRelationPart(interfaceName))
                     .then(() => checkForRelationPart(contractName))

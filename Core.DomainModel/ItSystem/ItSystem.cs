@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
@@ -115,7 +116,9 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ExternalReference Reference { get; set; }
 
-        public int ArchiveDuty { get; set; }
+        public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
+
+        public string ArchiveDutyComment { get; set; }
 
         public string LinkToDirectoryAdminUrl { get; set; }
         public string LinkToDirectoryAdminUrlName { get; set; }

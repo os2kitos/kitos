@@ -19,15 +19,16 @@
     app.controller("system.SystemMainCtrl",
         [
             "$rootScope", "$scope", "itSystem", "businessTypes", "user", "autofocus", "hasWriteAccess", "select2LoadingService",
-            ($rootScope, $scope, itSystem, businessTypes, user, autofocus, hasWriteAccess, select2LoadingService) => {
+            ($rootScope, $scope, itSystem, businessTypes, user, autofocus, hasWriteAccess, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
 
                 $rootScope.page.title = "IT System - Rediger system";
                 autofocus();
+                $scope.readMoreArchiveLinkUrl = Kitos.Constants.Archiving.ReadMoreUri;
 
                 itSystem.updateUrl = `api/itsystem/${itSystem.id}`;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
-
+                $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
                 $scope.businessTypes = businessTypes.data.value;
 
@@ -41,11 +42,11 @@
                     true,
                     [`orgId=${user.currentOrganizationId}`],
                     true);
-            
+
                 $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.isValidUrl = (ref: string) => {
-                    if(ref !== null) {
+                    if (ref !== null) {
                         return Kitos.Utility.Validation.validateUrl(ref);
                     }
                     return false;

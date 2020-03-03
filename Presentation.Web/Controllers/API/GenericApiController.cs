@@ -12,6 +12,7 @@ using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -328,6 +329,19 @@ namespace Presentation.Web.Controllers.API
                         var value = valuePair.Value.Value<string>();
                         var enumValue = Enum.Parse(t, value, true);
                         propRef.SetValue(item, enumValue);
+                    }
+                    else if (t.IsNullableEnum())
+                    {
+                        var value = valuePair.Value.Value<string>();
+                        if (value == null)
+                        {
+                            propRef.SetValue(item, null);
+                        }
+                        else
+                        {
+                            var enumValue = Enum.Parse(Nullable.GetUnderlyingType(t), value, true);
+                            propRef.SetValue(item, enumValue);
+                        }
                     }
                     // parse null values properly
                     else if (t.IsEquivalentTo(typeof(int?)))

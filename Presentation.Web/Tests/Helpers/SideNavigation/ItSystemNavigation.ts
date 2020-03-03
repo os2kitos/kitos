@@ -1,11 +1,15 @@
-﻿class ItSystemNavigation {
+﻿import NavigationHelper = require("../../Utility/NavigationHelper");
+
+class ItSystemNavigation {
+
+    private static readonly navigation = new NavigationHelper();
 
     public static mainPage() {
-        element(by.css(`[data-ui-sref="${ItSystemNavigationSrefs.mainPageSref}"`)).click();
+        return ItSystemNavigation.navigation.goToSubMenuElement(ItSystemNavigationSrefs.mainPageSref);
     }
 
     public static exposedInterfacesPage() {
-        element(by.css(`[data-ui-sref="${ItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
+        return ItSystemNavigation.navigation.goToSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref);
     }
 }
 

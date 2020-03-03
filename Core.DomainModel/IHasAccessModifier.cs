@@ -5,11 +5,11 @@
         /// <summary>
         /// Only users within the organization this instance was created in have read access.
         /// </summary>
-        Local,
+        Local = 0,
         /// <summary>
         /// Everyone have read access.
         /// </summary>
-        Public
+        Public = 1
     }
 
     /// <summary>

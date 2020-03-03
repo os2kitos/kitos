@@ -200,9 +200,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var itInterfaceDto = InterfaceHelper.CreateInterfaceDto(
-                A<string>(), 
-                A<string>(), 
-                null, 
+                A<string>(),
+                A<string>(),
+                null,
                 organizationId,
                 AccessModifier.Public);
             var itInterface = await InterfaceHelper.CreateInterface(itInterfaceDto);
@@ -235,6 +235,35 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, result.StatusCode);
                 await AssertSystemDeletedAsync(system.Id);
+            }
+        }
+
+        [Theory]
+        [InlineData(ArchiveDutyRecommendationTypes.B)]
+        [InlineData(ArchiveDutyRecommendationTypes.K)]
+        [InlineData(ArchiveDutyRecommendationTypes.Undecided)]
+        [InlineData(ArchiveDutyRecommendationTypes.NoRecommendation)]
+        public async Task CanModifyArchiveDutyValues(ArchiveDutyRecommendationTypes recommendation)
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var comment = A<string>();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var initialValues = await ItSystemHelper.GetSystemAsync(system.Id);
+
+            //Act
+            using (var changeDutyResponse = await ItSystemHelper.SendChangeArchiveDutyRecommendationRequestAsync(system.Id, recommendation))
+            using (var changeCommentResponse = await ItSystemHelper.SendChangeArchiveDutyRecommendationCommentRequestAsync(system.Id, comment))
+            {
+                //Assert - initial and changed values
+                Assert.Equal(HttpStatusCode.OK, changeDutyResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, changeCommentResponse.StatusCode);
+                Assert.Null(initialValues.ArchiveDuty);
+                Assert.Null(initialValues.ArchiveDutyComment);
+
+                var changedValues = await ItSystemHelper.GetSystemAsync(system.Id);
+                Assert.Equal(recommendation, changedValues.ArchiveDuty);
+                Assert.Equal(comment, changedValues.ArchiveDutyComment);
             }
         }
 

@@ -1,18 +1,24 @@
-﻿class LocalItSystemNavigation {
+﻿import NavigationHelper = require("../../Utility/NavigationHelper");
+
+class LocalItSystemNavigation {
+
+    private static readonly navigation = new NavigationHelper();
 
     public static mainPage() {
-        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.mainPageSref}"`)).click();
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.mainPageSref);
     }
 
     public static exposedInterfacesPage() {
-        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.exposedInterfacesSref}"`)).click();
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.exposedInterfacesSref);
     }
 
     public static relationsPage() {
-        return element(by.css(`[data-ui-sref="${LocalItSystemNavigationSrefs.relationsSref}"`)).click();
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.relationsSref);
     }
     
-    
+    public static openArchivingPage() {
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.archivingSref);
+    }
 }
 
 export = LocalItSystemNavigation;
@@ -21,4 +27,5 @@ class LocalItSystemNavigationSrefs {
     static mainPageSref = "it-system.usage.main";
     static exposedInterfacesSref = "it-system.usage.interfaces";
     static relationsSref = "it-system.usage.relation";
+    static archivingSref = "it-system.usage.archiving";
 }

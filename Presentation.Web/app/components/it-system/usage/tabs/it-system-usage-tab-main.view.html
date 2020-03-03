@@ -273,8 +273,14 @@
                             <input id="archiveDuty" class="form-control input-sm"
                                    data-field="accessModifier"
                                    data-ng-disabled="true"
-                                   data-ng-model="system.archiveDuty">
-                            <p>Læs mere hos <a href="https://www.sa.dk/da/offentlig-forvaltning/kommuner-og-regioner/bevaring-kassation-it-systemer/">Rigsarkivet</a></p>
+                                   data-ng-model="system.archiveDuty.value">
+                            <span ng-if="system.archiveDuty.value && system.archiveDuty.optionalComment" class="help-block small">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                {{system.archiveDuty.optionalComment}}
+                            </span>
+                            <span class="help-block small">
+                                Læs mere hos <a target="_blank" href="{{system.archiveDuty.readMoreLink}}">Rigsarkivet</a>
+                            </span>
                         </div>
                         <!-- UUID -->
                         <div class="form-group">

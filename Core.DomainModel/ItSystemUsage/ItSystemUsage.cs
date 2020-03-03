@@ -316,9 +316,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
 
-        public int? ArchiveDuty { get; set; }
-
-        public bool? Archived { get; set; }
+        public ArchiveDutyTypes? ArchiveDuty { get; set; }
 
         public bool? ReportedToDPA { get; set; }
 

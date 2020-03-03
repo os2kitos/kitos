@@ -1,9 +1,10 @@
 ﻿module Kitos.Services {
 
     export interface ISelect2LoadingService {
-        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean);
-        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
-        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
+        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean, nameContentQueryParamName?: string);
+        loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
+        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
+        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear? :boolean);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
@@ -12,18 +13,18 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]) {
             return {
-                data: () => ({ "results": dataFn() }) ,
+                data: () => ({ "results": dataFn() }),
                 allowClear: true
             };
         }
 
-        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear = true) {
             return {
                 minimumResultsForSearch: Infinity,
                 data: () => ({ "results": dataFn() }),
-                allowClear: true
+                allowClear: allowClear
             };
         }
 
@@ -34,7 +35,24 @@
             checkResultsForDisabled,
             nameContentQueryParamName = "q") {
             var self = this;
-            return {
+            return this.loadSelect2WithDataHandler(url, allowClear, paramArray, (item, items) => {
+                if (checkResultsForDisabled) {
+                    self.handleResultsWithDisabled(items, item);
+                } else {
+                    self.handleResults(items, item);
+                }
+            }, nameContentQueryParamName);
+        }
+
+        loadSelect2WithDataHandler(
+            url: string,
+            allowClear: boolean,
+            paramArray,
+            resultBuilder: (candidate: any, allResults: any[]) => void,
+            nameContentQueryParamName = "q",
+            formatResult = null) {
+            var self = this;
+            let config = <any>{
                 minimumInputLength: 1,
                 initSelection(elem, callback) {
                 },
@@ -53,17 +71,16 @@
                     results(data, page) {
                         var results = [];
                         _.each(data.data.response, (obj) => {
-                            if (checkResultsForDisabled) {
-                                self.handleResultsWithDisabled(results, obj);
-                            } else {
-                                self.handleResults(results, obj);
-                            }
-                            
+                            resultBuilder(obj, results);
                         });
                         return { results: results };
                     }
                 }
             };
+            if (formatResult != null) {
+                config.formatResult = formatResult;
+            }
+            return config;
         }
 
         private handleResultsWithDisabled(list: any, obj: { id; name; disabled; }) {
@@ -78,7 +95,7 @@
                 text: obj.name
             });
         }
-        
+
     }
     app.service("select2LoadingService", Select2LoadingService);
 }

@@ -16,12 +16,10 @@ describe("Global Admin can",
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
-                .then(() => ItSystemHelper.createSystem(itSystemName))
-                .then(() => testFixture.cleanupState());
+                .then(() => ItSystemHelper.createSystem(itSystemName));
         });
 
         beforeEach(() => {
-            testFixture.cleanupState();
             testFixture.enableLongRunningTest();
         });
 
@@ -36,8 +34,7 @@ describe("Global Admin can",
                 var referenceId = createReferenceId();
                 var validUrl = generateValidUrl();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                refHelper.goToSpecificItSystemReferences(itSystemName)
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
                     .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl));
@@ -50,8 +47,7 @@ describe("Global Admin can",
                 var validUrl = generateValidUrl();
                 var invalidUrl = generateInvalidUrl();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                refHelper.goToSpecificItSystemReferences(itSystemName)
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => expect(getEditButtonFromReference(referenceName).isPresent()).toBe(true))
                     .then(() => getEditButtonFromReference(referenceName).click())
@@ -67,8 +63,7 @@ describe("Global Admin can",
                 var referenceId = createReferenceId();
                 var validUrl = generateValidUrl();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                refHelper.goToSpecificItSystemReferences(itSystemName)
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                     .then(() => getDeleteButtonFromReference(referenceName).click())
                     .then(() => browser.switchTo().alert().accept())
@@ -92,16 +87,16 @@ function generateValidUrl() {
     return `http://www.${new Date().getTime()}.dk/`;
 }
 
-function generateInvalidUrl(){
+function generateInvalidUrl() {
     return `${new Date().getTime()}.dk/`;
 }
 
-function getReferenceId(refName : string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName +'"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
+function getReferenceId(refName: string) {
+    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
 }
 
 function getEditButtonFromReference(refName: string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="'+refName+'"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
+    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
 }
 
 function getDeleteButtonFromReference(refName: string) {

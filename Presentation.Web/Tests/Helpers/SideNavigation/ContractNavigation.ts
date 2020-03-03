@@ -1,11 +1,15 @@
-﻿class ContractNavigation {
+﻿import NavigationHelper = require("../../Utility/NavigationHelper");
+
+class ContractNavigation {
+
+    private static readonly navigation = new NavigationHelper();
 
     public static openMainPage() {
-        element(by.css(`[data-ui-sref="${ContractNavigationSrefs.mainPageSref}"`)).click();
+        return ContractNavigation.navigation.goToSubMenuElement(ContractNavigationSrefs.mainPageSref);
     }
 
     public static openSystemsPage() {
-        element(by.css(`[data-ui-sref="${ContractNavigationSrefs.systemPageSref}"`)).click();
+        return ContractNavigation.navigation.goToSubMenuElement(ContractNavigationSrefs.systemPageSref);
     }
 }
 

@@ -1,4 +1,11 @@
 ﻿module Kitos.Models.ViewModel.ItSystem {
+    import ArchiveDutyRecommendationFactory = Models.ItSystem.ArchiveDutyRecommendationFactory;
+
+    export interface IArchiveDuty {
+        value: string;
+        optionalComment: string;
+        readMoreLink: string;
+    }
 
     export interface ISystemViewModel {
         readonly name: string,
@@ -10,7 +17,7 @@
         readonly externalReferences: any,
         readonly taskRefs: any,
         readonly businessTypeName: string,
-        readonly archiveDuty: string,
+        readonly archiveDuty: IArchiveDuty,
         readonly uuid: string,
     }
 
@@ -24,7 +31,7 @@
         readonly externalReferences: any;
         readonly taskRefs: any;
         readonly businessTypeName: string;
-        readonly archiveDuty: string;
+        readonly archiveDuty: IArchiveDuty;
         readonly uuid: string;
 
         constructor(itSystem: any) {
@@ -38,19 +45,16 @@
             this.businessTypeName = itSystem.businessTypeName;
             this.uuid = itSystem.uuid;
 
-            this.archiveDuty = this.mapArchiveDuty(itSystem.archiveDuty);
+            this.archiveDuty = this.mapArchiveDuty(itSystem);
             this.accessModifier = Mappers.AccessModifierMapper.mapAccessModifier(itSystem.accessModifier);
         }
 
-        private mapArchiveDuty(archiveDuty) {
-            switch (archiveDuty) {
-                case 1:
-                    return "B";
-                case 2:
-                    return "K";
-                case 3:
-                    return "Ved ikke";
-            default:
+        private mapArchiveDuty(system): IArchiveDuty {
+            const archiveDuty = ArchiveDutyRecommendationFactory.mapFromNumeric(system.archiveDuty);
+            return <IArchiveDuty> {
+                value: !archiveDuty || archiveDuty.value < 1 ? null : archiveDuty.name,
+                optionalComment: system.archiveDutyComment,
+                readMoreLink: Constants.Archiving.ReadMoreUri,
             }
         }
     }
