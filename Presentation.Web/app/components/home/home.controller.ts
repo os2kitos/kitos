@@ -55,8 +55,8 @@
             $scope.SSOLogin = () => {
                 // KITOSUDV-629: TODO: Redirect to new SSO endpoint
                 $http({
-                    method: "POST",
-                    url: "/SSO/Login"
+                    method: "GET",
+                    url: "SSOLogin"
                 });
             };
 
