@@ -137,12 +137,12 @@
                             <label for="interface-url" class="control-label small">Link til yderligere beskrivelse</label>
                             <div class="input-group">
                                 <input type="text" id="interface-url" class="form-control input-sm" placeholder="http://" data-element-type="InterfaceDescriptionLinkInput"
-                                       data-autosave="{{interface.updateUrl}}"
+                                       data-ng-blur="saveLink()"
                                        data-field="url"
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="interface.url">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-sm btn-default" type="button" data-href-blank="interface.url">
+                                    <button ng-disabled="linkButtonDisabled" class="btn btn-sm btn-default" type="button" data-href-blank="interface.url">
                                         <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                     </button>
                                 </span>

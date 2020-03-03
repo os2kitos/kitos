@@ -31,6 +31,7 @@
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
 
+                $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
 
                 const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Slettes)" : "";
                 $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
@@ -41,6 +42,16 @@
 
                 $scope.dataRows = [];
                 _.each(dataRows, pushDataRow);
+
+                $scope.saveLink = () => {
+                    $http.patch(itInterface.updateUrl + "?organizationId=" + user.currentOrganizationId,
+                        { url: itInterface.url })
+                        .then(success => {
+                            $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
+                            notify.addSuccessMessage("Feltet er opdateret");
+                        },
+                            error => notify.addErrorMessage("Fejl! Feltet kunne ikke ændres!"));
+                }
 
                 function pushDataRow(dataRow: any) {
                     dataRow.show = true;
