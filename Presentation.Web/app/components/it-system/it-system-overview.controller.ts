@@ -521,7 +521,7 @@ ItProjects($select=Name)`;
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderReference(dataItem.Reference);
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -552,7 +552,7 @@ ItProjects($select=Name)`;
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderExternalReference(dataItem.Reference);
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -838,13 +838,9 @@ ItProjects($select=Name)`;
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (dataItem.RiskSupervisionDocumentationUrl != null && Utility.Validation.validateUrl(dataItem.RiskSupervisionDocumentationUrl)) {
-                                return dataItem.RiskSupervisionDocumentationUrl;
-                            }
-                            if (dataItem.RiskSupervisionDocumentationUrlName != null) {
-                                return dataItem.RiskSupervisionDocumentationUrlName;
-                            }
-                            return "";
+                            return Helpers.ExcelExportHelper.renderUrlOrFallback(
+                                dataItem.RiskSupervisionDocumentationUrl,
+                                dataItem.RiskSupervisionDocumentationUrlName);
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
@@ -874,13 +870,9 @@ ItProjects($select=Name)`;
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (dataItem.LinkToDirectoryUrl != null && Utility.Validation.validateUrl(dataItem.LinkToDirectoryUrl)) {
-                                return dataItem.LinkToDirectoryUrl;
-                            }
-                            if (dataItem.LinkToDirectoryUrlName != null) {
-                                return dataItem.LinkToDirectoryUrlName;
-                            }
-                            return "";
+                            return Helpers.ExcelExportHelper.renderUrlOrFallback(
+                                dataItem.LinkToDirectoryUrl,
+                                dataItem.LinkToDirectoryUrlName);
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,

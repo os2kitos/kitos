@@ -2,7 +2,7 @@
 
     export class ExcelExportHelper {
 
-        static renderReference(reference: Models.Reference.IOdataReference) {
+        static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
             if (reference == null) {
                 return "";
             }
@@ -12,14 +12,24 @@
             return reference.Title;
         }
 
-        static renderExternalReference(reference: Models.Reference.IOdataReference) {
+        static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
             if (reference == null) {
                 return "";
             }
-            if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
+            if (reference.ExternalReferenceId != null) {
                 return reference.ExternalReferenceId;
             }
             return reference.Title;
+        }
+
+        static renderUrlOrFallback(url, fallback) {
+            if (Utility.Validation.validateUrl(url)) {
+                return url;
+            }
+            if (fallback != null) {
+                return fallback;
+            }
+            return "";
         }
     }
 }

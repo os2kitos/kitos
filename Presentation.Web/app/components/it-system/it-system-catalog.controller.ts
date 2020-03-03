@@ -570,7 +570,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderReference(dataItem.Reference);
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -601,7 +601,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderExternalReference(dataItem.Reference);
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
