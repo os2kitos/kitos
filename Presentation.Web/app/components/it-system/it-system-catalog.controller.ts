@@ -571,10 +571,13 @@
                         },
                         excelTemplate: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
+                            if (reference == null) {
+                                return "";
                             }
-                            return "";
+                            if (Utility.Validation.validateUrl(reference.URL)) {
+                                return reference.URL;
+                            }
+                            return reference.Title;
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -606,10 +609,13 @@
                         },
                         excelTemplate: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
+                            if (reference == null) {
+                                return "";
                             }
-                            return "";
+                            if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
+                                return reference.ExternalReferenceId;
+                            }
+                            return reference.Title;
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,

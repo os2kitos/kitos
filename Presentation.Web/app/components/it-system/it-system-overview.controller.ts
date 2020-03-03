@@ -522,10 +522,13 @@ ItProjects($select=Name)`;
                         },
                         excelTemplate: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
+                            if (reference == null) {
+                                return "";
                             }
-                            return "";
+                            if (Utility.Validation.validateUrl(reference.URL)) {
+                                return reference.URL;
+                            }
+                            return reference.Title;
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -557,10 +560,13 @@ ItProjects($select=Name)`;
                         },
                         excelTemplate: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
+                            if (reference == null) {
+                                return "";
                             }
-                            return "";
+                            if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
+                                return reference.ExternalReferenceId;
+                            }
+                            return reference.Title;
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -846,11 +852,11 @@ ItProjects($select=Name)`;
                             }
                         },
                         excelTemplate: dataItem => {
+                            if (dataItem.RiskSupervisionDocumentationUrl != null && Utility.Validation.validateUrl(dataItem.RiskSupervisionDocumentationUrl)) {
+                                return dataItem.RiskSupervisionDocumentationUrl;
+                            }
                             if (dataItem.RiskSupervisionDocumentationUrlName != null) {
                                 return dataItem.RiskSupervisionDocumentationUrlName;
-                            }
-                            if (dataItem.RiskSupervisionDocumentationUrl != null) {
-                                return dataItem.RiskSupervisionDocumentationUrl;
                             }
                             return "";
                         },
@@ -882,11 +888,11 @@ ItProjects($select=Name)`;
                             }
                         },
                         excelTemplate: dataItem => {
+                            if (dataItem.LinkToDirectoryUrl != null && Utility.Validation.validateUrl(dataItem.LinkToDirectoryUrl)) {
+                                return dataItem.LinkToDirectoryUrl;
+                            }
                             if (dataItem.LinkToDirectoryUrlName != null) {
                                 return dataItem.LinkToDirectoryUrlName;
-                            }
-                            if (dataItem.LinkToDirectoryUrl != null) {
-                                return dataItem.LinkToDirectoryUrl;
                             }
                             return "";
                         },
