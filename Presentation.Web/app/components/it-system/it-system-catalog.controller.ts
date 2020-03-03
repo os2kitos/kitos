@@ -570,11 +570,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
-                            }
-                            return "";
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -605,11 +601,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.Title;
-                            }
-                            return "";
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
