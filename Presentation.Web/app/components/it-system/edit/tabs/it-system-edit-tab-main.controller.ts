@@ -19,7 +19,7 @@
     app.controller("system.SystemMainCtrl",
         [
             "$rootScope", "$scope", "itSystem", "businessTypes", "user", "autofocus", "hasWriteAccess", "select2LoadingService",
-            ($rootScope, $scope, itSystem, businessTypes, user, autofocus, hasWriteAccess, select2LoadingService) => {
+            ($rootScope, $scope, itSystem, businessTypes, user, autofocus, hasWriteAccess, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
 
                 $rootScope.page.title = "IT System - Rediger system";
                 autofocus();
@@ -42,11 +42,11 @@
                     true,
                     [`orgId=${user.currentOrganizationId}`],
                     true);
-            
+
                 $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.isValidUrl = (ref: string) => {
-                    if(ref !== null) {
+                    if (ref !== null) {
                         return Kitos.Utility.Validation.validateUrl(ref);
                     }
                     return false;

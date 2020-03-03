@@ -371,6 +371,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\Select2OptionViewModel.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\archiveDuty.ts" />

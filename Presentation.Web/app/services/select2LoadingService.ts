@@ -3,8 +3,8 @@
     export interface ISelect2LoadingService {
         loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean, nameContentQueryParamName?: string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
-        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
-        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]);
+        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
+        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear? :boolean);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
@@ -13,18 +13,18 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        select2LocalData(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]) {
             return {
                 data: () => ({ "results": dataFn() }),
                 allowClear: true
             };
         }
 
-        select2LocalDataNoSearch(dataFn: () => [Models.Generic.NamedEntity.NamedEntityDTO]) {
+        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear = true) {
             return {
                 minimumResultsForSearch: Infinity,
                 data: () => ({ "results": dataFn() }),
-                allowClear: true
+                allowClear: allowClear
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage.Relation {
     import NamedEntityDTO = Models.Generic.NamedEntity.NamedEntityDTO;
+    import Select2OptionViewModel = Models.ViewModel.Generic.Select2OptionViewModel;
     import IItSystemUsageRelationDescriptionDto = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDescriptionDTO;
     import IItSystemUsageRelationReferenceDto = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationReferenceDTO;
     import IItSystemUsageRelationDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
@@ -11,23 +12,18 @@
     }
 
     export interface ISystemRelationSelectionModel {
-        value?: ISystemRelationModalIdText;
-        options: ISystemRelationModalIdText[];
-    }
-
-    export interface ISystemRelationModalIdText {
-        id: number;
-        text: string;
+        value?: Select2OptionViewModel;
+        options: Select2OptionViewModel[];
     }
 
     export interface ISystemRelationModalViewModel {
         fromSystem: NamedEntityDTO;
-        toSystem: ISystemRelationModalIdText;
+        toSystem: Select2OptionViewModel;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
         frequency: ISystemRelationSelectionModel;
-        reference: ISystemRelationModalIdText;
-        description: ISystemRelationModalIdText;
+        reference: Select2OptionViewModel;
+        description: Select2OptionViewModel;
     }
 
     export interface ISystemRelationViewModel {
@@ -132,12 +128,12 @@
         headerText: string;
         isEditDialog: boolean;
         fromSystem: NamedEntityDTO;
-        toSystem: ISystemRelationModalIdText;
+        toSystem: Select2OptionViewModel;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
         frequency: ISystemRelationSelectionModel;
-        reference: ISystemRelationModalIdText;
-        description: ISystemRelationModalIdText;
+        reference: Select2OptionViewModel;
+        description: Select2OptionViewModel;
 
         constructor(fromSystemId: number, fromSystemName: string) {
             this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
@@ -145,8 +141,8 @@
             this.interface = <ISystemRelationSelectionModel>{ value: null, options: [] };
             this.contract = <ISystemRelationSelectionModel>{ value: null, options: [] };
             this.frequency = <ISystemRelationSelectionModel>{ value: null, options: [] };
-            this.reference = <ISystemRelationModalIdText>{};
-            this.description = <ISystemRelationModalIdText>{};
+            this.reference = <Select2OptionViewModel>{};
+            this.description = <Select2OptionViewModel>{};
         }
 
         configureAsNewRelationDialog() {
@@ -155,7 +151,7 @@
         }
 
         configureAsEditRelationDialog(relationData: IItSystemUsageRelationDTO, optionsResult: IItSystemUsageRelationOptionsDTO) {
-            this.toSystem = <ISystemRelationModalIdText>{ id: relationData.toUsage.id, text: relationData.toUsage.name };
+            this.toSystem = <Select2OptionViewModel>{ id: relationData.toUsage.id, text: relationData.toUsage.name };
             this.updateAvailableOptions(optionsResult);
 
             this.bindValue(this.frequency, relationData.frequencyType);
@@ -177,7 +173,7 @@
 
         private bindValue(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO) {
             if (sourceData) {
-                targetData.value = <ISystemRelationModalIdText>{ id: sourceData.id, text: sourceData.name };
+                targetData.value = <Select2OptionViewModel>{ id: sourceData.id, text: sourceData.name };
             } else {
                 targetData.value = null;
             }
@@ -185,7 +181,7 @@
 
         private bindOptions(targetData: ISystemRelationSelectionModel, sourceData: NamedEntityDTO[]) {
             let selectedValue = targetData.value;
-            targetData.options = _.map(sourceData, dto => <ISystemRelationModalIdText>{ id: dto.id, text: dto.name });
+            targetData.options = _.map(sourceData, dto => <Select2OptionViewModel>{ id: dto.id, text: dto.name });
             targetData.value = null;
 
             //Set selected value to previously selected value if it was selected before
