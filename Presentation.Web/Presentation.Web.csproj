@@ -330,6 +330,7 @@
     <Content Include="Logout.ashx" />
     <None Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
