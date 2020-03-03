@@ -22,5 +22,10 @@ class NavigationHelper {
     public acceptAlertBox(): webdriver.promise.Promise<void> {
         return browser.switchTo().alert().accept();
     }
+
+    public goToSubMenuElement(srefName: string) {
+        console.log("Nanvigating to sub menu ", srefName);
+        return element(by.css(`[data-ui-sref="${srefName}"`)).click();
+    }
 }
 export = NavigationHelper;

@@ -1,15 +1,15 @@
-﻿class ItSystemNavigation {
+﻿import NavigationHelper = require("../../Utility/NavigationHelper");
 
-    private static  getSubMenuElement(srefName: string) {
-        return element(by.css(`[data-ui-sref="${srefName}"`));
-    }
+class ItSystemNavigation {
+
+    private static readonly navigation = new NavigationHelper();
 
     public static mainPage() {
-        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.mainPageSref).click();
+        return ItSystemNavigation.navigation.goToSubMenuElement(ItSystemNavigationSrefs.mainPageSref);
     }
 
     public static exposedInterfacesPage() {
-        return ItSystemNavigation.getSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref).click();
+        return ItSystemNavigation.navigation.goToSubMenuElement(ItSystemNavigationSrefs.exposedInterfacesSref);
     }
 }
 
