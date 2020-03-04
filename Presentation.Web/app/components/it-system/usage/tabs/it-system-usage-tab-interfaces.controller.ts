@@ -23,7 +23,17 @@
 
             $scope.systemUsage = itSystemUsage;
 
-            $scope.interfaceExposures = exhibits;
+            var exhibitViewModels = _.map(exhibits,
+                (exhibit) => new Kitos.Models.ViewModel.ItSystem.ExposedInterfaceViewModel(
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.maxTextFieldCharCount,
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount,
+                    exhibit));
+
+            $scope.interfaceExposures = exhibitViewModels;
+
+            $scope.expandParagraph = (e) => {
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
+            };
         }
     ]);
 })(angular, app);
