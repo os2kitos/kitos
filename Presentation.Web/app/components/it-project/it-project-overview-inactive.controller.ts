@@ -487,6 +487,9 @@
                             }
                         },
                         excelTemplate: dataItem => {
+                            if (!dataItem.ItProjectStatusUpdates) {
+                                return "";
+                            }   
                             return Helpers.ExcelExportHelper.renderProjectStatusColor(dataItem.ItProjectStatusUpdates);
                         },
                         filterable: false,
@@ -589,6 +592,9 @@
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
                         excelTemplate: dataItem => {
+                            if (!dataItem.GoalStatus.Status) {
+                                return "";
+                            }
                             return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);
                         },
                         hidden: true,
