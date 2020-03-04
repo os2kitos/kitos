@@ -1,4 +1,5 @@
 ﻿module Kitos.Helpers {
+    import IItProjectInactiveOverview = ItProject.OverviewInactive.IItProjectInactiveOverview;
 
     export class ExcelExportHelper {
 
@@ -31,5 +32,52 @@
             }
             return "";
         }
+
+        static renderProjectStatusColor(status: Models.ItProject.IItProjectStatusUpdate[]) {
+            if (status.length > 0) {
+                var latestStatus = status[0];
+                var statusTime = latestStatus.TimeStatus;
+                var statusQuality = latestStatus.QualityStatus;
+                var statusResources = latestStatus.ResourcesStatus;
+                if (latestStatus.IsCombined) {
+                    return latestStatus.CombinedStatus;
+                } else {
+                    /* If no combined status exists, take the lowest status from the splitted status */
+                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
+                        return "Rød";
+                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
+                        return "Gul";
+                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
+                        return "Grøn";
+                    } else {
+                        return "Hvid";
+                    }
+                }
+            } else {
+                return "";
+            }
+        }
+
+        static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
+            var latestStatus = dataItem.ItProjectStatusUpdates[0];
+            var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;
+            return ExcelExportHelper.convertColorsToDanish(statusToShow);
+        }
+
+        static convertColorsToDanish(color: string) {
+            switch (color) {
+                case "Green":
+                    return "Grøn";
+                case "Yellow":
+                    return "Gul";
+                case "Red":
+                    return "Rød";
+                case "White":
+                    return "Hvid";
+                default:
+                    return color;
+            }
+        }
+
     }
 }
