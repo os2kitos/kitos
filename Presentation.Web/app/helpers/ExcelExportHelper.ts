@@ -1,11 +1,25 @@
 ﻿module Kitos.Helpers {
     import IItProjectInactiveOverview = ItProject.OverviewInactive.IItProjectInactiveOverview;
 
+    interface IStatusColor {
+        danish: string;
+        english: string;
+    }
+
     export class ExcelExportHelper {
+
+        private static readonly noValueFallback = "";
+
+        private static readonly colors = {
+            red: <IStatusColor>{ danish: "Rød", english: "Red" },
+            green: <IStatusColor>{ danish: "Grøn", english: "Green" },
+            yellow: <IStatusColor>{ danish: "Gul", english: "Yellow" },
+            white: <IStatusColor>{ danish: "Hvid", english: "White" }
+        }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
             if (reference == null) {
-                return "";
+                return ExcelExportHelper.noValueFallback;
             }
             if (Utility.Validation.validateUrl(reference.URL)) {
                 return reference.URL;
@@ -15,7 +29,7 @@
 
         static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
             if (reference == null) {
-                return "";
+                return ExcelExportHelper.noValueFallback;
             }
             if (reference.ExternalReferenceId != null) {
                 return reference.ExternalReferenceId;
@@ -30,28 +44,37 @@
             if (fallback != null) {
                 return fallback;
             }
-            return "";
+            return ExcelExportHelper.noValueFallback;
         }
 
         static renderProjectStatusColor(status: Models.ItProject.IItProjectStatusUpdate[]) {
 
-            var getColor = (statusArray: Array<string>) => {
-                var colToMatch = ["Red", "Yellow", "Green", "White"];
-                var i: number;
-                for (i = 0; i < colToMatch.length; i++) {
-                    if (statusArray.indexOf(colToMatch[i]) > -1) {
-                        this.convertColorsToDanish(colToMatch[i]);
-                    }
-                    else {
-                        continue;
+            const getColor = (statusArray: Array<string>) => {
+                var prioritizedColorOrder = [
+                    ExcelExportHelper.colors.red,
+                    ExcelExportHelper.colors.yellow,
+                    ExcelExportHelper.colors.green,
+                    ExcelExportHelper.colors.white
+                ];
+
+                let normalizedStatuses = _.filter(statusArray, item => !!item);
+                normalizedStatuses = _.map(normalizedStatuses, item => item.toLowerCase());
+
+                for (let currentPrioritizedColor of prioritizedColorOrder) {
+
+                    const existingColor = _.find(normalizedStatuses, currentPrioritizedColor.english.toLowerCase());
+
+                    if (existingColor) {
+                        return currentPrioritizedColor.danish;
                     }
                 }
-                return this.convertColorsToDanish(colToMatch[i]);
+
+                return ExcelExportHelper.noValueFallback;
             };
 
             if (status.length > 0) {
-                var latestStatus = status[0];
-                var statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
+                const latestStatus = status[0];
+                const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
 
                 if (latestStatus.IsCombined) {
                     return this.convertColorsToDanish(latestStatus.CombinedStatus);
@@ -61,7 +84,7 @@
                 }
             }
             else {
-                return "";
+                return ExcelExportHelper.noValueFallback;
             }
         }
 
@@ -70,29 +93,24 @@
         }
 
         static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
-            var latestStatus = dataItem.ItProjectStatusUpdates[0];
-            var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;
+            const latestStatus = dataItem.ItProjectStatusUpdates[0];
+            const statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;
             return ExcelExportHelper.convertColorsToDanish(statusToShow);
         }
 
         static convertColorsToDanish(color: string) {
-            switch (color) {
-                case "Green":
-                    return "Grøn";
-                case "Yellow":
-                    return "Gul";
-                case "Red":
-                    return "Rød";
-                case "White":
-                    return "Hvid";
-                default:
-                    return "";
+            if (color !== null) {
+                const knownColor = ExcelExportHelper.colors[color.toLowerCase()];
+                if (!_.isUndefined(knownColor)) {
+                    return knownColor.danish;
+                }
             }
+            return ExcelExportHelper.noValueFallback;
         }
 
         static getGoalStatus(goalStatus: Models.TrafficLight) {
             if (goalStatus == null) {
-                return "";
+                return ExcelExportHelper.noValueFallback;
             }
             return this.convertColorsToDanish(goalStatus.toString());
         }
