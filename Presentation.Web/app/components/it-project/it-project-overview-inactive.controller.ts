@@ -355,6 +355,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
@@ -382,6 +385,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
