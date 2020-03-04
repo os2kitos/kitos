@@ -564,6 +564,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -591,6 +594,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
