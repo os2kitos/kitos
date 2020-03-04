@@ -58,6 +58,15 @@
             }
         }
 
+        static renderDate(dataItem: IItProjectInactiveOverview, moment: moment.MomentStatic) {
+
+            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
+                return "";
+            }
+
+            return moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+        }
+
         static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
             var latestStatus = dataItem.ItProjectStatusUpdates[0];
             var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : status;

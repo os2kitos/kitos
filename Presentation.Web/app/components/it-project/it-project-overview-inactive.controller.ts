@@ -428,11 +428,7 @@
                             return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
-                                return "";
-                            }
-
-                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                           return Helpers.ExcelExportHelper.renderDate(dataItem,this.moment);
                         },
                         sortable: false,
                         filterable: false
@@ -450,11 +446,7 @@
                             return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
-                                return "";
-                            }
-
-                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem,this.moment);
                         },
                         sortable: false,
                         filterable: false
