@@ -72,4 +72,13 @@
     </parameterentry>
   </parameter>
 
+  <!-- SSO SAML configuration -->
+  <parameter name="SSOServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/ServiceProvider/@server"/>
+  </parameter>
+
+  <parameter name="SSOIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/IDPEndPoints/add/@id"/>
+  </parameter>
+
 </parameters>

@@ -29,4 +29,6 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `
                 -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp `
                 -defaultUserPassword $Env:DefaultUserPassword `
-                -useDefaultUserPassword $Env:UseDefaultUserPassword
+                -useDefaultUserPassword $Env:UseDefaultUserPassword `
+				-ssoServiceProviderServer $Env:ssoServiceProviderServer `
+				-ssoIDPEndPoints $Env:ssoIDPEndPoints

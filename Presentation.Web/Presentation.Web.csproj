@@ -324,8 +324,6 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
-    <Content Include="Controllers\SSO\LoggedIn.html" />
-    <Content Include="Controllers\SSO\LoggedOut.html" />
     <Content Include="idp-metadata\kombit-saml_demo-brugervendtsystem.xml" />
     <Content Include="Logout.ashx" />
     <None Include="Login.ashx" />
