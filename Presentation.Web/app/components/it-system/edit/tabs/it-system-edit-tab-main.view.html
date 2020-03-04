@@ -81,7 +81,7 @@
                                 <tr ng-repeat="reference in system.externalReferences">
                                     <td>
                                         <p class="noMargin" ng-show="!isValidUrl(reference.url)">{{reference.title}}</p>
-                                        <a ng-show="isValidUrl(reference.url)" href="{{reference.url}}">{{reference.title}}</a>
+                                        <a target="_blank" ng-show="isValidUrl(reference.url)" href="{{reference.url}}">{{reference.title}}</a>
                                     </td>
                                 </tr>
                             </table>
