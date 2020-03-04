@@ -489,7 +489,7 @@
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem. ItProjectStatusUpdates[0];
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
                                 var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
                                 return `<span data-square-traffic-light="${statusToShow}"></span>`;
                             } else {
