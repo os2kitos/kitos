@@ -86,9 +86,15 @@
                 case "White":
                     return "Hvid";
                 default:
-                    return color;
+                    return "";
             }
         }
 
+        static getGoalStatus(goalStatus: Models.TrafficLight) {
+            if (goalStatus == null) {
+                return "";
+            }
+            return this.convertColorsToDanish(goalStatus.toString());
+        }
     }
 }

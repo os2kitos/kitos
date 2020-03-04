@@ -565,8 +565,7 @@
                             if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
-
-                            return this.moment(dataItem.StatusDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.StatusDate);
                         },
                         hidden: true,
                         filterable: {
@@ -589,7 +588,9 @@
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.GoalStatus && Helpers.ExcelExportHelper.convertColorsToDanish(dataItem.GoalStatus.Status.toString()) || "",
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
