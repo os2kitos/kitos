@@ -34,37 +34,39 @@
         }
 
         static renderProjectStatusColor(status: Models.ItProject.IItProjectStatusUpdate[]) {
-            if (status.length > 0) {
-                var latestStatus = status[0];
-                var statusTime = latestStatus.TimeStatus;
-                var statusQuality = latestStatus.QualityStatus;
-                var statusResources = latestStatus.ResourcesStatus;
-                if (latestStatus.IsCombined) {
-                    return latestStatus.CombinedStatus;
-                } else {
-                    /* If no combined status exists, take the lowest status from the splitted status */
-                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
-                        return "Rød";
-                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
-                        return "Gul";
-                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
-                        return "Grøn";
-                    } else {
-                        return "Hvid";
+
+            var getColor = (statusArray: Array<string>) => {
+                var colToMatch = ["Red", "Yellow", "Green", "White"];
+                var i: number;
+                for (i = 0; i < colToMatch.length; i++) {
+                    if (statusArray.indexOf(colToMatch[i]) > -1) {
+                        this.convertColorsToDanish(colToMatch[i]);
+                    }
+                    else {
+                        continue;
                     }
                 }
-            } else {
+                return this.convertColorsToDanish(colToMatch[i]);
+            };
+
+            if (status.length > 0) {
+                var latestStatus = status[0];
+                var statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
+
+                if (latestStatus.IsCombined) {
+                    return this.convertColorsToDanish(latestStatus.CombinedStatus);
+                }
+                else {
+                    return getColor(statusArray);
+                }
+            }
+            else {
                 return "";
             }
         }
 
-        static renderDate(dataItem: IItProjectInactiveOverview, moment: moment.MomentStatic) {
-
-            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
-                return "";
-            }
-
-            return moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+        static renderDate(date: Date) {
+            return moment(date).format("DD-MM-YYYY");
         }
 
         static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {
