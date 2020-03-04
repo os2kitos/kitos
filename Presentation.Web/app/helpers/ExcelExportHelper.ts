@@ -114,5 +114,16 @@
             }
             return this.convertColorsToDanish(goalStatus.toString());
         }
+
+        static getRoles(rights: any[]) {
+
+            var string = "";
+
+            for (let right of rights) {
+                string += `${right.Role.Name}`;
+            }
+            return string;
+
+        }
     }
 }
