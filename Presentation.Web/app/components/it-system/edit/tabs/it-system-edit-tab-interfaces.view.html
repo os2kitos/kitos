@@ -6,7 +6,7 @@
         <table class="table table-striped table-condensed table-fixed">
             <thead ng-if="interfaceExposures.length > 0">
                 <tr>
-                    <th class="col-xs-2">Snitflade</th>
+                    <th class="col-xs-1">Snitflade</th>
                     <th class="col-xs-1">Grænseflade</th>
                     <th class="col-xs-1">Beskrivelse</th>
                     <th class="col-xs-1">Reference</th>
@@ -23,14 +23,14 @@
                     <td>{{exposure.interfaceName}}</td>
 
                     <!-- description -->
-                    <td style="width: 300px">
+                    <td class="longTextField">
                         <p ng-if="exposure.description" ng-show="!exposure.description.longText" data-element-type="usedByRelationDescription">{{exposure.description.description}}</p>
                         <p ng-if="exposure.description" ng-show="exposure.description.longText" style="height: {{exposure.description.shortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{exposure.description.description}}</p>
                         <a ng-if="exposure.description" ng-show="exposure.description.longText" ng-click="expandParagraph($event)">Se mere</a>
                     </td>
 
                     <!-- link to further description -->
-                    <td style="overflow-wrap: break-word; width: 150px">
+                    <td class="referenceLinkField">
                         <a ng-if="exposure.url" ng-show="exposure.url.isValid" href="{{exposure.url}}" target="_blank"><img alt="{{exposure.url}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
                     </td>
                 </tr>

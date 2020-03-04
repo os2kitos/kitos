@@ -1,15 +1,7 @@
 ﻿module Kitos.Models.ViewModel.ItSystem {
 
-    export interface IGenericDescriptionViewModel {
-        description: string;
-        longText: boolean;
-        shortTextLineCount: number;
-    }
-
-    export interface IGenericUrlViewModel {
-        value: string;
-        isValid: boolean;
-    }
+    import IGenericUrlViewModel = ViewModel.Generic.IGenericUrlViewModel;
+    import IGenericDescriptionViewModel = ViewModel.Generic.IGenericDescriptionViewModel;
 
     export interface IExposedInterfaceViewModel {
         name: string,

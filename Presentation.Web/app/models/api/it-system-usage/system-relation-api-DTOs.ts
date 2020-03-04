@@ -40,12 +40,6 @@
         ShortTextLineCount: number;
     }
 
-    export interface IItSystemUsageRelationDescriptionDTO {
-        Description: string;
-        LongText: boolean;
-        ShortTextLineCount: number;
-    }
-
     export interface ISystemRelationPatchDTO {
         Id: number;
         Description: string;
