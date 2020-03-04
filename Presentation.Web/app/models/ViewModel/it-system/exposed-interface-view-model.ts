@@ -4,25 +4,31 @@
     import IGenericDescriptionViewModel = ViewModel.Generic.IGenericDescriptionViewModel;
 
     export interface IExposedInterfaceViewModel {
+        id: number,
         name: string,
         interfaceName: string,
         url: IGenericUrlViewModel,
         description: IGenericDescriptionViewModel,
+        disabled: boolean,
     }
 
     export class ExposedInterfaceViewModel implements IExposedInterfaceViewModel {
+        id: number;
         name: string;
         interfaceName: string;
         url: IGenericUrlViewModel;
         description: IGenericDescriptionViewModel;
+        disabled: boolean;
 
         constructor(
             maxTextFieldCharCount: number,
             shortTextLineCount: number,
             currentExposedInterface: any) {
 
+            this.id = currentExposedInterface.id;
             this.name = currentExposedInterface.name;
             this.interfaceName = currentExposedInterface.interfaceName;
+            this.disabled = currentExposedInterface.disabled;
 
             const des = currentExposedInterface.description;
             if (des != null) {
