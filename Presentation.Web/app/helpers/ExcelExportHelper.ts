@@ -115,9 +115,9 @@
             return this.convertColorsToDanish(goalStatus.toString());
         }
 
-        static getRoles(rights: any[]) {
+        static renderUserRoles(rights: any[]) {
 
-            var string = "";
+            let string = "";
 
             for (let right of rights) {
                 string += `${right.Role.Name}`;
