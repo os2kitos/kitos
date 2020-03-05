@@ -14,7 +14,7 @@
                     <th>
                         Beskrivelse
                     </th>
-                    <th>
+                    <th class="centeredHeader">
                         Reference
                     </th>
                     <th>
@@ -38,7 +38,11 @@
                         <a ng-if="relation.Description" ng-show="relation.Description.longText" ng-click="expandParagraph($event)">Se mere</a>
                     </td>
                     <td class="referenceLinkField">
-                        <a ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank" class="referenceLink"><img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg"></a>
+                        <div ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" class="referenceLink">
+                            <a title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank">
+                                <img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg">
+                            </a>
+                        </div>
                         <p ng-if="relation.Reference" ng-show="relation.Reference.LongText" style="height: {{relation.Reference.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Reference.Reference}}</p>
                         <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="relationReference">{{relation.Reference.Reference}}</p>
@@ -78,7 +82,7 @@
                     <th>
                         Beskrivelse
                     </th>
-                    <th>
+                    <th class="centeredHeader">
                         Reference
                     </th>
                     <th>
@@ -102,7 +106,11 @@
                         <a ng-if="relation.Description" ng-show="relation.Description.longText" ng-click="expandParagraph($event)">Se mere</a>
                     </td>
                     <td class="referenceLinkField">
-                        <a ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank" class="referenceLink"><img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg"></a>
+                        <div ng-if="relation.Reference" ng-show="relation.Reference.ValidUrl" class="referenceLink">
+                            <a title="{{relation.Reference.Reference}}" href="{{relation.Reference.Reference}}" target="_blank">
+                                <img alt="{{relation.Reference.Reference}}" src="/Content/img/EksterneReferencer.svg">
+                            </a>
+                        </div>
                         <p ng-if="relation.Reference" ng-show="relation.Reference.LongText" style="height: {{relation.Reference.ShortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{relation.Reference.Reference}}</p>
                         <a ng-if="relation.Reference" ng-show="relation.Reference.LongText" ng-click="expandParagraph($event)">Se mere</a>
                         <p ng-if="relation.Reference" ng-show="!relation.Reference.ValidUrl && !relation.Reference.LongText" data-element-type="usedByRelationReference">{{relation.Reference.Reference}}</p>
