@@ -30,5 +30,5 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp `
                 -defaultUserPassword $Env:DefaultUserPassword `
                 -useDefaultUserPassword $Env:UseDefaultUserPassword `
-                -ssoServiceProviderServer $Env:ssoServiceProviderServer `
-                -ssoIDPEndPoints $Env:ssoIDPEndPoints
+                -ssoServiceProviderServer $Env:SsoServiceProviderServer `
+                -ssoIDPEndPoints $Env:SsoIDPEndPoints
