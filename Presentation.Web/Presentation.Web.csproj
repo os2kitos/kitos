@@ -327,7 +327,7 @@
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
-    <None Include="Login.ashx" />
+    <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
