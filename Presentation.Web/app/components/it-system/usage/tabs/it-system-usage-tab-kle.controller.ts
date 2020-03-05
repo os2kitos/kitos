@@ -1,23 +1,23 @@
 ﻿(function(ng, app) {
     app.config([
-        '$stateProvider', function($stateProvider) {
+        '$stateProvider', $stateProvider => {
             $stateProvider.state('it-system.usage.kle', {
                 url: '/kle',
                 templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-kle.view.html',
                 controller: 'system.EditKle',
                 resolve: {
-
                 }
             });
         }
     ]);
 
     app.controller('system.EditKle', [
-        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'hasWriteAccess',
-        function ($scope, $http, $state, $stateParams, notify, user, hasWriteAccess) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'hasWriteAccess',"itSystemUsage",
+        ($scope, $http, $state, $stateParams, notify, user, hasWriteAccess, itSystemUsage) => {
             var usageId = $stateParams.id;
             var baseUrl = 'api/itSystemUsage/' + usageId;
 
+            $scope.system = itSystemUsage.itSystem;
             $scope.pagination = {
                 skip: 0,
                 take: 50

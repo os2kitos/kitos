@@ -933,7 +933,7 @@
                         template: (dataItem) => { return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights);
+                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights,this.projectRoles);
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,

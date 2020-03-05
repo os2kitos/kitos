@@ -2,8 +2,43 @@
     <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <i class="glyphicon glyphicon-tasks"></i>
-            Tilknyttede opgaver
+            <strong>Tilknyttede opgaver (Data fra IT Systemkataloget)</strong>
+        </div>
+        <div class="panel-body">
+            <!-- KLE ID and Name from the parent IT-syste, -->
+            <div class="form-group">
+                <table id="system-kle" class="table table-condensed table-fixed">
+                    <thead>
+                    <tr>
+                        <th class="KleIdColumn small Kle">
+                            KLE ID
+                        </th>
+                        <th class="small Kle">
+                            KLE Navn
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="disabledColor bordered">
+                    <tr ng-if="!system.taskRefs || system.taskRefs.length == 0">
+                        <td colspan="2">
+                            <p class="noMargin">Ingen KLE valgt</p>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="kle in system.taskRefs">
+                        <td>
+                            <p class="noMargin">{{kle.taskKey}}</p>
+                        </td>
+                        <td>
+                            <p class="noMargin">{{kle.description}}</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p>Forslag til justering af KLE opmærkning kan sendes til: <a href="mailto:info@kitos.dk" target="_blank">info@kitos.dk</a></p>
+            </div>
+        </div>
+        <div class="panel-heading">
+            <strong>Lokalt tilknyttede opgaver</strong>
         </div>
         <div class="panel-body">
             <div data-kle-filter="selectedTaskGroup" data-has-write-access="hasWriteAccess"></div>

@@ -223,7 +223,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations($count=true;$top=0),Reference`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations,Reference`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -509,12 +509,12 @@
                         filterable: false
                     },
                     {
-                        field: "AssociatedSystemRelations/@count",
+                        field: "AssociatedSystemRelations",
                         title: "Antal relationer",
                         width: 60,
                         persistId: "numberOfRelations", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return dataItem["AssociatedSystemRelations@odata.count"].toString();
+                            return dataItem.AssociatedSystemRelations.length.toString();
                         },
                         attributes: {
                             "class": "text-center",

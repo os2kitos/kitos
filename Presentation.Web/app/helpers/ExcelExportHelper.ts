@@ -18,7 +18,7 @@
         }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
-            if (reference == null) {
+            if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
             if (Utility.Validation.validateUrl(reference.URL)) {
@@ -28,7 +28,7 @@
         }
 
         static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
-            if (reference == null) {
+            if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
             if (reference.ExternalReferenceId != null) {
@@ -57,14 +57,15 @@
                     ExcelExportHelper.colors.white
                 ];
 
-                let normalizedStatuses = _.filter(statusArray, item => !!item);
-                normalizedStatuses = _.map(normalizedStatuses, item => item.toLowerCase());
+                const statusMap = _.reduce(statusArray, (acc: any, current) => {
+                    if (!!current) {
+                        acc[current.toLowerCase()] = true;
+                    }
+                    return acc;
+                }, <any>{});
 
                 for (let currentPrioritizedColor of prioritizedColorOrder) {
-
-                    const existingColor = _.find(normalizedStatuses, currentPrioritizedColor.english.toLowerCase());
-
-                    if (existingColor) {
+                    if (statusMap.hasOwnProperty(currentPrioritizedColor.english.toLowerCase())) {
                         return currentPrioritizedColor.danish;
                     }
                 }
@@ -74,12 +75,12 @@
 
             if (status.length > 0) {
                 const latestStatus = status[0];
-                const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
 
                 if (latestStatus.IsCombined) {
                     return this.convertColorsToDanish(latestStatus.CombinedStatus);
                 }
                 else {
+                    const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
                     return getColor(statusArray);
                 }
             }
@@ -99,31 +100,38 @@
         }
 
         static convertColorsToDanish(color: string) {
-            if (color !== null) {
-                const knownColor = ExcelExportHelper.colors[color.toLowerCase()];
-                if (!_.isUndefined(knownColor)) {
-                    return knownColor.danish;
-                }
+            if (color === null || _.isUndefined(color)) {
+                return ExcelExportHelper.noValueFallback;
             }
-            return ExcelExportHelper.noValueFallback;
+            const knownColor = ExcelExportHelper.colors[color.toLowerCase()];
+            if (!_.isUndefined(knownColor)) {
+                return knownColor.danish;
+            }
         }
 
         static getGoalStatus(goalStatus: Models.TrafficLight) {
-            if (goalStatus == null) {
+            if (goalStatus === null || _.isUndefined(goalStatus)) {
                 return ExcelExportHelper.noValueFallback;
             }
             return this.convertColorsToDanish(goalStatus.toString());
         }
 
-        static renderUserRoles(rights: any[]) {
+        static renderUserRoles(rights: any[], projectRoles) {
+            let result = "";
+            _.each(rights,
+                (right, index, ) => {
+                    if (!_.find(projectRoles, (option: any) => (option.Id === parseInt(right.Role.Id, 10)))) {
+                        result += `${right.Role.Name} (udgået)`;
+                    } else {
+                        result += `${right.Role.Name}`;
+                    }
 
-            let string = "";
+                    if (index !== rights.length - 1) {
+                        result += ", ";
+                    }
 
-            for (let right of rights) {
-                string += `${right.Role.Name}`;
-            }
-            return string;
-
+                });
+            return result;
         }
     }
 }
