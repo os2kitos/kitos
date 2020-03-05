@@ -1,7 +1,7 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage.Relation {
     import NamedEntityDTO = Models.Generic.NamedEntity.NamedEntityDTO;
     import Select2OptionViewModel = Models.ViewModel.Generic.Select2OptionViewModel;
-    import IItSystemUsageRelationDescriptionDto = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDescriptionDTO;
+    import IGenericDescriptionViewModel = Models.ViewModel.Generic.IGenericDescriptionViewModel;
     import IItSystemUsageRelationReferenceDto = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationReferenceDTO;
     import IItSystemUsageRelationDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
     import IItSystemUsageRelationOptionsDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO;
@@ -31,7 +31,7 @@
         FromSystem: IItSystemUsageRelationIdName;
         ToSystem: IItSystemUsageRelationIdName;
         Interface?: IItSystemUsageRelationIdName;
-        Description: IItSystemUsageRelationDescriptionDto;
+        Description: IGenericDescriptionViewModel;
         Reference: IItSystemUsageRelationReferenceDto;
         Contract?: IItSystemUsageRelationIdName;
         Frequency?: IItSystemUsageRelationIdName;
@@ -42,7 +42,7 @@
         FromSystem: IItSystemUsageRelationIdName;
         ToSystem: IItSystemUsageRelationIdName;
         Interface?: IItSystemUsageRelationIdName;
-        Description: IItSystemUsageRelationDescriptionDto;
+        Description: IGenericDescriptionViewModel;
         Reference: IItSystemUsageRelationReferenceDto;
         Contract?: IItSystemUsageRelationIdName;
         Frequency?: IItSystemUsageRelationIdName;
@@ -91,10 +91,10 @@
 
             var des = currentRelation.description;
             if (des != null) {
-                this.Description = <IItSystemUsageRelationDescriptionDto>{};
-                this.Description.Description = des;
-                this.Description.LongText = des.length > maxTextFieldCharCount;
-                this.Description.ShortTextLineCount = shortTextLineCount;
+                this.Description = <IGenericDescriptionViewModel>{};
+                this.Description.description = des;
+                this.Description.longText = des.length > maxTextFieldCharCount;
+                this.Description.shortTextLineCount = shortTextLineCount;
             }
 
             //Reference
