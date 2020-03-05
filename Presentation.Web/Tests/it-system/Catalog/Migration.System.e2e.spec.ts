@@ -67,7 +67,7 @@ describe("Global Administrator is able to migrate from one system to another", (
 
     it("Global Admin is able to see a sorted view", () => {
         var systemNameFrom = createItSystemName(1);
-        var orgA = createOrgName("A");
+        var orgA = createOrgName("a");
         var orgB = createOrgName("B");
         var orgC = createOrgName("C");
         var orgBB = createOrgName("BB");
