@@ -26,44 +26,44 @@ describe("Global Administrator is able to migrate from one system to another", (
         testFixture.disableLongRunningTest();
     });
 
-    //it("Local admin is not able to see the move button", () => {
-    //    loginHelper.loginAsLocalAdmin()
-    //        .then(() => pageObject.getPage())
-    //        .then(() => SystemCatalogHelper.waitForKendoGrid())
-    //        .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
-    //});
+    it("Local admin is not able to see the move button", () => {
+        loginHelper.loginAsLocalAdmin()
+            .then(() => pageObject.getPage())
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
+            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
+    });
 
-    //it("Regular user is not able to see the move button", () => {
-    //    loginHelper.loginAsRegularUser()
-    //        .then(() => pageObject.getPage())
-    //        .then(() => SystemCatalogHelper.waitForKendoGrid())
-    //        .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
-    //});
+    it("Regular user is not able to see the move button", () => {
+        loginHelper.loginAsRegularUser()
+            .then(() => pageObject.getPage())
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
+            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
+    });
 
-    //it("Global admin is able to get to the final migration window and execute a migration", () => {
-    //    var systemNameFrom = createItSystemName(1);
-    //    var systemNameTo = createItSystemName(2);
-    //    loginHelper.loginAsGlobalAdmin()
-    //        .then(() => pageObject.getPage())
-    //        .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
-    //        .then(() => SystemCatalogHelper.createSystem(systemNameTo))
-    //        .then(() => toggleSystemActivation(systemNameFrom))
-    //        .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-    //        .then(() => waitForElement(constants.moveSystemButton))
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(true))
-    //        .then(() => element(cssHelper.byDataElementType(constants.moveSystemButton)).click())
-    //        .then(() => waitForElement(constants.consequenceButton))
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.consequenceButton)).isPresent()).toBe(true))
-    //        .then(() => select2SearchForSystem(systemNameTo))
-    //        .then(() => waitForSelect2DataAndSelect())
-    //        .then(() => element(cssHelper.byDataElementType(constants.consequenceButton)).click())
-    //        .then(() => waitForElement(constants.startMigrationButton))
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(true))
-    //        .then(() => element(cssHelper.byDataElementType(constants.startMigrationButton)).click())
-    //        .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
-    //});
+    it("Global admin is able to get to the final migration window and execute a migration", () => {
+        var systemNameFrom = createItSystemName(1);
+        var systemNameTo = createItSystemName(2);
+        loginHelper.loginAsGlobalAdmin()
+            .then(() => pageObject.getPage())
+            .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
+            .then(() => SystemCatalogHelper.createSystem(systemNameTo))
+            .then(() => toggleSystemActivation(systemNameFrom))
+            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
+            .then(() => waitForElement(constants.moveSystemButton))
+            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(true))
+            .then(() => element(cssHelper.byDataElementType(constants.moveSystemButton)).click())
+            .then(() => waitForElement(constants.consequenceButton))
+            .then(() => expect(element(cssHelper.byDataElementType(constants.consequenceButton)).isPresent()).toBe(true))
+            .then(() => select2SearchForSystem(systemNameTo))
+            .then(() => waitForSelect2DataAndSelect())
+            .then(() => element(cssHelper.byDataElementType(constants.consequenceButton)).click())
+            .then(() => waitForElement(constants.startMigrationButton))
+            .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(true))
+            .then(() => element(cssHelper.byDataElementType(constants.startMigrationButton)).click())
+            .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
+    });
 
     it("Global Admin is able to see a sorted view", () => {
         var systemNameFrom = createItSystemName(1);
