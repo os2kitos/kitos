@@ -115,7 +115,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey,"ResponsibleUsage.OrganizationUnit.Name");
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -355,6 +355,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
@@ -382,6 +385,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -432,7 +438,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.StartDate);
                         },
                         sortable: false,
                         filterable: false
@@ -454,7 +460,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.EndDate);
                         },
                         sortable: false,
                         filterable: false
@@ -487,28 +493,10 @@
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusTime = latestStatus.TimeStatus;
-                                var statusQuality = latestStatus.QualityStatus;
-                                var statusResources = latestStatus.ResourcesStatus;
-                                if (latestStatus.IsCombined) {
-                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
-                                } else {
-                                    /* If no combined status exists, take the lowest status from the splitted status */
-                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
-                                        return "<span data-square-traffic-light='Red'></span>";
-                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
-                                        return "<span data-square-traffic-light='Yellow'></span>";
-                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
-                                        return "<span data-square-traffic-light='Green'></span>";
-                                    } else {
-                                        return "<span data-square-traffic-light='White'></span>";
-                                    }
-                                }
-                            } else {
+                            if (!dataItem.ItProjectStatusUpdates) {
                                 return "";
-                            }
+                            }   
+                            return Helpers.ExcelExportHelper.renderProjectStatusColor(dataItem.ItProjectStatusUpdates);
                         },
                         filterable: false,
                         sortable: false
@@ -527,9 +515,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].TimeStatus);
                             } else {
                                 return "";
                             }
@@ -551,9 +537,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].QualityStatus);
                             } else {
                                 return "";
                             }
@@ -575,9 +559,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].ResourcesStatus);
                             } else {
                                 return "";
                             }
@@ -592,8 +574,7 @@
                             if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
-
-                            return this.moment(dataItem.StatusDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.StatusDate);
                         },
                         hidden: true,
                         filterable: {
@@ -616,7 +597,12 @@
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.GoalStatus && dataItem.GoalStatus.Status.toString() || "",
+                        excelTemplate: dataItem => {
+                            if (!dataItem.GoalStatus) {
+                                return "";
+                            }
+                            return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);
+                        },
                         hidden: true,
                         filterable: {
                             cell: {

@@ -1,12 +1,12 @@
 ﻿module Kitos.Models.ItProject {
     export interface IItProjectStatusUpdate extends IEntity {
-        CombinedStatus: String;
-        TimeStatus: String;
-        QualityStatus: String;
-        ResourcesStatus: String;
-        IsCombined: Boolean;
+        CombinedStatus: string;
+        TimeStatus: string;
+        QualityStatus: string;
+        ResourcesStatus: string;
+        IsCombined: boolean;
         Created: Date;
-        IsFinal: Boolean;
+        IsFinal: boolean;
         Note: string;
         AssociatedItProjectId: number;
         /** Gets or sets the associated it project. */
