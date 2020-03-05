@@ -115,5 +115,23 @@
             }
             return this.convertColorsToDanish(goalStatus.toString());
         }
+
+        static renderUserRoles(rights: any[], projectRoles) {
+            let result = "";
+            _.each(rights,
+                (right, index, ) => {
+                    if (!_.find(projectRoles, (option: any) => (option.Id === parseInt(right.Role.Id, 10)))) {
+                        result += `${right.Role.Name} (udgået)`;
+                    } else {
+                        result += `${right.Role.Name}`;
+                    }
+
+                    if (index !== rights.length - 1) {
+                        result += ", ";
+                    }
+
+                });
+            return result;
+        }
     }
 }
