@@ -598,7 +598,7 @@
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
                         excelTemplate: dataItem => {
-                            if (!dataItem.GoalStatus.Status) {
+                            if (!dataItem.GoalStatus) {
                                 return "";
                             }
                             return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);

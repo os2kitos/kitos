@@ -74,12 +74,12 @@
 
             if (status.length > 0) {
                 const latestStatus = status[0];
-                const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
 
                 if (latestStatus.IsCombined) {
                     return this.convertColorsToDanish(latestStatus.CombinedStatus);
                 }
                 else {
+                    const statusArray = [latestStatus.TimeStatus, latestStatus.QualityStatus, latestStatus.ResourcesStatus];
                     return getColor(statusArray);
                 }
             }
@@ -109,7 +109,7 @@
         }
 
         static getGoalStatus(goalStatus: Models.TrafficLight) {
-            if (goalStatus == null) {
+            if (goalStatus == null || _.isUndefined(goalStatus)) {
                 return ExcelExportHelper.noValueFallback;
             }
             return this.convertColorsToDanish(goalStatus.toString());
