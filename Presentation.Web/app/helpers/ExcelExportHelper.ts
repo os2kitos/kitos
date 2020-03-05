@@ -57,14 +57,15 @@
                     ExcelExportHelper.colors.white
                 ];
 
-                let normalizedStatuses = _.filter(statusArray, item => !!item);
-                normalizedStatuses = _.map(normalizedStatuses, item => item.toLowerCase());
+                const statusMap = _.reduce(statusArray, (acc: any, current) => {
+                    if (!!current) {
+                        acc[current.toLowerCase()] = true;
+                    }
+                    return acc;
+                }, <any>{});
 
                 for (let currentPrioritizedColor of prioritizedColorOrder) {
-
-                    const existingColor = _.find(normalizedStatuses, currentPrioritizedColor.english.toLowerCase());
-
-                    if (existingColor) {
+                    if (statusMap.hasOwnProperty(currentPrioritizedColor.english.toLowerCase())) {
                         return currentPrioritizedColor.danish;
                     }
                 }
