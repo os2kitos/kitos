@@ -67,53 +67,35 @@ describe("Global Administrator is able to migrate from one system to another", (
 
     it("Global Admin is able to see a sorted view", () => {
         var systemNameFrom = createItSystemName(1);
-        var orgAc = createOrgName("Ac");
-        var orgBc = createOrgName("Bc");
-        var orgCc = createOrgName("Cc");
-        var orgBb = createOrgName("Bb");
-        var orgAaSmall = createOrgName("aa");
-        var orgBaSmall = createOrgName("ba");
-        var orgCaSmall = createOrgName("ca");
+        var orgA = createOrgName("a");
+        var orgB = createOrgName("B");
+        var orgC = createOrgName("C");
+        var orgBB = createOrgName("BB");
         loginHelper.loginAsGlobalAdmin()
             .then(() => pageObject.getPage())
             .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
             .then(() => SystemCatalogHelper.setSystemToPublic(systemNameFrom))
-            .then(() => OrgHelper.createOrg(orgAc))
-            .then(() => OrgHelper.createOrg(orgBc))
-            .then(() => OrgHelper.createOrg(orgCc))
-            .then(() => OrgHelper.createOrg(orgBb))
-            .then(() => OrgHelper.createOrg(orgAaSmall))
-            .then(() => OrgHelper.createOrg(orgBaSmall))
-            .then(() => OrgHelper.createOrg(orgCaSmall))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgAc))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBc))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgCc))
+            .then(() => OrgHelper.createOrg(orgA))
+            .then(() => OrgHelper.createOrg(orgB))
+            .then(() => OrgHelper.createOrg(orgC))
+            .then(() => OrgHelper.createOrg(orgBB))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgA))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgB))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgC))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
             .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgAc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgBc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgCc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgC))
             .then(() => browser.refresh())
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBb))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBB))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
             .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgAc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgBb))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),2,orgBc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),3,orgCc))
-            .then(() => browser.refresh())
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgAaSmall))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBaSmall))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgCaSmall))
-            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-            .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 0, orgAaSmall))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 1, orgAc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgBaSmall))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 3, orgBb))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 4, orgBc))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 5, orgCaSmall))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 6, orgCc));
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),2,orgBB))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),3,orgC));
+
     });
 
     function createItSystemName(index: number) {
