@@ -18,7 +18,7 @@
         }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
-            if (reference == null) {
+            if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
             if (Utility.Validation.validateUrl(reference.URL)) {
@@ -28,7 +28,7 @@
         }
 
         static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
-            if (reference == null) {
+            if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
             if (reference.ExternalReferenceId != null) {
@@ -99,17 +99,17 @@
         }
 
         static convertColorsToDanish(color: string) {
-            if (color !== null) {
-                const knownColor = ExcelExportHelper.colors[color.toLowerCase()];
-                if (!_.isUndefined(knownColor)) {
-                    return knownColor.danish;
-                }
+            if (color === null || _.isUndefined(color)) {
+                return ExcelExportHelper.noValueFallback;
             }
-            return ExcelExportHelper.noValueFallback;
+            const knownColor = ExcelExportHelper.colors[color.toLowerCase()];
+            if (!_.isUndefined(knownColor)) {
+                return knownColor.danish;
+            }
         }
 
         static getGoalStatus(goalStatus: Models.TrafficLight) {
-            if (goalStatus == null || _.isUndefined(goalStatus)) {
+            if (goalStatus === null || _.isUndefined(goalStatus)) {
                 return ExcelExportHelper.noValueFallback;
             }
             return this.convertColorsToDanish(goalStatus.toString());
