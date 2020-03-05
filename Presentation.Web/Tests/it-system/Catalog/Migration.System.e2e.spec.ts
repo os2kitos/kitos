@@ -26,76 +26,94 @@ describe("Global Administrator is able to migrate from one system to another", (
         testFixture.disableLongRunningTest();
     });
 
-    it("Local admin is not able to see the move button", () => {
-        loginHelper.loginAsLocalAdmin()
-            .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
-    });
+    //it("Local admin is not able to see the move button", () => {
+    //    loginHelper.loginAsLocalAdmin()
+    //        .then(() => pageObject.getPage())
+    //        .then(() => SystemCatalogHelper.waitForKendoGrid())
+    //        .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
+    //});
 
-    it("Regular user is not able to see the move button", () => {
-        loginHelper.loginAsRegularUser()
-            .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
-    });
+    //it("Regular user is not able to see the move button", () => {
+    //    loginHelper.loginAsRegularUser()
+    //        .then(() => pageObject.getPage())
+    //        .then(() => SystemCatalogHelper.waitForKendoGrid())
+    //        .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
+    //});
 
-    it("Global admin is able to get to the final migration window and execute a migration", () => {
-        var systemNameFrom = createItSystemName(1);
-        var systemNameTo = createItSystemName(2);
-        loginHelper.loginAsGlobalAdmin()
-            .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
-            .then(() => SystemCatalogHelper.createSystem(systemNameTo))
-            .then(() => toggleSystemActivation(systemNameFrom))
-            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-            .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(true))
-            .then(() => element(cssHelper.byDataElementType(constants.moveSystemButton)).click())
-            .then(() => waitForElement(constants.consequenceButton))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.consequenceButton)).isPresent()).toBe(true))
-            .then(() => select2SearchForSystem(systemNameTo))
-            .then(() => waitForSelect2DataAndSelect())
-            .then(() => element(cssHelper.byDataElementType(constants.consequenceButton)).click())
-            .then(() => waitForElement(constants.startMigrationButton))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(true))
-            .then(() => element(cssHelper.byDataElementType(constants.startMigrationButton)).click())
-            .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
-    });
+    //it("Global admin is able to get to the final migration window and execute a migration", () => {
+    //    var systemNameFrom = createItSystemName(1);
+    //    var systemNameTo = createItSystemName(2);
+    //    loginHelper.loginAsGlobalAdmin()
+    //        .then(() => pageObject.getPage())
+    //        .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
+    //        .then(() => SystemCatalogHelper.createSystem(systemNameTo))
+    //        .then(() => toggleSystemActivation(systemNameFrom))
+    //        .then(() => openMigrationOnSpecificSystem(systemNameFrom))
+    //        .then(() => waitForElement(constants.moveSystemButton))
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(true))
+    //        .then(() => element(cssHelper.byDataElementType(constants.moveSystemButton)).click())
+    //        .then(() => waitForElement(constants.consequenceButton))
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.consequenceButton)).isPresent()).toBe(true))
+    //        .then(() => select2SearchForSystem(systemNameTo))
+    //        .then(() => waitForSelect2DataAndSelect())
+    //        .then(() => element(cssHelper.byDataElementType(constants.consequenceButton)).click())
+    //        .then(() => waitForElement(constants.startMigrationButton))
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(true))
+    //        .then(() => element(cssHelper.byDataElementType(constants.startMigrationButton)).click())
+    //        .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
+    //});
 
     it("Global Admin is able to see a sorted view", () => {
         var systemNameFrom = createItSystemName(1);
-        var orgA = createOrgName("A");
-        var orgB = createOrgName("B");
-        var orgC = createOrgName("C");
-        var orgBB = createOrgName("BB");
+        var orgAc = createOrgName("Ac");
+        var orgBc = createOrgName("Bc");
+        var orgCc = createOrgName("Cc");
+        var orgBb = createOrgName("Bb");
+        var orgAaSmall = createOrgName("aa");
+        var orgBaSmall = createOrgName("ba");
+        var orgCaSmall = createOrgName("ca");
         loginHelper.loginAsGlobalAdmin()
             .then(() => pageObject.getPage())
             .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
             .then(() => SystemCatalogHelper.setSystemToPublic(systemNameFrom))
-            .then(() => OrgHelper.createOrg(orgA))
-            .then(() => OrgHelper.createOrg(orgB))
-            .then(() => OrgHelper.createOrg(orgC))
-            .then(() => OrgHelper.createOrg(orgBB))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgA))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgB))
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgC))
+            .then(() => OrgHelper.createOrg(orgAc))
+            .then(() => OrgHelper.createOrg(orgBc))
+            .then(() => OrgHelper.createOrg(orgCc))
+            .then(() => OrgHelper.createOrg(orgBb))
+            .then(() => OrgHelper.createOrg(orgAaSmall))
+            .then(() => OrgHelper.createOrg(orgBaSmall))
+            .then(() => OrgHelper.createOrg(orgCaSmall))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgAc))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBc))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgCc))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
             .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgC))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgAc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgBc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgCc))
             .then(() => browser.refresh())
-            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBB))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBb))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
             .then(() => waitForElement(constants.moveSystemButton))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),2,orgBB))
-            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),3,orgC));
-
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgAc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgBb))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),2,orgBc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),3,orgCc))
+            .then(() => browser.refresh())
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgAaSmall))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBaSmall))
+            .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgCaSmall))
+            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
+            .then(() => waitForElement(constants.moveSystemButton))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 0, orgAaSmall))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 1, orgAc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgBaSmall))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 3, orgBb))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 4, orgBc))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 5, orgCaSmall))
+            .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 6, orgCc));
     });
 
     function createItSystemName(index: number) {

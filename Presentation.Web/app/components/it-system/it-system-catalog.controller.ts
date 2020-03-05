@@ -900,7 +900,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name)
+                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name.toLowerCase())
                 },
                 serverPaging: true,
                 serverSorting: true,
