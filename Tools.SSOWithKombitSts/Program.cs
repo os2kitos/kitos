@@ -77,6 +77,8 @@ namespace Tools.SSOWithKombitSts
           var xmlNamespaceManager = GetXmlNamespaceManager(patchedCertificateSamlXml);
           var entityIdAttr = patchedCertificateSamlXml.SelectSingleNode("//md:EntityDescriptor/@entityID", xmlNamespaceManager);
           entityIdAttr.Value = entityId;
+          var acsLocation = patchedCertificateSamlXml.SelectSingleNode("//md:AssertionConsumerService/@Location", xmlNamespaceManager);
+          acsLocation.Value = entityId + "/Login.ashx";
           return patchedCertificateSamlXml;
         }
 
