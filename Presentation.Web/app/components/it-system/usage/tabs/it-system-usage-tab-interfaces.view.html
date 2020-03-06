@@ -9,7 +9,7 @@
                     <th class="col-xs-1">Snitflade</th>
                     <th class="col-xs-1">Grænseflade</th>
                     <th class="col-xs-1">Beskrivelse</th>
-                    <th class="col-xs-1">Reference</th>
+                    <th class="col-xs-1 centeredContent">Reference</th>
                 </tr>
             </thead>
             <tbody class="small">
@@ -31,7 +31,9 @@
 
                     <!-- link to further description -->
                     <td>
-                        <a ng-if="exposure.url" ng-show="exposure.url.isValid" href="{{exposure.url.value}}" target="_blank"><img alt="{{exposure.url.value}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
+                        <div class="referenceLink">
+                            <a ng-if="exposure.url" ng-show="exposure.url.isValid" href="{{exposure.url.value}}" target="_blank"><img alt="{{exposure.url.value}}" src="/Content/img/EksterneReferencer.svg"></a>
+                        </div>
                     </td>
                 </tr>
                 <tr ng-if="interfaceExposures.length == 0">
