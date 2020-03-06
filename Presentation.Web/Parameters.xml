@@ -74,7 +74,7 @@
 
   <!-- SSO SAML configuration -->
   <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos.dk']/@server"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos-local.strongminds.dk']/@server"/>
   </parameter>
 
   <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
@@ -83,7 +83,7 @@
 
   <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
   <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos.dk']/@id"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos-local.strongminds.dk']/@id"/>
   </parameter>
 
   <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
