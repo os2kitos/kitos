@@ -74,11 +74,11 @@
 
   <!-- SSO SAML configuration -->
   <parameter name="SSOServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/ServiceProvider[@id='https://kitos.dk']/@server"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation[@xmlns='urn:dk.nita.saml20.configuration']/ServiceProvider[@id='https://kitos.dk']@server"/>
   </parameter>
 
   <parameter name="SSOIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/IDPEndPoints/add[@default='true']/@id"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation[@xmlns='urn:dk.nita.saml20.configuration']/IDPEndPoints[@metadata='idp-metadata']/add[@default='true']/@id"/>
   </parameter>
 
 </parameters>
