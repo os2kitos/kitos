@@ -674,6 +674,15 @@ table.table-fixed {
     table-layout: fixed;
 }
 
+table.table-disabled-color {
+    th{
+        font-size: 85%;
+        font-weight: 700;
+        font-family: Calibri,Candara,Arial,sans-serif!important;
+    }
+    background-color: #eee;
+}
+
 table.table-no-margin {
     margin: 0;
 }
@@ -1455,6 +1464,11 @@ tr.angular-ui-tree-empty {
         max-width: 100%;
         min-width: 100%;
     }
+
+    .referenceLinkField {
+        overflow-wrap: break-word;
+        width: 150px;
+    }
 }
 
 div.asInput {
@@ -1482,3 +1496,56 @@ div.multipleInputSpacing{
 .noMargin{
     margin: 0px;
 }
+
+th.Kle {
+    font-family: Calibri,Candara,Arial,sans-serif !important;
+}
+
+th.KleIdColumn {
+    width: 60px;
+    border-right: 1px solid #ddd;
+}
+
+.disabledColor{
+    background-color: #eee;
+}
+
+tbody.bordered {
+    border: 1px solid #ddd;
+}
+
+tbody.bordered > tr > td {
+    border: 1px solid #ddd;
+}
+
+
+.noPaddingLeftRightGDPR * {
+    input {
+        padding: 5px 0;
+    }
+
+    div {
+        margin-top: 5px !important;
+    }
+
+    padding-left: 0;
+    padding-right: 0;
+}
+.GDPRHeaderPadding {
+    padding: 0 0 0 5px;
+}
+
+.noRightBorder {
+    border-right: 0 !important;
+}
+.noLeftBorder {
+    border-left: 0 !important;
+}
+.boldParagraph{
+    font-weight:bold;
+}
+
+.longTextField{
+    width: 300px;
+}
+

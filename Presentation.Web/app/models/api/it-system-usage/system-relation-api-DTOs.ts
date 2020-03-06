@@ -4,7 +4,7 @@
     import ISystemRelationModalViewModel = Models.ViewModel.ItSystemUsage.Relation.ISystemRelationModalViewModel;
     import ISystemRelationSelectionModel = Models.ViewModel.ItSystemUsage.Relation.ISystemRelationSelectionModel;
     import SystemRelationModalViewModel = Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel;
-    import ISystemRelationModalIdText = Models.ViewModel.ItSystemUsage.Relation.ISystemRelationModalIdText;
+    import Select2OptionViewModel = Models.ViewModel.Generic.Select2OptionViewModel;
 
     export interface IItSystemUsageCreateRelationDTO {
         FromUsageId: number;
@@ -36,12 +36,6 @@
     export interface IItSystemUsageRelationReferenceDTO {
         Reference: string;
         ValidUrl: boolean;
-        LongText: boolean;
-        ShortTextLineCount: number;
-    }
-
-    export interface IItSystemUsageRelationDescriptionDTO {
-        Description: string;
         LongText: boolean;
         ShortTextLineCount: number;
     }
@@ -111,7 +105,7 @@
 
         }
 
-        private setValuesOrNull(value: ISystemRelationModalIdText) {
+        private setValuesOrNull(value: Select2OptionViewModel) {
             if (value !== null) {
                 return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.text }
             } else {

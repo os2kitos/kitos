@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
+    <h4>{{systemUsageName}}</h4>
     <div class="panel panel-default">
         <div class="row">
             <!-- 1st column -->
@@ -49,7 +49,6 @@
                            data-ng-disabled="!hasWriteAccess"
                            data-field="dataProcessor"
                            data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)">
-                    <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databansvarlig hentes automatisk fra orgnanisationen.</span>
                 </div>
                 <!-- Data processing agreement -->
                 <div class="form-group" ng-show="filterDataProcessor">
@@ -72,6 +71,49 @@
                     </ul>
                     <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
                 </div>
+                <!-- Data processors -->
+                <p class="small boldParagraph">Databehandlere</p>
+                <table class="table table-striped table-bordered">
+                    <thead >
+                        <tr>
+                            <th class="GDPRHeaderPadding"><p class="small">Navn</p></th>
+                            <th class="GDPRHeaderPadding noRightBorder"><p class="small">CVR</p></th>
+                            <th class="GDPRHeaderPadding noLeftBorder"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
+                        <td>
+                            {{ dataWorker.dataWorkerName }}
+                        </td>
+                        <td class="noRightBorder">
+                            {{ dataWorker.dataWorkerCvr }}
+                        </td>
+                        <td class="text-right noLeftBorder" style="width: 20px;">
+                            <button type="button"
+                                    class="btn btn-danger btn-xs delete-project"
+                                    data-confirmed-click="delete({{ dataWorker.id }})"
+                                    data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                    data-ng-show="hasWriteAccess">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot data-ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                        <tr >
+                            <td colspan="3" style="padding: 0">
+                                <input type="hidden"
+                                       id="dataWorker-selector"
+                                       class="form-control input-sm"
+                                       data-ui-select2="dataWorkerSelectOptions"
+                                       data-ng-model="selectedDataWorker"
+                                       data-ng-change="save()"
+                                       data-placeholder="Vælg Databehandler"/>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
                 <!-- Data processor control -->
                 <div class="form-group">
                     <label class="control-label small">Tilsyn/kontrol af databehandleren</label><br>
@@ -613,57 +655,4 @@
                 </div>
             </div>
         </div>
-
-
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="object-section-container">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Databehandlere</div>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Navn</th>
-                                    <th>CVR</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
-                                    <td>
-                                        {{ dataWorker.dataWorkerName }}
-                                    </td>
-                                    <td>
-                                        {{ dataWorker.dataWorkerCvr }}
-                                    </td>
-                                    <td class="text-right">
-                                        <button type="button"
-                                                class="btn btn-danger btn-xs delete-project"
-                                                data-confirmed-click="delete({{ dataWorker.id }})"
-                                                data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                                data-ng-show="hasWriteAccess">
-                                            <i class="glyphicon glyphicon-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot data-ng-show="hasWriteAccess">
-                                <tr>
-                                    <td colspan="3">
-                                        <input type="hidden"
-                                               id="dataWorker-selector"
-                                               class="form-control input-sm"
-                                               data-ui-select2="dataWorkerSelectOptions"
-                                               data-ng-model="selectedDataWorker"
-                                               data-ng-change="save()"
-                                               data-placeholder="Vælg Databehandler" />
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>

@@ -14,7 +14,7 @@
         ($scope, $state, itSystemUsage, notify, hasWriteAccess, referenceService) => {
             $scope.objectId = itSystemUsage.id;
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.referenceName = itSystemUsage.itSystem.name;
+            $scope.referenceName = $scope.systemUsageName;
 
 
             $scope.setChosenReference = id => {
@@ -105,10 +105,10 @@
                 toolbar: [
                     {
                         name: "addReference",
-                        text: "Tilføj reference",
+                        text: "Tilføj reference til IT System",
                         template: () => {
                             if (hasWriteAccess) {
-                                return "<a id=\"addReferenceItSystemUsaged\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>Tilføj reference</a>";
+                                return "<a id=\"addReferenceItSystemUsaged\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>Tilføj reference til IT System</a>";
                             } else {
                                 return "";
                             }

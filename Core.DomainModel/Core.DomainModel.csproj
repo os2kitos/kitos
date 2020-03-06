@@ -51,6 +51,8 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="ArchiveDutyRecommendationTypes.cs" />
+    <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
@@ -194,7 +196,6 @@
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
-    <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="Organization\OrganizationCategory.cs" />
     <Compile Include="Organization\TaskRef.cs" />

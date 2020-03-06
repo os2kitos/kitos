@@ -39,7 +39,7 @@
                     $modal.open({
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
-                        controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
+                        controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService : Kitos.Services.ISelect2LoadingService) => {
                             modalOpen = true;
                             $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
                             $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);

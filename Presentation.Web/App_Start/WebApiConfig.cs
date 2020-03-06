@@ -174,9 +174,8 @@ namespace Presentation.Web
             BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
-            var ReportsITSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder);
-            ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
-
+            var reportsItSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder);
+            reportsItSystemContacts.EntityType.HasKey(x => x.roleId);
 
             var orgNameSpace = entitySetOrganizations;
 

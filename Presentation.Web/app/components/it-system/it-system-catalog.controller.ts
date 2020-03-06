@@ -16,7 +16,7 @@
         clearOptions(): void;
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
-        allowToggleUsage : boolean;
+        allowToggleUsage: boolean;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -25,7 +25,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
@@ -296,7 +296,7 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions, 
+                dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
@@ -560,17 +560,17 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 var url = reference.URL;
-                                if (url != null) {
-                                    if (Utility.Validation.validateUrl(url)) {
-                                        return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
-                                    }
-                                    else {
-                                        return reference.Title;
-                                    }
+                                if (Utility.Validation.validateUrl(url)) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
                                 }
-
+                                else {
+                                    return reference.Title;
+                                }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -588,7 +588,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.ExternalReferenceId) {
+                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
@@ -599,6 +599,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -816,7 +819,7 @@
             });
             this.modalMigration.center().open();
         }
-        
+
         public onNewTargetSystemSelected = () => {
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
@@ -897,7 +900,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name)
+                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name.toLowerCase())
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -922,7 +925,7 @@
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e,this._,this.$timeout,this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
         // adds usage at selected system within current context
@@ -995,8 +998,8 @@
                 dataSource.filter(newFilter);
             }
 
-    
-           
+
+
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
@@ -1029,13 +1032,13 @@
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                            .createSystemAuthorization()
-                            .getOverviewAuthorization()
+                                .createSystemAuthorization()
+                                .getOverviewAuthorization()
                         ],
                         systemUsageUserAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                            .createSystemUsageAuthorization()
-                            .getOverviewAuthorization()
+                                .createSystemUsageAuthorization()
+                                .getOverviewAuthorization()
                         ],
                         userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
                             .then(result => result.data.response)

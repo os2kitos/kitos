@@ -3,48 +3,35 @@
     <div class="panel panel-default">
         <div class="panel-heading"><strong>IT systemet udstiller følgende snitflader:</strong></div>
 
-        <table class="table table-striped table-condensed">
+        <table class="table table-striped table-condensed table-fixed">
             <thead ng-if="interfaceExposures.length > 0">
                 <tr>
-                    <th class="col-xs-2">Snitflade</th>
+                    <th class="col-xs-1">Snitflade</th>
                     <th class="col-xs-1">Grænseflade</th>
-                    <th class="col-xs-1">Data</th>
-                    <th class="col-xs-1">Datatype</th>
+                    <th class="col-xs-1">Beskrivelse</th>
+                    <th class="col-xs-1">Reference</th>
                 </tr>
             </thead>
             <tbody class="small">
-                <tr ng-repeat-start="exposure in interfaceExposures">
+                <tr ng-repeat="exposure in interfaceExposures">
                     <!-- name of the interface -->
-                    <td rowspan="{{exposure.dataRows.length || 1}}">
+                    <td>
                         <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
                     </td>
 
                     <!-- interface (grænseflade) -->
-                    <td rowspan="{{exposure.dataRows.length || 1}}">{{exposure.interfaceName}}</td>
+                    <td>{{exposure.interfaceName}}</td>
 
-                    <!-- data -->
-                    <td rowspan="1">
-                        <span ng-if="exposure.dataRows.length > 0">
-                            {{exposure.dataRows[0].data}}
-                        </span>
+                    <!-- description -->
+                    <td class="longTextField">
+                        <p ng-if="exposure.description" ng-show="!exposure.description.longText" data-element-type="usedByRelationDescription">{{exposure.description.description}}</p>
+                        <p ng-if="exposure.description" ng-show="exposure.description.longText" style="height: {{exposure.description.shortTextLineCount}}em; overflow: hidden" class="readMoreParagraph">{{exposure.description.description}}</p>
+                        <a ng-if="exposure.description" ng-show="exposure.description.longText" ng-click="expandParagraph($event)">Se mere</a>
                     </td>
 
-                    <!-- data type -->
+                    <!-- link to further description -->
                     <td>
-                        <span ng-if="exposure.dataRows.length > 0">
-                            {{exposure.dataRows[0].dataTypeName}}
-                        </span>
-                    </td>
-                </tr>
-                <tr ng-repeat="dataRow in exposure.dataRows" ng-if="!$first" ng-repeat-end="">
-                    <!-- data -->
-                    <td rowspan="1">
-                        {{dataRow.data}}
-                    </td>
-
-                    <!-- data type -->
-                    <td>
-                        {{dataRow.dataTypeName}}
+                        <a ng-if="exposure.url" ng-show="exposure.url.isValid" href="{{exposure.url.value}}" target="_blank"><img alt="{{exposure.url.value}}" src="/Content/img/EksterneReferencer.svg" style="width: 1em"></a>
                     </td>
                 </tr>
                 <tr ng-if="interfaceExposures.length == 0">

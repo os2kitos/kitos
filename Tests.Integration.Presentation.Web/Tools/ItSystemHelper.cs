@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -93,30 +94,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 ItSystemUsageId = systemUsageId,
                 DataWorkerId = organizationId
-            };
-
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
-        }
-
-        public static async Task<WishDTO> CreateWishAsync(int systemUsageId, string text, Cookie optionalLogin = null, int? userId = null)
-        {
-            using (var response = await SendCreateWishRequestAsync(systemUsageId, text, optionalLogin, userId))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<WishDTO>();
-            }
-        }
-
-        public static async Task<HttpResponseMessage> SendCreateWishRequestAsync(int systemUsageId, string text, Cookie optionalLogin = null, int? userId = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl("api/wish/");
-            var body = new
-            {
-                userId = userId ?? TestEnvironment.DefaultUserId,
-                text = text,
-                itSystemUsageId = systemUsageId
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
@@ -225,6 +202,45 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
             }
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeSystemUsageArchiveDutyRequestAsync(int usageId, ArchiveDutyTypes duty)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystemusage/{usageId}?organizationId=-1");
+            var body = new
+            {
+                archiveDuty = (int)duty
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeArchiveDutyRecommendationRequestAsync(int systemId, ArchiveDutyRecommendationTypes recommendation)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId=-1");
+            var body = new
+            {
+                archiveDuty = (int)recommendation
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeArchiveDutyRecommendationCommentRequestAsync(int systemId, string comment)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId=-1");
+            var body = new
+            {
+                archiveDutyComment = comment
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
     }
 }

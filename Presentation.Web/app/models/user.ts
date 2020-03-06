@@ -14,8 +14,6 @@
         OrganizationUnitRights?: IOrganizationUnitRight;
         /** Passwords reset request issued for the user */
         PasswordResetRequests?: IPasswordResetRequest[];
-        /** Wishes created by this user */
-        Wishes?: ItSystem.IWish[];
         /** Gets or sets the  or  associated with this user */
         ItProjectStatuses?: ItProject.IItProjectStatus[];
         /** Risks associated with this user */

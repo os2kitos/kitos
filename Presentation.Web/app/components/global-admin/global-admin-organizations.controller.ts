@@ -5,7 +5,7 @@
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout','exportGridToExcelService'];
+        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout', 'exportGridToExcelService'];
 
         constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout, private exportGridToExcelService) {
             $rootScope.page.title = 'Organisationer';
@@ -40,12 +40,12 @@
                         }
                     }
                 } as kendo.data.DataSourceOptions,
-                    toolbar: [
-                        {
-                            name: "opretOrganisation",
-                            text: "Opret Organisation",
-                            template: "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
-                        },
+                toolbar: [
+                    {
+                        name: "opretOrganisation",
+                        text: "Opret Organisation",
+                        template: "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
                 ],
                 excel: {
@@ -152,6 +152,9 @@
             }
         }
 
+        private reload() {
+            this.$state.go(".", null, { reload: true });
+        }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
@@ -169,8 +172,15 @@
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
 
             if (this.$window.confirm("Er du sikker på at slette " + dataItem["Name"] + "?")) {
-                this.mainGrid.dataSource.remove(dataItem);
-                this.mainGrid.dataSource.sync();
+                this.$http.delete(`api/organization/${dataItem["Id"]}?organizationId=${this.user.currentOrganizationId}`)
+                    .then(
+                        success => {
+                            this.notify.addSuccessMessage("Organisation slettet");
+                            this.reload();
+                        },
+                        error => {
+                            this.notify.addErrorMessage("Kunne ikke slette organisationen");
+                        });
             }
         }
     }

@@ -9,11 +9,11 @@
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify'];
 
         constructor(private $rootScope, private $scope, private $http, private notify) {
-            $rootScope.page.title = 'Ny organisation';
-            this.title = 'Opret organisation';
-            this.org = {};
-            this.org.accessModifier = "1";
-            this.org.typeId = 1; // set type to municipality by default
+            var orgViewModel = new Models.ViewModel.GlobalAdmin.Organization.OrganizationModalViewModel();
+            orgViewModel.configureAsNewOrganizationDialog();
+            $rootScope.page.title = orgViewModel.title;
+            $scope.title = orgViewModel.title;
+            $scope.org = orgViewModel.data;
             this.buttonDisabled = false;
         }
 
@@ -23,14 +23,14 @@
 
         public submit() {
             this.buttonDisabled = true;
-            var payload = this.org;
+            var payload = this.$scope.org;
             this.$http.post('api/organization', payload)
                 .success((result) => {
-                    this.notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
+                    this.notify.addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet!`);
                     this.$scope.$close(true);
                 })
                 .error((result) => {
-                    this.notify.addErrorMessage("Organisationen " + this.org.name + " kunne ikke oprettes!");
+                    this.notify.addErrorMessage(`Organisationen ${this.org.name} kunne ikke oprettes!`);
                 });
         }
     }
@@ -56,7 +56,7 @@
                                 // OK
                                 // GOTO parent state and reload
                                 $state.go('^', null, { reload: true });
-                            }, function () {
+                            }, () => {
                                 // Cancel
                                 // GOTO parent state
                                 $state.go('^');

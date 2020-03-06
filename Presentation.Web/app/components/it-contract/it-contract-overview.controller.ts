@@ -32,7 +32,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         private roleSelectorDataSource;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
@@ -185,26 +185,14 @@
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
-
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
         }
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row[data-field='ResponsibleOrganizationUnit.Name']");
-            // find the access modifier kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
-
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleOrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -576,6 +564,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -603,6 +594,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,

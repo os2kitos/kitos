@@ -20,23 +20,22 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         afterEach(() => {
             testFixture.enableAutoBrowserWaits();
-            testFixture.cleanupState();
         });
 
         beforeAll(() => {
             testFixture.enableLongRunningTest();
+            loginHelper.loginAsGlobalAdmin();
         });
 
         afterAll(() => {
             testFixture.disableLongRunningTest();
+            testFixture.cleanupState();
         });
 
         it("When system is deleted successfully",
             () => {
                 var systemName = createSystemName();
-
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => loadPage())
+                loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
                     .then(() => console.log("Expecting system with name " + systemName))
@@ -53,8 +52,7 @@ describe("Getting the correct message when there is a conflict deleting a system
             () => {
                 var systemName = createSystemName();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => loadPage())
+                loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
                     .then(() => expectSystemWithName(systemName))
@@ -71,8 +69,7 @@ describe("Getting the correct message when there is a conflict deleting a system
                 var systemName = createSystemName();
                 var interfaceName = createInterfaceName();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => loadPage())
+                loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
                     .then(() => expectSystemWithName(systemName))
@@ -90,8 +87,7 @@ describe("Getting the correct message when there is a conflict deleting a system
                 var mainSystemName = "main" + createSystemName();
                 var childSystemName = "child" + createSystemName();
 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => loadPage())
+                loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(mainSystemName))
                     .then(() => console.log("Expecting system with name " + mainSystemName))
@@ -124,7 +120,7 @@ describe("Getting the correct message when there is a conflict deleting a system
             return itSystemPage.getPage()
                 .then(() => waitForKendoGrid());
         }
-    
+
         function createSystemName() {
             return "System" + new Date().getTime();
         }

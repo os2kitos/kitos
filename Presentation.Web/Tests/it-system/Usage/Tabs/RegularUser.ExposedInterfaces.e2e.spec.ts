@@ -17,17 +17,18 @@ describe("Regular user can",
         var ec = protractor.ExpectedConditions;
 
         beforeAll(() => {
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => ItSystemHelper.createSystem(itSystemName))
-                    .then(() => ItSystemHelper.createSystem(itSystemWithInterfaceName))
-                    .then(() => ItSystemHelper.createLocalSystem(itSystemWithInterfaceName))
-                    .then(() => InterfaceHelper.createInterface(interfaceName))
-                    .then(() => InterfaceHelper.bindInterfaceToSystem(itSystemWithInterfaceName, interfaceName));
-            },
+            loginHelper.loginAsGlobalAdmin()
+                .then(() => ItSystemHelper.createSystem(itSystemName))
+                .then(() => ItSystemHelper.createSystem(itSystemWithInterfaceName))
+                .then(() => ItSystemHelper.createLocalSystem(itSystemWithInterfaceName))
+                .then(() => InterfaceHelper.createInterface(interfaceName))
+                .then(() => InterfaceHelper.bindInterfaceToSystem(itSystemWithInterfaceName, interfaceName))
+                .then(() => testFixture.cleanupState())
+                .then(() => loginHelper.loginAsRegularUser());
+        },
             testFixture.longRunningSetup());
 
         beforeEach(() => {
-            testFixture.cleanupState();
             testFixture.enableLongRunningTest();
         });
 
@@ -38,8 +39,7 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system usage details",
             () => {
-                loginHelper.loginAsRegularUser()
-                    .then(() => SystemUsageHelper.openLocalSystem(itSystemWithInterfaceName))
+                SystemUsageHelper.openLocalSystem(itSystemWithInterfaceName)
                     .then(() => LocalItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
                     .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
@@ -48,8 +48,7 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system details with interface",
             () => {
-                loginHelper.loginAsRegularUser()
-                    .then(() => ItSystemHelper.openSystem(itSystemWithInterfaceName))
+                ItSystemHelper.openSystem(itSystemWithInterfaceName)
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
                     .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
@@ -58,8 +57,7 @@ describe("Regular user can",
 
         it("View exposed interfaces from it system details without interface",
             () => {
-                loginHelper.loginAsRegularUser()
-                    .then(() => ItSystemHelper.openSystem(itSystemName))
+                ItSystemHelper.openSystem(itSystemName)
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
                     .then(() => browser.waitForAngular())
                     .then(() => console.log("Checking for correct url"))
