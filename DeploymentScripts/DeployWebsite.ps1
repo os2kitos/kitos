@@ -31,8 +31,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     ) `
     -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints)
     
-    Write-Host $ssoServiceProviderServer
-    Write-Host $ssoIDPEndPoints
+    Write-Host $fullCommand
 
     & cmd.exe /C $fullCommand
     
