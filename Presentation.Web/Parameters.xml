@@ -83,16 +83,16 @@
 
   <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
   <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos.dk']/@id"/>
   </parameter>
 
   <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
   <parameter name="SsoAllowedAudience" defaultvalue="__SSO_ServiceProvider_Id__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
   </parameter>
 
   <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
   </parameter>
 
 </parameters>
