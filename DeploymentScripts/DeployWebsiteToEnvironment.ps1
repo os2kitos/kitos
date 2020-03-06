@@ -31,4 +31,6 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -defaultUserPassword $Env:DefaultUserPassword `
                 -useDefaultUserPassword $Env:UseDefaultUserPassword `
                 -ssoServiceProviderServer "$Env:SsoServiceProviderServer" `
-                -ssoIDPEndPoints "$Env:SsoIDPEndPoints"
+                -ssoIDPEndPoints "$Env:SsoIDPEndPoints" `
+                -ssoServiceProviderId "$Env:SsoServiceProviderId" `
+                -ssoCertificateThumbPrint "$Env:SsoCertificateThumbPrint"

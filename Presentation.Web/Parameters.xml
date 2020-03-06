@@ -81,4 +81,18 @@
     <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
   </parameter>
 
+  <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
+  <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+  </parameter>
+
+  <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
+  <parameter name="SsoAllowedAudience" defaultvalue="__SSO_ServiceProvider_Id__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+  </parameter>
+
+  <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="TODO - add xpath"/>
+  </parameter>
+
 </parameters>
