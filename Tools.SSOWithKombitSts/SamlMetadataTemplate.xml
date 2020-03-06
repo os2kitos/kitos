@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="kitos_ids" entityID="https://kitos.dk" validUntil="2023-02-01T08:00:00.0000000Z">
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="kitos_ids" entityID="" validUntil="2023-02-01T08:00:00.0000000Z">
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
         <md:KeyDescriptor use="signing">
             <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
