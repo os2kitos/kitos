@@ -74,11 +74,25 @@
 
   <!-- SSO SAML configuration -->
   <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/ServiceProvider/@server"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos.dk']/@server"/>
   </parameter>
 
   <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/SAML20Federation/IDPEndPoints/add/@id"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+  </parameter>
+
+  <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
+  <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos.dk']/@id"/>
+  </parameter>
+
+  <!-- Service provider Id and allowed audience are the same for our configuration by we must still replace both-->
+  <parameter name="SsoAllowedAudience" defaultvalue="__SSO_ServiceProvider_Id__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
+  </parameter>
+
+  <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
   </parameter>
 
 </parameters>
