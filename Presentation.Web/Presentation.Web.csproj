@@ -1300,6 +1300,10 @@
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
+      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
+      <Name>Core.BackgroundJobs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>

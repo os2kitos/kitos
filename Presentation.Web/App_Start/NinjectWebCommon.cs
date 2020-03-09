@@ -16,6 +16,9 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
+using Core.BackgroundJobs.Factory;
+using Core.BackgroundJobs.Model.ExternalLinks;
+using Core.BackgroundJobs.Services;
 using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
@@ -152,6 +155,7 @@ namespace Presentation.Web
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
             RegisterOptions(kernel);
+            RegisterBackgroundJobs(kernel);
         }
 
         private static void RegisterDomainEventsEngine(IKernel kernel)
@@ -244,6 +248,13 @@ namespace Presentation.Web
                     return ctx.Kernel.Get<IAuthorizationContextFactory>().Create(context);
                 })
                 .InRequestScope();
+        }
+
+        private static void RegisterBackgroundJobs(IKernel kernel)
+        {
+            kernel.Bind<IBackgroundJobFactory>().To<BackgroundJobFactory>().InTransientScope();
+            kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InTransientScope();
+            kernel.Bind<CheckExternalLinks>().To<CheckExternalLinks>().InTransientScope();
         }
     }
 }
