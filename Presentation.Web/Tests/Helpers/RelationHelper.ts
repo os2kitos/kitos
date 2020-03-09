@@ -2,7 +2,6 @@
 import relationPage = require("../PageObjects/it-system/Usage/Tabs/ItSystemUsageRelation.po");
 import localSystemNavigation = require("./SideNavigation/LocalItSystemNavigation");
 import Select2 = require("./Select2Helper");
-import Select = require("./SelectHelper");
 
 class RelationHelper {
     private static readonly exhibitSystemSelectId = "s2id_RelationSystemExposed";
@@ -23,12 +22,10 @@ class RelationHelper {
         return systemUsageHelper.openLocalSystem(fromSystemName)
             .then(() => localSystemNavigation.relationsPage())
             .then(() => relationPage.getCreateButton().click())
-            .then(() => Select2.searchFor(toSystemName, this.exhibitSystemSelectId))
-            .then(() => Select2.waitForDataAndSelect())
+            .then(() => Select2.select(toSystemName, this.exhibitSystemSelectId))
             .then(() => Select2.selectWithNoSearch(interfaceName, this.relationInterfaceSelectId))
             .then(() => Select2.selectWithNoSearch(frequencyType, this.relationFrequencyTypeSelectId))
-            .then(() => Select2.searchFor(contractName, this.relationContractSelectId))
-            .then(() => Select2.waitForDataAndSelect())
+            .then(() => Select2.select(contractName, this.relationContractSelectId))
             .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
             .then(() => relationPage.getDescriptionInputField().sendKeys(descriptionText))
             .then(() => relationPage.getSaveButton().click());
@@ -49,8 +46,7 @@ class RelationHelper {
             .then(() => relationPage.getEditButton(toSystemName).click())
             .then(() => Select2.selectWithNoSearch(interfaceName, this.relationInterfaceSelectId))
             .then(() => Select2.selectWithNoSearch(frequencyType, this.relationFrequencyTypeSelectId))
-            .then(() => Select2.searchFor(contractName, this.relationContractSelectId))
-            .then(() => Select2.waitForDataAndSelect())
+            .then(() => Select2.select(contractName, this.relationContractSelectId))
             .then(() => relationPage.getReferenceInputField().clear())
             .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
             .then(() => relationPage.getDescriptionInputField().clear())
