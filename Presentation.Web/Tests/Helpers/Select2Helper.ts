@@ -25,14 +25,16 @@ class Select2Helper {
 
     public static select(name: string, elementId: string) {
         return this.searchFor(name, elementId)
-            .then(() => this.waitForDataAndSelect());
+            .then(() => this.waitForDataAndSelect())
+            .then(() => console.log(`Found and selected ${name}`));
     }
 
     public static selectWithNoSearch(name: string, elementId: string) {
         return element(by.id(elementId))
             .element(by.className(Select2Helper.selectChoice))
             .click()
-            .then(() => this.findResult(name).first().click());
+            .then(() => this.findResult(name).first().click())
+            .then(() => console.log(`Selected ${name}`));
     }
 
     public static getData(elementId: string) {
@@ -41,7 +43,7 @@ class Select2Helper {
     }
 
     private static findResult(name: string) {
-        console.log(`Finding ${name} in select2 result list`);
+        console.log(`Finding ${name} in no search select2 result list`);
         return element(by.id("select2-drop"))
             .element(by.tagName("ul"))
             .all(by.tagName("li"))
