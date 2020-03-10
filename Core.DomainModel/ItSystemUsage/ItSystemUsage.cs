@@ -362,8 +362,6 @@ namespace Core.DomainModel.ItSystemUsage
         #endregion
         public string GeneralPurpose { get; set; }
         public DataOptions isBusinessCritical { get; set; }
-        public DataOptions ContainsLegalInfo { get; set; }
-        public DataSensitivityLevel DataLevel { get; set; }
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }

@@ -927,6 +927,7 @@
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

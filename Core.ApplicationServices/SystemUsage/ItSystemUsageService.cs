@@ -100,8 +100,6 @@ namespace Core.ApplicationServices.SystemUsage
             usage.OrganizationId = newSystemUsage.OrganizationId;
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
-            usage.DataLevel = DataSensitivityLevel.NONE;
-            usage.ContainsLegalInfo = DataOptions.NO;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 

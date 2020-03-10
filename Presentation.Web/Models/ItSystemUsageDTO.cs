@@ -91,11 +91,8 @@ namespace Presentation.Web.Models
 
         public DataOptions isBusinessCritical { get; set; }
 
-        public DataSensitivityLevel DataLevel { get; set; }
-
         public UserCount UserCount { get; set; }
-
-        public DataOptions ContainsLegalInfo { get; set; }
+        
         public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
 
         public string datahandlerSupervisionDocumentationUrlName { get; set; }

@@ -565,35 +565,35 @@ ItProjects($select=Name)`;
                             }
                         }
                     },
-                    {
-                        field: "DataLevel", title: "Datatype", width: 150,
-                        persistId: "dataLevel",
-                        template: dataItem => {
-                            switch (dataItem.DataLevel) {
-                                case "PERSONALDATA":
-                                    return "Persondata";
-                                case "PERSONALDATANDSENSITIVEDATA":
-                                    return "Persondata og følsomme persondata";
-                                default:
-                                    return "Ingen persondata";
-                            }
-                        },
-                        attributes: { "class": "might-overflow" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: function (args) {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
-                            }
-                        }
-                    },
+                    //{
+                    //    field: "DataLevel", title: "Datatype", width: 150,
+                    //    persistId: "dataLevel",
+                    //    template: dataItem => {
+                    //        switch (dataItem.DataLevel) {
+                    //            case "PERSONALDATA":
+                    //                return "Persondata";
+                    //            case "PERSONALDATANDSENSITIVEDATA":
+                    //                return "Persondata og følsomme persondata";
+                    //            default:
+                    //                return "Ingen persondata";
+                    //        }
+                    //    },
+                    //    attributes: { "class": "might-overflow" },
+                    //    hidden: true,
+                    //    filterable: {
+                    //        cell: {
+                    //            template: function (args) {
+                    //                args.element.kendoDropDownList({
+                    //                    dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
+                    //                    dataTextField: "type",
+                    //                    dataValueField: "value",
+                    //                    valuePrimitive: true
+                    //                });
+                    //            },
+                    //            showOperators: false
+                    //        }
+                    //    }
+                    //},
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract",

@@ -189,8 +189,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(usageCreatedByRepo, createdUsage);
             Assert.Same(objectOwner, createdUsage.ObjectOwner);
             Assert.Equal(input.OrganizationId, createdUsage.OrganizationId);
-            Assert.Equal(DataSensitivityLevel.NONE, createdUsage.DataLevel);
-            Assert.Equal(DataOptions.NO, createdUsage.ContainsLegalInfo);
             Assert.Empty(createdUsage.AssociatedDataWorkers);
             Assert.Equal(input.ItSystemId, createdUsage.ItSystemId);
             _usageRepository.Verify(x => x.Insert(usageCreatedByRepo), Times.Once);
