@@ -1,16 +1,30 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Infrastructure.Services.Extensions;
+using Serilog;
 
 namespace Infrastructure.Services.Http
 {
     public class EndpointValidationService : IEndpointValidationService
     {
-        private static readonly HttpClient Client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
+        private readonly ILogger _logger;
+
+        private static readonly HttpClient Client;
+
+        static EndpointValidationService()
+        {
+            Client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = true });
+            //TODO: Try with different headers to see why some servers return 406 when HttpClient calls (strongminds.dk does this)
+        }
+
+        public EndpointValidationService(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public async Task<EndpointValidation> ValidateAsync(string url)
         {
@@ -38,7 +52,7 @@ namespace Infrastructure.Services.Http
                         case HttpStatusCode.OK:
                         case HttpStatusCode.Redirect:
                         case HttpStatusCode.MovedPermanently:
-                            //Will result in pages being shown - redirect may be a "short link" which redirects to the real link
+                            //Will result in pages being shown - redirect might be a "short link" which redirects to the real link
                             return new EndpointValidation(url);
                         default:
                             return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.ErrorResponse, response.StatusCode));
@@ -47,8 +61,7 @@ namespace Infrastructure.Services.Http
             }
             catch (Exception e)
             {
-                //TODO: Log and fail
-                Debug.WriteLine($"FAILED:{e.Message}");
+                _logger.Error(e, "Failed to validate url {url}", url);
                 return new EndpointValidation(url);
             }
         }
