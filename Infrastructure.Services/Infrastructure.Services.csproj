@@ -60,8 +60,10 @@
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Http\EndpointValidation.cs" />
     <Compile Include="Http\EndpointValidationService.cs" />
+    <Compile Include="Http\EndpointValidationErrorType.cs" />
     <Compile Include="Http\IEndpointValidationService.cs" />
     <Compile Include="Http\EndpointValidationError.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />

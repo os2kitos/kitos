@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Infrastructure.Services.Extensions;
 
 namespace Infrastructure.Services.Http
 {
@@ -11,12 +13,22 @@ namespace Infrastructure.Services.Http
 
         public async Task<EndpointValidation> ValidateAsync(string url)
         {
-            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
             {
-                return new EndpointValidation(url, new EndpointValidationError(false));
+                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.InvalidUriFormat));
             }
 
-            using (var response = await Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url)))
+            if (!uri.IsHttpUri())
+            {
+                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.InvalidWebsiteUri));
+            }
+
+            if (!await CanResolveHostAsync(uri).ConfigureAwait(false))
+            {
+                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.DnsLookupFailed));
+            }
+
+            using (var response = await Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)))
             {
                 switch (response.StatusCode)
                 {
@@ -26,8 +38,21 @@ namespace Infrastructure.Services.Http
                         //Will result in pages being shown - redirect may be a "short link" which redirects to the real link
                         return new EndpointValidation(url);
                     default:
-                        return new EndpointValidation(url, new EndpointValidationError(true, response.StatusCode));
+                        return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.ErrorResponse, response.StatusCode));
                 }
+            }
+        }
+
+        private static async Task<bool> CanResolveHostAsync(Uri uri)
+        {
+            try
+            {
+                var hostEntry = await Dns.GetHostEntryAsync(uri.Host);
+                return hostEntry?.AddressList?.Any() == true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

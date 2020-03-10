@@ -4,12 +4,12 @@ namespace Infrastructure.Services.Http
 {
     public class EndpointValidationError
     {
-        public bool ValidUri { get; }
+        public EndpointValidationErrorType ErrorType { get; }
         public HttpStatusCode? StatusCode { get; }
 
-        public EndpointValidationError(bool validUri, HttpStatusCode? statusCode = null)
+        public EndpointValidationError(EndpointValidationErrorType errorType, HttpStatusCode? statusCode = null)
         {
-            ValidUri = validUri;
+            ErrorType = errorType;
             StatusCode = statusCode;
         }
     }

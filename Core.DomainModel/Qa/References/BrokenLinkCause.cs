@@ -2,7 +2,7 @@
 {
     public enum BrokenLinkCause
     {
-        InvalidUrl,
-        ErrorResponse
+        InvalidUrl = 0,
+        ErrorResponse = 1
     }
 }

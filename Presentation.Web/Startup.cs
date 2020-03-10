@@ -27,10 +27,8 @@ namespace Presentation.Web
                     ValidateAudience = false,
                     ValidIssuer = BearerTokenConfig.Issuer,
                     ValidateIssuer = true,
-
                     IssuerSigningKey = BearerTokenConfig.SecurityKey,
                     ValidateIssuerSigningKey = true,
-
                     ValidateLifetime = true,
                 }
             });
@@ -54,8 +52,7 @@ namespace Presentation.Web
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),
-                //TODO: Use this cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
-                cronExpression: Cron.Minutely(),
+                cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
         }
     }

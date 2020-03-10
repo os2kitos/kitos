@@ -103,10 +103,25 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
         private static void SetResults<T>(IBrokenLinkWithOrigin<T> item, T origin, EndpointValidationError error, string url) where T : IEntity
         {
             item.BrokenReferenceOrigin = origin;
-            item.Cause = error.ValidUri ? BrokenLinkCause.ErrorResponse : BrokenLinkCause.InvalidUrl;
+            item.Cause = ParseCause(error.ErrorType);
             item.ErrorResponseCode = error.StatusCode.HasValue ? (int)error.StatusCode.Value : default(int?);
             item.ReferenceDateOfLatestLinkChange = origin.LastChanged;
             item.ValueOfCheckedUrl = url;
+        }
+
+        private static BrokenLinkCause ParseCause(EndpointValidationErrorType errorErrorType)
+        {
+            switch (errorErrorType)
+            {
+                case EndpointValidationErrorType.InvalidUriFormat:
+                case EndpointValidationErrorType.InvalidWebsiteUri:
+                case EndpointValidationErrorType.DnsLookupFailed:
+                    return BrokenLinkCause.InvalidUrl;
+                case EndpointValidationErrorType.ErrorResponse:
+                    return BrokenLinkCause.ErrorResponse;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(errorErrorType), errorErrorType, null);
+            }
         }
 
         private bool Include(string url)
