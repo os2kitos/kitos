@@ -23,17 +23,18 @@
                            data-field="localCallName"
                            data-autosave="{{autoSaveUrl}}">
                 </div>
+                <!-- Sensitive Data Level -->
                 <div class="form-group">
-                    <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
-                    <select class="form-control input-sm"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="usage.dataLevel"
+                    <label for="sensitive-data" class="control-label small">Hvilke typer data indeholder systemet</label>
+                    <select id="sensitive-data"
+                            class="form-control input-sm"
+                            ui-select2="{allowClear: true}"
+                            data-ng-model="dataLevels"
                             data-ng-disabled="!hasWriteAccess"
-                            data-field="dataLevel"
-                            data-autosave="{{autoSaveUrl}}">
-                        <option value="0">Ingen persondata</option>
-                        <option value="1">Persondata</option>
-                        <option value="2">Persondata og følsomme persondata</option>
+                            data-field="sensitiveDataLevel"
+                            ng-change="updateSensitiveDataLevel()"
+                            multiple>
+                        <option ng-repeat="option in dataLevelOptions" value="{{option.id}}">{{option.text}}</option>
                     </select>
                 </div>
                 <!-- Category of data -->
@@ -63,8 +64,9 @@
             <!-- 2nd column -->
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label for="system-name" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
-                    <select class="form-control input-sm"
+                    <label for="numberOfUsers" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
+                    <select id="numberOfUsers"
+                            class="form-control input-sm"
                             ui-select2="{minimumResultsForSearch: -1}"
                             data-ng-model="usage.userCount"
                             data-ng-disabled="!hasWriteAccess"

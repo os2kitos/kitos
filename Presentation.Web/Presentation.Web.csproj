@@ -390,6 +390,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Generic\UrlViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\exposed-interface-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />

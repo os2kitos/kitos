@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.ItSystemUsage.GDPR;
 
 namespace Presentation.Web.Models
 {
@@ -88,6 +89,8 @@ namespace Presentation.Web.Models
         public int? ItSystemCategoriesId { get; set; }
 
         public string GeneralPurpose { get; set; }
+
+        public ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions isBusinessCritical { get; set; }
 
