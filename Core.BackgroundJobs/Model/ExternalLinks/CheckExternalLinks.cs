@@ -65,7 +65,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
                 var url = itInterface.Url;
                 if (Include(url))
                 {
-                    var validation = await _endpointValidationService.ValidateAsync(url);
+                    var validation = await _endpointValidationService.ValidateAsync(url).ConfigureAwait(false);
                     if (!validation.Success)
                     {
                         var item = new BrokenLinkInInterface();
@@ -87,7 +87,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
                 var url = systemReference.URL;
                 if (Include(url))
                 {
-                    var validation = await _endpointValidationService.ValidateAsync(url);
+                    var validation = await _endpointValidationService.ValidateAsync(url).ConfigureAwait(false);
                     if (!validation.Success)
                     {
                         var item = new BrokenLinkInExternalReference();
