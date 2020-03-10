@@ -5,6 +5,12 @@ namespace Core.DomainModel.Qa.References
 {
     public class BrokenExternalReferencesReport
     {
+        public BrokenExternalReferencesReport()
+        {
+            BrokenExternalReferences = new List<BrokenLinkInExternalReference>();
+            BrokenInterfaceLinks = new List<BrokenLinkInInterface>();
+        }
+
         public int Id { get; set; }
 
         public DateTime Created { get; set; }

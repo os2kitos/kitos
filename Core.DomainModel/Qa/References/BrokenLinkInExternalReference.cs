@@ -10,6 +10,8 @@ namespace Core.DomainModel.Qa.References
 
         public BrokenLinkCause Cause { get; set; }
 
+        public int? ErrorResponseCode { get; set; }
+
         public DateTime ReferenceDateOfLatestLinkChange { get; set; }
 
         public virtual ExternalReference BrokenReferenceOrigin { get; set; }

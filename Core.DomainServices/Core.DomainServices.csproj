@@ -86,6 +86,10 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\Interface\IInterfaceRepository.cs" />
+    <Compile Include="Repositories\Interface\InterfaceRepository.cs" />
+    <Compile Include="Repositories\Qa\BrokenExternalReferencesReportRepository.cs" />
+    <Compile Include="Repositories\Qa\IBrokenExternalReferencesReportRepository.cs" />
     <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />

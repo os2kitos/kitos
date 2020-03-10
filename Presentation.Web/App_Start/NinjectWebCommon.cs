@@ -31,8 +31,10 @@ using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -48,6 +50,7 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
 using Infrastructure.DataAccess.Services;
+using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
@@ -55,6 +58,7 @@ using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Http;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -117,6 +121,7 @@ namespace Presentation.Web
         {
             RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
+            kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
@@ -142,6 +147,7 @@ namespace Presentation.Web
             kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
             kernel.Bind<IReferenceService>().To<ReferenceService>().InRequestScope();
+            kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -194,7 +200,9 @@ namespace Presentation.Web
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
             kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
+            kernel.Bind<IInterfaceRepository>().To<InterfaceRepository>().InRequestScope();
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InRequestScope();
+            kernel.Bind<IBrokenExternalReferencesReportRepository>().To<BrokenExternalReferencesReportRepository>().InRequestScope();
             kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InRequestScope();
         }
 

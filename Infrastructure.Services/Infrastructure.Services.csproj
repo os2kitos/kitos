@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\KitosUrl.cs" />
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
@@ -59,6 +60,10 @@
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="Http\EndpointValidation.cs" />
+    <Compile Include="Http\EndpointValidationService.cs" />
+    <Compile Include="Http\IEndpointValidationService.cs" />
+    <Compile Include="Http\EndpointValidationError.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

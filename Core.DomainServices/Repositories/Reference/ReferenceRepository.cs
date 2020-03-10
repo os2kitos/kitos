@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -49,6 +50,24 @@ namespace Core.DomainServices.Repositories.Reference
         public Maybe<IEntityWithExternalReferences> GetRootEntity(int id, ReferenceRootType rootType)
         {
             return ResolveRepositoryOperations(rootType).Get(id);
+        }
+
+        public IQueryable<ExternalReference> GetByRootType(ReferenceRootType rootType)
+        {
+            var baseQuery = _referenceRepository.AsQueryable();
+            switch (rootType)
+            {
+                case ReferenceRootType.System:
+                    return baseQuery.Where(x => x.ItSystem_Id != null);
+                case ReferenceRootType.SystemUsage:
+                    return baseQuery.Where(x => x.ItSystemUsage_Id != null);
+                case ReferenceRootType.Contract:
+                    return baseQuery.Where(x => x.Itcontract_Id != null);
+                case ReferenceRootType.Project:
+                    return baseQuery.Where(x => x.ItProject_Id != null);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type");
+            }
         }
 
         public void SaveRootEntity(IEntityWithExternalReferences root)

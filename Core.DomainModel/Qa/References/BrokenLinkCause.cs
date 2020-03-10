@@ -2,10 +2,7 @@
 {
     public enum BrokenLinkCause
     {
-        NotFound,
-        BadRequest,
-        Forbidden,
-        Unauthorized,
-        Other
+        InvalidUrl,
+        ErrorResponse
     }
 }

@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202003100723309_BrokenReferencesReport"; }
+            get { return "202003100919578_BrokenReferencesReport"; }
         }
         
         string IMigrationMetadata.Source

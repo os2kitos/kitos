@@ -10,6 +10,8 @@ namespace Core.DomainModel.Qa.References
 
         BrokenLinkCause Cause { get; set; }
 
+        int? ErrorResponseCode { get; set; }
+
         DateTime ReferenceDateOfLatestLinkChange { get; set; }
     }
 }
