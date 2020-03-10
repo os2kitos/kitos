@@ -3,9 +3,12 @@ using Microsoft.Owin;
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
+using System.Net;
+using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Services;
 using Hangfire.Common;
+using Ninject;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
@@ -48,7 +51,13 @@ namespace Presentation.Web
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
-            //TODO: Move configurations to repository
+            //Allow all versions of ssl for outgoing connections
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Ssl3 |
+                SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12;
+
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),

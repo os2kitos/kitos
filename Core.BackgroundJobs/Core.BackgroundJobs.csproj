@@ -71,6 +71,10 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
+      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
+      <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
       <Name>Infrastructure.Services</Name>

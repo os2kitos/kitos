@@ -357,6 +357,9 @@
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
+    <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
+    <Compile Include="Ninject\KernelBuilder.cs" />
+    <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
