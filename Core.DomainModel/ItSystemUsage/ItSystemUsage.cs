@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -35,6 +36,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
+            SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
         }
 
         public bool IsActive
@@ -352,6 +354,12 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
+
+        #region GDPR
+
+        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
+
+        #endregion
         public string GeneralPurpose { get; set; }
         public DataOptions isBusinessCritical { get; set; }
         public DataOptions ContainsLegalInfo { get; set; }
