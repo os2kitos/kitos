@@ -71,7 +71,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("/api/dataRow/");
 
             var body = new
-            {   
+            {
                 itInterfaceId = interfaceId
             };
 

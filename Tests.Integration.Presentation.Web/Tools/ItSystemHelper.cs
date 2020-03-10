@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 name = itSystemName,
                 belongsToId = orgId,
                 organizationId = orgId,
-                AccessModifier = accessModifier,
+                AccessModifier = accessModifier
             };
 
             using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem"), cookie, itSystem))
