@@ -3,7 +3,6 @@ using Microsoft.Owin;
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
-using Core.BackgroundJobs.Factory;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Services;
 using Hangfire.Common;
@@ -51,6 +50,7 @@ namespace Presentation.Web
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
+            //TODO: Move configurations to repository
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),

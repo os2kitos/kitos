@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Core.DomainModel.Result;
 using Serilog;
 
@@ -9,7 +8,6 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
     {
         private readonly ILogger _logger;
         public string Id => StandardJobIds.CheckExternalLinks;
-
 
         public CheckExternalLinks(ILogger logger)
         {
