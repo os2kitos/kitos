@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Xunit;
@@ -70,11 +71,32 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("/api/dataRow/");
 
             var body = new
-            {
+            {   
                 itInterfaceId = interfaceId
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+
+        public static async Task<HttpResponseMessage> SendGetInterfaceRequestAsync(int interfaceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itinterface/{interfaceId}");
+
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<ItInterfaceDTO> GetInterfaceById(int interfaceId, Cookie optionalLogin = null)
+        {
+
+            using (var response = await SendGetInterfaceRequestAsync(interfaceId, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
+            }
+
         }
     }
 }

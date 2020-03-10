@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
         public override IHttpActionResult Get()

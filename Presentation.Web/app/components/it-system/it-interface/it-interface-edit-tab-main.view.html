@@ -69,14 +69,8 @@
 
                         <!-- belongs to -->
                         <div class="form-group">
-                            <label for="belongs-to" class="control-label small">Rettighedshaver</label>
-                            <input type="hidden" id="belongs-to" data-element-type="InterfaceBelongsToInput" class="form-control input-sm"
-                                   data-ui-select2="organizationSelectOptions"
-                                   data-placeholder="Vælg organisation"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{interface.updateUrl}}"
-                                   data-field="belongsToId"
-                                   data-ng-model="interface.belongsTo">
+                            <label class="control-label small">Rettighedshaver </label>
+                            <input type="text" value="{{interface.belongsToName}}" class="form-control input-sm" data-element-type="InterfaceBelongsTo"  disabled="disabled" />
                         </div>
 
                         <!-- Access modifier -->

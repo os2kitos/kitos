@@ -45,7 +45,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
         [InlineData(OrganizationRole.User, TestEnvironment.SecondOrganizationId)]
         public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
-            //Arrabge
+            //Arrange
             var interFacePrefixName = CreateInterFacePrefixName();
             var token = await HttpApi.GetTokenAsync(role);
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
@@ -98,6 +98,28 @@ namespace Tests.Integration.Presentation.Web.Interfaces
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
+        }
+
+
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Author_Is_Same_As_Exhibit_System(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+
+            //Act - perform the action with the actual role
+            await InterfaceExhibitHelper.CreateExhibit(system.Id, interfaceDto.Id, login);
+            var interfaceResult = await InterfaceHelper.GetInterfaceById(interfaceDto.Id, login);
+            var systemResult = await ItSystemHelper.GetSystemAsync(system.Id, login);
+
+            //Assert
+            Assert.Equal(systemResult.BelongsToName, interfaceResult.BelongsToName);
+                
         }
 
         [Theory]
