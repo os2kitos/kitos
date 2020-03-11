@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Infrastructure.Services.Extensions;
+using Polly;
 using Serilog;
 
 namespace Infrastructure.Services.Http
@@ -20,8 +21,12 @@ namespace Infrastructure.Services.Http
 
         static EndpointValidationService()
         {
-            //Make sure redirects are followed to the end - a redirect might point to nowhere if not followed
-            Client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = true });
+            //Follow redirects
+            Client = new HttpClient(new HttpClientHandler
+            {
+                AllowAutoRedirect = true,
+                UseCookies = false
+            });
 
             //Set max timeout to 30 in stead of the default 100
             Client.Timeout = TimeSpan.FromSeconds(30);
@@ -62,7 +67,7 @@ namespace Infrastructure.Services.Http
                     return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.DnsLookupFailed));
                 }
 
-                using (var response = await Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)))
+                using (var response = await LoadEndpointWithBackOffRetryAsync(uri).ConfigureAwait(false))
                 {
                     switch (response.StatusCode)
                     {
@@ -83,6 +88,34 @@ namespace Infrastructure.Services.Http
                 //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
                 return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.CommunicationError));
             }
+        }
+
+        private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
+        {
+            return Policy
+                .HandleResult<HttpResponseMessage>(ShouldRetry)
+                .WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15) }, onRetry: HandleFailedRequest)
+                .ExecuteAsync(() => Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)));
+        }
+
+        private void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
+        {
+            _logger.Warning("{correlationId}: Request failed with {statusCode}. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), result.Result.StatusCode, timeSpan, retryCount);
+            result.Result.Dispose();
+        }
+
+        private static bool ShouldRetry(HttpResponseMessage message)
+        {
+            return MatchAnyStatusCode(message,
+                HttpStatusCode.ServiceUnavailable,  //Either it is down or we are being throttled
+                HttpStatusCode.InternalServerError,             //Might be transient server error
+                HttpStatusCode.GatewayTimeout,                  //Timeout at the proxy level
+                HttpStatusCode.BadGateway);                     //Error at the proxy level
+        }
+
+        private static bool MatchAnyStatusCode(HttpResponseMessage message, params HttpStatusCode[] statuses)
+        {
+            return statuses.Contains(message.StatusCode);
         }
 
         private static async Task<bool> CanResolveHostAsync(Uri uri)
