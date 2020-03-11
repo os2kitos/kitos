@@ -202,7 +202,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var itInterfaceDto = InterfaceHelper.CreateInterfaceDto(
                 A<string>(),
                 A<string>(),
-                null,
                 organizationId,
                 AccessModifier.Public);
             var itInterface = await InterfaceHelper.CreateInterface(itInterfaceDto);
