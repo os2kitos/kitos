@@ -13,7 +13,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class ItSystemHelper
     {
-        public static async Task<ItSystemDTO> CreateItSystemInOrganizationAsync(string itSystemName, int orgId,AccessModifier accessModifier)
+        public static async Task<ItSystemDTO> CreateItSystemInOrganizationAsync(string itSystemName, int orgId, AccessModifier accessModifier)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
