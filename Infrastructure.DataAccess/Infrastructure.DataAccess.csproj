@@ -927,6 +927,9 @@
     <EmbeddedResource Include="Migrations\202003021344549_Archive_Duty_Changes.resx">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003091419426_BelongsToRemovedFromInterface.resx">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003111405293_removedRegularPersonData.resx">
       <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
     </EmbeddedResource>
