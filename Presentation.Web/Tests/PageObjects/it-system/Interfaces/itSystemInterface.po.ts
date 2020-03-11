@@ -34,7 +34,7 @@ class ItSystemInterfaceCatalog implements IPageObject {
     }
 
     public getInterfaceBelongsToField() {
-        return element(this.cssHelper.byDataElementType(this.constants.interfaceBelongsTo));
+        return element(this.cssHelper.byDataElementType(this.constants.interfaceBelongsToReadonly));
     }
 
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {

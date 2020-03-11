@@ -76,7 +76,7 @@ class Constants {
     readonly interfaceDataTypeInput = "InterfaceDataTypeInput";
     readonly interfaceDataTableInput = "InterfaceDataInput";
     readonly interfaceNewRowButton = "InterfaceNewRowButton";
-    readonly interfaceBelongsTo = "InterfaceBelongsTo";
+    readonly interfaceBelongsToReadonly = "InterfaceBelongsToReadonly";
 
     readonly interfaceSelectExhibit = "s2id_interface-exposed-by";
     readonly interfaceSelectBelongs = "s2id_belongs-to";
