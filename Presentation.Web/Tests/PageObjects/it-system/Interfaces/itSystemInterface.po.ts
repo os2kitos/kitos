@@ -12,7 +12,6 @@ class ItSystemInterfaceCatalog implements IPageObject {
     private constants = new Constants();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
     public cssHelper = new CssHelper();
-    
 
     public getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/system/interface-catalog");

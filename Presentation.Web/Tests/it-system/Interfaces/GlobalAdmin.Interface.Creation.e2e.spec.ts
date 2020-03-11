@@ -43,7 +43,7 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 console.log("Getting page");
                 return pageObject.getPage();
             }).then(() => {
-                console.log("Creating interface");1
+                console.log("Creating interface");
                 return InterfaceCatalogHelper.createInterface(interfaceName);
             }).then(() => {
                 console.log("Creating IT system");
