@@ -36,6 +36,8 @@ namespace Infrastructure.Services.Http
 
             //Some servers return 406 if no user agent is set as part of a ModSecure policy
             Client.DefaultRequestHeaders.UserAgent.ParseAdd(ChromeUserAgent);
+
+            Client.DefaultRequestHeaders.ExpectContinue = false;
         }
 
         public EndpointValidationService(ILogger logger)
