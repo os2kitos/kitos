@@ -339,6 +339,8 @@ namespace Presentation.Web
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
                 .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.Usages.Any()))
+                .ForMember(dest => dest.BelongsToId, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Id))
+                .ForMember(dest => dest.BelongsToName, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Name))
                 .ReverseMap();
 
             Mapper.CreateMap<ItInterfaceUsage, ItInterfaceUsageDTO>()

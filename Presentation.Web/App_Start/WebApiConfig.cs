@@ -259,7 +259,6 @@ namespace Presentation.Web
 
             var itInterfaces = BindEntitySet<ItInterface, ItInterfacesController>(builder);
             itInterfaces.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            itInterfaces.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
             itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, entitySetItSystems);
