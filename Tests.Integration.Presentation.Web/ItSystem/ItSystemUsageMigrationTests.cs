@@ -811,7 +811,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private static async Task<ItInterfaceDTO> CreateInterfaceAsync()
         {
             var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(),
-                CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+                CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             return createdInterface;
         }
 

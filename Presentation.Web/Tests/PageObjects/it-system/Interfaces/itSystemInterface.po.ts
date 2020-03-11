@@ -2,12 +2,14 @@
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper");
 import CssHelper = require("../../../Object-wrappers/CSSLocatorHelper");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
+import Constants = require("../../../Utility/Constants");
 
 var ec = protractor.ExpectedConditions;
 
 class ItSystemInterfaceCatalog implements IPageObject {
     private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
+    private constants = new Constants();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
     public cssHelper = new CssHelper();
 
@@ -29,6 +31,10 @@ class ItSystemInterfaceCatalog implements IPageObject {
 
     public getInterfaceNameInputField() {
         return element(this.cssHelper.byDataElementType("interfaceNameInput"));
+    }
+
+    public getInterfaceBelongsToField() {
+        return element(this.cssHelper.byDataElementType(this.constants.interfaceBelongsToReadonly));
     }
 
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {

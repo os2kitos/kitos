@@ -559,6 +559,10 @@
     <Compile Include="Migrations\202003021344549_Archive_Duty_Changes.Designer.cs">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.cs" />
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.Designer.cs">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202003101531451_Removed-RegularPersonalDataType.cs" />
     <Compile Include="Migrations\202003101531451_Removed-RegularPersonalDataType.Designer.cs">
       <DependentUpon>202003101531451_Removed-RegularPersonalDataType.cs</DependentUpon>
@@ -922,9 +926,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003021344549_Archive_Duty_Changes.resx">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003101531451_Removed-RegularPersonalDataType.resx">
-      <DependentUpon>202003101531451_Removed-RegularPersonalDataType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
