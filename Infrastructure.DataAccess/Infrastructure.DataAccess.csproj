@@ -563,10 +563,6 @@
     <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.Designer.cs">
       <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003101531451_Removed-RegularPersonalDataType.cs" />
-    <Compile Include="Migrations\202003101531451_Removed-RegularPersonalDataType.Designer.cs">
-      <DependentUpon>202003101531451_Removed-RegularPersonalDataType.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
