@@ -274,8 +274,8 @@
                     {
                         field: "ExhibitedBy.ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo.Name ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
-                        excelTemplate: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo.Name ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
+                        template: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
+                        excelTemplate: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
