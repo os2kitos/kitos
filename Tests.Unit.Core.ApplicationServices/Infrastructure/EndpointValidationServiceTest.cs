@@ -10,11 +10,12 @@ namespace Tests.Unit.Core.Infrastructure
     public class EndpointValidationServiceTest
     {
         [Theory]
+        [InlineData("http://127.0.0.1/should-not-be-here/", false, EndpointValidationErrorType.ErrorResponseCode, HttpStatusCode.NotFound)]
         [InlineData("http://strongminds.dk", true, null, null)]
         [InlineData("https://google.com", true, null, null)]
         [InlineData("htt:/google.com", false, EndpointValidationErrorType.InvalidWebsiteUri, null)]
         [InlineData("https://d724FF4EE-EA34-4941-88C3-D567958976FF.com", false, EndpointValidationErrorType.DnsLookupFailed, null)]
-        [InlineData("https://google.com/icannotbefound1337.com", false, EndpointValidationErrorType.ErrorResponse, HttpStatusCode.NotFound)]
+        [InlineData("https://google.com/icannotbefound1337.com", false, EndpointValidationErrorType.ErrorResponseCode, HttpStatusCode.NotFound)]
         public async Task Validate_Returns(string candidate, bool success, EndpointValidationErrorType? expectedErrorType, HttpStatusCode? expectedStatusCode)
         {
             //Arrange

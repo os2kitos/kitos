@@ -46,6 +46,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
         {
             var brokenInterfaceLinks = await CheckInterfaceLinksAsync().ConfigureAwait(false);
             var brokenSystemLinks = await CheckSystemLinksAsync().ConfigureAwait(false);
+
             var report = new BrokenExternalReferencesReport
             {
                 Created = _operationClock.Now,
@@ -115,9 +116,12 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
             {
                 case EndpointValidationErrorType.InvalidUriFormat:
                 case EndpointValidationErrorType.InvalidWebsiteUri:
-                case EndpointValidationErrorType.DnsLookupFailed:
                     return BrokenLinkCause.InvalidUrl;
-                case EndpointValidationErrorType.ErrorResponse:
+                case EndpointValidationErrorType.DnsLookupFailed:
+                    return BrokenLinkCause.DnsLookupFailed;
+                case EndpointValidationErrorType.CommunicationError:
+                    return BrokenLinkCause.CommunicationError;
+                case EndpointValidationErrorType.ErrorResponseCode:
                     return BrokenLinkCause.ErrorResponse;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(errorErrorType), errorErrorType, null);
@@ -126,12 +130,20 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
 
         private bool Include(string url)
         {
+            //Url is not defined
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return false;
+            }
+
+            //Url is a valid uri
             if (Uri.TryCreate(url, UriKind.Absolute, out var result))
             {
                 //Ignore internal links
                 return GetHost(_kitosUrl.Url).Equals(GetHost(result), StringComparison.OrdinalIgnoreCase) == false;
             }
-            return true;
+
+            return false;
 
         }
 

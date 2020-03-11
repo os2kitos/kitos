@@ -5,6 +5,7 @@
         InvalidUriFormat,
         InvalidWebsiteUri,
         DnsLookupFailed,
-        ErrorResponse
+        CommunicationError,
+        ErrorResponseCode
     }
 }

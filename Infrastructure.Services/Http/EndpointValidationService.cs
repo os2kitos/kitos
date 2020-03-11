@@ -23,6 +23,9 @@ namespace Infrastructure.Services.Http
             //Make sure redirects are followed to the end - a redirect might point to nowhere if not followed
             Client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = true });
 
+            //Set max timeout to 30 in stead of the default 100
+            Client.Timeout = TimeSpan.FromSeconds(30);
+
             //Prevent 406 from servers which require content negotiation
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(AnyMediaType));
 
@@ -37,8 +40,13 @@ namespace Infrastructure.Services.Http
 
         public async Task<EndpointValidation> ValidateAsync(string url)
         {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.InvalidUriFormat));
+            }
             try
             {
+                _logger.Debug("Checking Endpoint at: '{uri}'", url);
                 if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
                 {
                     return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.InvalidUriFormat));
@@ -64,14 +72,16 @@ namespace Infrastructure.Services.Http
                             //Will result in pages being shown - redirect might be a "short link" which redirects to the real link
                             return new EndpointValidation(url);
                         default:
-                            return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.ErrorResponse, response.StatusCode));
+                            return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.ErrorResponseCode, response.StatusCode));
                     }
                 }
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Failed to validate url {url}", url);
-                return new EndpointValidation(url);
+                _logger.Information(e, "Failed to validate url {url}", url);
+
+                //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
+                return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.CommunicationError));
             }
         }
 
@@ -79,13 +89,26 @@ namespace Infrastructure.Services.Http
         {
             try
             {
-                var hostEntry = await Dns.GetHostEntryAsync(uri.Host);
+                var uriHost = uri.Host;
+
+                if (IsIpAddress(uriHost))
+                {
+                    //Does not require DNS lookup
+                    return true;
+                }
+
+                var hostEntry = await Dns.GetHostEntryAsync(uriHost);
                 return hostEntry?.AddressList?.Any() == true;
             }
             catch
             {
                 return false;
             }
+        }
+
+        private static bool IsIpAddress(string uriHost)
+        {
+            return IPAddress.TryParse(uriHost, out var ip);
         }
     }
 }

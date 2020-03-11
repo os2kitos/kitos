@@ -3,6 +3,8 @@
     public enum BrokenLinkCause
     {
         InvalidUrl = 0,
-        ErrorResponse = 1
+        DnsLookupFailed = 1,
+        ErrorResponse = 2,
+        CommunicationError = 3
     }
 }

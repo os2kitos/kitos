@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Infrastructure.Services.Http
+﻿namespace Infrastructure.Services.Http
 {
     public class EndpointValidation
     {
