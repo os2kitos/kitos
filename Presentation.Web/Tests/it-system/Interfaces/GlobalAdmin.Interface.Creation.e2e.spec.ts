@@ -5,14 +5,12 @@ import InterfaceCatalogHelper = require("../../Helpers/InterfaceCatalogHelper");
 import InterfaceHelper = require("../../Helpers/InterfaceHelper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 import constant = require("../../Utility/Constants");
-import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 
 describe("Only Global Administrator is able to create and fill out an interface", () => {
     var loginHelper = new Login();
     var pageObject = new ItSystemInterface();
     var testFixture = new TestFixtureWrapper();
     var constants = new constant();
-    var cssHelper = new CssHelper();
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -45,7 +43,7 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 console.log("Getting page");
                 return pageObject.getPage();
             }).then(() => {
-                console.log("Creating interface");
+                console.log("Creating interface");1
                 return InterfaceCatalogHelper.createInterface(interfaceName);
             }).then(() => {
                 console.log("Creating IT system");
@@ -58,8 +56,8 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return verifyDataWasSaved(interfaceName, id, description, descriptionLink, note, dataRow, systemName, systemInterface, access, dataType, version);
             }).then(() => {
                 console.log("Verifying BelongsTo for interface is same as its exhibit system and field is readonly");
-                expect(element(cssHelper.byDataElementType(constants.interfaceBelongsTo)).getAttribute("disabled")).toEqual("true");
-                expect(element(cssHelper.byDataElementType(constants.interfaceBelongsTo)).getAttribute("value")).toEqual(org);
+                verifyAttributeIsEqualTo(pageObject.getInterfaceBelongsToField(), "disabled", "true");
+                verifyAttributeIsEqualTo(pageObject.getInterfaceBelongsToField(), "value" , org);
             });
     });
 
@@ -116,6 +114,10 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 InterfaceHelper.verifyDataFromSelect2(dataTypeTable, constants.interfaceSelectTableDataType);
             });
     };
+
+    function verifyAttributeIsEqualTo(element: protractor.ElementFinder , attributeValueToGet: string, expectedValue: string) {
+        expect(element.getAttribute(attributeValueToGet)).toEqual(expectedValue);
+    }
 
 
     function createInterfaceName() {

@@ -87,10 +87,5 @@ class SystemCatalogHelper {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
-
-    public static getValueFromSelect2(Selec2Element: string) {
-        console.log("Getting data from " + Selec2Element);
-        return Select2.getData(Selec2Element).getText();
-    }
 }
 export = SystemCatalogHelper;

@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Interfaces
 {
-    public class ItIterfacesTest : WithAutoFixture
+    public class ItInterfacesTest : WithAutoFixture
     {
         private int _defaultUserId;
 
@@ -156,7 +156,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
         private string CreateInterFacePrefixName()
         {
-            return $"{nameof(ItIterfacesTest)}-{A<Guid>():N}";
+            return $"{nameof(ItInterfacesTest)}-{A<Guid>():N}";
         }
 
         private static async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
@@ -172,7 +172,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
         private async Task<ItInterfaceDTO[]> GenerateTestInterfaces(string name)
         {
-            _defaultUserId = TestEnvironment.DefaultUserId;
             var itInterfaceDto1 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var itInterfaceDto2 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var itInterfaceDto3 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), TestEnvironment.SecondOrganizationId, AccessModifier.Local);
