@@ -5,12 +5,12 @@ using Moq;
 using Serilog;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.Services
+namespace Tests.Unit.Core.Infrastructure
 {
     public class EndpointValidationServiceTest
     {
         [Theory]
-        [InlineData("https://strongminds.dk", true, null, null)]
+        [InlineData("http://strongminds.dk", true, null, null)]
         [InlineData("https://google.com", true, null, null)]
         [InlineData("htt:/google.com", false, EndpointValidationErrorType.InvalidWebsiteUri, null)]
         [InlineData("https://d724FF4EE-EA34-4941-88C3-D567958976FF.com", false, EndpointValidationErrorType.DnsLookupFailed, null)]

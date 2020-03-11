@@ -208,7 +208,6 @@
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
-    <Compile Include="Services\EndpointValidationServiceTest.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />

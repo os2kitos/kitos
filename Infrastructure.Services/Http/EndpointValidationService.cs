@@ -11,14 +11,23 @@ namespace Infrastructure.Services.Http
 {
     public class EndpointValidationService : IEndpointValidationService
     {
+        private const string ChromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36";
+        private const string AnyMediaType = "*/*";
+
         private readonly ILogger _logger;
 
         private static readonly HttpClient Client;
 
         static EndpointValidationService()
         {
+            //Make sure redirects are followed to the end - a redirect might point to nowhere if not followed
             Client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = true });
-            //TODO: Try with different headers to see why some servers return 406 when HttpClient calls (strongminds.dk does this)
+
+            //Prevent 406 from servers which require content negotiation
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(AnyMediaType));
+
+            //Some servers return 406 if no user agent is set as part of a ModSecure policy
+            Client.DefaultRequestHeaders.UserAgent.ParseAdd(ChromeUserAgent);
         }
 
         public EndpointValidationService(ILogger logger)

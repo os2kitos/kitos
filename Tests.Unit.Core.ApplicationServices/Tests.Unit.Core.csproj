@@ -147,6 +147,7 @@
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
+    <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
