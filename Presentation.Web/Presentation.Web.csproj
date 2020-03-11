@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
@@ -326,6 +327,7 @@
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />

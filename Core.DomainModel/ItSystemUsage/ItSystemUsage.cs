@@ -484,7 +484,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             if (activeUser == null)
@@ -548,7 +548,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             return relation
@@ -558,6 +558,58 @@ namespace Core.DomainModel.ItSystemUsage
                 .Select(_ => _.SetContract(toContract))
                 .Select(_ => _.SetFrequency(toFrequency))
                 .Select(_ => _.SetReference(changedReference));
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
+            User activeUser,
+            DataSensitivityLevel dataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (SensitiveDataLevelExists(dataLevel))
+            {
+                return new OperationError("Data sensitivity level already exists", OperationFailure.Conflict);
+            }
+
+            var newDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = dataLevel
+            };
+
+            SensitiveDataLevels.Add(newDataLevel);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newDataLevel;
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
+            User activeUser,
+            DataSensitivityLevel dataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (!SensitiveDataLevelExists(dataLevel))
+            {
+                return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+            }
+
+            var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == dataLevel);
+            SensitiveDataLevels.Remove(dataLevelToRemove);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return dataLevelToRemove;
+        }
+
+        private bool SensitiveDataLevelExists(DataSensitivityLevel dataLevel)
+        {
+            return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == dataLevel);
         }
     }
 }

@@ -178,10 +178,16 @@ namespace Infrastructure.DataAccess
                 {
                     foreach (var validationError in validationErrors.ValidationErrors)
                     {
-                        Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName,
+                            validationError.ErrorMessage);
                     }
                 }
+
                 throw;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 

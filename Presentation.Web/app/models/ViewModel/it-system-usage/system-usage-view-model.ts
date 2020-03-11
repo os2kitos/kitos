@@ -53,7 +53,7 @@
         }
 
         mapDataLevels(dataLevel: any) {
-            switch (dataLevel.sensitivityDataLevel) {
+            switch (dataLevel.dataSensitivityLevel) {
                 case 0:
                     return SensitiveDataLevel.NONE;
                 case 1:

@@ -22,7 +22,7 @@
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
-            $scope.dataLevels = itSystemUsage.sensitiveDataLevels;
+            $scope.dataLevels = _.map(itSystemUsage.sensitiveDataLevels, (item) => item.toString());
             $scope.dataLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelOptions().options;
             autofocus();
 
@@ -33,9 +33,27 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.updateSensitiveDataLevel = () => {
-                var test = $scope.dataLevels;
-            }
+            $scope.$watchCollection("dataLevels",
+                (newValue: string[], oldValue: string[], scope) => {
+                    if (oldValue === newValue) {
+                        return; //Skip if it is the first time it is loaded
+                    }
+                    if (oldValue.length < newValue.length) { //Add case
+                        const differingItem = _.difference(newValue, oldValue)[0];
+                        $http.patch("api/v1/itsystemusage/" + itSystemUsage.id + "/sensitivityLevel/add/" + differingItem)
+                            .then(
+                                onSuccess => notify.addSuccessMessage("Feltet er opdateret."),
+                                onError => notify.addErrorMessage("Kunne ikke opdatere feltet."));
+                    }
+                    if (oldValue.length > newValue.length) { //Remove case
+                        const differingItem = _.difference(oldValue, newValue);
+                        $http.patch("api/v1/itsystemusage/" + itSystemUsage.id + "/sensitivityLevel/remove/" + differingItem)
+                            .then(
+                                onSuccess => notify.addSuccessMessage("Feltet er opdateret."),
+                                onError => notify.addErrorMessage("Kunne ikke opdatere feltet."));
+                    }
+                });
+
 
             $scope.patchDate = (field, value) => {
                 var expirationDate = itSystemUsage.expirationDate;

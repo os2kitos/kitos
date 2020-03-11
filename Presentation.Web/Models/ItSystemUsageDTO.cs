@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Models
 {
@@ -90,7 +91,7 @@ namespace Presentation.Web.Models
 
         public string GeneralPurpose { get; set; }
 
-        public ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
+        public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
 
         public DataOptions isBusinessCritical { get; set; }
 

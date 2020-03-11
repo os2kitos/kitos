@@ -32,7 +32,6 @@
                             data-ng-model="dataLevels"
                             data-ng-disabled="!hasWriteAccess"
                             data-field="sensitiveDataLevel"
-                            ng-change="updateSensitiveDataLevel()"
                             multiple>
                         <option ng-repeat="option in dataLevelOptions" value="{{option.id}}">{{option.text}}</option>
                     </select>
