@@ -198,21 +198,8 @@
             </div>
             <!-- 2nd column -->
             <div class="col-xs-6">
-                <div class="form-group"
-                     data-ng-show="usage.dataLevel == 1 || usage.dataLevel == 2">
-                    <label class="control-label small">Almindelige persondata:</label>
-                    <div class="well">
-                        <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
-                            <label>
-                                <input type="checkbox" ng-model="r.Checked"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}
-                            </label>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="form-group"
+            <div class="form-group"
                      data-ng-show="usage.dataLevel == 2">
                     <label class="control-label small">Følsomme persondata:</label>
                     <div class="well">
@@ -241,21 +228,8 @@
                 </div>
 
                 <!-- Catagory of data -->
-                <div class="form-group"
-                     data-ng-show="systemUsage.dataLevel == 1">
-                    <label class="control-label small">Almindelige persondata:</label>
-                    <div class="well">
-                        <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
-                            <label>
-                                <input type="checkbox" ng-model="r.Checked"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}
-                            </label>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="form-group"
+            <div class="form-group"
                      data-ng-show="systemUsage.dataLevel == 2">
                     <label class="control-label small">Følsomme persondata:</label>
                     <div class="well">
