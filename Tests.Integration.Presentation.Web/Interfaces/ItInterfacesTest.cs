@@ -15,8 +15,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 {
     public class ItInterfacesTest : WithAutoFixture
     {
-        private int _defaultUserId;
-
         [Fact]
         public async Task Global_Administrator_Can_Get_All_Interfaces()
         {
