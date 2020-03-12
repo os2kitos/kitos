@@ -9,6 +9,17 @@ namespace Tests.Unit.Core.Infrastructure
 {
     public class EndpointValidationServiceTest
     {
+        public EndpointValidationServiceTest()
+        {
+            //Configure how htto client handles TLS and cert validation
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Ssl3 |
+                SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
+        }
+
         [Theory]
         [InlineData("http://127.0.0.1/should-not-be-here/", false, EndpointValidationErrorType.ErrorResponseCode, HttpStatusCode.NotFound)]
         [InlineData("http://kitos.dk", true, null, null)] //will upgrade to https
