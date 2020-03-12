@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess;
@@ -65,15 +64,6 @@ namespace Tools.Test.Database.Model.Tasks
             };
 
             context.ItSystemUsages.Add(itSystemUsage);
-            context.SaveChanges();
-
-            foreach (var option in context.AttachedOptions.Where(x => x.ObjectId == itSystem.Id && x.ObjectType == EntityType.ITSYSTEM))
-            {
-                option.ObjectId = itSystemUsage.Id;
-                option.ObjectType = EntityType.ITSYSTEMUSAGE;
-                context.AttachedOptions.Add(option);
-            }
-
             context.SaveChanges();
 
             return true;

@@ -67,8 +67,6 @@
     <Compile Include="Mapping\ItSystemUsageSensitiveDataLevelMap.cs" />
     <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
-    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
-    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -566,6 +564,14 @@
     <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.Designer.cs">
       <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003111405293_removedRegularPersonData.cs" />
+    <Compile Include="Migrations\202003111405293_removedRegularPersonData.Designer.cs">
+      <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.cs" />
+    <Compile Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.Designer.cs">
+      <DependentUpon>202003121334292_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -929,11 +935,18 @@
     <EmbeddedResource Include="Migrations\202003091419426_BelongsToRemovedFromInterface.resx">
       <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003111405293_removedRegularPersonData.resx">
+      <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.resx">
+      <DependentUpon>202003121334292_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Remove_Orphaned_AttachedOptions.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
