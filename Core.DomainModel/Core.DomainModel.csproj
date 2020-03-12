@@ -63,6 +63,7 @@
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
+    <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />

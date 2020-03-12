@@ -1,4 +1,3 @@
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
@@ -11,7 +10,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions
     {
         public ItSystem()
         {
