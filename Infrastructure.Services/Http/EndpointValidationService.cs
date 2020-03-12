@@ -88,6 +88,9 @@ namespace Infrastructure.Services.Http
             {
                 _logger.Information(e, "Failed to validate url {url}", url);
 
+                //TODO: Remove this
+                Console.Out.WriteLine($"FAILED to validate. Error: {BuildExceptionChain(e)}");
+
                 //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
                 return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.CommunicationError));
             }
@@ -156,7 +159,7 @@ namespace Infrastructure.Services.Http
                     return true;
                 }
 
-                var hostEntry = await Dns.GetHostEntryAsync(uriHost);
+                var hostEntry = await Dns.GetHostEntryAsync(uriHost).ConfigureAwait(false);
                 return hostEntry?.AddressList?.Any() == true;
             }
             catch
