@@ -103,7 +103,7 @@
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
-    <Compile Include="Interfaces\ItIterfacesTest.cs" />
+    <Compile Include="Interfaces\ItInterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
     <Compile Include="LocalAdminArea\LocalConfigTest.cs" />

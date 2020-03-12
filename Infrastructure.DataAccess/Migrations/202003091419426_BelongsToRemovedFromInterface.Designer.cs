@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Data_Sensitivity_Level_Changes : IMigrationMetadata
+    public sealed partial class BelongsToRemovedFromInterface : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Data_Sensitivity_Level_Changes));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(BelongsToRemovedFromInterface));
         
         string IMigrationMetadata.Id
         {
-            get { return "202003101026264_Data_Sensitivity_Level_Changes"; }
+            get { return "202003091419426_BelongsToRemovedFromInterface"; }
         }
         
         string IMigrationMetadata.Source

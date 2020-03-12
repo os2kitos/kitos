@@ -12,7 +12,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
     var testFixture = new TestFixtureWrapper();
     var constants = new constant();
 
-
     afterEach(() => {
         testFixture.cleanupState();
     });
@@ -24,8 +23,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
     afterAll(() => {
         testFixture.disableLongRunningTest();
     });
-
-
 
     it("Global Admin is able to create and fill out data on a interface", () => {
         var interfaceName = createInterfaceName();
@@ -53,10 +50,14 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 return ItSystemHelper.createSystem(systemName);
             }).then(() => {
                 console.log("Inserting data");
-                return writeDataToAllInputs(interfaceName, id, description, descriptionLink, note, dataRow, systemName, systemInterface, access, org, dataType, version);
+                return writeDataToAllInputs(interfaceName, id, description, descriptionLink, note, dataRow, systemName, systemInterface, access, dataType, version);
             }).then(() => {
                 console.log("Verifying data");
-                return verifyDataWasSaved(interfaceName, id, description, descriptionLink, note, dataRow, systemName, systemInterface, access, org, dataType, version);
+                return verifyDataWasSaved(interfaceName, id, description, descriptionLink, note, dataRow, systemName, systemInterface, access, dataType, version);
+            }).then(() => {
+                console.log("Verifying BelongsTo for interface is same as its exhibit system and field is readonly");
+                verifyAttributeIsEqualTo(pageObject.getInterfaceBelongsToField(), "disabled", "true");
+                verifyAttributeIsEqualTo(pageObject.getInterfaceBelongsToField(), "value" , org);
             });
     });
 
@@ -70,7 +71,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
         systemName: string,
         systemInterface: string,
         access: string,
-        belongsTo: string,
         dataTypeTable: string,
         version: string) {
         return InterfaceCatalogHelper.gotoSpecificInterface(nameOfInterface)
@@ -82,7 +82,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 .then(() => InterfaceHelper.selectDataFromSelect2Field(systemName, constants.interfaceSelectExhibit))
                 .then(() => InterfaceHelper.selectDataFromSelect2Field(systemInterface, constants.interfaceSelectInterface))
                 .then(() => InterfaceHelper.selectDataFromSelect2Field(access, constants.interfaceSelectAccess))
-                .then(() => InterfaceHelper.selectDataFromSelect2Field(belongsTo, constants.interfaceSelectBelongs))
                 .then(() => InterfaceHelper.writeDataToTextInput(version, constants.interfaceVersionInput))
                 .then(() => InterfaceHelper.writeDataToTable(dataRow, dataTypeTable)));
     };
@@ -97,7 +96,6 @@ describe("Only Global Administrator is able to create and fill out an interface"
         systemName: string,
         systemInterface: string,
         access: string,
-        belongsTo: string,
         dataTypeTable: string,
         version: string) {
         return InterfaceCatalogHelper.gotoSpecificInterface(nameOfInterface)
@@ -113,10 +111,13 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 InterfaceHelper.verifyDataFromSelect2(systemName, constants.interfaceSelectExhibit);
                 InterfaceHelper.verifyDataFromSelect2(systemInterface, constants.interfaceSelectInterface);
                 InterfaceHelper.verifyDataFromSelect2(access, constants.interfaceSelectAccess);
-                InterfaceHelper.verifyDataFromSelect2(belongsTo, constants.interfaceSelectBelongs);
                 InterfaceHelper.verifyDataFromSelect2(dataTypeTable, constants.interfaceSelectTableDataType);
             });
     };
+
+    function verifyAttributeIsEqualTo(element: protractor.ElementFinder , attributeValueToGet: string, expectedValue: string) {
+        expect(element.getAttribute(attributeValueToGet)).toEqual(expectedValue);
+    }
 
 
     function createInterfaceName() {
