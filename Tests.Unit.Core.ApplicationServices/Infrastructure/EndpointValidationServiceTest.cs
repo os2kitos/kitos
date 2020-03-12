@@ -11,13 +11,7 @@ namespace Tests.Unit.Core.Infrastructure
     {
         public EndpointValidationServiceTest()
         {
-            //Configure how htto client handles TLS and cert validation
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Ssl3 |
-                SecurityProtocolType.Tls |
-                SecurityProtocolType.Tls11 |
-                SecurityProtocolType.Tls12;
-            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
+            ServiceEndpointConfiguration.ConfigureValidationOfOutgoingConnections();
         }
 
         [Theory]

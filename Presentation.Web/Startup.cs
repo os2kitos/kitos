@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Services;
 using Hangfire.Common;
+using Infrastructure.Services.Http;
 using Ninject;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
@@ -51,14 +52,7 @@ namespace Presentation.Web
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
-            //Allow all versions of ssl for outgoing connections
-            //NOTE: Once we solve https://os2web.atlassian.net/browse/KITOSUDV-679 we can move the certificate validation to the client handler inside EndpointValidationService.cs in stead of overriding the global configuration
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Ssl3 |
-                SecurityProtocolType.Tls |
-                SecurityProtocolType.Tls11 |
-                SecurityProtocolType.Tls12;
-            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
+            ServiceEndpointConfiguration.ConfigureValidationOfOutgoingConnections();
 
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
