@@ -11,7 +11,10 @@ namespace Tests.Unit.Core.Infrastructure
     {
         [Theory]
         [InlineData("http://127.0.0.1/should-not-be-here/", false, EndpointValidationErrorType.ErrorResponseCode, HttpStatusCode.NotFound)]
-        [InlineData("http://strongminds.dk", true, null, null)]
+        [InlineData("http://kitos.dk", true, null, null)] //will upgrade to https
+        [InlineData("https://kitos.dk", true, null, null)]
+        [InlineData("http://strongminds.dk", true, null, null)] //will upgrade to https
+        [InlineData("https://strongminds.dk", true, null, null)]
         [InlineData("https://google.com", true, null, null)]
         [InlineData("htt:/google.com", false, EndpointValidationErrorType.InvalidWebsiteUri, null)]
         [InlineData("https://d724FF4EE-EA34-4941-88C3-D567958976FF.com", false, EndpointValidationErrorType.DnsLookupFailed, null)]
