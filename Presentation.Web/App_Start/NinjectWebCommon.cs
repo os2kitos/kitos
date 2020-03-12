@@ -8,6 +8,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
