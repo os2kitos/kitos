@@ -3,13 +3,10 @@ using Microsoft.Owin;
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
-using System.Net;
-using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Services;
 using Hangfire.Common;
 using Infrastructure.Services.Http;
-using Ninject;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
@@ -48,7 +45,6 @@ namespace Presentation.Web
             // Initializing the Hangfire scheduler
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
 
-            //TODO: move to app setting if hangfire dashboard is enabled *- default OFF
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
