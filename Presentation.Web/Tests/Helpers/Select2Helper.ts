@@ -60,6 +60,12 @@ class Select2Helper {
         } else {
             expect(findElement().getAttribute("class")).toContain(Select2Helper.disabledSelect2Class);
         }
+
+    }
+
+    public static selectMultiChoiceValue(value: string, elementId: string) {
+        return element(by.id(elementId)).element(by.className("select2-input")).sendKeys(value)
+            .then(() => element(by.className("select2-match")).click());
     }
 }
 export = Select2Helper;

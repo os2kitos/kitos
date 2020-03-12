@@ -1,8 +1,10 @@
 ﻿import constants = require("../../../../Utility/Constants");
+import Select2Helper = require("../../../../Helpers/Select2Helper");
 
 class ItSystemUsageMain {
 
     private static consts = new constants();
+
 
     static getHeaderName() {
         return element(by.id(this.consts.systemUsageHeaderName));
@@ -70,6 +72,10 @@ class ItSystemUsageMain {
 
     static getKLE() {
         return element(by.id(this.consts.mainKLE)).all(by.tagName("td"));
+    }
+
+    static selectMultiChoiceInputField() {
+        return element(by.id("s2id_sensitive-data")).element(by.className("select2-input"));
     }
 
 }
