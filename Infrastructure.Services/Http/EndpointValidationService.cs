@@ -96,7 +96,7 @@ namespace Infrastructure.Services.Http
         private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
         {
             return Policy
-                .Handle<Exception>() //outer policy handles transient protocol errors
+                .Handle<Exception>() //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
                 .WaitAndRetryAsync(BackOffDurations)
                 .ExecuteAsync(() =>
                 {
