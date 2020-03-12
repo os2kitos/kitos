@@ -42,7 +42,9 @@
             "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
             ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
 
-            $scope.usage = itSystemUsage;
+                $scope.usage = itSystemUsage;
+                $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
