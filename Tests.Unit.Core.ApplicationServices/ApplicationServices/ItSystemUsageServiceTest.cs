@@ -8,9 +8,9 @@ using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -39,6 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
 
         public ItSystemUsageServiceTest()
         {
@@ -54,6 +55,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _domainEvents = new Mock<IDomainEvents>();
+            _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -65,7 +67,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _interfaceRepository.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
-                Mock.Of<ILogger>());
+                Mock.Of<ILogger>(),
+                _sensitiveDataLevelRepository.Object);
         }
 
         [Fact]
@@ -845,6 +848,123 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(relations.Ok);
             Assert.Same(relationsFromFirst.OrderBy(x => x.Id).Last(), relations.Value.Single());
+        }
+
+        [Theory]
+        [InlineData(SensitiveDataLevel.NONE)]
+        [InlineData(SensitiveDataLevel.PERSONALDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var addedSensitiveData = result.Value;
+            Assert.Equal(sensitiveDataLevel, addedSensitiveData.SensitiveDataLevel);
+        }
+
+        [Fact]
+        public void AddSensitiveData_Returns_NotFound_If_No_System_Usage()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            //Act
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
+        }
+
+        [Fact]
+        public void AddSensitiveData_Returns_Forbidden_If_User_Not_Allowed_To_Modify()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);
+        }
+
+        [Theory]
+        [InlineData(SensitiveDataLevel.NONE)]
+        [InlineData(SensitiveDataLevel.PERSONALDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            itSystemUsage.SensitiveDataLevels.Add(new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = itSystemUsage,
+                SensitiveDataLevel = sensitiveDataLevel
+            });
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var removedSensitiveData = result.Value;
+            Assert.Equal(sensitiveDataLevel, removedSensitiveData.SensitiveDataLevel);
+        }
+
+        [Fact]
+        public void RemoveSensitiveData_Returns_NotFound_If_No_System_Usage()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
+        }
+
+        [Fact]
+        public void RemoveSensitiveData_Returns_Forbidden_If_User_Not_Allowed_To_Modify()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);
+        }
+
+        private void AssertSensitiveDataLevelError(
+            Result<ItSystemUsageSensitiveDataLevel, OperationError> sensitiveDataLevelResult, OperationFailure failure)
+        {
+            Assert.False(sensitiveDataLevelResult.Ok);
+            var operationError = sensitiveDataLevelResult.Error;
+            Assert.Equal(failure, operationError.FailureType);
         }
 
         private static ItSystemUsage CreateSystemUsageWithRelations(List<SystemRelation> relationsFromFirst, int organizationId)

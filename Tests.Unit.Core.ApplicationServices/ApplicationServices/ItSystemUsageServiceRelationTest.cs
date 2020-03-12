@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -43,6 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ILogger> _mockLogger;
         private readonly ItSystemUsageService _sut;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _mockSensitiveDataLevelRepository;
 
         public ItSystemUsageServiceRelationTest()
         {
@@ -53,6 +55,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockOptionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
             _mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
             _mockSystemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
+            _mockSensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _mockTransactionManager = new Mock<ITransactionManager>();
             _mockLogger = new Mock<ILogger>();
             _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
@@ -69,7 +72,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _interfaceRepository.Object,
                 _mockTransactionManager.Object,
                 Mock.Of<IDomainEvents>(),
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockSensitiveDataLevelRepository.Object);
         }
 
         [Theory]

@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItSystemUsage.GDPR
 {
-    public enum DataSensitivityLevel
+    public enum SensitiveDataLevel
     {
         NONE = 0,
         PERSONALDATA = 1,

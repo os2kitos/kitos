@@ -3,6 +3,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -232,6 +233,94 @@ namespace Tests.Unit.Core.Model
         }
 
         private static void AssertErrorResult(Result<SystemRelation, OperationError> result, string message, OperationFailure error)
+        {
+            Assert.False(result.Ok);
+            var operationError = result.Error;
+            Assert.Equal(error, operationError.FailureType);
+            Assert.True(operationError.Message.HasValue);
+            Assert.Equal(message, operationError.Message.Value);
+        }
+
+        [Theory]
+        [InlineData(SensitiveDataLevel.NONE)]
+        [InlineData(SensitiveDataLevel.PERSONALDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        {
+            //Arrange
+            var activeUser = new User();
+
+            //Act
+            var result = _sut.AddSensitiveDataLevel(activeUser, sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var usageSensitiveDataLevel = result.Value;
+            Assert.Equal(sensitiveDataLevel, usageSensitiveDataLevel.SensitiveDataLevel);
+            Assert.Single(_sut.SensitiveDataLevels);
+
+        }
+
+        [Fact]
+        public void AddSensitiveData_Fails_With_Conflict_If_Sensitivity_Level_Already_Exists()
+        {
+            //Arrange
+            var activeUser = new User();
+            var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                SensitiveDataLevel = SensitiveDataLevel.NONE
+            };
+            _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
+
+            //Act
+            var result = _sut.AddSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertErrorResult(result, "Data sensitivity level already exists", OperationFailure.Conflict);
+        }
+
+        [Theory]
+        [InlineData(SensitiveDataLevel.NONE)]
+        [InlineData(SensitiveDataLevel.PERSONALDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        {
+            //Arrange
+            var activeUser = new User();
+            var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = _sut,
+                SensitiveDataLevel = sensitiveDataLevel
+            };
+            _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(activeUser, sensitiveDataLevel);
+
+            //Assert
+            Assert.True(result.Ok);
+            var usageSensitiveDataLevel = result.Value;
+            Assert.Equal(preAddedSensitiveDataLevel, usageSensitiveDataLevel);
+            Assert.Empty(_sut.SensitiveDataLevels);
+
+        }
+
+        [Fact]
+        public void RemoveSensitiveData_Fails_With_NotFound_If_Sensitivity_Level_Does_Not_Exist()
+        {
+            //Arrange
+            var activeUser = new User();
+
+            //Act
+            var result = _sut.RemoveSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+
+            //Assert
+            AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+        }
+
+        private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
             var operationError = result.Error;

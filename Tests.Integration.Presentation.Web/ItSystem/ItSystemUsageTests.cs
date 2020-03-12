@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -124,6 +125,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
+        }
+
+        [Fact]
+        public async Task Can_Add_SensitiveDataLevel()
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var test = SensitiveDataLevel.NONE;
         }
     }
 }

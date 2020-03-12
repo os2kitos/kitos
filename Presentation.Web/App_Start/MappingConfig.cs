@@ -478,7 +478,7 @@ namespace Presentation.Web
             Mapper.CreateMap<ExcelImportError, ExcelImportErrorDTO>();
 
             Mapper.CreateMap<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>()
-                .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitivityDataLevel));
+                .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitiveDataLevel));
         }
     }
 }

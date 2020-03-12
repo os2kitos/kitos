@@ -562,12 +562,12 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
             User activeUser,
-            DataSensitivityLevel dataLevel)
+            SensitiveDataLevel sensitiveDataLevel)
         {
             if (activeUser == null)
                 throw new ArgumentNullException(nameof(activeUser));
 
-            if (SensitiveDataLevelExists(dataLevel))
+            if (SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity level already exists", OperationFailure.Conflict);
             }
@@ -575,7 +575,7 @@ namespace Core.DomainModel.ItSystemUsage
             var newDataLevel = new ItSystemUsageSensitiveDataLevel()
             {
                 ItSystemUsage = this,
-                SensitivityDataLevel = dataLevel
+                SensitiveDataLevel = sensitiveDataLevel
             };
 
             SensitiveDataLevels.Add(newDataLevel);
@@ -588,17 +588,17 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
             User activeUser,
-            DataSensitivityLevel dataLevel)
+            SensitiveDataLevel sensitiveDataLevel)
         {
             if (activeUser == null)
                 throw new ArgumentNullException(nameof(activeUser));
 
-            if (!SensitiveDataLevelExists(dataLevel))
+            if (!SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
             }
 
-            var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == dataLevel);
+            var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitiveDataLevel == sensitiveDataLevel);
             SensitiveDataLevels.Remove(dataLevelToRemove);
 
             LastChangedByUser = activeUser;
@@ -607,9 +607,9 @@ namespace Core.DomainModel.ItSystemUsage
             return dataLevelToRemove;
         }
 
-        private bool SensitiveDataLevelExists(DataSensitivityLevel dataLevel)
+        private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
         {
-            return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == dataLevel);
+            return SensitiveDataLevels.Any(x => x.SensitiveDataLevel == sensitiveDataLevel);
         }
     }
 }
