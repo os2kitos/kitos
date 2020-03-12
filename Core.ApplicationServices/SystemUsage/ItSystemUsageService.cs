@@ -440,7 +440,7 @@ namespace Core.ApplicationServices.SystemUsage
                     );
         }
 
-        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, DataSensitivityLevel dataSensitivityLevel)
         {
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
@@ -452,7 +452,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError(OperationFailure.Forbidden);
 
             return usage
-                .AddSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .AddSensitiveDataLevel(_userContext.UserEntity, dataSensitivityLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
                     onSuccess: addedSensitivityLevel =>
@@ -464,7 +464,7 @@ namespace Core.ApplicationServices.SystemUsage
                 );
         }
 
-        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, DataSensitivityLevel dataSensitivityLevel)
         {
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
@@ -476,7 +476,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError(OperationFailure.Forbidden);
 
             return usage
-                .RemoveSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .RemoveSensitiveDataLevel(_userContext.UserEntity, dataSensitivityLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
                     onSuccess: removedSensitivityLevel =>

@@ -6,6 +6,6 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
     {
         public int Id { get; set; }
         public virtual ItSystemUsage ItSystemUsage { get; set; }
-        public SensitiveDataLevel SensitiveDataLevel { get; set; }
+        public DataSensitivityLevel DataSensitivityLevel { get; set; }
     }
 }

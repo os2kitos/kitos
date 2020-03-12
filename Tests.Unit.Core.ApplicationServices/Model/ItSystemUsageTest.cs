@@ -242,22 +242,22 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(SensitiveDataLevel.NONE)]
-        [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
-        public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        [InlineData(DataSensitivityLevel.NONE)]
+        [InlineData(DataSensitivityLevel.PERSONALDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALLEGALDATA)]
+        public void AddSensitiveData_Returns_Ok(DataSensitivityLevel dataSensitivityLevel)
         {
             //Arrange
             var activeUser = new User();
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(activeUser, sensitiveDataLevel);
+            var result = _sut.AddSensitiveDataLevel(activeUser, dataSensitivityLevel);
 
             //Assert
             Assert.True(result.Ok);
             var usageSensitiveDataLevel = result.Value;
-            Assert.Equal(sensitiveDataLevel, usageSensitiveDataLevel.SensitiveDataLevel);
+            Assert.Equal(dataSensitivityLevel, usageSensitiveDataLevel.DataSensitivityLevel);
             Assert.Single(_sut.SensitiveDataLevels);
 
         }
@@ -269,35 +269,35 @@ namespace Tests.Unit.Core.Model
             var activeUser = new User();
             var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
             {
-                SensitiveDataLevel = SensitiveDataLevel.NONE
+                DataSensitivityLevel = DataSensitivityLevel.NONE
             };
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+            var result = _sut.AddSensitiveDataLevel(activeUser, DataSensitivityLevel.NONE);
 
             //Assert
             AssertErrorResult(result, "Data sensitivity level already exists", OperationFailure.Conflict);
         }
 
         [Theory]
-        [InlineData(SensitiveDataLevel.NONE)]
-        [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
-        public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        [InlineData(DataSensitivityLevel.NONE)]
+        [InlineData(DataSensitivityLevel.PERSONALDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALLEGALDATA)]
+        public void RemoveSensitiveData_Returns_Ok(DataSensitivityLevel dataSensitivityLevel)
         {
             //Arrange
             var activeUser = new User();
             var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
             {
                 ItSystemUsage = _sut,
-                SensitiveDataLevel = sensitiveDataLevel
+                DataSensitivityLevel = dataSensitivityLevel
             };
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(activeUser, sensitiveDataLevel);
+            var result = _sut.RemoveSensitiveDataLevel(activeUser, dataSensitivityLevel);
 
             //Assert
             Assert.True(result.Ok);
@@ -314,7 +314,7 @@ namespace Tests.Unit.Core.Model
             var activeUser = new User();
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+            var result = _sut.RemoveSensitiveDataLevel(activeUser, DataSensitivityLevel.NONE);
 
             //Assert
             AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);

@@ -851,11 +851,11 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Theory]
-        [InlineData(SensitiveDataLevel.NONE)]
-        [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
-        public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        [InlineData(DataSensitivityLevel.NONE)]
+        [InlineData(DataSensitivityLevel.PERSONALDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALLEGALDATA)]
+        public void AddSensitiveData_Returns_Ok(DataSensitivityLevel dataSensitivityLevel)
         {
             //Arrange
             var itSystem = CreateItSystem();
@@ -864,12 +864,12 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, sensitiveDataLevel);
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, dataSensitivityLevel);
 
             //Assert
             Assert.True(result.Ok);
             var addedSensitiveData = result.Value;
-            Assert.Equal(sensitiveDataLevel, addedSensitiveData.SensitiveDataLevel);
+            Assert.Equal(dataSensitivityLevel, addedSensitiveData.DataSensitivityLevel);
         }
 
         [Fact]
@@ -880,7 +880,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, DataSensitivityLevel.NONE);
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
@@ -896,18 +896,18 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+            var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, DataSensitivityLevel.NONE);
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);
         }
 
         [Theory]
-        [InlineData(SensitiveDataLevel.NONE)]
-        [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
-        public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
+        [InlineData(DataSensitivityLevel.NONE)]
+        [InlineData(DataSensitivityLevel.PERSONALDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALDATANDSENSITIVEDATA)]
+        [InlineData(DataSensitivityLevel.PERSONALLEGALDATA)]
+        public void RemoveSensitiveData_Returns_Ok(DataSensitivityLevel dataSensitivityLevel)
         {
             //Arrange
             var itSystem = CreateItSystem();
@@ -915,18 +915,18 @@ namespace Tests.Unit.Core.ApplicationServices
             itSystemUsage.SensitiveDataLevels.Add(new ItSystemUsageSensitiveDataLevel()
             {
                 ItSystemUsage = itSystemUsage,
-                SensitiveDataLevel = sensitiveDataLevel
+                DataSensitivityLevel = dataSensitivityLevel
             });
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, sensitiveDataLevel);
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, dataSensitivityLevel);
 
             //Assert
             Assert.True(result.Ok);
             var removedSensitiveData = result.Value;
-            Assert.Equal(sensitiveDataLevel, removedSensitiveData.SensitiveDataLevel);
+            Assert.Equal(dataSensitivityLevel, removedSensitiveData.DataSensitivityLevel);
         }
 
         [Fact]
@@ -937,7 +937,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, DataSensitivityLevel.NONE);
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
@@ -953,7 +953,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
+            var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, DataSensitivityLevel.NONE);
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);

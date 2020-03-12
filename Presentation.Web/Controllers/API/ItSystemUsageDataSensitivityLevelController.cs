@@ -54,13 +54,13 @@ namespace Presentation.Web.Controllers.API
             );
         }
 
-        private SensitiveDataLevel MapSensitivityLevel(int input)
+        private DataSensitivityLevel MapSensitivityLevel(int input)
         {
-            if (Enum.IsDefined(typeof(SensitiveDataLevel), input))
+            if (Enum.IsDefined(typeof(DataSensitivityLevel), input))
             {
-                return (SensitiveDataLevel)input;
+                return (DataSensitivityLevel)input;
             }
-            throw new InvalidEnumArgumentException(nameof(input), input, typeof(SensitiveDataLevel));
+            throw new InvalidEnumArgumentException(nameof(input), input, typeof(DataSensitivityLevel));
         }
     }
 }

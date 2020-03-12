@@ -101,18 +101,18 @@ namespace Core.ApplicationServices.SystemUsage
         /// Adds information about which data sensitivity levels are applied to the system usage />
         /// </summary>
         /// <param name="itSystemUsageId"></param>
-        /// <param name="sensitiveDataLevel"></param>
+        /// <param name="dataSensitivityLevel"></param>
         /// <returns></returns>
         Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId,
-            SensitiveDataLevel sensitiveDataLevel);
+            DataSensitivityLevel dataSensitivityLevel);
 
         /// <summary>
         /// Removes information about which data sensitivity levels are applied to the system usage />
         /// </summary>
         /// <param name="itSystemUsageId"></param>
-        /// <param name="sensitiveDataLevel"></param>
+        /// <param name="dataSensitivityLevel"></param>
         /// <returns></returns>
         Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId,
-            SensitiveDataLevel sensitiveDataLevel);
+            DataSensitivityLevel dataSensitivityLevel);
     }
 }

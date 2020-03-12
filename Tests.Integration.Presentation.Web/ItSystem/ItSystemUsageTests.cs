@@ -136,7 +136,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var test = SensitiveDataLevel.NONE;
+
+            //Act
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, DataSensitivityLevel.NONE);
+
         }
     }
 }
