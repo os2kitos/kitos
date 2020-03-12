@@ -15,6 +15,12 @@ namespace Infrastructure.Services.Http
     {
         private const string ChromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36";
         private const string AnyMediaType = "*/*";
+        private static readonly IEnumerable<string> ErrorContentWhichShouldNotBeRetried = new[]
+        {
+            "Unable to connect to the remote server",
+            "An existing connection was forcibly closed by the remote host",
+            "The remote name could not be resolved"
+        };
 
         private readonly ILogger _logger;
 
@@ -88,9 +94,6 @@ namespace Infrastructure.Services.Http
             {
                 _logger.Information(e, "Failed to validate url {url}", url);
 
-                //TODO: Remove this
-                Console.Out.WriteLine($"FAILED to validate. Error: {BuildExceptionChain(e)}");
-
                 //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
                 return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.CommunicationError));
             }
@@ -99,7 +102,7 @@ namespace Infrastructure.Services.Http
         private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
         {
             return Policy
-                .Handle<Exception>() //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                .Handle<Exception>(ShouldRetryException) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
                 .WaitAndRetryAsync(BackOffDurations, onRetry: HandleFailedRequest)
                 .ExecuteAsync(() =>
                 {
@@ -108,6 +111,18 @@ namespace Infrastructure.Services.Http
                         .WaitAndRetryAsync(BackOffDurations, onRetry: HandleFailedRequest)
                         .ExecuteAsync(() => Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)));
                 });
+        }
+
+        private static bool ShouldRetryException(Exception arg)
+        {
+            if (arg is TaskCanceledException)
+            {
+                //Timeout due to unresponsive host - do not retry
+                return false;
+            }
+            var exceptionChain = BuildExceptionChain(arg);
+            var shouldIgnore = ErrorContentWhichShouldNotBeRetried.Any(content => exceptionChain.IndexOf(content, StringComparison.OrdinalIgnoreCase) != -1);
+            return shouldIgnore == false;
         }
 
         private static IEnumerable<TimeSpan> CreateDurations(params int[] durationInSeconds)
