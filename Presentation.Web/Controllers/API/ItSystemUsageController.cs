@@ -8,7 +8,6 @@ using System.Security;
 using System.Web.Http;
 using Castle.Core.Internal;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
@@ -28,20 +27,17 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
-        private readonly IGenericRepository<AttachedOption> _attachedOptionsRepository;
 
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IItSystemUsageService itSystemUsageService,
-            IGenericRepository<AttachedOption> attachedOptionsRepository)
+            IItSystemUsageService itSystemUsageService)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
-            _attachedOptionsRepository = attachedOptionsRepository;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
@@ -147,17 +143,6 @@ namespace Presentation.Web.Controllers.API
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
-
-                    //copy attached options from system to systemusage
-                    var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
-                    foreach (var option in attachedOptions)
-                    {
-                        option.ObjectId = sysUsage.Id;
-                        option.ObjectType = EntityType.ITSYSTEMUSAGE;
-                        _attachedOptionsRepository.Insert(option);
-                    }
-                    _attachedOptionsRepository.Save();
-
 
                     return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }

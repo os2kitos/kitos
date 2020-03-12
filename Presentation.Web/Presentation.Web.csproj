@@ -446,8 +446,7 @@
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsFunctionController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsRegularPersonalDataController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsSensitivePersonalDataController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsSensitivePersonalDataController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
     <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
@@ -491,7 +490,6 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
@@ -520,7 +518,6 @@
     <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />

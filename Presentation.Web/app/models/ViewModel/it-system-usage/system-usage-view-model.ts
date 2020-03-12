@@ -29,9 +29,13 @@
         isActive: boolean;
         active: boolean;
         sensitiveDataLevels: SensitiveDataLevel[];
+        showPersonalData: boolean;
+        showSensitivePersonalData: boolean;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
+        showPersonalData: boolean;
+        showSensitivePersonalData: boolean;
         sensitiveDataLevels: SensitiveDataLevel[];
         id: number;
         organizationId: number;
@@ -50,9 +54,13 @@
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
             this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
+            this.showPersonalData = _.some(this.sensitiveDataLevels,
+                x => x === SensitiveDataLevel.PERSONALDATA || x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
+            this.showSensitivePersonalData = _.some(this.sensitiveDataLevels,
+                x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
         }
 
-        mapDataLevels(dataLevel: any) {
+        mapDataLevels(dataLevel: any) : SensitiveDataLevel {
             switch (dataLevel.dataSensitivityLevel) {
                 case 0:
                     return SensitiveDataLevel.NONE;
@@ -62,7 +70,11 @@
                     return SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA;
                 case 3:
                     return SensitiveDataLevel.PERSONALLEGALDATA;
+                default:
+                    throw new RangeError(`${dataLevel.dataSensitivityLevel} is not a valid SensitiveDataLevel`);
             }
         }
+
+
     }
 }

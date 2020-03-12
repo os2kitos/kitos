@@ -123,12 +123,10 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
-        public DbSet<LocalRegularPersonalDataType> LocalRegularPersonalDataTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
         public DbSet<AdviceSent> AdviceSent { get; set; }
-        public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
         public DbSet<DataResponsible> DataResponsibles { get; set; }
@@ -216,7 +214,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
