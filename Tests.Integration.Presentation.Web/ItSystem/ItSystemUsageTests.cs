@@ -138,7 +138,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
             //Act
-            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, DataSensitivityLevel.NONE);
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, SensitiveDataLevel.NONE);
 
         }
     }

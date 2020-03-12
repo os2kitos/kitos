@@ -13,11 +13,11 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class ItSystemUsageHelper
     {
-        public static async Task AddSensitiveDataLevel(int systemUsageId, DataSensitivityLevel dataSensitivityLevel)
+        public static async Task AddSensitiveDataLevel(int systemUsageId, SensitiveDataLevel sensitiveDataLevel)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var okResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add/{dataSensitivityLevel}"), cookie, null))
+            using (var okResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/add/{sensitiveDataLevel}"), cookie, null))
             {
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
                 
