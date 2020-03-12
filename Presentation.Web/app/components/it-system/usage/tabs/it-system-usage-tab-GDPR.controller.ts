@@ -90,10 +90,7 @@
                 } else {
                     let OptType = 0;
                     switch (optionType) {
-                        case "REGULARPERSONALDATA":
-                            OptType = 0; 
-                            break;
-                        case "SENSITIVEPERSONALDATA":
+                    case "SENSITIVEPERSONALDATA":
                             OptType = 1; 
                             break;
                         case "REGISTERTYPEDATA":
