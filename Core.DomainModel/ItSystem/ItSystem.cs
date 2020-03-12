@@ -22,8 +22,21 @@ namespace Core.DomainModel.ItSystem
             AccessTypes = new List<AccessType>();
             Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
-
         }
+
+        public int? BelongsToId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the organization the system belongs to.
+        /// </summary>
+        /// <remarks>
+        /// Belongs to is a OIO term - think "produced by".
+        /// </remarks>
+        /// <value>
+        /// The organization the it system belongs to.
+        /// </value>
+        public virtual Organization.Organization BelongsTo { get; set; }
+
 
         /// <summary>
         /// Gets or sets the user defined system identifier.

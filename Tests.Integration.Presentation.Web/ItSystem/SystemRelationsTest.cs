@@ -415,7 +415,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var targetInterface = Maybe<ItInterfaceDTO>.None;
             if (withInterface)
             {
-                targetInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), null, OrganizationId, AccessModifier.Public));
+                targetInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), OrganizationId, AccessModifier.Public));
                 await InterfaceExhibitHelper.CreateExhibit(system2.Id, targetInterface.Value.Id);
             }
 

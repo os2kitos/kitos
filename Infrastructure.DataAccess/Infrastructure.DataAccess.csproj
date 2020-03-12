@@ -562,6 +562,10 @@
     <Compile Include="Migrations\202003021344549_Archive_Duty_Changes.Designer.cs">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.cs" />
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.Designer.cs">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -921,6 +925,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003021344549_Archive_Duty_Changes.resx">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003091419426_BelongsToRemovedFromInterface.resx">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
