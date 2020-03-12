@@ -10,13 +10,11 @@
 
     public enum OptionType
     {
-        REGULARPERSONALDATA,
-        SENSITIVEPERSONALDATA,
-        REGISTERTYPEDATA
+        SENSITIVEPERSONALDATA = 1,
+        REGISTERTYPEDATA = 2
     }
     public enum EntityType
     {
-        ITSYSTEM,
-        ITSYSTEMUSAGE
+        ITSYSTEMUSAGE = 1
     }
 }

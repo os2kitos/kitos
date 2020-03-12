@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
@@ -16,8 +17,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         public AttachedOptionsRegisterTypesController(
                 IGenericRepository<AttachedOption> repository,
                 IGenericRepository<RegisterType> registerTypeRepository,
-                IGenericRepository<LocalRegisterType> localRegisterTypeRepository)
-               : base(repository, registerTypeRepository, localRegisterTypeRepository)
+                IGenericRepository<LocalRegisterType> localRegisterTypeRepository,
+                IItSystemUsageRepository usageRepository)
+               : base(repository, registerTypeRepository, localRegisterTypeRepository, usageRepository)
         {
 
         }

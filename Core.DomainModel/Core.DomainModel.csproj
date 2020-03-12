@@ -63,6 +63,7 @@
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
+    <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
@@ -100,7 +101,6 @@
     <Compile Include="ItSystem\DataLevelTypes\DataTypes.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="ItSystem\SensitivePersonalDataType.cs" />
-    <Compile Include="ItSystem\RegularPersonalDataType.cs" />
     <Compile Include="ItSystem\ItSystemCategories.cs" />
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
@@ -128,7 +128,6 @@
     <Compile Include="LocalOptions\LocalTerminationDeadlineType.cs" />
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
-    <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
