@@ -97,7 +97,7 @@ namespace Infrastructure.Services.Http
         {
             return Policy
                 .Handle<Exception>() //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
-                .WaitAndRetryAsync(BackOffDurations)
+                .WaitAndRetryAsync(BackOffDurations, onRetry: HandleFailedRequest)
                 .ExecuteAsync(() =>
                 {
                     return Policy
@@ -110,6 +110,18 @@ namespace Infrastructure.Services.Http
         private static IEnumerable<TimeSpan> CreateDurations(params int[] durationInSeconds)
         {
             return durationInSeconds.Select(s => TimeSpan.FromSeconds(s)).ToArray();
+        }
+
+        private void HandleFailedRequest(Exception exception, TimeSpan timeSpan, int retryCount, Context context)
+        {
+            _logger.Warning("{correlationId}: Request failed exception of chain {exnChain}. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), BuildExceptionChain(exception), timeSpan, retryCount);
+        }
+
+        private static string BuildExceptionChain(Exception exception)
+        {
+            return exception == null
+                ? "END_OF_CHAIN"
+                : $"{exception.GetType().Name}('0x{exception.HResult:X}','{exception.Message}')-->{BuildExceptionChain(exception.InnerException)}";
         }
 
         private void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
