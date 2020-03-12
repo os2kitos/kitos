@@ -7,13 +7,6 @@
         InterfaceId: number;
         /** Gets or sets the interface option.Provides details about an it system of type interface. */
         Interface: IInterface;
-        InterfaceTypeId: number;
-        /** Gets or sets the type of the interface.Provides details about an it system of type interface. */
-        InterfaceType: IInterfaceType;
-        TsaId: number;
-        Tsa: ITsa;
-        MethodId: number;
-        Method: IMethod;
         DataRows: Array<IDataRow>;
         Note: string;
         Disabled: boolean;

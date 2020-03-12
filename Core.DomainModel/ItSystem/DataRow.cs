@@ -12,7 +12,6 @@ namespace Core.DomainModel.ItSystem
     {
         public DataRow()
         {
-            this.Usages = new List<DataRowUsage>();
         }
 
         public int ItInterfaceId { get; set; }
@@ -31,11 +30,6 @@ namespace Core.DomainModel.ItSystem
         /// Description/name of the data
         /// </summary>
         public string Data { get; set; }
-
-        /// <summary>
-        /// Local usages of this exposition
-        /// </summary>
-        public virtual ICollection<DataRowUsage> Usages { get; set; }
 
         /// <summary>
         /// Determines whether a user has write access to this instance.

@@ -5,13 +5,14 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Model.Result;
 using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -45,8 +46,8 @@ namespace Presentation.Web.Controllers.API
 
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
-                var refinement = entityAccessLevel == EntityReadAccessLevel.All ? 
-                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.None : 
+                var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.None :
                     Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
 
                 var mainQuery = Repository.AsQueryable();
@@ -55,9 +56,9 @@ namespace Presentation.Web.Controllers.API
                     .Select(x => x.Apply(mainQuery))
                     .GetValueOrFallback(mainQuery);
 
-                var requiresPostFiltering = 
+                var requiresPostFiltering =
                     refinement
-                        .Select(x=>x.RequiresPostFiltering())
+                        .Select(x => x.RequiresPostFiltering())
                         .GetValueOrFallback(false);
 
                 if (requiresPostFiltering)
@@ -109,30 +110,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// GET api/T/id?hasWriteAccess
-        /// Returns whether the current authenticated user has write access
-        /// to the object with the given id
-        /// </summary>
-        /// <param name="id">The id of the object</param>
-        /// <param name="organizationId"></param>
-        /// <param name="hasWriteAccess">Route qualifier</param>
-        /// <returns>True or false</returns>
-        public HttpResponseMessage GetHasWriteAccess(int id, int organizationId, bool? hasWriteAccess)
-        {
-            try
-            {
-                var entity = Repository.GetByKey(id);
-                var allowWriteAccess = AllowModify(entity);
-
-                return Ok(allowWriteAccess);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
         /// GET api/T/GetAccessRights
         /// Checks what access rights the user has for the given entities
         /// </summary>
@@ -161,12 +138,41 @@ namespace Presentation.Web.Controllers.API
             {
                 return NotFound();
             }
-            return Ok(new EntityAccessRightsDTO
+            return Ok(GetAccessRightsForEntity(item));
+        }
+
+        private EntityAccessRightsDTO GetAccessRightsForEntity(TModel item)
+        {
+            return new EntityAccessRightsDTO
             {
+                Id = item.Id,
                 CanDelete = AllowDelete(item),
                 CanEdit = AllowModify(item),
                 CanView = AllowRead(item)
-            });
+            };
+        }
+
+        /// <summary>
+        /// POST api/T/idListAsCsv?getEntityListAccessRights
+        /// Uses POST verb to allow use of body for potentially long list of ids
+        /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
+        /// </summary>
+        /// <param name="ids">The ids of the objects</param>
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]int[] ids, bool? getEntityListAccessRights)
+        {
+            if (ids == null || ids.Length == 0)
+            {
+                return BadRequest();
+            }
+
+            return Ok(
+                ids
+                    .Distinct()
+                    .Select(id => Repository.GetByKey(id))
+                    .Where(entity => entity != null)
+                    .Select(GetAccessRightsForEntity)
+                    .ToList()
+            );
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -323,6 +329,19 @@ namespace Presentation.Web.Controllers.API
                         var value = valuePair.Value.Value<string>();
                         var enumValue = Enum.Parse(t, value, true);
                         propRef.SetValue(item, enumValue);
+                    }
+                    else if (t.IsNullableEnum())
+                    {
+                        var value = valuePair.Value.Value<string>();
+                        if (value == null)
+                        {
+                            propRef.SetValue(item, null);
+                        }
+                        else
+                        {
+                            var enumValue = Enum.Parse(Nullable.GetUnderlyingType(t), value, true);
+                            propRef.SetValue(item, enumValue);
+                        }
                     }
                     // parse null values properly
                     else if (t.IsEquivalentTo(typeof(int?)))

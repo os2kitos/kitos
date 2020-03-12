@@ -3,28 +3,22 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Core.DomainModel;
+using Infrastructure.DataAccess;
 
 namespace Tools.Test.Database.Model.Tasks
 {
     public class EnableAllOptionsTask : DatabaseTask
     {
-        public EnableAllOptionsTask(string connectionString) : base(connectionString)
+        public override bool Execute(KitosContext context)
         {
-        }
+            var optionTypes = LoadAllOptionTypes();
 
-        public override bool Execute()
-        {
-            using (var context = CreateKitosContext())
+            foreach (var optionType in optionTypes)
             {
-                var optionTypes = LoadAllOptionTypes();
-
-                foreach (var optionType in optionTypes)
-                {
-                    Console.Out.WriteLine("Enabling all options of type:" + optionType.Name);
-                    var dbSet = context.Set(optionType).ToListAsync().GetAwaiter().GetResult();
-                    EnableAllLocalOptions(dbSet);
-                    context.SaveChanges();
-                }
+                Console.Out.WriteLine("Enabling all options of type:" + optionType.Name);
+                var dbSet = context.Set(optionType).ToListAsync().GetAwaiter().GetResult();
+                EnableAllLocalOptions(dbSet);
+                context.SaveChanges();
             }
 
             return true;
@@ -54,11 +48,15 @@ namespace Tools.Test.Database.Model.Tasks
         {
             foreach (dynamic localOption in contextLocalGoalTypes)
             {
-                localOption.IsLocallyAvailable = true;  
-                localOption.IsEnabled = true;       
+                localOption.IsLocallyAvailable = true;
+                localOption.IsEnabled = true;
                 localOption.IsObligatory = true;    //Makes it immediately available in all organizations
             }
+        }
 
+        public override string ToString()
+        {
+            return $"Task: {GetType().Name}.";
         }
     }
 }

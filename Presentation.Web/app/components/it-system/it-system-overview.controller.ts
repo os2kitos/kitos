@@ -16,7 +16,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
         private orgUnitStorageKey = "it-system-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
 
         public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
@@ -81,7 +81,7 @@
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
-              }
+        }
 
         private fixKleIdFilter(filterUrl, column) {
             var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
@@ -106,16 +106,12 @@
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -124,14 +120,7 @@
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
 
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-            // find the kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
 
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
@@ -164,10 +153,12 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
+
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
         };
+
         private activate() {
             // overview grid options
             var mainGridOptions: Kitos.IKendoGridOptions<IItSystemUsageOverview> = {
@@ -177,7 +168,19 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=BelongsTo,BusinessType,Parent,TaskRefs),\
+ArchivePeriods,\
+Reference,\
+Organization,\
+ResponsibleUsage($expand=OrganizationUnit),\
+MainContract($expand=ItContract($expand=Supplier)),\
+Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),\
+Rights($expand=User,Role),\
+ArchiveType,\
+SensitiveDataType,\
+ObjectOwner,\
+LastChangedByUser,\
+ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -243,7 +246,7 @@
                         },
                         parse: response => {
                             // HACK to flattens the Rights on usage so they can be displayed as single columns
-                            
+
                             // iterrate each usage
                             this._.forEach(response.value, usage => {
                                 usage.roles = [];
@@ -260,12 +263,12 @@
                                 if (!usage.ItSystem.Parent) { usage.ItSystem.Parent = { Name: "" }; }
                                 if (!usage.ResponsibleUsage) { usage.ResponsibleUsage = { OrganizationUnit: { Name: "" } }; }
                                 if (!usage.ItSystem.BusinessType) { usage.ItSystem.BusinessType = { Name: "" }; }
-                                if (!usage.ItSystem.AppTypeOption) { usage.ItSystem.AppTypeOption = { Name: "" }; }
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                                 if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!usage.MainContract.ItContract.Supplier) { usage.MainContract.ItContract.Supplier = { Name: "" }; }
+                                if (!usage.ItSystem.BelongsTo) { usage.ItSystem.BelongsTo = { Name: "" }; }
                             });
                             return response;
                         }
@@ -323,11 +326,11 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
-                page:this.onPaging,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        persistId: "isActive",
                         template: dataItem => {
                             if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
@@ -344,7 +347,7 @@
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
-                        persistId: "localid", // DON'T YOU DARE RENAME!
+                        persistId: "localid",
                         excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
                         hidden: true,
                         filterable: {
@@ -359,7 +362,7 @@
                     },
                     {
                         field: "ItSystem.Uuid", title: "UUID", width: 150,
-                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        persistId: "uuid",
                         excelTemplate: dataItem => dataItem.ItSystem.Uuid,
                         hidden: true,
                         filterable: {
@@ -373,7 +376,7 @@
                     },
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
-                        persistId: "parentsysname", // DON'T YOU DARE RENAME!
+                        persistId: "parentsysname",
                         template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
                         hidden: true,
                         filterable: {
@@ -386,8 +389,8 @@
                         }
                     },
                     {
-                        field: "SystemName", title: "IT System", width: 320, 
-                        persistId: "sysname", // DON'T YOU DARE RENAME!
+                        field: "SystemName", title: "IT System", width: 320,
+                        persistId: "sysname",
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
@@ -421,7 +424,7 @@
                     },
                     {
                         field: "Version", title: "Version", width: 150,
-                        persistId: "version", // DON'T YOU DARE RENAME!
+                        persistId: "version",
                         excelTemplate: dataItem => dataItem && dataItem.Version || "",
                         hidden: true,
                         filterable: {
@@ -435,7 +438,7 @@
                     },
                     {
                         field: "LocalCallName", title: "Lokal kaldenavn", width: 150,
-                        persistId: "localname", // DON'T YOU DARE RENAME!
+                        persistId: "localname",
                         excelTemplate: dataItem => dataItem && dataItem.LocalCallName || "",
                         hidden: true,
                         filterable: {
@@ -449,7 +452,7 @@
                     },
                     {
                         field: "ResponsibleUsage.OrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 190,
-                        persistId: "orgunit", // DON'T YOU DARE RENAME!
+                        persistId: "orgunit",
                         template: dataItem => dataItem.ResponsibleUsage ? dataItem.ResponsibleUsage.OrganizationUnit.Name : "",
                         filterable: {
                             cell: {
@@ -460,7 +463,7 @@
                     },
                     {
                         field: "ItSystem.BusinessType.Name", title: "Forretningstype", width: 150,
-                        persistId: "busitype", // DON'T YOU DARE RENAME!
+                        persistId: "busitype",
                         template: dataItem => dataItem.ItSystem.BusinessType ? dataItem.ItSystem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -473,22 +476,8 @@
                         }
                     },
                     {
-                        field: "ItSystem.AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ItSystem.AppTypeOption ? dataItem.ItSystem.AppTypeOption.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
-                        persistId: "taskkey", // DON'T YOU DARE RENAME!
+                        persistId: "taskkey",
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -504,7 +493,7 @@
                     },
                     {
                         field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
-                        persistId: "klename", // DON'T YOU DARE RENAME!
+                        persistId: "klename",
                         template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
@@ -519,17 +508,20 @@
                     },
                     {
                         field: "Reference.Title", title: "Reference", width: 150,
-                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        persistId: "ReferenceId",
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (Utility.Validation.validateUrl(reference.URL)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -543,11 +535,11 @@
                     },
                     {
                         field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
-                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        persistId: "folderref",
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.ExternalReferenceId) {
+                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
@@ -558,6 +550,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -572,15 +567,15 @@
                     },
                     {
                         field: "DataLevel", title: "Datatype", width: 150,
-                        persistId: "dataLevel", // DON'T YOU DARE RENAME!
+                        persistId: "dataLevel",
                         template: dataItem => {
                             switch (dataItem.DataLevel) {
                                 case "PERSONALDATA":
                                     return "Persondata";
                                 case "PERSONALDATANDSENSITIVEDATA":
                                     return "Persondata og følsomme persondata";
-                            default:
-                                return "Ingen persondata";
+                                default:
+                                    return "Ingen persondata";
                             }
                         },
                         attributes: { "class": "might-overflow" },
@@ -601,7 +596,7 @@
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
-                        persistId: "contract", // DON'T YOU DARE RENAME!
+                        persistId: "contract",
                         template: dataItem => {
                             if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
@@ -625,7 +620,7 @@
                     },
                     {
                         field: "MainContract.ItContract.Supplier.Name", title: "Leverandør", width: 175,
-                        persistId: "supplier", // DON'T YOU DARE RENAME!
+                        persistId: "supplier",
                         template: dataItem =>
                             dataItem.MainContract &&
                             dataItem.MainContract.ItContract &&
@@ -641,8 +636,27 @@
                         }
                     },
                     {
+                        field: "ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 210,
+                        persistId: "belongsto",
+                        template: dataItem => dataItem.ItSystem.BelongsTo ? dataItem.ItSystem.BelongsTo.Name : "",
+                        attributes: {
+                            "data-element-type": "systemRightsOwnerObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "systemRightsOwnerHeader"
+                        },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        },
+                    },
+                    {
                         field: "ItProjects", title: "IT Projekt", width: 150,
-                        persistId: "sysusage", // DON'T YOU DARE RENAME!
+                        persistId: "sysusage",
                         template: dataItem => dataItem.ItProjects.length > 0 ? this._.first(dataItem.ItProjects).Name : "",
                         hidden: true,
                         filterable: {
@@ -656,7 +670,7 @@
                     },
                     {
                         field: "ObjectOwner.Name", title: "Taget i anvendelse af", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
+                        persistId: "ownername",
                         template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
                         hidden: true,
                         filterable: {
@@ -670,7 +684,7 @@
                     },
                     {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
-                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        persistId: "lastchangedname",
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
@@ -684,7 +698,7 @@
                     },
                     {
                         field: "LastChanged", title: "Sidste redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "changed", // DON'T YOU DARE RENAME!
+                        persistId: "changed",
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.LastChanged) {
                                 return "";
@@ -701,7 +715,7 @@
                     },
                     {
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
-                        persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
+                        persistId: "concludedSystemFrom",
                         hidden: false,
                         excelTemplate: dataItem => {
                             if (!dataItem || !dataItem.Concluded) {
@@ -709,7 +723,7 @@
                             }
                             return dataItem.Concluded.toLocaleDateString("da-DK");
                         },
-                        filterable: 
+                        filterable:
                         {
                             operators: {
                                 date: {
@@ -722,7 +736,7 @@
                     },
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
-                        persistId: "ArchiveDuty", // DON'T YOU DARE RENAME!
+                        persistId: "ArchiveDuty",
                         template: dataItem => {
                             switch (dataItem.ArchiveDuty) {
                                 case 1:
@@ -748,7 +762,7 @@
                             }
                         },
                         hidden: false,
-                        filterable:{
+                        filterable: {
                             cell: {
                                 template: function (args) {
                                     args.element.kendoDropDownList({
@@ -764,7 +778,7 @@
                     },
                     {
                         field: "Registertype", title: "Er dokumentbærende", width: 160,
-                        persistId: "Registertype", // DON'T YOU DARE RENAME!
+                        persistId: "Registertype",
                         template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
                         hidden: false,
                         filterable: {
@@ -783,7 +797,7 @@
                     },
                     {
                         field: "EndDate", title: "Journalperiode slutdato", format: "{0:dd-MM-yyyy}", width: 180,
-                        persistId: "ArchivePeriodsEndDate", // DON'T YOU DARE RENAME!
+                        persistId: "ArchivePeriodsEndDate",
                         template: dataItem => {
                             if (!dataItem || !dataItem.ArchivePeriods) {
                                 return "";
@@ -794,14 +808,14 @@
                                     if (!dateList || dateList.StartDate > x.StartDate) {
                                         dateList = x;
                                     }
-                                } 
+                                }
                             });
                             if (!dateList) {
                                 return "";
                             } else {
                                 return this.moment(dateList.EndDate).format("DD-MM-YYYY");
                             }
-                            
+
                         },
                         hidden: true,
                         filterable: false,
@@ -809,9 +823,8 @@
                     },
                     {
                         field: "RiskSupervisionDocumentationUrlName", title: "Risikovurdering", width: 150,
-                        persistId: "riskSupervisionDocumentationUrlName", // DON'T YOU DARE RENAME!
-                        template: dataItem => 
-                        {
+                        persistId: "riskSupervisionDocumentationUrlName",
+                        template: dataItem => {
                             if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
                                 return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
                             }
@@ -823,6 +836,11 @@
                             } else {
                                 return "";
                             }
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderUrlOrFallback(
+                                dataItem.RiskSupervisionDocumentationUrl,
+                                dataItem.RiskSupervisionDocumentationUrlName);
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
@@ -837,7 +855,7 @@
                     },
                     {
                         field: "LinkToDirectoryUrlName", title: "Fortegnelse", width: 150,
-                        persistId: "LinkToDirectoryUrlName", // DON'T YOU DARE RENAME!
+                        persistId: "LinkToDirectoryUrlName",
                         template: dataItem => {
                             if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
                                 return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
@@ -850,6 +868,11 @@
                             } else {
                                 return "";
                             }
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderUrlOrFallback(
+                                dataItem.LinkToDirectoryUrl,
+                                dataItem.LinkToDirectoryUrlName);
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
@@ -864,7 +887,7 @@
                     },
                     {
                         field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
-                        persistId: "ItContractDataHandler", // DON'T YOU DARE RENAME!
+                        persistId: "ItContractDataHandler",
                         template: dataItem => {
                             if (dataItem.Contracts != null) {
                                 if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {

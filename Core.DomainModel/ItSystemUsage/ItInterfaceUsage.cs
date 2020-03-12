@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 
@@ -21,7 +21,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ItInterfaceUsage()
         {
-            this.DataRowUsages = new List<DataRowUsage>();
         }
 
         public int ItSystemUsageId { get; set; }
@@ -35,11 +34,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The contract for this interface usage.
         /// </summary>
         public virtual ItContract.ItContract ItContract { get; set; }
-
-        /// <summary>
-        /// Local details regarding the usage of the exposed data of the interface
-        /// </summary>
-        public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }
 
         public int? InfrastructureId { get; set; }
         /// <summary>
@@ -55,5 +49,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// Whether local usage of the interface is wanted or not.
         /// </summary>
         public bool IsWishedFor { get; set; }
+
+        /// <summary>
+        /// Temporary migration column used while data is migrated and before the tables are removed
+        /// </summary>
+        public Guid? MigratedToUuid { get; set; }
     }
 }

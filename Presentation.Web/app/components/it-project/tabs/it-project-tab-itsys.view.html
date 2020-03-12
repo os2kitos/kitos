@@ -6,14 +6,12 @@
             <thead>
                 <tr>
                     <th>IT System</th>
-                    <th>Applikationstype</th>
                     <th><!-- edit ctrl --></th>
                 </tr>
             </thead>
             <tbody>
                 <tr data-ng-repeat="usage in systemUsages">
-                    <td><a data-ui-sref="it-system.usage.interfaces({ id: usage.id })">{{ usage.itSystem.name }} <span data-ng-if="usage.itSystem.disabled">(Slettes)</span></a></td>
-                    <td>{{ usage.itSystem.appTypeName }}</td>
+                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{ usage.itSystem.name }} <span data-ng-if="usage.itSystem.disabled">(Slettes)</span></a></td>
                     <td class="text-right">
                         <button type="button"
                                 class="btn btn-danger btn-xs delete-usage"

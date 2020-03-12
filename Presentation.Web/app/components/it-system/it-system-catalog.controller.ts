@@ -16,6 +16,7 @@
         clearOptions(): void;
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
+        allowToggleUsage: boolean;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -24,7 +25,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
@@ -34,6 +35,7 @@
         public canCreate = this.userAccessRights.canCreate;
         public canMigrate = this.userMigrationRights.canExecuteMigration;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
+        public allowToggleUsage = false;
 
         public static $inject:
             Array<string> = [
@@ -52,8 +54,8 @@
                 "userMigrationRights",
                 "gridStateService",
                 "$uibModal",
-                "needsWidthFixService",
-                "exportGridToExcelService"
+                "exportGridToExcelService",
+                "systemUsageUserAccessRights"
             ];
 
         constructor(
@@ -72,8 +74,8 @@
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
-            private needsWidthFixService,
             private exportGridToExcelService,
+            private systemUsageUserAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
@@ -81,6 +83,7 @@
             private municipalityId,
             private municipalityName,
             public migrationConsequenceText) {
+            this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -162,7 +165,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -222,9 +225,6 @@
                                     if (!system.BusinessType) {
                                         system.BusinessType = { Name: "" };
                                     }
-                                    if (!system.AppTypeOption) {
-                                        system.AppTypeOption = { Name: "" };
-                                    }
                                     if (!system.BelongsTo) {
                                         system.BelongsTo = { Name: "" };
                                     }
@@ -254,7 +254,7 @@
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemCatalogVm.clearOptions()'>#: text #</button>"
+                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemCatalogVm.clearOptions()' data-element-type='resetFilterButton'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
@@ -296,7 +296,7 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions, 
+                dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
@@ -312,12 +312,12 @@
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
                             "data-element-type": "catalogUsageObject"
@@ -441,20 +441,6 @@
                         }
                     },
                     {
-                        field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
-                        persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
@@ -527,20 +513,6 @@
                         }
                     },
                     {
-                        field: "ObjectOwner.Name", title: "Oprettet af: Bruger", width: 150,
-                        persistId: "ownername", // DON'T YOU DARE RENAME!
-                        template: dataItem => `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}`,
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
@@ -588,17 +560,17 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 var url = reference.URL;
-                                if (url != null) {
-                                    if (Utility.Validation.validateUrl(url)) {
-                                        return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
-                                    }
-                                    else {
-                                        return reference.Title;
-                                    }
+                                if (Utility.Validation.validateUrl(url)) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
                                 }
-
+                                else {
+                                    return reference.Title;
+                                }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -616,7 +588,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.ExternalReferenceId) {
+                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
@@ -627,6 +599,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -736,10 +711,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -847,7 +819,7 @@
             });
             this.modalMigration.center().open();
         }
-        
+
         public onNewTargetSystemSelected = () => {
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
@@ -928,7 +900,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => response.response
+                    data: (response) => this._.orderBy(response.response, (dto: any) => dto.organization.name.toLowerCase())
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -943,9 +915,9 @@
                         var orgName = dataItem.organization.name;
                         var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${orgName} <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
+                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p> <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {
-                            return orgName;
+                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p>`;
                         }
                     },
                 }
@@ -953,7 +925,7 @@
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e,this._,this.$timeout,this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
         // adds usage at selected system within current context
@@ -972,10 +944,7 @@
         private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
-                organizationId: this.user.currentOrganizationId,
-                dataLevel: dataItem.DataLevel,
-                containsLegalInfo: dataItem.ContainsLegalInfo,
-                AssociatedDataWorkers: dataItem.AssociatedDataWorkers
+                organizationId: this.user.currentOrganizationId
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));
@@ -1029,8 +998,8 @@
                 dataSource.filter(newFilter);
             }
 
-    
-           
+
+
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
@@ -1061,18 +1030,19 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["$http", function ($http) {
-                            return $http.get("api/itsystem/?getEntitiesAccessRights=true")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
-                        userMigrationRights: ["$http", function ($http) {
-                            return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                                .createSystemAuthorization()
+                                .getOverviewAuthorization()
+                        ],
+                        systemUsageUserAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                                .createSystemUsageAuthorization()
+                                .getOverviewAuthorization()
+                        ],
+                        userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
+                            .then(result => result.data.response)
+                        ],
                     }
                 });
 

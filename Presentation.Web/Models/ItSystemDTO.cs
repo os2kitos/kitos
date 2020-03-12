@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Presentation.Web.Models
 {
@@ -11,7 +10,6 @@ namespace Presentation.Web.Models
         {
             TaskRefIds = new List<int>();
             //CanUseInterfaceIds = new List<int>();
-            this.AssociatedDataWorkers = new List<ItSystemDataWorkerRelationDTO>();
         }
 
         public int Id { get; set; }
@@ -47,7 +45,6 @@ namespace Presentation.Web.Models
         public AccessModifier AccessModifier { get; set; }
 
         public string Description { get; set; }
-        public string Url { get; set; }
 
         /// <summary>
         /// Gets or sets the task reference ids.
@@ -62,16 +59,10 @@ namespace Presentation.Web.Models
         public IEnumerable<int> TaskRefIds { get; set; }
         public IEnumerable<TaskRefDTO> TaskRefs { get; set; }
 
-        public int? AppTypeOptionId { get; set; }
-        public string AppTypeOptionName { get; set; }
-
         public int? BusinessTypeId { get; set; }
         public string BusinessTypeName { get; set; }
 
         public int? InterfaceId { get; set; }
-        public int? InterfaceTypeId { get; set; }
-        public int? TsaId { get; set; }
-        public int? MethodId { get; set; }
 
         public IEnumerable<DataRowDTO> DataRows { get; set; }
 
@@ -94,14 +85,8 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
-        public int ArchiveDuty { get; set; }
-        //GDPR
-        public string GeneralPurpose { get; set; }
-        public DataSensitivityLevel DataLevel { get; set; }
-        public DataOptions ContainsLegalInfo { get; set; }
-        public bool IsDataTransferedToThirdCountries { get; set; }
-        public string DataIsTransferedTo { get; set; }
-        public ICollection<ItSystemDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
+        public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
+        public string ArchiveDutyComment { get; set; }
 
         public string LinkToDirectoryAdminUrlName { get; set; }
         public string LinkToDirectoryAdminUrl { get; set; }

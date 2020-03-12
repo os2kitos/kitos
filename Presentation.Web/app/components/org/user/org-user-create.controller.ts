@@ -12,7 +12,6 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
-        isReadOnly: boolean;
         hasApi: boolean;
     }
 
@@ -27,7 +26,6 @@
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
-        public isReadOnly = false;
         public hasApi = false;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
@@ -51,7 +49,6 @@
             this.isUserSystemAdmin = user.isSystemAdmin;
             this.isUserContractAdmin = user.isContractAdmin;
             this.isUserReportAdmin = user.isReportAdmin;
-            this.isReadOnly = user.isReadOnly;
             this.hasApi = user.hasApi;
 
             autofocus();
@@ -96,9 +93,6 @@
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
                     if (this.vm.isReportAdmin)
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
-                    if (this.vm.isReadOnly)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
-
 
                     // when all requests are done
                     this.$q.all(promises).then(
@@ -143,8 +137,6 @@
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
                 if (this.vm.isReportAdmin)
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
-                if (this.vm.isReadOnly)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
 
                 // when all requests are done
                 this.$q.all(promises).then(

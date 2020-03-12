@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
@@ -403,14 +403,15 @@ namespace Presentation.Web.Controllers.API
                 Repository
                     .AsQueryable()
                     .ByOrganizationId(orgId)
-                    .ByPartOfName(name);
+                    .ByNameExact(name);
 
             return !system.Any();
         }
 
         private static IEnumerable<UsingOrganizationDTO> Map(IEnumerable<UsingOrganization> usingOrganizations)
         {
-            return usingOrganizations.Select(
+            return usingOrganizations
+                .Select(
                 usingOrganization => new UsingOrganizationDTO
                 {
                     SystemUsageId = usingOrganization.ItSystemUsageId,

@@ -47,8 +47,10 @@ namespace Core.ApplicationServices.Authorization
             switch (entity)
             {
                 //Prefer match on hasOrganization first since it has static knowledge of organization relationship
-                case IHasOrganization hasOrg:
+                case IOwnedByOrganization hasOrg:
                     return IsActiveInOrganization(hasOrg.OrganizationId);
+                case IIsPartOfOrganization organizationRelationship:
+                    return organizationRelationship.IsPartOfOrganization(ActiveOrganizationId);
                 case IContextAware contextAware:
                     return contextAware.IsInContext(ActiveOrganizationId);
                 default:
@@ -59,11 +61,6 @@ namespace Core.ApplicationServices.Authorization
         public bool HasAssignedWriteAccess(IEntity entity)
         {
             return entity.HasUserWriteAccess(UserEntity);
-        }
-
-        public bool HasOwnership(IEntity entity)
-        {
-            return entity.ObjectOwnerId == UserId;
         }
     }
 }

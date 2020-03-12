@@ -16,15 +16,17 @@
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
         roles: Array<any>;
         Rights: Array<any>;
+        OriginalEntity : any;
     }
 
     export class OverviewController implements IOverviewController {
         private storageKey = "it-project-overview-options";
         private orgUnitStorageKey = "it-project-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
+        public projectIdToAccessLookup = {};
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -44,7 +46,9 @@
             "economyCalc",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights",
+            "authorizationServiceFactory"
         ];
 
         constructor(
@@ -65,7 +69,9 @@
             private economyCalc,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private authorizationServiceFactory : Services.Authorization.IAuthorizationServiceFactory) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -175,18 +181,12 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
-
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -194,16 +194,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-            // find the access modifier kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
-
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -236,7 +227,7 @@
         }
 
         public toggleLock(dataItem) {
-            if (dataItem.hasWriteAccess) {
+            if (dataItem.OriginalEntity.hasWriteAccess) {
                 dataItem.IsPriorityLocked = !dataItem.IsPriorityLocked;
             }
         }
@@ -250,7 +241,7 @@
                 return regexp.test(Url.toLowerCase());
         };
         private activate() {
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -311,8 +302,11 @@
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
 
                             // iterrate each project
+                            let projectIds = [];
                             this._.forEach(response.value,
                                 project => {
+                                    projectIds.push(project.Id);
+                                    this.projectIdToAccessLookup[project.Id] = { project: project }
                                     project.roles = [];
                                     // iterrate each right
                                     this._.forEach(project.Rights,
@@ -329,14 +323,7 @@
                                     var phase = `Phase${project.CurrentPhase}`;
                                     project.CurrentPhaseObj = project[phase];
 
-                                    if (this.user.isGlobalAdmin ||
-                                        this.user.isLocalAdmin ||
-                                        this._.find(project.Rights, { 'userId': this.user.id }) ||
-                                        this.user.id === project.ObjectOwnerId) {
-                                        project.hasWriteAccess = true;
-                                    } else {
-                                        project.hasWriteAccess = false;
-                                    }
+                                    project.hasWriteAccess = true;
 
                                     if (!project.Parent) {
                                         project.Parent = { Name: "" };
@@ -355,17 +342,26 @@
                                     }
                                 });
 
+                            //Lazy load access rights in a batch
+                            if (projectIds.length > 0) {
+                                this.authorizationServiceFactory
+                                    .createProjectAuthorization()
+                                    .getAuthorizationForItems(projectIds)
+                                    .then(accessRights => {
+                                        this._.forEach(accessRights, rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
+                                    });
+                            }
+
                             return response;
                         }
                     }
                 },
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
                         template:
-                            "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
+                            "<button data-element-type='createProjectButton' ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
@@ -467,6 +463,9 @@
                     {
                         field: "Name",
                         title: "IT Projekt",
+                        attributes: {
+                            "data-element-type": "projectNameKendoObject"
+                        },
                         width: 340,
                         persistId: "projname", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem
@@ -517,11 +516,7 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            if ((dataItem && dataItem.Reference) == null) {
-                                return "";
-                            } else {
-                                return dataItem && dataItem.Reference.Title;
-                            }
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-left" },
                         filterable: {
@@ -552,6 +547,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -610,11 +608,11 @@
                             return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem || !dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.StartDate);
                         },
                         sortable: false,
                         filterable: false
@@ -634,11 +632,11 @@
                             return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem || !dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
+                            if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.EndDate);
                         },
                         sortable: false,
                         filterable: false
@@ -677,32 +675,10 @@
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusTime = latestStatus.TimeStatus;
-                                var statusQuality = latestStatus.QualityStatus;
-                                var statusResources = latestStatus.ResourcesStatus;
-                                if (latestStatus.IsCombined) {
-                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
-                                } else {
-                                    /* If no combined status exists, take the lowest status from the splitted status */
-                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
-                                        return "<span data-square-traffic-light='Red'></span>";
-                                    } else if (statusTime === "Yellow" ||
-                                        statusQuality === "Yellow" ||
-                                        statusResources === "Yellow") {
-                                        return "<span data-square-traffic-light='Yellow'></span>";
-                                    } else if (statusTime === "Green" ||
-                                        statusQuality === "Green" ||
-                                        statusResources === "Green") {
-                                        return "<span data-square-traffic-light='Green'></span>";
-                                    } else {
-                                        return "<span data-square-traffic-light='White'></span>";
-                                    }
-                                }
-                            } else {
+                            if (!dataItem.ItProjectStatusUpdates) {
                                 return "";
                             }
+                            return Helpers.ExcelExportHelper.renderProjectStatusColor(dataItem.ItProjectStatusUpdates);
                         },
                         filterable: false,
                         sortable: false
@@ -725,11 +701,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined)
-                                    ? latestStatus.CombinedStatus
-                                    : latestStatus.TimeStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].TimeStatus);
                             } else {
                                 return "";
                             }
@@ -755,11 +727,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined)
-                                    ? latestStatus.CombinedStatus
-                                    : latestStatus.QualityStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].QualityStatus);
                             } else {
                                 return "";
                             }
@@ -785,11 +753,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined)
-                                    ? latestStatus.CombinedStatus
-                                    : latestStatus.ResourcesStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].ResourcesStatus);
                             } else {
                                 return "";
                             }
@@ -807,8 +771,7 @@
                             if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
-
-                            return this.moment(dataItem.StatusDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.StatusDate);
                         },
                         hidden: true,
                         filterable: {
@@ -836,10 +799,12 @@
                         width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
-                        excelTemplate: dataItem => dataItem &&
-                            dataItem.GoalStatus &&
-                            dataItem.GoalStatus.Status.toString() ||
-                            "",
+                        excelTemplate: dataItem => {
+                            if (!dataItem.GoalStatus) {
+                                return "";
+                            }
+                            return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -899,13 +864,16 @@
                         title: "Prioritet: Projekt",
                         width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: () =>
-                            `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.hasWriteAccess">
+                        template: (dataItem) =>
+                        {
+                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                            return `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
-                                                </select>`,
+                                                </select>`;
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.Priority.toString() || "",
                         filterable: {
                             cell: {
@@ -926,18 +894,22 @@
                         title: "Prioritet: Portefølje",
                         width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: () => `<div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
-                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.hasWriteAccess">
+                        template: (dataItem) =>
+                        {
+                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                            return `<div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                    <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.OriginalEntity.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
+                                                        <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.OriginalEntity.hasWriteAccess">
                                                         <i class="glyphicon glyphicon-lock"></i>
                                                     </label>
                                                 </div>
-                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="!dataItem.hasWriteAccess">
+                                                <select data-ng-model="dataItem.PriorityPf" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priorityPf" data-ng-disabled="!dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
                                                     <option value="Mid">Mellem</option>
                                                     <option value="Low">Lav</option>
-                                                </select>`,
+                                                </select>`;
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.PriorityPf.toString() || "",
                         hidden: true,
                         filterable: {
@@ -958,8 +930,10 @@
                         // filtering doesn't allow to sort on an array of values, it needs a single value for each row...
                         field: "Rights.Role", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => {
-                            return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                        template: (dataItem) => { return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights,this.projectRoles);
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -1148,7 +1122,12 @@
                         orgUnits: [
                             "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                        ]
+                        ],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createProjectAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

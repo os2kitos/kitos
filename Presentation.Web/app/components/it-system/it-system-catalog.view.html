@@ -16,14 +16,14 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
-        <button ng-click='systemCatalogVm.onNewTargetSystemSelected()' class='btn btn-success pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvenser</button>
+        <button ng-click="systemCatalogVm.onNewTargetSystemSelected()" class="btn btn-success pull-right migrationReportButton" data-element-type="consequenceButton">Se konsekvenser</button>
     </div>
 </div>
 
 <div data-kendo-window="systemCatalogVm.modalMigrationConsequence"
-     data-k-title="'Konsekvens'" 
-     data-k-visible="false" data-k-modal="true" data-k-width="800" >
-    <div >
+     data-k-title="'Konsekvens'"
+     data-k-visible="false" data-k-modal="true" data-k-width="800">
+    <div>
         <div id="copyPasteConsequence">
             <div class="migrationDivPadding">
                 <h3>Opsummering af ændringer ifm. flytning af "IT-system anvendelse" til nyt IT-system </h3>
@@ -39,7 +39,7 @@
                     <div class="panel-heading">
                         System anvendelsen flyttes:
                     </div>
-                    <table class="table org-role-table">
+                    <table class="table">
                         <tr>
                             <th>Fra</th>
                             <th>Til</th>
@@ -47,46 +47,76 @@
                         <tr>
                             <td>
                                 Navn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
-                                <br/>
+                                <br />
                                 Id: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
                             </td>
                             <td>
                                 Navn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
-                                <br/>
+                                <br />
                                 Id: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
                             </td>
                         </tr>
                     </table>
                 </div>
+
                 <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">Følgende kontrakter i Kitos berøres:</h4>
-                <div class="panel panel-default " ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
-                    <div class="panel-heading">
-                        Navn: {{affectedContracts.contract.name}}
-                        <br/>
-                        Id: {{affectedContracts.contract.id}}
-                    </div >
-                    <div>
-                        <div class="migrationDivBorders migrationDivPadding">
-                            IT-systemet er omfattet af kontrakten <strong> {{affectedContracts.systemAssociatedInContract ? 'Ja' : 'Nej' }}</strong>
-                        </div>
-                        <div class="migrationDivPadding" ng-if="affectedContracts.affectedInterfaceUsages.length > 0" ng-class="{'migrationDivBorders': affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0}">
-                            "Anvender" snitfladerelation, der flyttes
-                            <ul>
-                                <li ng-repeat="interfaceToBeMoved in affectedContracts.affectedInterfaceUsages">{{interfaceToBeMoved.name}} ( Id: {{interfaceToBeMoved.id}} )</li>
-                            </ul>
-                        </div>
-                        <div class="migrationDivPadding" ng-if="affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0">
-                            "Udstiller" snitfladerelation, der slettes
-                            <ul>
-                                <li ng-repeat="interfaceToBeDeleted in affectedContracts.interfaceExhibitUsagesToBeDeleted">{{interfaceToBeDeleted.name}} ( Id: {{interfaceToBeDeleted.id}} )</li>
-                            </ul>
-                        </div>
-                    </div>
+                <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">
+                    <table class="table">
+                        <tr>
+                            <th>Id</th>
+                            <th>Navn</th>
+                        </tr>
+                        <tr ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
+                            <td class="idTableDataCellFormat">{{affectedContracts.id}}</td>
+                            <td>{{affectedContracts.name}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedRelations.length > 0">Følgende systemrelationer berøres:</h4>
+                <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedRelations.length > 0">
+                    <table class="table">
+                        <tr>
+                            <th>Anvendersystem</th>
+                            <th>Udstillersystem</th>
+                            <th>Relationsbeskrivelse</th>
+                            <th>Snitflade der fjernes fra relationen</th>
+                            <th>Frekvens</th>
+                            <th>Kontrakt</th>
+                        </tr>
+                        <tr ng-repeat="relation in systemCatalogVm.migrationReportDTO.affectedRelations">
+                            <td>
+                                Navn: {{relation.toSystemUsage.name }}
+                                <br />
+                                Id: {{ relation.toSystemUsage.id}}
+                            </td>
+                            <td>
+                                Navn: {{relation.fromSystemUsage.name }}
+                                <br />
+                                Id: {{relation.fromSystemUsage.id}}
+                            </td>
+                            <td>
+                                {{relation.description}}
+                            </td>
+                            <td>
+                                Navn: {{relation.interface.name}}
+                                <br />
+                                Id:{{relation.interface.id}}
+                            </td>
+                            <td>
+                                {{relation.frequencyType.name}}
+                            </td>
+                            <td ng-if="relation.contract">
+                                Navn: {{relation.contract.name}}
+                                <br />
+                                Id: {{relation.contract.id}}
+                            </td>
+                            <td ng-if="!relation.contract">Ingen kontrakt</td>
+                        </tr>
+                    </table>
                 </div>
                 <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">Følgende projekter, hvor IT-systemet anvendes, berøres:</h4>
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">
-                    <div class="panel-heading">
-                    </div>
                     <table class="table">
                         <tr>
                             <th>Id</th>
@@ -100,8 +130,8 @@
                 </div>
             </div>
         </div>
-        <button ng-click='systemCatalogVm.copyToClipBoard()' class="btn migrationReportButton">Kopiér til udklipsholder</button>
-        <button ng-click='systemCatalogVm.cancelMigration()' class='btn btn-danger pull-left migrationReportButton'>Annullér</button>
-        <button ng-click='systemCatalogVm.performMigration()' class='btn btn-success pull-right migrationReportButton' data-element-type="startMigration">Gennemfør flytning</button>
-    </div >
+        <button ng-click="systemCatalogVm.copyToClipBoard()" class="btn migrationReportButton">Kopiér til udklipsholder</button>
+        <button ng-click="systemCatalogVm.cancelMigration()" class="btn btn-danger pull-left migrationReportButton">Annullér</button>
+        <button ng-click="systemCatalogVm.performMigration()" class="btn btn-success pull-right migrationReportButton" data-element-type="startMigration">Gennemfør flytning</button>
+    </div>
 </div>

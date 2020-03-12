@@ -1,43 +1,16 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config([
-        "$stateProvider", function ($stateProvider) {
+        "$stateProvider", $stateProvider => {
             $stateProvider.state("it-contract.edit.systems", {
                 url: "/systems",
                 templateUrl: "app/components/it-contract/tabs/it-contract-tab-systems.view.html",
                 controller: "contract.EditSystemsCtrl",
                 resolve: {
                     user: [
-                        "userService", function (userService) {
-                            return userService.getUser();
-                        }
-                    ],
-                    exhibitedInterfaces: [
-                        "$http", "contract", function ($http, contract) {
-                            return $http.get("api/ItInterfaceExhibitUsage/?contractId=" + contract.id).then(function (result) {
-                                return result.data.response;
-                            });
-                        }
-                    ],
-                    usedInterfaces: [
-                        "$http", "contract", function ($http, contract) {
-                            return $http.get("api/ItInterfaceUsage/?contractId=" + contract.id).then(function (result) {
-                                return result.data.response;
-                            });
-                        }
-                    ],
-                    interfaces: [
-                        "$http", function ($http) {
-                            return $http.get("odata/ItInterfaces").then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "userService", userService => userService.getUser()
                     ],
                     agreementElements: [
-                        "$http", function ($http) {
-                            return $http.get("odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "$http", $http => $http.get("odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                     ]
                 }
             });
@@ -45,74 +18,54 @@
     ]);
 
     app.controller("contract.EditSystemsCtrl", [
-        "$scope", "$http", "$state", "$stateParams", "notify", "user", "contract", "exhibitedInterfaces", "usedInterfaces", "agreementElements", "_", "$filter",
-        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements, _, $filter) {
+        "$scope", "$http", "$stateParams", "notify", "user", "contract", "agreementElements", "_", "$filter", "systemRelationService",
+        ($scope, $http, $stateParams, notify, user, contract, agreementElements, _, $filter, systemRelationService) => {
 
-            $scope.autoSaveUrl = "api/itcontract/" + $stateParams.id;
-            $scope.exhibitedInterfaces = exhibitedInterfaces;
-            $scope.usedInterfaces = usedInterfaces;
+            $scope.autoSaveUrl = `api/itcontract/${$stateParams.id}`;
             $scope.contract = contract;
 
             $scope.agreementElements = agreementElements;
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, "name");
 
-            $scope.deleteExhibit = function (exhibitId, usageId) {
-                $http({
-                    method: "DELETE",
-                    url: "api/itInterfaceExhibitUsage/?usageId=" + usageId + "&exhibitId=" + exhibitId
-                })
-                    .success(function () {
-                        notify.addSuccessMessage("Snitfladerelationen er slettet.");
-                        reload();
-                    })
-                    .error(function () {
-                        notify.addSuccessMessage("Fejl! Snitfladerelationen kunne ikke slettes.");
-                    });
+            const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                return Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
+                    systemRelations,
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.maxTextFieldCharCount,
+                    Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
             }
 
-            $scope.deleteUsed = function (usageId, sysId, interfaceId) {
-                $http({
-                    method: "DELETE",
-                    url: "api/ItInterfaceUsage/?usageId=" + usageId + "&sysId=" + sysId + "&interfaceId=" + interfaceId + "&organizationId=" + user.currentOrganizationId
-                })
-                    .success(function () {
-                        notify.addSuccessMessage("Snitfladerelationen er slettet.");
-                        reload();
-                    })
-                    .error(function () {
-                        notify.addSuccessMessage("Fejl! Snitfladerelationen kunne ikke slettes.");
-                    });
-            }
+            systemRelationService.getRelationWithContract(contract.id)
+                .then((systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
+                    $scope.usageRelations = mapDataToViewmodelArray(systemRelations);
+                });
 
-            function reload() {
-                $state.go(".", null, { reload: true });
-            }
-
-
+            function formatAssociatedSystems(associatedSystemUsages: any);
             function formatAssociatedSystems(associatedSystemUsages) {
 
                 //helper functions
+                function deleteAssociatedSystem(associatedSystem: any);
                 function deleteAssociatedSystem(associatedSystem) {
                     return $http.delete("api/itcontract/" + contract.id + "?systemUsageId=" + associatedSystem.id + "&organizationId=" + user.currentOrganizationId);
                 }
 
+                function postAssociatedSystem(associatedSystem: any);
                 function postAssociatedSystem(associatedSystem) {
                     return $http.post("api/itcontract/" + contract.id + "?systemUsageId=" + associatedSystem.selectedSystem.id + "&organizationId=" + user.currentOrganizationId);
                 }
 
                 //for each row of associated system
-                _.each(associatedSystemUsages, function (systemUsage: { show; delete; id;}) {
+                _.each(associatedSystemUsages, (systemUsage: { show; delete; id; }) => {
 
                     systemUsage.show = true;
 
                     //delete the row
-                    systemUsage.delete = function () {
-                        deleteAssociatedSystem(systemUsage).success(function () {
+                    systemUsage.delete = () => {
+                        deleteAssociatedSystem(systemUsage).success(() => {
                             notify.addSuccessMessage("Rækken er slettet.");
                             _.remove(contract.associatedSystemUsages, { id: systemUsage.id });
                             systemUsage.show = false;
-                        }).error(function () {
+                        }).error(() => {
                             notify.addErrorMessage("Kunne ikke slette rækken");
                         });
                     };
@@ -122,9 +75,9 @@
                 $scope.associatedSystemUsages = associatedSystemUsages;
 
                 $scope.newAssociatedSystemUsage = {
-                    save: function () {
+                    save() {
                         //post new binding
-                        postAssociatedSystem($scope.newAssociatedSystemUsage).success(function (result) {
+                        postAssociatedSystem($scope.newAssociatedSystemUsage).success(result => {
 
                             notify.addSuccessMessage("Rækken er tilføjet.");
 
@@ -132,7 +85,7 @@
                             contract.associatedSystemUsages = result.response;
                             formatAssociatedSystems(result.response);
 
-                        }).error(function (result) {
+                        }).error(result => {
 
                             //couldn't add new binding
                             notify.addErrorMessage("Fejl! Kunne ikke tilføje rækken!");
@@ -142,117 +95,34 @@
                 };
             }
 
+
             formatAssociatedSystems(contract.associatedSystemUsages);
 
-            $scope.newAssociatedInterfaceSave = function () {
-                var url = "";
-                if ($scope.newAssociatedInterfaceRelation == "exhibit")
-                    url = "api/itInterfaceExhibitUsage?usageId=" + $scope.newAssociatedInterfaceSelectedSystemUsage.id + "&exhibitId=" + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id;
-
-                if ($scope.newAssociatedInterfaceRelation == "using")
-                    url = "api/ItInterfaceUsage?usageId=" + $scope.newAssociatedInterfaceSelectedSystemUsage.id
-                        + "&sysId=" + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.sysId
-                        + "&interfaceId=" + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.intfId
-                        + "&organizationId=" + user.currentOrganizationId;
-
-                $http({
-                    method: "PATCH",
-                    url: url,
-                    data: {
-                        itContractId: contract.id
-                    }
-                })
-                    .success(function () {
-                        reload();
-                    });
-            }
-
-            // select2 options for looking up a system's interfaces
-            $scope.itInterfaceUsagesSelectOptions = {
-                minimumInputLength: 1,
-                initSelection: function (elem, callback) {
-                },
-                ajax: {
-                    data: function (term, page) {
-                        return { query: term };
-                    },
-                    quietMillis: 500,
-                    transport: function (queryParams) {
-                        var url = "";
-                        if ($scope.newAssociatedInterfaceRelation == "exhibit")
-                            url = "api/exhibit?sysId=" + $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId + "&orgId=" + user.currentOrganizationId + "&q=" + queryParams.data.query;
-
-                        if ($scope.newAssociatedInterfaceRelation == "using")
-                            url = `odata/ItInterfaces?$filter=contains(Name, '${queryParams.data.query}')`;
-
-                        var res = $http.get(url).then(queryParams.success);
-                        res.abort = function () {
-                            return null;
-                        };
-
-                        return res;
-                    },
-
-                    results: function (data, page) {
-                        var results = [];
-
-                        // for each interface usages
-                        if ($scope.newAssociatedInterfaceRelation == "exhibit") {
-                            // interface exhibit
-                            _.each(data.data.response, function (usage: { id; itInterfaceName; itInterfaceDisabled; }) {
-                                if (!usage.itInterfaceDisabled) {
-                                    results.push({
-                                        // use the id of the interface usage
-                                        id: usage.id,
-                                        // use the name of the actual interface
-                                        text: $filter('limitToDots')(usage.itInterfaceName, 30) 
-                                    });
-                                }
-                            });
-                        } else {
-                            // interface usage
-                            _.each(data.data.value, function (usage: { Id; Name; Disabled; }) {
-                                if (!usage.Disabled) {
-                                    results.push({
-                                        // use the id of the interface usage
-                                        id: { intfId: usage.Id, sysId: $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId },
-                                        // use the name of the actual interface
-                                        text: $filter('limitToDots')(usage.Name, 30)
-                                    });
-                                }
-
-                            });
-                        }
-
-                        return { results: results };
-                    }
-                }
+            $scope.expandParagraph = (e) => {
+                Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.RelationTableCellParagraphSizeConfig.shortTextLineCount);
             };
 
-            // select2 options for looking up it system usages
             $scope.itSystemUsagesSelectOptions = {
                 minimumInputLength: 1,
-                initSelection: function (elem, callback) {
+                initSelection(elem, callback) {
                 },
                 ajax: {
-                    data: function (term, page) {
+                    data(term, page) {
                         return { query: term };
                     },
                     quietMillis: 500,
-                    transport: function (queryParams) {
+                    transport(queryParams) {
                         var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query).then(queryParams.success);
-                        res.abort = function () {
-                            return null;
-                        };
+                        res.abort = () => null;
 
                         return res;
                     },
 
-                    results: function (data, page) {
+                    results(data, page) {
                         var results = [];
 
                         // for each system usages
-                        _.each(data.data.response, function (usage: { id; itSystem; }) {
+                        _.each(data.data.response, (usage: { id; itSystem; }) => {
                             if (!usage.itSystem.disabled) {
                                 results.push({
                                     // the id of the system usage id, that is selected
@@ -269,6 +139,7 @@
                     }
                 }
             };
+
         }
     ]);
 })(angular, app);

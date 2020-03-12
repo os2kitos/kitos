@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItProject;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Project
 {
@@ -10,9 +9,9 @@ namespace Core.ApplicationServices.Project
         /// <summary>
         /// Adds an IT project. It creates default phases and saves the project.
         /// </summary>
-        /// <param name="project"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        Result<ItProject, OperationFailure> AddProject(ItProject project);
+        Result<ItProject, OperationFailure> AddProject(string name, int organizationId);
 
         Result<ItProject, OperationFailure> DeleteProject(int id);
 

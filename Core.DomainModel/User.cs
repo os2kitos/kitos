@@ -13,7 +13,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IContextAware
+    public class User : Entity, IContextAware, IIsPartOfOrganization
     {
         public User()
         {
@@ -23,7 +23,6 @@ namespace Core.DomainModel
             ItProjectRights = new List<ItProjectRight>();
             ItSystemRights = new List<ItSystemRight>();
             ItContractRights = new List<ItContractRight>();
-            Wishes = new List<Wish>();
             ItProjectStatuses = new List<ItProjectStatus>();
             ResponsibleForRisks = new List<Risk>();
             ResponsibleForCommunications = new List<Communication>();
@@ -46,6 +45,11 @@ namespace Core.DomainModel
         public string DefaultUserStartPreference { get; set; }
 
         public bool? HasApiAccess { get; set; }
+
+        public bool CanAuthenticate()
+        {
+            return IsGlobalAdmin || OrganizationRights.Any();
+        }
 
         /// <summary>
         ///     The organization the user will be automatically logged into.
@@ -87,11 +91,6 @@ namespace Core.DomainModel
         public virtual ICollection<PasswordResetRequest> PasswordResetRequests { get; set; }
 
         /// <summary>
-        ///     Wishes created by this user
-        /// </summary>
-        public virtual ICollection<Wish> Wishes { get; set; }
-
-        /// <summary>
         ///     Gets or sets the <see cref="Assignment" /> or <see cref="Milestone" /> associated with this user
         /// </summary>
         public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
@@ -121,27 +120,18 @@ namespace Core.DomainModel
             return $"{Id}:{Name} {LastName}";
         }
 
+        public bool IsPartOfOrganization(int organizationId)
+        {
+            return IsInContext(organizationId) || OrganizationRights.Any(x => x.OrganizationId == organizationId);
+        }
+
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }
 
-        public bool IsReadOnly => IsReadOnlyInOrg(DefaultOrganizationId.GetValueOrDefault());
-
-        public bool IsReadOnlyInOrg(int organizationId)
-        {
-            return OrganizationRights.Any(
-                right => (right.Role == OrganizationRole.ReadOnly) &&
-                         (right.OrganizationId == organizationId));
-        }
-
         public override bool HasUserWriteAccess(User user)
         {
-            if (IsReadOnly)
-            {
-                return (Id == user.Id) || base.HasUserWriteAccess(user);
-            }
-
-            return IsReadOnly;
+            return (Id == user.Id) || base.HasUserWriteAccess(user);
         }
 
         public bool IsInContext(int organizationId)

@@ -3,8 +3,6 @@
     [Parameter(Mandatory=$true)][string]$migrationsFolderPath,
     [Parameter(Mandatory=$true)][string]$kitosDbConnectionString,
     [Parameter(Mandatory=$true)][string]$hangfireDbConnectionString,
-    [Parameter(Mandatory=$true)][string]$defaultOrganization,
-    [Parameter(Mandatory=$true)][string]$secondOrganization,
     [Parameter(Mandatory=$true)][string]$globalAdminUserName,
     [Parameter(Mandatory=$true)][string]$globalAdminPw,
     [Parameter(Mandatory=$true)][string]$localAdminUserName,
@@ -42,56 +40,15 @@ Write-Host "Running migrations"
 #-------------------------------------------------------------
 Run-DB-Migrations -newDb $true -migrationsFolder "$migrationsFolderPath" -connectionString "$kitosDbConnectionString"
 
+##-------------------------------------------------------------
+Write-Host "Creating test database"
 #-------------------------------------------------------------
-Write-Host "Enabling custom options"
-#-------------------------------------------------------------
+& $testToolsExePath "CreateCleanTestDatabase"  `
+                    "$kitosDbConnectionString" `
+                    "$globalAdminUserName" "$globalAdminPw"  `
+                    "$localAdminUserName" "$localAdminPw"  `
+                    "$normalUserUserName" "$normalUserPw"  `
+                    "$apiUserUserName" "$apiUserPw"  `
+                    "$apiGlobalAdminUserName" "$apiGlobalAdminPw"
 
-& $testToolsExePath "EnableAllOptions" "$kitosDbConnectionString"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO ENABLE ALL OPTIONS IN KITOS DB" }
-
-#-------------------------------------------------------------
-Write-Host "Configuring test organizations"
-#-------------------------------------------------------------
-
-& $testToolsExePath "CreateOrganization" "$kitosDbConnectionString" "1" "$secondOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE ORGANIZATION" }
-
-#-------------------------------------------------------------
-Write-Host "Configuring test users"
-#-------------------------------------------------------------
-
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$globalAdminUserName" "$globalAdminPw" "GlobalAdmin" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE GLOBAL ADMIN" }
-
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$localAdminUserName" "$localAdminPw" "LocalAdmin" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE LOCAL ADMIN" }
-
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$normalUserUserName" "$normalUserPw" "User" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
-
-& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "User" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
-
-& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiGlobalAdminUserName" "$apiGlobalAdminPw" "GlobalAdmin" "$defaultOrganization,$secondOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE MULTI ORGANIZATION APIACCESS USER" }
-
-#-------------------------------------------------------------
-Write-Host "Create IT System"
-#-------------------------------------------------------------
-& $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "DefaultTestItSystem" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
-
-& $testToolsExePath "CreateItSystemWithParent" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem" "$secondOrganization" "1"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
-
-#-------------------------------------------------------------
-Write-Host "Create IT Contract"
-#-------------------------------------------------------------
-& $testToolsExePath "CreateItContract" "$kitosDbConnectionString" "DefaultTestItContract"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT CONTRACT" }
-
-#-------------------------------------------------------------
-Write-Host "Create TaskRef"
-#-------------------------------------------------------------
-& $testToolsExePath "CreateTaskRef" "$kitosDbConnectionString" "$defaultOrganization"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE TASK REF" }
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE TEST DATABASE" }

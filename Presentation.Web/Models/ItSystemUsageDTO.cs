@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel;
 
 namespace Presentation.Web.Models
 {
@@ -121,8 +122,7 @@ namespace Presentation.Web.Models
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 
-        public bool? Archived { get; set; }
-        public int? ArchiveDuty { get; set; }
+        public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool? ReportedToDPA { get; set; }
         public string DocketNo { get; set; }
         public string ArchiveNotes { get; set; }

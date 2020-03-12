@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System;
+
+namespace Core.DomainModel
 {
     /// <summary>
     /// Defines interface for objects that have a 1:M option choice in another object.
@@ -8,7 +10,7 @@
     /// <remarks>
     /// These types of OptionEntities can only be used by one <see cref="References"/>.
     /// </remarks>
-    public abstract class OptionEntity<TReference> : Entity
+    public abstract class OptionEntity<TReference> : Entity, IHasName
     {
         /// <summary>
         /// Gets or sets the name.
@@ -22,6 +24,8 @@
         public string Name { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.
+        /// NOTE: This value is confusing since the db value does not reflect reality.
+        /// It is set by the controllers and is set based on <see cref="IsObligatory"/> OR <see cref="LocalOptionEntity{OptionType}.IsActive"/>
         /// </summary>
         /// <value>
         ///   <c>true</c> if this instance is active; otherwise, <c>false</c>.

@@ -51,20 +51,31 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="ArchiveDutyRecommendationTypes.cs" />
+    <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
+    <Compile Include="Extensions\HasOrganizationExtensions.cs" />
+    <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="IHasUuid.cs" />
+    <Compile Include="IIsPartOfOrganization.cs" />
+    <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
+    <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
+    <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
+    <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
+    <Compile Include="ItSystem\DomainEvents\InterfaceDeleted.cs" />
+    <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
-    <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
     <Compile Include="KLE\KLEChange.cs" />
     <Compile Include="KLE\KLEChangeType.cs" />
@@ -72,13 +83,14 @@
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
+    <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItContract\ItContractAgreementElementTypes.cs" />
     <Compile Include="ItProject\Assignment.cs" />
-    <Compile Include="IHasOrganization.cs" />
+    <Compile Include="IOwnedByOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItProject\ItProjectStatusUpdate.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPR.cs" />
@@ -93,10 +105,8 @@
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
     <Compile Include="LocalOptions\LocalDataType.cs" />
-    <Compile Include="LocalOptions\LocalFrequencyType.cs" />
     <Compile Include="LocalOptions\LocalInterfaceType.cs" />
     <Compile Include="LocalOptions\LocalItSystemCategories.cs" />
-    <Compile Include="LocalOptions\LocalItSystemType.cs" />
     <Compile Include="LocalOptions\LocalGoalType.cs" />
     <Compile Include="LocalOptions\LocalItProjectRole.cs" />
     <Compile Include="LocalOptions\LocalItProjectType.cs" />
@@ -106,7 +116,6 @@
     <Compile Include="LocalOptions\LocalItContractTemplateType.cs" />
     <Compile Include="LocalOptions\LocalItContractType.cs" />
     <Compile Include="LocalOptions\LocalBusinessType.cs" />
-    <Compile Include="LocalOptions\LocalItInterfaceType.cs" />
     <Compile Include="LocalOptionEntity.cs" />
     <Compile Include="LocalOptions\LocalItSystemRole.cs" />
     <Compile Include="LocalOptions\LocalOptionExtendType.cs" />
@@ -117,9 +126,7 @@
     <Compile Include="LocalOptions\LocalProcurementStrategyType.cs" />
     <Compile Include="LocalOptions\LocalPurchaseFormType.cs" />
     <Compile Include="LocalOptions\LocalTerminationDeadlineType.cs" />
-    <Compile Include="LocalOptions\LocalMethodType.cs" />
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
-    <Compile Include="LocalOptions\LocalTsaType.cs" />
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
     <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
@@ -150,18 +157,14 @@
     <Compile Include="ItSystem\ItInterfaceExhibit.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
-    <Compile Include="ItSystemUsage\DataRowUsage.cs" />
     <Compile Include="ItSystem\DataType.cs" />
-    <Compile Include="ItSystem\FrequencyType.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceExhibitUsage.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceUsage.cs" />
     <Compile Include="ItSystem\ItInterface.cs" />
     <Compile Include="ItSystem\ItSystemBase.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageOrgUnitUsage.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsage.cs" />
-    <Compile Include="ItSystem\ItSystemType.cs" />
     <Compile Include="ItSystem\SensitiveDataType.cs" />
-    <Compile Include="ItSystem\TsaType.cs" />
     <Compile Include="Organization\IOrganizationModule.cs" />
     <Compile Include="Organization\OrganizationType.cs" />
     <Compile Include="Organization\OrganizationUnit.cs" />
@@ -189,13 +192,10 @@
     <Compile Include="ItProject\Risk.cs" />
     <Compile Include="ItProject\Stakeholder.cs" />
     <Compile Include="ItSystem\InterfaceType.cs" />
-    <Compile Include="ItSystem\ItInterfaceType.cs" />
     <Compile Include="ItSystem\ItSystem.cs" />
     <Compile Include="ItSystem\ItSystemRight.cs" />
     <Compile Include="ItSystem\ItSystemRole.cs" />
-    <Compile Include="ItSystem\MethodType.cs" />
     <Compile Include="ItSystem\BusinessType.cs" />
-    <Compile Include="ItSystem\Wish.cs" />
     <Compile Include="ItProject\Milestone.cs" />
     <Compile Include="Organization\OrganizationCategory.cs" />
     <Compile Include="Organization\TaskRef.cs" />
@@ -206,9 +206,16 @@
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Organization\TaskUsage.cs" />
+    <Compile Include="References\AddReferenceCommand.cs" />
+    <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
+    <Compile Include="Result\Maybe.cs" />
+    <Compile Include="Result\ObjectExtensions.cs" />
+    <Compile Include="Result\OperationError.cs" />
+    <Compile Include="Result\OperationFailure.cs" />
+    <Compile Include="Result\Result.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
@@ -217,6 +224,12 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

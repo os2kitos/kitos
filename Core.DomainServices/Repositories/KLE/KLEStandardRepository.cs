@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
 using Serilog;
@@ -32,7 +33,7 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<TaskUsage> taskUsageRepository,
             IOperationClock clock,
-            ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(), taskUsageRepository)
+            ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
@@ -51,7 +52,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         public KLEStatus GetKLEStatus(DateTime lastUpdated)
         {
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var publishedDate = GetPublishedDate(kleXmlData);
             return new KLEStatus
             {
@@ -69,7 +70,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         public IOrderedEnumerable<KLEChange> GetKLEChangeSummary()
         {
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
 
             var kleChangeSummary = GetKLEChangeSummary(kleXmlData);
 
@@ -80,6 +81,7 @@ namespace Core.DomainServices.Repositories.KLE
         {
             var result = new List<KLEChange>();
             var mostRecentTaskRefs = _kleConverterHelper.ConvertToTaskRefs(kleXmlData);
+            
             foreach (var existingTaskRef in _existingTaskRefRepository.Get())
             {
                 if (mostRecentTaskRefs.TryGet(existingTaskRef.TaskKey, out var mostRecentTaskRef))
@@ -93,7 +95,9 @@ namespace Core.DomainServices.Repositories.KLE
                             ChangeType = KLEChangeType.Renamed,
                             TaskKey = existingTaskRef.TaskKey,
                             UpdatedDescription = mostRecentTaskRef.Description,
-                            ChangeDetails = $"Navneskift fra '{existingTaskRef.Description}' til '{mostRecentTaskRef.Description}'"
+                            ChangeDetails = $"Navneskift fra '{existingTaskRef.Description}' til '{mostRecentTaskRef.Description}'",
+                            ActiveTo = mostRecentTaskRef.ActiveTo,
+                            ActiveFrom = mostRecentTaskRef.ActiveFrom,
                         });
                     }
                     else if (existingTaskRef.Uuid == Guid.Empty)
@@ -103,7 +107,9 @@ namespace Core.DomainServices.Repositories.KLE
                             Uuid = mostRecentTaskRef.Uuid,
                             ChangeType = KLEChangeType.UuidPatched,
                             TaskKey = existingTaskRef.TaskKey,
-                            ChangeDetails = "Opdatering af null uuid"
+                            ChangeDetails = "Opdatering af null uuid",
+                            ActiveTo = mostRecentTaskRef.ActiveTo,
+                            ActiveFrom = mostRecentTaskRef.ActiveFrom,
                         });
                     }
                     mostRecentTaskRefs.Remove(mostRecentTaskRef.TaskKey);
@@ -127,7 +133,9 @@ namespace Core.DomainServices.Repositories.KLE
                     ChangeType = KLEChangeType.Added,
                     TaskKey = mostRecentTaskRef.TaskKey,
                     UpdatedDescription = mostRecentTaskRef.Description,
-                    ChangeDetails = "Nyt KLE element"
+                    ChangeDetails = "Nyt KLE element",
+                    ActiveTo = mostRecentTaskRef.ActiveTo,
+                    ActiveFrom = mostRecentTaskRef.ActiveFrom,
                 }));
 
             return result;
@@ -137,7 +145,7 @@ namespace Core.DomainServices.Repositories.KLE
         {
             _logger.Debug("UpdateKLE: Begin");
 
-            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var changes = GetKLEChangeSummary(kleXmlData);
             _logger.Debug($"Changes: {changes.Count}");
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -251,6 +259,8 @@ namespace Core.DomainServices.Repositories.KLE
                 update.Item1.LastChanged = updateTime;
                 update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
+                update.Item1.ActiveFrom = update.Item2.ActiveFrom;
+                update.Item1.ActiveTo = update.Item2.ActiveTo;
             }
         }
 
@@ -273,7 +283,9 @@ namespace Core.DomainServices.Repositories.KLE
                     ObjectOwnerId = ownerObjectId,
                     LastChanged = updateTime,
                     LastChangedByUserId = ownerObjectId,
-                    OwnedByOrganizationUnitId = ownedByOrgnizationUnitId
+                    OwnedByOrganizationUnitId = ownedByOrgnizationUnitId,
+                    ActiveFrom = kleChange.ActiveFrom,
+                    ActiveTo = kleChange.ActiveTo,
                 }
             );
             _existingTaskRefRepository.AddRange(addedTaskRefs);
@@ -294,6 +306,8 @@ namespace Core.DomainServices.Repositories.KLE
                 update.Item1.LastChanged = updateTime;
                 update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
+                update.Item1.ActiveFrom = update.Item2.ActiveFrom;
+                update.Item1.ActiveTo = update.Item2.ActiveTo;
             }
         }
 

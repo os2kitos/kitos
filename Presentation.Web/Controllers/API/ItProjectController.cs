@@ -6,12 +6,12 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Project;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
@@ -497,7 +497,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         protected override ItProject PostQuery(ItProject item)
         {
-            var result = _itProjectService.AddProject(item);
+            var result = _itProjectService.AddProject(item.Name, item.OrganizationId);
             if (result.Ok)
                 return result.Value;
 

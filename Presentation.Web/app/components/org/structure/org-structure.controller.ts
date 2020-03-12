@@ -1,42 +1,30 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config([
-        "$stateProvider", function ($stateProvider) {
+        "$stateProvider", $stateProvider => {
             $stateProvider.state("organization.structure", {
                 url: "/structure",
                 templateUrl: "app/components/org/structure/org-structure.view.html",
                 controller: "org.StructureCtrl",
                 resolve: {
                     orgUnits: [
-                        "$http", "user", function ($http: ng.IHttpService, user) {
-                            return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
-                                return result.data.response;
-                            });
-                        }
+                        "$http", "user", ($http: ng.IHttpService, user) => $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
+                            return result.data.response;
+                        })
                     ],
-                    localOrgUnitRoles: ['$http', function ($http) {
-                        return $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }],
-                    orgUnitRoles: ['$http', function ($http) {
-                        return $http.get("odata/OrganizationUnitRoles")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }],
+                    localOrgUnitRoles: ['$http', $http => $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        .then(result => result.data.value)],
+                    orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
+                        .then(result => result.data.value)],
                     user: [
-                        "userService", function (userService) {
-                            return userService.getUser();
-                        }
+                        "userService", userService => userService.getUser()
                     ],
-                    hasWriteAccess: [
-                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
-                        }
+                    userAccessRights: ["authorizationServiceFactory", "user",
+                        (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, user) =>
+                            authorizationServiceFactory
+                                .createOrganizationAuthorization()
+                                .getAuthorizationForItem(user.currentOrganizationId)
+                    ],
+                    hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit
                     ]
                 }
             });
@@ -44,8 +32,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess", "authorizationServiceFactory",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess, authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -85,14 +73,18 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" + orgUnit.id + "?hasWriteAccess&organizationId=" + user.currentOrganizationId).then((result) => {
-                        orgUnit.hasWriteAccess = result.data.response;
 
-                        _.each(orgUnit.children, function (u) {
-                            flattenAndSave(u, result.data.response, orgUnit);
+                    authorizationServiceFactory
+                        .createOrganizationUnitAuthorization()
+                        .getAuthorizationForItem(orgUnit.id)
+                        .then(response => {
+                            orgUnit.hasWriteAccess = response.canEdit;
+
+                            _.each(orgUnit.children,
+                                u => {
+                                    flattenAndSave(u, response.canEdit, orgUnit);
+                                });
                         });
-
-                    });
                 } else {
                     orgUnit.hasWriteAccess = true;
 
@@ -127,7 +119,7 @@
 
             $scope.chosenOrgUnit = null;
 
-            $scope.chooseOrgUnit = function (node, event) {
+            $scope.chooseOrgUnit = (node, event) => {
                 if (event) {
                     var isDiv = angular.element(event.target)[0].tagName === "DIV";
                     if (!isDiv) {
@@ -182,7 +174,7 @@
                         if (right.show)
                             count++;
                     });
-                    
+
                     $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
                 });
 

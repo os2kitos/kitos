@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Projects

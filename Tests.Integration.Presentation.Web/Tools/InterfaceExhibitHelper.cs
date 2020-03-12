@@ -31,11 +31,18 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new
             {
-                id = interfaceId,
+                itInterfaceId = interfaceId,
                 itSystemId = systemId
             };
 
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveExhibitRequest(int interfaceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit/{interfaceId}?organizationId=-1" /*org id not used*/), cookie);
         }
 
         public static async Task<IReadOnlyList<ItInterfaceExhibitUsageDTO>> GetExhibitInterfaceUsages(int contractId)

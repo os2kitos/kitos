@@ -1,4 +1,0 @@
-Test af nye feature rules
-1. opret it kontrakt
-2. opret organization
-3. 

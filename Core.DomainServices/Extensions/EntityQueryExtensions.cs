@@ -12,14 +12,14 @@ namespace Core.DomainServices.Extensions
     {
         public static IQueryable<T> ByOrganizationId<T>(this IQueryable<T> result, int organizationId) where T :
             class,
-            IHasOrganization
+            IOwnedByOrganization
         {
             return new QueryByOrganizationId<T>(organizationId).Apply(result);
         }
 
         public static IQueryable<T> ByOrganizationId<T>(this IQueryable<T> result, int organizationId, OrganizationDataReadAccessLevel accessLevel) where T :
             class,
-            IHasOrganization
+            IOwnedByOrganization
         {
             return QueryFactory.ByOrganizationId<T>(organizationId, accessLevel).Apply(result);
         }
@@ -34,7 +34,7 @@ namespace Core.DomainServices.Extensions
         public static IQueryable<T> ByPublicAccessOrOrganizationId<T>(this IQueryable<T> result, int organizationId) where T :
             class,
             IHasAccessModifier,
-            IHasOrganization
+            IOwnedByOrganization
         {
             return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result); ;
         }
@@ -44,7 +44,7 @@ namespace Core.DomainServices.Extensions
             int organizationId,
             OrganizationDataReadAccessLevel organizationAccessLevel,
             CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccessLevel)
-            where T : class, IHasAccessModifier, IHasOrganization
+            where T : class, IHasAccessModifier, IOwnedByOrganization
         {
             var domainQueries = new List<IDomainQuery<T>>();
 
@@ -79,7 +79,7 @@ namespace Core.DomainServices.Extensions
         public static IQueryable<T> ByOrganizationDataQueryParameters<T>(
             this IQueryable<T> result,
             OrganizationDataQueryParameters parameters)
-            where T : class, IHasAccessModifier, IHasOrganization
+            where T : class, IHasAccessModifier, IOwnedByOrganization
         {
             var activeOrganizationId = parameters.ActiveOrganizationId;
             var dataAccessLevel = parameters.DataAccessLevel;

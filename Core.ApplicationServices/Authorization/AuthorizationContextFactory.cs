@@ -1,4 +1,9 @@
-﻿using Core.ApplicationServices.Authorization.Policies;
+﻿using System;
+using System.Linq;
+using Core.ApplicationServices.Authorization.Policies;
+using Core.DomainModel;
+using Core.DomainModel.Result;
+using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Authorization
@@ -6,19 +11,39 @@ namespace Core.ApplicationServices.Authorization
     public class AuthorizationContextFactory : IAuthorizationContextFactory
     {
         private readonly IEntityTypeResolver _typeResolver;
+        private readonly IGenericRepository<GlobalConfig> _globalConfigurationRepository;
         private static readonly GlobalReadAccessPolicy GlobalReadAccessPolicy = new GlobalReadAccessPolicy();
 
-        public AuthorizationContextFactory(IEntityTypeResolver typeResolver)
+        public AuthorizationContextFactory(IEntityTypeResolver typeResolver, IGenericRepository<GlobalConfig> globalConfigurationRepository)
         {
             _typeResolver = typeResolver;
+            _globalConfigurationRepository = globalConfigurationRepository;
         }
 
         public IAuthorizationContext Create(IOrganizationalUserContext userContext)
         {
-            //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
             return userContext is UnauthenticatedUserContext
                 ? new UnauthenticatedAuthorizationContext()
-                : (IAuthorizationContext)new OrganizationAuthorizationContext(userContext, _typeResolver, new ModuleLevelAccessPolicy(userContext), GlobalReadAccessPolicy);
+                : (IAuthorizationContext)CreateOrganizationAuthorizationContext(userContext);
+        }
+
+        private OrganizationAuthorizationContext CreateOrganizationAuthorizationContext(IOrganizationalUserContext userContext)
+        {
+            Maybe<GlobalConfig> globalConfig =
+                _globalConfigurationRepository
+                    .AsQueryable()
+                    .FirstOrDefault(gc => gc.key == GlobalConfigKeys.OnlyGlobalAdminMayEditReports);
+
+            //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
+            var onlyGlobalAdminMayEditReports = globalConfig.Select(x => bool.TrueString.Equals(x.value,StringComparison.OrdinalIgnoreCase)).GetValueOrFallback(false);
+            var moduleLevelAccessPolicy = new ModuleModificationPolicy(userContext, onlyGlobalAdminMayEditReports);
+
+            return new OrganizationAuthorizationContext(
+                userContext,
+                _typeResolver,
+                moduleLevelAccessPolicy,
+                GlobalReadAccessPolicy,
+                moduleLevelAccessPolicy);
         }
     }
 }

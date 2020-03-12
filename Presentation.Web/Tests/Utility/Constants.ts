@@ -6,6 +6,10 @@
 class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoReportNameObjects = "reportNameKendoObject";
+    readonly kendoProjectNameObjects = "projectNameKendoObject";
+    readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
+    readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractNameObject";
@@ -14,13 +18,17 @@ class Constants {
     readonly kendoButtonUseFilter = "useFilterButton";
     readonly kendoButtonDeleteFilter = "removeFilterButton";
     readonly kendoContractButtonCreateContract = "createContractButton";
+    readonly kendoProjectButtonCreateProject = "createProjectButton";
+    readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
-    readonly kendoUsedByHeaderObject = "usedByNameHeader";
+    readonly kendoUsedByHeader = "usedByNameHeader";
     readonly kendoUsedByObject = "usedByNameObject";
+
+    readonly kendoCatalogNameFilter = "Name";
 
     readonly kendoUserEmailHeader = "userHeaderEmail";
     readonly kendoUserEmailObject = "userEmailObject";
@@ -32,7 +40,10 @@ class Constants {
     readonly kendoRemoveFilter = "removeFilterButton";
     readonly kendoUserDeleteButton = "userDeleteButton";
 
+    readonly kendoRelationCountObject = "relationCountObject";
+
     //Environmental variables
+    readonly defaultSystemUsageName = "DefaultTestItSystem";
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
     readonly nameOfSystemInput = "nameOfItSystemInput";
@@ -48,10 +59,35 @@ class Constants {
     readonly invalidUrl = "invalidUrl";
     readonly refId = "1337";
     readonly refTitle = "STRONGMINDS";
+    readonly migrationOrgNameToMove = "MigrationMoveOrgName";
+
+    //interfaceInoputConstants
+    readonly interfaceNameInput = "InterfaceNameInput";
+    readonly interfaceIdInput = "InterfaceIdInput";
+    readonly interfaceVersionInput = "InterfaceVersionInput";
+    readonly interfaceExhibitInput = "InterfaceExhibitInput";
+    readonly interfaceBelongsToInput = "InterfaceBelongsToInput";
+    readonly interfaceAccesAbilityInput = "InterfaceAccesAbilityInput";
+    readonly interfaceInterfaceInput = "InterfaceInterfaceInput";
+    readonly interfaceDescriptionInput = "InterfaceDescriptionInput";
+    readonly interfaceNoteInput = "InterfaceNoteInput";
+    readonly interfaceDescriptionLinkInput = "InterfaceDescriptionLinkInput";
+    readonly interfaceDataInput = "InterfaceDataInput";
+    readonly interfaceDataTypeInput = "InterfaceDataTypeInput";
+    readonly interfaceDataTableInput = "InterfaceDataInput";
+    readonly interfaceNewRowButton = "InterfaceNewRowButton";
+
+
+    readonly interfaceSelectExhibit = "s2id_interface-exposed-by";
+    readonly interfaceSelectBelongs = "s2id_belongs-to";
+    readonly interfaceSelectAccess = "s2id_interface-access";
+    readonly interfaceSelectInterface = "s2id_interface-interface";
+    readonly interfaceSelectTableDataType = "s2id_interface-data-type";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
     readonly navigationSystemButton = "systemButton";
+    readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
     readonly navigationReportsButton = "reportButton";
 
@@ -73,11 +109,50 @@ class Constants {
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
     readonly kendoSystemDeleteButton = "deleteSystemButton";
-
+    
     readonly kleStatusLabel = "KLEStatusLabel";
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
+
+    //Local System 
+    readonly createRelationButton = "create-Relation";
+    readonly referenceInputField = "Reference";
+    readonly descriptionInputField = "description";
+    readonly saveButtonText = "Gem";
+
+    readonly systemUsageHeaderName = "systemUsageHeaderName";
+
+    readonly mainLocalId = "sysId";
+    readonly mainCallName = "localcallname";
+    readonly mainNote = "note";
+    readonly mainVersion = "version";
+    readonly mainOwner = "usage-owner";
+    readonly mainSystemName = "system-name";
+    readonly mainParentName = "system-parent";
+    readonly mainPreviousName = "system-previousname";
+    readonly mainBelongsTo = "system-belongs-to";
+    readonly mainAccess = "system-access";
+    readonly mainDescription = "system-description";
+    readonly mainReferences = "system-referencer";
+    readonly mainKLE = "system-kle";
+    readonly mainBusinessType = "system-business-type";
+    readonly mainArchive = "archiveDuty";
+    readonly mainUUID = "system-uuid";
+
+    readonly relationDescriptionField = "relationDescription";
+    readonly relationReferenceField = "relationReference";
+    readonly relationFrequencyTypeField = "relationFrequencyType";
+
+    readonly usedByRelationDescriptionField = "usedByRelationDescription";
+    readonly usedByRelationReferenceField = "usedByRelationReference";
+    readonly usedByRelationFrequencyTypeField = "usedByRelationFrequencyType";
+
+
+    //Local admin
+
+    readonly itProjectIncludeModuleInput = "project-include";
+    
 }
 export = Constants;
 

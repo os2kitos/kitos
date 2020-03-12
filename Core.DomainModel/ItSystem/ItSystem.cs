@@ -1,9 +1,12 @@
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
+using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItSystem
 {
-    using DataTypes;
 
     /// <summary>
     /// Represents an it system.
@@ -12,15 +15,13 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
-            this.ArchivePeriods = new List<ArchivePeriod>();
-            this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
-            this.Children = new List<ItSystem>();
-            this.TaskRefs = new List<TaskRef>();
-            this.AccessTypes = new List<AccessType>();
-            this.Wishes = new List<Wish>();
-            this.Usages = new List<ItSystemUsage.ItSystemUsage>();
+            ArchivePeriods = new List<ArchivePeriod>();
+            ItInterfaceExhibits = new List<ItInterfaceExhibit>();
+            Children = new List<ItSystem>();
+            TaskRefs = new List<TaskRef>();
+            AccessTypes = new List<AccessType>();
+            Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
-            this.AssociatedDataWorkers = new List<ItSystemDataWorkerRelation>();
 
         }
 
@@ -36,9 +37,6 @@ namespace Core.DomainModel.ItSystem
         public string ItSystemId { get; set; }
 
         public string PreviousName { get; set; }
-
-        public int? AppTypeOptionId { get; set; }
-        public virtual ItSystemType AppTypeOption { get; set; }
 
         /// <summary>
         /// Gets or sets exhibited interfaces for this instance.
@@ -73,8 +71,7 @@ namespace Core.DomainModel.ItSystem
         /// The type of the business.
         /// </value>
         public virtual BusinessType BusinessType { get; set; }
-
-        public virtual ICollection<Wish> Wishes { get; set; }
+        
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
@@ -99,25 +96,38 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
+        public ReferenceRootType GetRootType()
+        {
+            return ReferenceRootType.System;
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
+        }
+
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
-        //GDPR
-        public string GeneralPurpose { get; set; }
 
-        public DataSensitivityLevel DataLevel { get; set; }
+        public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
 
-        public DataOptions ContainsLegalInfo { get; set; }
-
-        public bool IsDataTransferedToThirdCountries { get; set; }
-
-        public string DataIsTransferedTo { get; set; }
-
-        public int ArchiveDuty { get; set; }
-
-        public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
+        public string ArchiveDutyComment { get; set; }
 
         public string LinkToDirectoryAdminUrl { get; set; }
         public string LinkToDirectoryAdminUrlName { get; set; }
+
+        public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
+        {
+            interfaceExhibit = ItInterfaceExhibits.FirstOrDefault(i => i.ItInterface.Id == interfaceId);
+
+            return interfaceExhibit != null;
+        }
     }
 }

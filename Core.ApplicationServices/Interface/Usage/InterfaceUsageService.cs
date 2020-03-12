@@ -1,9 +1,8 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Contract;
 using Serilog;
 
@@ -44,19 +43,19 @@ namespace Core.ApplicationServices.Interface.Usage
                               $"ItSystemUsageId: {systemUsageId}, " +
                               $"ItSystemId: {systemId}," +
                               $"ItInterfaceId: {interfaceId} }} already exists");
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Conflict);
+                return OperationFailure.Conflict;
             }
 
             var contract = _contractRepository.GetById(contractId);
             if (contract == null)
             {
                 _logger.Error("Contract with id: {id} not found. Cannot create interface usage", contractId);
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
 
             if (!AllowCreateInterfaceUsageIn(contract))
             {
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var newInterfaceUsage = _interfaceUsageRepository.Create();
@@ -69,7 +68,7 @@ namespace Core.ApplicationServices.Interface.Usage
             _interfaceUsageRepository.Insert(newInterfaceUsage);
             _interfaceUsageRepository.Save();
 
-            return Result<ItInterfaceUsage, OperationFailure>.Success(newInterfaceUsage);
+            return newInterfaceUsage;
         }
 
         private bool AllowCreateInterfaceUsageIn(ItContract contract)
@@ -85,17 +84,17 @@ namespace Core.ApplicationServices.Interface.Usage
             if (interfaceUsageToBeDeleted == null)
             {
                 _logger.Error($"Could not find interface usage with key {key}");
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!AllowDelete(interfaceUsageToBeDeleted))
             {
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
             _interfaceUsageRepository.Save();
-            return Result<ItInterfaceUsage, OperationFailure>.Success(interfaceUsageToBeDeleted);
+            return interfaceUsageToBeDeleted;
         }
 
         private bool AllowDelete(ItInterfaceUsage interfaceExhibitUsageToBeDeleted)

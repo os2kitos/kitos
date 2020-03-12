@@ -7,6 +7,7 @@ using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Security

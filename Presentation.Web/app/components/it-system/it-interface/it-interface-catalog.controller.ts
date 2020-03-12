@@ -14,7 +14,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-interface-catalog-options";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
@@ -33,8 +33,8 @@
             "gridStateService",
             "$uibModal",
             "$http",
-            "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -50,8 +50,8 @@
             private gridStateService: Services.IGridStateFactory,
             private $modal,
             private $http,
-            private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -89,8 +89,8 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
-            this.canCreate = !this.user.isReadOnly;
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,BelongsTo,Organization,ExhibitedBy($expand=ItSystem),LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            this.canCreate = userAccessRights.canCreate;
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -133,9 +133,7 @@
                                 if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
                                 if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
                                 if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
-                                if (!ItInterface.Tsa) { ItInterface.Tsa = { Name: "" }; }
                                 if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
-                                if (!ItInterface.Method) { ItInterface.Method = { Name: "" }; }
                                 if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
                             });
                             return response;
@@ -272,19 +270,6 @@
                         }
                     },
                     {
-                        field: "InterfaceType.Name", title: "Snitfladetype", width: 150,
-                        persistId: "inftype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
@@ -302,11 +287,10 @@
                         field: "Url", title: "Link til beskrivelse", width: 125,
                         persistId: "link", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (!dataItem.Url) {
-                                return "";
+                            if (Utility.Validation.validateUrl(dataItem.Url)) {
+                                return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
                             }
-
-                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
+                            return "";
                         },
                         excelTemplate: dataItem => dataItem && dataItem.Url || "",
                         attributes: { "class": "text-center" },
@@ -338,36 +322,9 @@
                         }
                     },
                     {
-                        field: "Tsa.Name", title: "TSA", width: 90,
-                        persistId: "tsa", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "Interface.Name", title: "Grænseflade", width: 150,
                         persistId: "infname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Interface ? dataItem.Interface.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "Method.Name", title: "Metode", width: 150,
-                        persistId: "method", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Method ? dataItem.Method.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -555,10 +512,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -673,7 +627,12 @@
                     resolve: {
                         user: [
                             "userService", userService => userService.getUser()
-                        ]
+                        ],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                            .createInterfaceAuthorization()
+                            .getOverviewAuthorization()
+                        ],
                     }
                 });
             }

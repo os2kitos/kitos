@@ -52,5 +52,12 @@ namespace Core.DomainServices.Repositories.Contract
         {
             return _contractRepository.AsQueryable().ById(contractId);
         }
+
+        public IQueryable<ItContract> GetByOrganizationId(int organizationId)
+        {
+            return _contractRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId);
+        }
     }
 }

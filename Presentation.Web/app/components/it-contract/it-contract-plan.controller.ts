@@ -20,7 +20,7 @@
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
@@ -43,7 +43,8 @@
             "orgUnits",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -63,7 +64,8 @@
             private orgUnits: Array<any>,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights : Models.Api.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -158,17 +160,12 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -176,16 +173,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleOrganizationUnit.Name']");
-            // find the access modifier kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => dataItem.Id == orgUnitId);
-
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleOrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -225,7 +213,7 @@
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
 
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -235,7 +223,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures,Reference`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations,Reference`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -388,12 +376,6 @@
                     <uib-tab index="0" heading="Systemer">
                         <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                    <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" data-odata-query="odata/ItInterfaceExhibits?$select=ItInterface&$expand=ItInterface($select=Name, Disabled)&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
-                    </uib-tab>
-                    <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" data-odata-query="odata/ItContracts?$select=AssociatedInterfaceUsages&$expand=AssociatedInterfaceUsages($select=ItInterface;$expand=ItInterface($select=Name, Disabled))&$filter=AssociatedInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
-                    </uib-tab>
                 </uib-tabset>`;
 
                 },
@@ -467,6 +449,12 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${
                             dataItem.Name}</a>`,
+                        attributes: {
+                            "data-element-type": "contractNameObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "contractNameHeader"
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
@@ -511,7 +499,7 @@
                     {
                         field: "AssociatedSystemUsages",
                         title: "Antal systemer",
-                        width: 50,
+                        width: 60,
                         persistId: "numOfItSystems", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             return dataItem.AssociatedSystemUsages.length.toString();
@@ -521,26 +509,17 @@
                         filterable: false
                     },
                     {
-                        field: "AssociatedInterfaceUsages",
-                        title: "Antal udstillede snitflader",
-                        width: 50,
-                        persistId: "numOfItInterfacesExhibit", // DON'T YOU DARE RENAME!
+                        field: "AssociatedSystemRelations",
+                        title: "Antal relationer",
+                        width: 60,
+                        persistId: "numberOfRelations", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return dataItem.AssociatedInterfaceExposures.length.toString();
+                            return dataItem.AssociatedSystemRelations.length.toString();
                         },
-                        attributes: { "class": "text-center" },
-                        sortable: false,
-                        filterable: false
-                    },
-                    {
-                        field: "AssociatedInterfaceExposures",
-                        title: "Antal anvendte snitflader",
-                        width: 50,
-                        persistId: "numOfItInterfacesUsages", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            return dataItem.AssociatedInterfaceUsages.length.toString();
+                        attributes: {
+                            "class": "text-center",
+                            "data-element-type": "relationCountObject"
                         },
-                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -559,6 +538,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -590,6 +572,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -1069,6 +1054,11 @@
                     user: ["userService", userService => userService.getUser()],
                     itContractRoles: [
                         "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                    ],
+                    userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                        authorizationServiceFactory
+                        .createContractAuthorization()
+                        .getOverviewAuthorization()
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))

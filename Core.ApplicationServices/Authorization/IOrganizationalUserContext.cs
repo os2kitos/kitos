@@ -13,6 +13,5 @@ namespace Core.ApplicationServices.Authorization
         bool IsActiveInOrganization(int organizationId);
         bool IsActiveInSameOrganizationAs(IEntity entity);
         bool HasAssignedWriteAccess(IEntity entity);
-        bool HasOwnership(IEntity entity);
     }
 }

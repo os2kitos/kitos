@@ -7,9 +7,9 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    public class LocalFrequencyTypesController : LocalOptionBaseController<LocalFrequencyType, DataRowUsage, FrequencyType>
+    public class LocalFrequencyTypesController : LocalOptionBaseController<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>
     {
-        public LocalFrequencyTypesController(IGenericRepository<LocalFrequencyType> repository, IGenericRepository<FrequencyType> optionsRepository)
+        public LocalFrequencyTypesController(IGenericRepository<LocalRelationFrequencyType> repository, IGenericRepository<RelationFrequencyType> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

@@ -69,7 +69,6 @@ namespace Presentation.Web.Models
         public DateTime ItSystemUsageTerminated { get; set; }
         public int ItSystemUsageTerminationDeadlineInSystem_Id { get; set; }
         public bool ItSystemUsageArchiveDuty { get; set; }
-        public bool ItSystemUsageArchived { get; set; }
         public bool ItSystemUsageReportedToDPA { get; set; }
         public string ItSystemUsageDocketNo { get; set; }
         public DateTime ItSystemUsageArchivedDate { get; set; }
@@ -88,13 +87,11 @@ namespace Presentation.Web.Models
 
         public int ItSystemId { get; set; }
         public int ItSystemItSystemId { get; set; }
-        public int ItSystemAppTypeOptionId { get; set; }
         public int ItSystemParentId { get; set; }
         public int ItSystemBusinessTypeId { get; set; }
         public string ItSystemName { get; set; }
         public string ItSystemUuid { get; set; }
         public string ItSystemDescription { get; set; }
-        public string ItSystemUrl { get; set; }
         public int ItSystemAccessModifier { get; set; }
         public int ItSystemOrganizationId { get; set; }
         public int ItSystemBelongsToId { get; set; }

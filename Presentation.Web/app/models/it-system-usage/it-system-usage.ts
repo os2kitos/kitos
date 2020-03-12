@@ -44,8 +44,6 @@
         MainContract: ItContract.IItContractItSystemUsage;
         /** Gets or sets it contracts associated with this instance. */
         Contracts: Array<ItContract.IItContractItSystemUsage>;
-        /** Gets or sets the wishes associated with this instance. */
-        Wishes: Array<ItSystem.IWish>;
         /** Gets or sets the organization units associated with this instance. */
         OrgUnits: Array<IOrganizationUnit>;
         /** Gets or sets the organization units that are using this instance. */

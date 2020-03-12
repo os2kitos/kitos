@@ -64,8 +64,8 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
-    <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
     <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
@@ -83,7 +83,6 @@
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
     <Compile Include="Mapping\BusinessTypeMap.cs" />
-    <Compile Include="Mapping\ItSystemTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
     <Compile Include="Mapping\ItInterfaceMap.cs" />
@@ -105,13 +104,11 @@
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
-    <Compile Include="Mapping\DataRowUsageMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\FrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
-    <Compile Include="Mapping\TsaTypeMap.cs" />
+    <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
@@ -120,7 +117,6 @@
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
-    <Compile Include="Mapping\ItInterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
@@ -131,7 +127,6 @@
     <Compile Include="Mapping\ItSystemRightMap.cs" />
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\TaskRefMap.cs" />
-    <Compile Include="Mapping\MethodTypeMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
@@ -142,7 +137,6 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\ArchivePeriodMap.cs" />
-    <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201607110712126_Initial.cs" />
     <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
       <DependentUpon>201607110712126_Initial.cs</DependentUpon>
@@ -515,12 +509,65 @@
     <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.Designer.cs">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.cs" />
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.Designer.cs">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.cs" />
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.cs" />
+    <Compile Include="Migrations\202001291246020_Fix_SystemRelation.Designer.cs">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.cs" />
+    <Compile Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.Designer.cs">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.cs" />
+    <Compile Include="Migrations\202001311141051_SystemRelation_Renaming.Designer.cs">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs" />
+    <Compile Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.Designer.cs">
+      <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002100739397_Relation_UUID.cs" />
+    <Compile Include="Migrations\202002100739397_Relation_UUID.Designer.cs">
+      <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs" />
+    <Compile Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.Designer.cs">
+      <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002190948110_Migrate_System_Url_To_References.cs" />
+    <Compile Include="Migrations\202002190948110_Migrate_System_Url_To_References.Designer.cs">
+      <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs" />
+    <Compile Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.Designer.cs">
+      <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.cs" />
+    <Compile Include="Migrations\202002260819505_Remove_ReadOnly_Roles.Designer.cs">
+      <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002270832001_Removed_Wishes.cs" />
+    <Compile Include="Migrations\202002270832001_Removed_Wishes.Designer.cs">
+      <DependentUpon>202002270832001_Removed_Wishes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003021344549_Archive_Duty_Changes.cs" />
+    <Compile Include="Migrations\202003021344549_Archive_Duty_Changes.Designer.cs">
+      <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
     <Compile Include="Services\WithinAmbienTransaction.cs" />
     <Compile Include="Services\TransactionManager.cs" />
+    <Compile Include="Tools\SqlMigrationScriptRepository.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
@@ -824,6 +871,27 @@
     <EmbeddedResource Include="Migrations\202001201357301_Added-KLEHistoryTable.resx">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280931470_Add_SystemRelation.resx">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291246020_Fix_SystemRelation.resx">
+      <DependentUpon>202001291246020_Fix_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001291318103_Redefine_SystemRelation_Ref.resx">
+      <DependentUpon>202001291318103_Redefine_SystemRelation_Ref.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001311141051_SystemRelation_Renaming.resx">
+      <DependentUpon>202001311141051_SystemRelation_Renaming.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.resx">
+      <DependentUpon>202001311318173_Removed-Datatypes-Method-Tsa-ItInterfaceType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002100739397_Relation_UUID.resx">
+      <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -835,7 +903,29 @@
     <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
     <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
     <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
+    <EmbeddedResource Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.resx">
+      <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002190948110_Migrate_System_Url_To_References.resx">
+      <DependentUpon>202002190948110_Migrate_System_Url_To_References.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.resx">
+      <DependentUpon>202002211336592_Removed_AppTypes_DataLevel_And_GDPR_From_System.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002260819505_Remove_ReadOnly_Roles.resx">
+      <DependentUpon>202002260819505_Remove_ReadOnly_Roles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002270832001_Removed_Wishes.resx">
+      <DependentUpon>202002270832001_Removed_Wishes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003021344549_Archive_Duty_Changes.resx">
+      <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

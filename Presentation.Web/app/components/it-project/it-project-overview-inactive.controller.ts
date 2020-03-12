@@ -21,7 +21,7 @@
     export class OverviewInactiveController implements IOverviewInactiveController {
         private storageKey = "it-project-overview-inactive-options";
         private orgUnitStorageKey = "it-project-overview-inactive-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         public mainGrid: IKendoGrid<IItProjectInactiveOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -102,17 +102,12 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -120,16 +115,7 @@
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleUsage.OrganizationUnit.Name']");
-            // find the access modifier kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
-
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleUsage.OrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -232,15 +218,13 @@
                                 var phase = `Phase${project.CurrentPhase}`;
                                 project.CurrentPhaseObj = project[phase];
 
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
-                                    project.hasWriteAccess = true;
-                                }
                                 if (!project.Parent) { project.Parent = { Name: "" }; }
                                 if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
                                 if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
                                 if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                                 if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
                             });
+
                             return response;
                         }
                     }
@@ -371,6 +355,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
@@ -398,6 +385,9 @@
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -448,7 +438,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.StartDate);
                         },
                         sortable: false,
                         filterable: false
@@ -470,7 +460,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.CurrentPhaseObj.EndDate);
                         },
                         sortable: false,
                         filterable: false
@@ -503,28 +493,10 @@
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusTime = latestStatus.TimeStatus;
-                                var statusQuality = latestStatus.QualityStatus;
-                                var statusResources = latestStatus.ResourcesStatus;
-                                if (latestStatus.IsCombined) {
-                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
-                                } else {
-                                    /* If no combined status exists, take the lowest status from the splitted status */
-                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
-                                        return "<span data-square-traffic-light='Red'></span>";
-                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
-                                        return "<span data-square-traffic-light='Yellow'></span>";
-                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
-                                        return "<span data-square-traffic-light='Green'></span>";
-                                    } else {
-                                        return "<span data-square-traffic-light='White'></span>";
-                                    }
-                                }
-                            } else {
+                            if (!dataItem.ItProjectStatusUpdates) {
                                 return "";
-                            }
+                            }   
+                            return Helpers.ExcelExportHelper.renderProjectStatusColor(dataItem.ItProjectStatusUpdates);
                         },
                         filterable: false,
                         sortable: false
@@ -543,9 +515,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].TimeStatus);
                             } else {
                                 return "";
                             }
@@ -567,9 +537,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].QualityStatus);
                             } else {
                                 return "";
                             }
@@ -591,9 +559,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
-                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
-                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
-                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                                return Helpers.ExcelExportHelper.renderStatusColorWithStatus(dataItem, dataItem.ItProjectStatusUpdates[0].ResourcesStatus);
                             } else {
                                 return "";
                             }
@@ -608,8 +574,7 @@
                             if (!dataItem || !dataItem.StatusDate) {
                                 return "";
                             }
-
-                            return this.moment(dataItem.StatusDate).format("DD-MM-YYYY");
+                            return Helpers.ExcelExportHelper.renderDate(dataItem.StatusDate);
                         },
                         hidden: true,
                         filterable: {
@@ -632,7 +597,12 @@
                         field: "GoalStatus.Status", title: "Status Mål", width: 150,
                         persistId: "goalstatus", // DON'T YOU DARE RENAME!
                         template: dataItem => `<span data-square-traffic-light="${dataItem.GoalStatus.Status}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.GoalStatus && dataItem.GoalStatus.Status.toString() || "",
+                        excelTemplate: dataItem => {
+                            if (!dataItem.GoalStatus) {
+                                return "";
+                            }
+                            return Helpers.ExcelExportHelper.getGoalStatus(dataItem.GoalStatus.Status);
+                        },
                         hidden: true,
                         filterable: {
                             cell: {

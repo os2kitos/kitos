@@ -24,29 +24,24 @@
         public selectSettings: ISelectSettings;
 
         public static $inject: Array<string> = [
-            "$scope",
             "$rootScope",
-            "$http",
             "_",
             "project",
             "projectTypes",
-            "user",
-            "hasWriteAccess"
+            "hasWriteAccess",
+            "userAccessRights"
         ];
 
         constructor(
-            private $scope: ng.IScope,
             private $rootScope,
-            private $http: ng.IHttpService,
             private _: ILoDashWithMixins,
             public project,
             public projectTypes,
-            private user,
-            public hasWriteAccess) {
+            public hasWriteAccess,
+            public userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) {
             this.autosaveUrl = `api/itproject/${this.project.id}`;
-
-            if (!hasWriteAccess) {
-                _.remove($rootScope.page.subnav.buttons, function (o:any) {
+            if (!userAccessRights.canDelete) {
+                _.remove($rootScope.page.subnav.buttons, function (o: any) {
                     return o.text === "Slet IT Projekt";
                 });
             }
@@ -67,11 +62,14 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
+                        userAccessRights: ["authorizationServiceFactory", "$stateParams",
+                            (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
+                            authorizationServiceFactory
+                            .createProjectAuthorization()
+                            .getAuthorizationForItem($stateParams.id)
+                        ],
                         hasWriteAccess: [
-                            "$http", "$stateParams", "user", ($http, $stateParams, user) => {
-                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
-                            }
+                            "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                         ],
                         project: [
                             "$http", "$stateParams", ($http: ng.IHttpService, $stateParams) => {

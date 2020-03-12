@@ -8,7 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Moq;
-using Tests.Unit.Presentation.Web.Helpers;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(contextResult, result);
         }
 
-        public interface IEntityWithOrganization : IEntity, IHasOrganization { }
+        public interface IEntityWithOrganization : IEntity, IOwnedByOrganization { }
 
         [Theory]
         [InlineData(true)]
@@ -172,24 +172,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(hasAccess, result);
-        }
-
-        [Theory]
-        [InlineData(1, 1, true)]
-        [InlineData(1, 2, false)]
-        [InlineData(2, 1, false)]
-        public void HasOwnership_Returns_Based_On_OwnerId(int entityOwnerId, int userId, bool expectedResult)
-        {
-            //Arrange
-            var user = new User() { Id = userId };
-            var sut = new OrganizationalUserContext(Many<OrganizationRole>(), user, A<int>());
-            var entity = Mock.Of<IEntity>(x => x.ObjectOwnerId == entityOwnerId);
-
-            //Act
-            var result = sut.HasOwnership(entity);
-
-            //Assert
-            Assert.Equal(expectedResult, result);
         }
 
         #region helpers

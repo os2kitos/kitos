@@ -41,11 +41,7 @@ namespace Presentation.Web
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Description
-            Mapper.CreateMap<ItSystemDataWorkerRelation, ItSystemDataWorkerRelationDTO>()
-                  .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
-                  .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
-                  .ReverseMap();
-
+            
             Mapper.CreateMap<ContactPerson, ContactPersonDTO>()
                  .ReverseMap();
 
@@ -74,19 +70,11 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<ItInterfaceType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
             Mapper.CreateMap<InterfaceType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<DataType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<MethodType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -98,11 +86,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
-            Mapper.CreateMap<TsaType, OptionDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<FrequencyType, OptionDTO>()
+            Mapper.CreateMap<RelationFrequencyType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -119,10 +103,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<ItContractRole, RoleDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.References, opt => opt.Ignore());
-
-            Mapper.CreateMap<ItSystemType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
@@ -197,11 +177,6 @@ namespace Presentation.Web
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null));
-
-            Mapper.CreateMap<Wish, WishDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.User, opt => opt.Ignore())
-                  .ForMember(dest => dest.ItSystemUsage, opt => opt.Ignore());
 
             Mapper.CreateMap<Organization, OrganizationDTO>()
                 .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
@@ -304,7 +279,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.ItSystemUsageTerminated, opt => opt.MapFrom(src => src.Object.Terminated))
                .ForMember(dto => dto.ItSystemUsageTerminationDeadlineInSystem_Id, opt => opt.MapFrom(src => src.Object.TerminationDeadlineInSystem.Id))
                .ForMember(dto => dto.ItSystemUsageArchiveDuty, opt => opt.MapFrom(src => src.Object.ArchiveDuty))
-               .ForMember(dto => dto.ItSystemUsageArchived, opt => opt.MapFrom(src => src.Object.Archived))
                .ForMember(dto => dto.ItSystemUsageReportedToDPA, opt => opt.MapFrom(src => src.Object.ReportedToDPA))
                .ForMember(dto => dto.ItSystemUsageDocketNo, opt => opt.MapFrom(src => src.Object.DocketNo))
                .ForMember(dto => dto.ItSystemUsageArchivedDate, opt => opt.MapFrom(src => src.Object.ArchivedDate))
@@ -321,13 +295,11 @@ namespace Presentation.Web
                .ForMember(dto => dto.OrganizationTypeId, opt => opt.MapFrom(src => src.Object.Organization.TypeId))
                .ForMember(dto => dto.ItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.Id))
                .ForMember(dto => dto.ItSystemItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.ItSystemId))
-               .ForMember(dto => dto.ItSystemAppTypeOptionId, opt => opt.MapFrom(src => src.Object.ItSystem.AppTypeOptionId))
                .ForMember(dto => dto.ItSystemParentId, opt => opt.MapFrom(src => src.Object.ItSystem.ParentId))
                .ForMember(dto => dto.ItSystemBusinessTypeId, opt => opt.MapFrom(src => src.Object.ItSystem.BusinessTypeId))
                .ForMember(dto => dto.ItSystemName, opt => opt.MapFrom(src => src.Object.ItSystem.Name))
                .ForMember(dto => dto.ItSystemUuid, opt => opt.MapFrom(src => src.Object.ItSystem.Uuid))
                .ForMember(dto => dto.ItSystemDescription, opt => opt.MapFrom(src => src.Object.ItSystem.Description))
-               .ForMember(dto => dto.ItSystemUrl, opt => opt.MapFrom(src => src.Object.ItSystem.Url))
                .ForMember(dto => dto.ItSystemAccessModifier, opt => opt.MapFrom(src => src.Object.ItSystem.AccessModifier))
                .ForMember(dto => dto.ItSystemOrganizationId, opt => opt.MapFrom(src => src.Object.ItSystem.OrganizationId))
                .ForMember(dto => dto.ItSystemBelongsToId, opt => opt.MapFrom(src => src.Object.ItSystem.BelongsToId))
@@ -358,29 +330,16 @@ namespace Presentation.Web
             Mapper.CreateMap<ItSystem, ItSystemDTO>()
                 .ForMember(dest => dest.TaskRefIds, opt => opt.MapFrom(src => src.TaskRefs.Select(x => x.Id)))
                 .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.Usages.Any()))
-                //.ForMember(dest => dest.CanUseInterfaceIds, opt => opt.MapFrom(src => src.CanUseInterfaces.Select(x => x.Id)))
-                //.ForMember(dest => dest.ExposedInterfaceIds, opt => opt.MapFrom(src => src.ItInterfaceExhibits.Select(x => x.Id)))
                 .ReverseMap()
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
-                // Udkommenteret ifm. OS2KITOS-663
-                //.ForMember(dest => dest.CanUseInterfaces, opt => opt.Ignore())
                 .ForMember(dest => dest.ItInterfaceExhibits, opt => opt.Ignore());
-            //.ForMember(dest => dest.CanBeUsedBy, opt => opt.Ignore());
 
             //Simplere mapping than the one above, only one way
             Mapper.CreateMap<ItSystem, ItSystemSimpleDTO>();
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
-                .ForMember(dest => dest.InterfaceTypeName, opt => opt.MapFrom(src => src.InterfaceType.Name)) // have to map here else the EF proxy class type name is used :(
                 .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.Usages.Any()))
                 .ReverseMap();
-
-            // Udkommenteret ifm. OS2KITOS-663
-            //Mapper.CreateMap<ItInterfaceUse, ItInterfaceUseDTO>()
-            //      .ReverseMap();
-
-            Mapper.CreateMap<DataRowUsage, DataRowUsageDTO>()
-                  .ReverseMap();
 
             Mapper.CreateMap<ItInterfaceUsage, ItInterfaceUsageDTO>()
                   .ForMember(dest => dest.ItInterfaceItInterfaceName, opt => opt.MapFrom(src => src.ItInterface.Name))
@@ -399,10 +358,6 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractId, opt => opt.MapFrom(src => src.MainContract.ItContractId))
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
-                // Udkommenteret ifm. OS2KITOS-663
-                //.ForMember(dest => dest.InterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Count))
-                //.ForMember(dest => dest.ActiveInterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Sum(x => x.ItInterfaceUsages.Count(y => y.ItContract.IsActive))))
-
                 .ReverseMap()
                 .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())

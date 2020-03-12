@@ -15,7 +15,7 @@
                     autoSaveUrl: "@",
                     appendurl: "@",
                     field: "@",
-                    disabled: "&ngDisabled",
+                    disabled: "=ngDisabled",
                     required: "@"
                 },
                 link: function (scope, element, attr, ctrl) {
@@ -37,6 +37,10 @@
                         } else {
                             scope.optionDescription = null;
                         }
+                    });
+
+                    scope.$watch(attr.disabled, function (newVal) {
+                        element.prop('disabled', newVal);
                     });
                 }
             };

@@ -88,10 +88,12 @@
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
-    <Compile Include="Authorization\IAuthorizationPolicy.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
-    <Compile Include="Authorization\Policies\ModuleLevelAccessPolicy.cs" />
+    <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
+    <Compile Include="Authorization\Policies\IModuleCreationPolicy.cs" />
+    <Compile Include="Authorization\Policies\IModuleModificationPolicy.cs" />
+    <Compile Include="Authorization\Policies\ModuleModificationPolicy.cs" />
     <Compile Include="Authorization\OrganizationalUserContext.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContext.cs" />
     <Compile Include="Authorization\IPermissionVisitor.cs" />
@@ -108,13 +110,15 @@
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
+    <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\OptionsService.cs" />
     <Compile Include="TaskRefs\IKLEApplicationService.cs" />
     <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
     <Compile Include="TaskRefs\KLEApplicationService.cs" />
-    <Compile Include="Model\Result\OperationFailure.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
@@ -126,7 +130,6 @@
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
-    <Compile Include="Model\SystemUsage\Migration\ItContractMigration.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="IExcelHandler.cs" />
     <Compile Include="IExcelService.cs" />
@@ -136,7 +139,7 @@
     <Compile Include="Project\ItProjectService.cs" />
     <Compile Include="Interface\ItInterfaceService.cs" />
     <Compile Include="System\IItSystemService.cs" />
-    <Compile Include="System\IReferenceService.cs" />
+    <Compile Include="References\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />
     <Compile Include="SystemUsage\ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
@@ -146,7 +149,7 @@
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailClient.cs" />
-    <Compile Include="System\ReferenceService.cs" />
+    <Compile Include="References\ReferenceService.cs" />
     <Compile Include="UserService.cs" />
   </ItemGroup>
   <ItemGroup>

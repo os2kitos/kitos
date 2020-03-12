@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Model.Result;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -37,12 +36,12 @@ namespace Core.ApplicationServices.Organizations
 
             if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
             {
-                return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             right = _organizationRightRepository.Insert(right);
             _organizationRightRepository.Save();
-            return Result<OrganizationRight, OperationFailure>.Success(right);
+            return right;
         }
 
         public Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)
@@ -67,24 +66,24 @@ namespace Core.ApplicationServices.Organizations
         {
             if (right == null)
             {
-                return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowDelete(right))
             {
-                return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             if (right.Role == OrganizationRole.GlobalAdmin && right.UserId == _userContext.UserId)
             {
                 //Only other global admins should do this. Otherwise the system could end up without a global admin
-                return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.Conflict);
+                return OperationFailure.Conflict;
             }
 
             _organizationRightRepository.DeleteByKey(right.Id);
             _organizationRightRepository.Save();
 
-            return Result<OrganizationRight, OperationFailure>.Success(right);
+            return right;
         }
     }
 }

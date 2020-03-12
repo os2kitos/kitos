@@ -7,6 +7,7 @@
         fromSystem: NamedEntityDTO;
         toSystem: NamedEntityDTO;
         affectedItProjects: Array<NamedEntityDTO>;
-        affectedContracts: Array<IItContractItSystemUsageDTO>;
+        affectedContracts: Array<NamedEntityDTO>;
+        affectedRelations: Array<RelationMigrationDTO>;
     }
 }

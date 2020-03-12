@@ -13,16 +13,14 @@
             controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', '$timeout', function ($rootScope, $http, $state, $modal, notify, user, $scope, $timeout) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
-                    { state: 'it-system.overview', text: "IT Systemer" },
-                    { state: 'it-system.catalog', text: 'IT System katalog' },
-                    { state: 'it-system.interfaceCatalog', text: 'Snitflade katalog' },
-                    { state: 'it-system.edit', text: 'IT System', showWhen: 'it-system.edit' },
-                    { state: 'it-system.usage', text: 'IT System anvendelse', showWhen: 'it-system.usage' },
-                    { state: 'it-system.interface-edit', text: 'Snitflade', showWhen: 'it-system.interface-edit' }
+                    { state: 'it-system.overview', substate: 'it-system.usage', text: "IT Systemer i " + user.currentOrganizationName},
+                    { state: 'it-system.catalog', substate: 'it-system.edit', text: 'IT Systemkatalog' },
+                    { state: 'it-system.interfaceCatalog', substate: 'it-system.interface-edit.main', text: 'Snitfladekatalog' }
                 ];
                 
                 $rootScope.page.subnav.buttons = [
-                    { func: removeUsage, text: 'Fjern anvendelse', style: 'btn-danger', showWhen: 'it-system.usage' },
+                    {
+                        func: removeUsage, text: 'Fjern anvendelse', style: 'btn-danger', showWhen: 'it-system.usage', dataElementType: 'removeSystemUsageButton'},
                     { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                 ];
 
@@ -40,7 +38,7 @@
                             $state.go('it-system.overview');
                         })
                         .error(function (error, status) {
-                            if (status === 401)
+                            if (status === 403)
                                 msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             else
                                 msg.toErrorMessage("Fejl! Kunne ikke slette IT System anvendelsen!");
@@ -61,7 +59,7 @@
                         .error(function (data, status) {
                             if (status == 409)
                                 msg.toErrorMessage('Fejl! Kan ikke slette snitflade, den er tilknyttet et IT System, som er i lokal anvendelse!');
-                            else if (status === 401)
+                            else if (status === 403)
                                 msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             else
                                 msg.toErrorMessage('Fejl! Kunne ikke slette Snitfladen!');

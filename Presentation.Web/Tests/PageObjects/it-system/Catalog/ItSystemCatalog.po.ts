@@ -12,20 +12,24 @@ class ItSystemCatalog implements IPageObject {
     private navigationHelper = new NavigationHelper();
 
 
-    public getPage(): webdriver.promise.Promise<void> {
+    getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/system/catalog");
     }
 
-    public kendoToolbarHelper = new KendoToolbarHelper();
-    public kendoToolbarWrapper = new KendoToolbarWrapper();
-    public createCatalogForm = element(this.byDataElementType(this.consts.catalogCreateForm));
+    kendoToolbarHelper = new KendoToolbarHelper();
+    kendoToolbarWrapper = new KendoToolbarWrapper();
+    createCatalogForm = element(this.byDataElementType(this.consts.catalogCreateForm));
 
-    public isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
+    isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.createCatalogForm);
     }
 
-    public waitForKendoGrid(): webdriver.until.Condition<boolean> {
+    waitForKendoGrid(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+    }
+
+    getCreateSystemButton() {
+        return this.kendoToolbarWrapper.headerButtons().systemCatalogCreate;
     }
 }
 

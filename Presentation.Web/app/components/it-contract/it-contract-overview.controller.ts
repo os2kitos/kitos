@@ -32,7 +32,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
         private roleSelectorDataSource;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
@@ -56,7 +56,8 @@
             "ecoStreamData",
             "$uibModal",
             "needsWidthFixService",
-            "exportGridToExcelService"
+            "exportGridToExcelService",
+            "userAccessRights"
         ];
 
         constructor(
@@ -77,7 +78,8 @@
             private ecoStreamData,
             private $modal,
             private needsWidthFixService,
-            private exportGridToExcelService) {
+            private exportGridToExcelService,
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -174,10 +176,7 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            //Add only excel option if user is not readonly
-            if (!this.user.isReadOnly) {
-                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            }
+            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -186,26 +185,14 @@
         }
 
         public saveGridProfile() {
-            // the stored org unit id must be the current
-            var currentOrgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
-            this.$window.localStorage.setItem(this.orgUnitStorageKey + "-profile", currentOrgUnitId);
-
+            Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
         }
 
         public loadGridProfile() {
             this.gridState.loadGridProfile(this.mainGrid);
-
-            var orgUnitId = this.$window.localStorage.getItem(this.orgUnitStorageKey + "-profile");
-            // update session
-            this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
-            // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row[data-field='ResponsibleOrganizationUnit.Name']");
-            // find the access modifier kendo widget
-            var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
-            orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
-
+            Utility.KendoFilterProfileHelper.saveProfileSessionStorageData(this.$window, this.$, this.orgUnitStorageKey, "ResponsibleOrganizationUnit.Name");
             this.mainGrid.dataSource.read();
             this.notify.addSuccessMessage("Anvender gemte filtre og sortering");
         }
@@ -233,7 +220,7 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
-        
+
 
         public parseOptionEnum(enumName: string): string {
             switch (enumName) {
@@ -246,7 +233,7 @@
                 default:
                     return "";
             }
-        }      
+        }
 
         private activate() {
 
@@ -255,7 +242,7 @@
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
-            this.canCreate = !this.user.isReadOnly;
+            this.canCreate = this.userAccessRights.canCreate;
 
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -342,9 +329,9 @@
 
                                     contract.status = {
                                         max: totalWhiteStatuses +
-                                        totalRedStatuses +
-                                        totalYellowStatuses +
-                                        totalGreenStatuses,
+                                            totalRedStatuses +
+                                            totalYellowStatuses +
+                                            totalGreenStatuses,
                                         white: totalWhiteStatuses,
                                         red: totalRedStatuses,
                                         yellow: totalYellowStatuses,
@@ -382,31 +369,31 @@
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
-                        "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
+                            "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                        "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
+                            "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                        "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewVm.saveGridProfile()'>#: text #</button>"
+                            "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewVm.saveGridProfile()'>#: text #</button>"
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                        "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewVm.loadGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewVm.loadGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                        "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -577,6 +564,9 @@
                             }
                             return "";
                         },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
+                        },
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
@@ -597,13 +587,16 @@
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
-                                        reference.Title + 
+                                        reference.Title +
                                         "</a>";
                                 } else {
                                     return reference.Title;
                                 }
                             }
                             return "";
+                        },
+                        excelTemplate: dataItem => {
+                            return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -767,7 +760,7 @@
                     }
                 }
             };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole); 
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -953,6 +946,11 @@
                         ],
                         user: [
                             "userService", userService => userService.getUser()
+                        ],
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                            authorizationServiceFactory
+                                .createContractAuthorization()
+                                .getOverviewAuthorization()
                         ],
                         orgUnits: [
                             "$http", "user", "_",

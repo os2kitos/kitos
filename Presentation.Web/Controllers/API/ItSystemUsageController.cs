@@ -6,11 +6,11 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Castle.Core.Internal;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -145,7 +145,6 @@ namespace Presentation.Web.Controllers.API
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
-                    sysUsage.DataLevel = dto.DataLevel;
 
                     //copy attached options from system to systemusage
                     var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
