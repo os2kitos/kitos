@@ -7,6 +7,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
@@ -24,8 +25,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         public AttachedOptionsFunctionController(
             IGenericRepository<AttachedOption> repository,
             IGenericRepository<TOption> optionRepository,
-            IGenericRepository<TLocalOption> localOptionRepository)
-               : base(repository)
+            IGenericRepository<TLocalOption> localOptionRepository,
+            IItSystemUsageRepository usageRepository)
+               : base(repository, usageRepository)
         {
             _attachedOptionRepository = repository;
             _optionRepository = optionRepository;

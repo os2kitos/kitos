@@ -1,3 +1,5 @@
+using Infrastructure.DataAccess.Tools;
+
 namespace Infrastructure.DataAccess.Migrations
 {
     using System;
@@ -22,8 +24,9 @@ namespace Infrastructure.DataAccess.Migrations
             DropColumn("dbo.ItSystem", "RegularPersonalDataType_Id");
             DropTable("dbo.LocalRegularPersonalDataTypes");
             DropTable("dbo.RegularPersonalDataTypes");
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Remove_Orphaned_AttachedOptions.sql")); //Make sure orphans are removed
         }
-        
+
         public override void Down()
         {
             CreateTable(

@@ -389,12 +389,6 @@ namespace Presentation.Web
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
             getSensitivePersonalDataByUsageId.Namespace = "gdpr";
 
-            var getSensitivePersonalDataBySystemId = builder.Function("GetSensitivePersonalDataBySystemId");
-            getSensitivePersonalDataBySystemId.Parameter<int>("id");
-            getSensitivePersonalDataBySystemId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
-            builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
-            getSensitivePersonalDataBySystemId.Namespace = "gdpr";
-
             var getRegisterTypeByObjectId = builder.Function("GetRegisterTypesByObjectID");
             getRegisterTypeByObjectId.Parameter<int>("id");
             getRegisterTypeByObjectId.ReturnsCollectionFromEntitySet<RegisterType>("RegisterTypes");
