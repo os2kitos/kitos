@@ -902,14 +902,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Migrations\SQLScripts\1.Kitos_script.sql" />
-    <Content Include="Migrations\SQLScripts\2.udfaldsrum.sql" />
-    <Content Include="Migrations\SQLScripts\3.LokaleUdfaldsrum.sql" />
-    <Content Include="Migrations\SQLScripts\4.CleanUp.sql" />
-    <Content Include="Migrations\SQLScripts\6.dbFix.sql" />
-    <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
-    <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
-    <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
     <EmbeddedResource Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.resx">
       <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
     </EmbeddedResource>
@@ -934,9 +926,7 @@
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
-    <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
-    <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
