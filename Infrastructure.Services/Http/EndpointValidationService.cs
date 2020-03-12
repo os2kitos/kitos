@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,6 +19,8 @@ namespace Infrastructure.Services.Http
         private readonly ILogger _logger;
 
         private static readonly HttpClient Client;
+        private static readonly IEnumerable<TimeSpan> BackOffDurations = CreateDurations(1, 5, 15).ToList().AsReadOnly();
+
 
         static EndpointValidationService()
         {
@@ -36,8 +39,6 @@ namespace Infrastructure.Services.Http
 
             //Some servers return 406 if no user agent is set as part of a ModSecure policy
             Client.DefaultRequestHeaders.UserAgent.ParseAdd(ChromeUserAgent);
-
-            Client.DefaultRequestHeaders.ExpectContinue = false;
         }
 
         public EndpointValidationService(ILogger logger)
@@ -95,9 +96,20 @@ namespace Infrastructure.Services.Http
         private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
         {
             return Policy
-                .HandleResult<HttpResponseMessage>(ShouldRetry)
-                .WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15) }, onRetry: HandleFailedRequest)
-                .ExecuteAsync(() => Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)));
+                .Handle<Exception>() //outer policy handles transient protocol errors
+                .WaitAndRetryAsync(BackOffDurations)
+                .ExecuteAsync(() =>
+                {
+                    return Policy
+                        .HandleResult<HttpResponseMessage>(ShouldRetryFailedResponse) //Inner policy deals with response related errors
+                        .WaitAndRetryAsync(BackOffDurations, onRetry: HandleFailedRequest)
+                        .ExecuteAsync(() => Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri)));
+                });
+        }
+
+        private static IEnumerable<TimeSpan> CreateDurations(params int[] durationInSeconds)
+        {
+            return durationInSeconds.Select(s => TimeSpan.FromSeconds(s)).ToArray();
         }
 
         private void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
@@ -106,7 +118,7 @@ namespace Infrastructure.Services.Http
             result.Result.Dispose();
         }
 
-        private static bool ShouldRetry(HttpResponseMessage message)
+        private static bool ShouldRetryFailedResponse(HttpResponseMessage message)
         {
             return MatchAnyStatusCode(message,
                 HttpStatusCode.ServiceUnavailable,  //Either it is down or we are being throttled

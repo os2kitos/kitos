@@ -59,7 +59,6 @@ namespace Presentation.Web
                 SecurityProtocolType.Tls11 |
                 SecurityProtocolType.Tls12;
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
-            ServicePointManager.Expect100Continue = false;
 
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
