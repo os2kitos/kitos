@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
         public override IHttpActionResult Get()
@@ -35,12 +35,11 @@ namespace Presentation.Web.Controllers.OData
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItInterface>>))]
         public IHttpActionResult GetItInterfaces(int key)
         {
-
             var result = Repository
                 .AsQueryable()
                 .ByOrganizationDataQueryParameters(

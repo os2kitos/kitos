@@ -4,6 +4,7 @@ using Core.DomainServices;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
@@ -14,8 +15,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         public AttachedOptionsSensitivePersonalDataController(
             IGenericRepository<AttachedOption> repository,
             IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository,
-            IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository)
-           : base(repository, sensitiveDataTypeRepository, localSensitivePersonalDataTypeRepository)
+            IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository,
+            IItSystemUsageRepository usageRepository)
+           : base(repository, sensitiveDataTypeRepository, localSensitivePersonalDataTypeRepository, usageRepository)
         {
         }
 
@@ -25,14 +27,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         public IHttpActionResult GetSensitivePersonalDataByUsageId(int id)
         {
             return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.SENSITIVEPERSONALDATA);
-        }
-
-        [HttpGet]
-        [EnableQuery]
-        [ODataRoute("GetSensitivePersonalDataBySystemId(id={id})")]
-        public IHttpActionResult GetSensitivePersonalDataBySystemId(int id)
-        {
-            return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEM, OptionType.SENSITIVEPERSONALDATA);
         }
     }
 }
