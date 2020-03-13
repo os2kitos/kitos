@@ -403,6 +403,11 @@ namespace Core.ApplicationServices.Authorization
                    || (HasPermission(new VisibilityControlPermission(permission.Target)));
         }
 
+        public bool Visit(ViewBrokenExternalReferencesReportPermission permission)
+        {
+            return IsGlobalAdmin();
+        }
+
         #endregion PERMISSIONS
     }
 }

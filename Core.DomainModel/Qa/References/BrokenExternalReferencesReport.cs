@@ -18,5 +18,14 @@ namespace Core.DomainModel.Qa.References
         public virtual ICollection<BrokenLinkInInterface> BrokenInterfaceLinks { get; set; }
 
         public virtual ICollection<BrokenLinkInExternalReference> BrokenExternalReferences { get; set; }
+
+        public IEnumerable<IBrokenLink> GetBrokenLinks()
+        {
+            foreach (var brokenLinkInExternalReference in BrokenExternalReferences)
+                yield return brokenLinkInExternalReference;
+
+            foreach (var brokenLinkInInterface in BrokenInterfaceLinks)
+                yield return brokenLinkInInterface;
+        }
     }
 }

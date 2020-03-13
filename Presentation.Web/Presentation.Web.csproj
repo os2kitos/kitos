@@ -319,12 +319,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
+    <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
+    <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
@@ -353,6 +356,7 @@
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
