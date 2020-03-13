@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using Core.ApplicationServices;
 using Core.DomainModel.Result;
@@ -59,10 +60,13 @@ namespace Presentation.Web.Models.Csv
             return BuildResponse(documentInput);
         }
 
+
+
         private HttpResponseMessage BuildResponse(IEnumerable<object> documentInput)
         {
             var s = documentInput.ToCsv();
-            var bytes = Encoding.UTF8.GetBytes(s);
+            var outputEncoding = Encoding.Unicode;
+            var bytes = outputEncoding.GetBytes(s);
             var stream = new MemoryStream();
             stream.Write(bytes, 0, bytes.Length);
             stream.Seek(0, SeekOrigin.Begin);
@@ -70,12 +74,11 @@ namespace Presentation.Web.Models.Csv
             {
                 Content = new StreamContent(stream),
             };
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            result.Content.Headers.ContentEncoding.Add(outputEncoding.WebName);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv") { CharSet = outputEncoding.WebName };
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue(DispositionTypeNames.Attachment)
             {
-                FileNameStar = BuildFileName(),
-                DispositionType = "attachment"
-
+                FileNameStar = BuildFileName()
             };
             return result;
         }

@@ -14,6 +14,11 @@
     }]);
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window) => {
         $rootScope.page.title = "Andet";
+        $scope.brokenLinksReportLink = "api/v1/broken-external-references-report/current/csv";
+
+        //TODO: Load status before showing it
+        //TODO: Perform the odd encoding which deals with the incorrect charset
+
         getKleStatus();
         function getKleStatus() {
             $scope.KLEUpdateAvailableLabel = "Undersøger om der er en ny version af KLE...";

@@ -62,9 +62,9 @@ namespace Presentation.Web.Controllers.API
                     .WithColumn("Origin", "Oprindelse", MapBrokenLinkOriginType)
                     .WithColumn("OriginObjectName", "Navn", MapBrokenLinkOriginName)
                     .WithColumn("RefName", "Ref. Navn", MapReferenceName)
-                    .WithColumn("Url", "Url", link => link.ValueOfCheckedUrl)
                     .WithColumn("ErrorCategory", @"Fejlkategori", MapErrorCategory)
-                    .WithColumn("ErrorCode", "Fejlkode", MapErrorCode);
+                    .WithColumn("ErrorCode", "Fejlkode", MapErrorCode)
+                    .WithColumn("Url", "Url", link => link.ValueOfCheckedUrl);
 
 
             csvResponseBuilder = report

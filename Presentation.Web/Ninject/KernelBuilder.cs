@@ -12,6 +12,7 @@ using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
+using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
@@ -147,6 +148,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InCommandScope(Mode);
             kernel.Bind<IReferenceService>().To<ReferenceService>().InCommandScope(Mode);
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
+            kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
