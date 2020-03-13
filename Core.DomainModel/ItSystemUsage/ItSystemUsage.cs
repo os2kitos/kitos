@@ -37,6 +37,14 @@ namespace Core.DomainModel.ItSystemUsage
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
+            isBusinessCritical = DataOptions.UNDECIDED;
+            dataProcessorControl = DataOptions.UNDECIDED;
+            precautions = DataOptions.UNDECIDED;
+            UserSupervision = DataOptions.UNDECIDED;
+            riskAssessment = DataOptions.UNDECIDED;
+            preriskAssessment = PreRiskAssessment.UNDECIDED;
+            DPIA = DataOptions.UNDECIDED;
+            answeringDataDPIA = DataOptions.UNDECIDED;
         }
 
         public bool IsActive
@@ -359,40 +367,42 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        #endregion
         public string GeneralPurpose { get; set; }
-        public DataOptions isBusinessCritical { get; set; }
+        public DataOptions? isBusinessCritical { get; set; }
+
+        public DataOptions? dataProcessorControl { get; set; }
+        public DataOptions? precautions { get; set; }
+        public DataOptions? UserSupervision { get; set; }
+        public DataOptions? riskAssessment { get; set; }
+        public PreRiskAssessment? preriskAssessment { get; set; }
+        public DataOptions? DPIA { get; set; }
+        public DataOptions? answeringDataDPIA { get; set; }
+
+        #endregion
+
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }
 
         public string dataProcessor { get; set; }
 
-        public int dataProcessorControl { get; set; }
 
         public DateTime? lastControl { get; set; }
 
         public string noteUsage { get; set; }
 
-        public int precautions { get; set; }
 
-        public int riskAssessment { get; set; }
 
         public DateTime? riskAssesmentDate { get; set; }
 
-        public int preriskAssessment { get; set; }
 
         public string noteRisks { get; set; }
 
-        public int DPIAhearing { get; set; }
-
         public DateTime? DPIADate { get; set; }
 
-        public int DPIA { get; set; }
 
         public DateTime? DPIADateFor { get; set; }
 
-        public int answeringDataDPIA { get; set; }
 
         public DateTime? DPIAdeleteDate { get; set; }
 
@@ -425,7 +435,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public DateTime? UserSupervisionDate { get; set; }
 
-        public int UserSupervision { get; set; }
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
 
