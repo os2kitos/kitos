@@ -12,7 +12,9 @@
                            class="form-control input-sm"
                            data-field="generalPurpose"
                            data-ng-model="generalPurpose"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Overordnet formål"
+                           data-element-type="GDPRSystemPurpose"
+                           />
                 </div>
                 <!-- Business critical -->
                 <div class="form-group">
@@ -48,7 +50,9 @@
                            data-ng-model="systemUsage.dataProcessor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="dataProcessor"
-                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)">
+                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
+                           data-element-type="GDPRDataResponsible"
+                           >
                 </div>
                 <!-- Data processing agreement -->
                 <div class="form-group" ng-show="filterDataProcessor">
@@ -82,7 +86,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
+                        <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
                             <td>
                                 {{ dataWorker.dataWorkerName }}
                             </td>
