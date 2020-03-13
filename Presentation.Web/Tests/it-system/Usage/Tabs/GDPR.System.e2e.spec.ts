@@ -34,7 +34,6 @@ describe("User is able to", () => {
                 .then(() => console.log("Entering data into field"))
                 .then(() => Select2Helper.selectMultiChoiceValue("Almindelig","s2id_sensitive-data"))
                 .then(() => browser.sleep(1000));
-
         });
 
     function createItSystemName() {
