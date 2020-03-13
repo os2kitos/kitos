@@ -378,6 +378,7 @@
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
@@ -395,10 +396,12 @@
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\UrlViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-misc-brokenlinks-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\exposed-interface-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
+    <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />

@@ -34,11 +34,14 @@
         <button class="btn btn-default" style="margin-left: 5px" id="KLEUpdateButton" data-element-type="KLEUpdateButton" ng-disabled="!KleApplyUpdateButtonInteraction" ng-click="UpdateKLE()">Opdater KLE</button>
         <a id="KLEDownloadAnchor" style="visibility: hidden; width: 0px" />
     </div>
-    
+
     <h3>Rapport over brudte links</h3>
-    <div class="well">
-        <p>TODO: Intro tekst</p>
-        
-        <a id="brokenLinksReportAnchor" href="{{brokenLinksReportLink}}">Hent rapport over brudte links</a>
+    <div class="well" ng-if="brokenLinksVm.available">
+        <p><strong>Oprettet:</strong> {{brokenLinksVm.createdDate}}</p>
+        <p><strong>Antal registrerede fejl:</strong> {{brokenLinksVm.brokenLinksCount}}</p>
+        <a class="btn btn-default" id="brokenLinksReportAnchor" href="{{brokenLinksVm.linkToCurrentReport}}">Hent rapporten</a>
+    </div>
+    <div class="well" ng-if="!brokenLinksVm.available">
+        <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
     </div>
 </div>

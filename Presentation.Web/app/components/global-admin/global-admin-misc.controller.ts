@@ -8,16 +8,16 @@
             resolve: {
                 globalConfigs: [
                     "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
+                ],
+                brokenLinkStatus: [
+                    "brokenLinksReportService", (brokenLinksReportService: Kitos.Services.BrokenLinksReport.IBrokenLinksReportService) => brokenLinksReportService.getStatus()
                 ]
             }
         });
     }]);
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", "brokenLinkStatus", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window, brokenLinkStatus:Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO) => {
         $rootScope.page.title = "Andet";
-        $scope.brokenLinksReportLink = "api/v1/broken-external-references-report/current/csv";
-
-        //TODO: Load status before showing it
-        //TODO: Perform the odd encoding which deals with the incorrect charset
+        $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
 
         getKleStatus();
         function getKleStatus() {
