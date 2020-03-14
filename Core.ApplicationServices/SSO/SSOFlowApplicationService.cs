@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Infrastructure.Soap.STSAdresse;
-using Infrastructure.Soap.STSBruger;
 using LivscyklusKodeType = Infrastructure.Soap.STSAdresse.LivscyklusKodeType;
 
 namespace Core.ApplicationServices.SSO
@@ -25,8 +23,8 @@ namespace Core.ApplicationServices.SSO
 
         private static string GetStsBrugerEmailAdresseUuid(string uuid)
         {
-            var client = CreateBrugerPortTypeClient();
-            var laesRequest = CreateStsBrugerLaesRequest(uuid);
+            var client = StsBrugerHelpers.CreateBrugerPortTypeClient(CreateHttpBinding(), UrlServicePlatformBrugerService, GetClientCertificate(CertificateThumbprint));
+            var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(MunicipalityCvr, uuid);
             var brugerPortType = client.ChannelFactory.CreateChannel();
             var laesResponse = brugerPortType.laes(laesRequest);
             var registreringType1 = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering[0];
@@ -42,8 +40,8 @@ namespace Core.ApplicationServices.SSO
 
         private static IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
         {
-            var client = CreateAdressePortTypeClient();
-            var laesRequest = CreateStsAdresseLaesRequest(emailAdresseUuid);
+            var client = StsAdresseHelpers.CreateAdressePortTypeClient(CreateHttpBinding(), UrlServicePlatformAdresseService, GetClientCertificate(CertificateThumbprint));
+            var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(MunicipalityCvr, emailAdresseUuid);
             var adressePortType = client.ChannelFactory.CreateChannel();
             var laesResponse = adressePortType.laes(laesRequest);
             var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
@@ -59,72 +57,6 @@ namespace Core.ApplicationServices.SSO
                 result.Add(latest.AdresseTekst);
             }
             return result;
-        }
-
-        private static Infrastructure.Soap.STSBruger.laesRequest CreateStsBrugerLaesRequest(string uuid)
-        {
-            var laesInputType = new Infrastructure.Soap.STSBruger.LaesInputType {UUIDIdentifikator = uuid};
-            var laesRequest = new Infrastructure.Soap.STSBruger.laesRequest()
-            {
-                LaesRequest1 = new Infrastructure.Soap.STSBruger.LaesRequestType()
-                {
-                    LaesInput = laesInputType,
-                    AuthorityContext = new Infrastructure.Soap.STSBruger.AuthorityContextType()
-                    {
-                        MunicipalityCVR = MunicipalityCvr 
-                    }
-                }
-            };
-            return laesRequest;
-        }
-
-        private static Infrastructure.Soap.STSAdresse.laesRequest CreateStsAdresseLaesRequest(string uuid)
-        {
-            var laesInputType = new Infrastructure.Soap.STSAdresse.LaesInputType {UUIDIdentifikator = uuid};
-            var laesRequest = new Infrastructure.Soap.STSAdresse.laesRequest()
-            {
-                LaesRequest1 = new Infrastructure.Soap.STSAdresse.LaesRequestType()
-                {
-                    LaesInput = laesInputType,
-                    AuthorityContext = new Infrastructure.Soap.STSAdresse.AuthorityContextType()
-                    {
-                        MunicipalityCVR = MunicipalityCvr 
-                    }
-                }
-            };
-            return laesRequest;
-        }
-
-        private static BrugerPortTypeClient CreateBrugerPortTypeClient()
-        {
-            var binding = CreateHttpBinding();
-            var client = new BrugerPortTypeClient(binding, new EndpointAddress(UrlServicePlatformBrugerService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = GetClientCertificate(CertificateThumbprint)
-                    }
-                }
-            };
-            return client;
-        }
-
-        private static AdressePortTypeClient CreateAdressePortTypeClient()
-        {
-            var binding = CreateHttpBinding();
-            var client = new AdressePortTypeClient(binding, new EndpointAddress(UrlServicePlatformAdresseService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = GetClientCertificate(CertificateThumbprint)
-                    }
-                }
-            };
-            return client;
         }
 
         private static BasicHttpBinding CreateHttpBinding()
