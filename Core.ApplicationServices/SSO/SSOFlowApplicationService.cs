@@ -1,45 +1,75 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using Infrastructure.Soap.STSAdresse;
 using Infrastructure.Soap.STSBruger;
+using LivscyklusKodeType = Infrastructure.Soap.STSAdresse.LivscyklusKodeType;
 
 namespace Core.ApplicationServices.SSO
 {
     public class SSOFlowApplicationService
     {
-        private const string HttpsExttestServiceplatformenDkServiceOrganisationBruger = "https://exttest.serviceplatformen.dk/service/Organisation/Bruger/5";
+        private const string UrlServicePlatformBrugerService = "https://exttest.serviceplatformen.dk/service/Organisation/Bruger/5";
+        private const string UrlServicePlatformAdresseService = "https://exttest.serviceplatformen.dk/service/Organisation/Adresse/5";
         private const string CertificateThumbprint = "1793d097f45b0acea258f7fe18d5a4155799da26";
+        private const string EmailTypeIdentifier = "5d13e891-162a-456b-abf2-fd9b864df96d";
         private const string MunicipalityCvr = "58271713"; // Ballerup CVR
 
-        public string GetStsBrugerEmail(string uuid)
+        public IEnumerable<string> GetStsBrugerEmails(string uuid)
         {
-            var binding = CreateHttpBinding();
-            var client = CreateBrugerPortTypeClient(binding);
-            var laesRequest = CreateRequest(uuid);
+            var emailAdresseUuid = GetStsBrugerEmailAdresseUuid(uuid);
+            return GetStsAdresseEmailFromUuid(emailAdresseUuid);
+        }
+
+        private static string GetStsBrugerEmailAdresseUuid(string uuid)
+        {
+            var client = CreateBrugerPortTypeClient();
+            var laesRequest = CreateStsBrugerLaesRequest(uuid);
             var brugerPortType = client.ChannelFactory.CreateChannel();
             var laesResponse = brugerPortType.laes(laesRequest);
             var registreringType1 = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering[0];
-            var adresseFlerRelationTypes = registreringType1.RelationListe.Adresser;
-            var emailUnikIdType = new UnikIdType {Item = "5d13e891-162a-456b-abf2-fd9b864df96d"};
-            foreach (var adresseFlerRelationType in adresseFlerRelationTypes)
+            foreach (var adresse in registreringType1.RelationListe.Adresser)
             {
-                if (adresseFlerRelationType.ReferenceID.Equals(emailUnikIdType))
+                if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
                 {
-                    return adresseFlerRelationType.ToString();
+                    return adresse.ReferenceID.Item;
                 }
             }
             return string.Empty;
         }
 
-        private static laesRequest CreateRequest(string uuid)
+        private static IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
         {
-            var laesInputType = new LaesInputType {UUIDIdentifikator = uuid};
-            var laesRequest = new laesRequest()
+            var client = CreateAdressePortTypeClient();
+            var laesRequest = CreateStsAdresseLaesRequest(emailAdresseUuid);
+            var adressePortType = client.ChannelFactory.CreateChannel();
+            var laesResponse = adressePortType.laes(laesRequest);
+            var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+            var result = new List<string>();
+            foreach (var registreringType1 in registreringType1s)
             {
-                LaesRequest1 = new LaesRequestType()
+                if (registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
+                    registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret))
+                {
+                    continue;
+                }
+                var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                result.Add(latest.AdresseTekst);
+            }
+            return result;
+        }
+
+        private static Infrastructure.Soap.STSBruger.laesRequest CreateStsBrugerLaesRequest(string uuid)
+        {
+            var laesInputType = new Infrastructure.Soap.STSBruger.LaesInputType {UUIDIdentifikator = uuid};
+            var laesRequest = new Infrastructure.Soap.STSBruger.laesRequest()
+            {
+                LaesRequest1 = new Infrastructure.Soap.STSBruger.LaesRequestType()
                 {
                     LaesInput = laesInputType,
-                    AuthorityContext = new AuthorityContextType()
+                    AuthorityContext = new Infrastructure.Soap.STSBruger.AuthorityContextType()
                     {
                         MunicipalityCVR = MunicipalityCvr 
                     }
@@ -48,9 +78,43 @@ namespace Core.ApplicationServices.SSO
             return laesRequest;
         }
 
-        private static BrugerPortTypeClient CreateBrugerPortTypeClient(BasicHttpBinding binding)
+        private static Infrastructure.Soap.STSAdresse.laesRequest CreateStsAdresseLaesRequest(string uuid)
         {
-            var client = new BrugerPortTypeClient(binding, new EndpointAddress(HttpsExttestServiceplatformenDkServiceOrganisationBruger))
+            var laesInputType = new Infrastructure.Soap.STSAdresse.LaesInputType {UUIDIdentifikator = uuid};
+            var laesRequest = new Infrastructure.Soap.STSAdresse.laesRequest()
+            {
+                LaesRequest1 = new Infrastructure.Soap.STSAdresse.LaesRequestType()
+                {
+                    LaesInput = laesInputType,
+                    AuthorityContext = new Infrastructure.Soap.STSAdresse.AuthorityContextType()
+                    {
+                        MunicipalityCVR = MunicipalityCvr 
+                    }
+                }
+            };
+            return laesRequest;
+        }
+
+        private static BrugerPortTypeClient CreateBrugerPortTypeClient()
+        {
+            var binding = CreateHttpBinding();
+            var client = new BrugerPortTypeClient(binding, new EndpointAddress(UrlServicePlatformBrugerService))
+            {
+                ClientCredentials =
+                {
+                    ClientCertificate =
+                    {
+                        Certificate = GetClientCertificate(CertificateThumbprint)
+                    }
+                }
+            };
+            return client;
+        }
+
+        private static AdressePortTypeClient CreateAdressePortTypeClient()
+        {
+            var binding = CreateHttpBinding();
+            var client = new AdressePortTypeClient(binding, new EndpointAddress(UrlServicePlatformAdresseService))
             {
                 ClientCredentials =
                 {
