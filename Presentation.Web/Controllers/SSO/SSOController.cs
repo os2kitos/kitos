@@ -1,5 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Web.Http;
+using System.Xml;
+using Castle.Core.Internal;
 using dk.nita.saml20.identity;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -13,24 +18,47 @@ namespace Presentation.Web.Controllers.SSO
         [Route("")]
         public IHttpActionResult SSO()
         {
-            // TODO: Check incoming SAML response
-            var result = "User not authenticated using SAML";
+            var result = "User not authenticated";
             if (Saml20Identity.IsInitialized())
             {
                 var currentIdentityName = Saml20Identity.Current.Name;
-                result = $"Welcome '{currentIdentityName}' ({GetCurrentSaml20IdentityClaims()})";
+                result = $"No Kitos privilegees for user '{currentIdentityName}'";
+                var samlAttributes = Saml20Identity.Current["dk:gov:saml:attribute:Privileges_intermediate"];
+                if (!samlAttributes.IsNullOrEmpty()) 
+                {
+                    if (HasCurrentUserKitosPrivilege())
+                    {
+                        result = $"User '{currentIdentityName}' has Kitos read access";
+                    }
+                }
             }
             return Ok(result);
         }
 
-        private static string GetCurrentSaml20IdentityClaims()
+        private static bool HasCurrentUserKitosPrivilege()
         {
-            var stringBuilder = new StringBuilder();
-            foreach (var currentClaim in Saml20Identity.Current.Claims)
+            const string samlKitosPrivilegeKey = "dk:gov:saml:attribute:Privileges_intermediate";
+            const string samlKitosReadAccessRoleIdentifier = "http://kitos-local.strongminds.dk/roles/usersystemrole/readaccess/1";
+            var result = false;
+            if (Saml20Identity.Current.HasAttribute(samlKitosPrivilegeKey))
             {
-                stringBuilder.AppendLine(currentClaim.Value);
+                var samlAttribute = Saml20Identity.Current[samlKitosPrivilegeKey].First();
+                var decodedSamlPrivilege = DecodeSamlRequestString(samlAttribute.AttributeValue.First());
+                var samlPrivilegeAsXml = new XmlDocument();
+                samlPrivilegeAsXml.LoadXml(decodedSamlPrivilege);
+                var privilegeNode = samlPrivilegeAsXml.SelectSingleNode("//Privilege");
+                if (privilegeNode != null && privilegeNode.InnerText.Contains(samlKitosReadAccessRoleIdentifier))
+                {
+                    result = true;
+                }
             }
-            return stringBuilder.ToString();
+            return result;
+        }
+
+        private static string DecodeSamlRequestString(string compressedData) 
+        {
+            var memStream = new MemoryStream(Convert.FromBase64String(compressedData));
+            return new StreamReader(memStream, Encoding.UTF8).ReadToEnd();
         }
     }
 }

@@ -52,14 +52,6 @@
                 userService.loginSSO(token).then(user => $scope.loginResult(user));
             }
 
-            $scope.SSOLogin = () => {
-                // KITOSUDV-629: TODO: Redirect to new SSO endpoint
-                $http({
-                    method: "GET",
-                    url: "SSOLogin"
-                });
-            };
-
             // login
             $scope.submitLogin = () => {
 
