@@ -1,12 +1,12 @@
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Infrastructure.Soap.STSBruger;
+using Infrastructure.Soap.STSAdresse;
 
-namespace Core.ApplicationServices.SSO
+namespace Core.DomainServices.SSO
 {
-    internal static class StsBrugerHelpers
+    internal static class StsAdresseHelpers
     {
-        public static laesRequest CreateStsBrugerLaesRequest(string municipalityCvr, string uuid)
+        public static laesRequest CreateStsAdresseLaesRequest(string municipalityCvr, string uuid)
         {
             var laesInputType = new LaesInputType {UUIDIdentifikator = uuid};
             var laesRequest = new laesRequest
@@ -14,7 +14,7 @@ namespace Core.ApplicationServices.SSO
                 LaesRequest1 = new LaesRequestType
                 {
                     LaesInput = laesInputType,
-                    AuthorityContext = new AuthorityContextType
+                    AuthorityContext = new AuthorityContextType()
                     {
                         MunicipalityCVR = municipalityCvr 
                     }
@@ -23,9 +23,9 @@ namespace Core.ApplicationServices.SSO
             return laesRequest;
         }
 
-        public static BrugerPortTypeClient CreateBrugerPortTypeClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        public static AdressePortTypeClient CreateAdressePortTypeClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
-            var client = new BrugerPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
+            var client = new AdressePortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {
                 ClientCredentials =
                 {

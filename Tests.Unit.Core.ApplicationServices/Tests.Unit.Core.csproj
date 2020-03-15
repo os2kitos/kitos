@@ -146,7 +146,7 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
-    <Compile Include="ApplicationServices\SSO\SSOFlowApplicationServiceTest.cs" />
+    <Compile Include="DomainServices\SSO\StsBrugerEmailServiceTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />

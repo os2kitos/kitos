@@ -185,7 +185,7 @@ namespace Presentation.Web
 
         private static void RegisterSSO(IKernel kernel)
         {
-            kernel.Bind<ISSOFlowApplicationService>().To<SSOFlowApplicationService>().InRequestScope();
+            kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InRequestScope();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

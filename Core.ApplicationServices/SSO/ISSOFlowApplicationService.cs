@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Core.ApplicationServices.SSO.State;
 
 namespace Core.ApplicationServices.SSO
 {
-    public interface ISSOFlowApplicationService
+    public interface ISsoFlowApplicationService
     {
-        bool HasCurrentUserKitosPrivilege();
-        IEnumerable<string> GetStsBrugerEmails(string uuid);
+        AbstractState StartSsoLoginFlow();
     }
 }
