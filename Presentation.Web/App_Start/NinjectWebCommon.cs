@@ -13,6 +13,7 @@ using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -152,6 +153,7 @@ namespace Presentation.Web
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
+            RegisterSSO(kernel);
             RegisterOptions(kernel);
         }
 
@@ -179,6 +181,11 @@ namespace Presentation.Web
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InRequestScope();
             kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InRequestScope();
             kernel.Bind<IOperationClock>().To<OperationClock>().InRequestScope();
+        }
+
+        private static void RegisterSSO(IKernel kernel)
+        {
+            kernel.Bind<ISSOFlowApplicationService>().To<SSOFlowApplicationService>().InRequestScope();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

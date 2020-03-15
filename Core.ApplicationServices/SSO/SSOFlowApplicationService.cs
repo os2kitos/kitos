@@ -1,19 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.Text;
+using System.Xml;
+using dk.nita.saml20.identity;
 using LivscyklusKodeType = Infrastructure.Soap.STSAdresse.LivscyklusKodeType;
 
 namespace Core.ApplicationServices.SSO
 {
-    public class SSOFlowApplicationService
+    public class SSOFlowApplicationService : ISSOFlowApplicationService
     {
         private const string UrlServicePlatformBrugerService = "https://exttest.serviceplatformen.dk/service/Organisation/Bruger/5";
         private const string UrlServicePlatformAdresseService = "https://exttest.serviceplatformen.dk/service/Organisation/Adresse/5";
         private const string CertificateThumbprint = "1793d097f45b0acea258f7fe18d5a4155799da26";
         private const string EmailTypeIdentifier = "5d13e891-162a-456b-abf2-fd9b864df96d";
         private const string MunicipalityCvr = "58271713"; // Ballerup CVR
+
+        public bool HasCurrentUserKitosPrivilege()
+        {
+            const string samlKitosPrivilegeKey = "dk:gov:saml:attribute:Privileges_intermediate";
+            const string samlKitosReadAccessRoleIdentifier = "http://kitos-local.strongminds.dk/roles/usersystemrole/readaccess/1";
+            var result = false;
+            if (Saml20Identity.Current.HasAttribute(samlKitosPrivilegeKey))
+            {
+                var samlAttribute = Saml20Identity.Current[samlKitosPrivilegeKey].First();
+                var decodedSamlPrivilege = DecodeSamlRequestString(samlAttribute.AttributeValue.First());
+                var samlPrivilegeAsXml = new XmlDocument();
+                samlPrivilegeAsXml.LoadXml(decodedSamlPrivilege);
+                var privilegeNode = samlPrivilegeAsXml.SelectSingleNode("//Privilege");
+                if (privilegeNode != null && privilegeNode.InnerText.Contains(samlKitosReadAccessRoleIdentifier))
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        private static string DecodeSamlRequestString(string compressedData) 
+        {
+            var memStream = new MemoryStream(Convert.FromBase64String(compressedData));
+            return new StreamReader(memStream, Encoding.UTF8).ReadToEnd();
+        }
 
         public IEnumerable<string> GetStsBrugerEmails(string uuid)
         {
