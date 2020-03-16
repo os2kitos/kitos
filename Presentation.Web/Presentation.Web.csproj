@@ -710,6 +710,7 @@
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalSystem.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
