@@ -22,6 +22,15 @@ class ItSystemUsageGDPR {
     static getLegalDataLevelCheckBox() {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeLegalCheckbox));
     }
+
+    static getDefaultPersonalSensitiveDataCheckbox1() {
+        return element(this.cssHelper.byDataElementType(this.consts.defaultPersonalSensitivData1));
+    }
+
+    static getDefaultPersonalSensitiveDataCheckbox2() {
+        return element(this.cssHelper.byDataElementType(this.consts.defaultPersonalSensitivData2));
+    }
+
 }
 
 export = ItSystemUsageGDPR;

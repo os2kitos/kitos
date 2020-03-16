@@ -219,7 +219,7 @@
                                 <input type="checkbox" data-element-type="dataLevelTypeSensitiveCheckbox" ng-change="dataLevelChange('personalSensitiveDataSelected')" ng-model="usageViewModel.personalSensitiveDataSelected" data-ng-disabled="!hasWriteAccess">Følsomme persondata
                                 <div class="checkbox" data-ng-repeat="r in sensitivePersonalData" ng-if="usageViewModel.personalSensitiveDataSelected">
                                     <label>
-                                        <input type="checkbox" ng-model="r.Checked"
+                                        <input type="checkbox" ng-model="r.Checked" data-element-type="sensitivepersonalDataCheckbox-{{r.Name}}"
                                                data-ng-disabled="!hasWriteAccess"
                                                ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
                                     </label>

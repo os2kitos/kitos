@@ -153,6 +153,8 @@ class Constants {
     readonly dataLevelTypeSensitiveCheckbox = "dataLevelTypeSensitiveCheckbox";
     readonly dataLevelTypeLegalCheckbox = "dataLevelTypeLegalCheckbox";
 
+    readonly defaultPersonalSensitivData1 = "sensitivepersonalDataCheckbox-TestFølsomData";
+    readonly defaultPersonalSensitivData2 = "sensitivepersonalDataCheckbox-FølsomDataTest";
 
     //Local admin
 
