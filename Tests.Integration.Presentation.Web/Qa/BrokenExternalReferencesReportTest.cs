@@ -1,15 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity.SqlServer;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Qa.References;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Presentation.Web.Models.Qa;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Qa
 {
-    public class BrokenExternalReferencesReportTest
+    public class BrokenExternalReferencesReportTest : WithAutoFixture
     {
         [Fact]
         public async Task Get_Status_Returns_ReportNotAvailable()
@@ -54,6 +62,71 @@ namespace Tests.Integration.Presentation.Web.Qa
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        public class LinkReportCsvFormat
+        {
+            public string Oprindelse { get; set; }
+            public string Navn { get; set; }
+            public string Referencenavn { get; set; }
+            public string Fejlkategori { get; set; }
+            public string Fejlkode { get; set; }
+            public string Url { get; set; }
+        }
+
+        [Fact]
+        public async Task Get_CurrentCsv_Returns_Unicode_Encoded_Csv()
+        {
+            //Arrange - a broken link in both a system and an interface
+            PurgeBrokenExternalReferencesReportTable();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var systemReferenceName = A<string>();
+            const string systemReferenceUrl = "http://google.com/notfount1337.html";
+            const string interfaceUrl = "http://google.com/notfounth4x0r.html";
+            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, systemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, interfaceUrl);
+
+            //Act
+            await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
+            var dto = await WaitForReportGenerationCompletedAsync();
+
+            //Assert that the two controlled errors are present
+            Assert.True(dto.Available);
+            var report = await GetBrokenLinksReporAsync();
+
+            var brokenSystemLink = report[system.Name];
+            AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", systemReferenceUrl);
+            var brokenInterfaceLink = report[interfaceDto.Name];
+            AssertBrokenLinkRow(brokenInterfaceLink, "Snitflade", interfaceDto.Name, string.Empty, "Se fejlkode", "404", interfaceUrl);
+        }
+
+        private static void AssertBrokenLinkRow(LinkReportCsvFormat brokenLink, string expectedOrigin, string expectedName, string expectedReferenceName, string expectedErrorCategory, string expectedErrorCode, string expectedUrl)
+        {
+            Assert.Equal(expectedOrigin, brokenLink.Oprindelse);
+            Assert.Equal(expectedName, brokenLink.Navn);
+            Assert.Equal(expectedReferenceName, brokenLink.Referencenavn);
+            Assert.Equal(expectedErrorCategory, brokenLink.Fejlkategori);
+            Assert.Equal(expectedErrorCode, brokenLink.Fejlkode);
+            Assert.Equal(expectedUrl, brokenLink.Url);
+        }
+
+        private static async Task<IDictionary<string, LinkReportCsvFormat>> GetBrokenLinksReporAsync()
+        {
+            using (var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync())
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                using (var csvReader = new CsvReader(new StringReader(await response.Content.ReadAsStringAsync()),
+                    new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = ";",
+                        HasHeaderRecord = true
+                    }))
+                {
+                    return csvReader.GetRecords<LinkReportCsvFormat>().ToDictionary(x => x.Navn);
+                }
             }
         }
 

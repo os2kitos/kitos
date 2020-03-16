@@ -11,16 +11,16 @@ namespace Core.ApplicationServices.Qa
     {
         private readonly IBrokenExternalReferencesReportRepository _repository;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IBackgroundJobManager _backgroundJobManager;
+        private readonly IBackgroundJobScheduler _backgroundJobScheduler;
 
         public BrokenExternalReferencesReportService(
             IBrokenExternalReferencesReportRepository repository,
             IAuthorizationContext authorizationContext,
-            IBackgroundJobManager backgroundJobManager)
+            IBackgroundJobScheduler backgroundJobScheduler)
         {
             _repository = repository;
             _authorizationContext = authorizationContext;
-            _backgroundJobManager = backgroundJobManager;
+            _backgroundJobScheduler = backgroundJobScheduler;
         }
 
 
@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.Qa
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            _backgroundJobManager.TriggerLinkCheck();
+            _backgroundJobScheduler.ScheduleLinkCheck();
 
             return Maybe<OperationError>.None;
         }

@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.API
                     .WithFileName($"kitos_external_references_report-{report.Created:yyyy-MM-dd}.csv")
                     .WithColumn("Origin", "Oprindelse", MapBrokenLinkOriginType)
                     .WithColumn("OriginObjectName", "Navn", MapBrokenLinkOriginName)
-                    .WithColumn("RefName", "Ref. Navn", MapReferenceName)
+                    .WithColumn("RefName", "Referencenavn", MapReferenceName)
                     .WithColumn("ErrorCategory", @"Fejlkategori", MapErrorCategory)
                     .WithColumn("ErrorCode", "Fejlkode", MapErrorCode)
                     .WithColumn("Url", "Url", link => link.ValueOfCheckedUrl);

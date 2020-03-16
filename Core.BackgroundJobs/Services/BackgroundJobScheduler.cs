@@ -4,9 +4,9 @@ using Infrastructure.Services.BackgroundJobs;
 
 namespace Core.BackgroundJobs.Services
 {
-    public class BackgroundJobManager : IBackgroundJobManager
+    public class BackgroundJobScheduler : IBackgroundJobScheduler
     {
-        public void TriggerLinkCheck()
+        public void ScheduleLinkCheck()
         {
             RecurringJob.Trigger(StandardJobIds.CheckExternalLinks);
         }

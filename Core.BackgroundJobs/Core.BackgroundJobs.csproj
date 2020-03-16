@@ -75,7 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Factory\IBackgroundJobFactory.cs" />
     <Compile Include="Services\BackgroundJobLauncher.cs" />
-    <Compile Include="Services\BackgroundJobManager.cs" />
+    <Compile Include="Services\BackgroundJobScheduler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
