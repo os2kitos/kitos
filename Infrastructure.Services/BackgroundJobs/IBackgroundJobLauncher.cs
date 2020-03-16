@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Core.BackgroundJobs.Services
+namespace Infrastructure.Services.BackgroundJobs
 {
     public interface IBackgroundJobLauncher
     {

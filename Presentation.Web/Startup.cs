@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Services;
 using Hangfire.Common;
+using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;

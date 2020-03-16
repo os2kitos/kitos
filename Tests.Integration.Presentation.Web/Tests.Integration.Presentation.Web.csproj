@@ -110,6 +110,7 @@
     <Compile Include="Organizations\OrganizationTest.cs" />
     <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Qa\BrokenExternalReferencesReportTest.cs" />
     <Compile Include="References\ExternalReferencesTest.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
     <Compile Include="Security\AuthorizationTests.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\AuthorizationHelper.cs" />
+    <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />

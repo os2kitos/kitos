@@ -2,6 +2,7 @@
 using Core.BackgroundJobs.Factory;
 using Core.BackgroundJobs.Model;
 using Core.DomainModel.Result;
+using Infrastructure.Services.BackgroundJobs;
 using Serilog;
 
 namespace Core.BackgroundJobs.Services

@@ -58,6 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundJobs\IBackgroundJobLauncher.cs" />
+    <Compile Include="BackgroundJobs\IBackgroundJobManager.cs" />
     <Compile Include="Configuration\KitosUrl.cs" />
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />

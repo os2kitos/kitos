@@ -45,6 +45,7 @@ using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
+using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
@@ -276,6 +277,7 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IBackgroundJobFactory>().To<BackgroundJobFactory>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
+            kernel.Bind<IBackgroundJobManager>().To<BackgroundJobManager>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
         }
     }

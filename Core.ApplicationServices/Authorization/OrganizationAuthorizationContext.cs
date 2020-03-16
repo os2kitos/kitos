@@ -408,6 +408,11 @@ namespace Core.ApplicationServices.Authorization
             return IsGlobalAdmin();
         }
 
+        public bool Visit(TriggerBrokenReferencesReportPermission permission)
+        {
+            return IsGlobalAdmin();
+        }
+
         #endregion PERMISSIONS
     }
 }

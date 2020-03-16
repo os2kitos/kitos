@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Qa;
@@ -36,6 +37,19 @@ namespace Presentation.Web.Controllers.API
                     onFailure: error => error.FailureType == OperationFailure.NotFound
                         ? Ok(MapStatus(Maybe<BrokenExternalReferencesReport>.None))
                         : FromOperationError(error)
+                );
+        }
+
+        [HttpPost]
+        [Route("trigger")]
+        public HttpResponseMessage Trigger()
+        {
+            return _brokenExternalReferencesReportService
+                .TriggerReportGeneration()
+                .Match
+                (
+                    onValue: FromOperationError,
+                    onNone: () => CreateResponse(HttpStatusCode.Accepted)
                 );
         }
 
