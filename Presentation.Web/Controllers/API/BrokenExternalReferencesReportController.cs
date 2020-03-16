@@ -73,12 +73,12 @@ namespace Presentation.Web.Controllers.API
             csvResponseBuilder =
                 csvResponseBuilder
                     .WithFileName($"kitos_external_references_report-{report.Created:yyyy-MM-dd}.csv")
-                    .WithColumn("Origin", "Oprindelse", MapBrokenLinkOriginType)
-                    .WithColumn("OriginObjectName", "Navn", MapBrokenLinkOriginName)
-                    .WithColumn("RefName", "Referencenavn", MapReferenceName)
-                    .WithColumn("ErrorCategory", @"Fejlkategori", MapErrorCategory)
-                    .WithColumn("ErrorCode", "Fejlkode", MapErrorCode)
-                    .WithColumn("Url", "Url", link => link.ValueOfCheckedUrl);
+                    .WithColumn(BrokenExternalReferencesReportColumns.Origin, MapBrokenLinkOriginType)
+                    .WithColumn(BrokenExternalReferencesReportColumns.OriginObjectName, MapBrokenLinkOriginName)
+                    .WithColumn(BrokenExternalReferencesReportColumns.RefName, MapReferenceName)
+                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCategory, MapErrorCategory)
+                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCode, MapErrorCode)
+                    .WithColumn(BrokenExternalReferencesReportColumns.Url, link => link.ValueOfCheckedUrl);
 
 
             csvResponseBuilder = report

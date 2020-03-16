@@ -36,9 +36,9 @@ namespace Presentation.Web.Models.Csv
             return this;
         }
 
-        public CsvResponseBuilder<T> WithColumn(string id, string title, Func<T, string> valueBinding)
+        public CsvResponseBuilder<T> WithColumn(CsvColumnIdentity column, Func<T, string> valueBinding)
         {
-            _columns.Add(new CsvColumnDefinition<T>(id, title, valueBinding));
+            _columns.Add(new CsvColumnDefinition<T>(column, valueBinding));
             return this;
         }
 
@@ -98,7 +98,7 @@ namespace Presentation.Web.Models.Csv
 
             foreach (var column in _columns)
             {
-                header.Add(column.Id, column.Title);
+                header.Add(column.Identity.Id, column.Identity.DisplayName);
             }
 
             return headerExpando;
@@ -113,7 +113,7 @@ namespace Presentation.Web.Models.Csv
 
                 foreach (var column in _columns)
                 {
-                    row.Add(column.Id, column.BindValueFunc(rowInput));
+                    row.Add(column.Identity.Id, column.BindValueFunc(rowInput));
                 }
 
                 yield return rowExpando;
