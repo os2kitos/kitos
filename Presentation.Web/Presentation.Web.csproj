@@ -699,6 +699,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
@@ -719,6 +720,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalProject.po.ts" />

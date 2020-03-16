@@ -23,19 +23,6 @@
                            data-field="localCallName"
                            data-autosave="{{autoSaveUrl}}">
                 </div>
-                <!-- Sensitive Data Level -->
-                <div class="form-group">
-                    <label for="sensitive-data" class="control-label small">Hvilke typer data indeholder systemet</label>
-                    <select id="sensitive-data"
-                            class="form-control input-sm"
-                            ui-select2="{allowClear: true}"
-                            data-ng-model="dataLevels"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="sensitiveDataLevel"
-                            multiple>
-                        <option ng-repeat="option in dataLevelOptions" value="{{option.id}}">{{option.text}}</option>
-                    </select>
-                </div>
                 <!-- Category of data -->
                 <div class="form-group" ng-if="shouldShowCategories">
                     <select-option data-id="categories"

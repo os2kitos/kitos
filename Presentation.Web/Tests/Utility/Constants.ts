@@ -148,6 +148,13 @@ class Constants {
     readonly usedByRelationReferenceField = "usedByRelationReference";
     readonly usedByRelationFrequencyTypeField = "usedByRelationFrequencyType";
 
+    readonly dataLevelTypeNoneCheckbox = "dataLevelTypeNoneCheckbox";
+    readonly dataLevelTypeRegularCheckbox = "dataLevelTypeRegularCheckbox";
+    readonly dataLevelTypeSensitiveCheckbox = "dataLevelTypeSensitiveCheckbox";
+    readonly dataLevelTypeLegalCheckbox = "dataLevelTypeLegalCheckbox";
+
+    readonly defaultPersonalSensitivData1 = "sensitivepersonalDataCheckbox-TestFølsomData";
+    readonly defaultPersonalSensitivData2 = "sensitivepersonalDataCheckbox-FølsomDataTest";
 
     //Local admin
 
