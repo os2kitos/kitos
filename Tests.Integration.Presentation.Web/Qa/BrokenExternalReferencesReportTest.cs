@@ -99,9 +99,9 @@ namespace Tests.Integration.Presentation.Web.Qa
             Assert.True(dto.Available);
             var report = await GetBrokenLinksReportAsync();
 
-            var brokenSystemLink = report[system.Name];
+            var brokenSystemLink = Assert.Single(report[system.Name]);
             AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", SystemReferenceUrl);
-            var brokenInterfaceLink = report[interfaceDto.Name];
+            var brokenInterfaceLink = Assert.Single(report[interfaceDto.Name]);
             AssertBrokenLinkRow(brokenInterfaceLink, "Snitflade", interfaceDto.Name, string.Empty, "Se fejlkode", "404", InterfaceUrl);
         }
 
@@ -141,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.Qa
             Assert.Equal(expectedUrl, brokenLink.Url);
         }
 
-        private static async Task<IDictionary<string, LinkReportCsvFormat>> GetBrokenLinksReportAsync()
+        private static async Task<Dictionary<string, List<LinkReportCsvFormat>>> GetBrokenLinksReportAsync()
         {
             using (var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync())
             {
@@ -153,7 +153,14 @@ namespace Tests.Integration.Presentation.Web.Qa
                         HasHeaderRecord = true
                     }))
                 {
-                    return csvReader.GetRecords<LinkReportCsvFormat>().ToDictionary(x => x.Navn);
+                    var result = new Dictionary<string, List<LinkReportCsvFormat>>();
+
+                    foreach (var parentGroup in csvReader.GetRecords<LinkReportCsvFormat>().GroupBy(record => record.Navn))
+                    {
+                        result[parentGroup.Key] = new List<LinkReportCsvFormat>(parentGroup);
+                    }
+
+                    return result;
                 }
             }
         }
