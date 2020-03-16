@@ -28,7 +28,7 @@ describe("User is able to", () => {
         testFixture.cleanupState();
     });
 
-    it("User is able to select and remove a datalevel on a it system",
+    it("Select and remove a datalevel on a it system",
         () => {
             ItSystemCatalogHelper.createSystem(itSystem1)
                 .then(() => ItSystemCatalogHelper.getActivationToggleButton(itSystem1).click())
