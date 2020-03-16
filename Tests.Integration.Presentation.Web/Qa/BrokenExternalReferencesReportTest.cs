@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.Qa
 
             //Assert that the two controlled errors are present
             Assert.True(dto.Available);
-            var report = await GetBrokenLinksReporAsync();
+            var report = await GetBrokenLinksReportAsync();
 
             var brokenSystemLink = report[system.Name];
             AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", SystemReferenceUrl);
@@ -111,10 +111,8 @@ namespace Tests.Integration.Presentation.Web.Qa
             //Arrange - a broken link in both a system and an interface
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var systemReferenceName = A<string>();
-
-            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
-            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
@@ -143,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.Qa
             Assert.Equal(expectedUrl, brokenLink.Url);
         }
 
-        private static async Task<IDictionary<string, LinkReportCsvFormat>> GetBrokenLinksReporAsync()
+        private static async Task<IDictionary<string, LinkReportCsvFormat>> GetBrokenLinksReportAsync()
         {
             using (var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync())
             {
