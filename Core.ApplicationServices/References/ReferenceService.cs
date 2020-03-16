@@ -122,28 +122,28 @@ namespace Core.ApplicationServices.References
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
-            return DeleteExternalReference(system);
+            return DeleteExternalReferences(system);
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemUsageId(int usageId)
         {
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
-            return DeleteExternalReference(itSystemUsage);
+            return DeleteExternalReferences(itSystemUsage);
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId)
         {
             var contract = _contractRepository.GetById(contractId);
-            return DeleteExternalReference(contract);
+            return DeleteExternalReferences(contract);
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId)
         {
             var project = _projectRepository.GetById(projectId);
-            return DeleteExternalReference(project);
+            return DeleteExternalReferences(project);
         }
 
-        private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReference(IEntityWithExternalReferences root)
+        private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)
         {
             if (root == null)
             {

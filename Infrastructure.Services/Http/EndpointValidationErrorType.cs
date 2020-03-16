@@ -2,10 +2,10 @@
 {
     public enum EndpointValidationErrorType
     {
-        InvalidUriFormat,
-        InvalidWebsiteUri,
-        DnsLookupFailed,
-        CommunicationError,
-        ErrorResponseCode
+        InvalidUriFormat = 0,
+        InvalidWebsiteUri = 1,
+        DnsLookupFailed = 2,
+        CommunicationError = 3,
+        ErrorResponseCode = 4
     }
 }

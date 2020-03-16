@@ -144,7 +144,6 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
             }
 
             return false;
-
         }
 
         private static string GetHost(Uri url)

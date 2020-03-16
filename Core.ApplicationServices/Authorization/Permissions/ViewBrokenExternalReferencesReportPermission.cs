@@ -6,8 +6,7 @@ namespace Core.ApplicationServices.Authorization.Permissions
     {
         public BrokenExternalReferencesReport Target { get; }
 
-        public 
-            ViewBrokenExternalReferencesReportPermission(BrokenExternalReferencesReport target)
+        public ViewBrokenExternalReferencesReportPermission(BrokenExternalReferencesReport target)
         {
             Target = target;
         }
