@@ -60,7 +60,6 @@ class Select2Helper {
         } else {
             expect(findElement().getAttribute("class")).toContain(Select2Helper.disabledSelect2Class);
         }
-
     }
 }
 export = Select2Helper;
