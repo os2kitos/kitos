@@ -93,7 +93,19 @@ namespace Presentation.Web.Models
 
         public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
 
-        public DataOptions isBusinessCritical { get; set; }
+        public DataOptions? IsBusinessCritical { get; set; }
+
+        public DataOptions? DataProcessorControl { get; set; }
+
+        public DataOptions? Precautions { get; set; }
+
+        public DataOptions? RiskAssessment { get; set; }
+
+        public RiskLevel? PreRiskAssessment { get; set; }
+
+        public DataOptions? DPIA { get; set; }
+
+        public DataOptions? AnsweringDataDPIA { get; set; }
 
         public UserCount UserCount { get; set; }
         
@@ -118,7 +130,7 @@ namespace Presentation.Web.Models
         public string DataHearingSupervisionDocumentationUrl { get; set; }
 
         public DateTime UserSupervisionDate { get; set; }
-        public int UserSupervision { get; set; }
+        public DataOptions? UserSupervision { get; set; }
 
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }

@@ -8,7 +8,7 @@
         UNDECIDED = 3
     }
 
-    public enum PreRiskAssessment
+    public enum RiskLevel
     {
         LOW = 0,
         MIDDLE = 1,

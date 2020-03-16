@@ -42,7 +42,7 @@ namespace Core.DomainModel.ItSystemUsage
             precautions = DataOptions.UNDECIDED;
             UserSupervision = DataOptions.UNDECIDED;
             riskAssessment = DataOptions.UNDECIDED;
-            preriskAssessment = PreRiskAssessment.UNDECIDED;
+            preriskAssessment = RiskLevel.UNDECIDED;
             DPIA = DataOptions.UNDECIDED;
             answeringDataDPIA = DataOptions.UNDECIDED;
         }
@@ -374,7 +374,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions? precautions { get; set; }
         public DataOptions? UserSupervision { get; set; }
         public DataOptions? riskAssessment { get; set; }
-        public PreRiskAssessment? preriskAssessment { get; set; }
+        public RiskLevel? preriskAssessment { get; set; }
         public DataOptions? DPIA { get; set; }
         public DataOptions? answeringDataDPIA { get; set; }
 

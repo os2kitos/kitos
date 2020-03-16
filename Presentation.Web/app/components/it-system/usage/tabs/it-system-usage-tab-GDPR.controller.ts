@@ -38,6 +38,9 @@
 
                 $scope.usage = itSystemUsage;
                 $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+                $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
+                $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
+                $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
 
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
