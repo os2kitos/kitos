@@ -4,12 +4,14 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Project;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Time;
+using Fasterflect;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -25,6 +27,8 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly ItProjectService _sut;
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IReferenceService> _referenceService;
 
         public ItProjectServiceTest()
         {
@@ -33,11 +37,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _specificProjectRepo = new Mock<IItProjectRepository>();
             _userRepository = new Mock<IUserRepository>();
             _userContext = new Mock<IOrganizationalUserContext>();
+            _transactionManager = new Mock<ITransactionManager>();
+            _referenceService = new Mock<IReferenceService>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
                 _specificProjectRepo.Object,
                 _userRepository.Object,
+                _referenceService.Object,
+                _transactionManager.Object,
                 _userContext.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
         }
@@ -45,7 +53,7 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Add_Throws_If_Name_Is_Null()
         {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddProject(null,0));
+            Assert.Throws<ArgumentNullException>(() => _sut.AddProject(null, 0));
         }
 
         [Fact]
@@ -55,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(false);
 
             //Act
-            var result = _sut.AddProject(A<string>(),A<int>());
+            var result = _sut.AddProject(A<string>(), A<int>());
 
             //Assert
             Assert.False(result.Ok);
@@ -71,7 +79,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(true);
 
             //Act
-            var result = _sut.AddProject(A<string>(),A<int>());
+            var result = _sut.AddProject(A<string>(), A<int>());
 
             //Assert
             Assert.True(result.Ok);
@@ -134,9 +142,12 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var id = A<int>();
+            var databaseTransaction = new Mock<IDatabaseTransaction>();
             var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() } } };
             _itProjectRepo.Setup(x => x.GetByKey(id)).Returns(itProject);
             _authorizationContext.Setup(x => x.AllowDelete(itProject)).Returns(true);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(databaseTransaction.Object);
+            _referenceService.Setup(x => x.DeleteByProjectId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.DeleteProject(id);
@@ -145,6 +156,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             _itProjectRepo.Verify(x => x.DeleteWithReferencePreload(itProject), Times.Once);
             _itProjectRepo.Verify(x => x.Save(), Times.Once);
+            databaseTransaction.Verify(x => x.Commit(), Times.Once);
             Assert.Empty(itProject.Handover.Participants); //Make sure participants were emptied prior to deletion
         }
 

@@ -3,11 +3,17 @@ using System.Data;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -24,6 +30,9 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
+        private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
+        private readonly Mock<IItContractRepository> _contractRepository;
+        private readonly Mock<IItProjectRepository> _projectRepository;
 
         public ReferenceServiceTest()
         {
@@ -33,9 +42,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _dbTransaction = new Mock<IDatabaseTransaction>();
 
+            _systemUsageRepository = new Mock<IItSystemUsageRepository>();
+            _contractRepository = new Mock<IItContractRepository>();
+            _projectRepository = new Mock<IItProjectRepository>();
             _sut = new ReferenceService(
                 _referenceRepository.Object,
                 _systemRepository.Object,
+                _systemUsageRepository.Object,
+                _contractRepository.Object, 
+                _projectRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 new Mock<IOrganizationalUserContext>().Object,
@@ -44,14 +59,14 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_NotFound()
+        public void DeleteBySystemId_Returns_NotFound()
         {
             //Arrange
-            var system = CreateSystem();
-            ExpectGetSystemReturns(system.Id, null);
+            var id = A<int>();
+            ExpectGetSystemReturns(id, null);
 
             //Act
-            var result = _sut.DeleteBySystemId(system.Id);
+            var result = _sut.DeleteBySystemId(id);
 
             //Assert
             Assert.False(result.Ok);
@@ -61,7 +76,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
+        public void DeleteBySystemId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
         {
             //Arrange
             var system = CreateSystem();
@@ -79,7 +94,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_Ok_If_No_References()
+        public void DeleteBySystemId_Returns_Ok_If_No_References()
         {
             //Arrange
             var system = CreateSystem();
@@ -96,7 +111,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_Ok_If_References()
+        public void DeleteBySystemId_Returns_Ok_If_References()
         {
             //Arrange
             var system = CreateSystem();
@@ -108,6 +123,221 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Act
             var result = _sut.DeleteBySystemId(system.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+
+
+        [Fact]
+        public void DeleteBySystemUsageId_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetSystemUsageReturns(id, null);
+
+            //Act
+            var result = _sut.DeleteBySystemUsageId(id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteBySystemUsageId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
+        {
+            //Arrange
+            var systemUsage = CreateSystemUsage();
+            ExpectGetSystemUsageReturns(systemUsage.Id, systemUsage);
+            ExpectAllowModifyReturns(systemUsage, false);
+
+            //Act
+            var result = _sut.DeleteBySystemUsageId(systemUsage.Id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteBySystemUsageId_Returns_Ok_If_No_References()
+        {
+            var systemUsage = CreateSystemUsage();
+            ExpectGetSystemUsageReturns(systemUsage.Id, systemUsage);
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            //Act
+            var result = _sut.DeleteBySystemUsageId(systemUsage.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteBySystemUsageId_Returns_Ok_If_References()
+        {
+            //Arrange
+            var systemUsage = CreateSystemUsage();
+            var reference = CreateReference();
+            systemUsage = AddExternalReference(systemUsage, reference);
+            ExpectGetSystemUsageReturns(systemUsage.Id, systemUsage);
+            ExpectAllowModifyReturns(systemUsage, true);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.DeleteBySystemUsageId(systemUsage.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteByContractId_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetContractReturns(id, null);
+
+            //Act
+            var result = _sut.DeleteByContractId(id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByContractId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
+        {
+            //Arrange
+            var contract = CreateContract();
+            ExpectGetContractReturns(contract.Id, contract);
+            ExpectAllowModifyReturns(contract, false);
+
+            //Act
+            var result = _sut.DeleteByContractId(contract.Id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByContractId_Returns_Ok_If_No_References()
+        {
+            var contract = CreateContract();
+            ExpectGetContractReturns(contract.Id, contract);
+            ExpectAllowModifyReturns(contract, true);
+
+            //Act
+            var result = _sut.DeleteByContractId(contract.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByContractId_Returns_Ok_If_References()
+        {
+            //Arrange
+            var contract = CreateContract();
+            var reference = CreateReference();
+            contract = AddExternalReference(contract, reference);
+            ExpectGetContractReturns(contract.Id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.DeleteByContractId(contract.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteByProjectId_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetProjectReturns(id, null);
+
+            //Act
+            var result = _sut.DeleteByProjectId(id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByProjectId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
+        {
+            //Arrange
+            var project = CreateProject();
+            ExpectGetProjectReturns(project.Id, project);
+            ExpectAllowModifyReturns(project, false);
+
+            //Act
+            var result = _sut.DeleteByProjectId(project.Id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByProjectId_Returns_Ok_If_No_References()
+        {
+            var project = CreateProject();
+            ExpectGetProjectReturns(project.Id, project);
+            ExpectAllowModifyReturns(project, true);
+
+            //Act
+            var result = _sut.DeleteByProjectId(project.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByProjectId_Returns_Ok_If_References()
+        {
+            //Arrange
+            var project = CreateProject();
+            var reference = CreateReference();
+            project = AddExternalReference(project, reference);
+            ExpectGetProjectReturns(project.Id, project);
+            ExpectAllowModifyReturns(project, true);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.DeleteByProjectId(project.Id);
 
             //Assert
             Assert.True(result.Ok);
@@ -222,6 +452,22 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
+
+        private void ExpectGetSystemUsageReturns(int id, ItSystemUsage systemUsage)
+        {
+            _systemUsageRepository.Setup(x => x.GetSystemUsage(id)).Returns(systemUsage);
+        }
+
+        private void ExpectGetContractReturns(int id, ItContract contract)
+        {
+            _contractRepository.Setup(x => x.GetById(id)).Returns(contract);
+        }
+
+        private void ExpectGetProjectReturns(int id, ItProject project)
+        {
+            _projectRepository.Setup(x => x.GetById(id)).Returns(project);
+        }
+
         private void ExpectTransactionToBeSet()
         {
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(_dbTransaction.Object);
@@ -231,12 +477,27 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             return new ItSystem { Id = A<int>() };
         }
+
+        private ItContract CreateContract()
+        {
+            return new ItContract { Id = A<int>() };
+        }
+
+        private ItProject CreateProject()
+        {
+            return new ItProject { Id = A<int>() };
+        }
+
+        private ItSystemUsage CreateSystemUsage()
+        {
+            return new ItSystemUsage { Id = A<int>(), ItSystem = CreateSystem() };
+        }
         private ExternalReference CreateReference()
         {
             return new ExternalReference { Id = A<int>() };
         }
 
-        private static ItSystem AddExternalReference(ItSystem system, ExternalReference reference)
+        private static T AddExternalReference<T>(T system, ExternalReference reference) where T: IEntityWithExternalReferences
         {
             system.ExternalReferences.Add(reference);
             return system;

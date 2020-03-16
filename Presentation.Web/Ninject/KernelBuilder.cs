@@ -28,6 +28,7 @@ using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.References.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Context;
@@ -53,6 +54,7 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
+using Ninject.Syntax;
 using Ninject.Web.Common;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Factories.Authentication;
@@ -168,10 +170,20 @@ namespace Presentation.Web.Ninject
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
-            kernel.Bind<IDomainEventHandler<ExposingSystemChanged>>().To<RelationSpecificInterfaceEventsHandler>().InCommandScope(Mode);
-            kernel.Bind<IDomainEventHandler<InterfaceDeleted>>().To<RelationSpecificInterfaceEventsHandler>().InCommandScope(Mode);
-            kernel.Bind<IDomainEventHandler<ContractDeleted>>().To<ContractDeletedHandler>().InCommandScope(Mode);
-            kernel.Bind<IDomainEventHandler<SystemUsageDeleted>>().To<SystemUsageDeletedHandler>().InCommandScope(Mode);
+            RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvent<InterfaceDeleted, RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
+            RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
+            RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+
+        }
+
+        private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
+            where TDomainEvent : IDomainEvent
+            where THandler : IDomainEventHandler<TDomainEvent>
+        {
+            kernel.Bind<IDomainEventHandler<TDomainEvent>>().To<THandler>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)

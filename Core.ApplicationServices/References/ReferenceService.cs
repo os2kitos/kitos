@@ -5,8 +5,11 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
@@ -16,6 +19,9 @@ namespace Core.ApplicationServices.References
     {
         private readonly IReferenceRepository _referenceRepository;
         private readonly IItSystemRepository _itSystemRepository;
+        private readonly IItSystemUsageRepository _systemUsageRepository;
+        private readonly IItContractRepository _contractRepository;
+        private readonly IItProjectRepository _projectRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
@@ -25,6 +31,9 @@ namespace Core.ApplicationServices.References
         public ReferenceService(
             IReferenceRepository referenceRepository,
             IItSystemRepository itSystemRepository,
+            IItSystemUsageRepository systemUsageRepository,
+            IItContractRepository contractRepository,
+            IItProjectRepository projectRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
@@ -32,6 +41,9 @@ namespace Core.ApplicationServices.References
         {
             _referenceRepository = referenceRepository;
             _itSystemRepository = itSystemRepository;
+            _systemUsageRepository = systemUsageRepository;
+            _contractRepository = contractRepository;
+            _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _userContext = userContext;
@@ -55,7 +67,7 @@ namespace Core.ApplicationServices.References
                     {
                         if (!_authorizationContext.AllowModify(root))
                         {
-                            return new OperationError("Not allowed to modify root entity",OperationFailure.Forbidden);
+                            return new OperationError("Not allowed to modify root entity", OperationFailure.Forbidden);
                         }
 
                         return root
@@ -84,22 +96,68 @@ namespace Core.ApplicationServices.References
                 );
         }
 
+        public Result<ExternalReference, OperationFailure> DeleteByReferenceId(int referenceId)
+        {
+            return
+                _referenceRepository.Get(referenceId)
+                    .Select(externalReference => new { externalReference, owner = externalReference.GetOwner() })
+                    .Select<Result<ExternalReference, OperationFailure>>(referenceAndOwner =>
+                    {
+                        if (!_authorizationContext.AllowModify(referenceAndOwner.owner))
+                        {
+                            return OperationFailure.Forbidden;
+                        }
+
+                        _referenceRepository.Delete(referenceAndOwner.externalReference);
+                        return referenceAndOwner.externalReference;
+                    })
+                    .Match<Result<ExternalReference, OperationFailure>>
+                    (
+                        onValue: result => result,
+                        onNone: () => OperationFailure.NotFound
+                    );
+
+        }
+
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
-            if (system == null)
+            return DeleteExternalReference(system);
+        }
+
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemUsageId(int usageId)
+        {
+            var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
+            return DeleteExternalReference(itSystemUsage);
+        }
+
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId)
+        {
+            var contract = _contractRepository.GetById(contractId);
+            return DeleteExternalReference(contract);
+        }
+
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId)
+        {
+            var project = _projectRepository.GetById(projectId);
+            return DeleteExternalReference(project);
+        }
+
+        private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReference(IEntityWithExternalReferences root)
+        {
+            if (root == null)
             {
                 return OperationFailure.NotFound;
             }
 
-            if (!_authorizationContext.AllowModify(system))
+            if (!_authorizationContext.AllowModify(root))
             {
                 return OperationFailure.Forbidden;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                var systemExternalReferences = system.ExternalReferences.ToList();
+                var systemExternalReferences = root.ExternalReferences.ToList();
 
                 if (systemExternalReferences.Count == 0)
                 {
@@ -110,11 +168,10 @@ namespace Core.ApplicationServices.References
                 {
                     _referenceRepository.Delete(reference);
                 }
+
                 transaction.Commit();
                 return systemExternalReferences;
             }
-
         }
-
     }
 }
