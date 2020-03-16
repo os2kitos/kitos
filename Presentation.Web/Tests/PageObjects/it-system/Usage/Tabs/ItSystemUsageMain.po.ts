@@ -5,7 +5,6 @@ class ItSystemUsageMain {
 
     private static consts = new constants();
 
-
     static getHeaderName() {
         return element(by.id(this.consts.systemUsageHeaderName));
     }
@@ -77,7 +76,6 @@ class ItSystemUsageMain {
     static selectMultiChoiceInputField() {
         return element(by.id("s2id_sensitive-data")).element(by.className("select2-input"));
     }
-
 }
 
 export = ItSystemUsageMain;

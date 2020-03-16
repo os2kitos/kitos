@@ -1,7 +1,6 @@
 ﻿import constants = require("../../../../Utility/Constants");
 import CssHelper = require("../../../../Object-wrappers/CSSLocatorHelper");
 
-
 class ItSystemUsageGDPR {
 
     private static consts = new constants();
@@ -30,7 +29,6 @@ class ItSystemUsageGDPR {
     static getDefaultPersonalSensitiveDataCheckbox2() {
         return element(this.cssHelper.byDataElementType(this.consts.defaultPersonalSensitivData2));
     }
-
 }
 
 export = ItSystemUsageGDPR;
