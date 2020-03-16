@@ -91,7 +91,6 @@
     <Compile Include="SSO\StsAdresseHelpers.cs" />
     <Compile Include="SSO\StsBrugerEmailService.cs" />
     <Compile Include="SSO\StsBrugerHelpers.cs" />
-    <Compile Include="SSO\StsException.cs" />
     <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />
