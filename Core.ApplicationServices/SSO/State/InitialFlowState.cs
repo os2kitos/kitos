@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
 using Core.DomainServices.SSO;
 using dk.nita.saml20.identity;
@@ -13,7 +12,8 @@ namespace Core.ApplicationServices.SSO.State
     {
         private readonly IStsBrugerEmailService _stsBrugerEmailService;
 
-        public InitialFlowState(): this(new StsBrugerEmailService()) {}
+        public InitialFlowState(): this(new StsBrugerEmailService()) 
+        {}
 
         public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService)
         {

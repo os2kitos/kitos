@@ -9,9 +9,11 @@ namespace Core.DomainServices.SSO
 {
     public class StsBrugerEmailService : IStsBrugerEmailService
     {
+        // TODO: Move urls + thumbprint usage to AWS Parameter Store
         private const string UrlServicePlatformBrugerService = "https://exttest.serviceplatformen.dk/service/Organisation/Bruger/5";
         private const string UrlServicePlatformAdresseService = "https://exttest.serviceplatformen.dk/service/Organisation/Adresse/5";
         private const string CertificateThumbprint = "1793d097f45b0acea258f7fe18d5a4155799da26";
+        
         private const string EmailTypeIdentifier = "5d13e891-162a-456b-abf2-fd9b864df96d";
         private const string MunicipalityCvr = "58271713"; // Ballerup CVR
 
