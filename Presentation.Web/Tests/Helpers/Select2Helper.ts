@@ -62,10 +62,5 @@ class Select2Helper {
         }
 
     }
-
-    public static selectMultiChoiceValue(value: string, elementId: string) {
-        return element(by.id(elementId)).element(by.className("select2-input")).sendKeys(value)
-            .then(() => element(by.className("select2-match")).click());
-    }
 }
 export = Select2Helper;
