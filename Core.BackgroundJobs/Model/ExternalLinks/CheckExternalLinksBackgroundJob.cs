@@ -15,7 +15,7 @@ using Infrastructure.Services.Http;
 
 namespace Core.BackgroundJobs.Model.ExternalLinks
 {
-    public class CheckExternalLinks : IAsyncBackgroundJob
+    public class CheckExternalLinksBackgroundJob : IAsyncBackgroundJob
     {
         private readonly IReferenceRepository _referenceRepository;
         private readonly IInterfaceRepository _interfaceRepository;
@@ -26,7 +26,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
 
         public string Id => StandardJobIds.CheckExternalLinks;
 
-        public CheckExternalLinks(
+        public CheckExternalLinksBackgroundJob(
             IReferenceRepository referenceRepository,
             IInterfaceRepository interfaceRepository,
             IBrokenExternalReferencesReportRepository reportRepository,

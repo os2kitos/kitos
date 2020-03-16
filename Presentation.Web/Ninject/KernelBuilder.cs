@@ -276,7 +276,7 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IBackgroundJobFactory>().To<BackgroundJobFactory>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
-            kernel.Bind<CheckExternalLinks>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
         }
     }
 }

@@ -50,7 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\ExternalLinks\CheckExternalLinks.cs" />
+    <Compile Include="Model\ExternalLinks\CheckExternalLinksBackgroundJob.cs" />
     <Compile Include="Model\IAsyncBackgroundJob.cs" />
     <Compile Include="Factory\BackgroundJobFactory.cs" />
     <Compile Include="Model\StandardJobIds.cs" />

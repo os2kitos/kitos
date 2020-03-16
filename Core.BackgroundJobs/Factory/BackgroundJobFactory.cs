@@ -15,7 +15,7 @@ namespace Core.BackgroundJobs.Factory
 
         public IAsyncBackgroundJob CreateExternalReferenceCheck()
         {
-            return _kernel.Get<CheckExternalLinks>();
+            return _kernel.Get<CheckExternalLinksBackgroundJob>();
         }
     }
 }
