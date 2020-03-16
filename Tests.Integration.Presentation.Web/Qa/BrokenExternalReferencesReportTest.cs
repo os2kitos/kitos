@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.SqlServer;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
+using ExpectedObjects.Strategies;
 using Presentation.Web.Models.Qa;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -19,6 +20,9 @@ namespace Tests.Integration.Presentation.Web.Qa
 {
     public class BrokenExternalReferencesReportTest : WithAutoFixture
     {
+        private const string SystemReferenceUrl = "http://google.com/notfount1337.html";
+        private const string InterfaceUrl = "http://google.com/notfounth4x0r.html";
+
         [Fact]
         public async Task Get_Status_Returns_ReportNotAvailable()
         {
@@ -43,9 +47,9 @@ namespace Tests.Integration.Presentation.Web.Qa
 
             //Act
             await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
+            var dto = await WaitForReportGenerationCompletedAsync();
 
             //Assert
-            var dto = await WaitForReportGenerationCompletedAsync();
             Assert.True(dto.Available);
             Assert.NotNull(dto.BrokenLinksCount);
             Assert.NotNull(dto.CreatedDate);
@@ -82,12 +86,10 @@ namespace Tests.Integration.Presentation.Web.Qa
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var systemReferenceName = A<string>();
-            const string systemReferenceUrl = "http://google.com/notfount1337.html";
-            const string interfaceUrl = "http://google.com/notfounth4x0r.html";
-            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, systemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, interfaceUrl);
+            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
 
             //Act
             await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
@@ -98,9 +100,37 @@ namespace Tests.Integration.Presentation.Web.Qa
             var report = await GetBrokenLinksReporAsync();
 
             var brokenSystemLink = report[system.Name];
-            AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", systemReferenceUrl);
+            AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", SystemReferenceUrl);
             var brokenInterfaceLink = report[interfaceDto.Name];
-            AssertBrokenLinkRow(brokenInterfaceLink, "Snitflade", interfaceDto.Name, string.Empty, "Se fejlkode", "404", interfaceUrl);
+            AssertBrokenLinkRow(brokenInterfaceLink, "Snitflade", interfaceDto.Name, string.Empty, "Se fejlkode", "404", InterfaceUrl);
+        }
+
+        [Fact, Description("Makes sure parent objects can be removed even if referred by a report")]
+        public async Task Can_Delete_Objects_Which_Are_Referred_By_Report()
+        {
+            //Arrange - a broken link in both a system and an interface
+            PurgeBrokenExternalReferencesReportTable();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var systemReferenceName = A<string>();
+
+            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
+            await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
+            var dto = await WaitForReportGenerationCompletedAsync();
+            Assert.True(dto.Available);
+
+            //Act
+            using (var deleteReferenceResponse = await ReferencesHelper.DeleteReferenceAsync(referenceToBeExplicitlyDeleted.Id))
+            using (var deleteItSystemResponse = await ItSystemHelper.DeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId))
+            using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(interfaceDto.Id))
+            {
+                Assert.Equal(HttpStatusCode.OK, deleteReferenceResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, deleteItSystemResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
+            }
         }
 
         private static void AssertBrokenLinkRow(LinkReportCsvFormat brokenLink, string expectedOrigin, string expectedName, string expectedReferenceName, string expectedErrorCategory, string expectedErrorCode, string expectedUrl)
@@ -129,13 +159,6 @@ namespace Tests.Integration.Presentation.Web.Qa
                 }
             }
         }
-
-        /*TODO: Deletion is possible for
-         - interface with broken link (DELETE api/itinterface/{id})
-         - system with references that hold broken link (DELETE api/itsystem/{id})
-         - reference that hold broken link (DELETE api/reference/{id})
-
-             */
 
         private static void PurgeBrokenExternalReferencesReportTable()
         {

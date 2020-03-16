@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.References.DomainEvents;
@@ -29,7 +30,7 @@ namespace Core.DomainServices.Model.EventHandlers
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                foreach (var report in domainEvent.DeletedInterface.BrokenLinkReports)
+                foreach (var report in domainEvent.DeletedInterface.BrokenLinkReports.ToList())
                 {
                     _interfaceBrokenLinks.Delete(report);
                 }
@@ -41,7 +42,7 @@ namespace Core.DomainServices.Model.EventHandlers
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                foreach (var report in domainEvent.DeletedExternalReference.BrokenLinkReports)
+                foreach (var report in domainEvent.DeletedExternalReference.BrokenLinkReports.ToList())
                 {
                     _externalReferenceBrokenLinks.Delete(report);
                 }

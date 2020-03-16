@@ -144,9 +144,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie login)
+        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
         {
-            var cookie = login;
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
 
@@ -157,9 +157,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             int systemId,
             int parentSystemId,
             int organizationId,
-            Cookie login)
+            Cookie optionalLogin = null)
         {
-            var cookie = login;
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
             var body = new
