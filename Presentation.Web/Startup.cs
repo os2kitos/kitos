@@ -2,6 +2,7 @@
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
+using System.Net;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
@@ -17,7 +18,7 @@ namespace Presentation.Web
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
-            //setup token authentication
+            // Setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
                 AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,
@@ -33,6 +34,14 @@ namespace Presentation.Web
                     ValidateLifetime = true,
                 }
             });
+
+            // Setup http certificate validation
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Ssl3 |
+                SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
 
             app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();

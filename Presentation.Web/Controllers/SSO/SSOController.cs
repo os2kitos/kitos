@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Web.Http;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.State;
 using dk.nita.saml20.identity;

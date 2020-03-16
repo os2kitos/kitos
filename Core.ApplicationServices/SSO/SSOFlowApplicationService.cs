@@ -6,10 +6,10 @@ namespace Core.ApplicationServices.SSO
     {
         public AbstractState StartSsoLoginFlow()
         {
-            AbstractState resultingState = new InitialFlowState();
-            var flowContext = new FlowContext(resultingState);
+            AbstractState initialState = new InitialFlowState();
+            var flowContext = new FlowContext(initialState);
             flowContext.HandleLoginCompleted();
-            return resultingState;
+            return flowContext.CurrentState;
         }
     }
 }
