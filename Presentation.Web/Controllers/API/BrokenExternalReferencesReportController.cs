@@ -6,7 +6,6 @@ using Core.ApplicationServices.Qa;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.Result;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.Csv;
 using Presentation.Web.Models.Qa;
 
 namespace Presentation.Web.Controllers.API
@@ -15,9 +14,6 @@ namespace Presentation.Web.Controllers.API
     [RoutePrefix("api/v1/broken-external-references-report")]
     public class BrokenExternalReferencesReportController : BaseApiController
     {
-        private const string UnknownValueString = "Ukendt";
-        private static readonly string EmptyValueString = string.Empty;
-
         private readonly IBrokenExternalReferencesReportService _brokenExternalReferencesReportService;
 
         public BrokenExternalReferencesReportController(IBrokenExternalReferencesReportService brokenExternalReferencesReportService)
@@ -61,90 +57,9 @@ namespace Presentation.Web.Controllers.API
                 .GetLatestReport()
                 .Match
                 (
-                    onSuccess: CreateReportCsvResponse,
+                    onSuccess: BrokenExternalReferencesReportCsvMapper.CreateReportCsvResponse,
                     onFailure: FromOperationError
                 );
-        }
-
-        private static HttpResponseMessage CreateReportCsvResponse(BrokenExternalReferencesReport report)
-        {
-            var csvResponseBuilder = new CsvResponseBuilder<IBrokenLink>();
-
-            csvResponseBuilder =
-                csvResponseBuilder
-                    .WithFileName($"kitos_external_references_report-{report.Created:yyyy-MM-dd}.csv")
-                    .WithColumn(BrokenExternalReferencesReportColumns.Origin, MapBrokenLinkOriginType)
-                    .WithColumn(BrokenExternalReferencesReportColumns.OriginObjectName, MapBrokenLinkOriginName)
-                    .WithColumn(BrokenExternalReferencesReportColumns.RefName, MapReferenceName)
-                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCategory, MapErrorCategory)
-                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCode, MapErrorCode)
-                    .WithColumn(BrokenExternalReferencesReportColumns.Url, link => link.ValueOfCheckedUrl);
-
-
-            csvResponseBuilder = report
-                .GetBrokenLinks()
-                .Aggregate(csvResponseBuilder, (builder, brokenLink) => builder.WithRow(brokenLink));
-
-            return csvResponseBuilder.Build();
-        }
-
-        private static string MapErrorCode(IBrokenLink arg)
-        {
-            return arg.ErrorResponseCode.HasValue ? arg.ErrorResponseCode.Value.ToString("D") : EmptyValueString;
-        }
-
-        private static string MapErrorCategory(IBrokenLink arg)
-        {
-            switch (arg.Cause)
-            {
-                case BrokenLinkCause.InvalidUrl:
-                    return "Ugyldig URL";
-                case BrokenLinkCause.DnsLookupFailed:
-                    return "Ugyldigt domæne";
-                case BrokenLinkCause.ErrorResponse:
-                    return "Se fejlkode";
-                case BrokenLinkCause.CommunicationError:
-                    return "Kommunikationsfejl";
-                default:
-                    return UnknownValueString;
-            }
-        }
-
-        private static string MapReferenceName(IBrokenLink arg)
-        {
-            switch (arg)
-            {
-                case BrokenLinkInExternalReference reference:
-                    return reference.BrokenReferenceOrigin.Title;
-                default:
-                    return EmptyValueString;
-            }
-        }
-
-        private static string MapBrokenLinkOriginName(IBrokenLink arg)
-        {
-            switch (arg)
-            {
-                case BrokenLinkInExternalReference reference:
-                    return reference.BrokenReferenceOrigin.ItSystem.Name;
-                case BrokenLinkInInterface linkInInterface:
-                    return linkInInterface.BrokenReferenceOrigin.Name;
-                default:
-                    return UnknownValueString;
-            }
-        }
-
-        private static string MapBrokenLinkOriginType(IBrokenLink arg)
-        {
-            switch (arg)
-            {
-                case BrokenLinkInExternalReference _:
-                    return "IT System";
-                case BrokenLinkInInterface _:
-                    return "Snitflade";
-                default:
-                    return UnknownValueString;
-            }
         }
 
         private static BrokenExternalReferencesReportStatusDTO MapStatus(Maybe<BrokenExternalReferencesReport> reportResult)
@@ -152,13 +67,13 @@ namespace Presentation.Web.Controllers.API
             return reportResult
                 .Match
                 (
-                    onValue: report => new BrokenExternalReferencesReportStatusDTO()
+                    onValue: report => new BrokenExternalReferencesReportStatusDTO
                     {
                         Available = true,
                         CreatedDate = report.Created,
                         BrokenLinksCount = report.GetBrokenLinks().Count()
                     },
-                    onNone: () => new BrokenExternalReferencesReportStatusDTO()
+                    onNone: () => new BrokenExternalReferencesReportStatusDTO
                     {
                         Available = false
                     }
