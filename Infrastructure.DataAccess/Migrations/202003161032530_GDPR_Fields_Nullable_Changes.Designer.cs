@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202003131005236_GDPR_Fields_Nullable_Changes"; }
+            get { return "202003161032530_GDPR_Fields_Nullable_Changes"; }
         }
         
         string IMigrationMetadata.Source

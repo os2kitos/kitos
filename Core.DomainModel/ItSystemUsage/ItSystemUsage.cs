@@ -398,8 +398,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string noteRisks { get; set; }
 
-        public DateTime? DPIADate { get; set; }
-
 
         public DateTime? DPIADateFor { get; set; }
 
@@ -429,9 +427,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
-
-        public string DataHearingSupervisionDocumentationUrlName { get; set; }
-        public string DataHearingSupervisionDocumentationUrl { get; set; }
 
         public DateTime? UserSupervisionDate { get; set; }
 

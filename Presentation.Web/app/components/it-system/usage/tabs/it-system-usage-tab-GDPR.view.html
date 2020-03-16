@@ -113,7 +113,7 @@
                         <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                     </select>
                 </div>
-                <div ng-show="systemUsage.dataProcessorControl == 1">
+                <div ng-show="usageViewModel.dataProcessorControl == 1">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="lastControl" class="control-label small">Dato for seneste tilsyn/kontrol</label>

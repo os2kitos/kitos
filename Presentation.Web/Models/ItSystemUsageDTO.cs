@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Models
@@ -125,9 +124,6 @@ namespace Presentation.Web.Models
 
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
-
-        public string DataHearingSupervisionDocumentationUrlName { get; set; }
-        public string DataHearingSupervisionDocumentationUrl { get; set; }
 
         public DateTime UserSupervisionDate { get; set; }
         public DataOptions? UserSupervision { get; set; }

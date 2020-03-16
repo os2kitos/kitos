@@ -160,10 +160,6 @@
                                 $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
                                 break;
-                            case 'DataHearingSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.DataHearingSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.DataHearingSupervisionDocumentationUrl;
-                                break;
                             case 'DPIASupervisionDocumentationUrl':
                                 $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
@@ -196,11 +192,6 @@
                                         .RiskSupervisionDocumentationUrlName,
                                     riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
 
-                                    dataHearingSupervisionDocumentationUrlName: $scope.usage
-                                        .DataHearingSupervisionDocumentationUrlName,
-                                    dataHearingSupervisionDocumentationUrl: $scope.usage
-                                        .DataHearingSupervisionDocumentationUrl,
-
                                     DPIASupervisionDocumentationUrlName: $scope.usage
                                         .DPIASupervisionDocumentationUrlName,
                                     DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
@@ -225,10 +216,6 @@
                                 case 'RiskSupervisionDocumentationUrl':
                                     payload.riskSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.riskSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'DataHearingSupervisionDocumentationUrl':
-                                    payload.dataHearingSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'DPIASupervisionDocumentationUrl':
                                     payload.DPIASupervisionDocumentationUrlName = $scope.linkName;

@@ -16,10 +16,16 @@ namespace Infrastructure.DataAccess.Migrations
             AlterColumn("dbo.ItSystemUsage", "answeringDataDPIA", c => c.Int());
             AlterColumn("dbo.ItSystemUsage", "UserSupervision", c => c.Int());
             DropColumn("dbo.ItSystemUsage", "DPIAhearing");
+            DropColumn("dbo.ItSystemUsage", "DPIADate");
+            DropColumn("dbo.ItSystemUsage", "DataHearingSupervisionDocumentationUrlName");
+            DropColumn("dbo.ItSystemUsage", "DataHearingSupervisionDocumentationUrl");
         }
         
         public override void Down()
         {
+            AddColumn("dbo.ItSystemUsage", "DataHearingSupervisionDocumentationUrl", c => c.String());
+            AddColumn("dbo.ItSystemUsage", "DataHearingSupervisionDocumentationUrlName", c => c.String());
+            AddColumn("dbo.ItSystemUsage", "DPIADate", c => c.DateTime(precision: 7, storeType: "datetime2"));
             AddColumn("dbo.ItSystemUsage", "DPIAhearing", c => c.Int(nullable: false));
             AlterColumn("dbo.ItSystemUsage", "UserSupervision", c => c.Int(nullable: false));
             AlterColumn("dbo.ItSystemUsage", "answeringDataDPIA", c => c.Int(nullable: false));
