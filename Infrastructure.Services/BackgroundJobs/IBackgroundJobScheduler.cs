@@ -2,6 +2,6 @@
 {
     public interface IBackgroundJobScheduler
     {
-        void ScheduleLinkCheck();
+        void ScheduleLinkCheckForImmediateExecution();
     }
 }

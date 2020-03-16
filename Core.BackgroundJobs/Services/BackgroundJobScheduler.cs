@@ -6,7 +6,7 @@ namespace Core.BackgroundJobs.Services
 {
     public class BackgroundJobScheduler : IBackgroundJobScheduler
     {
-        public void ScheduleLinkCheck()
+        public void ScheduleLinkCheckForImmediateExecution()
         {
             RecurringJob.Trigger(StandardJobIds.CheckExternalLinks);
         }

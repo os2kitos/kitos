@@ -4,7 +4,6 @@ using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
 using Core.BackgroundJobs.Model;
-using Core.BackgroundJobs.Services;
 using Hangfire.Common;
 using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;

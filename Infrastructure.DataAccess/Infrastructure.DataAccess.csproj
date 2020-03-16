@@ -906,7 +906,6 @@
       <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.resx">
       <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>

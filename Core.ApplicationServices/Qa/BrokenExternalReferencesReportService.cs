@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.Qa
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            _backgroundJobScheduler.ScheduleLinkCheck();
+            _backgroundJobScheduler.ScheduleLinkCheckForImmediateExecution();
 
             return Maybe<OperationError>.None;
         }
