@@ -21,7 +21,7 @@
             $scope.hasViewAccess = user.currentOrganizationId === itSystemUsage.organizationId;
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
-            $scope.system = new Kitos.Models.ViewModel.ItSystem.SystemViewModel(itSystemUsage.itSystem);
+            $scope.system = itSystemUsage.itSystem;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.validateUrl(url);
 
