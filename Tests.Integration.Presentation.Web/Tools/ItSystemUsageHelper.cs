@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystemUsage;
 using Xunit;
 
@@ -28,6 +29,18 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
                 return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
             }
+        }
+
+        public static async Task<ItSystemUsageDTO> PatchSystemUsage(int usageSystemId, int orgId, object body)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystemusage/{usageSystemId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+            }
+
         }
     }
 }
