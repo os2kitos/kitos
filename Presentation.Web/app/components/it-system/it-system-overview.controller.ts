@@ -180,7 +180,8 @@ ArchiveType,\
 SensitiveDataType,\
 ObjectOwner,\
 LastChangedByUser,\
-ItProjects($select=Name)`;
+ItProjects($select=Name),\
+SensitiveDataLevels($select=SensitivityDataLevel)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -565,35 +566,34 @@ ItProjects($select=Name)`;
                             }
                         }
                     },
-                    //{
-                    //    field: "DataLevel", title: "Datatype", width: 150,
-                    //    persistId: "dataLevel",
-                    //    template: dataItem => {
-                    //        switch (dataItem.DataLevel) {
-                    //            case "PERSONALDATA":
-                    //                return "Persondata";
-                    //            case "PERSONALDATANDSENSITIVEDATA":
-                    //                return "Persondata og følsomme persondata";
-                    //            default:
-                    //                return "Ingen persondata";
-                    //        }
-                    //    },
-                    //    attributes: { "class": "might-overflow" },
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            template: function (args) {
-                    //                args.element.kendoDropDownList({
-                    //                    dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
-                    //                    dataTextField: "type",
-                    //                    dataValueField: "value",
-                    //                    valuePrimitive: true
-                    //                });
-                    //            },
-                    //            showOperators: false
-                    //        }
-                    //    }
-                    //},
+                    {
+                        field: "DataLevel", title: "Datatype", width: 150,
+                        persistId: "dataLevel",
+                        template: dataItem => {
+                            var contains = [];
+                            _.each(dataItem.SensitiveDataLevels,
+                                dataLevel => {
+                                    switch (dataLevel.SensitivityDataLevel) {
+                                        case "NONE":
+                                            contains.push("Ingen persondata");
+                                            return;
+                                        case "PERSONALDATA":
+                                            contains.push("Almindelige persondata");
+                                            return;
+                                        case "PERSONALDATANDSENSITIVEDATA":
+                                            contains.push("Følsomme persondata");
+                                            return;
+                                        case "PERSONALLEGALDATA":
+                                            contains.push("Straffedomme og lovovertrædelser");
+                                            return;
+                                    }
+                                });
+                            return contains.toString();
+                        },
+                        attributes: { "class": "might-overflow" },
+                        hidden: true,
+                        filterable: false
+                    },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract",
