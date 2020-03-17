@@ -9,11 +9,13 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -55,7 +57,6 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
-using Ninject.Syntax;
 using Ninject.Web.Common;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Factories.Authentication;
@@ -166,6 +167,12 @@ namespace Presentation.Web.Ninject
             RegisterKLE(kernel);
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
+            RegisterSSO(kernel);
+        }
+
+        private void RegisterSSO(IKernel kernel)
+        {
+            kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)
