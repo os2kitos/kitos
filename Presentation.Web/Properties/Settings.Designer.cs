@@ -85,5 +85,32 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["UseDefaultPassword"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1793d097f45b0acea258f7fe18d5a4155799da26")]
+        public string SsoCertificateThumbprint {
+            get {
+                return ((string)(this["SsoCertificateThumbprint"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("exttest.serviceplatformen.dk")]
+        public string StsOrganisationEndpointHost {
+            get {
+                return ((string)(this["StsOrganisationEndpointHost"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("58271713")]
+        public string StsOrganisationAuthorizedMunicipalityCvr {
+            get {
+                return ((string)(this["StsOrganisationAuthorizedMunicipalityCvr"]));
+            }
+        }
     }
 }

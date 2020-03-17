@@ -43,6 +43,7 @@ using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.SSO;
 using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
@@ -172,7 +173,15 @@ namespace Presentation.Web.Ninject
 
         private void RegisterSSO(IKernel kernel)
         {
+            kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
+                new StsOrganisationIntegrationConfiguration(
+                    Settings.Default.SsoCertificateThumbprint,
+                    Settings.Default.StsOrganisationEndpointHost,
+                    Settings.Default.StsOrganisationAuthorizedMunicipalityCvr))
+                .InSingletonScope();
+
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IStsBrugerEmailService>().To<StsBrugerEmailService>().InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)

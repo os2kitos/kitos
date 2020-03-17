@@ -3,66 +3,103 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using Core.DomainModel.Result;
 using Infrastructure.Soap.STSAdresse;
+using RegistreringType1 = Infrastructure.Soap.STSBruger.RegistreringType1;
 
 namespace Core.DomainServices.SSO
 {
     public class StsBrugerEmailService : IStsBrugerEmailService
     {
-        // TODO: Move urls + thumbprint usage to AWS Parameter Store
-        private const string UrlServicePlatformBrugerService = "https://exttest.serviceplatformen.dk/service/Organisation/Bruger/5";
-        private const string UrlServicePlatformAdresseService = "https://exttest.serviceplatformen.dk/service/Organisation/Adresse/5";
-        private const string CertificateThumbprint = "1793d097f45b0acea258f7fe18d5a4155799da26";
-        
-        private const string EmailTypeIdentifier = "5d13e891-162a-456b-abf2-fd9b864df96d";
-        private const string MunicipalityCvr = "58271713"; // Ballerup CVR
+        private readonly string _urlServicePlatformBrugerService;
+        private readonly string _urlServicePlatformAdresseService;
+        private readonly string _certificateThumbprint;
+        private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
+        private readonly string _authorizedMunicipalityCvr;
+
+        public StsBrugerEmailService(StsOrganisationIntegrationConfiguration configuration)
+        {
+            _certificateThumbprint = configuration.CertificateThumbprint;
+            _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
+            _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
+            _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
+        }
 
         public IEnumerable<string> GetStsBrugerEmails(string uuid)
         {
-            var emailAdresseUuid = GetStsBrugerEmailAdresseUuid(uuid);
-            return GetStsAdresseEmailFromUuid(emailAdresseUuid);
+            return
+                GetStsBrugerEmailAdresseUuid(uuid)
+                    .Select(GetStsAdresseEmailFromUuid)
+                    .GetValueOrFallback(Enumerable.Empty<string>());
         }
 
-        private static string GetStsBrugerEmailAdresseUuid(string uuid)
+        private Maybe<string> GetStsBrugerEmailAdresseUuid(string uuid)
         {
-            var client = StsBrugerHelpers.CreateBrugerPortTypeClient(CreateHttpBinding(),
-                UrlServicePlatformBrugerService, GetClientCertificate(CertificateThumbprint));
-            var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(MunicipalityCvr, uuid);
-            var brugerPortType = client.ChannelFactory.CreateChannel();
-            var laesResponse = brugerPortType.laes(laesRequest);
-            var registreringType1 = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering[0];
-            foreach (var adresse in registreringType1.RelationListe.Adresser)
+            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
-                if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
+                var client = StsBrugerHelpers.CreateBrugerPortTypeClient(CreateHttpBinding(),
+                    _urlServicePlatformBrugerService, clientCertificate);
+                var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(_authorizedMunicipalityCvr, uuid);
+                var brugerPortType = client.ChannelFactory.CreateChannel();
+                var laesResponse = brugerPortType.laes(laesRequest);
+
+                foreach (var registreringType1 in laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering)
                 {
-                    return adresse.ReferenceID.Item;
+                    if (IsObsolete(registreringType1))
+                    {
+                        continue;
+                    }
+
+                    foreach (var adresse in registreringType1.RelationListe.Adresser)
+                    {
+                        if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
+                        {
+                            return adresse.ReferenceID.Item;
+                        }
+                    }
                 }
+
+                return Maybe<string>.None;
             }
-            return string.Empty;
         }
 
-        private static IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
+        private static bool IsObsolete(RegistreringType1 registreringType1)
         {
-            var client = StsAdresseHelpers.CreateAdressePortTypeClient(CreateHttpBinding(),
-                UrlServicePlatformAdresseService, GetClientCertificate(CertificateThumbprint));
-            var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(MunicipalityCvr, emailAdresseUuid);
-            var adressePortType = client.ChannelFactory.CreateChannel();
-            var laesResponse = adressePortType.laes(laesRequest);
-            var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
-            var result = new List<string>();
-            foreach (var registreringType1 in registreringType1s)
+            return registreringType1.LivscyklusKode == Infrastructure.Soap.STSBruger.LivscyklusKodeType.Slettet ||
+                   registreringType1.LivscyklusKode == Infrastructure.Soap.STSBruger.LivscyklusKodeType.Passiveret;
+        }
+
+        private IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
+        {
+            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
-                if (registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
-                    registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret))
+                var client = StsAdresseHelpers.CreateAdressePortTypeClient(CreateHttpBinding(),
+                    _urlServicePlatformAdresseService, clientCertificate);
+                var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(_authorizedMunicipalityCvr, emailAdresseUuid);
+                var adressePortType = client.ChannelFactory.CreateChannel();
+                var laesResponse = adressePortType.laes(laesRequest);
+                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+                var result = new List<string>();
+
+                foreach (var registreringType1 in registreringType1s)
                 {
-                    continue;
+                    if (IsObsolete(registreringType1))
+                    {
+                        continue;
+                    }
+
+                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    result.Add(latest.AdresseTekst);
                 }
 
-                var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
-                result.Add(latest.AdresseTekst);
+                return result;
             }
+        }
 
-            return result;
+        private static bool IsObsolete(Infrastructure.Soap.STSAdresse.RegistreringType1 registreringType1)
+        {
+            return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
+                   registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
         }
 
         private static BasicHttpBinding CreateHttpBinding()
@@ -84,23 +121,25 @@ namespace Core.DomainServices.SSO
 
         private static X509Certificate2 GetClientCertificate(string thumbprint)
         {
-            X509Certificate2 result;
-            var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-            store.Open(OpenFlags.ReadOnly);
-            try
+            using (var store = new X509Store(StoreName.My, StoreLocation.LocalMachine))
             {
-                var results = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                if (results.Count == 0)
+                store.Open(OpenFlags.ReadOnly);
+                X509Certificate2 result;
+                try
                 {
-                    throw new Exception("Unable to find certificate!");
+                    var results = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                    if (results.Count == 0)
+                    {
+                        throw new Exception("Unable to find certificate!");
+                    }
+                    result = results[0];
                 }
-                result = results[0];
+                finally
+                {
+                    store.Close();
+                }
+                return result;
             }
-            finally
-            {
-                store.Close();
-            }
-            return result;
         }
     }
 }

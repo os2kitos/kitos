@@ -90,6 +90,8 @@
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="SSO\IStsBrugerEmailService.cs" />
     <Compile Include="SSO\StsAdresseHelpers.cs" />
+    <Compile Include="SSO\StsOrganisationConstants.cs" />
+    <Compile Include="SSO\StsOrganisationIntegrationConfiguration.cs" />
     <Compile Include="SSO\StsBrugerEmailService.cs" />
     <Compile Include="SSO\StsBrugerHelpers.cs" />
     <Compile Include="Repositories\Interface\IInterfaceRepository.cs" />

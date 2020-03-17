@@ -12,9 +12,6 @@ namespace Core.ApplicationServices.SSO.State
     {
         private readonly IStsBrugerEmailService _stsBrugerEmailService;
 
-        public InitialFlowState(): this(new StsBrugerEmailService()) 
-        {}
-
         public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService)
         {
             _stsBrugerEmailService = stsBrugerEmailService;
@@ -52,8 +49,8 @@ namespace Core.ApplicationServices.SSO.State
 
         private static bool CurrentUserHasKitosPrivilege()
         {
-            const string samlKitosPrivilegeKey = "dk:gov:saml:attribute:Privileges_intermediate";
-            const string samlKitosReadAccessRoleIdentifier = "http://kitos-local.strongminds.dk/roles/usersystemrole/readaccess/1";
+            const string samlKitosPrivilegeKey = "dk:gov:saml:attribute:Privileges_intermediate"; //TODO: to const class
+            const string samlKitosReadAccessRoleIdentifier = "http://kitos-local.strongminds.dk/roles/usersystemrole/readaccess/1"; //TODO: replace entity id in this string..
             var result = false;
             if (Saml20Identity.Current.HasAttribute(samlKitosPrivilegeKey))
             {
