@@ -43,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl($"api/reference/{id}?organizationId=-1");
+            var url = TestEnvironment.CreateUrl($"api/reference/{id}?{KitosApiConstants.UnusedOrganizationIdParameter}");
 
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }

@@ -135,6 +135,7 @@
     <Compile Include="Tools\ItContractHelper.cs" />
     <Compile Include="Tools\ItProjectHelper.cs" />
     <Compile Include="Tools\ItSystemHelper.cs" />
+    <Compile Include="Tools\KitosApiConstants.cs" />
     <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
