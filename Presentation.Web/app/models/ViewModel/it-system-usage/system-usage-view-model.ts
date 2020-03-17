@@ -151,6 +151,8 @@
 
         mapOperationOption(operationOption: number) {
             switch (operationOption) {
+                case null:
+                    return Operation.UNDECIDED;
                 case 0:
                     return Operation.UNDECIDED;
                 case 1:
