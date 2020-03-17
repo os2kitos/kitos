@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -43,6 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ILogger> _mockLogger;
         private readonly ItSystemUsageService _sut;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
+        private readonly Mock<IReferenceService> _referenceService;
 
         public ItSystemUsageServiceRelationTest()
         {
@@ -58,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _mockOptionsService.Setup(x => x.GetAvailableOption(It.IsAny<int>(), It.IsAny<int>())).Returns(Maybe<RelationFrequencyType>.None);
+            _referenceService = new Mock<IReferenceService>();
             _sut = new ItSystemUsageService(
                 _mockSystemUsageRepository.Object,
                 _mockAuthorizationContext.Object,
@@ -67,6 +70,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockOrganizationalUserContext.Object,
                 _mockSystemRelationRepository.Object,
                 _interfaceRepository.Object,
+                _referenceService.Object, 
                 _mockTransactionManager.Object,
                 Mock.Of<IDomainEvents>(),
                 _mockLogger.Object);

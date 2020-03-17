@@ -1,7 +1,7 @@
 ﻿﻿<div class="container">
     <h3>Regneark for kontraktindgåelse</h3>
     <p>
-        Her kan du uploade et regneark som leverandører kan downloade på forsiden af KITOS. <br/>
+        Her kan du uploade et regneark som leverandører kan downloade på forsiden af KITOS. <br />
         Filen der uploades her, bliver downloadet for brugeren som Kontrakt_Indgåelse_Skabelon.xslx, så sørg for at filen har det samme format.
     </p>
     <div class="form-group">
@@ -32,6 +32,16 @@
         <label class="col-xs-12" id="KLEStatusLabel" data-element-type="KLEStatusLabel">{{KLEUpdateAvailableLabel}}</label>
         <button class="btn btn-default" style="margin-left: 15px" id="KLEChangesButton" data-element-type="KLEChangesButton" ng-disabled="!KleUpdateAvailableButtonInteraction" ng-click="GetKLEChanges()">Vis ændringer i KLE</button>
         <button class="btn btn-default" style="margin-left: 5px" id="KLEUpdateButton" data-element-type="KLEUpdateButton" ng-disabled="!KleApplyUpdateButtonInteraction" ng-click="UpdateKLE()">Opdater KLE</button>
-        <a id="KLEDownloadAnchor" style="visibility: hidden; width: 0px"/>
+        <a id="KLEDownloadAnchor" style="visibility: hidden; width: 0px" />
     </div>
- </div>
+
+    <h3>Rapport over brudte links</h3>
+    <div class="well" ng-if="brokenLinksVm.available">
+        <p><strong>Oprettet:</strong> {{brokenLinksVm.createdDate}}</p>
+        <p><strong>Antal registrerede fejl:</strong> {{brokenLinksVm.brokenLinksCount}}</p>
+        <a class="btn btn-default" id="brokenLinksReportAnchor" href="{{brokenLinksVm.linkToCurrentReport}}">Hent rapporten</a>
+    </div>
+    <div class="well" ng-if="!brokenLinksVm.available">
+        <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
+    </div>
+</div>

@@ -10,5 +10,7 @@ namespace Core.ApplicationServices.Authorization
         bool Visit(AdministerOrganizationRightPermission permission);
         bool Visit(DefineOrganizationTypePermission permission);
         bool Visit(CreateEntityWithVisibilityPermission permission);
+        bool Visit(ViewBrokenExternalReferencesReportPermission permission);
+        bool Visit(TriggerBrokenReferencesReportPermission permission);
     }
 }

@@ -37,6 +37,15 @@
     <Reference Include="Ninject.Web.Common">
       <HintPath>..\packages\Ninject.Web.Common.3.2.3.0\lib\net45-full\Ninject.Web.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Polly, Version=5.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly.5.9.0\lib\net45\Polly.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -49,6 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundJobs\IBackgroundJobLauncher.cs" />
+    <Compile Include="BackgroundJobs\IBackgroundJobScheduler.cs" />
+    <Compile Include="Configuration\KitosUrl.cs" />
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
@@ -59,6 +71,13 @@
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
+    <Compile Include="Extensions\UriExtensions.cs" />
+    <Compile Include="Http\EndpointValidation.cs" />
+    <Compile Include="Http\EndpointValidationService.cs" />
+    <Compile Include="Http\EndpointValidationErrorType.cs" />
+    <Compile Include="Http\IEndpointValidationService.cs" />
+    <Compile Include="Http\EndpointValidationError.cs" />
+    <Compile Include="Http\ServiceEndpointConfiguration.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
