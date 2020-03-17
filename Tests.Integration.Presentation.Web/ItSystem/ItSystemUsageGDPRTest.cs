@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
-using ExpectedObjects.Comparisons;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -39,6 +34,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task Can_Add_SensitiveDataLevel()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var sensitivityLevel = A<SensitiveDataLevel>();
+
+            //Act
+            var sensitivityLevelDTO =
+                await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
+
+            //Assert
+            Assert.Equal(sensitivityLevel, sensitivityLevelDTO.DataSensitivityLevel);
+        }
+
+        [Fact]
         public async Task Can_Remove_SensitiveDataLevel()
         {
             //Arrange
@@ -46,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
+            var sensitivityLevel = A<SensitiveDataLevel>();
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act
@@ -68,13 +81,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
+            var sensitivityLevel = A<SensitiveDataLevel>();
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act
             using (var result = await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/add/{sensitivityLevel}"), cookie, null))
+                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/add"), cookie, sensitivityLevel))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
@@ -93,15 +106,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
 
             //Act
             using (var result = await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/remove/{sensitivityLevel}"), cookie, null))
+                    $"api/v1/itsystemusage/{usage.Id}/sensitivityLevel/remove"), cookie, A<SensitiveDataLevel>()))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+                Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
                 var notUpdatedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
                 Assert.Empty(notUpdatedUsage.SensitiveDataLevels);
             }

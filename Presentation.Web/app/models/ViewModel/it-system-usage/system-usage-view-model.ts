@@ -4,8 +4,8 @@
     export enum SensitiveDataLevel {
         NONE = 0,
         PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2,
-        PERSONALLEGALDATA = 3
+        SENSITIVEDATA = 2,
+        LEGALDATA = 3
     }
 
     export enum DataOption {
@@ -20,18 +20,6 @@
         MIDDLE = 1,
         HIGH = 2,
         UNDECIDED = 3
-    }
-
-    export class SensitiveDataLevelOptions {
-        options: Select2OptionViewModel[];
-        constructor() {
-            this.options = [
-                <Select2OptionViewModel>{ id: 0, text: "Ingen persondata" },
-                <Select2OptionViewModel>{ id: 1, text: "Almindelige persondata" },
-                <Select2OptionViewModel>{ id: 2, text: "Følsomme persondata" },
-                <Select2OptionViewModel>{ id: 3, text: "Straffedomme og lovovertrædelser" }
-            ];
-        }
     }
 
     export class DataOptions {
@@ -114,8 +102,8 @@
             this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
             this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
             this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
-            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
-            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA)
+            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.SENSITIVEDATA);
+            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.LEGALDATA)
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);
@@ -135,9 +123,9 @@
                 case 1:
                     return SensitiveDataLevel.PERSONALDATA;
                 case 2:
-                    return SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA;
+                    return SensitiveDataLevel.SENSITIVEDATA;
                 case 3:
-                    return SensitiveDataLevel.PERSONALLEGALDATA;
+                    return SensitiveDataLevel.LEGALDATA;
                 default:
                     throw new RangeError(`${dataLevel.dataSensitivityLevel} is not a valid SensitiveDataLevel`);
             }

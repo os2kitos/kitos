@@ -35,8 +35,8 @@ namespace Tools.Test.Database.Model.Tasks
 
             _tasks = new List<DatabaseTask>
             {
-                new CreateSensitivePersonalDataTypeTask("TestFølsomData"),
-                new CreateSensitivePersonalDataTypeTask("FølsomDataTest"),
+                new CreateSensitivePersonalDataTypeTask("TestSensitiveData1"),
+                new CreateSensitivePersonalDataTypeTask("TestSensitiveData2"),
                 new EnableAllOptionsTask(),
                 new CreateOrganizationTask((int)OrganizationTypeKeys.Kommune,SecondOrganizationName),
                 new CreateKitosUserTask(_globalAdmin, OrganizationRole.GlobalAdmin, DefaultOrganizationName),

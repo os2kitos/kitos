@@ -862,8 +862,8 @@ namespace Tests.Unit.Core.ApplicationServices
         [Theory]
         [InlineData(SensitiveDataLevel.NONE)]
         [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        [InlineData(SensitiveDataLevel.SENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.LEGALDATA)]
         public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
         {
             //Arrange
@@ -914,8 +914,8 @@ namespace Tests.Unit.Core.ApplicationServices
         [Theory]
         [InlineData(SensitiveDataLevel.NONE)]
         [InlineData(SensitiveDataLevel.PERSONALDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA)]
-        [InlineData(SensitiveDataLevel.PERSONALLEGALDATA)]
+        [InlineData(SensitiveDataLevel.SENSITIVEDATA)]
+        [InlineData(SensitiveDataLevel.LEGALDATA)]
         public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
         {
             //Arrange

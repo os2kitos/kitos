@@ -41,7 +41,7 @@
                 $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
-
+                $scope.sensitiveDataLevel = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
@@ -350,31 +350,35 @@
                         });
                 };
 
-                $scope.dataLevelChange = function (dataLevel) {
+                $scope.dataLevelChange = (dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel) => {
                     switch (dataLevel) {
-                        case "personalNoDataSelected":
-                            updateDataLevels(0, $scope.usageViewModel.personalNoDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.NONE:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalNoDataSelected);
                             break;
-                        case "personalRegularDataSelected":
-                            updateDataLevels(1, $scope.usageViewModel.personalRegularDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.PERSONALDATA:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalRegularDataSelected);
                             break;
-                        case "personalSensitiveDataSelected":
-                            updateDataLevels(2, $scope.usageViewModel.personalSensitiveDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.SENSITIVEDATA:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalSensitiveDataSelected);
                             break;
-                        case "personalLegalDataSelected":
-                            updateDataLevels(3, $scope.usageViewModel.personalLegalDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.LEGALDATA:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalLegalDataSelected);
                             break;
                         default:
                             break;
                     }
                 };
 
-                function updateDataLevels(dataLevel, boolValue) {
+                function updateDataLevels(dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel, boolValue: boolean) {
                     if (boolValue) {
-                        $http.patch("api/v1/itsystemusage/" + itSystemUsage.id + "/sensitivityLevel/add/" + dataLevel);
+                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/add`, dataLevel)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
+                                onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                     else {
-                        $http.patch("api/v1/itsystemusage/" + itSystemUsage.id + "/sensitivityLevel/remove/" + dataLevel);
+                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/remove`, dataLevel)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
+                                onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                 }
 

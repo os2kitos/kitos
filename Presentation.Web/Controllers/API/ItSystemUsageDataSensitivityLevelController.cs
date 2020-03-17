@@ -1,15 +1,15 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Result;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Controllers.API
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/itsystemusage")]
     public class ItSystemUsageDataSensitivityLevelController : BaseApiController
     {
@@ -28,40 +28,57 @@ namespace Presentation.Web.Controllers.API
         /// <param name="dataSensitivityLevel"></param>
         /// <returns></returns>
         [HttpPatch]
-        [Route("{id}/sensitivityLevel/add/{dataSensitivityLevel}")]
-        public HttpResponseMessage AddSensitivityLevel(int id, int dataSensitivityLevel)
+        [Route("{id}/sensitivityLevel/add")]
+        public HttpResponseMessage AddSensitivityLevel(int id, [FromBody]SensitiveDataLevel dataSensitivityLevel)
         {
-            var sensitivityLevel = MapSensitivityLevel(dataSensitivityLevel);
-            var result = _usageService.AddSensitiveDataLevel(id, sensitivityLevel);
+            var result = _usageService.AddSensitiveDataLevel(id, dataSensitivityLevel);
 
             return result.Match
             (
-                onSuccess: itSystemUsageDataLevel =>  Ok(Map<ItSystemUsageSensitiveDataLevel,ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
-                onFailure: FromOperationError
+                onSuccess: itSystemUsageDataLevel =>  Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
+                onFailure: operationError =>
+                {
+                    switch (operationError.FailureType)
+                    {
+                        case OperationFailure.NotFound:
+                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        default:
+                            return FromOperationError(operationError);
+                    }
+                }
+                    
             );
         }
 
         [HttpPatch]
-        [Route("{id}/sensitivityLevel/remove/{dataSensitivityLevel}")]
-        public HttpResponseMessage RemoveSensitivityLevel(int id, int dataSensitivityLevel)
+        [Route("{id}/sensitivityLevel/remove")]
+        public HttpResponseMessage RemoveSensitivityLevel(int id, [FromBody]SensitiveDataLevel dataSensitivityLevel)
         {
-            var sensitivityLevel = MapSensitivityLevel(dataSensitivityLevel);
-            var result = _usageService.RemoveSensitiveDataLevel(id, sensitivityLevel);
+            var result = _usageService.RemoveSensitiveDataLevel(id, dataSensitivityLevel);
 
             return result.Match
             (
-                onSuccess: itSystemUsageDataLevel => Ok(Map<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
-                onFailure: FromOperationError
+                onSuccess: itSystemUsageDataLevel => Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
+                onFailure: operationError =>
+                {
+                    switch (operationError.FailureType)
+                    {
+                        case OperationFailure.NotFound:
+                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        default:
+                            return FromOperationError(operationError);
+                    }
+                }
             );
         }
 
-        private SensitiveDataLevel MapSensitivityLevel(int input)
+        private static ItSystemUsageSensitiveDataLevelDTO MapSensitiveDataLevelDTO(
+            ItSystemUsageSensitiveDataLevel dataLevel)
         {
-            if (Enum.IsDefined(typeof(SensitiveDataLevel), input))
+            return new ItSystemUsageSensitiveDataLevelDTO
             {
-                return (SensitiveDataLevel)input;
-            }
-            throw new InvalidEnumArgumentException(nameof(input), input, typeof(SensitiveDataLevel));
+                DataSensitivityLevel = dataLevel.SensitivityDataLevel
+            };
         }
     }
 }

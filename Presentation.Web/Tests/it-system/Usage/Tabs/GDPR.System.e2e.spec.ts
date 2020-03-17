@@ -6,9 +6,10 @@ import ItSystemUsageGDPR = require("../../../PageObjects/It-system/Usage/Tabs/It
 import LocalSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
 import Constants = require("../../../Utility/Constants")
 import CssHelper = require("../../../Object-wrappers/CSSLocatorHelper")
+import NavigationHelper = require("../../../Utility/NavigationHelper");
 
 describe("User is able to", () => {
-
+    var navigationHelper = new NavigationHelper();
     var loginHelper = new login();
     var testFixture = new TestFixtureWrapper();
     var itSystem1 = createItSystemName();
@@ -31,15 +32,14 @@ describe("User is able to", () => {
     it("Select and remove a datalevel on a it system",
         () => {
             ItSystemCatalogHelper.createSystem(itSystem1)
-                .then(() => ItSystemCatalogHelper.getActivationToggleButton(itSystem1).click())
+                .then(() => ItSystemCatalogHelper.createLocalSystem(itSystem1))
                 .then(() => itSystemHelper.openLocalSystem(itSystem1))
                 .then(() => LocalSystemNavigation.openGDPRPage())
                 .then(() => ItSystemUsageGDPR.getRegularDataLevelCheckBox().click())
                 .then(() => expectCheckboxVisibilityToBe(consts.defaultPersonalSensitivData1,false))
                 .then(() => ItSystemUsageGDPR.getSensitiveDataLevelCheckBox().click())
                 .then(() => ItSystemUsageGDPR.getLegalDataLevelCheckBox().click())
-                .then(() => browser.refresh())
-                .then(() => browser.waitForAngular())
+                .then(() => navigationHelper.refreshPage())
                 .then(() => expectCheckboxVisibilityToBe(consts.defaultPersonalSensitivData1, true))
                 .then(() => expectCheckboxValue(consts.dataLevelTypeNoneCheckbox, false))
                 .then(() => expectCheckboxValue(consts.dataLevelTypeRegularCheckbox, true))
@@ -48,7 +48,7 @@ describe("User is able to", () => {
         });
 
     function createItSystemName() {
-        return `SystemUsageMain${new Date().getTime()}`;
+        return `Gdprtest${new Date().getTime()}`;
     }
 
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
