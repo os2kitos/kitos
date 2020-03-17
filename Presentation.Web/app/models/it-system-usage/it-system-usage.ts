@@ -1,6 +1,5 @@
 ﻿module Kitos.Models.ItSystemUsage {
     import ItSystem = Models.ItSystem.IItSystem;
-    import SensitiveDataLevel = Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
 
     export interface IItSystemUsage extends IEntity {
         /** Gets or sets a value indicating whether this instance's status is active. */
@@ -74,7 +73,7 @@
         LinkToDirectoryUrl: string;
         LinkToDirectoryUrlName: string;
 
-        SensitiveDataLevels: any;
+        SensitiveDataLevels: Models.Odata.ItSystemUsage.IItSystemUsageSensitiveDataLevelDTO[];
         
     }
 }

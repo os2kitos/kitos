@@ -153,7 +153,7 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-
+        
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
@@ -573,20 +573,8 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             var contains = [];
                             _.each(dataItem.SensitiveDataLevels,
                                 dataLevel => {
-                                    switch (dataLevel.SensitivityDataLevel) {
-                                        case "NONE":
-                                            contains.push("Ingen persondata");
-                                            return;
-                                        case "PERSONALDATA":
-                                            contains.push("Almindelige persondata");
-                                            return;
-                                        case "PERSONALDATANDSENSITIVEDATA":
-                                            contains.push("Følsomme persondata");
-                                            return;
-                                        case "PERSONALLEGALDATA":
-                                            contains.push("Straffedomme og lovovertrædelser");
-                                            return;
-                                    }
+                                    contains.push(
+                                        Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel.SensitivityDataLevel));
                                 });
                             return contains.toString();
                         },

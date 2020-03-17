@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Result;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.ItSystemUsage;
 
@@ -35,8 +35,18 @@ namespace Presentation.Web.Controllers.API
 
             return result.Match
             (
-                onSuccess: itSystemUsageDataLevel =>  Ok(Map<ItSystemUsageSensitiveDataLevel,ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
-                onFailure: FromOperationError
+                onSuccess: itSystemUsageDataLevel =>  Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
+                onFailure: operationError =>
+                {
+                    switch (operationError.FailureType)
+                    {
+                        case OperationFailure.NotFound:
+                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        default:
+                            return FromOperationError(operationError);
+                    }
+                }
+                    
             );
         }
 
@@ -48,9 +58,27 @@ namespace Presentation.Web.Controllers.API
 
             return result.Match
             (
-                onSuccess: itSystemUsageDataLevel => Ok(Map<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
-                onFailure: FromOperationError
+                onSuccess: itSystemUsageDataLevel => Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
+                onFailure: operationError =>
+                {
+                    switch (operationError.FailureType)
+                    {
+                        case OperationFailure.NotFound:
+                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        default:
+                            return FromOperationError(operationError);
+                    }
+                }
             );
+        }
+
+        private static ItSystemUsageSensitiveDataLevelDTO MapSensitiveDataLevelDTO(
+            ItSystemUsageSensitiveDataLevel dataLevel)
+        {
+            return new ItSystemUsageSensitiveDataLevelDTO
+            {
+                DataSensitivityLevel = dataLevel.SensitivityDataLevel
+            };
         }
     }
 }

@@ -1,23 +1,10 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
-    import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
 
     export enum SensitiveDataLevel {
         NONE = 0,
         PERSONALDATA = 1,
         SENSITIVEDATA = 2,
         LEGALDATA = 3
-    }
-
-    export class SensitiveDataLevelOptions {
-        options: Select2OptionViewModel[];
-        constructor() {
-            this.options = [
-                <Select2OptionViewModel>{ id: 0, text: "Ingen persondata" },
-                <Select2OptionViewModel>{ id: 1, text: "Almindelige persondata" },
-                <Select2OptionViewModel>{ id: 2, text: "Følsomme persondata" },
-                <Select2OptionViewModel>{ id: 3, text: "Straffedomme og lovovertrædelser" }
-            ];
-        }
     }
 
     export interface ISystemUsageViewModel {
