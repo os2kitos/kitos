@@ -10,12 +10,6 @@
                     $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                     .then(result => result.data)
                 ],
-                regularSensitiveData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetRegularPersonalDataByUsageId(id=" + $stateParams.id + ")")
-                        .then(function (result) {
-                            return result.data.value;
-                        });
-                }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("odata/GetSensitivePersonalDataByUsageId(id=" + $stateParams.id + ")")
                         .then(function (result) {
@@ -39,15 +33,14 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
-            $scope.regularSensitiveData = _.orderBy(regularSensitiveData, "Priority", "desc");
-                $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
+            $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
 
@@ -97,10 +90,7 @@
                 } else {
                     let OptType = 0;
                     switch (optionType) {
-                        case "REGULARPERSONALDATA":
-                            OptType = 0; 
-                            break;
-                        case "SENSITIVEPERSONALDATA":
+                    case "SENSITIVEPERSONALDATA":
                             OptType = 1; 
                             break;
                         case "REGISTERTYPEDATA":

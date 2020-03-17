@@ -1,8 +1,12 @@
-﻿using Microsoft.Owin;
+﻿using System;
+using Microsoft.Owin;
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
-using System.Net;
+using Core.BackgroundJobs.Model;
+using Hangfire.Common;
+using Infrastructure.Services.BackgroundJobs;
+using Infrastructure.Services.Http;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
@@ -13,10 +17,7 @@ namespace Presentation.Web
     {
         public void Configuration(IAppBuilder app)
         {
-            // Initializing the Hangfire scheduler
-            GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
+            InitializeHangfire(app);
 
             // Setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
@@ -27,26 +28,33 @@ namespace Presentation.Web
                     ValidateAudience = false,
                     ValidIssuer = BearerTokenConfig.Issuer,
                     ValidateIssuer = true,
-
                     IssuerSigningKey = BearerTokenConfig.SecurityKey,
                     ValidateIssuerSigningKey = true,
-
                     ValidateLifetime = true,
                 }
             });
 
-            // Setup http certificate validation
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Ssl3 |
-                SecurityProtocolType.Tls |
-                SecurityProtocolType.Tls11 |
-                SecurityProtocolType.Tls12;
-            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true;
-
-            app.UseNinject(); 
+            app.UseNinject();
             app.Use<ApiRequestsLoggingMiddleware>();
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
             app.Use<DenyModificationsThroughApiMiddleware>();
+        }
+
+        private static void InitializeHangfire(IAppBuilder app)
+        {
+            // Initializing the Hangfire scheduler
+            GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
+
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+            ServiceEndpointConfiguration.ConfigureValidationOfOutgoingConnections();
+
+            new RecurringJobManager().AddOrUpdate(
+                recurringJobId: StandardJobIds.CheckExternalLinks,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),
+                cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
+                timeZone: TimeZoneInfo.Local);
         }
     }
 }

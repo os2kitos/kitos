@@ -96,6 +96,8 @@
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
+    <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
+    <Compile Include="Authorization\Permissions\ViewBrokenExternalReferencesReportPermission.cs" />
     <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
     <Compile Include="Authorization\Policies\IModuleCreationPolicy.cs" />
     <Compile Include="Authorization\Policies\IModuleModificationPolicy.cs" />
@@ -120,6 +122,8 @@
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\OptionsService.cs" />
     <Compile Include="KLE\IKLEApplicationService.cs" />
+    <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
+    <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />
     <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />

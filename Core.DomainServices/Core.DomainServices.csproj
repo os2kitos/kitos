@@ -69,6 +69,7 @@
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,6 +92,10 @@
     <Compile Include="SSO\StsAdresseHelpers.cs" />
     <Compile Include="SSO\StsBrugerEmailService.cs" />
     <Compile Include="SSO\StsBrugerHelpers.cs" />
+    <Compile Include="Repositories\Interface\IInterfaceRepository.cs" />
+    <Compile Include="Repositories\Interface\InterfaceRepository.cs" />
+    <Compile Include="Repositories\Qa\BrokenExternalReferencesReportRepository.cs" />
+    <Compile Include="Repositories\Qa\IBrokenExternalReferencesReportRepository.cs" />
     <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />

@@ -42,7 +42,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit/{interfaceId}?organizationId=-1" /*org id not used*/), cookie);
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit/{interfaceId}?{KitosApiConstants.UnusedOrganizationIdParameter}" /*org id not used*/), cookie);
         }
 
         public static async Task<IReadOnlyList<ItInterfaceExhibitUsageDTO>> GetExhibitInterfaceUsages(int contractId)

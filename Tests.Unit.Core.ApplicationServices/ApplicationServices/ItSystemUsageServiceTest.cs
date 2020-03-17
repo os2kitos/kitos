@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Options;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -39,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private Mock<IReferenceService> _referenceService;
 
         public ItSystemUsageServiceTest()
         {
@@ -54,6 +56,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _domainEvents = new Mock<IDomainEvents>();
+            _referenceService = new Mock<IReferenceService>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -63,6 +66,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _userContext.Object,
                 _relationRepositoryMock.Object,
                 _interfaceRepository.Object,
+                _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
                 Mock.Of<ILogger>());
@@ -235,8 +239,11 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var id = A<int>();
             var itSystemUsage = new ItSystemUsage();
+            var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetUsageByKeyReturns(id, itSystemUsage);
             _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(true);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _referenceService.Setup(x => x.DeleteBySystemUsageId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.Delete(id);
@@ -246,6 +253,8 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Same(itSystemUsage, result.Value);
             _usageRepository.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
             _usageRepository.Verify(x => x.Save(), Times.Once);
+            _referenceService.Verify(x => x.DeleteBySystemUsageId(id), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<SystemUsageDeleted>(ev => ev.DeletedSystemUsage == itSystemUsage)));
         }
 

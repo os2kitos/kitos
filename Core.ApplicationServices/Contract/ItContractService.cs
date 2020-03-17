@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.References;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
@@ -14,6 +15,7 @@ namespace Core.ApplicationServices.Contract
     public class ItContractService : IItContractService
     {
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IAuthorizationContext _authorizationContext;
@@ -22,12 +24,14 @@ namespace Core.ApplicationServices.Contract
         public ItContractService(
             IGenericRepository<ItContract> repository,
             IGenericRepository<EconomyStream> economyStreamRepository,
+            IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
+            _referenceService = referenceService;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _authorizationContext = authorizationContext;
@@ -56,6 +60,12 @@ namespace Core.ApplicationServices.Contract
                 _economyStreamRepository.Save();
 
                 //Delete the contract
+                var deleteByContractId = _referenceService.DeleteByContractId(id);
+                if (deleteByContractId.Failed)
+                {
+                    transaction.Rollback();
+                    return deleteByContractId.Error;
+                }
                 _domainEvents.Raise(new ContractDeleted(contract));
                 _repository.DeleteWithReferencePreload(contract);
                 _repository.Save();

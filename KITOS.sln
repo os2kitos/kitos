@@ -104,6 +104,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.SSOWithKombitSts", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Soap", "Infrastructure.Soap\Infrastructure.Soap.csproj", "{A05389EA-25F4-45B5-8534-0775D9671456}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.BackgroundJobs", "Core.BackgroundJobs\Core.BackgroundJobs.csproj", "{7F765808-5258-4E41-8B27-6E7D4667AA24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -170,6 +172,10 @@ Global
 		{A05389EA-25F4-45B5-8534-0775D9671456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A05389EA-25F4-45B5-8534-0775D9671456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A05389EA-25F4-45B5-8534-0775D9671456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F765808-5258-4E41-8B27-6E7D4667AA24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F765808-5258-4E41-8B27-6E7D4667AA24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F765808-5258-4E41-8B27-6E7D4667AA24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F765808-5258-4E41-8B27-6E7D4667AA24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,6 +201,7 @@ Global
 		{D8C15077-71C5-4837-9F3C-3B642B142434} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 		{2285BE42-1FDB-4B48-B9C3-4E87D829515A} = {1755BABD-3C1F-497A-AB69-9D643B576506}
 		{A05389EA-25F4-45B5-8534-0775D9671456} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
+		{7F765808-5258-4E41-8B27-6E7D4667AA24} = {2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}

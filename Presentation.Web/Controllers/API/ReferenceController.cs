@@ -31,6 +31,13 @@ namespace Presentation.Web.Controllers.API
             return new ChildEntityCrudAuthorization<ExternalReference, IEntityWithExternalReferences>(reference => reference.GetOwner(), base.GetCrudAuthorization());
         }
 
+        public override HttpResponseMessage Delete(int id, int organizationId)
+        {
+            return _referenceService
+                .DeleteByReferenceId(id)
+                .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
+        }
+
         public override HttpResponseMessage Post(ExternalReferenceDTO dto)
         {
             if (dto == null)

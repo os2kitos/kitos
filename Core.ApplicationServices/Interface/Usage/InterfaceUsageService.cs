@@ -91,7 +91,6 @@ namespace Core.ApplicationServices.Interface.Usage
             {
                 return OperationFailure.Forbidden;
             }
-
             _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
             _interfaceUsageRepository.Save();
             return interfaceUsageToBeDeleted;
