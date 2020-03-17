@@ -568,10 +568,6 @@
     <Compile Include="Migrations\202003111405293_removedRegularPersonData.Designer.cs">
       <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.cs" />
-    <Compile Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.Designer.cs">
-      <DependentUpon>202003121334292_Data_Sensitivity_Level_Changes.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -937,9 +933,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003111405293_removedRegularPersonData.resx">
       <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003121334292_Data_Sensitivity_Level_Changes.resx">
-      <DependentUpon>202003121334292_Data_Sensitivity_Level_Changes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
