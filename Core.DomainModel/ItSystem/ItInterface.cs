@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Qa.References;
 using Core.DomainModel.Result;
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -71,6 +72,8 @@ namespace Core.DomainModel.ItSystem
         ///     The interface local exposure.
         /// </value>
         public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
+
+        public virtual ICollection<BrokenLinkInInterface> BrokenLinkReports { get; set; }
 
         public bool Disabled { get; set; }
 

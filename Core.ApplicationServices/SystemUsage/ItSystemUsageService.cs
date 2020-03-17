@@ -4,6 +4,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Options;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
@@ -36,6 +37,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IGenericRepository<SystemRelation> _relationRepository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
+        private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
 
         public ItSystemUsageService(
@@ -47,6 +49,7 @@ namespace Core.ApplicationServices.SystemUsage
             IOrganizationalUserContext userContext,
             IGenericRepository<SystemRelation> relationRepository,
             IGenericRepository<ItInterface> interfaceRepository,
+            IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             ILogger logger, 
@@ -62,6 +65,7 @@ namespace Core.ApplicationServices.SystemUsage
             _domainEvents = domainEvents;
             _relationRepository = relationRepository;
             _interfaceRepository = interfaceRepository;
+            _referenceService = referenceService;
             _logger = logger;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
@@ -118,21 +122,31 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ItSystemUsage, OperationFailure> Delete(int id)
         {
-            var itSystemUsage = GetById(id);
-            if (itSystemUsage == null)
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                return OperationFailure.NotFound;
-            }
-            if (!_authorizationContext.AllowDelete(itSystemUsage))
-            {
-                return OperationFailure.Forbidden;
-            }
+                var itSystemUsage = GetById(id);
+                if (itSystemUsage == null)
+                {
+                    return OperationFailure.NotFound;
+                }
+                if (!_authorizationContext.AllowDelete(itSystemUsage))
+                {
+                    return OperationFailure.Forbidden;
+                }
 
-            // delete it system usage
-            _domainEvents.Raise(new SystemUsageDeleted(itSystemUsage));
-            _usageRepository.DeleteByKeyWithReferencePreload(id);
-            _usageRepository.Save();
-            return itSystemUsage;
+                // delete it system usage
+                var deleteBySystemUsageId = _referenceService.DeleteBySystemUsageId(id);
+                if (deleteBySystemUsageId.Failed)
+                {
+                    transaction.Rollback();
+                    return deleteBySystemUsageId.Error;
+                }
+                _domainEvents.Raise(new SystemUsageDeleted(itSystemUsage));
+                _usageRepository.DeleteByKeyWithReferencePreload(id);
+                _usageRepository.Save();
+                transaction.Commit();
+                return itSystemUsage;
+            }
         }
 
         public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)

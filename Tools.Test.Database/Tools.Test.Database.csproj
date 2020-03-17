@@ -64,6 +64,7 @@
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
     <Compile Include="Model\Tasks\CreateOrganizationTask.cs" />
     <Compile Include="Model\Tasks\CreateItProjectTask.cs" />
+    <Compile Include="Model\Tasks\CreateSensitivePersonalDataTypeTask.cs" />
     <Compile Include="Model\Tasks\CreateTaskRefTask.cs" />
     <Compile Include="Model\Tasks\DatabaseTask.cs" />
     <Compile Include="Model\Tasks\DropDatabaseTask.cs" />

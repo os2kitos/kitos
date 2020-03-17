@@ -143,9 +143,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie login)
+        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
         {
-            var cookie = login;
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
 
@@ -156,9 +156,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             int systemId,
             int parentSystemId,
             int organizationId,
-            Cookie login)
+            Cookie optionalLogin = null)
         {
-            var cookie = login;
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
             var body = new
@@ -207,7 +207,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl($"api/itsystemusage/{usageId}?organizationId=-1");
+            var url = TestEnvironment.CreateUrl($"api/itsystemusage/{usageId}?{KitosApiConstants.UnusedOrganizationIdParameter}");
             var body = new
             {
                 archiveDuty = (int)duty
@@ -220,7 +220,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId=-1");
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?{KitosApiConstants.UnusedOrganizationIdParameter}");
             var body = new
             {
                 archiveDuty = (int)recommendation
@@ -233,7 +233,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId=-1");
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?{KitosApiConstants.UnusedOrganizationIdParameter}");
             var body = new
             {
                 archiveDutyComment = comment

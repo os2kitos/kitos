@@ -5,6 +5,7 @@ using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -35,7 +36,7 @@ namespace Presentation.Web.Controllers.API
 
             return result.Match
             (
-                onSuccess: Ok,
+                onSuccess: itSystemUsageDataLevel =>  Ok(Map<ItSystemUsageSensitiveDataLevel,ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
                 onFailure: FromOperationError
             );
         }
@@ -49,7 +50,7 @@ namespace Presentation.Web.Controllers.API
 
             return result.Match
             (
-                onSuccess: Ok,
+                onSuccess: itSystemUsageDataLevel => Ok(Map<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>(itSystemUsageDataLevel)),
                 onFailure: FromOperationError
             );
         }

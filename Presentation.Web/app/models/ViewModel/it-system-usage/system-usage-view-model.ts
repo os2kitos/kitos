@@ -67,8 +67,10 @@
         isActive: boolean;
         active: boolean;
         sensitiveDataLevels: SensitiveDataLevel[];
-        showPersonalData: boolean;
-        showSensitivePersonalData: boolean;
+        personalLegalDataSelected: boolean;
+        personalSensitiveDataSelected: boolean;
+        personalRegularDataSelected: boolean;
+        personalNoDataSelected: boolean;
         isBusinessCritical: DataOption;
         dataProcessorControl: DataOption;
         precautions: DataOption;
@@ -80,8 +82,10 @@
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
-        showPersonalData: boolean;
-        showSensitivePersonalData: boolean;
+        personalLegalDataSelected: boolean;
+        personalSensitiveDataSelected: boolean;
+        personalRegularDataSelected: boolean;
+        personalNoDataSelected: boolean;
         sensitiveDataLevels: SensitiveDataLevel[];
         id: number;
         organizationId: number;
@@ -108,10 +112,10 @@
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
             this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
-            this.showPersonalData = _.some(this.sensitiveDataLevels,
-                x => x === SensitiveDataLevel.PERSONALDATA || x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
-            this.showSensitivePersonalData = _.some(this.sensitiveDataLevels,
-                x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
+            this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
+            this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
+            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
+            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA)
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);

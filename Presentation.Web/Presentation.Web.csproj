@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
@@ -326,6 +327,9 @@
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
+    <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
+    <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
+    <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
@@ -355,10 +359,16 @@
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportColumns.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
+    <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
+    <Compile Include="Ninject\KernelBuilder.cs" />
+    <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -373,7 +383,9 @@
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-sensitive-data-level.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
@@ -390,11 +402,13 @@
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\UrlViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-misc-brokenlinks-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\exposed-interface-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
+    <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -699,6 +713,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
@@ -719,6 +734,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalProject.po.ts" />
@@ -1299,6 +1315,10 @@
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
+      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
+      <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>

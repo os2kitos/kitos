@@ -38,7 +38,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.DeleteWithCookieAsync(
-                TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId=-1"), cookie);
+                TestEnvironment.CreateUrl($"api/itcontract/{contractId}?{KitosApiConstants.UnusedOrganizationIdParameter}"), cookie);
         }
 
         public static async Task<ItContractDTO> GetItContract(int contractId)

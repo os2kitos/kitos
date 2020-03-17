@@ -12,7 +12,8 @@
                            class="form-control input-sm"
                            data-field="generalPurpose"
                            data-ng-model="generalPurpose"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Overordnet formål"
+                           data-element-type="GDPRSystemPurpose" />
                 </div>
                 <!-- Business critical -->
                 <div class="form-group">
@@ -34,7 +35,8 @@
                            data-ng-model="systemUsage.dataProcessor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="dataProcessor"
-                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)">
+                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
+                           data-element-type="GDPRDataResponsible">
                 </div>
                 <!-- Data processing agreement -->
                 <div class="form-group" ng-show="filterDataProcessor">
@@ -68,7 +70,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers">
+                        <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
                             <td>
                                 {{ dataWorker.dataWorkerName }}
                             </td>
@@ -170,40 +172,39 @@
             </div>
             <!-- 2nd column -->
             <div class="col-xs-6">
-                <div class="form-group" data-ng-show="usageViewModel.showPersonalData">
-                    <label for="regularPersonalData" class="control-label small">Almindelige persondata:</label>
-                    <input id="regularPersonalData" class="form-control" disabled value="Systemet indeholder almindelige persondata" />
-                </div>
-
-                <div class="form-group"
-                     data-ng-show="usageViewModel.showSensitivePersonalData">
-                    <label class="control-label small">Følsomme persondata:</label>
-                    <div class="well">
-                        <div class="checkbox" data-ng-repeat="r in sensitivePersonalData">
-                            <label>
-                                <input type="checkbox" ng-model="r.Checked"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label class="control-label small">Hvilke kategorier af registrerede indgår i databehandlingen?</label>
                     <div class="well">
-                        <div class="checkbox" data-ng-repeat="r in registerTypes">
+                        <div class="checkbox">
                             <label>
-                                <input type="checkbox" ng-model="r.Checked"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
+                                <input type="checkbox" data-element-type="dataLevelTypeNoneCheckbox" ng-change="dataLevelChange('personalNoDataSelected')" ng-model="usageViewModel.personalNoDataSelected" data-ng-disabled="!hasWriteAccess">Ingen Persondata
+                            </label>
+                            <br />
+                            <label>
+                                <input type="checkbox" data-element-type="dataLevelTypeRegularCheckbox" ng-change="dataLevelChange('personalRegularDataSelected')" ng-model="usageViewModel.personalRegularDataSelected" data-ng-disabled="!hasWriteAccess">Almindelig persondata
+                                <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> F.eks.: Navn, adresse, telefonummer, e-mailadresse, CPR-nr, titel m.m.</span>
+                            </label>
+                            <br />
+                            <label>
+                                <input type="checkbox" data-element-type="dataLevelTypeSensitiveCheckbox" ng-change="dataLevelChange('personalSensitiveDataSelected')" ng-model="usageViewModel.personalSensitiveDataSelected" data-ng-disabled="!hasWriteAccess">Følsomme persondata
+                                <div class="checkbox" data-ng-repeat="r in sensitivePersonalData" ng-if="usageViewModel.personalSensitiveDataSelected">
+                                    <label>
+                                        <input type="checkbox" ng-model="r.Checked" data-element-type="sensitivepersonalDataCheckbox-{{r.Name}}"
+                                               data-ng-disabled="!hasWriteAccess"
+                                               ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
+                                    </label>
+                                </div>
+                            </label>
+                            <br />
+                            <label>
+                                <input type="checkbox" data-element-type="dataLevelTypeLegalCheckbox" ng-change="dataLevelChange('personalLegalDataSelected')" ng-model="usageViewModel.personalLegalDataSelected" data-ng-disabled="!hasWriteAccess">Straffedomme og lovovertrædelser
                             </label>
                         </div>
                     </div>
                 </div>
 
 
-                <div data-ng-show="usageViewModel.showSensitivePersonalData">
+                <div data-ng-show="usageViewModel.personalSensitiveDataSelected">
                     <div class="well">
                         <!-- Implemented technical precautions -->
                         <div class="form-group">

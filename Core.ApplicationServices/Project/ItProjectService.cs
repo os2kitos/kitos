@@ -1,6 +1,8 @@
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
@@ -10,6 +12,7 @@ using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Time;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Project
 {
@@ -19,6 +22,8 @@ namespace Core.ApplicationServices.Project
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItProjectRepository _itProjectRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IReferenceService _referenceService;
+        private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
 
@@ -27,6 +32,8 @@ namespace Core.ApplicationServices.Project
             IAuthorizationContext authorizationContext,
             IItProjectRepository itProjectRepository,
             IUserRepository userRepository,
+            IReferenceService referenceService,
+            ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
             IOperationClock operationClock)
         {
@@ -34,6 +41,8 @@ namespace Core.ApplicationServices.Project
             _authorizationContext = authorizationContext;
             _itProjectRepository = itProjectRepository;
             _userRepository = userRepository;
+            _referenceService = referenceService;
+            _transactionManager = transactionManager;
             _userContext = userContext;
             _operationClock = operationClock;
         }
@@ -54,21 +63,31 @@ namespace Core.ApplicationServices.Project
 
         public Result<ItProject, OperationFailure> DeleteProject(int id)
         {
-            var project = _projectRepository.GetByKey(id);
-            if (project == null)
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                return OperationFailure.NotFound;
-            }
+                var project = _projectRepository.GetByKey(id);
+                if (project == null)
+                {
+                    return OperationFailure.NotFound;
+                }
 
-            if (!_authorizationContext.AllowDelete(project))
-            {
-                return OperationFailure.Forbidden;
-            }
-            project.Handover?.Participants?.Clear();
-            _projectRepository.DeleteWithReferencePreload(project);
-            _projectRepository.Save();
+                if (!_authorizationContext.AllowDelete(project))
+                {
+                    return OperationFailure.Forbidden;
+                }
 
-            return project;
+                var deleteByProjectId = _referenceService.DeleteByProjectId(id);
+                if (deleteByProjectId.Failed)
+                {
+                    transaction.Rollback();
+                    return deleteByProjectId.Error;
+                }
+                project.Handover?.Participants?.Clear();
+                _projectRepository.DeleteWithReferencePreload(project);
+                _projectRepository.Save();
+                transaction.Commit();
+                return project;
+            }
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)

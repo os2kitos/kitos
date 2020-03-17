@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
+using Core.DomainModel.References.DomainEvents;
 using Core.DomainModel.Result;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.Repositories.Reference
 {
@@ -31,24 +34,50 @@ namespace Core.DomainServices.Repositories.Reference
         private readonly IGenericRepository<ItSystem> _systemRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<ItProject> _projectRepository;
+        private readonly IDomainEvents _domainEvents;
 
         public ReferenceRepository(
             IGenericRepository<ExternalReference> referenceRepository,
             IGenericRepository<ItContract> contractRepository,
             IGenericRepository<ItSystem> systemRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
-            IGenericRepository<ItProject> projectRepository)
+            IGenericRepository<ItProject> projectRepository,
+            IDomainEvents domainEvents)
         {
             _referenceRepository = referenceRepository;
             _contractRepository = contractRepository;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
             _projectRepository = projectRepository;
+            _domainEvents = domainEvents;
+        }
+
+        public Maybe<ExternalReference> Get(int referenceId)
+        {
+            return _referenceRepository.GetByKey(referenceId);
         }
 
         public Maybe<IEntityWithExternalReferences> GetRootEntity(int id, ReferenceRootType rootType)
         {
             return ResolveRepositoryOperations(rootType).Get(id);
+        }
+
+        public IQueryable<ExternalReference> GetByRootType(ReferenceRootType rootType)
+        {
+            var baseQuery = _referenceRepository.AsQueryable();
+            switch (rootType)
+            {
+                case ReferenceRootType.System:
+                    return baseQuery.Where(x => x.ItSystem_Id != null);
+                case ReferenceRootType.SystemUsage:
+                    return baseQuery.Where(x => x.ItSystemUsage_Id != null);
+                case ReferenceRootType.Contract:
+                    return baseQuery.Where(x => x.Itcontract_Id != null);
+                case ReferenceRootType.Project:
+                    return baseQuery.Where(x => x.ItProject_Id != null);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type");
+            }
         }
 
         public void SaveRootEntity(IEntityWithExternalReferences root)
@@ -80,6 +109,11 @@ namespace Core.DomainServices.Repositories.Reference
 
         public void Delete(ExternalReference reference)
         {
+            if (reference == null)
+            {
+                throw new ArgumentNullException(nameof(reference));
+            }
+            _domainEvents.Raise(new ExternalReferenceDeleted(reference));
             _referenceRepository.Delete(reference);
             _referenceRepository.Save();
         }

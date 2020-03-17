@@ -29,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendDeleteInterfaceRequestAsync(int id)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/itinterface/{id}?organizationId=-1"); //Org id not used
+            var url = TestEnvironment.CreateUrl($"api/itinterface/{id}?{KitosApiConstants.UnusedOrganizationIdParameter}"); //Org id not used
 
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
@@ -83,6 +83,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl($"api/itinterface/{interfaceId}");
 
             return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<ItInterfaceDTO> SetUrlAsync(int interfaceId, string url, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itinterface/{interfaceId}?{KitosApiConstants.UnusedOrganizationIdParameter}"), cookie, new { url = url }))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
+            }
         }
 
         public static async Task<ItInterfaceDTO> GetInterfaceById(int interfaceId, Cookie optionalLogin = null)
