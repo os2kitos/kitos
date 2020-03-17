@@ -145,7 +145,7 @@
             this.preRiskAssessment = this.mapRiskLevelOption(itSystemUsage.preRiskAssessment);
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
-            this.hostedAt = this.mapHostedAtOption(itSystemUsage.operation);
+            this.hostedAt = this.mapHostedAtOption(itSystemUsage.hostedAt);
 
         }
 
@@ -160,7 +160,7 @@
                 case 2:
                     return HostedAt.EXTERNAL;
                 default:
-                    throw new RangeError(`${hostedAtOption} is not a valid operation Option`);
+                    throw new RangeError(`${hostedAtOption} is not a valid hostedAt Option`);
             }
         }
 

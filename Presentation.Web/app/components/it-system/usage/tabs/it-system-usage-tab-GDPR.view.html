@@ -45,7 +45,7 @@
                             ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
                             ng-model="usageViewModel.hostedAt"
                             data-autosave="{{autoSaveUrl}}"
-                            data-field="Operation"
+                            data-field="HostedAt"
                             data-ng-disabled="!hasWriteAccess">
                         <option hidden selected value />
                         <option ng-repeat="option in hostedAtOptions" value="{{option.id}}" ng-bind-html="option.text" />
