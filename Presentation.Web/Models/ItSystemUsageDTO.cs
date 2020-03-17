@@ -106,6 +106,8 @@ namespace Presentation.Web.Models
 
         public DataOptions? AnsweringDataDPIA { get; set; }
 
+        public Operating? Operation { get; set; }
+
         public UserCount UserCount { get; set; }
         
         public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }

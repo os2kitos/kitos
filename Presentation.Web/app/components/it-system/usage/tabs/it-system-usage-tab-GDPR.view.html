@@ -38,6 +38,20 @@
                            data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
                            data-element-type="GDPRDataResponsible">
                 </div>
+                <!-- Operation -->
+                <div class="form-group">
+                    <label for="Operation" class="control-label small">Operation</label>
+                    <select class="form-control input-sm" id="Operation"
+                            ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                            ng-model="usageViewModel.operation"
+                            data-autosave="{{autoSaveUrl}}"
+                            data-field="Operation"
+                            data-ng-disabled="!hasWriteAccess">
+                        <option hidden selected value />
+                        <option ng-repeat="option in operationOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                    </select>
+                </div>
+
                 <!-- Data processing agreement -->
                 <div class="form-group" ng-show="filterDataProcessor">
                     <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>

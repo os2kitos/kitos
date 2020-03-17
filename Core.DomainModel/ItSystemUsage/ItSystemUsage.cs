@@ -368,15 +368,24 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public string GeneralPurpose { get; set; }
+
         public DataOptions? isBusinessCritical { get; set; }
 
         public DataOptions? dataProcessorControl { get; set; }
+
         public DataOptions? precautions { get; set; }
+
         public DataOptions? UserSupervision { get; set; }
+
         public DataOptions? riskAssessment { get; set; }
+
         public RiskLevel? preriskAssessment { get; set; }
+
         public DataOptions? DPIA { get; set; }
+
         public DataOptions? answeringDataDPIA { get; set; }
+
+        public Operating? operation { get; set; }
 
         #endregion
 

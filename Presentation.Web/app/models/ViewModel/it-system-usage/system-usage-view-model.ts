@@ -22,6 +22,12 @@
         UNDECIDED = 3
     }
 
+    export enum Operation {
+        UNDECIDED = 0,
+        ONPREMISE = 1,
+        EXTERNAL = 2,
+    }
+
     export class SensitiveDataLevelOptions {
         options: Select2OptionViewModel[];
         constructor() {
@@ -56,6 +62,18 @@
                 <Select2OptionViewModel>{ id: 2, text: "Høj risiko" }
             ];
         }
+
+    }
+
+    export class OperationOptions {
+        options: Select2OptionViewModel[];
+        constructor() {
+            this.options = [
+                <Select2OptionViewModel>{ id: 0, text: "&nbsp" },
+                <Select2OptionViewModel>{ id: 1, text: "On-premise" },
+                <Select2OptionViewModel>{ id: 2, text: "Eksternt" }
+            ];
+        }
     }
 
     export interface ISystemUsageViewModel {
@@ -79,6 +97,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
+        operation: Operation;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
@@ -102,6 +121,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
+        operation: Operation;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -115,7 +135,7 @@
             this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
             this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
             this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
-            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA)
+            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA);
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);
@@ -125,7 +145,21 @@
             this.preRiskAssessment = this.mapRiskLevelOption(itSystemUsage.preRiskAssessment);
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
+            this.operation = this.mapOperationOption(itSystemUsage.operation);
 
+        }
+
+        mapOperationOption(operationOption: number) {
+            switch (operationOption) {
+                case 0:
+                    return Operation.UNDECIDED;
+                case 1:
+                    return Operation.ONPREMISE;
+                case 2:
+                    return Operation.EXTERNAL;
+                default:
+                    throw new RangeError(`${operationOption} is not a valid operation Option`);
+            }
         }
 
         mapDataLevels(dataLevel: any): SensitiveDataLevel {
@@ -160,16 +194,16 @@
 
         mapRiskLevelOption(dataOption: number): RiskLevel {
             switch (dataOption) {
-            case 0:
+                case 0:
                     return RiskLevel.LOW;
-            case 1:
+                case 1:
                     return RiskLevel.MIDDLE;
-            case 2:
+                case 2:
                     return RiskLevel.HIGH;
-            case 3:
+                case 3:
                     return RiskLevel.UNDECIDED;
-            default:
-                throw new RangeError(`${dataOption} is not a valid RiskLevel`);
+                default:
+                    throw new RangeError(`${dataOption} is not a valid RiskLevel`);
             }
         }
 
