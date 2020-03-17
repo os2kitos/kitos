@@ -22,7 +22,7 @@
         UNDECIDED = 3
     }
 
-    export enum Operation {
+    export enum HostedAt {
         UNDECIDED = 0,
         ONPREMISE = 1,
         EXTERNAL = 2,
@@ -65,7 +65,7 @@
 
     }
 
-    export class OperationOptions {
+    export class HostedAtOptions {
         options: Select2OptionViewModel[];
         constructor() {
             this.options = [
@@ -97,7 +97,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
-        operation: Operation;
+        hostedAt: HostedAt;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
@@ -121,7 +121,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
-        operation: Operation;
+        hostedAt: HostedAt;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -145,22 +145,22 @@
             this.preRiskAssessment = this.mapRiskLevelOption(itSystemUsage.preRiskAssessment);
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
-            this.operation = this.mapOperationOption(itSystemUsage.operation);
+            this.hostedAt = this.mapHostedAtOption(itSystemUsage.operation);
 
         }
 
-        mapOperationOption(operationOption: number) {
-            switch (operationOption) {
+        mapHostedAtOption(hostedAtOption: number) {
+            switch (hostedAtOption) {
                 case null:
-                    return Operation.UNDECIDED;
+                    return HostedAt.UNDECIDED;
                 case 0:
-                    return Operation.UNDECIDED;
+                    return HostedAt.UNDECIDED;
                 case 1:
-                    return Operation.ONPREMISE;
+                    return HostedAt.ONPREMISE;
                 case 2:
-                    return Operation.EXTERNAL;
+                    return HostedAt.EXTERNAL;
                 default:
-                    throw new RangeError(`${operationOption} is not a valid operation Option`);
+                    throw new RangeError(`${hostedAtOption} is not a valid operation Option`);
             }
         }
 

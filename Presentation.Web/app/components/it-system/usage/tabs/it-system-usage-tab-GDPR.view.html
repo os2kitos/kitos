@@ -40,15 +40,15 @@
                 </div>
                 <!-- Operation -->
                 <div class="form-group">
-                    <label for="Operation" class="control-label small">IT systemet driftes</label>
-                    <select class="form-control input-sm" id="Operation"
+                    <label for="HostedAt" class="control-label small">IT systemet driftes</label>
+                    <select class="form-control input-sm" id="HostedAt"
                             ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
-                            ng-model="usageViewModel.operation"
+                            ng-model="usageViewModel.hostedAt"
                             data-autosave="{{autoSaveUrl}}"
                             data-field="Operation"
                             data-ng-disabled="!hasWriteAccess">
                         <option hidden selected value />
-                        <option ng-repeat="option in operationOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                        <option ng-repeat="option in hostedAtOptions" value="{{option.id}}" ng-bind-html="option.text" />
                     </select>
                 </div>
 

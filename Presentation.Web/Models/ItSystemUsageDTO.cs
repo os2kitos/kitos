@@ -106,7 +106,7 @@ namespace Presentation.Web.Models
 
         public DataOptions? AnsweringDataDPIA { get; set; }
 
-        public Operating? Operation { get; set; }
+        public HostedAt? HostedAt { get; set; }
 
         public UserCount UserCount { get; set; }
         

@@ -24,7 +24,7 @@
         HUNDREDPLUS = 3
     }
 
-    public enum Operating
+    public enum HostedAt
     {
         UNDECIDED = 0,
         ONPREMISE = 1,

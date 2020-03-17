@@ -385,7 +385,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public DataOptions? answeringDataDPIA { get; set; }
 
-        public Operating? operation { get; set; }
+        public HostedAt? hostedAt { get; set; }
 
         #endregion
 

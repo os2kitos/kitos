@@ -18,6 +18,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     public class ItSystemUsageGDPRTest : WithAutoFixture
     {
 
+
+        //[Fact]
+        //public async Task Can_Change_OperationOptions()
+        //{
+        //    //Arrange
+        //    var dataOption = A<Operating>();
+        //    var body = new { IsBusinessCritical = dataOption };
+        //    const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+        //    var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+        //    var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+        //    //Act
+        //    var itSystemUsageDTO = await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
+
+        //    //Assert
+        //    Assert.NotNull(itSystemUsageDTO.IsBusinessCritical);
+        //    Assert.Equal(dataOption, itSystemUsageDTO.IsBusinessCritical.Value);
+
+        //}
+
+
+
         [Fact]
         public async Task Can_Change_DataOptions()
         {
