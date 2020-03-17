@@ -4,7 +4,7 @@
     {
         NONE = 0,
         PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2,
-        PERSONALLEGALDATA = 3
+        SENSITIVEDATA = 2,
+        LEGALDATA = 3
     }
 }

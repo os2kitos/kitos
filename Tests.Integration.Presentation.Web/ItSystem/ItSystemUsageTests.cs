@@ -135,7 +135,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
+            var sensitivityLevel = SensitiveDataLevel.NONE;
 
             //Act
             var sensitivityLevelDTO =
@@ -153,7 +153,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
+            var sensitivityLevel = SensitiveDataLevel.NONE;
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act
@@ -175,7 +175,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
+            var sensitivityLevel = SensitiveDataLevel.NONE;
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
 
             //Act

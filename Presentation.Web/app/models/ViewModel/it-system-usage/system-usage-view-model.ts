@@ -4,8 +4,8 @@
     export enum SensitiveDataLevel {
         NONE = 0,
         PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2,
-        PERSONALLEGALDATA = 3
+        SENSITIVEDATA = 2,
+        LEGALDATA = 3
     }
 
     export class SensitiveDataLevelOptions {
@@ -60,8 +60,8 @@
             this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
             this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
             this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
-            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
-            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA)
+            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.SENSITIVEDATA);
+            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.LEGALDATA)
 
         }
 
@@ -72,9 +72,9 @@
                 case 1:
                     return SensitiveDataLevel.PERSONALDATA;
                 case 2:
-                    return SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA;
+                    return SensitiveDataLevel.SENSITIVEDATA;
                 case 3:
-                    return SensitiveDataLevel.PERSONALLEGALDATA;
+                    return SensitiveDataLevel.LEGALDATA;
                 default:
                     throw new RangeError(`${dataLevel.dataSensitivityLevel} is not a valid SensitiveDataLevel`);
             }
