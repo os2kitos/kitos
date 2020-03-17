@@ -112,5 +112,14 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["StsOrganisationAuthorizedMunicipalityCvr"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-local.strongminds.dk")]
+        public string SsoSamlEntityId {
+            get {
+                return ((string)(this["SsoSamlEntityId"]));
+            }
+        }
     }
 }

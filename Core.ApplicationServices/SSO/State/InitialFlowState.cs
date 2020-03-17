@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using Core.DomainModel.Result;
 using Core.DomainServices.SSO;
 using dk.nita.saml20.identity;
 
@@ -11,10 +12,12 @@ namespace Core.ApplicationServices.SSO.State
     public class InitialFlowState : AbstractState
     {
         private readonly IStsBrugerEmailService _stsBrugerEmailService;
+        private readonly string _samlKitosReadAccessRoleIdentifier;
 
-        public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService)
+        public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService, SsoFlowConfiguration configuration)
         {
             _stsBrugerEmailService = stsBrugerEmailService;
+            _samlKitosReadAccessRoleIdentifier = $"{configuration.SamlEntityId}/roles/usersystemrole/readaccess/1";
         }
 
         public override void Handle(FlowEvent @event, FlowContext context)
@@ -35,7 +38,7 @@ namespace Core.ApplicationServices.SSO.State
         {
             foreach (var claim in Saml20Identity.Current.Claims)
             {
-                var serials = claim.Value.Split(new[]{ "Serial=" }, StringSplitOptions.RemoveEmptyEntries);
+                var serials = claim.Value.Split(new[] { "Serial=" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var serial in serials)
                 {
                     if (Guid.TryParse(serial, out var userUuid))
@@ -47,27 +50,25 @@ namespace Core.ApplicationServices.SSO.State
             return string.Empty;
         }
 
-        private static bool CurrentUserHasKitosPrivilege()
+        private bool CurrentUserHasKitosPrivilege()
         {
-            const string samlKitosPrivilegeKey = "dk:gov:saml:attribute:Privileges_intermediate"; //TODO: to const class
-            const string samlKitosReadAccessRoleIdentifier = "http://kitos-local.strongminds.dk/roles/usersystemrole/readaccess/1"; //TODO: replace entity id in this string..
-            var result = false;
-            if (Saml20Identity.Current.HasAttribute(samlKitosPrivilegeKey))
-            {
-                var samlAttribute = Saml20Identity.Current[samlKitosPrivilegeKey].First();
-                var decodedSamlPrivilege = DecodeSamlRequestString(samlAttribute.AttributeValue.First());
-                var samlPrivilegeAsXml = new XmlDocument();
-                samlPrivilegeAsXml.LoadXml(decodedSamlPrivilege);
-                var privilegeNode = samlPrivilegeAsXml.SelectSingleNode("//Privilege");
-                if (privilegeNode != null && privilegeNode.InnerText.Contains(samlKitosReadAccessRoleIdentifier))
-                {
-                    result = true;
-                }
-            }
-            return result;
+            return
+                Saml20Identity
+                    .Current[StsAdgangsStyringConstants.Attributes.PrivilegeKey]
+                    .FirstOrDefault()
+                    .FromNullable()
+                    .Select(samlAttribute =>
+                    {
+                        var decodedSamlPrivilege = DecodeSamlRequestString(samlAttribute.AttributeValue.First());
+                        var samlPrivilegeAsXml = new XmlDocument();
+                        samlPrivilegeAsXml.LoadXml(decodedSamlPrivilege);
+                        Maybe<XmlNode> privilegeNode = samlPrivilegeAsXml.SelectSingleNode("//Privilege");
+                        return privilegeNode.Select(x => x.InnerText.Contains(_samlKitosReadAccessRoleIdentifier)).GetValueOrFallback(false);
+                    })
+                    .GetValueOrFallback(false);
         }
 
-        private static string DecodeSamlRequestString(string compressedData) 
+        private static string DecodeSamlRequestString(string compressedData)
         {
             var memStream = new MemoryStream(Convert.FromBase64String(compressedData));
             return new StreamReader(memStream, Encoding.UTF8).ReadToEnd();
