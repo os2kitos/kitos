@@ -1,9 +1,8 @@
 ﻿module Kitos.Services.ItSystemUsage {
-    import SensitiveDataLevel = Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
 
     export interface IGDPRService {
-        addDataLevel(systemUsageId: number, dataLevel: SensitiveDataLevel);
-        removeDataLevel(systemUsageId: number, dataLevel: SensitiveDataLevel);
+        addDataLevel(systemUsageId: number, dataLevel: number);
+        removeDataLevel(systemUsageId: number, dataLevel: number);
     }
 
     export class GDPRService implements IGDPRService {
@@ -12,11 +11,11 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        addDataLevel(systemUsageId: number, dataLevel: SensitiveDataLevel) {
+        addDataLevel(systemUsageId: number, dataLevel: number) {
             return this.$http.patch(`api/v1/itsystemusage/${systemUsageId}/sensitivityLevel/add`, dataLevel);
         }
 
-        removeDataLevel(systemUsageId: number, dataLevel: SensitiveDataLevel) {
+        removeDataLevel(systemUsageId: number, dataLevel: number) {
             return this.$http.patch(`api/v1/itsystemusage/${systemUsageId}/sensitivityLevel/remove`, dataLevel);
         }
     }
