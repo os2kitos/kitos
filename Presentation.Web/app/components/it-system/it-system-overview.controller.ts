@@ -93,6 +93,11 @@
             return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
         }
 
+        private fixDataTypeFilter(filterUrl, column) {
+            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "SensitiveDataLevels/any(c: $1c/SensitivityDataLevel$2)");
+        }
+
         // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
@@ -215,6 +220,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
                                 parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+                                parameterMap.$filter = this.fixDataTypeFilter(parameterMap.$filter, "SensitiveDataLevels/SensitivityDataLevel");
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
@@ -567,20 +573,23 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "DataLevel", title: "Datatype", width: 150,
+                        field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            var contains = [];
-                            _.each(dataItem.SensitiveDataLevels,
-                                dataLevel => {
-                                    contains.push(
-                                        Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel.SensitivityDataLevel));
-                                });
-                            return contains.toString();
+                            return _.map(dataItem.SensitiveDataLevels,
+                                dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
+                                    .SensitivityDataLevel))
+                                .toString();
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        },
+                        sortable: false
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,

@@ -1,11 +1,32 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
 
-    export enum SensitiveDataLevel {
-        NONE = 0,
-        PERSONALDATA = 1,
-        SENSITIVEDATA = 2,
-        LEGALDATA = 3
+    export interface ISensitiveDataLevelModel {
+        value: number;
+        textValue: string;
+        text: string;
     }
+
+
+    export class SensitiveDataLevelViewModel {
+        static readonly levels = {
+            none: <ISensitiveDataLevelModel>{ value: 0, textValue: "NONE", text: "Ingen persondata" },
+            personal: <ISensitiveDataLevelModel>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige persondata" },
+            sensitive: <ISensitiveDataLevelModel>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme persondata" },
+            legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+        };
+
+        static getTextValueToTextMap() {
+            return _.reduce(this.levels,
+                (acc: any, current) => {
+                    acc[current.textValue] = current.text;
+
+                    return acc;
+                },
+                <any>{});
+        }
+        
+    }
+
 
     export interface ISystemUsageViewModel {
         id: number;
@@ -15,19 +36,17 @@
         expirationDate;
         isActive: boolean;
         active: boolean;
-        sensitiveDataLevels: SensitiveDataLevel[];
-        personalLegalDataSelected: boolean;
-        personalSensitiveDataSelected: boolean;
-        personalRegularDataSelected: boolean;
-        personalNoDataSelected: boolean;
+        legalDataSelected: boolean;
+        sensitiveDataSelected: boolean;
+        personalDataSelected: boolean;
+        noDataSelected: boolean;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
-        personalLegalDataSelected: boolean;
-        personalSensitiveDataSelected: boolean;
-        personalRegularDataSelected: boolean;
-        personalNoDataSelected: boolean;
-        sensitiveDataLevels: SensitiveDataLevel[];
+        legalDataSelected: boolean;
+        sensitiveDataSelected: boolean;
+        personalDataSelected: boolean;
+        noDataSelected: boolean;
         id: number;
         organizationId: number;
         itSystem: ViewModel.ItSystem.ISystemViewModel;
@@ -44,29 +63,18 @@
             this.expirationDate = itSystemUsage.expirationDate;
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
-            this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
-            this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
-            this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
-            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.SENSITIVEDATA);
-            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.LEGALDATA)
+
+            const sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
+            this.noDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.none.value);
+            this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
+            this.sensitiveDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.sensitive.value);
+            this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
 
         }
 
-        mapDataLevels(dataLevel: any) : SensitiveDataLevel {
-            switch (dataLevel.dataSensitivityLevel) {
-                case 0:
-                    return SensitiveDataLevel.NONE;
-                case 1:
-                    return SensitiveDataLevel.PERSONALDATA;
-                case 2:
-                    return SensitiveDataLevel.SENSITIVEDATA;
-                case 3:
-                    return SensitiveDataLevel.LEGALDATA;
-                default:
-                    throw new RangeError(`${dataLevel.dataSensitivityLevel} is not a valid SensitiveDataLevel`);
-            }
+        mapDataLevels(dataLevel: any): number {
+            return dataLevel.dataSensitivityLevel;
         }
-
 
     }
 }

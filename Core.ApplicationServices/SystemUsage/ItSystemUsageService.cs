@@ -459,7 +459,7 @@ namespace Core.ApplicationServices.SystemUsage
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
             if (usageResult.IsNone)
-                return new OperationError(OperationFailure.NotFound);
+                return new OperationError(OperationFailure.BadInput);
 
             var usage = usageResult.Value;
             if (!_authorizationContext.AllowModify(usage))
@@ -483,7 +483,7 @@ namespace Core.ApplicationServices.SystemUsage
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
             if (usageResult.IsNone)
-                return new OperationError(OperationFailure.NotFound);
+                return new OperationError(OperationFailure.BadInput);
 
             var usage = usageResult.Value;
             if (!_authorizationContext.AllowModify(usage))

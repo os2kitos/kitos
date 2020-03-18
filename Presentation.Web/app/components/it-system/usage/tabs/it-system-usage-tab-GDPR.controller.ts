@@ -33,15 +33,15 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
 
                 $scope.usage = itSystemUsage;
                 $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
                 $scope.registerTypes = registerTypes;
                 $scope.usageId = $stateParams.id;
                 $scope.systemUsage = systemUsage;
-                $scope.sensitiveDataLevel = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
+                $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
                 $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
                 $scope.filterDataProcessor = $scope.contracts.length > 0;
@@ -360,33 +360,33 @@
                         });
                 };
 
-                $scope.dataLevelChange = (dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel) => {
+                $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.NONE:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalNoDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.noDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.PERSONALDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalRegularDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.SENSITIVEDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalSensitiveDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.sensitiveDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.LEGALDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalLegalDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.legalDataSelected);
                             break;
                         default:
                             break;
                     }
                 };
 
-                function updateDataLevels(dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel, boolValue: boolean) {
-                    if (boolValue) {
-                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/add`, dataLevel)
+                function updateDataLevels(dataLevel: number, selected: boolean) {
+                    if (selected) {
+                        GDPRService.addDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                     else {
-                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/remove`, dataLevel)
+                        GDPRService.removeDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
