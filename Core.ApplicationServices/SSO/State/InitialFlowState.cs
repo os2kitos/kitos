@@ -1,11 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
 using Core.DomainServices.SSO;
-using dk.nita.saml20.identity;
 
 namespace Core.ApplicationServices.SSO.State
 {
@@ -13,66 +8,43 @@ namespace Core.ApplicationServices.SSO.State
     {
         private readonly IStsBrugerEmailService _stsBrugerEmailService;
         private readonly string _samlKitosReadAccessRoleIdentifier;
+        private readonly Saml20IdentityParser _parser;
 
         public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService, SsoFlowConfiguration configuration)
         {
             _stsBrugerEmailService = stsBrugerEmailService;
-            _samlKitosReadAccessRoleIdentifier = $"{configuration.SamlEntityId}/roles/usersystemrole/readaccess/1";
+            _parser = Saml20IdentityParser.CreateFromContext();
+            _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
 
         public override void Handle(FlowEvent @event, FlowContext context)
         {
             if (@event.Equals(FlowEvent.LoginCompleted))
             {
-                if (CurrentUserHasKitosPrivilege())
+                var userUuid = GetCurrentUserUuid();
+                if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    var userUuid = GetCurrentUserUuid();
-                    var stsBrugerEmails = _stsBrugerEmailService.GetStsBrugerEmails(userUuid);
+                    var stsBrugerEmails = _stsBrugerEmailService.GetStsBrugerEmails(userUuid.Value);
                     context.TransitionTo(new LookupStsUserEmailState(stsBrugerEmails));
                     context.HandleUserHasValidAccessRoleInSamlToken();
+                }
+                else
+                {
+                    context.TransitionTo(new UserWithNoPrivilegesState());
                 }
             }
         }
 
-        private static string GetCurrentUserUuid()
+        private Maybe<string> GetCurrentUserUuid()
         {
-            foreach (var claim in Saml20Identity.Current.Claims)
-            {
-                var serials = claim.Value.Split(new[] { "Serial=" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var serial in serials)
-                {
-                    if (Guid.TryParse(serial, out var userUuid))
-                    {
-                        return userUuid.ToString();
-                    }
-                }
-            }
-            return string.Empty;
+            return _parser.MatchUuid().Select(uuid => uuid.Value.ToString());
         }
 
         private bool CurrentUserHasKitosPrivilege()
         {
-            return
-                Saml20Identity
-                    .Current[StsAdgangsStyringConstants.Attributes.PrivilegeKey]
-                    .FirstOrDefault()
-                    .FromNullable()
-                    .Select(samlAttribute =>
-                    {
-                        var decodedSamlPrivilege = DecodeSamlRequestString(samlAttribute.AttributeValue.First());
-                        var samlPrivilegeAsXml = new XmlDocument();
-                        samlPrivilegeAsXml.LoadXml(decodedSamlPrivilege);
-                        Maybe<XmlNode> privilegeNode = samlPrivilegeAsXml.SelectSingleNode("//Privilege");
-                        return privilegeNode.Select(x => x.InnerText.Contains(_samlKitosReadAccessRoleIdentifier)).GetValueOrFallback(false);
-                    })
-                    .GetValueOrFallback(false);
+            return _parser
+                .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
+                .HasValue;
         }
-
-        private static string DecodeSamlRequestString(string compressedData)
-        {
-            var memStream = new MemoryStream(Convert.FromBase64String(compressedData));
-            return new StreamReader(memStream, Encoding.UTF8).ReadToEnd();
-        }
-
     }
 }
