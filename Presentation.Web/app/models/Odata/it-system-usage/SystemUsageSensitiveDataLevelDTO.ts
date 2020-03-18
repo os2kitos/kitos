@@ -10,8 +10,9 @@
     }
 
     export class SensitiveDataLevelMapper {
+        static readonly textValueToTextMap = Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.getTextValueToTextMap();
         static map(input: string) {
-            return Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.getTextValueToTextMap()[input];
+            return SensitiveDataLevelMapper.textValueToTextMap[input];
         }
     }
 }
