@@ -173,7 +173,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterSSO(IKernel kernel)
         {
-            kernel.Bind<SsoFlowConfiguration>().ToMethod(_=>new SsoFlowConfiguration(Settings.Default.SsoSamlEntityId)).InSingletonScope();
+            kernel.Bind<SsoFlowConfiguration>().ToMethod(_=>new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
