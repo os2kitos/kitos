@@ -1,11 +1,17 @@
 ﻿import constants = require("../../../../Utility/Constants");
 import CssHelper = require("../../../../Object-wrappers/CSSLocatorHelper");
+import NavigationHelper = require("../../../../Utility/NavigationHelper")
 
 class ItSystemUsageGDPR {
 
     private static consts = new constants();
     private static cssHelper = new CssHelper();
+    private static navigationHelper = new NavigationHelper();
 
+    static refreshPage(): webdriver.promise.Promise<void> {
+        return ItSystemUsageGDPR.navigationHelper.refreshPage();
+    }
+    
     static getNoDataLevelCheckBox() {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeNoneCheckbox));
     }

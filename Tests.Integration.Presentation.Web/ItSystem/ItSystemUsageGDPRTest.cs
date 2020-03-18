@@ -19,25 +19,25 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     {
 
 
-        //[Fact]
-        //public async Task Can_Change_OperationOptions()
-        //{
-        //    //Arrange
-        //    var dataOption = A<Operating>();
-        //    var body = new { IsBusinessCritical = dataOption };
-        //    const int organizationId = TestEnvironment.DefaultOrganizationId;
+        [Fact]
+        public async Task Can_Change_HostedAtOptions()
+        {
+            //Arrange
+            var dataOption = A<HostedAt>();
+            var body = new { HostedAt = dataOption };
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-        //    var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-        //    var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
-        //    //Act
-        //    var itSystemUsageDTO = await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
+            //Act
+            var itSystemUsageDTO = await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
 
-        //    //Assert
-        //    Assert.NotNull(itSystemUsageDTO.IsBusinessCritical);
-        //    Assert.Equal(dataOption, itSystemUsageDTO.IsBusinessCritical.Value);
+            //Assert
+            Assert.NotNull(itSystemUsageDTO.HostedAt);
+            Assert.Equal(dataOption, itSystemUsageDTO.HostedAt.Value);
 
-        //}
+        }
 
 
 

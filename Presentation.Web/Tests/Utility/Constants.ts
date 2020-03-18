@@ -156,6 +156,11 @@ class Constants {
     readonly defaultPersonalSensitivData1 = "sensitivepersonalDataCheckbox-TestFølsomData";
     readonly defaultPersonalSensitivData2 = "sensitivepersonalDataCheckbox-FølsomDataTest";
 
+    readonly hostedAtValueNone = " ";
+    readonly hostedAtValueExternal = "Eksternt";
+    readonly hostedAtValueOnPremise = "On-premise";
+    readonly hostedAtSelect2Id = "s2id_HostedAt";
+
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
