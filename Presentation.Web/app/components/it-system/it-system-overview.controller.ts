@@ -94,8 +94,8 @@
         }
 
         private fixDataTypeFilter(filterUrl, column) {
-            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, "SensitiveDataLevels/any(c: $1c/SensitivityDataLevel$2)");
+            var pattern = new RegExp(`${column} eq ('\\w+')`, "i");
+            return filterUrl.replace(pattern, "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq Core.DomainModel.ItSystemUsage.GDPR.SensitiveDataLevel$1)");
         }
 
         // saves grid state to local storage
@@ -585,8 +585,21 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
+                                        valuePrimitive: true
+                                    });
+                                },
                                 showOperators: false,
-                                operator: "contains"
+                                operator: "eq"
                             }
                         },
                         sortable: false
