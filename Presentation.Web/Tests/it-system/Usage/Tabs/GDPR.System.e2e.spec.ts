@@ -35,7 +35,6 @@ describe("User is able to", () => {
         testFixture.cleanupState();
     });
 
-
     it("Able to select a HostedAt value on a it system",
         () => {
             var hostedValue1 = consts.hostedAtValueNone;
