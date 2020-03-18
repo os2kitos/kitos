@@ -599,7 +599,7 @@ namespace Core.DomainModel.ItSystemUsage
 
             if (!SensitiveDataLevelExists(sensitiveDataLevel))
             {
-                return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+                return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.BadInput);
             }
 
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);

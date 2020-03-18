@@ -11,16 +11,7 @@
 
     export class SensitiveDataLevelMapper {
         static map(input: string) {
-            switch (input) {
-                case "NONE":
-                    return "Ingen persondata";
-                case "PERSONALDATA":
-                    return "Almindelige persondata";
-                case "SENSITIVEDATA":
-                    return "Følsomme persondata";
-                case "LEGALDATA":
-                    return "Straffedomme og lovovertrædelser";
-            }
+            return Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.getTextValueToTextMap()[input];
         }
     }
 }

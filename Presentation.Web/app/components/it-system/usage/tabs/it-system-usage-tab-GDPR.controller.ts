@@ -33,21 +33,22 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
 
                 $scope.usage = itSystemUsage;
                 $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
                 $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
-                $scope.sensitiveDataLevel = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
-            $scope.registerTypes = registerTypes;
-            $scope.usageId = $stateParams.id;
-            $scope.systemUsage = systemUsage;
-            $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
-            $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
-            $scope.filterDataProcessor = $scope.contracts.length > 0;
+
+                $scope.registerTypes = registerTypes;
+                $scope.usageId = $stateParams.id;
+                $scope.systemUsage = systemUsage;
+                $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
+                $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
+                $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
+                $scope.filterDataProcessor = $scope.contracts.length > 0;
 
                 //inherit from parent if general purpose is empty
                 $scope.generalPurpose = itSystemUsage.generalPurpose;
@@ -143,33 +144,33 @@
 
                                 $scope.usage = usage;
 
-                            switch (field) {
-                            case 'datahandlerSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
-                                break;
-                            case 'technicalSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
-                                break;
-                            case 'UserSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
-                                break;
-                            case 'RiskSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
-                                break;
-                            case 'DPIASupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
-                                break;
-                            case 'LinkToDirectoryUrl':
-                                    $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
-                                    $scope.Url = $scope.usage.LinkToDirectoryUrl;
-                                break;
-                            }
-                            $scope.ok = function() {
+                                switch (field) {
+                                    case 'datahandlerSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
+                                        break;
+                                    case 'technicalSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
+                                        break;
+                                    case 'UserSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
+                                        break;
+                                    case 'RiskSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
+                                        break;
+                                    case 'DPIASupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
+                                        break;
+                                    case 'LinkToDirectoryUrl':
+                                        $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
+                                        $scope.Url = $scope.usage.LinkToDirectoryUrl;
+                                        break;
+                                }
+                                $scope.ok = function () {
 
                                     var payload = {
                                         Id: $scope.usage.Id,
@@ -192,40 +193,40 @@
                                             .RiskSupervisionDocumentationUrlName,
                                         riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
 
-                                    DPIASupervisionDocumentationUrlName: $scope.usage
-                                        .DPIASupervisionDocumentationUrlName,
-                                    DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
+                                        DPIASupervisionDocumentationUrlName: $scope.usage
+                                            .DPIASupervisionDocumentationUrlName,
+                                        DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
 
                                         LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
                                         LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
                                     }
 
-                                switch (field) {
-                                case 'datahandlerSupervisionDocumentationUrl':
-                                    payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'technicalSupervisionDocumentationUrl':
-                                    payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.technicalSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'UserSupervisionDocumentationUrl':
-                                    payload.userSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.userSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'RiskSupervisionDocumentationUrl':
-                                    payload.riskSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.riskSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'DPIASupervisionDocumentationUrl':
-                                    payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.DPIASupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'LinkToDirectoryUrl':
-                                    payload.LinkToDirectoryUrlName = $scope.linkName;
-                                    payload.LinkToDirectoryUrl = $scope.Url;
-                                    break;
-                                }
+                                    switch (field) {
+                                        case 'datahandlerSupervisionDocumentationUrl':
+                                            payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'technicalSupervisionDocumentationUrl':
+                                            payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.technicalSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'UserSupervisionDocumentationUrl':
+                                            payload.userSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.userSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'RiskSupervisionDocumentationUrl':
+                                            payload.riskSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.riskSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'DPIASupervisionDocumentationUrl':
+                                            payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.DPIASupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'LinkToDirectoryUrl':
+                                            payload.LinkToDirectoryUrlName = $scope.linkName;
+                                            payload.LinkToDirectoryUrl = $scope.Url;
+                                            break;
+                                    }
 
                                     var msg = notify.addInfoMessage("Gemmer...", false);
 
@@ -350,33 +351,33 @@
                         });
                 };
 
-                $scope.dataLevelChange = (dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel) => {
+                $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.NONE:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalNoDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.noDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.PERSONALDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalRegularDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.personalDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.SENSITIVEDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalSensitiveDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.sensitiveDataSelected);
                             break;
-                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel.LEGALDATA:
-                            updateDataLevels(dataLevel, $scope.usageViewModel.personalLegalDataSelected);
+                        case Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal.value:
+                            updateDataLevels(dataLevel, $scope.usageViewModel.legalDataSelected);
                             break;
                         default:
                             break;
                     }
                 };
 
-                function updateDataLevels(dataLevel: Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel, boolValue: boolean) {
-                    if (boolValue) {
-                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/add`, dataLevel)
+                function updateDataLevels(dataLevel: number, selected: boolean) {
+                    if (selected) {
+                        GDPRService.addDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                     else {
-                        $http.patch(`api/v1/itsystemusage/${itSystemUsage.id}/sensitivityLevel/remove`, dataLevel)
+                        GDPRService.removeDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }

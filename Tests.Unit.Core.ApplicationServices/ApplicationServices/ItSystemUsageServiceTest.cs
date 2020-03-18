@@ -892,7 +892,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.AddSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
 
             //Assert
-            AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
+            AssertSensitiveDataLevelError(result, OperationFailure.BadInput);
         }
 
         [Fact]
@@ -939,7 +939,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void RemoveSensitiveData_Returns_NotFound_If_No_System_Usage()
+        public void RemoveSensitiveData_Returns_BadInput_If_No_System_Usage()
         {
             //Arrange
             var itSystem = CreateItSystem();
@@ -949,7 +949,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.RemoveSensitiveDataLevel(itSystemUsage.Id, SensitiveDataLevel.NONE);
 
             //Assert
-            AssertSensitiveDataLevelError(result, OperationFailure.NotFound);
+            AssertSensitiveDataLevelError(result, OperationFailure.BadInput);
         }
 
         [Fact]

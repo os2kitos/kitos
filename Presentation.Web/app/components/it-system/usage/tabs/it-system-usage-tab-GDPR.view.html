@@ -179,20 +179,20 @@
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeNoneCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.NONE)"
-                                       ng-model="usageViewModel.personalNoDataSelected"
+                                       ng-change="dataLevelChange(sensitivityLevels.none.value)"
+                                       ng-model="usageViewModel.noDataSelected"
                                        data-ng-disabled="!hasWriteAccess">
-                                Ingen Persondata
+                                {{sensitivityLevels.none.text}}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeRegularCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.PERSONALDATA)"
-                                       ng-model="usageViewModel.personalRegularDataSelected"
+                                       ng-change="dataLevelChange(sensitivityLevels.personal.value)"
+                                       ng-model="usageViewModel.personalDataSelected"
                                        data-ng-disabled="!hasWriteAccess">
-                                Almindelig persondata
+                                {{sensitivityLevels.personal.text}}
                                 <span class="help-block small">
                                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                                     F.eks.: Navn, adresse, telefonummer, e-mailadresse, CPR-nr, titel m.m.
@@ -203,13 +203,13 @@
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeSensitiveCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.SENSITIVEDATA)"
-                                       ng-model="usageViewModel.personalSensitiveDataSelected"
+                                       ng-change="dataLevelChange(sensitivityLevels.sensitive.value)"
+                                       ng-model="usageViewModel.sensitiveDataSelected"
                                        data-ng-disabled="!hasWriteAccess">
-                                Følsomme persondata
+                                {{sensitivityLevels.sensitive.text}}
                                 <div class="checkbox"
                                      data-ng-repeat="r in sensitivePersonalData"
-                                     ng-if="usageViewModel.personalSensitiveDataSelected">
+                                     ng-if="usageViewModel.sensitiveDataSelected">
                                     <label>
                                         <input type="checkbox"
                                                ng-model="r.Checked"
@@ -223,7 +223,12 @@
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" data-element-type="dataLevelTypeLegalCheckbox" ng-change="dataLevelChange(sensitiveDataLevel.LEGALDATA)" ng-model="usageViewModel.personalLegalDataSelected" data-ng-disabled="!hasWriteAccess">Straffedomme og lovovertrædelser
+                                <input type="checkbox"
+                                       data-element-type="dataLevelTypeLegalCheckbox"
+                                       ng-change="dataLevelChange(sensitivityLevels.legal.value)"
+                                       ng-model="usageViewModel.legalDataSelected"
+                                       data-ng-disabled="!hasWriteAccess">
+                                {{sensitivityLevels.legal.text}}
                             </label>
                         </div>
                     </div>
@@ -241,7 +246,7 @@
                     </div>
                 </div>
 
-                <div data-ng-show="usageViewModel.personalSensitiveDataSelected">
+                <div ng-show="usageViewModel.sensitiveDataSelected">
                     <div class="well">
                         <!-- Implemented technical precautions -->
                         <div class="form-group">

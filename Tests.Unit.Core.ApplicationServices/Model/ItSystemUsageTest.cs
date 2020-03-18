@@ -317,7 +317,7 @@ namespace Tests.Unit.Core.Model
             var result = _sut.RemoveSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
 
             //Assert
-            AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+            AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.BadInput);
         }
 
         private static void AssertErrorResult(Result<ItSystemUsageSensitiveDataLevel, OperationError> result, string message, OperationFailure error)

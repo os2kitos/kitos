@@ -36,16 +36,7 @@ namespace Presentation.Web.Controllers.API
             return result.Match
             (
                 onSuccess: itSystemUsageDataLevel =>  Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
-                onFailure: operationError =>
-                {
-                    switch (operationError.FailureType)
-                    {
-                        case OperationFailure.NotFound:
-                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        default:
-                            return FromOperationError(operationError);
-                    }
-                }
+                onFailure: FromOperationError
                     
             );
         }
@@ -59,16 +50,7 @@ namespace Presentation.Web.Controllers.API
             return result.Match
             (
                 onSuccess: itSystemUsageDataLevel => Ok(MapSensitiveDataLevelDTO(itSystemUsageDataLevel)),
-                onFailure: operationError =>
-                {
-                    switch (operationError.FailureType)
-                    {
-                        case OperationFailure.NotFound:
-                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        default:
-                            return FromOperationError(operationError);
-                    }
-                }
+                onFailure: FromOperationError
             );
         }
 
