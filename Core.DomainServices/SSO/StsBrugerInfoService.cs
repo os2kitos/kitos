@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using Core.DomainModel.Result;
+using Serilog;
 
 namespace Core.DomainServices.SSO
 {
     public class StsBrugerInfoService : IStsBrugerInfoService
     {
+        private readonly ILogger _logger;
         private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
 
         private readonly string _urlServicePlatformBrugerService;
@@ -17,8 +20,9 @@ namespace Core.DomainServices.SSO
         private readonly string _certificateThumbprint;
         private readonly string _authorizedMunicipalityCvr;
 
-        public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration)
+        public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
+            _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
@@ -27,16 +31,39 @@ namespace Core.DomainServices.SSO
             _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
-        public StsBrugerInfo GetStsBrugerInfo(Guid uuid)
+        public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid)
         {
-            var (emailAdresseUuid, organisationUuid) = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
-            var emails = GetStsAdresseEmailFromUuid(emailAdresseUuid);
-            var virksomhedUuid = GetStsVirksomhedFromUuid(organisationUuid);
-            var municipalityCvr = GetStsBrugerMunicipalityCvrFromUuid(virksomhedUuid);
-            return new StsBrugerInfo(emails, organisationUuid, municipalityCvr);
+            var organizationUuids = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
+            if (organizationUuids.Failed)
+            {
+                _logger.Error("Failed to resolve UUIDS '{error}'", organizationUuids.Error);
+                return Maybe<StsBrugerInfo>.None;
+            }
+
+            var (emailAdresseUuid, organisationUuid) = organizationUuids.Value;
+            var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid);
+
+            if (emailsResult.Failed)
+            {
+                _logger.Error("Failed to resolve Emails '{error}'", emailsResult.Error);
+                return Maybe<StsBrugerInfo>.None;
+            }
+
+            return
+                GetStsVirksomhedFromUuid(organisationUuid)
+                    .Select(GetStsBrugerMunicipalityCvrFromUuid)
+                    .Match
+                    (
+                        onSuccess: municipalityCvr => new StsBrugerInfo(uuid, emailsResult.Value, organisationUuid, municipalityCvr),
+                        onFailure: error =>
+                        {
+                            _logger.Error("Failed to resolve CVR '{error}'", error);
+                            return Maybe<StsBrugerInfo>.None;
+                        }
+                    );
         }
 
-        private (string emailAdresseUuid, string organisationUuid) GetStsBrugerEmailAdresseAndOrganizationUuids(Guid uuid)
+        private Result<(string emailAdresseUuid, string organisationUuid), string> GetStsBrugerEmailAdresseAndOrganizationUuids(Guid uuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -64,11 +91,11 @@ namespace Core.DomainServices.SSO
 
                     return (emailUuid, organizationUuid);
                 }
-                return (string.Empty, string.Empty);
+                return "Unable to resolve email and organization UUID";
             }
         }
 
-        private IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
+        private Result<IEnumerable<string>, string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -89,11 +116,15 @@ namespace Core.DomainServices.SSO
                     var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
                     result.Add(latest.AdresseTekst);
                 }
-                return result;
+
+                if (result.Any())
+                    return result;
+
+                return "No email addresses found";
             }
         }
 
-        private string GetStsVirksomhedFromUuid(string organisationUuid)
+        private Result<string, string> GetStsVirksomhedFromUuid(string organisationUuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -110,13 +141,13 @@ namespace Core.DomainServices.SSO
                         continue;
                     }
 
-                    return registreringType1.RelationListe.Virksomhed.ReferenceID.Item;
+                    return Result<string, string>.Success(registreringType1.RelationListe.Virksomhed.ReferenceID.Item);
                 }
-                return string.Empty;
+                return Result<string, string>.Failure("UUID not found");
             }
         }
 
-        private string GetStsBrugerMunicipalityCvrFromUuid(string virksomhedUuid)
+        private Result<string, string> GetStsBrugerMunicipalityCvrFromUuid(string virksomhedUuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -134,9 +165,9 @@ namespace Core.DomainServices.SSO
                     }
 
                     var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
-                    return latest.CVRNummerTekst;
+                    return Result<string, string>.Success(latest.CVRNummerTekst);
                 }
-                return string.Empty;
+                return Result<string, string>.Failure("Unable to resolve cvr");
             }
         }
 

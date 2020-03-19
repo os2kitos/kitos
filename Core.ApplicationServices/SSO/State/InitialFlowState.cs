@@ -25,8 +25,7 @@ namespace Core.ApplicationServices.SSO.State
                 var userUuid = GetCurrentUserUuid();
                 if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(userUuid.Value);
-                    context.TransitionTo(new LookupStsUserEmailState(stsBrugerInfo.Emails));
+                    context.TransitionTo(new LookupStsUserEmailState(userUuid.Value,_stsBrugerInfoService));
                     context.HandleUserHasValidAccessRoleInSamlToken();
                 }
                 else
