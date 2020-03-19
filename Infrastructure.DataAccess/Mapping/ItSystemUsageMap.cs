@@ -70,6 +70,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ItSystemCategories)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ItSystemCategoriesId);
+
+            HasMany(t => t.SensitiveDataLevels)
+                .WithRequired(t => t.ItSystemUsage)
+                .WillCascadeOnDelete(true);
         }
     }
 }

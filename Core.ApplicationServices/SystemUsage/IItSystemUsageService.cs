@@ -2,6 +2,7 @@
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SystemUsage
@@ -95,5 +96,21 @@ namespace Core.ApplicationServices.SystemUsage
         /// <returns></returns>
         Result<IEnumerable<SystemRelation>, OperationError> GetRelationsDefinedInOrganization(int organizationId,
             int pageNumber, int pageSize);
+
+        /// <summary>
+        /// Adds information about which data sensitivity levels are applied to the system usage />
+        /// </summary>
+        /// <param name="itSystemUsageId"></param>
+        /// <param name="sensitiveDataLevel"></param>
+        /// <returns></returns>
+        Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel);
+
+        /// <summary>
+        /// Removes information about which data sensitivity levels are applied to the system usage />
+        /// </summary>
+        /// <param name="itSystemUsageId"></param>
+        /// <param name="sensitiveDataLevel"></param>
+        /// <returns></returns>
+        Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel);
     }
 }

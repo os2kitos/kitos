@@ -23,19 +23,6 @@
                            data-field="localCallName"
                            data-autosave="{{autoSaveUrl}}">
                 </div>
-                <div class="form-group">
-                    <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
-                    <select class="form-control input-sm"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="usage.dataLevel"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="dataLevel"
-                            data-autosave="{{autoSaveUrl}}">
-                        <option value="0">Ingen persondata</option>
-                        <option value="1">Persondata</option>
-                        <option value="2">Persondata og følsomme persondata</option>
-                    </select>
-                </div>
                 <!-- Category of data -->
                 <div class="form-group" ng-if="shouldShowCategories">
                     <select-option data-id="categories"
@@ -63,8 +50,9 @@
             <!-- 2nd column -->
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label for="system-name" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
-                    <select class="form-control input-sm"
+                    <label for="numberOfUsers" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
+                    <select id="numberOfUsers"
+                            class="form-control input-sm"
                             ui-select2="{minimumResultsForSearch: -1}"
                             data-ng-model="usage.userCount"
                             data-ng-disabled="!hasWriteAccess"

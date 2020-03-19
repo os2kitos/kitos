@@ -1,6 +1,4 @@
-﻿import PageObject = require("../PageObjects/IPageObject.po");
-
-class NavigationHelper {
+﻿class NavigationHelper {
 
     public getPage(destUrl: string): webdriver.promise.Promise<void> {
         return browser.getCurrentUrl()
@@ -16,7 +14,8 @@ class NavigationHelper {
     }
 
     public refreshPage(): webdriver.promise.Promise<void> {
-        return browser.refresh();
+        return browser.refresh()
+            .then(() => browser.waitForAngular());
     }
 
     public acceptAlertBox(): webdriver.promise.Promise<void> {
