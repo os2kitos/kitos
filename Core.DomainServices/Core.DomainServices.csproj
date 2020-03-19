@@ -91,6 +91,9 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
+    <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
     <Compile Include="SSO\StsBrugerInfo.cs" />
     <Compile Include="SSO\IStsBrugerInfoService.cs" />
     <Compile Include="SSO\StsAdresseHelpers.cs" />
