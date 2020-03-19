@@ -22,7 +22,7 @@ namespace Core.ApplicationServices.SSO.Model
         {
             return
                 _navigator
-                    .MatchPrivilegeNode()
+                    .GetPrivilegeNode()
                     .Match(xml => xml.InnerText.EndsWith(privilegeId, StringComparison.OrdinalIgnoreCase)
                             ? new KitosSamlPrivilege(xml.InnerText)
                             : Maybe<KitosSamlPrivilege>.None, onNone: () => Maybe<KitosSamlPrivilege>.None);
@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.SSO.Model
         {
             return
                 _navigator
-                    .MatchSerials()
+                    .GetSerials()
                     .Match(serials =>
                     {
                         foreach (var serial in serials)

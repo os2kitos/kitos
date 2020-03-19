@@ -19,20 +19,20 @@ namespace Core.ApplicationServices.SSO.Model
             _sourceIdentity = sourceIdentity;
         }
 
-        public Maybe<XmlNode> MatchPrivilegeNode()
+        public Maybe<XmlNode> GetPrivilegeNode()
         {
             return
-                MatchAttribute(StsAdgangsStyringConstants.Attributes.PrivilegeKey)
+                GetAttribute(StsAdgangsStyringConstants.Attributes.PrivilegeKey)
                     .Select(ToXml)
                     .Match(xml => xml.SelectSingleNode("//Privilege"), onNone: () => Maybe<XmlNode>.None);
         }
 
-        public Maybe<SamlAttribute> MatchAttribute(string attributeName)
+        public Maybe<SamlAttribute> GetAttribute(string attributeName)
         {
             return _sourceIdentity[attributeName].FirstOrDefault();
         }
 
-        public Maybe<IEnumerable<string>> MatchSerials()
+        public Maybe<IEnumerable<string>> GetSerials()
         {
             var results = new List<string>();
             foreach (var claim in Saml20Identity.Current.Claims)
@@ -46,13 +46,13 @@ namespace Core.ApplicationServices.SSO.Model
 
         private static XmlDocument ToXml(SamlAttribute attribute)
         {
-            var attributeAsString = DecodeSamlRequestString(attribute.AttributeValue.First());
+            var attributeAsString = DecodeSAMLRequestString(attribute.AttributeValue.First());
             var attributeXmlDocument = new XmlDocument();
             attributeXmlDocument.LoadXml(attributeAsString);
             return attributeXmlDocument;
         }
 
-        private static string DecodeSamlRequestString(string compressedData)
+        private static string DecodeSAMLRequestString(string compressedData)
         {
             using (var memStream = new MemoryStream(Convert.FromBase64String(compressedData)))
             using (var reader = new StreamReader(memStream, Encoding.UTF8))
