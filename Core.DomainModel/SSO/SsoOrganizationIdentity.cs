@@ -6,6 +6,6 @@ namespace Core.DomainModel.SSO
     {
         public int Id { get; set; }
         public Guid ExternalUuid { get; set; }
-        public Organization.Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
     }
 }

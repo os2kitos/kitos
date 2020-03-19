@@ -63,6 +63,8 @@
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\SsoUserIdentityMap.cs" />
+    <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
     <Compile Include="Mapping\BrokenLinkInInterfaceMap.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
@@ -579,6 +581,10 @@
     <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.Designer.cs">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003191124414_SSO_Identities.cs" />
+    <Compile Include="Migrations\202003191124414_SSO_Identities.Designer.cs">
+      <DependentUpon>202003191124414_SSO_Identities.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -941,6 +947,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.resx">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003191124414_SSO_Identities.resx">
+      <DependentUpon>202003191124414_SSO_Identities.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

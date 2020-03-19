@@ -256,7 +256,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.userLockedOutDate, opt => opt.MapFrom(src => src.User.LockedOutDate))
                .ForMember(dto => dto.userFailedAttempts, opt => opt.MapFrom(src => src.User.FailedAttempts))
                .ForMember(dto => dto.userDefaultUserStartPreference, opt => opt.MapFrom(src => src.User.DefaultUserStartPreference))
-               .ForMember(dto => dto.userUniqueId, opt => opt.MapFrom(src => src.User.UniqueId))
                .ForMember(dto => dto.ItSystemUsageId, opt => opt.MapFrom(src => src.Object.Id))
                .ForMember(dto => dto.ItSystemUsageIsStatusActive, opt => opt.MapFrom(src => src.Object.IsStatusActive))
                .ForMember(dto => dto.ItSystemUsageNote, opt => opt.MapFrom(src => src.Object.Note))
