@@ -10,23 +10,19 @@
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
                 ],
-                sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByUsageId(id=" + $stateParams.id + ")")
-                        .then(function (result) {
-                            return result.data.value;
-                        });
-                }],
+                sensitivePersonalData: ["$http", "$stateParams", ($http, $stateParams) =>
+                    $http.get(`odata/GetSensitivePersonalDataByUsageId(id=${$stateParams.id})`)
+                        .then(result => result.data.value)
+                ],
                 registerTypes: [
-                    '$http', '$stateParams', ($http, $stateParams) =>
+                    "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)
                             .then(result => result.data.value)
                 ],
-                dataResponsible: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                    return $http.get('api/dataResponsible/' + user.currentOrganizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
+                dataResponsible: ["$http", "user", ($http, user) =>
+                    $http.get(`api/dataResponsible/${user.currentOrganizationId}`)
+                        .then(result => result.data.response)
+                ]
             }
         });
     }]);
@@ -66,15 +62,15 @@
                     $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
                 }
                 //inherit from parent
-                if (!systemUsage.dataProcessor) {
+                if (!$scope.systemUsage.dataProcessor) {
                     $scope.systemUsage.dataProcessor = dataResponsible.name;
                 }
-                $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
-                $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
+                $scope.updateUrl = `/api/itsystemusage/${$scope.usage.id}`;
+                $scope.dataWorkerSelectOptions = selectLazyLoading("api/organization", false, ["public=true", `orgId=${user.currentOrganizationId}`]);
 
-                $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
+                $scope.systemUsage.LinkToDirectoryUrl = encodeURI($scope.systemUsage.LinkToDirectoryUrl);
 
-                $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
+                $scope.updateDataLevel = (OptionId, Checked, optionType, entitytype) => {
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
 
@@ -84,7 +80,7 @@
                             ObjectId: itSystemUsage.id,
                             OptionId: OptionId,
                             OptionType: optionType,
-                            ObjectType: 'ITSYSTEMUSAGE'
+                            ObjectType: "ITSYSTEMUSAGE"
                         };
 
                         $http.post("odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
@@ -103,7 +99,7 @@
                                 OptType = 2;
                                 break;
                         }
-                        $http.delete("odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type=" + OptType + ", entityType=1)").success(() => {
+                        $http.delete(`odata/RemoveOption(id=${OptionId}, objectId=${itSystemUsage.id},type=${OptType}, entityType=1)`).success(() => {
                             msg.toSuccessMessage("Feltet er Opdateret.");
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
@@ -125,7 +121,7 @@
                         itSystemUsageService.patchSystem($scope.usageId, payload);
                     } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                        $scope.ArchivedDate = systemUsage.ArchivedDate;
+                        $scope.ArchivedDate = $scope.systemUsage.ArchivedDate;
                     } else {
                         date = date.format("YYYY-MM-DD");
                         var payload = {};
@@ -135,127 +131,98 @@
                     }
                 }
 
-                $scope.editLink = function (field) {
+                $scope.editLink = field => {
                     $uibModal.open({
-                        templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
+                        templateUrl: "app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html",
+                        resolve: {
+                            usage: [() => $scope.usage]
+                        },
                         controller: [
-                            '$scope', '$state', '$uibModalInstance', 'usage',
-                            function ($scope, $state, $uibModalInstance, usage) {
+                            "$scope", "$uibModalInstance", "usage",
+                            ($scope, $uibModalInstance, usage) => {
 
-                                $scope.usage = usage;
-
+                                //Ready old data in input fields.
                                 switch (field) {
-                                    case 'datahandlerSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
+                                    case "datahandlerSupervisionDocumentationUrl":
+                                        $scope.linkName = usage.datahandlerSupervisionDocumentationUrlName;
+                                        $scope.Url = usage.datahandlerSupervisionDocumentationUrl;
                                         break;
-                                    case 'technicalSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
+                                    case "technicalSupervisionDocumentationUrl":
+                                        $scope.linkName = usage.technicalSupervisionDocumentationUrlName;
+                                        $scope.Url = usage.technicalSupervisionDocumentationUrl;
                                         break;
-                                    case 'UserSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
+                                    case "userSupervisionDocumentationUrl":
+                                        $scope.linkName = usage.userSupervisionDocumentationUrlName;
+                                        $scope.Url = usage.userSupervisionDocumentationUrl;
                                         break;
-                                    case 'RiskSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
+                                    case "riskSupervisionDocumentationUrl":
+                                        $scope.linkName = usage.riskSupervisionDocumentationUrlName;
+                                        $scope.Url = usage.riskSupervisionDocumentationUrl;
                                         break;
-                                    case 'DPIASupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
+                                    case "dpiaSupervisionDocumentationUrl":
+                                        $scope.linkName = usage.dpiaSupervisionDocumentationUrlName;
+                                        $scope.Url = usage.dpiaSupervisionDocumentationUrl;
                                         break;
-                                    case 'LinkToDirectoryUrl':
-                                        $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
-                                        $scope.Url = $scope.usage.LinkToDirectoryUrl;
+                                    case "linkToDirectoryUrl":
+                                        $scope.linkName = usage.linkToDirectoryUrlName;
+                                        $scope.Url = usage.linkToDirectoryUrl;
                                         break;
                                 }
-                                $scope.ok = function () {
 
-                                    var payload = {
-                                        Id: $scope.usage.Id,
-
-                                        datahandlerSupervisionDocumentationUrlName: $scope.usage
-                                            .DatahandlerSupervisionDocumentationUrlName,
-                                        datahandlerSupervisionDocumentationUrl: $scope.usage
-                                            .DatahandlerSupervisionDocumentationUrl,
-
-                                        technicalSupervisionDocumentationUrlName: $scope.usage
-                                            .TechnicalSupervisionDocumentationUrlName,
-                                        technicalSupervisionDocumentationUrl: $scope.usage
-                                            .TechnicalSupervisionDocumentationUrl,
-
-                                        userSupervisionDocumentationUrlName: $scope.usage
-                                            .UserSupervisionDocumentationUrlName,
-                                        userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
-
-                                        riskSupervisionDocumentationUrlName: $scope.usage
-                                            .RiskSupervisionDocumentationUrlName,
-                                        riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
-
-                                        DPIASupervisionDocumentationUrlName: $scope.usage
-                                            .DPIASupervisionDocumentationUrlName,
-                                        DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
-
-                                        LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
-                                        LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
-                                    }
+                                $scope.ok = () => {
+                                    var linkName = $scope.linkName;
+                                    var url = $scope.Url;
+                                    var payload: any = {};
 
                                     switch (field) {
-                                        case 'datahandlerSupervisionDocumentationUrl':
-                                            payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
+                                        case "datahandlerSupervisionDocumentationUrl":
+                                            payload.datahandlerSupervisionDocumentationUrlName = linkName;
+                                            payload.datahandlerSupervisionDocumentationUrl = url;
                                             break;
-                                        case 'technicalSupervisionDocumentationUrl':
-                                            payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.technicalSupervisionDocumentationUrl = $scope.Url;
+                                        case "technicalSupervisionDocumentationUrl":
+                                            payload.technicalSupervisionDocumentationUrlName = linkName;
+                                            payload.technicalSupervisionDocumentationUrl = url;
                                             break;
-                                        case 'UserSupervisionDocumentationUrl':
-                                            payload.userSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.userSupervisionDocumentationUrl = $scope.Url;
+                                        case "userSupervisionDocumentationUrl":
+                                            payload.userSupervisionDocumentationUrlName = linkName;
+                                            payload.userSupervisionDocumentationUrl = url;
                                             break;
-                                        case 'RiskSupervisionDocumentationUrl':
-                                            payload.riskSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.riskSupervisionDocumentationUrl = $scope.Url;
+                                        case "riskSupervisionDocumentationUrl":
+                                            payload.riskSupervisionDocumentationUrlName = linkName;
+                                            payload.riskSupervisionDocumentationUrl = url;
                                             break;
-                                        case 'DPIASupervisionDocumentationUrl':
-                                            payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.DPIASupervisionDocumentationUrl = $scope.Url;
+                                        case "dpiaSupervisionDocumentationUrl":
+                                            payload.dpiaSupervisionDocumentationUrlName = linkName;
+                                            payload.dpiaSupervisionDocumentationUrl = url;
                                             break;
-                                        case 'LinkToDirectoryUrl':
-                                            payload.LinkToDirectoryUrlName = $scope.linkName;
-                                            payload.LinkToDirectoryUrl = $scope.Url;
+                                        case "linkToDirectoryUrl":
+                                            payload.linkToDirectoryUrlName = linkName;
+                                            payload.linkToDirectoryUrl = url;
                                             break;
                                     }
 
                                     var msg = notify.addInfoMessage("Gemmer...", false);
 
                                     $http({
-                                        method: 'PATCH',
-                                        url: 'api/itsystemusage/' +
-                                            $scope.usage.Id +
-                                            '?organizationId=' +
-                                            user.currentOrganizationId,
+                                        method: "PATCH",
+                                        url: `api/itsystemusage/${usage.id}?organizationId=${user.currentOrganizationId}`,
                                         data: payload
                                     })
-                                        .success(function () {
+                                        .success(() => {
                                             msg.toSuccessMessage("Feltet er opdateret.");
                                             $state.reload();
                                         })
-                                        .error(function () {
+                                        .error(() => {
                                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                         });
                                     $uibModalInstance.close();
                                 };
 
-                                $scope.cancel = function () {
-                                    $uibModalInstance.dismiss('cancel');
+                                $scope.cancel = () => {
+                                    $uibModalInstance.dismiss("cancel");
                                 };
                             }
                         ],
-                        resolve: {
-                            usage: [function () { return $scope.systemUsage; }]
-                        }
                     });
                 }
 
@@ -272,48 +239,48 @@
                     }
                 };
 
-                $scope.delete = function (dataworkerId) {
-                    $http.delete("api/UsageDataWorker/" + dataworkerId + "?organizationid=" + $scope.usage.organizationId)
-                        .success(function () {
+                $scope.delete = dataworkerId => {
+                    $http.delete(`api/UsageDataWorker/${dataworkerId}?organizationid=${$scope.usage.organizationId}`)
+                        .success(() => {
                             notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
                             reload();
                         })
-                        .error(function () {
+                        .error(() => {
                             notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
                         });
                 };
+
+                function selectLazyLoading(url: any, excludeSelf: any, paramAry: any);
                 function selectLazyLoading(url, excludeSelf, paramAry) {
                     return {
                         minimumInputLength: 1,
                         allowClear: true,
-                        placeholder: ' ',
-                        initSelection: function (elem, callback) {
+                        placeholder: " ",
+                        initSelection(elem, callback) {
                         },
                         ajax: {
-                            data: function (term, page) {
+                            data(term, page) {
                                 return { query: term };
                             },
                             quietMillis: 500,
-                            transport: function (queryParams) {
-                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
+                            transport(queryParams) {
+                                var extraParams = paramAry ? `&${paramAry.join("&")}` : "";
+                                var res = $http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
+                                res.abort = () => null;
 
                                 return res;
                             },
 
-                            results: function (data, page) {
+                            results(data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (obj: { id; name; cvr; }) {
+                                _.each(data.data.response, (obj: { id; name; cvr; }) => {
                                     if (excludeSelf && obj.id == itSystemUsage.id)
                                         return; // don't add self to result
 
                                     results.push({
                                         id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven',
+                                        text: obj.name ? obj.name : "Unavngiven",
                                         cvr: obj.cvr
                                     });
                                 });
@@ -327,14 +294,12 @@
                 function reload() {
                     return $state.transitionTo($state.current, $stateParams, {
                         reload: true
-                    }).then(function () {
+                    }).then(() => {
                         $scope.hideContent = true;
-                        return $timeout(function () {
-                            return $scope.hideContent = false;
-                        }, 1);
+                        return $timeout(() => $scope.hideContent = false, 1);
                     });
                 }
-                $scope.save = function () {
+                $scope.save = () => {
 
                     var data = {
                         ItSystemUsageId: $scope.usage.id,
@@ -342,11 +307,11 @@
                     }
 
                     $http.post("api/UsageDataworker/", data)
-                        .success(function () {
+                        .success(() => {
                             notify.addSuccessMessage("Databehandleren er tilknyttet.");
                             reload();
                         })
-                        .error(function () {
+                        .error(() => {
                             notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
                         });
                 };

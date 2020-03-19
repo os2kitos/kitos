@@ -63,7 +63,7 @@
                 },
                 <any>{});
         }
-        
+
     }
 
 
@@ -142,6 +142,8 @@
 
         mapDataOption(dataOption: number): DataOption {
             switch (dataOption) {
+                case null:
+                    return DataOption.UNDECIDED;
                 case 0:
                     return DataOption.NO;
                 case 1:
@@ -157,16 +159,18 @@
 
         mapRiskLevelOption(dataOption: number): RiskLevel {
             switch (dataOption) {
-            case 0:
-                    return RiskLevel.LOW;
-            case 1:
-                    return RiskLevel.MIDDLE;
-            case 2:
-                    return RiskLevel.HIGH;
-            case 3:
+                case null:
                     return RiskLevel.UNDECIDED;
-            default:
-                throw new RangeError(`${dataOption} is not a valid RiskLevel`);
+                case 0:
+                    return RiskLevel.LOW;
+                case 1:
+                    return RiskLevel.MIDDLE;
+                case 2:
+                    return RiskLevel.HIGH;
+                case 3:
+                    return RiskLevel.UNDECIDED;
+                default:
+                    throw new RangeError(`${dataOption} is not a valid RiskLevel`);
             }
         }
 
