@@ -42,12 +42,12 @@
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
                 $scope.sensitiveDataLevel = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevel;
-            $scope.registerTypes = registerTypes;
-            $scope.usageId = $stateParams.id;
-            $scope.systemUsage = systemUsage;
-            $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
-            $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
-            $scope.filterDataProcessor = $scope.contracts.length > 0;
+                $scope.registerTypes = registerTypes;
+                $scope.usageId = $stateParams.id;
+                $scope.systemUsage = systemUsage;
+                $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
+                $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
+                $scope.filterDataProcessor = $scope.contracts.length > 0;
 
                 //inherit from parent if general purpose is empty
                 $scope.generalPurpose = itSystemUsage.generalPurpose;
@@ -143,33 +143,33 @@
 
                                 $scope.usage = usage;
 
-                            switch (field) {
-                            case 'datahandlerSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
-                                break;
-                            case 'technicalSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
-                                break;
-                            case 'UserSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
-                                break;
-                            case 'RiskSupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
-                                break;
-                            case 'DPIASupervisionDocumentationUrl':
-                                $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
-                                $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
-                                break;
-                            case 'LinkToDirectoryUrl':
-                                    $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
-                                    $scope.Url = $scope.usage.LinkToDirectoryUrl;
-                                break;
-                            }
-                            $scope.ok = function() {
+                                switch (field) {
+                                    case 'datahandlerSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
+                                        break;
+                                    case 'technicalSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
+                                        break;
+                                    case 'UserSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
+                                        break;
+                                    case 'RiskSupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
+                                        break;
+                                    case 'DPIASupervisionDocumentationUrl':
+                                        $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
+                                        $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
+                                        break;
+                                    case 'LinkToDirectoryUrl':
+                                        $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
+                                        $scope.Url = $scope.usage.LinkToDirectoryUrl;
+                                        break;
+                                }
+                                $scope.ok = function () {
 
                                     var payload = {
                                         Id: $scope.usage.Id,
@@ -192,40 +192,40 @@
                                             .RiskSupervisionDocumentationUrlName,
                                         riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
 
-                                    DPIASupervisionDocumentationUrlName: $scope.usage
-                                        .DPIASupervisionDocumentationUrlName,
-                                    DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
+                                        DPIASupervisionDocumentationUrlName: $scope.usage
+                                            .DPIASupervisionDocumentationUrlName,
+                                        DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
 
                                         LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
                                         LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
                                     }
 
-                                switch (field) {
-                                case 'datahandlerSupervisionDocumentationUrl':
-                                    payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'technicalSupervisionDocumentationUrl':
-                                    payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.technicalSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'UserSupervisionDocumentationUrl':
-                                    payload.userSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.userSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'RiskSupervisionDocumentationUrl':
-                                    payload.riskSupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.riskSupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'DPIASupervisionDocumentationUrl':
-                                    payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
-                                    payload.DPIASupervisionDocumentationUrl = $scope.Url;
-                                    break;
-                                case 'LinkToDirectoryUrl':
-                                    payload.LinkToDirectoryUrlName = $scope.linkName;
-                                    payload.LinkToDirectoryUrl = $scope.Url;
-                                    break;
-                                }
+                                    switch (field) {
+                                        case 'datahandlerSupervisionDocumentationUrl':
+                                            payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'technicalSupervisionDocumentationUrl':
+                                            payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.technicalSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'UserSupervisionDocumentationUrl':
+                                            payload.userSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.userSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'RiskSupervisionDocumentationUrl':
+                                            payload.riskSupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.riskSupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'DPIASupervisionDocumentationUrl':
+                                            payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
+                                            payload.DPIASupervisionDocumentationUrl = $scope.Url;
+                                            break;
+                                        case 'LinkToDirectoryUrl':
+                                            payload.LinkToDirectoryUrlName = $scope.linkName;
+                                            payload.LinkToDirectoryUrl = $scope.Url;
+                                            break;
+                                    }
 
                                     var msg = notify.addInfoMessage("Gemmer...", false);
 
