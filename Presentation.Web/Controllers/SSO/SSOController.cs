@@ -2,10 +2,11 @@
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.SSO;
+using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
+using Core.DomainModel.Result;
 using dk.nita.saml20.identity;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.SSO;
 
 namespace Presentation.Web.Controllers.SSO
 {
@@ -13,10 +14,12 @@ namespace Presentation.Web.Controllers.SSO
     public class SSOController : ApiController
     {
         private readonly ISsoFlowApplicationService _ssoFlowApplicationService;
+        private readonly Maybe<ISaml20Identity> _ssoSamlState;
 
-        public SSOController(ISsoFlowApplicationService ssoFlowApplicationService)
+        public SSOController(ISsoFlowApplicationService ssoFlowApplicationService, Maybe<ISaml20Identity> ssoSamlState)
         {
             _ssoFlowApplicationService = ssoFlowApplicationService;
+            _ssoSamlState = ssoSamlState;
         }
 
         [InternalApi]
@@ -25,16 +28,19 @@ namespace Presentation.Web.Controllers.SSO
         public IHttpActionResult SSO()
         {
             var result = "User not authenticated";
-            if (Saml20Identity.IsInitialized())
+            if (_ssoSamlState.HasValue)
             {
-                var currentIdentityName = Saml20Identity.Current.Name;
+                var currentIdentityName = _ssoSamlState.Value.Name;
                 var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
 
                 switch (finalState)
                 {
-                    case ErrorState _:
-                        return SsoError(SsoErrorCode.MissingPrivilege);
+                    case ErrorState errorState when errorState.ErrorCode.HasValue:
+                        return SsoError(errorState.ErrorCode.Value);
+                    case ErrorState errorState when errorState.ErrorCode.IsNone:
+                        return SsoError(SsoErrorCode.Unknown);
                     case UserLoggedInState _:
+                        //TODO: Redirect to front page.. user is logged in now
                         result = $"User '{currentIdentityName}' has Kitos read access";
                         break;
                 }

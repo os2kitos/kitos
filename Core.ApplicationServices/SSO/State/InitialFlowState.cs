@@ -1,32 +1,23 @@
 ﻿using System;
+using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
-using Core.DomainServices;
-using Core.DomainServices.Repositories.SSO;
-using Core.DomainServices.SSO;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class InitialFlowState : AbstractState
     {
-        private readonly IStsBrugerInfoService _stsBrugerInfoService;
-        private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
-        private readonly IUserRepository _userRepository;
         private readonly string _samlKitosReadAccessRoleIdentifier;
         private readonly Saml20IdentityParser _parser;
+        private readonly ISsoStateFactory _stateFactory;
 
-        public InitialFlowState(SsoFlowConfiguration configuration, 
-            IStsBrugerInfoService stsBrugerInfoService,
-            ISsoUserIdentityRepository ssoUserIdentityRepository,
-            IUserRepository userRepository, 
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository)
+        public InitialFlowState(
+            SsoFlowConfiguration configuration, 
+            Saml20IdentityParser parser,
+            ISsoStateFactory stateFactory)
         {
-            _stsBrugerInfoService = stsBrugerInfoService;
-            _ssoUserIdentityRepository = ssoUserIdentityRepository;
-            _userRepository = userRepository;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
-            _parser = Saml20IdentityParser.CreateFromContext();
+            _parser = parser;
+            _stateFactory = stateFactory;
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
 
@@ -37,12 +28,13 @@ namespace Core.ApplicationServices.SSO.State
                 var externalUserUuid = GetUserExternalUuid();
                 if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    context.TransitionTo(new PrivilegeVerifiedState(externalUserUuid.Value, _userRepository, _stsBrugerInfoService, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository));
+                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value));
                     context.HandleUserPrivilegeVerified();
                 }
                 else
                 {
                     context.TransitionTo(new ErrorState());
+                    context.HandleUserPrivilegeInvalid();
                 }
             }
         }

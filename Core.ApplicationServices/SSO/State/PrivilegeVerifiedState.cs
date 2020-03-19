@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.ApplicationServices.SSO.Factories;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
@@ -10,20 +11,21 @@ namespace Core.ApplicationServices.SSO.State
         private readonly Guid _userUuid;
         private readonly IStsBrugerInfoService _stsBrugerInfoService;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly ISsoStateFactory _ssoStateFactory;
         private readonly IUserRepository _userRepository;
 
-        public PrivilegeVerifiedState(Guid userUuid,
+        public PrivilegeVerifiedState(
+            Guid userUuid,
             IUserRepository userRepository,
             IStsBrugerInfoService stsBrugerInfoService,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository)
+            ISsoStateFactory ssoStateFactory)
         {
             _userUuid = userUuid;
             _stsBrugerInfoService = stsBrugerInfoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
             _userRepository = userRepository;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
+            _ssoStateFactory = ssoStateFactory;
         }
 
         public override void Handle(FlowEvent @event, FlowContext context)
@@ -33,12 +35,14 @@ namespace Core.ApplicationServices.SSO.State
                 var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                 if (!stsBrugerInfo.HasValue)
                 {
+                    //TODO: Not exception just bail out
                     throw new ApplicationException("PrivilegeVerifiedState: Unable to extract user info from STS");
                 }
 
-                if (_ssoUserIdentityRepository.GetByExternalUuid(stsBrugerInfo.Value.Uuid).HasValue)
+                var userResult = _ssoUserIdentityRepository.GetByExternalUuid(stsBrugerInfo.Value.Uuid);
+                if (userResult.HasValue)
                 {
-                    context.TransitionTo(new UserLoggedInState());
+                    context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(userResult.Value.User));
                     context.HandleUserSeenBefore();
                 }
                 else
@@ -48,8 +52,9 @@ namespace Core.ApplicationServices.SSO.State
                         var user = _userRepository.GetByEmail(email);
                         if (user != null)
                         {
-                            context.TransitionTo(new UserIdentifiedState(user, _userUuid, stsBrugerInfo.Value.BelongsToOrganizationUuid, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository));
+                            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(user, stsBrugerInfo.Value));
                             context.HandleUserFirstTimeVisit();
+                            return;
                         }
                     }
                     // TODO: ?? Further handling in KITOSUDV-627: User creation flow

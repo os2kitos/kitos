@@ -16,6 +16,7 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SSO;
+using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -47,6 +48,7 @@ using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.SSO;
 using Core.DomainServices.Time;
+using dk.nita.saml20.identity;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
@@ -183,8 +185,10 @@ namespace Presentation.Web.Ninject
                     Settings.Default.StsOrganisationAuthorizedMunicipalityCvr))
                 .InSingletonScope();
 
+            kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
             kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
+            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_=>Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)

@@ -133,7 +133,10 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
+    <Compile Include="SSO\Factories\SsoStateFactory.cs" />
     <Compile Include="SSO\ISsoFlowApplicationService.cs" />
+    <Compile Include="SSO\Model\SsoErrorCodes.cs" />
     <Compile Include="SSO\SsoFlowConfiguration.cs" />
     <Compile Include="SSO\SsoFlowApplicationService.cs" />
     <Compile Include="SSO\State\AbstractState.cs" />

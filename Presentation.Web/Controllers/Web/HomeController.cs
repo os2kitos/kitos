@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
+using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
 using Presentation.Web.Models.FeatureToggle;
-using Presentation.Web.Models.SSO;
 using Presentation.Web.Properties;
 
 namespace Presentation.Web.Controllers.Web
