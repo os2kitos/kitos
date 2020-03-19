@@ -5,7 +5,6 @@ namespace Tests.Unit.Core.DomainServices.SSO
 {
     public class StsBrugerEmailServiceTest
     {
-        //TODO: Must go away before merge
         [Fact]
         private void GetSTSBrugerEmails_GivenValidUuid_ReturnsUserEmail()
         {
