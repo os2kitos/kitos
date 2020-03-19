@@ -6,11 +6,11 @@ namespace Core.DomainServices.SSO
     public class StsBrugerInfo
     {
         public Guid Uuid { get; }
+        public Guid BelongsToOrganizationUuid { get; }
         public IEnumerable<string> Emails { get; }
-        public string BelongsToOrganizationUuid { get; }
         public string MunicipalityCvr { get; }
 
-        public StsBrugerInfo(Guid uuid, IEnumerable<string> emails, string belongsToOrganizationUuid, string municipalityCvr)
+        public StsBrugerInfo(Guid uuid, IEnumerable<string> emails, Guid belongsToOrganizationUuid, string municipalityCvr)
         {
             Uuid = uuid;
             Emails = emails;

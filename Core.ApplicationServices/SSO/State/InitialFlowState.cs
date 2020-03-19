@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 
@@ -10,13 +11,21 @@ namespace Core.ApplicationServices.SSO.State
     {
         private readonly IStsBrugerInfoService _stsBrugerInfoService;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
+        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly IUserRepository _userRepository;
         private readonly string _samlKitosReadAccessRoleIdentifier;
         private readonly Saml20IdentityParser _parser;
 
-        public InitialFlowState(IStsBrugerInfoService stsBrugerInfoService, SsoFlowConfiguration configuration, ISsoUserIdentityRepository ssoUserIdentityRepository)
+        public InitialFlowState(SsoFlowConfiguration configuration, 
+            IStsBrugerInfoService stsBrugerInfoService,
+            ISsoUserIdentityRepository ssoUserIdentityRepository,
+            IUserRepository userRepository, 
+            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository)
         {
             _stsBrugerInfoService = stsBrugerInfoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
+            _userRepository = userRepository;
+            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
             _parser = Saml20IdentityParser.CreateFromContext();
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
@@ -25,10 +34,10 @@ namespace Core.ApplicationServices.SSO.State
         {
             if (@event.Equals(FlowEvent.LoginCompleted))
             {
-                var userUuid = GetCurrentUserUuid();
-                if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
+                var externalUserUuid = GetUserExternalUuid();
+                if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    context.TransitionTo(new PrivilegeVerifiedState(userUuid.Value, _stsBrugerInfoService, _ssoUserIdentityRepository));
+                    context.TransitionTo(new PrivilegeVerifiedState(externalUserUuid.Value, _userRepository, _stsBrugerInfoService, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository));
                     context.HandleUserPrivilegeVerified();
                 }
                 else
@@ -38,7 +47,7 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private Maybe<Guid> GetCurrentUserUuid()
+        private Maybe<Guid> GetUserExternalUuid()
         {
             return _parser.MatchUuid().Select(x => x.Value);
         }

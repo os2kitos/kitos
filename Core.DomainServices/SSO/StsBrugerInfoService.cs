@@ -54,7 +54,7 @@ namespace Core.DomainServices.SSO
                     .Select(GetStsBrugerMunicipalityCvrFromUuid)
                     .Match
                     (
-                        onSuccess: municipalityCvr => new StsBrugerInfo(uuid, emailsResult.Value, organisationUuid, municipalityCvr),
+                        onSuccess: municipalityCvr => new StsBrugerInfo(uuid, emailsResult.Value, Guid.Parse(organisationUuid), municipalityCvr),
                         onFailure: error =>
                         {
                             _logger.Error("Failed to resolve CVR '{error}'", error);
