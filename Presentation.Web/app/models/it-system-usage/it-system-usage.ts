@@ -73,6 +73,7 @@
         LinkToDirectoryUrl: string;
         LinkToDirectoryUrlName: string;
 
-        DataLevel: string;
+        SensitiveDataLevels: Models.Odata.ItSystemUsage.IItSystemUsageSensitiveDataLevelDTO[];
+        
     }
 }

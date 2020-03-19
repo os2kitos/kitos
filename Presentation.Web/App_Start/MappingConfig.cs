@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -10,6 +11,8 @@ using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
+using Core.DomainModel.ItSystemUsage.GDPR;
+using Presentation.Web.Models.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
@@ -475,6 +478,9 @@ namespace Presentation.Web
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ExcelImportError, ExcelImportErrorDTO>();
+
+            Mapper.CreateMap<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>()
+                .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitivityDataLevel));
         }
     }
 }

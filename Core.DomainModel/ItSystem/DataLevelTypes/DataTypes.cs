@@ -1,11 +1,5 @@
 ﻿namespace Core.DomainModel.ItSystem.DataTypes
 {
-    public enum DataSensitivityLevel
-    {
-        NONE = 0,
-        PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2
-    }
     public enum DataOptions
     {
         NO = 0,
