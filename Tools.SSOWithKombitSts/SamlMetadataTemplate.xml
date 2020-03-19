@@ -1,28 +1,39 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="kitos_ids" entityID="https://kitos.dk/">
-    <md:SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="kitos_ids" entityID="TO_BE_REPLACED" validUntil="2023-02-01T08:00:00.0000000Z">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
         <md:KeyDescriptor use="signing">
-            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-                <ds:X509Data>
-                    <ds:X509Certificate></ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
+            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <X509Data>
+                    <X509Certificate>TO_BE_REPLACED</X509Certificate>
+                </X509Data>
+            </KeyInfo>
         </md:KeyDescriptor>
         <md:KeyDescriptor use="encryption">
-            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-                <ds:X509Data>
-                    <ds:X509Certificate></ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
+            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <X509Data>
+                    <X509Certificate>TO_BE_REPLACED</X509Certificate>
+                </X509Data>
+            </KeyInfo>
         </md:KeyDescriptor>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://demo-brugervendtsystem.kombit.dk/test/saml/SingleLogout"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://demo-brugervendtsystem.kombit.dk/test/saml/SingleLogout"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://demo-brugervendtsystem.kombit.dk/test/saml/SSO" index="0" isDefault="true"/>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://demo-brugervendtsystem.kombit.dk/test/saml/SSO" index="1"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="TO_BE_REPLACED" index="0" isDefault="true" />
+        <md:AttributeConsumingService index="0" isDefault="true">
+            <md:ServiceName xml:lang="da">SP</md:ServiceName>
+            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" isRequired="true" />
+        </md:AttributeConsumingService>
     </md:SPSSODescriptor>
+    <md:ContactPerson contactType="administrative">
+        <md:Company>STRONGMINDS</md:Company>
+        <md:EmailAddress>admin@strongminds.dk</md:EmailAddress>
+    </md:ContactPerson>
 </md:EntityDescriptor>

@@ -19,7 +19,7 @@ namespace Presentation.Web
         {
             InitializeHangfire(app);
 
-            //setup token authentication
+            // Setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
                 AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,

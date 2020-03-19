@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/"
+            xmlns:tns="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/"
+            xmlns:adresse="urn:oio:sts:organisation:adresse:1.1.3.0"
+            xmlns:callctx="http://serviceplatformen.dk/xml/schemas/CallContext/1/"
+            xmlns:authctx="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="1.0">
+
+    <xsd:import namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/"
+                schemaLocation="sp/CallContext_1.xsd"/>
+
+    <xsd:import namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/"
+                schemaLocation="sp/AuthorityContext_1.xsd"/>
+
+    <xsd:import namespace="urn:oio:sts:organisation:adresse:1.1.3.0"
+                schemaLocation="SF1500_EP_FS1/xsd/1.1.STS-3/AdresseOperationer.xsd"/>
+
+    <!-- Adresse - Importer -->
+    <xsd:element name="ImporterRequest" type="tns:ImporterRequestType"/>
+    <xsd:complexType name="ImporterRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:ImportInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="ImporterResponse" type="tns:ImporterResponseType"/>
+    <xsd:complexType name="ImporterResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:ImportOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Liste -->
+    <xsd:element name="ListRequest" type="tns:ListRequestType"/>
+    <xsd:complexType name="ListRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:ListInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="ListResponse" type="tns:ListResponseType"/>
+    <xsd:complexType name="ListResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:ListOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Laes -->
+    <xsd:element name="LaesRequest" type="tns:LaesRequestType"/>
+    <xsd:complexType name="LaesRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:LaesInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="LaesResponse" type="tns:LaesResponseType"/>
+    <xsd:complexType name="LaesResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:LaesOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Opret -->
+    <xsd:element name="OpretRequest" type="tns:OpretRequestType"/>
+    <xsd:complexType name="OpretRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:OpretInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="OpretResponse" type="tns:OpretResponseType"/>
+    <xsd:complexType name="OpretResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:OpretOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Passiver -->
+    <xsd:element name="PassiverRequest" type="tns:PassiverRequestType"/>
+    <xsd:complexType name="PassiverRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:PassiverInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="PassiverResponse" type="tns:PassiverResponseType"/>
+    <xsd:complexType name="PassiverResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:PassiverOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Ret -->
+    <xsd:element name="RetRequest" type="tns:RetRequestType"/>
+    <xsd:complexType name="RetRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:RetInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="RetResponse" type="tns:RetResponseType"/>
+    <xsd:complexType name="RetResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:RetOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Slet -->
+    <xsd:element name="SletRequest" type="tns:SletRequestType"/>
+    <xsd:complexType name="SletRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:SletInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SletResponse" type="tns:SletResponseType"/>
+    <xsd:complexType name="SletResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:SletOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- Adresse - Soeg -->
+    <xsd:element name="SoegRequest" type="tns:SoegRequestType"/>
+    <xsd:complexType name="SoegRequestType">
+        <xsd:sequence>
+            <xsd:element ref="callctx:CallContext" minOccurs="0" />
+            <xsd:element ref="authctx:AuthorityContext" minOccurs="0" />
+            <xsd:element ref="adresse:SoegInput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="SoegResponse" type="tns:SoegResponseType"/>
+    <xsd:complexType name="SoegResponseType">
+        <xsd:sequence>
+            <xsd:element ref="adresse:SoegOutput"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

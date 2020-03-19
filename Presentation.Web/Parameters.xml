@@ -72,4 +72,28 @@
     </parameterentry>
   </parameter>
 
+  <!-- SSO SAML configuration -->
+  <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos-local.strongminds.dk']/@server"/>
+  </parameter>
+
+  <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+  </parameter>
+
+  <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos-local.strongminds.dk']/@id"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoServiceProviderId']/value/text()"/>
+  </parameter>
+
+  <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoCertificateThumbprint']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsOrganisationEndpointHost" defaultvalue="__STS_ORG_HOST__">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationEndpointHost']/value/text()"/>
+  </parameter>
+
 </parameters>
