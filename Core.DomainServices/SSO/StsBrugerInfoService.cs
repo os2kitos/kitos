@@ -13,6 +13,7 @@ namespace Core.DomainServices.SSO
         private readonly string _urlServicePlatformBrugerService;
         private readonly string _urlServicePlatformAdresseService;
         private readonly string _urlServicePlatformOrganisationService;
+        private readonly string _urlServicePlatformVirksomhedService;
         private readonly string _certificateThumbprint;
         private readonly string _authorizedMunicipalityCvr;
 
@@ -21,7 +22,8 @@ namespace Core.DomainServices.SSO
             _certificateThumbprint = configuration.CertificateThumbprint;
             _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
-            _urlServicePlatformOrganisationService= $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
+            _urlServicePlatformOrganisationService = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
+            _urlServicePlatformVirksomhedService = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
             _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
@@ -116,8 +118,26 @@ namespace Core.DomainServices.SSO
 
         private string GetStsBrugerMunicipalityCvrFromUuid(string virksomhedUuid)
         {
-            // TODO: Select CVR from virksomhed
-            throw new NotImplementedException();
+            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            {
+                var client = StsVirksomhedHelpers.CreateVirksomhedPortTypeClient(CreateHttpBinding(),
+                    _urlServicePlatformVirksomhedService, clientCertificate);
+                var laesRequest = StsVirksomhedHelpers.CreateStsVirksomhedLaesRequest(_authorizedMunicipalityCvr, virksomhedUuid);
+                var virksomhedPortType = client.ChannelFactory.CreateChannel();
+                var laesResponse = virksomhedPortType.laes(laesRequest);
+                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+                foreach (var registreringType1 in registreringType1s)
+                {
+                    if (registreringType1.IsStsVirksomhedObsolete())
+                    {
+                        continue;
+                    }
+
+                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    return latest.CVRNummerTekst;
+                }
+                return string.Empty;
+            }
         }
 
         private static BasicHttpBinding CreateHttpBinding()

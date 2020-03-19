@@ -13,7 +13,7 @@ namespace Tests.Unit.Core.DomainServices.SSO
             var result = sut.GetStsBrugerInfo("77edccca-4b0d-4dc0-9366-07236e49e965");
             Assert.Contains("neno@balk.dk", result.Emails);
             Assert.Equal("58271713", result.MunicipalityCvr);
-            Assert.Equal("", result.BelongsToOrganizationUuid);
+            Assert.Equal("4c5c9482-cab6-4a85-8491-88f98e61d161", result.BelongsToOrganizationUuid);
         }
     }
 }
