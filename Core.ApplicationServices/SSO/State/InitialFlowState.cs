@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.SSO.Model;
+﻿using System;
+using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
 using Core.DomainServices.SSO;
 
@@ -12,7 +13,7 @@ namespace Core.ApplicationServices.SSO.State
 
         public InitialFlowState(IStsBrugerInfoService stsBrugerInfoService, SsoFlowConfiguration configuration)
         {
-            _stsBrugerEmailService = stsBrugerEmailService;
+            _stsBrugerInfoService = stsBrugerInfoService;
             _parser = Saml20IdentityParser.CreateFromContext();
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
@@ -24,7 +25,7 @@ namespace Core.ApplicationServices.SSO.State
                 var userUuid = GetCurrentUserUuid();
                 if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(userUuid);
+                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(userUuid.Value);
                     context.TransitionTo(new LookupStsUserEmailState(stsBrugerInfo.Emails));
                     context.HandleUserHasValidAccessRoleInSamlToken();
                 }
@@ -35,9 +36,9 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private Maybe<string> GetCurrentUserUuid()
+        private Maybe<Guid> GetCurrentUserUuid()
         {
-            return _parser.MatchUuid().Select(uuid => uuid.Value.ToString());
+            return _parser.MatchUuid().Select(x => x.Value);
         }
 
         private bool CurrentUserHasKitosPrivilege()

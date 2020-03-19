@@ -27,7 +27,7 @@ namespace Core.DomainServices.SSO
             _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
-        public StsBrugerInfo GetStsBrugerInfo(string uuid)
+        public StsBrugerInfo GetStsBrugerInfo(Guid uuid)
         {
             var (emailAdresseUuid, organisationUuid) = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
             var emails = GetStsAdresseEmailFromUuid(emailAdresseUuid);
@@ -36,7 +36,7 @@ namespace Core.DomainServices.SSO
             return new StsBrugerInfo(emails, organisationUuid, municipalityCvr);
         }
 
-        private (string emailAdresseUuid, string organisationUuid) GetStsBrugerEmailAdresseAndOrganizationUuids(string uuid)
+        private (string emailAdresseUuid, string organisationUuid) GetStsBrugerEmailAdresseAndOrganizationUuids(Guid uuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {

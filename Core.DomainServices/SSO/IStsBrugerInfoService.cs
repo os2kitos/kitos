@@ -1,7 +1,9 @@
-﻿namespace Core.DomainServices.SSO
+﻿using System;
+
+namespace Core.DomainServices.SSO
 {
     public interface IStsBrugerInfoService
     {
-        StsBrugerInfo GetStsBrugerInfo(string uuid);
+        StsBrugerInfo GetStsBrugerInfo(Guid uuid);
     }
 }

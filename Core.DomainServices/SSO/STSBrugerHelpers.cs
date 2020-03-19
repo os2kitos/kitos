@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Infrastructure.Soap.STSBruger;
@@ -6,9 +7,9 @@ namespace Core.DomainServices.SSO
 {
     internal static class StsBrugerHelpers
     {
-        public static laesRequest CreateStsBrugerLaesRequest(string municipalityCvr, string uuid)
+        public static laesRequest CreateStsBrugerLaesRequest(string municipalityCvr, Guid uuid)
         {
-            var laesInputType = new LaesInputType {UUIDIdentifikator = uuid};
+            var laesInputType = new LaesInputType {UUIDIdentifikator = uuid.ToString()};
             var laesRequest = new laesRequest
             {
                 LaesRequest1 = new LaesRequestType
