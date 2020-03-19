@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
 using Core.DomainServices;
@@ -52,6 +53,42 @@ namespace Tests.Unit.Core.DomainServices.SSO
 
             //Assert
             Assert.False(result.HasValue);
+        }
+
+        [Fact]
+        public void AddNew_Returns_New_Identity()
+        {
+            //Arrange
+            var externalId = A<Guid>();
+            var user = new User();
+            ExpectRepositoryContent(CreateSsoUserIdentity(), CreateSsoUserIdentity());
+            _repository.Setup(x => x.Insert(It.IsAny<SsoUserIdentity>())).Returns((SsoUserIdentity input) => input);
+
+            //Act
+            var identityResult = _sut.AddNew(user, externalId);
+
+            //Assert
+            Assert.True(identityResult.Ok);
+            var identity = identityResult.Value;
+            Assert.NotNull(identityResult);
+            Assert.Same(user, identity.User);
+            Assert.Equal(externalId, identity.ExternalUuid);
+        }
+
+        [Fact]
+        public void AddNew_Returns_Conflict_If_Existing_Record_Exists()
+        {
+            //Arrange
+            var externalId = A<Guid>();
+            var user = new User();
+            ExpectRepositoryContent(CreateSsoUserIdentity(), CreateSsoUserIdentity(externalId));
+
+            //Act
+            var identityResult = _sut.AddNew(user, externalId);
+
+            //Assert
+            Assert.False(identityResult.Ok);
+            Assert.Equal(OperationFailure.Conflict, identityResult.Error.FailureType);
         }
 
         private void ExpectRepositoryContent(params SsoUserIdentity[] response)

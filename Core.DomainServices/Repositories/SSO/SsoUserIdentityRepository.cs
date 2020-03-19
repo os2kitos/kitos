@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
 
@@ -20,6 +21,23 @@ namespace Core.DomainServices.Repositories.SSO
                 .AsQueryable()
                 .Where(identity => identity.ExternalUuid == externalId)
                 .FirstOrDefault();
+        }
+
+        public Result<SsoUserIdentity, OperationError> AddNew(User user, Guid externalId)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var existing = GetByExternalUuid(externalId);
+            if (existing.HasValue)
+            {
+                return new OperationError("Existing mapping already exists for UUID:{externalId}", OperationFailure.Conflict);
+            }
+            var identity = new SsoUserIdentity(externalId, user);
+            identity = _repository.Insert(identity);
+            _repository.Save();
+            return identity;
         }
     }
 }

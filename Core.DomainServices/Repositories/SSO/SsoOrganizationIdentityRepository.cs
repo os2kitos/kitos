@@ -22,5 +22,22 @@ namespace Core.DomainServices.Repositories.SSO
                     .Where(identity => identity.ExternalUuid == externalId)
                     .FirstOrDefault();
         }
+
+        public Result<SsoOrganizationIdentity, OperationError> AddNew(DomainModel.Organization.Organization organization, Guid externalId)
+        {
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
+            var existing = GetByExternalUuid(externalId);
+            if (existing.HasValue)
+            {
+                return new OperationError("Existing mapping already exists for UUID:{externalId}", OperationFailure.Conflict);
+            }
+            var identity = new SsoOrganizationIdentity(externalId, organization);
+            identity = _repository.Insert(identity);
+            _repository.Save();
+            return identity;
+        }
     }
 }

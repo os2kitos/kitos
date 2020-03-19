@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel;
+using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;
@@ -53,6 +56,42 @@ namespace Tests.Unit.Core.DomainServices.SSO
 
             //Assert
             Assert.False(result.HasValue);
+        }
+
+        [Fact]
+        public void AddNew_Returns_New_Identity()
+        {
+            //Arrange
+            var externalId = A<Guid>();
+            var organization = new Organization();
+            ExpectRepositoryContent(CreateSsoOrganizationIdentity(), CreateSsoOrganizationIdentity());
+            _repository.Setup(x => x.Insert(It.IsAny<SsoOrganizationIdentity>())).Returns((SsoOrganizationIdentity input) => input);
+
+            //Act
+            var identityResult = _sut.AddNew(organization, externalId);
+
+            //Assert
+            Assert.True(identityResult.Ok);
+            var identity = identityResult.Value;
+            Assert.NotNull(identityResult);
+            Assert.Same(organization, identity.Organization);
+            Assert.Equal(externalId, identity.ExternalUuid);
+        }
+
+        [Fact]
+        public void AddNew_Returns_Conflict_If_Existing_Record_Exists()
+        {
+            //Arrange
+            var externalId = A<Guid>();
+            var organization = new Organization();
+            ExpectRepositoryContent(CreateSsoOrganizationIdentity(externalId), CreateSsoOrganizationIdentity());
+
+            //Act
+            var identityResult = _sut.AddNew(organization, externalId);
+
+            //Assert
+            Assert.False(identityResult.Ok);
+            Assert.Equal(OperationFailure.Conflict, identityResult.Error.FailureType);
         }
 
         private void ExpectRepositoryContent(params SsoOrganizationIdentity[] response)
