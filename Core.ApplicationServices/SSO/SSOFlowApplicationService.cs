@@ -5,18 +5,18 @@ namespace Core.ApplicationServices.SSO
 {
     public class SsoFlowApplicationService : ISsoFlowApplicationService
     {
-        private readonly IStsBrugerEmailService _emailService;
+        private readonly IStsBrugerInfoService _infoService;
         private readonly SsoFlowConfiguration _configuration;
 
-        public SsoFlowApplicationService(IStsBrugerEmailService emailService, SsoFlowConfiguration configuration)
+        public SsoFlowApplicationService(IStsBrugerInfoService infoService, SsoFlowConfiguration configuration)
         {
-            _emailService = emailService;
+            _infoService = infoService;
             _configuration = configuration;
         }
 
         public AbstractState StartSsoLoginFlow()
         {
-            AbstractState initialState = new InitialFlowState(_emailService, _configuration);
+            AbstractState initialState = new InitialFlowState(_infoService, _configuration);
             var flowContext = new FlowContext(initialState);
             flowContext.HandleLoginCompleted();
             return flowContext.CurrentState;

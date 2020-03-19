@@ -15,6 +15,17 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
     <XsdCodeGenEnabled>True</XsdCodeGenEnabled>
+    <XsdCodeGenSerializerMode>XmlSerializer</XsdCodeGenSerializerMode>
+    <XsdCodeGenReuseTypesFlag>True</XsdCodeGenReuseTypesFlag>
+    <XsdCodeGenReuseTypesMode>All</XsdCodeGenReuseTypesMode>
+    <XsdCodeGenReferences />
+    <XsdCodeGenNamespaceMappings>%2a, Infrastructure.Soap.ContractTypes</XsdCodeGenNamespaceMappings>
+    <XsdCodeGenCollectionTypes>System.Array%3bSystem.Collections.Generic.Dictionary`2</XsdCodeGenCollectionTypes>
+    <XsdCodeGenExcludedTypes />
+    <XsdCodeGenImportXmlTypes>True</XsdCodeGenImportXmlTypes>
+    <XsdCodeGenGenerateSerializableTypes>True</XsdCodeGenGenerateSerializableTypes>
+    <XsdCodeGenGenerateInternalTypes>False</XsdCodeGenGenerateInternalTypes>
+    <XsdCodeGenEnableDataBinding>False</XsdCodeGenEnableDataBinding>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,6 +61,16 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Connected Services\STSBruger\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Connected Services\STSOrganisation\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Connected Services\STSVirksomhed\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -313,6 +334,264 @@
     <None Include="Connected Services\STSBruger\ServiceplatformFault_1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Connected Services\STSOrganisation\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.importerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.ImporterResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.laesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.LaesResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.listResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.ListResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.opretResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.OpretResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.passiverResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.PassiverResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.RequestHeaderType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.retResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.RetResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.sletResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.SletResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.soegResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Infrastructure.Soap.STSOrganisation.SoegResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\OrganisationService.wsdl" />
+    <None Include="Connected Services\STSOrganisation\OrganisationServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\policies.wsdl" />
+    <None Include="Connected Services\STSOrganisation\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSOrganisation\ServiceplatformFaultMessage.wsdl" />
+    <None Include="Connected Services\STSOrganisation\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.importerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.ImporterResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.laesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.LaesResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.listResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.ListResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.opretResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.OpretResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.passiverResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.PassiverResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.RequestHeaderType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.retResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.RetResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.sletResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.SletResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.soegResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.SoegResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\policies.wsdl" />
+    <None Include="Connected Services\STSVirksomhed\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\ServiceplatformFaultMessage.wsdl" />
+    <None Include="Connected Services\STSVirksomhed\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\VirksomhedService.wsdl" />
+    <None Include="Connected Services\STSVirksomhed\VirksomhedServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\OrganisationServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\1.1.STS-3\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\common\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\SF1500_EP_FS8\xsd\common\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\sp\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\sp\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\sp\InvocationContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\sp\service.properties" />
+    <None Include="Organisation\sp\ServiceplatformFaultMessage_1.wsdl" />
+    <None Include="Organisation\sp\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\context\OrganisationService.wsdl" />
+    <None Include="Organisation\wsdl\context\policies.wsdl" />
+    <None Include="Organisation\wsdl\token\OrganisationService.wsdl" />
+    <None Include="Organisation\wsdl\token\policies.wsdl" />
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\common\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\SF1500_EP_FS11\xsd\common\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\sp\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\sp\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\sp\InvocationContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\sp\service.properties" />
+    <None Include="Virksomhed\sp\ServiceplatformFaultMessage_1.wsdl" />
+    <None Include="Virksomhed\sp\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\VirksomhedServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\context\policies.wsdl" />
+    <None Include="Virksomhed\wsdl\context\VirksomhedService.wsdl" />
+    <None Include="Virksomhed\wsdl\token\policies.wsdl" />
+    <None Include="Virksomhed\wsdl\token\VirksomhedService.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -320,6 +599,8 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Connected Services\STSAdresse\" />
     <WCFMetadataStorage Include="Connected Services\STSBruger\" />
+    <WCFMetadataStorage Include="Connected Services\STSOrganisation\" />
+    <WCFMetadataStorage Include="Connected Services\STSVirksomhed\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\STSAdresse\configuration91.svcinfo" />
@@ -345,6 +626,30 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSOrganisation\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSOrganisation\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSOrganisation\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == '' and '$(VisualStudioVersion)' != '' and '$(VisualStudioVersion)' != '11.0'">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -356,7 +661,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{3D9AD99F-2412-4246-B90B-4EAA41C64699}">
         <WcfProjectProperties>
-          <AutoStart>True</AutoStart>
+          <AutoStart>False</AutoStart>
         </WcfProjectProperties>
       </FlavorProperties>
     </VisualStudio>

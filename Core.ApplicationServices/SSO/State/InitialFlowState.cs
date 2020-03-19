@@ -11,12 +11,12 @@ namespace Core.ApplicationServices.SSO.State
 {
     public class InitialFlowState : AbstractState
     {
-        private readonly IStsBrugerEmailService _stsBrugerEmailService;
+        private readonly IStsBrugerInfoService _stsBrugerInfoService;
         private readonly string _samlKitosReadAccessRoleIdentifier;
 
-        public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService, SsoFlowConfiguration configuration)
+        public InitialFlowState(IStsBrugerInfoService stsBrugerInfoService, SsoFlowConfiguration configuration)
         {
-            _stsBrugerEmailService = stsBrugerEmailService;
+            _stsBrugerInfoService = stsBrugerInfoService;
             _samlKitosReadAccessRoleIdentifier = $"{configuration.SamlEntityId}/roles/usersystemrole/readaccess/1";
         }
 
@@ -27,8 +27,8 @@ namespace Core.ApplicationServices.SSO.State
                 if (CurrentUserHasKitosPrivilege())
                 {
                     var userUuid = GetCurrentUserUuid();
-                    var stsBrugerEmails = _stsBrugerEmailService.GetStsBrugerEmails(userUuid);
-                    context.TransitionTo(new LookupStsUserEmailState(stsBrugerEmails));
+                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(userUuid);
+                    context.TransitionTo(new LookupStsUserEmailState(stsBrugerInfo.Emails));
                     context.HandleUserHasValidAccessRoleInSamlToken();
                 }
             }

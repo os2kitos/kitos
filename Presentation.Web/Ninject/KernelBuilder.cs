@@ -182,7 +182,7 @@ namespace Presentation.Web.Ninject
                 .InSingletonScope();
 
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
-            kernel.Bind<IStsBrugerEmailService>().To<StsBrugerEmailService>().InCommandScope(Mode);
+            kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)

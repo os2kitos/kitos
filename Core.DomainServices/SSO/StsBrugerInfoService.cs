@@ -3,37 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Core.DomainModel.Result;
-using Infrastructure.Soap.STSAdresse;
-using RegistreringType1 = Infrastructure.Soap.STSBruger.RegistreringType1;
 
 namespace Core.DomainServices.SSO
 {
-    public class StsBrugerEmailService : IStsBrugerEmailService
+    public class StsBrugerInfoService : IStsBrugerInfoService
     {
+        private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
+
         private readonly string _urlServicePlatformBrugerService;
         private readonly string _urlServicePlatformAdresseService;
+        private readonly string _urlServicePlatformOrganisationService;
         private readonly string _certificateThumbprint;
-        private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
         private readonly string _authorizedMunicipalityCvr;
 
-        public StsBrugerEmailService(StsOrganisationIntegrationConfiguration configuration)
+        public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration)
         {
             _certificateThumbprint = configuration.CertificateThumbprint;
             _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
+            _urlServicePlatformOrganisationService= $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
             _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
-        public IEnumerable<string> GetStsBrugerEmails(string uuid)
+        public StsBrugerInfo GetStsBrugerInfo(string uuid)
         {
-            return
-                GetStsBrugerEmailAdresseUuid(uuid)
-                    .Select(GetStsAdresseEmailFromUuid)
-                    .GetValueOrFallback(Enumerable.Empty<string>());
+            var (emailAdresseUuid, organisationUuid) = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
+            var emails = GetStsAdresseEmailFromUuid(emailAdresseUuid);
+            var virksomhedUuid = GetStsVirksomhedFromUuid(organisationUuid);
+            var municipalityCvr = GetStsBrugerMunicipalityCvrFromUuid(virksomhedUuid);
+            return new StsBrugerInfo(emails, organisationUuid, municipalityCvr);
         }
 
-        private Maybe<string> GetStsBrugerEmailAdresseUuid(string uuid)
+        private (string emailAdresseUuid, string organisationUuid) GetStsBrugerEmailAdresseAndOrganizationUuids(string uuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -42,31 +43,27 @@ namespace Core.DomainServices.SSO
                 var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(_authorizedMunicipalityCvr, uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
                 var laesResponse = brugerPortType.laes(laesRequest);
-
                 foreach (var registreringType1 in laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering)
                 {
-                    if (IsObsolete(registreringType1))
+                    if (registreringType1.IsStsBrugerObsolete())
                     {
                         continue;
                     }
 
+                    var organizationUuid = registreringType1.RelationListe.Tilhoerer.ReferenceID.Item;
+                    var emailUuid = string.Empty;
                     foreach (var adresse in registreringType1.RelationListe.Adresser)
                     {
                         if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
                         {
-                            return adresse.ReferenceID.Item;
+                            emailUuid = adresse.ReferenceID.Item;
                         }
                     }
+
+                    return (emailUuid, organizationUuid);
                 }
-
-                return Maybe<string>.None;
+                return (string.Empty, string.Empty);
             }
-        }
-
-        private static bool IsObsolete(RegistreringType1 registreringType1)
-        {
-            return registreringType1.LivscyklusKode == Infrastructure.Soap.STSBruger.LivscyklusKodeType.Slettet ||
-                   registreringType1.LivscyklusKode == Infrastructure.Soap.STSBruger.LivscyklusKodeType.Passiveret;
         }
 
         private IEnumerable<string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
@@ -80,10 +77,9 @@ namespace Core.DomainServices.SSO
                 var laesResponse = adressePortType.laes(laesRequest);
                 var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
                 var result = new List<string>();
-
                 foreach (var registreringType1 in registreringType1s)
                 {
-                    if (IsObsolete(registreringType1))
+                    if (registreringType1.IsStsAdresseObsolete())
                     {
                         continue;
                     }
@@ -91,15 +87,37 @@ namespace Core.DomainServices.SSO
                     var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
                     result.Add(latest.AdresseTekst);
                 }
-
                 return result;
             }
         }
 
-        private static bool IsObsolete(Infrastructure.Soap.STSAdresse.RegistreringType1 registreringType1)
+        private string GetStsVirksomhedFromUuid(string organisationUuid)
         {
-            return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
-                   registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
+            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            {
+                var client = StsOrganisationHelpers.CreateOrganisationPortTypeClient(CreateHttpBinding(),
+                    _urlServicePlatformOrganisationService, clientCertificate);
+                var laesRequest = StsOrganisationHelpers.CreateStsOrganisationLaesRequest(_authorizedMunicipalityCvr, organisationUuid);
+                var organisationPortType = client.ChannelFactory.CreateChannel();
+                var laesResponse = organisationPortType.laes(laesRequest);
+                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+                foreach (var registreringType1 in registreringType1s)
+                {
+                    if (registreringType1.IsStsOrganisationObsolete())
+                    {
+                        continue;
+                    }
+
+                    return registreringType1.RelationListe.Virksomhed.ReferenceID.Item;
+                }
+                return string.Empty;
+            }
+        }
+
+        private string GetStsBrugerMunicipalityCvrFromUuid(string virksomhedUuid)
+        {
+            // TODO: Select CVR from virksomhed
+            throw new NotImplementedException();
         }
 
         private static BasicHttpBinding CreateHttpBinding()
