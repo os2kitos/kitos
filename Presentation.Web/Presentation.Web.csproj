@@ -70,6 +70,9 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="dk.nita.saml20, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.2.0.1\lib\net45\dk.nita.saml20.dll</HintPath>
+    </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
@@ -323,13 +326,19 @@
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
+    <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
+    <Content Include="Logout.ashx" />
+    <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
+    <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
@@ -363,6 +372,7 @@
     <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SSO\SsoErrorCodes.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
@@ -385,7 +395,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-sensitive-data-level.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
@@ -408,7 +418,9 @@
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\exposed-interface-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
+    <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -422,7 +434,6 @@
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
-    <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -689,6 +700,7 @@
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
+    <TypeScriptCompile Include="app\utility\view-data-state.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -1264,6 +1276,7 @@
     <Content Include="Content\notify\notify.less" />
     <Content Include="Content\kendo.default.min.css" />
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
+    <Content Include="Metadata.ashx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

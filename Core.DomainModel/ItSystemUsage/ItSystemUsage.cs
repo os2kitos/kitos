@@ -37,14 +37,6 @@ namespace Core.DomainModel.ItSystemUsage
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
-            isBusinessCritical = DataOptions.UNDECIDED;
-            dataProcessorControl = DataOptions.UNDECIDED;
-            precautions = DataOptions.UNDECIDED;
-            UserSupervision = DataOptions.UNDECIDED;
-            riskAssessment = DataOptions.UNDECIDED;
-            preriskAssessment = RiskLevel.UNDECIDED;
-            DPIA = DataOptions.UNDECIDED;
-            answeringDataDPIA = DataOptions.UNDECIDED;
         }
 
         public bool IsActive
@@ -363,84 +355,64 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
 
-        #region GDPR
 
-        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
-
-        public string GeneralPurpose { get; set; }
-
-        public DataOptions? isBusinessCritical { get; set; }
-
-        public DataOptions? dataProcessorControl { get; set; }
-
-        public DataOptions? precautions { get; set; }
-
-        public DataOptions? UserSupervision { get; set; }
-
-        public DataOptions? riskAssessment { get; set; }
-
-        public RiskLevel? preriskAssessment { get; set; }
-
-        public DataOptions? DPIA { get; set; }
-
-        public DataOptions? answeringDataDPIA { get; set; }
-
-        public HostedAt? hostedAt { get; set; }
-
-        #endregion
 
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }
 
+
+        #region GDPR
+        public string GeneralPurpose { get; set; }
+        public DataOptions? isBusinessCritical { get; set; }
+
         public string dataProcessor { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
-
+        public DataOptions? dataProcessorControl { get; set; }
         public DateTime? lastControl { get; set; }
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
 
         public string noteUsage { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
 
 
+        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        public DateTime? riskAssesmentDate { get; set; }
-
-
-        public string noteRisks { get; set; }
-
-
-        public DateTime? DPIADateFor { get; set; }
-
-
-        public DateTime? DPIAdeleteDate { get; set; }
-
-        public int numberDPIA { get; set; }
-
+        public DataOptions? precautions { get; set; }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
         public bool precautionsOptionsLogning { get; set; }
-
-        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
-
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
         public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? UserSupervision { get; set; }
+        public DateTime? UserSupervisionDate { get; set; }
         public string UserSupervisionDocumentationUrlName { get; set; }
         public string UserSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? riskAssessment { get; set; }
+        public DateTime? riskAssesmentDate { get; set; }
+        public RiskLevel? preriskAssessment { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
+        public string noteRisks { get; set; }
 
+        public DataOptions? DPIA { get; set; }
+        public DateTime? DPIADateFor { get; set; }
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
-        public DateTime? UserSupervisionDate { get; set; }
+        public DataOptions? answeringDataDPIA { get; set; }
+        public DateTime? DPIAdeleteDate { get; set; }
+        public int numberDPIA { get; set; }
 
-        public string LinkToDirectoryUrl { get; set; }
-        public string LinkToDirectoryUrlName { get; set; }
+        public HostedAt? hostedAt { get; set; }
+        #endregion
+
 
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 

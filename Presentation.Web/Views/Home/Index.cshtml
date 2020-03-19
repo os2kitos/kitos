@@ -10,4 +10,15 @@
         <div id="subnav-buttons" data-ng-if="page.subnav.buttons" data-ng-include="'app/shared/navigation/navigation-buttons.view.html'"></div>
         <div id="page-body" data-ui-view="" data-autoscroll="false" data-ng-cloak></div>
     </div>
+    
+    @if (ViewBag.SsoErrorCode != null)
+    {
+        <input type="hidden" data-state-type="sso-error" data-state-value="@ViewBag.SsoErrorCode" />
+    }
+    
+    @if (ViewBag.FeatureToggle != null)
+    {
+        <input type="hidden" data-state-type="feature-toggle" data-state-value="@ViewBag.FeatureToggle" />
+    }
+
 </div>

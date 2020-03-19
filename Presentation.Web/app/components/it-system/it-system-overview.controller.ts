@@ -93,6 +93,11 @@
             return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
         }
 
+        private fixDataTypeFilter(filterUrl, column) {
+            var pattern = new RegExp(`${column} eq ('\\w+')`, "i");
+            return filterUrl.replace(pattern, "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq Core.DomainModel.ItSystemUsage.GDPR.SensitiveDataLevel$1)");
+        }
+
         // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
@@ -153,7 +158,7 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-
+        
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
@@ -215,6 +220,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
                                 parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+                                parameterMap.$filter = this.fixDataTypeFilter(parameterMap.$filter, "SensitiveDataLevels/SensitivityDataLevel");
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
@@ -567,32 +573,36 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "DataLevel", title: "Datatype", width: 150,
+                        field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            var contains = [];
-                            _.each(dataItem.SensitiveDataLevels,
-                                dataLevel => {
-                                    switch (dataLevel.SensitivityDataLevel) {
-                                        case "NONE":
-                                            contains.push("Ingen persondata");
-                                            return;
-                                        case "PERSONALDATA":
-                                            contains.push("Almindelige persondata");
-                                            return;
-                                        case "PERSONALDATANDSENSITIVEDATA":
-                                            contains.push("Følsomme persondata");
-                                            return;
-                                        case "PERSONALLEGALDATA":
-                                            contains.push("Straffedomme og lovovertrædelser");
-                                            return;
-                                    }
-                                });
-                            return contains.toString();
+                            return _.map(dataItem.SensitiveDataLevels,
+                                dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
+                                    .SensitivityDataLevel))
+                                .toString();
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false,
+                                operator: "eq"
+                            }
+                        },
+                        sortable: false
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,

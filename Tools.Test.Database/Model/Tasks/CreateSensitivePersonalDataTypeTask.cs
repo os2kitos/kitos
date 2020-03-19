@@ -4,7 +4,7 @@ using Infrastructure.DataAccess;
 
 namespace Tools.Test.Database.Model.Tasks
 {
-    class CreateSensitivePersonalDataTypeTask : DatabaseTask
+    public class CreateSensitivePersonalDataTypeTask : DatabaseTask
     {
         private readonly string _name;
 

@@ -1,11 +1,10 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
     import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
 
-    export enum SensitiveDataLevel {
-        NONE = 0,
-        PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2,
-        PERSONALLEGALDATA = 3
+    export interface ISensitiveDataLevelModel {
+        value: number;
+        textValue: string;
+        text: string;
     }
 
     export enum DataOption {
@@ -28,17 +27,7 @@
         EXTERNAL = 2,
     }
 
-    export class SensitiveDataLevelOptions {
-        options: Select2OptionViewModel[];
-        constructor() {
-            this.options = [
-                <Select2OptionViewModel>{ id: 0, text: "Ingen persondata" },
-                <Select2OptionViewModel>{ id: 1, text: "Almindelige persondata" },
-                <Select2OptionViewModel>{ id: 2, text: "Følsomme persondata" },
-                <Select2OptionViewModel>{ id: 3, text: "Straffedomme og lovovertrædelser" }
-            ];
-        }
-    }
+    
 
     export class DataOptions {
         options: Select2OptionViewModel[];
@@ -65,6 +54,28 @@
 
     }
 
+
+    export class SensitiveDataLevelViewModel {
+        static readonly levels = {
+            none: <ISensitiveDataLevelModel>{ value: 0, textValue: "NONE", text: "Ingen persondata" },
+            personal: <ISensitiveDataLevelModel>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige persondata" },
+            sensitive: <ISensitiveDataLevelModel>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme persondata" },
+            legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+        };
+
+        static getTextValueToTextMap() {
+            return _.reduce(this.levels,
+                (acc: any, current) => {
+                    acc[current.textValue] = current.text;
+
+                    return acc;
+                },
+                <any>{});
+        }
+
+    }
+
+
     export class HostedAtOptions {
         options: Select2OptionViewModel[];
         constructor() {
@@ -84,11 +95,10 @@
         expirationDate;
         isActive: boolean;
         active: boolean;
-        sensitiveDataLevels: SensitiveDataLevel[];
-        personalLegalDataSelected: boolean;
-        personalSensitiveDataSelected: boolean;
-        personalRegularDataSelected: boolean;
-        personalNoDataSelected: boolean;
+        legalDataSelected: boolean;
+        sensitiveDataSelected: boolean;
+        personalDataSelected: boolean;
+        noDataSelected: boolean;
         isBusinessCritical: DataOption;
         dataProcessorControl: DataOption;
         precautions: DataOption;
@@ -101,11 +111,10 @@
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
-        personalLegalDataSelected: boolean;
-        personalSensitiveDataSelected: boolean;
-        personalRegularDataSelected: boolean;
-        personalNoDataSelected: boolean;
-        sensitiveDataLevels: SensitiveDataLevel[];
+        legalDataSelected: boolean;
+        sensitiveDataSelected: boolean;
+        personalDataSelected: boolean;
+        noDataSelected: boolean;
         id: number;
         organizationId: number;
         itSystem: ViewModel.ItSystem.ISystemViewModel;
@@ -131,11 +140,12 @@
             this.expirationDate = itSystemUsage.expirationDate;
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
-            this.sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
-            this.personalNoDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.NONE);
-            this.personalRegularDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATA);
-            this.personalSensitiveDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA);
-            this.personalLegalDataSelected = _.some(this.sensitiveDataLevels, x => x === SensitiveDataLevel.PERSONALLEGALDATA);
+
+            const sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
+            this.noDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.none.value);
+            this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
+            this.sensitiveDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.sensitive.value);
+            this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
             this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);
@@ -164,23 +174,14 @@
             }
         }
 
-        mapDataLevels(dataLevel: any): SensitiveDataLevel {
-            switch (dataLevel.dataSensitivityLevel) {
-                case 0:
-                    return SensitiveDataLevel.NONE;
-                case 1:
-                    return SensitiveDataLevel.PERSONALDATA;
-                case 2:
-                    return SensitiveDataLevel.PERSONALDATANDSENSITIVEDATA;
-                case 3:
-                    return SensitiveDataLevel.PERSONALLEGALDATA;
-                default:
-                    throw new RangeError(`${dataLevel.dataSensitivityLevel} is not a valid SensitiveDataLevel`);
-            }
+        mapDataLevels(dataLevel: any): number {
+            return dataLevel.dataSensitivityLevel;
         }
 
         mapDataOption(dataOption: number): DataOption {
             switch (dataOption) {
+                case null:
+                    return DataOption.UNDECIDED;
                 case 0:
                     return DataOption.NO;
                 case 1:
@@ -196,6 +197,8 @@
 
         mapRiskLevelOption(dataOption: number): RiskLevel {
             switch (dataOption) {
+                case null:
+                    return RiskLevel.UNDECIDED;
                 case 0:
                     return RiskLevel.LOW;
                 case 1:

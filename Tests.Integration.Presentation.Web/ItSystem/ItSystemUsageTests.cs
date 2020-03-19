@@ -126,23 +126,5 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
         }
-
-        [Fact]
-        public async Task Can_Add_SensitiveDataLevel()
-        {
-            //Arrange
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-            var sensitivityLevel = (int)SensitiveDataLevel.NONE;
-
-            //Act
-            var sensitivityLevelDTO =
-                await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitivityLevel);
-
-            //Assert
-            Assert.Equal(sensitivityLevel, sensitivityLevelDTO.DataSensitivityLevel);
-        }
     }
 }

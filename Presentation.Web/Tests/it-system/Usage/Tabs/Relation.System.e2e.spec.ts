@@ -27,8 +27,6 @@ describe("User is able to create and view relation",
         var frequencyTypeEdited = "Kvartal";
         var descriptionEdited = "some description edited";
         var referenceEdited = "some reference edited";
-        var interfaceNameEdited = createInterfaceName();
-        var contractNameEdited = createContractName();
 
         var expectedRelationCount = "1";
 
@@ -87,14 +85,14 @@ describe("User is able to create and view relation",
                     .then(() => checkContractForFrequencyType(relationSystemName1, frequencyType))
                     .then(() => RelationHelper.editRelation(relationSystemName1,
                         relationSystemName2,
-                        interfaceNameEdited,
+                        interfaceName,
                         frequencyTypeEdited,
-                        contractNameEdited,
+                        contractName,
                         referenceEdited,
                         descriptionEdited))
                     .then(() => checkForRelationPart(relationSystemName2))
-                    .then(() => checkForRelationPart(interfaceNameEdited))
-                    .then(() => checkForRelationPart(contractNameEdited))
+                    .then(() => checkForRelationPart(interfaceName))
+                    .then(() => checkForRelationPart(contractName))
                     .then(() => checkForDescription(relationSystemName2, descriptionEdited))
                     .then(() => checkForReference(relationSystemName2, referenceEdited))
                     .then(() => checkForFrequencyType(relationSystemName2, frequencyTypeEdited))
