@@ -79,15 +79,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Can_Change_PreRiskAssessment()
         {
             //Arrange
-            var dataOption = A<RiskLevel>();
-            var body = new { PreRiskAssessment = dataOption };
+            var riskLevel = A<RiskLevel>();
+            var body = new { PreRiskAssessment = riskLevel };
 
             //Act
             var itSystemUsageDTO = await Create_System_Usage_And_Change_Value_By_Body(body);
 
             //Assert
             Assert.NotNull(itSystemUsageDTO.PreRiskAssessment);
-            Assert.Equal(dataOption, itSystemUsageDTO.PreRiskAssessment.Value);
+            Assert.Equal(riskLevel, itSystemUsageDTO.PreRiskAssessment.Value);
         }
 
         [Fact]
