@@ -9,11 +9,13 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -41,6 +43,7 @@ using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.SSO;
 using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
@@ -55,7 +58,6 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
-using Ninject.Syntax;
 using Ninject.Web.Common;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Factories.Authentication;
@@ -166,6 +168,21 @@ namespace Presentation.Web.Ninject
             RegisterKLE(kernel);
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
+            RegisterSSO(kernel);
+        }
+
+        private void RegisterSSO(IKernel kernel)
+        {
+            kernel.Bind<SsoFlowConfiguration>().ToMethod(_=>new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
+            kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
+                new StsOrganisationIntegrationConfiguration(
+                    Settings.Default.SsoCertificateThumbprint,
+                    Settings.Default.StsOrganisationEndpointHost,
+                    Settings.Default.StsOrganisationAuthorizedMunicipalityCvr))
+                .InSingletonScope();
+
+            kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IStsBrugerEmailService>().To<StsBrugerEmailService>().InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)

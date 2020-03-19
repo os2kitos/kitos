@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="718f7d80-a98f-4b4c-8d47-24d7078c1992" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\Projects\kitos\Infrastructure.Soap\Bruger\wsdl\context\BrugerService.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="e2632eb5-f40b-4283-90d8-cd7bf8a3b6cd" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/wsdl/context/policies.wsdl" />
+    <MetadataFile FileName="BrugerService.wsdl" MetadataType="Wsdl" ID="e7b2382d-97c5-44d3-8558-91d2d77501e0" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/wsdl/context/BrugerService.wsdl" />
+    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="091fa758-b765-42e0-8abf-dc2c4a64694e" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/sp/AuthorityContext_1.xsd" />
+    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="76f7232a-a2c3-4c08-afa7-2910555af59a" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/sp/ServiceplatformFaultMessage_1.wsdl" />
+    <MetadataFile FileName="BrugerServiceMsg.xsd" MetadataType="Schema" ID="2a3585df-8dd1-4d90-9ae4-411968e7df9f" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/BrugerServiceMsg.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="15bb1f2d-ff6d-4263-8076-1733eb6fca56" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="be5c3ea3-93ec-4abe-8d5a-2b8d51c9ccf0" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/1.1.STS-3/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="7d29dc14-710d-4230-b268-b161522eb104" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/1.1.STS-3/Part.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="5b633089-0891-4a18-bc32-d2a321f0cca1" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="Bruger.xsd" MetadataType="Schema" ID="227e4fa8-0bab-4d3e-8be8-0e611dd62dfb" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/1.1.STS-3/Bruger.xsd" />
+    <MetadataFile FileName="BrugerOperationer.xsd" MetadataType="Schema" ID="cde1477b-49e9-482b-9105-13e1eb4eb755" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/SF1500_EP_FS2/xsd/1.1.STS-3/BrugerOperationer.xsd" />
+    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="5e238d7a-6e0a-4a39-bcab-45c0243b1b5d" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/sp/CallContext_1.xsd" />
+    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="d34ea718-52af-4d23-a313-02f3c31ac0ab" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Bruger/sp/ServiceplatformFault_1.xsd" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.TaskRefs;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.KLE;
 
-namespace Core.ApplicationServices.TaskRefs
+namespace Core.ApplicationServices.KLE
 {
     public class KLEApplicationService : IKLEApplicationService
     {
