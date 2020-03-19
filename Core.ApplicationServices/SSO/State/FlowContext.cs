@@ -19,29 +19,50 @@
             CurrentState.Handle(FlowEvent.LoginCompleted, this);
         }
 
-        public void HandleUserHasValidAccessRoleInSamlToken()
+        public void HandleUserPrivilegeVerified()
         {
-            CurrentState.Handle(FlowEvent.UserHasValidAccessRole, this);
+            CurrentState.Handle(FlowEvent.UserPrivilegeVerified, this);
         }
 
-        public void HandleUserWithEmailExists()
+        public void HandleUserPrivilegeInvalid()
         {
-            CurrentState.Handle(FlowEvent.UserExists, this);
+            CurrentState.Handle(FlowEvent.UserPrivilegeInvalid, this);
         }
 
-        public void HandleUserAlreadyAssociated()
+        public void HandleUserSeenBefore()
         {
-            CurrentState.Handle(FlowEvent.UserAlreadyAssociated, this);
+            CurrentState.Handle(FlowEvent.UserSeenBefore, this);
         }
 
-        public void HandleUserInKnownOrganization()
+        public void HandleUserFirstTimeVisit()
         {
-            CurrentState.Handle(FlowEvent.UserInKnownOrganization, this);
+            CurrentState.Handle(FlowEvent.UserFirstTimeVisit, this);
         }
 
-        public void HandleUserHasRole()
+        public void HandleOrganizationFound()
         {
-            CurrentState.Handle(FlowEvent.UserHasRole, this);
+            CurrentState.Handle(FlowEvent.OrganizationFound, this);
         }
+
+        public void HandleOrganizationNotFound()
+        {
+            CurrentState.Handle(FlowEvent.OrganizationNotFound, this);
+        }
+
+        public void HandleUserHasRoleInOrganization()
+        {
+            CurrentState.Handle(FlowEvent.UserHasRoleInOrganization, this);
+        }
+
+        public void HandleUserHasNoRoleInOrganization()
+        {
+            CurrentState.Handle(FlowEvent.UserHasNoRoleInOrganization, this);
+        }
+
+        public void HandleRoleAssigned()
+        {
+            CurrentState.Handle(FlowEvent.RoleAssigned, this);
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
+using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 
 namespace Core.ApplicationServices.SSO.State
@@ -8,12 +9,14 @@ namespace Core.ApplicationServices.SSO.State
     public class InitialFlowState : AbstractState
     {
         private readonly IStsBrugerInfoService _stsBrugerInfoService;
+        private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
         private readonly string _samlKitosReadAccessRoleIdentifier;
         private readonly Saml20IdentityParser _parser;
 
-        public InitialFlowState(IStsBrugerInfoService stsBrugerInfoService, SsoFlowConfiguration configuration)
+        public InitialFlowState(IStsBrugerInfoService stsBrugerInfoService, SsoFlowConfiguration configuration, ISsoUserIdentityRepository ssoUserIdentityRepository)
         {
             _stsBrugerInfoService = stsBrugerInfoService;
+            _ssoUserIdentityRepository = ssoUserIdentityRepository;
             _parser = Saml20IdentityParser.CreateFromContext();
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
@@ -25,12 +28,12 @@ namespace Core.ApplicationServices.SSO.State
                 var userUuid = GetCurrentUserUuid();
                 if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    context.TransitionTo(new LookupStsUserEmailState(userUuid.Value,_stsBrugerInfoService));
-                    context.HandleUserHasValidAccessRoleInSamlToken();
+                    context.TransitionTo(new PrivilegeVerifiedState(userUuid.Value, _stsBrugerInfoService, _ssoUserIdentityRepository));
+                    context.HandleUserPrivilegeVerified();
                 }
                 else
                 {
-                    context.TransitionTo(new UserWithNoPrivilegesState());
+                    context.TransitionTo(new ErrorState());
                 }
             }
         }

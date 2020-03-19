@@ -32,9 +32,9 @@ namespace Presentation.Web.Controllers.SSO
 
                 switch (finalState)
                 {
-                    case UserWithNoPrivilegesState _:
+                    case ErrorState _:
                         return SsoError(SsoErrorCode.MissingPrivilege);
-                    case UserSignedInState _:
+                    case UserLoggedInState _:
                         result = $"User '{currentIdentityName}' has Kitos read access";
                         break;
                 }

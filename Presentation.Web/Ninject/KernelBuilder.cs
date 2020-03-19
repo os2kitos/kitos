@@ -185,6 +185,7 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
             kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
+            kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)

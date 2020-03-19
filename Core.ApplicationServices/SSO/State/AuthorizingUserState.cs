@@ -2,11 +2,14 @@
 
 namespace Core.ApplicationServices.SSO.State
 {
-    public class UserSignedInState : AbstractState
+    public class AuthorizingUserState : AbstractState
     {
         public override void Handle(FlowEvent @event, FlowContext context)
         {
-            throw new NotImplementedException();
+            if (@event.Equals(FlowEvent.OrganizationFound))
+            {
+                // TODO
+            }
         }
     }
 }
