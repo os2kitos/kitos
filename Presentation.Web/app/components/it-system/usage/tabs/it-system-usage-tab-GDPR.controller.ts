@@ -18,10 +18,6 @@
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)
                             .then(result => result.data.value)
-                ],
-                dataResponsible: ["$http", "user", ($http, user) =>
-                    $http.get(`api/dataResponsible/${user.currentOrganizationId}`)
-                        .then(result => result.data.response)
                 ]
             }
         });
@@ -29,48 +25,29 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", 
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user) => {
                 //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
                 //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
                 var itSystemUsage = $scope.usage;
                 $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
+                $scope.noSearchNoClearSelect2 = { minimumResultsForSearch: -1, allowClear: false };
 
                 $scope.registerTypes = registerTypes;
-                $scope.usageId = $stateParams.id;
                 $scope.systemUsage = systemUsage;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
                 $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
                 $scope.filterDataProcessor = $scope.contracts.length > 0;
 
-                //inherit from parent if general purpose is empty
-                $scope.generalPurpose = itSystemUsage.generalPurpose;
-                if (!$scope.generalPurpose) {
-                    $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
-                }
-                //inherit from parent
-                $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
-                if (!$scope.systemUsage.LinkToDirectoryUrl) {
-                    $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
-                }
-                //inherit from parent
-                $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
-                if (!$scope.systemUsage.LinkToDirectoryUrlName) {
-                    $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
-                }
-                //inherit from parent
-                if (!$scope.systemUsage.dataProcessor) {
-                    $scope.systemUsage.dataProcessor = dataResponsible.name;
-                }
-                $scope.updateUrl = `/api/itsystemusage/${$scope.usage.id}`;
+
                 $scope.dataWorkerSelectOptions = selectLazyLoading("api/organization", false, ["public=true", `orgId=${user.currentOrganizationId}`]);
 
                 $scope.systemUsage.LinkToDirectoryUrl = encodeURI($scope.systemUsage.LinkToDirectoryUrl);
 
-                $scope.updateDataLevel = (OptionId, Checked, optionType, entitytype) => {
+                $scope.updateDataLevel = (OptionId, Checked, optionType) => {
 
                     var msg = notify.addInfoMessage("Arbejder ...", false);
 
@@ -110,23 +87,22 @@
                 $scope.patch = (field, value) => {
                     var payload = {};
                     payload[field] = value;
-                    itSystemUsageService.patchSystem($scope.usageId, payload);
+                    itSystemUsageService.patchSystem(itSystemUsage.id, payload);
                 }
 
                 $scope.patchDate = (field, value) => {
                     var date = moment(value, "DD-MM-YYYY");
+                    var payload = {};
                     if (value === "" || value == undefined) {
-                        var payload = {};
                         payload[field] = null;
-                        itSystemUsageService.patchSystem($scope.usageId, payload);
+                        itSystemUsageService.patchSystem(itSystemUsage.id, payload);
                     } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                         $scope.ArchivedDate = $scope.systemUsage.ArchivedDate;
                     } else {
                         date = date.format("YYYY-MM-DD");
-                        var payload = {};
                         payload[field] = date;
-                        itSystemUsageService.patchSystem($scope.usageId, payload);
+                        itSystemUsageService.patchSystem(itSystemUsage.id, payload);
                         $scope.ArchivedDate = date;
                     }
                 }
@@ -141,78 +117,21 @@
                             "$scope", "$uibModalInstance", "usage",
                             ($scope, $uibModalInstance, usage) => {
 
-                                //Ready old data in input fields.
-                                switch (field) {
-                                    case "datahandlerSupervisionDocumentationUrl":
-                                        $scope.linkName = usage.datahandlerSupervisionDocumentationUrlName;
-                                        $scope.Url = usage.datahandlerSupervisionDocumentationUrl;
-                                        break;
-                                    case "technicalSupervisionDocumentationUrl":
-                                        $scope.linkName = usage.technicalSupervisionDocumentationUrlName;
-                                        $scope.Url = usage.technicalSupervisionDocumentationUrl;
-                                        break;
-                                    case "userSupervisionDocumentationUrl":
-                                        $scope.linkName = usage.userSupervisionDocumentationUrlName;
-                                        $scope.Url = usage.userSupervisionDocumentationUrl;
-                                        break;
-                                    case "riskSupervisionDocumentationUrl":
-                                        $scope.linkName = usage.riskSupervisionDocumentationUrlName;
-                                        $scope.Url = usage.riskSupervisionDocumentationUrl;
-                                        break;
-                                    case "dpiaSupervisionDocumentationUrl":
-                                        $scope.linkName = usage.dpiaSupervisionDocumentationUrlName;
-                                        $scope.Url = usage.dpiaSupervisionDocumentationUrl;
-                                        break;
-                                    case "linkToDirectoryUrl":
-                                        $scope.linkName = usage.linkToDirectoryUrlName;
-                                        $scope.Url = usage.linkToDirectoryUrl;
-                                        break;
-                                }
+                                $scope.linkName = usage[field + "Name"];
+                                $scope.Url = usage[field];
 
                                 $scope.ok = () => {
-                                    var linkName = $scope.linkName;
-                                    var url = $scope.Url;
-                                    var payload: any = {};
-
-                                    switch (field) {
-                                        case "datahandlerSupervisionDocumentationUrl":
-                                            payload.datahandlerSupervisionDocumentationUrlName = linkName;
-                                            payload.datahandlerSupervisionDocumentationUrl = url;
-                                            break;
-                                        case "technicalSupervisionDocumentationUrl":
-                                            payload.technicalSupervisionDocumentationUrlName = linkName;
-                                            payload.technicalSupervisionDocumentationUrl = url;
-                                            break;
-                                        case "userSupervisionDocumentationUrl":
-                                            payload.userSupervisionDocumentationUrlName = linkName;
-                                            payload.userSupervisionDocumentationUrl = url;
-                                            break;
-                                        case "riskSupervisionDocumentationUrl":
-                                            payload.riskSupervisionDocumentationUrlName = linkName;
-                                            payload.riskSupervisionDocumentationUrl = url;
-                                            break;
-                                        case "dpiaSupervisionDocumentationUrl":
-                                            payload.dpiaSupervisionDocumentationUrlName = linkName;
-                                            payload.dpiaSupervisionDocumentationUrl = url;
-                                            break;
-                                        case "linkToDirectoryUrl":
-                                            payload.linkToDirectoryUrlName = linkName;
-                                            payload.linkToDirectoryUrl = url;
-                                            break;
-                                    }
+                                    var payload = {};
+                                    payload[field + "Name"] = $scope.linkName;
+                                    payload[field] = $scope.Url;
 
                                     var msg = notify.addInfoMessage("Gemmer...", false);
-
-                                    $http({
-                                        method: "PATCH",
-                                        url: `api/itsystemusage/${usage.id}?organizationId=${user.currentOrganizationId}`,
-                                        data: payload
-                                    })
-                                        .success(() => {
+                                    itSystemUsageService
+                                        .patchSystemUsage(usage.id, user.currentOrganizationId, payload)
+                                        .then(onSuccess => {
                                             msg.toSuccessMessage("Feltet er opdateret.");
                                             $state.reload();
-                                        })
-                                        .error(() => {
+                                        }, onError => {
                                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                         });
                                     $uibModalInstance.close();
@@ -249,7 +168,7 @@
                             notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
                         });
                 };
-
+                
                 function selectLazyLoading(url: any, excludeSelf: any, paramAry: any);
                 function selectLazyLoading(url, excludeSelf, paramAry) {
                     return {
@@ -337,12 +256,12 @@
 
                 function updateDataLevels(dataLevel: number, selected: boolean) {
                     if (selected) {
-                        GDPRService.addDataLevel(itSystemUsage.id, dataLevel)
+                        itSystemUsageService.addDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                     else {
-                        GDPRService.removeDataLevel(itSystemUsage.id, dataLevel)
+                        itSystemUsageService.removeDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
