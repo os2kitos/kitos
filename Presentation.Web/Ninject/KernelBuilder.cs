@@ -38,6 +38,7 @@ using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
@@ -237,6 +238,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportRepository>().To<BrokenExternalReferencesReportRepository>().InCommandScope(Mode);
             kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationRepository>().To<OrganizationRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
