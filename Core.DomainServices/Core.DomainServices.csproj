@@ -95,6 +95,8 @@
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
     <Compile Include="SSO\StsBrugerInfo.cs" />
     <Compile Include="SSO\IStsBrugerInfoService.cs" />
     <Compile Include="SSO\StsAdresseHelpers.cs" />
