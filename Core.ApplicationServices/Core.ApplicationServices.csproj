@@ -73,11 +73,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -144,6 +141,10 @@
     <Compile Include="SSO\State\FlowEvent.cs" />
     <Compile Include="SSO\State\InitialFlowState.cs" />
     <Compile Include="SSO\State\LookupStsUserEmailState.cs" />
+    <Compile Include="SSO\Model\KitosSamlPrivilege.cs" />
+    <Compile Include="SSO\Model\Saml20IdentityNavigator.cs" />
+    <Compile Include="SSO\Model\Saml20IdentityParser.cs" />
+    <Compile Include="SSO\Model\SamlUserUuid.cs" />
     <Compile Include="SSO\State\UserSignedInState.cs" />
     <Compile Include="SSO\State\UserWithNoPrivilegesState.cs" />
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />

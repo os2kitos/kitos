@@ -1,12 +1,15 @@
-﻿namespace Core.ApplicationServices.SSO
+﻿using System;
+
+namespace Core.ApplicationServices.SSO
 {
     public class SsoFlowConfiguration
     {
-        public string SamlEntityId { get; }
+        public string PrivilegePrefix { get; }
 
         public SsoFlowConfiguration(string samlEntityId)
         {
-            SamlEntityId = samlEntityId;
+            //NOTE: STS adgangsstyring adds http in front of priviliges in stead of our entity id's  https
+            PrivilegePrefix = new Uri(samlEntityId).Host;
         }
     }
 }

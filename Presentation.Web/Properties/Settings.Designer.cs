@@ -116,9 +116,9 @@ namespace Presentation.Web.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-local.strongminds.dk")]
-        public string SsoSamlEntityId {
+        public string SsoServiceProviderId {
             get {
-                return ((string)(this["SsoSamlEntityId"]));
+                return ((string)(this["SsoServiceProviderId"]));
             }
         }
     }

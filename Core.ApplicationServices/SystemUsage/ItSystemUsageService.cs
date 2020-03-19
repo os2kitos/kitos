@@ -9,9 +9,9 @@ using Core.DomainModel;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -36,6 +36,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<SystemRelation> _relationRepository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
+        private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
 
@@ -51,7 +52,8 @@ namespace Core.ApplicationServices.SystemUsage
             IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            ILogger logger)
+            ILogger logger, 
+            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -65,6 +67,7 @@ namespace Core.ApplicationServices.SystemUsage
             _interfaceRepository = interfaceRepository;
             _referenceService = referenceService;
             _logger = logger;
+            _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
@@ -104,8 +107,6 @@ namespace Core.ApplicationServices.SystemUsage
             usage.OrganizationId = newSystemUsage.OrganizationId;
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
-            usage.DataLevel = DataSensitivityLevel.NONE;
-            usage.ContainsLegalInfo = DataOptions.NO;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 
@@ -451,6 +452,57 @@ namespace Core.ApplicationServices.SystemUsage
                         },
                         onFailure: error => error
                     );
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
+        {
+            Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
+
+            if (usageResult.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var usage = usageResult.Value;
+            if (!_authorizationContext.AllowModify(usage))
+                return new OperationError(OperationFailure.Forbidden);
+
+            return usage
+                .AddSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
+                (
+                    onSuccess: addedSensitivityLevel =>
+                    {
+                        _usageRepository.Save();
+                        return addedSensitivityLevel;
+                    },
+                    onFailure: error => error);
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
+        {
+            Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
+
+            if (usageResult.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var usage = usageResult.Value;
+            if (!_authorizationContext.AllowModify(usage))
+                return new OperationError(OperationFailure.Forbidden);
+
+            return usage
+                .RemoveSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
+                (
+                    onSuccess: removedSensitivityLevel =>
+                    {
+                        _sensitiveDataLevelRepository.DeleteWithReferencePreload(removedSensitivityLevel);
+                        _sensitiveDataLevelRepository.Save();
+                        _usageRepository.Save();
+                        return removedSensitivityLevel;
+                    },
+                    onFailure: error =>
+                        error.FailureType == OperationFailure.NotFound
+                            ? new OperationError(OperationFailure.BadInput)
+                            : error);
         }
 
         #region Parameter Types

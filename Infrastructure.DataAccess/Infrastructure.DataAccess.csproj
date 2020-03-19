@@ -67,6 +67,7 @@
     <Compile Include="Mapping\BrokenLinkInInterfaceMap.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageSensitiveDataLevelMap.cs" />
     <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
@@ -574,6 +575,10 @@
     <Compile Include="Migrations\202003121331451_BrokenLinkReport.Designer.cs">
       <DependentUpon>202003121331451_BrokenLinkReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.cs" />
+    <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.Designer.cs">
+      <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -934,11 +939,15 @@
     <EmbeddedResource Include="Migrations\202003121331451_BrokenLinkReport.resx">
       <DependentUpon>202003121331451_BrokenLinkReport.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.resx">
+      <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_Orphaned_AttachedOptions.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

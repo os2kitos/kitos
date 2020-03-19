@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -35,6 +36,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
+            SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
         }
 
         public bool IsActive
@@ -352,10 +354,14 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
+
+        #region GDPR
+
+        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
+
+        #endregion
         public string GeneralPurpose { get; set; }
         public DataOptions isBusinessCritical { get; set; }
-        public DataOptions ContainsLegalInfo { get; set; }
-        public DataSensitivityLevel DataLevel { get; set; }
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }
@@ -478,7 +484,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             if (activeUser == null)
@@ -542,7 +548,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             return relation
@@ -552,6 +558,58 @@ namespace Core.DomainModel.ItSystemUsage
                 .Select(_ => _.SetContract(toContract))
                 .Select(_ => _.SetFrequency(toFrequency))
                 .Select(_ => _.SetReference(changedReference));
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
+            User activeUser,
+            SensitiveDataLevel sensitiveDataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (SensitiveDataLevelExists(sensitiveDataLevel))
+            {
+                return new OperationError("Data sensitivity level already exists", OperationFailure.Conflict);
+            }
+
+            var newDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            };
+
+            SensitiveDataLevels.Add(newDataLevel);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newDataLevel;
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
+            User activeUser,
+            SensitiveDataLevel sensitiveDataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (!SensitiveDataLevelExists(sensitiveDataLevel))
+            {
+                return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+            }
+
+            var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
+            SensitiveDataLevels.Remove(dataLevelToRemove);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return dataLevelToRemove;
+        }
+
+        private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
+        {
+            return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == sensitiveDataLevel);
         }
     }
 }

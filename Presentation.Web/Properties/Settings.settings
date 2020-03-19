@@ -32,7 +32,7 @@
     <Setting Name="StsOrganisationAuthorizedMunicipalityCvr" Type="System.String" Scope="Application">
       <Value Profile="(Default)">58271713</Value>
     </Setting>
-    <Setting Name="SsoSamlEntityId" Type="System.String" Scope="Application">
+    <Setting Name="SsoServiceProviderId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://kitos-local.strongminds.dk</Value>
     </Setting>
   </Settings>
