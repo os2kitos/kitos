@@ -33,11 +33,11 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
-
-                $scope.usage = itSystemUsage;
-                $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
+                //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
+                //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
+                var itSystemUsage = $scope.usage;
                 $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
