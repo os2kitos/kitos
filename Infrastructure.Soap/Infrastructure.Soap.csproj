@@ -14,7 +14,7 @@
     <StartArguments>/client:"WcfTestClient.exe"</StartArguments>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
-    <XsdCodeGenEnabled>True</XsdCodeGenEnabled>
+    <XsdCodeGenEnabled>False</XsdCodeGenEnabled>
     <XsdCodeGenSerializerMode>XmlSerializer</XsdCodeGenSerializerMode>
     <XsdCodeGenReuseTypesFlag>True</XsdCodeGenReuseTypesFlag>
     <XsdCodeGenReuseTypesMode>All</XsdCodeGenReuseTypesMode>
