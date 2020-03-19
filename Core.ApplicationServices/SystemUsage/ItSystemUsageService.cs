@@ -459,7 +459,7 @@ namespace Core.ApplicationServices.SystemUsage
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
             if (usageResult.IsNone)
-                return new OperationError(OperationFailure.BadInput);
+                return new OperationError(OperationFailure.NotFound);
 
             var usage = usageResult.Value;
             if (!_authorizationContext.AllowModify(usage))
@@ -474,8 +474,7 @@ namespace Core.ApplicationServices.SystemUsage
                         _usageRepository.Save();
                         return addedSensitivityLevel;
                     },
-                    onFailure: error => error
-                );
+                    onFailure: error => error);
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
@@ -483,7 +482,7 @@ namespace Core.ApplicationServices.SystemUsage
             Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(itSystemUsageId);
 
             if (usageResult.IsNone)
-                return new OperationError(OperationFailure.BadInput);
+                return new OperationError(OperationFailure.NotFound);
 
             var usage = usageResult.Value;
             if (!_authorizationContext.AllowModify(usage))
@@ -500,8 +499,10 @@ namespace Core.ApplicationServices.SystemUsage
                         _usageRepository.Save();
                         return removedSensitivityLevel;
                     },
-                    onFailure: error => error
-                );
+                    onFailure: error =>
+                        error.FailureType == OperationFailure.NotFound
+                            ? new OperationError(OperationFailure.BadInput)
+                            : error);
         }
 
         #region Parameter Types
