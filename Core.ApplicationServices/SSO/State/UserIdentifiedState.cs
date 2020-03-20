@@ -1,5 +1,4 @@
-﻿using System;
-using Core.ApplicationServices.SSO.Factories;
+﻿using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
@@ -18,7 +17,7 @@ namespace Core.ApplicationServices.SSO.State
             User user,
             StsBrugerInfo externalUser,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository, 
+            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
             ISsoStateFactory ssoStateFactory)
         {
             _user = user;
@@ -35,19 +34,20 @@ namespace Core.ApplicationServices.SSO.State
                 var result = _ssoUserIdentityRepository.AddNew(_user, _externalUser.Uuid);
                 if (result.Failed)
                 {
-                    //TODO Handle the error
+                    context.TransitionTo(new ErrorState());
+                    context.HandleUnknownError();
+                    return;
                 }
-                //TODO: Handle error result
 
                 var organizationResult = _ssoOrganizationIdentityRepository.GetByExternalUuid(_externalUser.BelongsToOrganizationUuid);
                 if (organizationResult.HasValue)
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user,organizationResult.Value.Organization));
+                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user, organizationResult.Value.Organization));
                     context.HandleOrganizationFound();
                 }
                 else
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user,_externalUser));
+                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user, _externalUser));
                     context.HandleOrganizationNotFound();
                 }
             }

@@ -77,6 +77,11 @@ namespace Core.ApplicationServices.SSO.State
             Handle(FlowEvent.UnsupportedFlow);
         }
 
+        public void HandleUnknownError()
+        {
+            Handle(FlowEvent.UnknownError);
+        }
+
         private void Handle(FlowEvent eventToHandle)
         {
             CurrentState.Handle(eventToHandle, this);

@@ -35,12 +35,14 @@ namespace Core.ApplicationServices.SSO.State
             if (@event.Equals(FlowEvent.UserPrivilegeVerified))
             {
                 var userResult = _ssoUserIdentityRepository.GetByExternalUuid(_userUuid);
+
+                //User has used the same SSO identity before and exists
                 if (userResult.HasValue)
                 {
                     context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(userResult.Value.User));
                     context.HandleUserSeenBefore();
                 }
-                else
+                else //Try to find the user by email
                 {
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                     if (!stsBrugerInfo.HasValue)
@@ -50,7 +52,7 @@ namespace Core.ApplicationServices.SSO.State
                     }
                     else
                     {
-                        var userByEmail = FindUserByEmail(context, stsBrugerInfo);
+                        var userByEmail = FindUserByEmail(stsBrugerInfo);
                         if (userByEmail.HasValue)
                         {
                             context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByEmail.Value, stsBrugerInfo.Value));
@@ -68,7 +70,7 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private Maybe<User> FindUserByEmail(FlowContext context, Maybe<StsBrugerInfo> stsBrugerInfo)
+        private Maybe<User> FindUserByEmail(Maybe<StsBrugerInfo> stsBrugerInfo)
         {
             foreach (var email in stsBrugerInfo.Value.Emails)
             {
