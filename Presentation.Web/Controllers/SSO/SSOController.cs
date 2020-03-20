@@ -4,8 +4,6 @@ using System.Web.Http.Results;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
-using Core.DomainModel.Result;
-using dk.nita.saml20.identity;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.SSO
@@ -14,12 +12,10 @@ namespace Presentation.Web.Controllers.SSO
     public class SSOController : ApiController
     {
         private readonly ISsoFlowApplicationService _ssoFlowApplicationService;
-        private readonly Maybe<ISaml20Identity> _ssoSamlState;
 
-        public SSOController(ISsoFlowApplicationService ssoFlowApplicationService, Maybe<ISaml20Identity> ssoSamlState)
+        public SSOController(ISsoFlowApplicationService ssoFlowApplicationService)
         {
             _ssoFlowApplicationService = ssoFlowApplicationService;
-            _ssoSamlState = ssoSamlState;
         }
 
         [InternalApi]
@@ -28,24 +24,26 @@ namespace Presentation.Web.Controllers.SSO
         public IHttpActionResult SSO()
         {
             var result = "User not authenticated";
-            if (_ssoSamlState.HasValue)
+            var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
+            switch (finalState)
             {
-                var currentIdentityName = _ssoSamlState.Value.Name;
-                var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
-
-                switch (finalState)
-                {
-                    case ErrorState errorState when errorState.ErrorCode.HasValue:
-                        return SsoError(errorState.ErrorCode.Value);
-                    case ErrorState errorState when errorState.ErrorCode.IsNone:
-                        return SsoError(SsoErrorCode.Unknown);
-                    case UserLoggedInState _:
-                        //TODO: Redirect to front page.. user is logged in now
-                        result = $"User '{currentIdentityName}' has Kitos read access";
-                        break;
-                }
+                case ErrorState errorState when errorState.ErrorCode.HasValue:
+                    return SsoError(errorState.ErrorCode.Value);
+                case UserLoggedInState _:
+                    return LoggedIn();
+                default:
+                    return SsoError(SsoErrorCode.Unknown);
             }
-            return Ok(result);
+        }
+
+        private IHttpActionResult LoggedIn()
+        {
+            //Redirect to front page
+            var uriBuilder = new UriBuilder(Request.RequestUri)
+            {
+                Path = string.Empty,
+            };
+            return Redirect(uriBuilder.Uri);
         }
 
         private RedirectResult SsoError(SsoErrorCode error)
