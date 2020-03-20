@@ -1,12 +1,12 @@
-﻿using System;
-using Core.ApplicationServices.SSO.Model;
+﻿using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class ErrorState : AbstractState
     {
-        public Maybe<SsoErrorCode> ErrorCode { get; private set; }
+        public Maybe<SsoErrorCode> ErrorCode { get; private set; } = Maybe<SsoErrorCode>.None;
+
         public override void Handle(FlowEvent @event, FlowContext context)
         {
             switch (@event)
@@ -18,7 +18,8 @@ namespace Core.ApplicationServices.SSO.State
                     ErrorCode = SsoErrorCode.NoOrganizationAndRole;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(@event), @event, null);
+                    ErrorCode = SsoErrorCode.Unknown;
+                    break;
             }
         }
     }

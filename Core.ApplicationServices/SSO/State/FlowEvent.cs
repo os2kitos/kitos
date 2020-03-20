@@ -12,6 +12,10 @@
         NoOrganizationAndRole = 7,
         UserHasRoleInOrganization = 8,
         UserHasNoRoleInOrganization = 9,
-        RoleAssigned = 10
+        RoleAssigned = 10,
+        UnableToResolveUserInStsOrganisation = 11, 
+        
+        //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning
+        UnsupportedFlow = 12
     }
 }
