@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.SSO.State
                 }
                 else
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization));
+                    context.Transition(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization),_=>_.HandleUserHasNoRoleInOrganization());
                 }
             }
         }
