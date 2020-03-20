@@ -11,7 +11,7 @@
                 Navn:
             </label>
             <div class="col-xs-7">
-                <input type="text" id="LinkName" data-ng-model="linkName"
+                <input type="text" id="LinkName" data-ng-model="linkName" data-element-type="gdprModalNameField"
                        class="form-control form-inline input-sm" aria-describedby="helpBlock" />
             </div>
         </div>
@@ -21,7 +21,7 @@
                Url:
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" data-ng-model="Url"
+                <input type="text" id="DokomentID" data-ng-model="Url" data-element-type="gdprModalUrlField"
                        class="form-control form-inline input-sm" aria-describedby="helpBlock" />
             </div>
         </div>
@@ -38,6 +38,7 @@
                     type="submit"
                     class="btn btn-success"
                     data-disabled-on-busy=""
+                    data-element-type="gdprSaveLinkButton"
                     data-ng-click="ok()">
                 Gem
             </button>

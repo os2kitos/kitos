@@ -1,9 +1,4 @@
-﻿// Since app uses namespaces (which is fine for smaller .ts apps) we are unable to import this class which is made using modules
-// Using modules is preferable in larger applications as this provides modularity and maintainability as there is no
-// global namespace pollution.
-
-// This class cannot currently be added to the app project
-class Constants {
+﻿class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
     readonly kendoReportNameObjects = "reportNameKendoObject";
@@ -109,7 +104,7 @@ class Constants {
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
     readonly kendoSystemDeleteButton = "deleteSystemButton";
-    
+
     readonly kleStatusLabel = "KLEStatusLabel";
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
@@ -153,8 +148,67 @@ class Constants {
     readonly dataLevelTypeSensitiveCheckbox = "dataLevelTypeSensitiveCheckbox";
     readonly dataLevelTypeLegalCheckbox = "dataLevelTypeLegalCheckbox";
 
-    readonly defaultPersonalSensitivData1 = "sensitivepersonalDataCheckbox-TestSensitiveData1";
-    readonly defaultPersonalSensitivData2 = "sensitivepersonalDataCheckbox-TestSensitiveData2";
+    readonly precautionsEncryptionCheckbox = "precautionsEncryptionCheckbox";
+    readonly precautionsPseudonomiseringCheckbox = "precautionsPseudonomiseringCheckbox";
+    readonly precautionsAccessControlCheckbox = "precautionsAccessControlCheckbox";
+    readonly precautionsLogningCheckbox = "precautionsLogningCheckbox";
+
+    readonly defaultSensitivData1 = "TestSensitiveData1";
+    readonly defaultSensitivData2 = "TestSensitiveData2";
+
+    readonly hostedAtValueNone = " ";
+    readonly hostedAtValueExternal = "Eksternt";
+    readonly hostedAtValueOnPremise = "On-premise";
+    readonly hostedAtSelect2Id = "s2id_HostedAt";
+
+    readonly gdprDefaultDate = "12-12-2020";
+    readonly gdprDefaultText = "Test";
+    readonly gdprDefaultNumberText = "5";
+    readonly gdprDefaultUrl = "https://www.strongminds.dk/";
+
+    readonly gdprDefaultPreRiskAssessmentValue = "Mellem risiko";
+    readonly gdprDefaultDropDownValueYes = "Ja";
+    readonly gdprDefaultDropDownValueNo = "Nej";
+
+    readonly gdprBusinessCriticalSelect2Id = "s2id_businessCritical";
+    readonly gdprDataProcessorControlSelect2Id = "s2id_dataProcessorControl";
+    readonly gdprRiskAssessmentSelect2Id = "s2id_riskAssessment";
+    readonly gdprDPIASelect2Id = "s2id_DPIA";
+    readonly gdprAnsweringDataDPIASelect2Id = "s2id_answeringDataDPIA";
+    readonly gdprPrecautionsSelect2Id = "s2id_precautions";
+    readonly gdprsUserSupervisionSelect2Id = "s2id_userSupervision";
+
+    readonly gdprGDPRSystemPurposeTextField = "GDPRSystemPurpose"; 
+    readonly gdprGDPRDataResponsibleTextField = "GDPRDataResponsible";
+    readonly gdprNoteUsageTextField = "GDPRNoteUsage";
+    readonly gdprNoteRiskTextField = "GDPRNoteRisk";
+
+    readonly gdprPreRiskAssessment = "s2id_preRiskAssessment";
+    readonly gdprNumberDPIATextField = "GDPRNumberDPIA";
+
+    readonly gdprDataProcessLinkButton = "dataProcessLinkButton";
+    readonly gdprNoteLinkButton = "NoteLinkButton";
+    readonly gdprPrecautionLinkButton = "PrecautionLinkButton";
+    readonly gdprSuperVisionLinkButton = "superVisionLinkButton";
+    readonly gdprRiskLinkButton = "riskLinkButton";
+    readonly gdprDPIALinkButton = "dpiaLinkButton";
+
+    readonly gdprDataProcessLinkField = "dataProcessLinkField";
+    readonly gdprNoteLinkField = "NoteLinkField";
+    readonly gdprPrecautionLinkField = "PrecautionLinkField";
+    readonly gdprSuperVisionLinkField = "superVisionLinkField";
+    readonly gdprRiskLinkField = "riskLinkField";
+    readonly gdprDPIALinkField = "dpiaLinkField";
+
+    readonly gdprModalSaveLinkButton = "gdprSaveLinkButton";
+    readonly gdprModalUrlField = "gdprModalUrlField";
+    readonly gdprModalNameField = "gdprModalNameField";
+
+    readonly gdprLastControlId = "lastControl";
+    readonly gdprRiskAssesmentDateId = "riskAssesmentDate";
+    readonly gdprDPIADateForId = "DPIADateFor";
+    readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
+    readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
 
     readonly hostedAtValueNone = " ";
     readonly hostedAtValueExternal = "Eksternt";
@@ -164,7 +218,6 @@ class Constants {
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
-    
+
 }
 export = Constants;
-

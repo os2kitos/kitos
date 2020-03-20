@@ -8,10 +8,10 @@
                     <label class="control-label small">Systemets overordnede formål</label>
                     <input type="text"
                            ng-disabled="!hasWriteAccess"
-                           ng-blur="patch('GeneralPurpose', systemUsage.GeneralPurpose)"
+                           ng-blur="patch('GeneralPurpose', usage.generalPurpose)"
                            class="form-control input-sm"
                            data-field="generalPurpose"
-                           ng-model="systemUsage.GeneralPurpose"
+                           ng-model="usage.generalPurpose"
                            data-placeholder="Overordnet formål"
                            data-element-type="GDPRSystemPurpose" />
                 </div>
@@ -74,7 +74,7 @@
                         </ul>
                     </div>
                     <span class="help-block small">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i> 
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
                         Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.
                     </span>
                 </div>
@@ -151,14 +151,14 @@
                     <div class="form-group">
                         <label for="datahandler-supervision-link" class="control-label small">Link til dokumentation</label>
                         <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
-                            <a id="datahandler-supervision-link" target="_blank"
-                               href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}"
-                               ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == '' || systemUsage.datahandlerSupervisionDocumentationUrl == null">
-                                {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
+                            <a id="datahandler-supervision-link" target="_blank" data-element-type="dataProcessLinkField"
+                               href="{{usage.datahandlerSupervisionDocumentationUrl}}"
+                               ng-hide="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
+                                {{usage.datahandlerSupervisionDocumentationUrlName ? usage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
                             </a>
                             <label for="datahandler-supervision-link"
                                    class="control-label small"
-                                   ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == '' || systemUsage.datahandlerSupervisionDocumentationUrl == null">
+                                   ng-show="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
                                 Intet link til dokumentation
                             </label>
                             <button type="button"
@@ -166,6 +166,7 @@
                                     ng-disabled="!hasWriteAccess"
                                     class="btn-link btn-editLink"
                                     title="Redigér link"
+                                    data-element-type="dataProcessLinkButton"
                                     ng-click="editLink('datahandlerSupervisionDocumentationUrl')">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                             </button>
@@ -179,6 +180,7 @@
                     <textarea id="noteUsage" class="form-control input-sm" rows="5"
                               ng-disabled="!hasWriteAccess"
                               ng-model="systemUsage.noteUsage"
+                              data-element-type="GDPRNoteUsage"
                               ng-blur="patch('noteUsage', systemUsage.noteUsage)"
                               data-field="noteUsage"></textarea>
                 </div>
@@ -188,13 +190,14 @@
                     <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
                         <a target="_blank"
                            id="directory-link"
-                           href="{{systemUsage.linkToDirectoryUrl}}"
-                           ng-hide="systemUsage.linkToDirectoryUrl == '' || systemUsage.linkToDirectoryUrl == null">
-                            {{systemUsage.linkToDirectoryUrlName ? systemUsage.linkToDirectoryUrlName : "Fortegnelse" }}
+                           data-element-type="NoteLinkField"
+                           href="{{usage.linkToDirectoryUrl}}"
+                           ng-hide="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
+                            {{usage.linkToDirectoryUrlName ? usage.linkToDirectoryUrlName : "Fortegnelse" }}
                         </a>
                         <label for="directory-link"
                                class="control-label small"
-                               ng-show="systemUsage.linkToDirectoryUrl == '' || systemUsage.linkToDirectoryUrl == null">
+                               ng-show="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
                             Intet link til fortegnelse
                         </label>
                         <button type="button"
@@ -202,6 +205,7 @@
                                 ng-disabled="!hasWriteAccess"
                                 class="btn-link btn-editLink"
                                 title="Redigér link"
+                                data-element-type="NoteLinkButton"
                                 ng-click="editLink('linkToDirectoryUrl')">
                             <i class="fa fa-pencil" aria-hidden="true"></i>
                         </button>
@@ -254,7 +258,7 @@
                             <label>
                                 <input type="checkbox"
                                        ng-model="r.Checked"
-                                       data-element-type="sensitivepersonalDataCheckbox-{{r.Name}}"
+                                       data-element-type="{{r.Name}}"
                                        ng-disabled="!hasWriteAccess"
                                        ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
                                 {{r.Name}}
@@ -306,10 +310,10 @@
                             <div class="form-group">
                                 <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
                                 <div id="precautionsOptions">
-                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsEncryption" ng-click="patch('precautionsOptionsEncryption', systemUsage.precautionsOptionsEncryption)" /> <span style="font-size: small;">Kryptering</span><br />
-                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsPseudonomisering" ng-click="patch('precautionsOptionsPseudonomisering', systemUsage.precautionsOptionsPseudonomisering)" /> <span style="font-size: small;">Pseudonomisering</span><br />
-                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsAccessControl" ng-click="patch('precautionsOptionsAccessControl', systemUsage.precautionsOptionsAccessControl)" /> <span style="font-size: small;">Adgangsstyring</span><br />
-                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsLogning" ng-click="patch('precautionsOptionsLogning', systemUsage.precautionsOptionsLogning)" /> <span style="font-size: small;">Logning</span><br />
+                                    <input type="checkbox" data-element-type="precautionsEncryptionCheckbox" ng-model="systemUsage.precautionsOptionsEncryption" ng-click="patch('precautionsOptionsEncryption', systemUsage.precautionsOptionsEncryption)" /> <span style="font-size: small;">Kryptering</span><br />
+                                    <input type="checkbox" data-element-type="precautionsPseudonomiseringCheckbox" ng-model="systemUsage.precautionsOptionsPseudonomisering" ng-click="patch('precautionsOptionsPseudonomisering', systemUsage.precautionsOptionsPseudonomisering)" /> <span style="font-size: small;">Pseudonomisering</span><br />
+                                    <input type="checkbox" data-element-type="precautionsAccessControlCheckbox" ng-model="systemUsage.precautionsOptionsAccessControl" ng-click="patch('precautionsOptionsAccessControl', systemUsage.precautionsOptionsAccessControl)" /> <span style="font-size: small;">Adgangsstyring</span><br />
+                                    <input type="checkbox" data-element-type="precautionsLogningCheckbox" ng-model="systemUsage.precautionsOptionsLogning" ng-click="patch('precautionsOptionsLogning', systemUsage.precautionsOptionsLogning)" /> <span style="font-size: small;">Logning</span><br />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -317,13 +321,14 @@
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
                                     <a target="_blank"
                                        id="technical-supervision-link"
-                                       href="{{systemUsage.technicalSupervisionDocumentationUrl}}"
-                                       ng-hide="systemUsage.technicalSupervisionDocumentationUrl == '' || systemUsage.technicalSupervisionDocumentationUrl == null">
-                                        {{systemUsage.technicalSupervisionDocumentationUrlName ? systemUsage.technicalSupervisionDocumentationUrlName : "Dokumentation" }}
+                                       data-element-type="PrecautionLinkField"
+                                       href="{{usage.technicalSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.technicalSupervisionDocumentationUrl == '' || usage.technicalSupervisionDocumentationUrl == null">
+                                        {{usage.technicalSupervisionDocumentationUrlName ? usage.technicalSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
                                     <label for="technical-supervision-link"
                                            class="control-label small"
-                                           ng-show="systemUsage.technicalSupervisionDocumentationUrl == '' || systemUsage.technicalSupervisionDocumentationUrl == null">
+                                           ng-show="usage.technicalSupervisionDocumentationUrl == '' || usage.technicalSupervisionDocumentationUrl == null">
                                         Intet link til dokumentation
                                     </label>
                                     <button type="button"
@@ -331,6 +336,7 @@
                                             ng-disabled="!hasWriteAccess"
                                             class="btn-link btn-editLink"
                                             title="Redigér link"
+                                            data-element-type="PrecautionLinkButton"
                                             ng-click="editLink('technicalSupervisionDocumentationUrl')">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
@@ -356,7 +362,7 @@
                         <div ng-show="usageViewModel.userSupervision == 1">
                             <div class="form-group">
                                 <label class="control-label small">Dato for seneste brugerkontrol</label><br>
-                                <input type="text" id="riskAssesmentDate" class="form-control"
+                                <input type="text" id="latestRiskAssesmentDate" class="form-control"
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
                                        ng-disabled="!hasWriteAccess"
@@ -370,13 +376,14 @@
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
                                     <a target="_blank"
                                        id="user-supervision-link"
-                                       href="{{systemUsage.userSupervisionDocumentationUrl}}"
-                                       ng-hide="systemUsage.userSupervisionDocumentationUrl == '' || systemUsage.userSupervisionDocumentationUrl == null">
-                                        {{systemUsage.userSupervisionDocumentationUrlName ? systemUsage.userSupervisionDocumentationUrlName : "Dokumentation" }}
+                                       data-element-type="superVisionLinkField"
+                                       href="{{usage.userSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.userSupervisionDocumentationUrl == '' || usage.userSupervisionDocumentationUrl == null">
+                                        {{usage.userSupervisionDocumentationUrlName ? usage.userSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
                                     <label for="user-supervision-link"
                                            class="control-label small"
-                                           ng-show="systemUsage.userSupervisionDocumentationUrl == '' || systemUsage.userSupervisionDocumentationUrl == null">
+                                           ng-show="usage.userSupervisionDocumentationUrl == '' || usage.userSupervisionDocumentationUrl == null">
                                         Intet link til dokumentation
                                     </label>
                                     <button type="button"
@@ -384,6 +391,7 @@
                                             ng-disabled="!hasWriteAccess"
                                             class="btn-link btn-editLink"
                                             title="Redigér link"
+                                            data-element-type="superVisionLinkButton"
                                             ng-click="editLink('userSupervisionDocumentationUrl')">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
@@ -440,13 +448,14 @@
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
                                 <a target="_blank"
                                    id="risk-supervision-link"
-                                   href="{{systemUsage.riskSupervisionDocumentationUrl}}"
-                                   ng-hide="systemUsage.riskSupervisionDocumentationUrl == '' || systemUsage.riskSupervisionDocumentationUrl == null">
-                                    {{systemUsage.riskSupervisionDocumentationUrlName ? systemUsage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
+                                   data-element-type="riskLinkField"
+                                   href="{{usage.riskSupervisionDocumentationUrl}}"
+                                   ng-hide="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
+                                    {{usage.riskSupervisionDocumentationUrlName ? usage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
                                 </a>
                                 <label for="risk-supervision-link"
                                        class="control-label small"
-                                       ng-show="systemUsage.riskSupervisionDocumentationUrl == '' || systemUsage.riskSupervisionDocumentationUrl == null">
+                                       ng-show="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
                                     Intet link til dokumentation
                                 </label>
                                 <button type="button"
@@ -454,6 +463,7 @@
                                         ng-disabled="!hasWriteAccess"
                                         class="btn-link btn-editLink"
                                         title="Redigér link"
+                                        data-element-type="riskLinkButton"
                                         ng-click="editLink('riskSupervisionDocumentationUrl')">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </button>
@@ -465,6 +475,7 @@
                             <textarea id="noteRisks" class="form-control input-sm" rows="5"
                                       ng-disabled="!hasWriteAccess"
                                       ng-model="systemUsage.noteRisks"
+                                      data-element-type="GDPRNoteRisk"
                                       ng-blur="patch('noteRisks', systemUsage.noteRisks)"
                                       data-field="noteRisks"></textarea>
                         </div>
@@ -505,12 +516,13 @@
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
                                     <a target="_blank"
                                        id="dpia-supervision-link"
-                                       href="{{systemUsage.dpiaSupervisionDocumentationUrl}}"
-                                       ng-hide="systemUsage.dpiaSupervisionDocumentationUrl == '' || systemUsage.dpiaSupervisionDocumentationUrl == null">
-                                        {{systemUsage.dpiaSupervisionDocumentationUrlName ? systemUsage.dpiaSupervisionDocumentationUrlName : "Dokumentation" }}
+                                       data-element-type="dpiaLinkField"
+                                       href="{{usage.dpiaSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.dpiaSupervisionDocumentationUrl == '' || usage.dpiaSupervisionDocumentationUrl == null">
+                                        {{usage.dpiaSupervisionDocumentationUrlName ? usage.dpiaSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
                                     <label for="dpia-supervision-link" class="control-label small"
-                                           ng-show="systemUsage.dpiaSupervisionDocumentationUrl == '' || systemUsage.dpiaSupervisionDocumentationUrl == null">
+                                           ng-show="usage.dpiaSupervisionDocumentationUrl == '' || usage.dpiaSupervisionDocumentationUrl == null">
                                         Intet link til dokumentation
                                     </label>
                                     <button type="button"
@@ -518,6 +530,7 @@
                                             ng-disabled="!hasWriteAccess"
                                             class="btn-link btn-editLink"
                                             title="Redigér link"
+                                            data-element-type="dpiaLinkButton"
                                             ng-click="editLink('dpiaSupervisionDocumentationUrl')">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
@@ -559,6 +572,7 @@
                                    ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
                                    data-field="numberDPIA"
                                    ng-model="systemUsage.numberDPIA"
+                                   data-element-type="GDPRNumberDPIA"
                                    ng-disabled="!hasWriteAccess" />
                         </div>
                     </div>
