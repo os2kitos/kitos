@@ -121,6 +121,14 @@ describe("User is able to", () => {
             .then(() => fillOutModalLinkWindow());
     }
 
+    function fillOutModalLinkWindow() {
+        return ItSystemUsageGDPR.getModalNameField().clear()
+            .then(() => ItSystemUsageGDPR.getModalNameField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPR.getModalUrlField().clear())
+            .then(() => ItSystemUsageGDPR.getModalUrlField().sendKeys(testUrl))
+            .then(() => ItSystemUsageGDPR.getModalSaveButton().click());
+    }
+
     function verifyCheckBoxes() {
         console.log("Verifying check boxes");
         console.log("Sensitive boxes");
@@ -169,7 +177,7 @@ describe("User is able to", () => {
         console.log("Verifying link fields");
         console.log("Checking Url");
         expect(ItSystemUsageGDPR.getDataProcessLinkField().getAttribute("href")).toEqual(testUrl);
-       // expect(ItSystemUsageGDPR.getNoteLinkField().getAttribute("href")).toEqual(testUrl); --> Felt bliver ikke gemt korrekt
+        expect(ItSystemUsageGDPR.getNoteLinkField().getAttribute("href")).toEqual(testUrl);
         expect(ItSystemUsageGDPR.getPrecautionLinkField().getAttribute("href")).toEqual(testUrl);
         expect(ItSystemUsageGDPR.getSuperVisionLinkField().getAttribute("href")).toEqual(testUrl);
         expect(ItSystemUsageGDPR.getRiskLinkField().getAttribute("href")).toEqual(testUrl);
@@ -202,11 +210,4 @@ describe("User is able to", () => {
         return expect(Select2Helper.getData(idOfDropDownBox).getText()).toEqual(expectedValue);
     }
 
-    function fillOutModalLinkWindow() {
-        return ItSystemUsageGDPR.getModalNameField().clear()
-            .then(() => ItSystemUsageGDPR.getModalNameField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPR.getModalUrlField().clear())
-            .then(() => ItSystemUsageGDPR.getModalUrlField().sendKeys(testUrl))
-            .then(() => ItSystemUsageGDPR.getModalSaveButton().click());
-    }
 });
