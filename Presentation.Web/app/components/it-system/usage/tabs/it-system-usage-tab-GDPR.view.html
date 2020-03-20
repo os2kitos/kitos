@@ -10,7 +10,7 @@
                            ng-disabled="!hasWriteAccess"
                            ng-blur="patch('GeneralPurpose', usage.generalPurpose)"
                            class="form-control input-sm"
-                           data-field="generalPurpose"
+                           data-field="GeneralPurpose"
                            ng-model="usage.generalPurpose"
                            data-placeholder="Overordnet formål"
                            data-element-type="GDPRSystemPurpose" />
@@ -32,10 +32,10 @@
                 <div class="form-group">
                     <label for="dataProcessor" class="control-label small">Dataansvarlig</label>
                     <input id="dataProcessor" type="text" class="form-control input-sm"
-                           ng-model="systemUsage.dataProcessor"
+                           ng-model="usage.dataProcessor"
                            ng-disabled="!hasWriteAccess"
-                           data-field="dataProcessor"
-                           ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
+                           data-field="DataProcessor"
+                           ng-blur="patch('DataProcessor', usage.dataProcessor)"
                            data-element-type="GDPRDataResponsible">
                 </div>
                 <!-- Data processing agreement -->
@@ -84,8 +84,8 @@
                             </td>
                             <td class="text-right noLeftBorder" style="width: 20px;">
                                 <button type="button"
-                                        class="btn btn-danger btn-xs delete-project"
-                                        data-confirmed-click="delete({{ dataWorker.id }})"
+                                        class="btn btn-danger btn-xs"
+                                        data-confirmed-click="deleteDataworker({{ dataWorker.id }})"
                                         data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
                                         ng-show="hasWriteAccess">
                                     <i class="glyphicon glyphicon-trash"></i>
@@ -101,7 +101,7 @@
                                        class="form-control input-sm"
                                        data-ui-select2="dataWorkerSelectOptions"
                                        ng-model="selectedDataWorker"
-                                       ng-change="save()"
+                                       ng-change="saveDataworker()"
                                        data-placeholder="Vælg Databehandler" />
                             </td>
                         </tr>
@@ -128,8 +128,8 @@
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
                                ng-disabled="!hasWriteAccess"
-                               ng-model="systemUsage.lastControl"
-                               ng-blur="patchDate('lastControl', systemUsage.lastControl)"
+                               ng-model="usage.lastControl"
+                               ng-blur="patchDate('lastControl', usage.lastControl)"
                                data-field="lastControl">
                         <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
                     </div>
@@ -165,10 +165,10 @@
                     <label for="noteUsage" class="control-label small">Bemærkninger</label>
                     <textarea id="noteUsage" class="form-control input-sm" rows="5"
                               ng-disabled="!hasWriteAccess"
-                              ng-model="systemUsage.noteUsage"
+                              ng-model="usage.noteUsage"
                               data-element-type="GDPRNoteUsage"
-                              ng-blur="patch('noteUsage', systemUsage.noteUsage)"
-                              data-field="noteUsage"></textarea>
+                              ng-blur="patch('NoteUsage', usage.noteUsage)"
+                              data-field="NoteUsage"></textarea>
                 </div>
                 <!-- Link til fortegnelse -->
                 <div class="form-group">
@@ -296,10 +296,29 @@
                             <div class="form-group">
                                 <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
                                 <div id="precautionsOptions">
-                                    <input type="checkbox" data-element-type="precautionsEncryptionCheckbox" ng-model="systemUsage.precautionsOptionsEncryption" ng-click="patch('precautionsOptionsEncryption', systemUsage.precautionsOptionsEncryption)" /> <span style="font-size: small;">Kryptering</span><br />
-                                    <input type="checkbox" data-element-type="precautionsPseudonomiseringCheckbox" ng-model="systemUsage.precautionsOptionsPseudonomisering" ng-click="patch('precautionsOptionsPseudonomisering', systemUsage.precautionsOptionsPseudonomisering)" /> <span style="font-size: small;">Pseudonomisering</span><br />
-                                    <input type="checkbox" data-element-type="precautionsAccessControlCheckbox" ng-model="systemUsage.precautionsOptionsAccessControl" ng-click="patch('precautionsOptionsAccessControl', systemUsage.precautionsOptionsAccessControl)" /> <span style="font-size: small;">Adgangsstyring</span><br />
-                                    <input type="checkbox" data-element-type="precautionsLogningCheckbox" ng-model="systemUsage.precautionsOptionsLogning" ng-click="patch('precautionsOptionsLogning', systemUsage.precautionsOptionsLogning)" /> <span style="font-size: small;">Logning</span><br />
+                                    <input type="checkbox" 
+                                           data-element-type="precautionsEncryptionCheckbox" 
+                                           ng-model="usage.precautionsOptionsEncryption" 
+                                           ng-click="patch('PrecautionsOptionsEncryption', usage.precautionsOptionsEncryption)" />
+                                    <span style="font-size: small;">Kryptering</span><br />
+
+                                    <input type="checkbox" 
+                                           data-element-type="precautionsPseudonomiseringCheckbox" 
+                                           ng-model="usage.precautionsOptionsPseudonomisering" 
+                                           ng-click="patch('PrecautionsOptionsPseudonomisering', usage.precautionsOptionsPseudonomisering)" /> 
+                                    <span style="font-size: small;">Pseudonomisering</span><br />
+
+                                    <input type="checkbox" 
+                                           data-element-type="precautionsAccessControlCheckbox" 
+                                           ng-model="usage.precautionsOptionsAccessControl" 
+                                           ng-click="patch('PrecautionsOptionsAccessControl', usage.precautionsOptionsAccessControl)" /> 
+                                    <span style="font-size: small;">Adgangsstyring</span><br />
+
+                                    <input type="checkbox" 
+                                           data-element-type="precautionsLogningCheckbox" 
+                                           ng-model="usage.precautionsOptionsLogning" 
+                                           ng-click="patch('PrecautionsOptionsLogning', usage.precautionsOptionsLogning)" /> 
+                                    <span style="font-size: small;">Logning</span><br />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -352,8 +371,8 @@
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
                                        ng-disabled="!hasWriteAccess"
-                                       ng-model="systemUsage.UserSupervisionDate"
-                                       ng-blur="patchDate('UserSupervisionDate', systemUsage.UserSupervisionDate)">
+                                       ng-model="usage.userSupervisionDate"
+                                       ng-blur="patchDate('UserSupervisionDate', usage.userSupervisionDate)">
                                 <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
 
@@ -409,8 +428,8 @@
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    ng-disabled="!hasWriteAccess"
-                                   ng-model="systemUsage.riskAssesmentDate"
-                                   ng-blur="patchDate('riskAssesmentDate', systemUsage.riskAssesmentDate)"
+                                   ng-model="usage.riskAssesmentDate"
+                                   ng-blur="patchDate('riskAssesmentDate', usage.riskAssesmentDate)"
                                    data-field="riskAssesmentDate">
                             <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
                         </div>
@@ -460,10 +479,10 @@
                             <label for="noteRisks" class="control-label small">Bemærkninger</label>
                             <textarea id="noteRisks" class="form-control input-sm" rows="5"
                                       ng-disabled="!hasWriteAccess"
-                                      ng-model="systemUsage.noteRisks"
+                                      ng-model="usage.noteRisks"
                                       data-element-type="GDPRNoteRisk"
-                                      ng-blur="patch('noteRisks', systemUsage.noteRisks)"
-                                      data-field="noteRisks"></textarea>
+                                      ng-blur="patch('NoteRisks', usage.noteRisks)"
+                                      data-field="NoteRisks"></textarea>
                         </div>
                     </div>
                 </div>
@@ -491,8 +510,8 @@
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
                                        ng-disabled="!hasWriteAccess"
-                                       ng-model="systemUsage.DPIADateFor"
-                                       ng-blur="patchDate('DPIADateFor', systemUsage.DPIADateFor)"
+                                       ng-model="usage.dpiaDateFor"
+                                       ng-blur="patchDate('DPIADateFor', usage.dpiaDateFor)"
                                        data-field="DPIADateFor">
                                 <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
@@ -547,17 +566,17 @@
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    ng-disabled="!hasWriteAccess"
-                                   ng-model="systemUsage.DPIAdeleteDate"
-                                   ng-blur="patchDate('DPIAdeleteDate', systemUsage.DPIAdeleteDate)"
+                                   ng-model="usage.dpiaDeleteDate"
+                                   ng-blur="patchDate('DPIAdeleteDate', usage.dpiaDeleteDate)"
                                    data-field="DPIAdeleteDate">
                             <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "25-04-2017"</span>
                         </div>
                         <div class="form-group">
                             <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
                             <input type="number" step="1" min="0" class="form-control input-sm"
-                                   ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
-                                   data-field="numberDPIA"
-                                   ng-model="systemUsage.numberDPIA"
+                                   ng-change="patch('NumberDPIA', usage.numberDPIA)"
+                                   data-field="NumberDPIA"
+                                   ng-model="usage.numberDPIA"
                                    data-element-type="GDPRNumberDPIA"
                                    ng-disabled="!hasWriteAccess" />
                         </div>

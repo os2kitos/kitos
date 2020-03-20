@@ -161,15 +161,6 @@
     readonly hostedAtValueOnPremise = "On-premise";
     readonly hostedAtSelect2Id = "s2id_HostedAt";
 
-    readonly gdprDefaultDate = "12-12-2020";
-    readonly gdprDefaultText = "Test";
-    readonly gdprDefaultNumberText = "5";
-    readonly gdprDefaultUrl = "https://www.strongminds.dk/";
-
-    readonly gdprDefaultPreRiskAssessmentValue = "Mellem risiko";
-    readonly gdprDefaultDropDownValueYes = "Ja";
-    readonly gdprDefaultDropDownValueNo = "Nej";
-
     readonly gdprBusinessCriticalSelect2Id = "s2id_businessCritical";
     readonly gdprDataProcessorControlSelect2Id = "s2id_dataProcessorControl";
     readonly gdprRiskAssessmentSelect2Id = "s2id_riskAssessment";

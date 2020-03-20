@@ -5,11 +5,6 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-GDPR.view.html",
             controller: "system.GDPR",
             resolve: {
-                systemUsage: [
-                    "$http", "$stateParams", ($http, $stateParams) =>
-                        $http.get(`odata/itSystemUsages(${$stateParams.id})`)
-                            .then(result => result.data)
-                ],
                 sensitivePersonalData: ["$http", "$stateParams", ($http, $stateParams) =>
                     $http.get(`odata/GetSensitivePersonalDataByUsageId(id=${$stateParams.id})`)
                         .then(result => result.data.value)
@@ -25,8 +20,8 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", 
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "select2LoadingService",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, moment, notify, registerTypes, sensitivePersonalData, user, select2LoadingService) => {
                 //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
                 //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
                 var itSystemUsage = $scope.usage;
@@ -36,26 +31,40 @@
                 $scope.noSearchNoClearSelect2 = { minimumResultsForSearch: -1, allowClear: false };
 
                 $scope.registerTypes = registerTypes;
-                $scope.systemUsage = systemUsage;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
                 $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
                 $scope.filterDataProcessor = $scope.contracts.length > 0;
 
+                $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(
+                    "api/organization",
+                    true,
+                    ["public=true", `orgId=${user.currentOrganizationId}`],
+                    (item,
+                        items) => {
+                        items.push({
+                            id: item.id,
+                            text: item.name,
+                            cvr: item.cvr
+                        });
+                    },
+                    "q",
+                    formatSupplier);
 
-                $scope.dataWorkerSelectOptions = selectLazyLoading("api/organization", false, ["public=true", `orgId=${user.currentOrganizationId}`]);
+                function formatSupplier(supplier) {
+                    var result = `<div>${supplier.text}</div>`;
+                    if (supplier.cvr) {
+                        result += `<div class="small">${supplier.cvr}</div>`;
+                    }
+                    return result;
+                }
 
-                $scope.systemUsage.LinkToDirectoryUrl = encodeURI($scope.systemUsage.LinkToDirectoryUrl);
-
-                $scope.updateDataLevel = (OptionId, Checked, optionType) => {
-
+                $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);
-
-                    if (Checked == true) {
-
+                    if (checked === true) {
                         var data = {
                             ObjectId: itSystemUsage.id,
-                            OptionId: OptionId,
+                            OptionId: optionId,
                             OptionType: optionType,
                             ObjectType: "ITSYSTEMUSAGE"
                         };
@@ -65,18 +74,17 @@
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
                         });
-
                     } else {
-                        let OptType = 0;
+                        let optType = 0;
                         switch (optionType) {
                             case "SENSITIVEPERSONALDATA":
-                                OptType = 1;
+                                optType = 1;
                                 break;
                             case "REGISTERTYPEDATA":
-                                OptType = 2;
+                                optType = 2;
                                 break;
                         }
-                        $http.delete(`odata/RemoveOption(id=${OptionId}, objectId=${itSystemUsage.id},type=${OptType}, entityType=1)`).success(() => {
+                        $http.delete(`odata/RemoveOption(id=${optionId}, objectId=${itSystemUsage.id},type=${optType}, entityType=1)`).success(() => {
                             msg.toSuccessMessage("Feltet er Opdateret.");
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
@@ -87,7 +95,9 @@
                 $scope.patch = (field, value) => {
                     var payload = {};
                     payload[field] = value;
-                    itSystemUsageService.patchSystem(itSystemUsage.id, payload);
+                    itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                        .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
 
                 $scope.patchDate = (field, value) => {
@@ -95,15 +105,17 @@
                     var payload = {};
                     if (value === "" || value == undefined) {
                         payload[field] = null;
-                        itSystemUsageService.patchSystem(itSystemUsage.id, payload);
+                        itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                        $scope.ArchivedDate = $scope.systemUsage.ArchivedDate;
                     } else {
                         date = date.format("YYYY-MM-DD");
                         payload[field] = date;
-                        itSystemUsageService.patchSystem(itSystemUsage.id, payload);
-                        $scope.ArchivedDate = date;
+                        itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     }
                 }
 
@@ -158,73 +170,11 @@
                     }
                 };
 
-                $scope.delete = dataworkerId => {
-                    $http.delete(`api/UsageDataWorker/${dataworkerId}?organizationid=${$scope.usage.organizationId}`)
-                        .success(() => {
-                            notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
-                            reload();
-                        })
-                        .error(() => {
-                            notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
-                        });
-                };
-                
-                function selectLazyLoading(url: any, excludeSelf: any, paramAry: any);
-                function selectLazyLoading(url, excludeSelf, paramAry) {
-                    return {
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        placeholder: " ",
-                        initSelection(elem, callback) {
-                        },
-                        ajax: {
-                            data(term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport(queryParams) {
-                                var extraParams = paramAry ? `&${paramAry.join("&")}` : "";
-                                var res = $http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
-                                res.abort = () => null;
-
-                                return res;
-                            },
-
-                            results(data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, (obj: { id; name; cvr; }) => {
-                                    if (excludeSelf && obj.id == itSystemUsage.id)
-                                        return; // don't add self to result
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name ? obj.name : "Unavngiven",
-                                        cvr: obj.cvr
-                                    });
-                                });
-
-                                return { results: results };
-                            }
-                        }
-                    };
-                }
-
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(() => {
-                        $scope.hideContent = true;
-                        return $timeout(() => $scope.hideContent = false, 1);
-                    });
-                }
-                $scope.save = () => {
-
+                $scope.saveDataworker = () => {
                     var data = {
                         ItSystemUsageId: $scope.usage.id,
                         DataWorkerId: $scope.selectedDataWorker.id
                     }
-
                     $http.post("api/UsageDataworker/", data)
                         .success(() => {
                             notify.addSuccessMessage("Databehandleren er tilknyttet.");
@@ -234,6 +184,27 @@
                             notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
                         });
                 };
+
+                $scope.deleteDataworker = dataworkerId => {
+                    $http.delete(`api/UsageDataWorker/${dataworkerId}?organizationid=${$scope.usage.organizationId}`)
+                        .success(() => {
+                            notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
+                            reload();
+                        })
+                        .error(() => {
+                            notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
+                        });
+                };
+
+                function reload() {
+                    return $state.transitionTo($state.current, $stateParams, {
+                        reload: true
+                    }).then(() => {
+                        $scope.hideContent = true;
+                        return $timeout(() => $scope.hideContent = false, 1);
+                    });
+                }
+                
 
                 $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {
