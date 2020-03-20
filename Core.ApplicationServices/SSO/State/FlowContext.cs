@@ -43,9 +43,9 @@ namespace Core.ApplicationServices.SSO.State
             Handle(FlowEvent.UserSeenBefore);
         }
 
-        public void HandleUserFirstTimeVisit()
+        public void HandleUserFirstTimeSsoVisit()
         {
-            Handle(FlowEvent.UserFirstTimeVisit);
+            Handle(FlowEvent.UserFirstTimeSsoVisit);
         }
 
         public void HandleOrganizationFound()
@@ -97,6 +97,11 @@ namespace Core.ApplicationServices.SSO.State
         public void HandleNoRoleAndOrganization()
         {
             Handle(FlowEvent.NoOrganizationAndRole);
+        }
+
+        public void HandleExistingSsoUserWithoutRoles()
+        {
+            Handle(FlowEvent.ExistingSsoUserWithoutRoles);
         }
     }
 }

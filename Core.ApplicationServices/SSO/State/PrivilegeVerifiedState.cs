@@ -39,14 +39,24 @@ namespace Core.ApplicationServices.SSO.State
                 //User has used the same SSO identity before and exists
                 if (userResult.HasValue)
                 {
-                    if (userResult.Value.User.CanAuthenticate())
+                    var user = userResult.Value.User;
+                    if (user.CanAuthenticate())
                     {
-                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(userResult.Value.User));
+                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user));
                         context.HandleUserSeenBefore();
                     }
                     else
                     {
-                        //TODO: MHS: User cannot authenticate - is not global admin or with any role so we must go through the UserWithNoRoles state and find the org before we go to authorizestate which deals with the assignmenstate
+                        //Resolve the user info
+                        var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
+                        if (!stsBrugerInfo.HasValue)
+                        {
+                            HandleUserResolutionFailed(context);
+                        }
+                        else
+                        {
+                            HandleExistingSsoUserIdentifiedWithoutRoles(context, user, stsBrugerInfo);
+                        }
                     }
                 }
                 else //Try to find the user by email
@@ -54,16 +64,14 @@ namespace Core.ApplicationServices.SSO.State
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                     if (!stsBrugerInfo.HasValue)
                     {
-                        context.TransitionTo(new ErrorState());
-                        context.HandleUnableToResolveUserInStsOrganisation();
+                        HandleUserResolutionFailed(context);
                     }
                     else
                     {
                         var userByEmail = FindUserByEmail(stsBrugerInfo);
                         if (userByEmail.HasValue)
                         {
-                            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByEmail.Value, stsBrugerInfo.Value));
-                            context.HandleUserFirstTimeVisit();
+                            HandleFirstTimeSsoVisit(context, userByEmail, stsBrugerInfo);
                         }
                         else
                         {
@@ -75,6 +83,24 @@ namespace Core.ApplicationServices.SSO.State
 
                 }
             }
+        }
+
+        private void HandleFirstTimeSsoVisit(FlowContext context, Maybe<User> userByEmail, Maybe<StsBrugerInfo> stsBrugerInfo)
+        {
+            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByEmail.Value, stsBrugerInfo.Value));
+            context.HandleUserFirstTimeSsoVisit();
+        }
+
+        private void HandleExistingSsoUserIdentifiedWithoutRoles(FlowContext context, User user, Maybe<StsBrugerInfo> stsBrugerInfo)
+        {
+            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(user, stsBrugerInfo.Value));
+            context.HandleExistingSsoUserWithoutRoles();
+        }
+
+        private static void HandleUserResolutionFailed(FlowContext context)
+        {
+            context.TransitionTo(new ErrorState());
+            context.HandleUnableToResolveUserInStsOrganisation();
         }
 
         private Maybe<User> FindUserByEmail(Maybe<StsBrugerInfo> stsBrugerInfo)
