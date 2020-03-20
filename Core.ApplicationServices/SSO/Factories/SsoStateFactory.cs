@@ -24,6 +24,7 @@ namespace Core.ApplicationServices.SSO.Factories
         private readonly SsoFlowConfiguration _configuration;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly ILogger _logger;
 
         public SsoStateFactory(
@@ -35,6 +36,7 @@ namespace Core.ApplicationServices.SSO.Factories
             SsoFlowConfiguration configuration,
             IApplicationAuthenticationState applicationAuthenticationState,
             IOrganizationRepository organizationRepository,
+            IOrganizationRoleService organizationRoleService,
             ILogger logger)
         {
             _infoService = infoService;
@@ -45,6 +47,7 @@ namespace Core.ApplicationServices.SSO.Factories
             _configuration = configuration;
             _applicationAuthenticationState = applicationAuthenticationState;
             _organizationRepository = organizationRepository;
+            _organizationRoleService = organizationRoleService;
             _logger = logger;
         }
 
@@ -74,12 +77,17 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateAuthorizingUserState(User user, Organization organization)
         {
-            return new AuthorizingUserState(user, organization, this);
+            return new AuthorizingUserState(user, organization, _organizationRoleService,this);
         }
 
         public AbstractState CreateAuthorizingUserFromUnknownOrgState(User user)
         {
             return new AuthorizingUserFromUnknownOrgState(user, this);
+        }
+
+        public AbstractState CreateAssigningRoleState(User user, Organization ssoOrganization)
+        {
+            return new AssigningRoleState(user,ssoOrganization,_organizationRoleService,this);
         }
     }
 }

@@ -1,6 +1,8 @@
-﻿using Core.ApplicationServices.SSO.Factories;
+﻿using System.Linq;
+using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 
 namespace Core.ApplicationServices.SSO.State
 {
@@ -8,12 +10,14 @@ namespace Core.ApplicationServices.SSO.State
     {
         private readonly User _user;
         private readonly Organization _ssoOrganization;
+        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly ISsoStateFactory _ssoStateFactory;
 
-        public AuthorizingUserState(User user, Organization ssoOrganization, ISsoStateFactory ssoStateFactory)
+        public AuthorizingUserState(User user, Organization ssoOrganization, IOrganizationRoleService organizationRoleService,ISsoStateFactory ssoStateFactory)
         {
             _user = user;
             _ssoOrganization = ssoOrganization;
+            _organizationRoleService = organizationRoleService;
             _ssoStateFactory = ssoStateFactory;
         }
 
@@ -21,7 +25,15 @@ namespace Core.ApplicationServices.SSO.State
         {
             if (@event.Equals(FlowEvent.OrganizationFound))
             {
-                // TODO
+                var rolesInOrganization = _organizationRoleService.GetRolesInOrganization(_user,_ssoOrganization.Id);
+                if (rolesInOrganization.Any())
+                {
+                    context.Transition(_ssoStateFactory.CreateUserLoggedIn(_user),_=>_.HandleUserHasRoleInOrganization());
+                }
+                else
+                {
+                    context.TransitionTo(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization));
+                }
             }
         }
     }
