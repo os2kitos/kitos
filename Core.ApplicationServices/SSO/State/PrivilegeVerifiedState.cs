@@ -39,8 +39,15 @@ namespace Core.ApplicationServices.SSO.State
                 //User has used the same SSO identity before and exists
                 if (userResult.HasValue)
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(userResult.Value.User));
-                    context.HandleUserSeenBefore();
+                    if (userResult.Value.User.CanAuthenticate())
+                    {
+                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(userResult.Value.User));
+                        context.HandleUserSeenBefore();
+                    }
+                    else
+                    {
+                        //TODO: MHS: User cannot authenticate - is not global admin or with any role so we must go through the UserWithNoRoles state and find the org before we go to authorizestate which deals with the assignmenstate
+                    }
                 }
                 else //Try to find the user by email
                 {
