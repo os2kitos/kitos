@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:part="urn:oio:sts:part:1.1.3.0" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:orgfaelles="urn:oio:sts:organisation:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="Part.xsd" namespace="urn:oio:sts:part:1.1.3.0" />
+  <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+  <element oio:definition="urn:oio:sagdok:aktoer:ADD:1.0.0" name="Aktoer" type="orgfaelles:AktoerType" />
+  <complexType oio:definition="urn:oio:sagdok:aktoer:ADD:1.0.0" name="AktoerType">
+    <complexContent mixed="false">
+      <extension base="part:PartType" />
+    </complexContent>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:organisationgyldighed:ADD:2.0.0" name="Gyldighed" type="orgfaelles:GyldighedType" />
+  <complexType oio:definition="urn:oio:sagdok:organisationgyldighed:ADD:2.0.0" name="GyldighedType">
+    <sequence>
+      <element oio:content="virkning" minOccurs="0" ref="sd:Virkning" />
+      <element oio:content="status" ref="orgfaelles:GyldighedStatusKode" />
+    </sequence>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:organisationgyldighedstatus:DT:2.0.0" name="GyldighedStatusKode" type="orgfaelles:GyldighedStatusKodeType" />
+  <simpleType oio:definition="urn:oio:sagdok:organisationgyldighedstatus:DT:2.0.0" name="GyldighedStatusKodeType">
+    <restriction base="string">
+      <enumeration value="Aktiv" />
+      <enumeration value="Inaktiv" />
+    </restriction>
+  </simpleType>
+</schema>

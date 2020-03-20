@@ -44,6 +44,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -87,6 +88,12 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="SSO\IStsBrugerEmailService.cs" />
+    <Compile Include="SSO\StsAdresseHelpers.cs" />
+    <Compile Include="SSO\StsOrganisationConstants.cs" />
+    <Compile Include="SSO\StsOrganisationIntegrationConfiguration.cs" />
+    <Compile Include="SSO\StsBrugerEmailService.cs" />
+    <Compile Include="SSO\StsBrugerHelpers.cs" />
     <Compile Include="Repositories\Interface\IInterfaceRepository.cs" />
     <Compile Include="Repositories\Interface\InterfaceRepository.cs" />
     <Compile Include="Repositories\Qa\BrokenExternalReferencesReportRepository.cs" />
@@ -120,6 +127,10 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
       <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
+      <Project>{A05389EA-25F4-45B5-8534-0775D9671456}</Project>
+      <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

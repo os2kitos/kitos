@@ -7,11 +7,11 @@
                 <div class="form-group">
                     <label class="control-label small">Systemets overordnede formål</label>
                     <input type="text"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-blur="patch('GeneralPurpose', generalPurpose)"
+                           ng-disabled="!hasWriteAccess"
+                           ng-blur="patch('GeneralPurpose', usage.generalPurpose)"
                            class="form-control input-sm"
                            data-field="generalPurpose"
-                           data-ng-model="generalPurpose"
+                           ng-model="usage.generalPurpose"
                            data-placeholder="Overordnet formål"
                            data-element-type="GDPRSystemPurpose" />
                 </div>
@@ -19,11 +19,11 @@
                 <div class="form-group">
                     <label for="businessCritical" class="control-label small">Forretningskritisk IT-System</label>
                     <select class="form-control input-sm" id="businessCritical"
-                            ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                            ui-select2="noSearchNoClearSelect2"
                             ng-model="usageViewModel.isBusinessCritical"
                             data-autosave="{{autoSaveUrl}}"
                             data-field="IsBusinessCritical"
-                            data-ng-disabled="!hasWriteAccess">
+                            ng-disabled="!hasWriteAccess">
                         <option hidden selected value />
                         <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                     </select>
@@ -32,32 +32,37 @@
                 <div class="form-group">
                     <label for="dataProcessor" class="control-label small">Dataansvarlig</label>
                     <input id="dataProcessor" type="text" class="form-control input-sm"
-                           data-ng-model="systemUsage.dataProcessor"
-                           data-ng-disabled="!hasWriteAccess"
+                           ng-model="systemUsage.dataProcessor"
+                           ng-disabled="!hasWriteAccess"
                            data-field="dataProcessor"
-                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
+                           ng-blur="patch('dataProcessor', systemUsage.dataProcessor)"
                            data-element-type="GDPRDataResponsible">
                 </div>
                 <!-- Data processing agreement -->
-                <div class="form-group" ng-show="filterDataProcessor">
-                    <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
-                    <div class="well">
-                        <ul id="dataProcessingAgreement"
-                            style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
-                            ng-repeat="contract in contracts">
-                            <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
+                <div class="form-group">
+                    <div ng-show="filterDataProcessor">
+                        <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
+                        <div class="well">
+                            <ul id="dataProcessingAgreement"
+                                style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
+                                ng-repeat="contract in contracts">
+                                <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div ng-hide="filterDataProcessor">
+                        <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
+                        <ul ng-disabled="true"
+                            id="dataProcessingAgreementNone"
+                            class="form-control input-sm"
+                            style="list-style-type:none">
+                            Ingen
                         </ul>
                     </div>
-                    <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
-                </div>
-                <div class="form-group" ng-hide="filterDataProcessor">
-                    <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
-                    <ul data-ng-disabled="true" id="dataProcessingAgreementNone"
-                        class="form-control input-sm"
-                        style="list-style-type:none">
-                        Ingen
-                    </ul>
-                    <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
+                    <span class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.
+                    </span>
                 </div>
                 <!-- Data processors -->
                 <p class="small boldParagraph">Databehandlere</p>
@@ -70,7 +75,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
+                        <tr ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
                             <td>
                                 {{ dataWorker.dataWorkerName }}
                             </td>
@@ -82,21 +87,21 @@
                                         class="btn btn-danger btn-xs delete-project"
                                         data-confirmed-click="delete({{ dataWorker.id }})"
                                         data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                        data-ng-show="hasWriteAccess">
+                                        ng-show="hasWriteAccess">
                                     <i class="glyphicon glyphicon-trash"></i>
                                 </button>
                             </td>
                         </tr>
                     </tbody>
-                    <tfoot data-ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                    <tfoot ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
                         <tr>
                             <td colspan="3" style="padding: 0">
                                 <input type="hidden"
                                        id="dataWorker-selector"
                                        class="form-control input-sm"
                                        data-ui-select2="dataWorkerSelectOptions"
-                                       data-ng-model="selectedDataWorker"
-                                       data-ng-change="save()"
+                                       ng-model="selectedDataWorker"
+                                       ng-change="save()"
                                        data-placeholder="Vælg Databehandler" />
                             </td>
                         </tr>
@@ -106,11 +111,11 @@
                 <div class="form-group">
                     <label for="dataProcessorControl" class="control-label small">Tilsyn/kontrol af databehandleren</label>
                     <select class="form-control input-sm" id="dataProcessorControl"
-                            ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                            ui-select2="noSearchNoClearSelect2"
                             ng-model="usageViewModel.dataProcessorControl"
                             data-autosave="{{autoSaveUrl}}"
                             data-field="DataProcessorControl"
-                            data-ng-disabled="!hasWriteAccess">
+                            ng-disabled="!hasWriteAccess">
                         <option hidden selected value />
                         <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                     </select>
@@ -122,29 +127,35 @@
                         <input type="text" id="lastControl" class="form-control"
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="systemUsage.lastControl"
+                               ng-disabled="!hasWriteAccess"
+                               ng-model="systemUsage.lastControl"
                                ng-blur="patchDate('lastControl', systemUsage.lastControl)"
                                data-field="lastControl">
                         <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-
-                            <a id="datahandler-link" target="_blank" data-element-type="dataProcessLinkField"
-                               href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}"
-                               data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == '' || systemUsage.datahandlerSupervisionDocumentationUrl == null">
-                                {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
+                        <label for="datahandler-supervision-link" class="control-label small">Link til dokumentation</label>
+                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                            <a id="datahandler-supervision-link" target="_blank" data-element-type="dataProcessLinkField"
+                               href="{{usage.datahandlerSupervisionDocumentationUrl}}"
+                               ng-hide="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
+                                {{usage.datahandlerSupervisionDocumentationUrlName ? usage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
                             </a>
-
-                            <label for="datahandler-link" class="control-label small"
-                                   data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == '' || systemUsage.datahandlerSupervisionDocumentationUrl == null">
+                            <label for="datahandler-supervision-link"
+                                   class="control-label small"
+                                   ng-show="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
                                 Intet link til dokumentation
                             </label>
-
-                            <button type="button" data-element-type="dataProcessLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            <button type="button"
+                                    style="float: right; cursor: pointer;"
+                                    ng-disabled="!hasWriteAccess"
+                                    class="btn-link btn-editLink"
+                                    title="Redigér link"
+                                    data-element-type="dataProcessLinkButton"
+                                    ng-click="editLink('datahandlerSupervisionDocumentationUrl')">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -153,21 +164,37 @@
                 <div class="form-group">
                     <label for="noteUsage" class="control-label small">Bemærkninger</label>
                     <textarea id="noteUsage" class="form-control input-sm" rows="5"
-                              data-ng-disabled="!hasWriteAccess"
-                              data-ng-model="systemUsage.noteUsage"
+                              ng-disabled="!hasWriteAccess"
+                              ng-model="systemUsage.noteUsage"
                               data-element-type="GDPRNoteUsage"
-                              ng-blur="patch('noteUsage', systemUsage.noteUsage)"dataProcessLinkButton
+                              ng-blur="patch('noteUsage', systemUsage.noteUsage)"
                               data-field="noteUsage"></textarea>
                 </div>
                 <!-- Link til fortegnelse -->
                 <div class="form-group">
-                    <label for="docu-link" class="control-label small">Link til fortegnelse</label>
-                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a target="_blank"´data-element-type="NoteLinkField" id="docu-link" href="{{systemUsage.LinkToDirectoryUrl}}" data-ng-hide="systemUsage.LinkToDirectoryUrl == '' || systemUsage.LinkToDirectoryUrl == null">
-                            {{systemUsage.LinkToDirectoryUrlName ? systemUsage.LinkToDirectoryUrlName : "Fortegnelse" }}
+                    <label for="directory-link" class="control-label small">Link til fortegnelse</label>
+                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                        <a target="_blank"
+                           id="directory-link"
+                           data-element-type="NoteLinkField"
+                           href="{{usage.linkToDirectoryUrl}}"
+                           ng-hide="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
+                            {{usage.linkToDirectoryUrlName ? usage.linkToDirectoryUrlName : "Fortegnelse" }}
                         </a>
-                        <label for="docu-link" class="control-label small" data-ng-show="systemUsage.LinkToDirectoryUrl == '' || systemUsage.LinkToDirectoryUrl == null">Intet link til fortegnelse</label>
-                        <button type="button" data-element-type="NoteLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('LinkToDirectoryUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                        <label for="directory-link"
+                               class="control-label small"
+                               ng-show="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
+                            Intet link til fortegnelse
+                        </label>
+                        <button type="button"
+                                style="float: right; cursor: pointer;"
+                                ng-disabled="!hasWriteAccess"
+                                class="btn-link btn-editLink"
+                                title="Redigér link"
+                                data-element-type="NoteLinkButton"
+                                ng-click="editLink('linkToDirectoryUrl')">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -180,51 +207,57 @@
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeNoneCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.NONE)"
-                                       ng-model="usageViewModel.personalNoDataSelected"
-                                       data-ng-disabled="!hasWriteAccess">
-                                Ingen Persondata
+                                       ng-change="dataLevelChange(sensitivityLevels.none.value)"
+                                       ng-model="usageViewModel.noDataSelected"
+                                       ng-disabled="!hasWriteAccess">
+                                {{sensitivityLevels.none.text}}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeRegularCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.PERSONALDATA)"
-                                       ng-model="usageViewModel.personalRegularDataSelected"
-                                       data-ng-disabled="!hasWriteAccess">
-                                Almindelig persondata
-                                <span class="help-block small">
-                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                    F.eks.: Navn, adresse, telefonummer, e-mailadresse, CPR-nr, titel m.m.
-                                </span>
+                                       ng-change="dataLevelChange(sensitivityLevels.personal.value)"
+                                       ng-model="usageViewModel.personalDataSelected"
+                                       ng-disabled="!hasWriteAccess">
+                                {{sensitivityLevels.personal.text}}
                             </label>
+                            <span class="help-block small inlineTab">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                F.eks.: Navn, adresse, telefonummer, e-mailadresse, CPR-nr, titel m.m.
+                            </span>
                         </div>
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox"
                                        data-element-type="dataLevelTypeSensitiveCheckbox"
-                                       ng-change="dataLevelChange(sensitiveDataLevel.SENSITIVEDATA)"
-                                       ng-model="usageViewModel.personalSensitiveDataSelected"
-                                       data-ng-disabled="!hasWriteAccess">
-                                Følsomme persondata
-                                <div class="checkbox"
-                                     data-ng-repeat="r in sensitivePersonalData"
-                                     ng-if="usageViewModel.personalSensitiveDataSelected">
-                                    <label>
-                                        <input type="checkbox"
-                                               ng-model="r.Checked"
-                                               data-element-type="{{r.Name}}"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
-                                        {{r.Name}}
-                                    </label>
-                                </div>
+                                       ng-change="dataLevelChange(sensitivityLevels.sensitive.value)"
+                                       ng-model="usageViewModel.sensitiveDataSelected"
+                                       ng-disabled="!hasWriteAccess">
+                                {{sensitivityLevels.sensitive.text}}
+
+                            </label>
+                        </div>
+                        <div class="checkbox inlineTab"
+                             ng-repeat="r in sensitivePersonalData"
+                             ng-if="usageViewModel.sensitiveDataSelected">
+                            <label>
+                                <input type="checkbox"
+                                       ng-model="r.Checked"
+                                       data-element-type="{{r.Name}}"
+                                       ng-disabled="!hasWriteAccess"
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
+                                {{r.Name}}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" data-element-type="dataLevelTypeLegalCheckbox" ng-change="dataLevelChange(sensitiveDataLevel.LEGALDATA)" ng-model="usageViewModel.personalLegalDataSelected" data-ng-disabled="!hasWriteAccess">Straffedomme og lovovertrædelser
+                                <input type="checkbox"
+                                       data-element-type="dataLevelTypeLegalCheckbox"
+                                       ng-change="dataLevelChange(sensitivityLevels.legal.value)"
+                                       ng-model="usageViewModel.legalDataSelected"
+                                       ng-disabled="!hasWriteAccess">
+                                {{sensitivityLevels.legal.text}}
                             </label>
                         </div>
                     </div>
@@ -232,27 +265,27 @@
                 <div class="form-group">
                     <label class="control-label small">Hvilke kategorier af registrerede indgår i databehandlingen?</label>
                     <div class="well">
-                        <div class="checkbox" data-ng-repeat="r in registerTypes">
+                        <div class="checkbox" ng-repeat="r in registerTypes">
                             <label>
                                 <input type="checkbox" ng-model="r.Checked"
-                                       data-ng-disabled="!hasWriteAccess"
+                                       ng-disabled="!hasWriteAccess"
                                        ng-click="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div data-ng-show="usageViewModel.personalSensitiveDataSelected">
+                <div ng-show="usageViewModel.sensitiveDataSelected">
                     <div class="well">
                         <!-- Implemented technical precautions -->
                         <div class="form-group">
                             <label for="precautions" class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
                             <select class="form-control input-sm" id="precautions"
-                                    ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                    ui-select2="noSearchNoClearSelect2"
                                     ng-model="usageViewModel.precautions"
                                     data-autosave="{{autoSaveUrl}}"
                                     data-field="Precautions"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
                                 <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                             </select>
@@ -270,13 +303,29 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a target="_blank" id="datahandler-link" data-element-type="PrecautionLinkField" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.TechnicalSupervisionDocumentationUrl == '' || systemUsage.TechnicalSupervisionDocumentationUrl == null">
-                                        {{systemUsage.TechnicalSupervisionDocumentationUrlName ? systemUsage.TechnicalSupervisionDocumentationUrlName : "Dokumentation" }}
+                                <label for="technical-supervision-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                                    <a target="_blank"
+                                       id="technical-supervision-link"
+                                       data-element-type="PrecautionLinkField"
+                                       href="{{usage.technicalSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.technicalSupervisionDocumentationUrl == '' || usage.technicalSupervisionDocumentationUrl == null">
+                                        {{usage.technicalSupervisionDocumentationUrlName ? usage.technicalSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
-                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.TechnicalSupervisionDocumentationUrl == '' || systemUsage.TechnicalSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
-                                    <button type="button" data-element-type="PrecautionLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('technicalSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                    <label for="technical-supervision-link"
+                                           class="control-label small"
+                                           ng-show="usage.technicalSupervisionDocumentationUrl == '' || usage.technicalSupervisionDocumentationUrl == null">
+                                        Intet link til dokumentation
+                                    </label>
+                                    <button type="button"
+                                            style="float: right; cursor: pointer;"
+                                            ng-disabled="!hasWriteAccess"
+                                            class="btn-link btn-editLink"
+                                            title="Redigér link"
+                                            data-element-type="PrecautionLinkButton"
+                                            ng-click="editLink('technicalSupervisionDocumentationUrl')">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -286,11 +335,11 @@
                         <div class="form-group">
                             <label for="userSupervision" class="control-label small">Logning af brugerkontrol</label><br>
                             <select class="form-control input-sm" id="userSupervision"
-                                    ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                    ui-select2="noSearchNoClearSelect2"
                                     ng-model="usageViewModel.userSupervision"
                                     data-autosave="{{autoSaveUrl}}"
                                     data-field="UserSupervision"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
                                 <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                             </select>
@@ -302,20 +351,36 @@
                                 <input type="text" id="latestRiskAssesmentDate" class="form-control"
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="systemUsage.UserSupervisionDate"
+                                       ng-disabled="!hasWriteAccess"
+                                       ng-model="systemUsage.UserSupervisionDate"
                                        ng-blur="patchDate('UserSupervisionDate', systemUsage.UserSupervisionDate)">
                                 <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a target="_blank" id="datahandler-link" data-element-type="superVisionLinkField" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == '' || systemUsage.UserSupervisionDocumentationUrl == null">
-                                        {{systemUsage.UserSupervisionDocumentationUrlName ? systemUsage.UserSupervisionDocumentationUrlName : "Dokumentation" }}
+                                <label for="user-supervision-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                                    <a target="_blank"
+                                       id="user-supervision-link"
+                                       data-element-type="superVisionLinkField"
+                                       href="{{usage.userSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.userSupervisionDocumentationUrl == '' || usage.userSupervisionDocumentationUrl == null">
+                                        {{usage.userSupervisionDocumentationUrlName ? usage.userSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
-                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == '' || systemUsage.UserSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
-                                    <button type="button" data-element-type="superVisionLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                    <label for="user-supervision-link"
+                                           class="control-label small"
+                                           ng-show="usage.userSupervisionDocumentationUrl == '' || usage.userSupervisionDocumentationUrl == null">
+                                        Intet link til dokumentation
+                                    </label>
+                                    <button type="button"
+                                            style="float: right; cursor: pointer;"
+                                            ng-disabled="!hasWriteAccess"
+                                            class="btn-link btn-editLink"
+                                            title="Redigér link"
+                                            data-element-type="superVisionLinkButton"
+                                            ng-click="editLink('userSupervisionDocumentationUrl')">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -326,11 +391,11 @@
                     <div class="form-group">
                         <label for="riskAssessment" class="control-label small">Foretaget risikovurdering</label><br>
                         <select class="form-control input-sm" id="riskAssessment"
-                                ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                ui-select2="noSearchNoClearSelect2"
                                 ng-model="usageViewModel.riskAssessment"
                                 data-autosave="{{autoSaveUrl}}"
                                 data-field="RiskAssessment"
-                                data-ng-disabled="!hasWriteAccess">
+                                ng-disabled="!hasWriteAccess">
                             <option hidden selected value />
                             <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                         </select>
@@ -343,8 +408,8 @@
                             <input type="text" id="riskAssesmentDate" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.riskAssesmentDate"
+                                   ng-disabled="!hasWriteAccess"
+                                   ng-model="systemUsage.riskAssesmentDate"
                                    ng-blur="patchDate('riskAssesmentDate', systemUsage.riskAssesmentDate)"
                                    data-field="riskAssesmentDate">
                             <span id="helpBlockRisk" class="help-block small">Eksempelvis "25-04-2017"</span>
@@ -353,11 +418,11 @@
                         <div class="form-group">
                             <label for="preRiskAssessment" class="control-label small">Hvad viste den seneste risikovurdering?</label>
                             <select class="form-control input-sm" id="preRiskAssessment"
-                                    ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                    ui-select2="noSearchNoClearSelect2"
                                     ng-model="usageViewModel.preRiskAssessment"
                                     data-autosave="{{autoSaveUrl}}"
                                     data-field="PreRiskAssessment"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
                                 <option ng-repeat="riskLevel in riskLevelOptions" value="{{riskLevel.id}}" ng-bind-html="riskLevel.text" />
                             </select>
@@ -365,21 +430,37 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                <a target="_blank" id="datahandler-link" data-element-type="riskLinkField" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == '' || systemUsage.RiskSupervisionDocumentationUrl == null">
-                                    {{systemUsage.RiskSupervisionDocumentationUrlName ? systemUsage.RiskSupervisionDocumentationUrlName : "Dokumentation" }}
+                            <label for="risk-supervision-link" class="control-label small">Link til dokumentation</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                                <a target="_blank"
+                                   id="risk-supervision-link"
+                                   data-element-type="riskLinkField"
+                                   href="{{usage.riskSupervisionDocumentationUrl}}"
+                                   ng-hide="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
+                                    {{usage.riskSupervisionDocumentationUrlName ? usage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
                                 </a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.RiskSupervisionDocumentationUrl == '' || systemUsage.RiskSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
-                                <button type="button" data-element-type="riskLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('RiskSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                <label for="risk-supervision-link"
+                                       class="control-label small"
+                                       ng-show="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
+                                    Intet link til dokumentation
+                                </label>
+                                <button type="button"
+                                        style="float: right; cursor: pointer;"
+                                        ng-disabled="!hasWriteAccess"
+                                        class="btn-link btn-editLink"
+                                        title="Redigér link"
+                                        data-element-type="riskLinkButton"
+                                        ng-click="editLink('riskSupervisionDocumentationUrl')">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
                         <!-- Notes risk -->
                         <div class="form-group">
                             <label for="noteRisks" class="control-label small">Bemærkninger</label>
                             <textarea id="noteRisks" class="form-control input-sm" rows="5"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-ng-model="systemUsage.noteRisks"
+                                      ng-disabled="!hasWriteAccess"
+                                      ng-model="systemUsage.noteRisks"
                                       data-element-type="GDPRNoteRisk"
                                       ng-blur="patch('noteRisks', systemUsage.noteRisks)"
                                       data-field="noteRisks"></textarea>
@@ -392,11 +473,11 @@
                         <div class="form-group">
                             <label for="DPIA" class="control-label small">Gennemført DPIA / Konsekvensanalyse</label>
                             <select class="form-control input-sm" id="DPIA"
-                                    ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                    ui-select2="noSearchNoClearSelect2"
                                     ng-model="usageViewModel.DPIA"
                                     data-autosave="{{autoSaveUrl}}"
                                     data-field="DPIA"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    ng-disabled="!hasWriteAccess">
                                 <option hidden selected value />
                                 <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                             </select>
@@ -409,21 +490,36 @@
                                 <input type="text" id="DPIADateFor" class="form-control"
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="systemUsage.DPIADateFor"
+                                       ng-disabled="!hasWriteAccess"
+                                       ng-model="systemUsage.DPIADateFor"
                                        ng-blur="patchDate('DPIADateFor', systemUsage.DPIADateFor)"
                                        data-field="DPIADateFor">
                                 <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "25-04-2017"</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a target="_blank" id="datahandler-link" data-element-type="dpiaLinkField" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == '' || systemUsage.DPIASupervisionDocumentationUrl == null">
-                                        {{systemUsage.DPIASupervisionDocumentationUrlName ? systemUsage.DPIASupervisionDocumentationUrlName : "Dokumentation" }}
+                                <label for="dpia-supervision-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                                    <a target="_blank"
+                                       id="dpia-supervision-link"
+                                       data-element-type="dpiaLinkField"
+                                       href="{{usage.dpiaSupervisionDocumentationUrl}}"
+                                       ng-hide="usage.dpiaSupervisionDocumentationUrl == '' || usage.dpiaSupervisionDocumentationUrl == null">
+                                        {{usage.dpiaSupervisionDocumentationUrlName ? usage.dpiaSupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
-                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == '' || systemUsage.DPIASupervisionDocumentationUrl == null">Intet link til dokumentation</label>
-                                    <button type="button" data-element-type="dpiaLinkButton" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DPIASupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                    <label for="dpia-supervision-link" class="control-label small"
+                                           ng-show="usage.dpiaSupervisionDocumentationUrl == '' || usage.dpiaSupervisionDocumentationUrl == null">
+                                        Intet link til dokumentation
+                                    </label>
+                                    <button type="button"
+                                            style="float: right; cursor: pointer;"
+                                            ng-disabled="!hasWriteAccess"
+                                            class="btn-link btn-editLink"
+                                            title="Redigér link"
+                                            data-element-type="dpiaLinkButton"
+                                            ng-click="editLink('dpiaSupervisionDocumentationUrl')">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -434,11 +530,11 @@
                     <div class="form-group">
                         <label for="answeringDataDPIA" class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label>
                         <select class="form-control input-sm" id="answeringDataDPIA"
-                                ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                                ui-select2="noSearchNoClearSelect2"
                                 ng-model="usageViewModel.answeringDataDPIA"
                                 data-autosave="{{autoSaveUrl}}"
                                 data-field="AnsweringDataDPIA"
-                                data-ng-disabled="!hasWriteAccess">
+                                ng-disabled="!hasWriteAccess">
                             <option hidden selected value />
                             <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
                         </select>
@@ -450,8 +546,8 @@
                             <input type="text" id="DPIAdeleteDate" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.DPIAdeleteDate"
+                                   ng-disabled="!hasWriteAccess"
+                                   ng-model="systemUsage.DPIAdeleteDate"
                                    ng-blur="patchDate('DPIAdeleteDate', systemUsage.DPIAdeleteDate)"
                                    data-field="DPIAdeleteDate">
                             <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "25-04-2017"</span>
@@ -461,9 +557,9 @@
                             <input type="number" step="1" min="0" class="form-control input-sm"
                                    ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
                                    data-field="numberDPIA"
-                                   data-ng-model="systemUsage.numberDPIA"
+                                   ng-model="systemUsage.numberDPIA"
                                    data-element-type="GDPRNumberDPIA"
-                                   data-ng-disabled="!hasWriteAccess" />
+                                   ng-disabled="!hasWriteAccess" />
                         </div>
                     </div>
                 </div>

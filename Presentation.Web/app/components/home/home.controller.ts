@@ -16,8 +16,8 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location", "$",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location, $) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -41,6 +41,13 @@
                 convert_urls: false
             };
 
+            const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
+            $scope.ssoVm = factory.createFromViewState();
+
+            const resetSsoError = () => {
+                $scope.ssoVm.error = null;
+            }
+
             $scope.text = {};
 
             var token = $location.search()["id_token"];
@@ -52,13 +59,9 @@
                 userService.loginSSO(token).then(user => $scope.loginResult(user));
             }
 
-            $scope.SSOLogin = () => {
-                notify.addInfoMessage("Should do redirect to OS2SSO...");
-                $auth.signIn();
-            };
-
             // login
             $scope.submitLogin = () => {
+                resetSsoError();
 
                 if ($scope.loginForm.$invalid) return;
 
