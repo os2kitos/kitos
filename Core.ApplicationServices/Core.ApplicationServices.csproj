@@ -86,8 +86,11 @@
     <Compile Include="ApplicationServiceModule.cs" />
     <Compile Include="Authentication\AuthenticationContext.cs" />
     <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\AuthenticationScope.cs" />
+    <Compile Include="Authentication\ApplicationApplicationAuthenticationState.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />

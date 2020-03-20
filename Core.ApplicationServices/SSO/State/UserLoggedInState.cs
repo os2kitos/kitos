@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 
 namespace Core.ApplicationServices.SSO.State
@@ -6,13 +7,14 @@ namespace Core.ApplicationServices.SSO.State
     public class UserLoggedInState : AbstractState
     {
         private readonly User _user;
+        private readonly IApplicationAuthenticationState _authenticationState;
 
-        public UserLoggedInState(User user)
+        public UserLoggedInState(User user, IApplicationAuthenticationState authenticationState)
         {
             _user = user;
+            _authenticationState = authenticationState;
         }
 
-        //TODO: Require the user!
         public override void Handle(FlowEvent @event, FlowContext context)
         {
             switch (@event)
@@ -20,7 +22,7 @@ namespace Core.ApplicationServices.SSO.State
                 case FlowEvent.UserSeenBefore:
                 case FlowEvent.UserHasRoleInOrganization:
                 case FlowEvent.RoleAssigned:
-                    // TODO: Authenticate the user
+                    _authenticationState.SetAuthenticatedUser(_user, AuthenticationScope.Session);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(@event), @event, null);

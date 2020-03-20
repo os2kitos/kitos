@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
 using Core.DomainModel;
@@ -19,8 +20,16 @@ namespace Core.ApplicationServices.SSO.Factories
         private readonly Maybe<ISaml20Identity> _samlState;
         private readonly IUserRepository _userRepository;
         private readonly SsoFlowConfiguration _configuration;
+        private readonly IApplicationAuthenticationState _applicationAuthenticationState;
 
-        public SsoStateFactory(IStsBrugerInfoService infoService, ISsoUserIdentityRepository ssoUserIdentityRepository, ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository, Maybe<ISaml20Identity> samlState, IUserRepository userRepository, SsoFlowConfiguration configuration)
+        public SsoStateFactory(
+            IStsBrugerInfoService infoService,
+            ISsoUserIdentityRepository ssoUserIdentityRepository,
+            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
+            Maybe<ISaml20Identity> samlState,
+            IUserRepository userRepository,
+            SsoFlowConfiguration configuration,
+            IApplicationAuthenticationState applicationAuthenticationState)
         {
             _infoService = infoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
@@ -28,6 +37,7 @@ namespace Core.ApplicationServices.SSO.Factories
             _samlState = samlState;
             _userRepository = userRepository;
             _configuration = configuration;
+            _applicationAuthenticationState = applicationAuthenticationState;
         }
 
         public AbstractState CreateInitialState()
@@ -46,7 +56,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateUserLoggedIn(User user)
         {
-            return new UserLoggedInState(user);
+            return new UserLoggedInState(user, _applicationAuthenticationState);
         }
 
         public AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo)

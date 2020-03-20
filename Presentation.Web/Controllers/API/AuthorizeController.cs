@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
+using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Cryptography;
@@ -31,17 +32,20 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly ICryptoService _cryptoService;
+        private readonly IApplicationAuthenticationState _applicationAuthenticationState;
 
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
             IOrganizationService organizationService,
-            ICryptoService cryptoService)
+            ICryptoService cryptoService,
+            IApplicationAuthenticationState applicationAuthenticationState)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
             _cryptoService = cryptoService;
+            _applicationAuthenticationState = applicationAuthenticationState;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
@@ -184,7 +188,8 @@ namespace Presentation.Web.Controllers.API
 
                 var user = result.Value;
 
-                FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
+                _applicationAuthenticationState.SetAuthenticatedUser(user,loginDto.RememberMe ? AuthenticationScope.Persistent : AuthenticationScope.Session);
+
                 var response = Map<User, UserDTO>(user);
                 loginInfo = new { UserId = user.Id, LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
