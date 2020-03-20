@@ -6,9 +6,11 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using dk.nita.saml20.identity;
+using Serilog;
 
 namespace Core.ApplicationServices.SSO.Factories
 {
@@ -21,6 +23,8 @@ namespace Core.ApplicationServices.SSO.Factories
         private readonly IUserRepository _userRepository;
         private readonly SsoFlowConfiguration _configuration;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
+        private readonly IOrganizationRepository _organizationRepository;
+        private readonly ILogger _logger;
 
         public SsoStateFactory(
             IStsBrugerInfoService infoService,
@@ -29,7 +33,9 @@ namespace Core.ApplicationServices.SSO.Factories
             Maybe<ISaml20Identity> samlState,
             IUserRepository userRepository,
             SsoFlowConfiguration configuration,
-            IApplicationAuthenticationState applicationAuthenticationState)
+            IApplicationAuthenticationState applicationAuthenticationState,
+            IOrganizationRepository organizationRepository,
+            ILogger logger)
         {
             _infoService = infoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
@@ -38,6 +44,8 @@ namespace Core.ApplicationServices.SSO.Factories
             _userRepository = userRepository;
             _configuration = configuration;
             _applicationAuthenticationState = applicationAuthenticationState;
+            _organizationRepository = organizationRepository;
+            _logger = logger;
         }
 
         public AbstractState CreateInitialState()
@@ -61,7 +69,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo)
         {
-            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository, this);
+            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository, _organizationRepository,this,_logger);
         }
 
         public AbstractState CreateAuthorizingUserState(User user, Organization organization)

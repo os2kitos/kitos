@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
+using Core.DomainServices.Repositories.Organization;
+using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
+using Serilog;
 
 namespace Core.ApplicationServices.SSO.State
 {
@@ -9,7 +12,9 @@ namespace Core.ApplicationServices.SSO.State
         private readonly User _user;
         private readonly StsBrugerInfo _externalUser;
 
-        public AuthorizingUserFromUnknownOrgState(User user, StsBrugerInfo externalUser)
+        public AuthorizingUserFromUnknownOrgState(
+            User user,
+            StsBrugerInfo externalUser)
         {
             _user = user;
             _externalUser = externalUser;
@@ -19,9 +24,7 @@ namespace Core.ApplicationServices.SSO.State
         {
             if (@event.Equals(FlowEvent.OrganizationNotFound))
             {
-                // TODO
-                //TODO: Transition to "find by cvr" (extend user info and pass that along the states in stead of small bits)
-                //TODO: If find by cvr fails then go to unknown state. If it succeeds, assign the relationship and then transition to authorizing state.
+                // TODO - check for role in any org
             }
         }
     }
