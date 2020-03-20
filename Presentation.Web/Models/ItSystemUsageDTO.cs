@@ -88,50 +88,7 @@ namespace Presentation.Web.Models
 
         public int? ItSystemCategoriesId { get; set; }
 
-        public string GeneralPurpose { get; set; }
-
-        public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
-
-        public DataOptions? IsBusinessCritical { get; set; }
-
-        public DataOptions? DataProcessorControl { get; set; }
-
-        public DataOptions? Precautions { get; set; }
-
-        public DataOptions? RiskAssessment { get; set; }
-
-        public RiskLevel? PreRiskAssessment { get; set; }
-
-        public DataOptions? DPIA { get; set; }
-
-        public DataOptions? AnsweringDataDPIA { get; set; }
-
-        public HostedAt? HostedAt { get; set; }
-
         public UserCount UserCount { get; set; }
-        
-        public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
-
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
-        public string TechnicalSupervisionDocumentationUrlName { get; set; }
-        public string TechnicalSupervisionDocumentationUrl { get; set; }
-
-        public string UserSupervisionDocumentationUrlName { get; set; }
-        public string UserSupervisionDocumentationUrl { get; set; }
-
-        public string RiskSupervisionDocumentationUrlName { get; set; }
-        public string RiskSupervisionDocumentationUrl { get; set; }
-
-        public string DPIASupervisionDocumentationUrlName { get; set; }
-        public string DPIASupervisionDocumentationUrl { get; set; }
-
-        public DateTime UserSupervisionDate { get; set; }
-        public DataOptions? UserSupervision { get; set; }
-
-        public string LinkToDirectoryUrlName { get; set; }
-        public string LinkToDirectoryUrl { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool? ReportedToDPA { get; set; }
@@ -140,5 +97,55 @@ namespace Presentation.Web.Models
         public int? ArchiveFreq { get; set; }
         public bool? Registertype { get; set; }
         public bool? ArchiveFromSystem { get; set; }
+
+        #region GDPR
+        public string GeneralPurpose { get; set; }
+        public DataOptions? IsBusinessCritical { get; set; }
+        public string DataProcessor { get; set; }
+        public HostedAt? HostedAt { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
+
+        public DataOptions? DataProcessorControl { get; set; }
+        public DateTime? LastControl { get; set; }
+        public string DatahandlerSupervisionDocumentationUrlName { get; set; }
+        public string DatahandlerSupervisionDocumentationUrl { get; set; }
+
+        public string NoteUsage { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+
+
+        public ICollection<ItSystemUsageSensitiveDataLevelDTO> SensitiveDataLevels { get; set; }
+
+        public DataOptions? Precautions { get; set; }
+        public bool PrecautionsOptionsEncryption { get; set; }
+        public bool PrecautionsOptionsPseudonomisering { get; set; }
+        public bool PrecautionsOptionsAccessControl { get; set; }
+        public bool PrecautionsOptionsLogning { get; set; }
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+
+        public DataOptions? UserSupervision { get; set; }
+        public DateTime UserSupervisionDate { get; set; }
+        public string UserSupervisionDocumentationUrlName { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+
+        public DataOptions? RiskAssessment { get; set; }
+        public DateTime? RiskAssesmentDate { get; set; }
+        public RiskLevel? PreRiskAssessment { get; set; }
+        public string RiskSupervisionDocumentationUrlName { get; set; }
+        public string RiskSupervisionDocumentationUrl { get; set; }
+        public string NoteRisks { get; set; }
+
+        public DataOptions? DPIA { get; set; }
+        public DateTime? DPIADateFor { get; set; }
+        public string DPIASupervisionDocumentationUrlName { get; set; }
+        public string DPIASupervisionDocumentationUrl { get; set; }
+
+        public DataOptions? AnsweringDataDPIA { get; set; }
+        public DateTime? DPIADeleteDate { get; set; }
+        public int NumberDPIA { get; set; }
+
+        #endregion
     }
 }

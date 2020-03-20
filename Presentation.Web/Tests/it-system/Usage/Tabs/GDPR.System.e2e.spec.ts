@@ -16,13 +16,19 @@ describe("Global admin is able to", () => {
     var consts = new Constants();
     var cssHelper = new CssHelper();
 
-    var dropDownValue = consts.gdprDefaultDropDownValueYes;
-    var preRiskAssessmentValue = consts.gdprDefaultPreRiskAssessmentValue;
-    var dateValue = consts.gdprDefaultDate;
-    var testUrl = consts.gdprDefaultUrl;
-    var hostedValue = consts.hostedAtValueExternal;
-    var defaultNumberValue = consts.gdprDefaultNumberText;
-    var defaultText = consts.gdprDefaultText;
+
+    var dropdownYes = "Ja";
+    var preRiskAssessmentMiddle = "Mellem risiko";
+    var hostedValue = "Eksternt";
+    var dateValue = getDate();
+    var testUrl = "https://www.strongminds.dk/";
+    var numberValue = new Date().getDay().toString();
+    
+    var purposeText = `purpose${new Date().getTime()}`;
+    var dataResponsibleText = `dataResponsible${new Date().getTime()}`;
+    var noteUsageText = `noteUsage${new Date().getTime()}`;
+    var noteRiskText = `noteRiskText${new Date().getTime()}`;
+    var urlNameText = `urlName${new Date().getTime()}`;
 
 
     beforeAll(() => {
@@ -76,15 +82,15 @@ describe("Global admin is able to", () => {
 
     function fillOutDropDown() {
         console.log("Selecting values into the dropdown fields");
-        return Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprBusinessCriticalSelect2Id)
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprDPIASelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprAnsweringDataDPIASelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprDataProcessorControlSelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprRiskAssessmentSelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprPrecautionsSelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprsUserSupervisionSelect2Id))
+        return Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprBusinessCriticalSelect2Id)
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprDPIASelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprAnsweringDataDPIASelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprDataProcessorControlSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprRiskAssessmentSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprPrecautionsSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprsUserSupervisionSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(hostedValue, consts.hostedAtSelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentValue, consts.gdprPreRiskAssessment));
+            .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment));
     }
 
     function fillOutDateFields() {
@@ -99,12 +105,11 @@ describe("Global admin is able to", () => {
 
     function fillOutTextFields() {
         console.log("Entering data into text fields");
-        return ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(defaultText)
-            .then(() => ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().clear())
-            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(defaultNumberValue));
+        return ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(purposeText)
+            .then(() => ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().sendKeys(dataResponsibleText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().sendKeys(noteUsageText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(numberValue));
     }
 
     function fillOutLinkFields() {
@@ -125,7 +130,7 @@ describe("Global admin is able to", () => {
 
     function fillOutModalLinkWindow() {
         return ItSystemUsageGDPRPage.getModalNameField().clear()
-            .then(() => ItSystemUsageGDPRPage.getModalNameField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPRPage.getModalNameField().sendKeys(urlNameText))
             .then(() => ItSystemUsageGDPRPage.getModalUrlField().clear())
             .then(() => ItSystemUsageGDPRPage.getModalUrlField().sendKeys(testUrl))
             .then(() => ItSystemUsageGDPRPage.getModalSaveButton().click());
@@ -150,13 +155,13 @@ describe("Global admin is able to", () => {
 
     function verifyDropDown() {
         console.log("Verifying drop down");
-        expectDropdownValueToEqual(dropDownValue, consts.gdprBusinessCriticalSelect2Id);
-        expectDropdownValueToEqual(dropDownValue, consts.gdprDataProcessorControlSelect2Id);
-        expectDropdownValueToEqual(dropDownValue, consts.gdprRiskAssessmentSelect2Id);
-        expectDropdownValueToEqual(dropDownValue, consts.gdprDPIASelect2Id);
-        expectDropdownValueToEqual(dropDownValue, consts.gdprAnsweringDataDPIASelect2Id);
+        expectDropdownValueToEqual(dropdownYes, consts.gdprBusinessCriticalSelect2Id);
+        expectDropdownValueToEqual(dropdownYes, consts.gdprDataProcessorControlSelect2Id);
+        expectDropdownValueToEqual(dropdownYes, consts.gdprRiskAssessmentSelect2Id);
+        expectDropdownValueToEqual(dropdownYes, consts.gdprDPIASelect2Id);
+        expectDropdownValueToEqual(dropdownYes, consts.gdprAnsweringDataDPIASelect2Id);
         expectDropdownValueToEqual(hostedValue, consts.hostedAtSelect2Id);
-        expectDropdownValueToEqual(preRiskAssessmentValue, consts.gdprPreRiskAssessment);
+        expectDropdownValueToEqual(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment);
     }
 
     function verifyDateFields() {
@@ -169,11 +174,11 @@ describe("Global admin is able to", () => {
 
     function verifyTextFields() {
         console.log("Verifying text fields");
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField())).toEqual(defaultText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField())).toEqual(defaultText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField())).toEqual(defaultText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField())).toEqual(defaultText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNumberDPIAField())).toEqual(defaultNumberValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField())).toEqual(purposeText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField())).toEqual(dataResponsibleText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField())).toEqual(noteUsageText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField())).toEqual(noteRiskText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNumberDPIAField())).toEqual(numberValue);
     }
 
     function verifyLinkFields() {
@@ -186,12 +191,12 @@ describe("Global admin is able to", () => {
         expect(getHrefUrl(ItSystemUsageGDPRPage.getRiskLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getDPIALinkField())).toEqual(testUrl);
         console.log("Checking Name");
-        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getRiskLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getText()).toEqual(urlNameText);
+        expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(urlNameText);
+        expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(urlNameText);
+        expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(urlNameText);
+        expect(ItSystemUsageGDPRPage.getRiskLinkField().getText()).toEqual(urlNameText);
+        expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(urlNameText);
     }
 
     function getHrefUrl(element: protractor.ElementFinder) {
@@ -215,4 +220,23 @@ describe("Global admin is able to", () => {
         console.log("Expecting " + idOfDropDownBox + " to equal " + expectedValue);
         return expect(Select2Helper.getData(idOfDropDownBox).getText()).toEqual(expectedValue);
     }
+
+    function getDate() {
+        const currentDay = new Date().getDate();
+        const currentMonth = new Date().getMonth();
+
+        if (currentDay <= 9) {
+            if (currentMonth <= 9) {
+                return `0${currentDay}-0${currentMonth}-${new Date().getFullYear()}`;
+            }
+            return `0${currentDay}-${currentMonth}-${new Date().getFullYear()}`;
+        }
+
+        if (currentMonth <= 9) {
+            return `${currentDay}-0${currentMonth}-${new Date().getFullYear()}`;
+        }
+        return `${currentDay}-${currentMonth}-${new Date().getFullYear()}`;
+
+    }
+
 });
