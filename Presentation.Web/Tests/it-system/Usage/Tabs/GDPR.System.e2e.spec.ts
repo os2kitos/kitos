@@ -215,11 +215,4 @@ describe("Global admin is able to", () => {
         console.log("Expecting " + idOfDropDownBox + " to equal " + expectedValue);
         return expect(Select2Helper.getData(idOfDropDownBox).getText()).toEqual(expectedValue);
     }
-
-
-    function expectHostedAtToEqual(expectedValue: string) {
-        console.log("Expecting hostedAt to equal " + expectedValue);
-        return expect(Select2Helper.getData(consts.hostedAtSelect2Id).getText()).toEqual(expectedValue);
-    }
-
 });

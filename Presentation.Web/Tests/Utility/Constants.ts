@@ -210,11 +210,6 @@
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
 
-    readonly hostedAtValueNone = " ";
-    readonly hostedAtValueExternal = "Eksternt";
-    readonly hostedAtValueOnPremise = "On-premise";
-    readonly hostedAtSelect2Id = "s2id_HostedAt";
-
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
