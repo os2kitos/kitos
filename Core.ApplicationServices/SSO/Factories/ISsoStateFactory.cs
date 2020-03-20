@@ -13,6 +13,6 @@ namespace Core.ApplicationServices.SSO.Factories
         AbstractState CreateUserLoggedIn(User valueUser);
         AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo);
         AbstractState CreateAuthorizingUserState(User user, Organization organization);
-        AbstractState CreateAuthorizingUserFromUnknownOrgState(User user, StsBrugerInfo externalUser);
+        AbstractState CreateAuthorizingUserFromUnknownOrgState(User user);
     }
 }

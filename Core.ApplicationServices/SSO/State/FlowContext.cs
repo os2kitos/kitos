@@ -1,4 +1,5 @@
-﻿using NotImplementedException = System.NotImplementedException;
+﻿using System;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SSO.State
 {
@@ -14,6 +15,12 @@ namespace Core.ApplicationServices.SSO.State
         public void TransitionTo(AbstractState nextState)
         {
             CurrentState = nextState;
+        }
+
+        public void Transition(AbstractState nextState, Action<FlowContext> withAction)
+        {
+            TransitionTo(nextState);
+            withAction(this);
         }
 
         public void HandleLoginCompleted()
@@ -85,6 +92,11 @@ namespace Core.ApplicationServices.SSO.State
         private void Handle(FlowEvent eventToHandle)
         {
             CurrentState.Handle(eventToHandle, this);
+        }
+
+        public void HandleNoRoleAndOrganization()
+        {
+            Handle(FlowEvent.NoOrganizationAndRole);
         }
     }
 }

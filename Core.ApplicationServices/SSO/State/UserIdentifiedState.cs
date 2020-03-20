@@ -70,7 +70,7 @@ namespace Core.ApplicationServices.SSO.State
                     }
                     else
                     {
-                        context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user, _externalUser));
+                        context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user));
                         context.HandleOrganizationNotFound();
                     }
                 }

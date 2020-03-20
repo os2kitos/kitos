@@ -77,9 +77,9 @@ namespace Core.ApplicationServices.SSO.Factories
             return new AuthorizingUserState(user, organization, this);
         }
 
-        public AbstractState CreateAuthorizingUserFromUnknownOrgState(User user, StsBrugerInfo externalUser)
+        public AbstractState CreateAuthorizingUserFromUnknownOrgState(User user)
         {
-            return new AuthorizingUserFromUnknownOrgState(user, externalUser);
+            return new AuthorizingUserFromUnknownOrgState(user, this);
         }
     }
 }

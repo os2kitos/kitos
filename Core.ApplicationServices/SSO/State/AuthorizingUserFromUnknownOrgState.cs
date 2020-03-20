@@ -1,30 +1,33 @@
 ﻿using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
-using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Repositories.SSO;
-using Core.DomainServices.SSO;
-using Serilog;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class AuthorizingUserFromUnknownOrgState : AbstractState
     {
         private readonly User _user;
-        private readonly StsBrugerInfo _externalUser;
+        private readonly ISsoStateFactory _stateFactory;
 
         public AuthorizingUserFromUnknownOrgState(
             User user,
-            StsBrugerInfo externalUser)
+            ISsoStateFactory stateFactory)
         {
             _user = user;
-            _externalUser = externalUser;
+            _stateFactory = stateFactory;
         }
 
         public override void Handle(FlowEvent @event, FlowContext context)
         {
             if (@event.Equals(FlowEvent.OrganizationNotFound))
             {
-                // TODO - check for role in any org
+                if (_user.CanAuthenticate())
+                {
+                    context.Transition(_stateFactory.CreateUserLoggedIn(_user), _ => _.HandleUserHasRoleInOrganization());
+                }
+                else
+                {
+                    context.Transition(new ErrorState(), _ => _.HandleNoRoleAndOrganization());
+                }
             }
         }
     }

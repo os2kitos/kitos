@@ -17,6 +17,6 @@
         
         //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning
         UnsupportedFlow = 12,
-        UnknownError = 13
+        UnknownError = 13,
     }
 }
