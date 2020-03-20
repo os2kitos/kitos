@@ -62,7 +62,7 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getSensitiveDataLevelCheckBox().click()
             .then(() => ItSystemUsageGDPRPage.getRegularDataLevelCheckBox().click())
             .then(() => ItSystemUsageGDPRPage.getLegalDataLevelCheckBox().click())
-            .then(() => ItSystemUsageGDPRPage.getSensitiveTestDataCheckbox().click());
+            .then(() => ItSystemUsageGDPRPage.getDefaultPersonalSensitiveDataCheckbox1().click());
 
     }
 
@@ -158,30 +158,30 @@ describe("Global admin is able to", () => {
 
     function verifyDateFields() {
         console.log("Verifying date fields");
-        expect(ItSystemUsageGDPRPage.getLastControlDateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPRPage.getRiskAssesmentDateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPRPage.getDPIADateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPRPage.getDPIADeleteDateField().getAttribute("value")).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getLastControlDateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getRiskAssesmentDateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dateValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dateValue);
     }
 
     function verifyTextFields() {
         console.log("Verifying text fields");
-        expect(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPRPage.getGDPRNumberDPIAField().getAttribute("value")).toEqual(defaultNumberValue);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField())).toEqual(defaultText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField())).toEqual(defaultText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField())).toEqual(defaultText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField())).toEqual(defaultText);
+        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNumberDPIAField())).toEqual(defaultNumberValue);
     }
 
     function verifyLinkFields() {
         console.log("Verifying link fields");
         console.log("Checking Url");
-        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPRPage.getNoteLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPRPage.getRiskLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPRPage.getDPIALinkField().getAttribute("href")).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getDataProcessLinkField())).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getNoteLinkField())).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getPrecautionLinkField())).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getSuperVisionLinkField())).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getRiskLinkField())).toEqual(testUrl);
+        expect(getHrefUrl(ItSystemUsageGDPRPage.getDPIALinkField())).toEqual(testUrl);
         console.log("Checking Name");
         expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getText()).toEqual(defaultText);
         expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(defaultText);
@@ -191,6 +191,13 @@ describe("Global admin is able to", () => {
         expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(defaultText);
     }
 
+    function getHrefUrl(element: protractor.ElementFinder) {
+        return element.getAttribute("href");
+    }
+
+    function getValueAttribute(element: protractor.ElementFinder) {
+        return element.getAttribute("value");
+    }
 
     function createItSystemName() {
         return `GdprTest${new Date().getTime()}`;
