@@ -250,7 +250,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterAuthenticationContext(IKernel kernel)
         {
-            kernel.Bind<IApplicationAuthenticationState>().To<ApplicationApplicationAuthenticationState>().InCommandScope(Mode);
+            kernel.Bind<IApplicationAuthenticationState>().To<ApplicationAuthenticationState>().InCommandScope(Mode);
             kernel.Bind<IAuthenticationContextFactory>().To<OwinAuthenticationContextFactory>().InCommandScope(Mode);
             kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InCommandScope(Mode);
         }

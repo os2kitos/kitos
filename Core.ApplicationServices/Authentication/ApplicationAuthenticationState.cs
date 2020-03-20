@@ -3,7 +3,7 @@ using Core.DomainModel;
 
 namespace Core.ApplicationServices.Authentication
 {
-    public class ApplicationApplicationAuthenticationState : IApplicationAuthenticationState
+    public class ApplicationAuthenticationState : IApplicationAuthenticationState
     {
         public void SetAuthenticatedUser(User user, AuthenticationScope scope)
         {
