@@ -153,8 +153,8 @@
     readonly precautionsAccessControlCheckbox = "precautionsAccessControlCheckbox";
     readonly precautionsLogningCheckbox = "precautionsLogningCheckbox";
 
-    readonly defaultPersonalSensitivData1 = "TestSensitiveData1";
-    readonly defaultPersonalSensitivData2 = "TestSensitiveData2";
+    readonly defaultSensitivData1 = "TestSensitiveData1";
+    readonly defaultSensitivData2 = "TestSensitiveData2";
 
     readonly hostedAtValueNone = " ";
     readonly hostedAtValueExternal = "Eksternt";
@@ -204,6 +204,11 @@
     readonly gdprModalUrlField = "gdprModalUrlField";
     readonly gdprModalNameField = "gdprModalNameField";
 
+    readonly gdprLastControlId = "lastControl";
+    readonly gdprRiskAssesmentDateId = "riskAssesmentDate";
+    readonly gdprDPIADateForId = "DPIADateFor";
+    readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
+    readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
 
     //Local admin
 

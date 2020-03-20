@@ -29,11 +29,11 @@ class ItSystemUsageGDPR {
     }
 
     static getDefaultPersonalSensitiveDataCheckbox1() {
-        return element(this.cssHelper.byDataElementType(this.consts.defaultPersonalSensitivData1));
+        return element(this.cssHelper.byDataElementType(this.consts.defaultSensitivData1));
     }
 
     static getDefaultPersonalSensitiveDataCheckbox2() {
-        return element(this.cssHelper.byDataElementType(this.consts.defaultPersonalSensitivData2));
+        return element(this.cssHelper.byDataElementType(this.consts.defaultSensitivData2));
     }
 
     static getPrecautionsEncryptionCheckbox() {
@@ -135,27 +135,24 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.gdprModalNameField));
     }
     static getLastControlDateField() {
-        return element(by.id("lastControl"));
+        return element(by.id(this.consts.gdprLastControlId));
     }
 
     static getRiskAssesmentDateField() {
-        return element(by.id("riskAssesmentDate"));
+        return element(by.id(this.consts.gdprRiskAssesmentDateId));
     }
 
     static getDPIADateField() {
-        return element(by.id("DPIADateFor"));
+        return element(by.id(this.consts.gdprDPIADateForId));
     }
 
     static getDPIADeleteDateField() {
-        return element(by.id("DPIAdeleteDate"));
+        return element(by.id(this.consts.gdprDPIAdeleteDateId));
     }
 
     static getLatestRiskAssesmentDateField() {
-        return element(by.id("latestRiskAssesmentDate"));
+        return element(by.id(this.consts.gdprLatestRiskAssesmentDateDateId));
     }
-
-
-
 }
 
 export = ItSystemUsageGDPR;

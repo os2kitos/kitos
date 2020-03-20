@@ -2,13 +2,13 @@
 import ItSystemCatalogHelper = require("../../../Helpers/SystemCatalogHelper");
 import itSystemHelper = require("../../../Helpers/SystemUsageHelper");
 import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
-import ItSystemUsageGDPR = require("../../../PageObjects/It-system/Usage/Tabs/ItSystemUsageGDPR.po");
+import ItSystemUsageGDPRPage = require("../../../PageObjects/It-system/Usage/Tabs/ItSystemUsageGDPR.po");
 import LocalSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
 import Constants = require("../../../Utility/Constants");
 import CssHelper = require("../../../Object-wrappers/CSSLocatorHelper");
 import Select2Helper = require("../../../Helpers/Select2Helper");
 
-describe("User is able to", () => {
+describe("Global admin is able to", () => {
 
     var loginHelper = new login();
     var testFixture = new TestFixtureWrapper();
@@ -40,7 +40,7 @@ describe("User is able to", () => {
         testFixture.cleanupState();
     });
 
-    it("Is able to fill out data on the GDPR page",
+    it("Fill out data on the GDPR page",
         () => {
             LocalSystemNavigation.openGDPRPage()
                 .then(() => fillOutCheckboxes())
@@ -49,7 +49,7 @@ describe("User is able to", () => {
                 .then(() => fillOutDateFields())
                 .then(() => fillOutTextFields())
                 .then(() => fillOutLinkFields())
-                .then(() => ItSystemUsageGDPR.refreshPage())
+                .then(() => ItSystemUsageGDPRPage.refreshPage())
                 .then(() => verifyCheckBoxes())
                 .then(() => verifyDropDown())
                 .then(() => verifyDateFields())
@@ -59,81 +59,81 @@ describe("User is able to", () => {
 
     function fillOutCheckboxes() {
         console.log("Clicking on checkboxes");
-        return ItSystemUsageGDPR.getSensitiveDataLevelCheckBox().click()
-            .then(() => ItSystemUsageGDPR.getRegularDataLevelCheckBox().click())
-            .then(() => ItSystemUsageGDPR.getLegalDataLevelCheckBox().click())
-            .then(() => ItSystemUsageGDPR.getSensitiveTestDataCheckbox().click());
+        return ItSystemUsageGDPRPage.getSensitiveDataLevelCheckBox().click()
+            .then(() => ItSystemUsageGDPRPage.getRegularDataLevelCheckBox().click())
+            .then(() => ItSystemUsageGDPRPage.getLegalDataLevelCheckBox().click())
+            .then(() => ItSystemUsageGDPRPage.getSensitiveTestDataCheckbox().click());
 
     }
 
     function fillOutPrecautionsCheckboxes() {
-        return ItSystemUsageGDPR.getPrecautionsEncryptionCheckbox().click()
-            .then(() => ItSystemUsageGDPR.getPrecautionsPseudonomiseringCheckbox().click())
-            .then(() => ItSystemUsageGDPR.getPrecautionsAccessControlCheckbox().click())
-            .then(() => ItSystemUsageGDPR.getPrecautionsLogningCheckbox().click());
+        return ItSystemUsageGDPRPage.getPrecautionsEncryptionCheckbox().click()
+            .then(() => ItSystemUsageGDPRPage.getPrecautionsPseudonomiseringCheckbox().click())
+            .then(() => ItSystemUsageGDPRPage.getPrecautionsAccessControlCheckbox().click())
+            .then(() => ItSystemUsageGDPRPage.getPrecautionsLogningCheckbox().click());
     }
 
     function fillOutDropDown() {
         console.log("Selecting values into the dropdown fields");
-        return selectValueFromSelect2Dropdown(dropDownValue, consts.gdprBusinessCriticalSelect2Id)
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprDPIASelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprAnsweringDataDPIASelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprDataProcessorControlSelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprRiskAssessmentSelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprPrecautionsSelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(dropDownValue, consts.gdprsUserSupervisionSelect2Id))
-            .then(() => selectValueFromSelect2Dropdown(preRiskAssessmentValue, consts.gdprPreRiskAssessment));
+        return Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprBusinessCriticalSelect2Id)
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprDPIASelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprAnsweringDataDPIASelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprDataProcessorControlSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprRiskAssessmentSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprPrecautionsSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(dropDownValue, consts.gdprsUserSupervisionSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentValue, consts.gdprPreRiskAssessment));
     }
 
     function fillOutDateFields() {
         console.log("Entering a date into date fields");
-        return ItSystemUsageGDPR.getLastControlDateField().sendKeys(dateValue)
-            .then(() => ItSystemUsageGDPR.getRiskAssesmentDateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPR.getDPIADateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPR.getLatestRiskAssesmentDateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPR.getDPIADeleteDateField().sendKeys(dateValue));
+        return ItSystemUsageGDPRPage.getLastControlDateField().sendKeys(dateValue)
+            .then(() => ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue))
+            .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
+            .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
+            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue));
 
     }
 
     function fillOutTextFields() {
         console.log("Entering data into text fields");
-        return ItSystemUsageGDPR.getGDPRSystemPurposeTextField().sendKeys(defaultText)
-            .then(() => ItSystemUsageGDPR.getGDPRDataResponsibleTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPR.getGDPRNoteUsageTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPR.getGDPRNoteRiskTextField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPR.getGDPRNumberDPIAField().clear())
-            .then(() => ItSystemUsageGDPR.getGDPRNumberDPIAField().sendKeys(defaultNumberValue));
+        return ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(defaultText)
+            .then(() => ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().clear())
+            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(defaultNumberValue));
     }
 
     function fillOutLinkFields() {
         console.log("Entering Urls into the link fields");
-        return ItSystemUsageGDPR.getDataProcessLinkButton().click()
+        return ItSystemUsageGDPRPage.getDataProcessLinkButton().click()
             .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPR.getDPIALinkButton().click())
+            .then(() => ItSystemUsageGDPRPage.getDPIALinkButton().click())
             .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPR.getNoteLinkButton().click())
+            .then(() => ItSystemUsageGDPRPage.getNoteLinkButton().click())
             .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPR.getPrecautionLinkButton().click())
+            .then(() => ItSystemUsageGDPRPage.getPrecautionLinkButton().click())
             .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPR.getRiskLinkButton().click())
+            .then(() => ItSystemUsageGDPRPage.getRiskLinkButton().click())
             .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPR.getSuperVisionLinkButton().click())
+            .then(() => ItSystemUsageGDPRPage.getSuperVisionLinkButton().click())
             .then(() => fillOutModalLinkWindow());
     }
 
     function fillOutModalLinkWindow() {
-        return ItSystemUsageGDPR.getModalNameField().clear()
-            .then(() => ItSystemUsageGDPR.getModalNameField().sendKeys(defaultText))
-            .then(() => ItSystemUsageGDPR.getModalUrlField().clear())
-            .then(() => ItSystemUsageGDPR.getModalUrlField().sendKeys(testUrl))
-            .then(() => ItSystemUsageGDPR.getModalSaveButton().click());
+        return ItSystemUsageGDPRPage.getModalNameField().clear()
+            .then(() => ItSystemUsageGDPRPage.getModalNameField().sendKeys(defaultText))
+            .then(() => ItSystemUsageGDPRPage.getModalUrlField().clear())
+            .then(() => ItSystemUsageGDPRPage.getModalUrlField().sendKeys(testUrl))
+            .then(() => ItSystemUsageGDPRPage.getModalSaveButton().click());
     }
 
     function verifyCheckBoxes() {
         console.log("Verifying check boxes");
         console.log("Sensitive boxes");
-        expectCheckboxValue(consts.defaultPersonalSensitivData1, true);
-        expectCheckboxValue(consts.defaultPersonalSensitivData2, false);
+        expectCheckboxValue(consts.defaultSensitivData1, true);
+        expectCheckboxValue(consts.defaultSensitivData2, false);
         console.log("Datalevel boxes");
         expectCheckboxValue(consts.dataLevelTypeNoneCheckbox, false);
         expectCheckboxValue(consts.dataLevelTypeRegularCheckbox, true);
@@ -158,51 +158,47 @@ describe("User is able to", () => {
 
     function verifyDateFields() {
         console.log("Verifying date fields");
-        expect(ItSystemUsageGDPR.getLastControlDateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPR.getRiskAssesmentDateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPR.getDPIADateField().getAttribute("value")).toEqual(dateValue);
-        expect(ItSystemUsageGDPR.getDPIADeleteDateField().getAttribute("value")).toEqual(dateValue);
+        expect(ItSystemUsageGDPRPage.getLastControlDateField().getAttribute("value")).toEqual(dateValue);
+        expect(ItSystemUsageGDPRPage.getRiskAssesmentDateField().getAttribute("value")).toEqual(dateValue);
+        expect(ItSystemUsageGDPRPage.getDPIADateField().getAttribute("value")).toEqual(dateValue);
+        expect(ItSystemUsageGDPRPage.getDPIADeleteDateField().getAttribute("value")).toEqual(dateValue);
     }
 
     function verifyTextFields() {
         console.log("Verifying text fields");
-        expect(ItSystemUsageGDPR.getGDPRSystemPurposeTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getGDPRDataResponsibleTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getGDPRNoteUsageTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getGDPRNoteRiskTextField().getAttribute("value")).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getGDPRNumberDPIAField().getAttribute("value")).toEqual(defaultNumberValue);
+        expect(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().getAttribute("value")).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().getAttribute("value")).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().getAttribute("value")).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().getAttribute("value")).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getGDPRNumberDPIAField().getAttribute("value")).toEqual(defaultNumberValue);
     }
 
     function verifyLinkFields() {
         console.log("Verifying link fields");
         console.log("Checking Url");
-        expect(ItSystemUsageGDPR.getDataProcessLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPR.getNoteLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPR.getPrecautionLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPR.getSuperVisionLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPR.getRiskLinkField().getAttribute("href")).toEqual(testUrl);
-        expect(ItSystemUsageGDPR.getDPIALinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getNoteLinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getRiskLinkField().getAttribute("href")).toEqual(testUrl);
+        expect(ItSystemUsageGDPRPage.getDPIALinkField().getAttribute("href")).toEqual(testUrl);
         console.log("Checking Name");
-        expect(ItSystemUsageGDPR.getDataProcessLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getNoteLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getPrecautionLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getSuperVisionLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getRiskLinkField().getText()).toEqual(defaultText);
-        expect(ItSystemUsageGDPR.getDPIALinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getRiskLinkField().getText()).toEqual(defaultText);
+        expect(ItSystemUsageGDPRPage.getDPIALinkField().getText()).toEqual(defaultText);
     }
 
 
     function createItSystemName() {
-        return `SystemUsageMain${new Date().getTime()}`;
+        return `GdprTest${new Date().getTime()}`;
     }
 
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
         console.log("Checking value for " + checkBoxDataElementType + " value to be " + toBe);
         return expect(element(cssHelper.byDataElementType(checkBoxDataElementType)).isSelected()).toBe(toBe);
-    }
-
-    function selectValueFromSelect2Dropdown(valueToSelect: string, idOfDropDownBox: string) {
-        return Select2Helper.selectWithNoSearch(valueToSelect, idOfDropDownBox);
     }
 
     function expectDropdownValueToEqual(expectedValue: string, idOfDropDownBox: string) {
