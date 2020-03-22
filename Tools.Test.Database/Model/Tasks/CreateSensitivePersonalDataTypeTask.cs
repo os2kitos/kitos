@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.DomainModel.ItSystem;
 using Infrastructure.DataAccess;
+using Tools.Test.Database.Model.Extensions;
 
 namespace Tools.Test.Database.Model.Tasks
 {
@@ -15,12 +16,16 @@ namespace Tools.Test.Database.Model.Tasks
 
         public override bool Execute(KitosContext context)
         {
+            var globalAdmin = context.GetGlobalAdmin();
+
             var sensitiveDataType = new SensitivePersonalDataType()
             {
                 Name = _name,
                 IsLocallyAvailable = true,
                 IsObligatory = true,
-                IsEnabled = true
+                IsEnabled = true,
+                LastChanged = DateTime.Now,
+                LastChangedByUserId = globalAdmin.Id
             };
             context.SensitivePersonalDataTypes.Add(sensitiveDataType);
 
