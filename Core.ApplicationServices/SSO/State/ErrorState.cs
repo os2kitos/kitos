@@ -1,11 +1,10 @@
 ﻿using Core.ApplicationServices.SSO.Model;
-using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class ErrorState : AbstractState
     {
-        public Maybe<SsoErrorCode> ErrorCode { get; private set; } = Maybe<SsoErrorCode>.None;
+        public SsoErrorCode ErrorCode { get; private set; }
 
         public override void Handle(FlowEvent @event, FlowContext context)
         {
@@ -16,6 +15,12 @@ namespace Core.ApplicationServices.SSO.State
                     break;
                 case FlowEvent.NoOrganizationAndRole:
                     ErrorCode = SsoErrorCode.NoOrganizationAndRole;
+                    break;
+                case FlowEvent.UnableToResolveUserInStsOrganisation:
+                    ErrorCode = SsoErrorCode.UserNotFoundInSTS;
+                    break;
+                case FlowEvent.UnsupportedFlow:
+                    ErrorCode = SsoErrorCode.UnsupportedFlow;
                     break;
                 default:
                     ErrorCode = SsoErrorCode.Unknown;

@@ -265,8 +265,8 @@
             if (!this._loadUserDeferred) {
 
                 this._loadUserDeferred = this.$q.defer();
-                // login or re-auth? If userLoginInfo is null then re-auth otherwise login
 
+                // Login or re-auth? If userLoginInfo is null then re-auth otherwise login
                 if (userLoginInfo) {
                     this.authorizeUser(userLoginInfo).then(
                         result => {
@@ -280,8 +280,13 @@
                 } else {
                     this.getCurrentUserIfAuthorized()
                         .then(
-                            result => this.successfulUserAuth(result.data.response),
-                            result => this.failedUserAuth(result));
+                        result => {
+                            if (result.data.response) {
+                                this.successfulUserAuth(result.data.response);
+                            } else {
+                                this.failedUserAuth(result);
+                            }
+                        }, result => this.failedUserAuth(result));
                 }
             }
 
@@ -304,7 +309,7 @@
 
         failedUserAuth = (result) => {
             this._loadUserDeferred.reject(result.data);
-            this._loadUserDeferred = null;
+            //this._loadUserDeferred = null;
             this.clearSavedOrgId();
         }
 

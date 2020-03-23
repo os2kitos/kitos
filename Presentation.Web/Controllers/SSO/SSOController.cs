@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 using System.Web.Http.Results;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Model;
@@ -19,6 +24,7 @@ namespace Presentation.Web.Controllers.SSO
         }
 
         [InternalApi]
+        //[RemoveSamlCookieFilter]
         [HttpGet]
         [Route("")]
         public IHttpActionResult SSO()
@@ -27,10 +33,12 @@ namespace Presentation.Web.Controllers.SSO
             var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
             switch (finalState)
             {
-                case ErrorState errorState when errorState.ErrorCode.HasValue:
-                    return SsoError(errorState.ErrorCode.Value);
+                case ErrorState errorState:
+                    return SsoError(errorState.ErrorCode);
+
                 case UserLoggedInState _:
                     return LoggedIn();
+
                 default:
                     return SsoError(SsoErrorCode.Unknown);
             }
@@ -54,6 +62,32 @@ namespace Presentation.Web.Controllers.SSO
                 Query = $"ssoErrorCode={error:G}"
             };
             return Redirect(uriBuilder.Uri);
+        }
+    }
+
+    public class RemoveSamlCookieFilter : ActionFilterAttribute 
+    {
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            var request = actionContext.Request;
+            var response = actionContext.Request.CreateResponse();
+
+            var currentCookie = request.Headers.GetCookies("oiosamlSession").FirstOrDefault();
+            if (currentCookie != null)
+            {
+                var cookie = new CookieHeaderValue("oiosamlSession", "")
+                {
+                    Expires = DateTimeOffset.Now.AddDays(-1),
+                    Domain = currentCookie.Domain,
+                    Path = currentCookie.Path,
+                    HttpOnly = currentCookie.HttpOnly,
+                    Secure = currentCookie.Secure
+                };
+
+                response.Headers.AddCookies(new[] { cookie });
+            }
+         
+            base.OnActionExecuting(actionContext);
         }
     }
 }

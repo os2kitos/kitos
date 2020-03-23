@@ -94,8 +94,21 @@
                 </div>
                 <div class="panel-footer sso-error" ng-if="ssoVm.error == 'MissingPrivilege'">
                     <strong>Den bruger, som du er logget på med, har ikke adgang til KITOS!</strong>
-                    <br/>
+                    <br />
                     Kontakt venligst din lokale IT administrator, som kan tildele rollen "KITOS Kiggeadgang"
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'NoOrganizationAndRole'">
+                    <strong>Den bruger, som du forsøger at logge på med, er fra en, for KITOS, ukendt organisation!</strong>
+                    <br />
+                    Kontakt venligst din lokale IT administrator, som kan tildele rollen "KITOS Kiggeadgang"
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'UnsupportedFlow'">
+                    <strong>Den bruger, som du forsøger at logge på med, kan ikke oprettes automatisk</strong>
+                    <br />
+                    Kontakt venligst din lokale IT administrator, som kan oplyse hvornår denne feature er implementeret
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'UserNotFoundInSTS'">
+                    <strong>Den bruger, som du forsøger at logge på med, er ukendt i STS Organisation</strong>
                 </div>
             </div>
 

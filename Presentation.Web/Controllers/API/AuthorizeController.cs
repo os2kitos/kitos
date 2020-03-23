@@ -53,16 +53,8 @@ namespace Presentation.Web.Controllers.API
         {
             var user = KitosUser;
             Logger.Debug($"GetLogin called for {user}");
-            try
-            {
-                var response = Map<User, UserDTO>(user);
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+            var response = Map<User, UserDTO>(user);
+            return Ok(response);
         }
 
         [Route("api/authorize/GetOrganizations")]

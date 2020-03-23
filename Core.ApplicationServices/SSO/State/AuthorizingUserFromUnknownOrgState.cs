@@ -22,11 +22,11 @@ namespace Core.ApplicationServices.SSO.State
             {
                 if (_user.CanAuthenticate())
                 {
-                    context.Transition(_stateFactory.CreateUserLoggedIn(_user), _ => _.HandleUserHasRoleInOrganization());
+                    context.TransitionTo(_stateFactory.CreateUserLoggedIn(_user), _ => _.HandleUserHasRoleInOrganization());
                 }
                 else
                 {
-                    context.Transition(new ErrorState(), _ => _.HandleNoRoleAndOrganization());
+                    context.TransitionTo(new ErrorState(), _ => _.HandleNoRoleAndOrganization());
                 }
             }
         }

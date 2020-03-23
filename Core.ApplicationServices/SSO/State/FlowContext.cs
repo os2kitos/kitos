@@ -12,15 +12,10 @@ namespace Core.ApplicationServices.SSO.State
             CurrentState = currentState;
         }
 
-        public void TransitionTo(AbstractState nextState)
+        public void TransitionTo(AbstractState nextState, Action<FlowContext> withAction)
         {
             CurrentState = nextState;
-        }
-
-        public void Transition(AbstractState nextState, Action<FlowContext> withAction)
-        {
-            TransitionTo(nextState);
-            withAction(this);
+            withAction?.Invoke(this);
         }
 
         public void HandleLoginCompleted()
@@ -80,7 +75,7 @@ namespace Core.ApplicationServices.SSO.State
 
         public void HandleUnsupportedFlow()
         {
-            //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning
+            //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning)
             Handle(FlowEvent.UnsupportedFlow);
         }
 

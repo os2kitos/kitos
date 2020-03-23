@@ -36,71 +36,56 @@ namespace Core.ApplicationServices.SSO.State
             {
                 var userResult = _ssoUserIdentityRepository.GetByExternalUuid(_userUuid);
 
-                //User has used the same SSO identity before and exists
+                // User has used the same SSO identity before and exists
                 if (userResult.HasValue)
                 {
                     var user = userResult.Value.User;
                     if (user.CanAuthenticate())
                     {
-                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user));
-                        context.HandleUserSeenBefore();
+                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user), 
+                            _ => _.HandleUserSeenBefore());
                     }
                     else
                     {
-                        //Resolve the user info
+                        // Resolve the user info
                         var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                         if (!stsBrugerInfo.HasValue)
                         {
-                            HandleUserResolutionFailed(context);
+                            context.TransitionTo(new ErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                         }
                         else
                         {
-                            HandleExistingSsoUserIdentifiedWithoutRoles(context, user, stsBrugerInfo);
+                            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(user, stsBrugerInfo.Value), 
+                                _ => _.HandleExistingSsoUserWithoutRoles());
                         }
                     }
                 }
-                else //Try to find the user by email
+                else // Try to find the user by email
                 {
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                     if (!stsBrugerInfo.HasValue)
                     {
-                        HandleUserResolutionFailed(context);
+                        context.TransitionTo(new ErrorState(), 
+                            _ => _.HandleUnableToResolveUserInStsOrganisation());
                     }
                     else
                     {
                         var userByEmail = FindUserByEmail(stsBrugerInfo);
                         if (userByEmail.HasValue)
                         {
-                            HandleFirstTimeSsoVisit(context, userByEmail, stsBrugerInfo);
+                            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByEmail.Value, stsBrugerInfo.Value), 
+                                _ => _.HandleUserFirstTimeSsoVisit());
                         }
                         else
                         {
                             // TODO: In KITOSUDV-627 switch to UserNotFoundState
-                            context.TransitionTo(new ErrorState());
-                            context.HandleUnsupportedFlow();
+                            context.TransitionTo(new ErrorState(), 
+                                _ => _.HandleUnsupportedFlow());
                         }
                     }
 
                 }
             }
-        }
-
-        private void HandleFirstTimeSsoVisit(FlowContext context, Maybe<User> userByEmail, Maybe<StsBrugerInfo> stsBrugerInfo)
-        {
-            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByEmail.Value, stsBrugerInfo.Value));
-            context.HandleUserFirstTimeSsoVisit();
-        }
-
-        private void HandleExistingSsoUserIdentifiedWithoutRoles(FlowContext context, User user, Maybe<StsBrugerInfo> stsBrugerInfo)
-        {
-            context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(user, stsBrugerInfo.Value));
-            context.HandleExistingSsoUserWithoutRoles();
-        }
-
-        private static void HandleUserResolutionFailed(FlowContext context)
-        {
-            context.TransitionTo(new ErrorState());
-            context.HandleUnableToResolveUserInStsOrganisation();
         }
 
         private Maybe<User> FindUserByEmail(Maybe<StsBrugerInfo> stsBrugerInfo)

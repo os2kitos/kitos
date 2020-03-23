@@ -25,7 +25,7 @@ namespace Core.ApplicationServices.SSO.State
             if (@event.Equals(FlowEvent.UserHasNoRoleInOrganization))
             {
                 _organizationRoleService.MakeUser(_user, _ssoOrganization);
-                context.Transition(_ssoStateFactory.CreateUserLoggedIn(_user), _ => _.HandleRoleAssigned());
+                context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(_user), _ => _.HandleRoleAssigned());
             }
         }
     }

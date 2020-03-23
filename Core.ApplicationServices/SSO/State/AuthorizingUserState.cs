@@ -28,11 +28,11 @@ namespace Core.ApplicationServices.SSO.State
                 var rolesInOrganization = _organizationRoleService.GetRolesInOrganization(_user,_ssoOrganization.Id);
                 if (rolesInOrganization.Any())
                 {
-                    context.Transition(_ssoStateFactory.CreateUserLoggedIn(_user),_=>_.HandleUserHasRoleInOrganization());
+                    context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(_user),_=>_.HandleUserHasRoleInOrganization());
                 }
                 else
                 {
-                    context.Transition(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization),_=>_.HandleUserHasNoRoleInOrganization());
+                    context.TransitionTo(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization),_=>_.HandleUserHasNoRoleInOrganization());
                 }
             }
         }

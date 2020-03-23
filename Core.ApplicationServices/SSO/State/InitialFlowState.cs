@@ -28,13 +28,12 @@ namespace Core.ApplicationServices.SSO.State
                 var externalUserUuid = GetUserExternalUuid();
                 if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value));
-                    context.HandleUserPrivilegeVerified();
+                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value), 
+                        _ => _.HandleUserPrivilegeVerified());
                 }
                 else
                 {
-                    context.TransitionTo(new ErrorState());
-                    context.HandleUserPrivilegeInvalid();
+                    context.TransitionTo(new ErrorState(), _ => _.HandleUserPrivilegeInvalid());
                 }
             }
         }

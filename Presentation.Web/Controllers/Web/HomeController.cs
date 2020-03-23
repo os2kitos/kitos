@@ -16,25 +16,24 @@ namespace Presentation.Web.Controllers.Web
             ViewBag.Environment = Settings.Default.Environment;
             AppendSsoError();
             AppendFeatureToggles();
-
             return View();
         }
 
         private void AppendSsoError()
         {
-            var ssoError = PopTempVariable<SsoErrorCode>(SsoErrorKey);
-            if (ssoError.HasValue)
+            if (TempData[SsoErrorKey] != null)
             {
-                ViewBag.SsoErrorCode = ssoError.Value;
+                var ssoError = (SsoErrorCode)TempData[SsoErrorKey];
+                ViewBag.SsoErrorCode = ssoError;
             }
         }
 
         private void AppendFeatureToggles()
         {
-            var feature = PopTempVariable<TemporaryFeature>(FeatureToggleKey);
-            if (feature.HasValue)
+            if (TempData[FeatureToggleKey] != null)
             {
-                ViewBag.FeatureToggle = feature.Value;
+                var feature = (TemporaryFeature)TempData[FeatureToggleKey];
+                ViewBag.FeatureToggle = feature;
             }
         }
 
@@ -42,35 +41,21 @@ namespace Presentation.Web.Controllers.Web
         {
             if (ssoErrorCode.HasValue)
             {
-                PushTempVariable(TemporaryFeature.Sso, FeatureToggleKey); //enable sso toggle
-                PushTempVariable(ssoErrorCode, SsoErrorKey);
+                TempData[FeatureToggleKey] = TemporaryFeature.Sso;
+                TempData[SsoErrorKey] = ssoErrorCode;
+                TempData.Keep();
             }
-
             return RedirectToAction(nameof(Index));
         }
 
         public ActionResult WithFeature(TemporaryFeature? feature)
         {
             if (feature.HasValue)
-                PushTempVariable(feature, FeatureToggleKey);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        private void PushTempVariable<T>(T ssoErrorCode, string key)
-        {
-            TempData[key] = ssoErrorCode;
-        }
-
-        private Maybe<T> PopTempVariable<T>(string key)
-        {
-            if (TempData[key] is T value)
             {
-                TempData[key] = null;
-                return value;
+                TempData[FeatureToggleKey] = feature;
+                TempData.Keep();
             }
-
-            return Maybe<T>.None;
+            return RedirectToAction(nameof(Index));
         }
     }
 }

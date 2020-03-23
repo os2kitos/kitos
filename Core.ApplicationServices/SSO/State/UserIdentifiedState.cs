@@ -1,6 +1,5 @@
 ﻿using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
@@ -68,7 +67,8 @@ namespace Core.ApplicationServices.SSO.State
             var organizationByExternalIdResult = _ssoOrganizationIdentityRepository.GetByExternalUuid(_externalUser.BelongsToOrganizationUuid);
             if (organizationByExternalIdResult.HasValue)
             {
-                TransitionToAuthorizingState(context, organizationByExternalIdResult.Value.Organization);
+                context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user, organizationByExternalIdResult.Value.Organization),
+                    _ => _.HandleOrganizationFound());
             }
             else
             {
@@ -86,20 +86,15 @@ namespace Core.ApplicationServices.SSO.State
                             _externalUser.BelongsToOrganizationUuid, organization.Id, _user.Id);
                     }
 
-                    TransitionToAuthorizingState(context, organization);
+                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user, organization),
+                        _ => _.HandleOrganizationFound());
                 }
                 else
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user));
-                    context.HandleOrganizationNotFound();
+                    context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserFromUnknownOrgState(_user), 
+                        _ => _.HandleOrganizationNotFound());
                 }
             }
-        }
-
-        private void TransitionToAuthorizingState(FlowContext context, Organization organization)
-        {
-            context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user, organization));
-            context.HandleOrganizationFound();
         }
     }
 }
