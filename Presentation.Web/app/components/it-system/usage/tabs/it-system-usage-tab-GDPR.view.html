@@ -38,6 +38,20 @@
                            ng-blur="patch('DataProcessor', usage.dataProcessor)"
                            data-element-type="GDPRDataResponsible">
                 </div>
+                <!-- HostedAt -->
+                <div class="form-group">
+                    <label for="HostedAt" class="control-label small">IT systemet driftes</label>
+                    <select class="form-control input-sm" id="HostedAt"
+                            ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
+                            ng-model="usageViewModel.hostedAt"
+                            data-autosave="{{autoSaveUrl}}"
+                            data-field="HostedAt"
+                            data-ng-disabled="!hasWriteAccess">
+                        <option hidden selected value />
+                        <option ng-repeat="option in hostedAtOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                    </select>
+                </div>
+
                 <!-- Data processing agreement -->
                 <div class="form-group">
                     <div ng-show="filterDataProcessor">

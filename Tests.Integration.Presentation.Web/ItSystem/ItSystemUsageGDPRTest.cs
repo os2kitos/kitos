@@ -15,6 +15,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     public class ItSystemUsageGDPRTest : WithAutoFixture
     {
 
+
+        [Fact]
+        public async Task Can_Change_HostedAtOptions()
+        {
+            //Arrange
+            var hostedAtOption = A<HostedAt>();
+            var body = new { HostedAt = hostedAtOption };
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+            //Act
+            var itSystemUsageDTO = await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
+
+            //Assert
+            Assert.NotNull(itSystemUsageDTO.HostedAt);
+            Assert.Equal(hostedAtOption, itSystemUsageDTO.HostedAt.Value);
+
+        }
+
+
+
         [Fact]
         public async Task Can_Change_IsBusinessCritical()
         {
