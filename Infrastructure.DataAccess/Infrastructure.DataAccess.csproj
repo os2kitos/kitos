@@ -583,9 +583,9 @@
     <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.Designer.cs">
       <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003171352316_AddedHostedAtEnumToItSystemUsage.cs" />
-    <Compile Include="Migrations\202003171352316_AddedHostedAtEnumToItSystemUsage.Designer.cs">
-      <DependentUpon>202003171352316_AddedHostedAtEnumToItSystemUsage.cs</DependentUpon>
+    <Compile Include="Migrations\202003230929438_AddedHostedAtEnumValueToItSystemUsage.cs" />
+    <Compile Include="Migrations\202003230929438_AddedHostedAtEnumValueToItSystemUsage.Designer.cs">
+      <DependentUpon>202003230929438_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -953,8 +953,8 @@
     <EmbeddedResource Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.resx">
       <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003171352316_AddedHostedAtEnumToItSystemUsage.resx">
-      <DependentUpon>202003171352316_AddedHostedAtEnumToItSystemUsage.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202003230929438_AddedHostedAtEnumValueToItSystemUsage.resx">
+      <DependentUpon>202003230929438_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -20,8 +20,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Can_Change_HostedAtOptions()
         {
             //Arrange
-            var dataOption = A<HostedAt>();
-            var body = new { HostedAt = dataOption };
+            var hostedAtOption = A<HostedAt>();
+            var body = new { HostedAt = hostedAtOption };
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
@@ -32,7 +32,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Assert
             Assert.NotNull(itSystemUsageDTO.HostedAt);
-            Assert.Equal(dataOption, itSystemUsageDTO.HostedAt.Value);
+            Assert.Equal(hostedAtOption, itSystemUsageDTO.HostedAt.Value);
 
         }
 
