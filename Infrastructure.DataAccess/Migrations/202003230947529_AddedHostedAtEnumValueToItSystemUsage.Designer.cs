@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedHostedAtEnumValue : IMigrationMetadata
+    public sealed partial class AddedHostedAtEnumValueToItSystemUsage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedHostedAtEnumValue));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedHostedAtEnumValueToItSystemUsage));
         
         string IMigrationMetadata.Id
         {
-            get { return "202003230929438_AddedHostedAtEnumValue"; }
+            get { return "202003230947529_AddedHostedAtEnumValueToItSystemUsage"; }
         }
         
         string IMigrationMetadata.Source
