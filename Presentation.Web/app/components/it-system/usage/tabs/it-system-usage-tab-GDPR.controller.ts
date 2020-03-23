@@ -5,82 +5,68 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-GDPR.view.html",
             controller: "system.GDPR",
             resolve: {
-                systemUsage: [
-                    "$http", "$stateParams", ($http, $stateParams) =>
-                        $http.get(`odata/itSystemUsages(${$stateParams.id})`)
-                            .then(result => result.data)
+                sensitivePersonalData: ["$http", "$stateParams", ($http, $stateParams) =>
+                    $http.get(`odata/GetSensitivePersonalDataByUsageId(id=${$stateParams.id})`)
+                        .then(result => result.data.value)
                 ],
-                sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByUsageId(id=" + $stateParams.id + ")")
-                        .then(function (result) {
-                            return result.data.value;
-                        });
-                }],
                 registerTypes: [
-                    '$http', '$stateParams', ($http, $stateParams) =>
+                    "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)
                             .then(result => result.data.value)
-                ],
-                dataResponsible: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                    return $http.get('api/dataResponsible/' + user.currentOrganizationId)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
+                ]
             }
         });
     }]);
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "dataResponsible", "GDPRService",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, sensitivePersonalData, user, dataResponsible, GDPRService) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsageService", "moment", "notify", "registerTypes", "sensitivePersonalData", "user", "select2LoadingService",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsageService, moment, notify, registerTypes, sensitivePersonalData, user, select2LoadingService) => {
+                //Usage is pulled from it-system-usage.controller.ts. This means we only need one request to DB to have usage available 
+                //On all subpages as we can access it from $scope.usage. Same with $scope.usageViewModel.
+                var itSystemUsage = $scope.usage;
+                $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
+                $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
+                $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
+                $scope.noSearchNoClearSelect2 = { minimumResultsForSearch: -1, allowClear: false };
 
-                $scope.usage = itSystemUsage;
-                $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
                 $scope.registerTypes = registerTypes;
-                $scope.usageId = $stateParams.id;
-                $scope.systemUsage = systemUsage;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
                 $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
                 $scope.filterDataProcessor = $scope.contracts.length > 0;
 
-                //inherit from parent if general purpose is empty
-                $scope.generalPurpose = itSystemUsage.generalPurpose;
-                if (!$scope.generalPurpose) {
-                    $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
-                }
-                //inherit from parent
-                $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
-                if (!$scope.systemUsage.LinkToDirectoryUrl) {
-                    $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
-                }
-                //inherit from parent
-                $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
-                if (!$scope.systemUsage.LinkToDirectoryUrlName) {
-                    $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
-                }
-                //inherit from parent
-                if (!systemUsage.dataProcessor) {
-                    $scope.systemUsage.dataProcessor = dataResponsible.name;
-                }
-                $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
-                $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
+                $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(
+                    "api/organization",
+                    true,
+                    ["public=true", `orgId=${user.currentOrganizationId}`],
+                    (item,
+                        items) => {
+                        items.push({
+                            id: item.id,
+                            text: item.name,
+                            cvr: item.cvr
+                        });
+                    },
+                    "q",
+                    formatSupplier);
 
-                $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
+                function formatSupplier(supplier) {
+                    var result = `<div>${supplier.text}</div>`;
+                    if (supplier.cvr) {
+                        result += `<div class="small">${supplier.cvr}</div>`;
+                    }
+                    return result;
+                }
 
-                $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
-
+                $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);
-
-                    if (Checked == true) {
-
+                    if (checked === true) {
                         var data = {
                             ObjectId: itSystemUsage.id,
-                            OptionId: OptionId,
+                            OptionId: optionId,
                             OptionType: optionType,
-                            ObjectType: 'ITSYSTEMUSAGE'
+                            ObjectType: "ITSYSTEMUSAGE"
                         };
 
                         $http.post("odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
@@ -88,18 +74,17 @@
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
                         });
-
                     } else {
-                        let OptType = 0;
+                        let optType = 0;
                         switch (optionType) {
                             case "SENSITIVEPERSONALDATA":
-                                OptType = 1;
+                                optType = 1;
                                 break;
                             case "REGISTERTYPEDATA":
-                                OptType = 2;
+                                optType = 2;
                                 break;
                         }
-                        $http.delete("odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type=" + OptType + ", entityType=1)").success(() => {
+                        $http.delete(`odata/RemoveOption(id=${optionId}, objectId=${itSystemUsage.id},type=${optType}, entityType=1)`).success(() => {
                             msg.toSuccessMessage("Feltet er Opdateret.");
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
@@ -110,161 +95,65 @@
                 $scope.patch = (field, value) => {
                     var payload = {};
                     payload[field] = value;
-                    itSystemUsageService.patchSystem($scope.usageId, payload);
+                    itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                        .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
 
                 $scope.patchDate = (field, value) => {
                     var date = moment(value, "DD-MM-YYYY");
+                    var payload = {};
                     if (value === "" || value == undefined) {
-                        var payload = {};
                         payload[field] = null;
-                        itSystemUsageService.patchSystem($scope.usageId, payload);
+                        itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                        $scope.ArchivedDate = systemUsage.ArchivedDate;
                     } else {
                         date = date.format("YYYY-MM-DD");
-                        var payload = {};
                         payload[field] = date;
-                        itSystemUsageService.patchSystem($scope.usageId, payload);
-                        $scope.ArchivedDate = date;
+                        itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
+                            .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
+                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     }
                 }
 
-                $scope.editLink = function (field) {
+                $scope.editLink = field => {
                     $uibModal.open({
-                        templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
+                        templateUrl: "app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html",
+                        resolve: {
+                            usage: [() => $scope.usage]
+                        },
                         controller: [
-                            '$scope', '$state', '$uibModalInstance', 'usage',
-                            function ($scope, $state, $uibModalInstance, usage) {
+                            "$scope", "$uibModalInstance", "usage",
+                            ($scope, $uibModalInstance, usage) => {
 
-                                $scope.usage = usage;
+                                $scope.linkName = usage[field + "Name"];
+                                $scope.Url = usage[field];
 
-                                switch (field) {
-                                    case 'datahandlerSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
-                                        break;
-                                    case 'technicalSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
-                                        break;
-                                    case 'UserSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
-                                        break;
-                                    case 'RiskSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
-                                        break;
-                                    case 'DataHearingSupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.DataHearingSupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.DataHearingSupervisionDocumentationUrl;
-                                        break;
-                                    case 'DPIASupervisionDocumentationUrl':
-                                        $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
-                                        $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
-                                        break;
-                                    case 'LinkToDirectoryUrl':
-                                        $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
-                                        $scope.Url = $scope.usage.LinkToDirectoryUrl;
-                                        break;
-                                }
-                                $scope.ok = function () {
-
-                                    var payload = {
-                                        Id: $scope.usage.Id,
-
-                                        datahandlerSupervisionDocumentationUrlName: $scope.usage
-                                            .DatahandlerSupervisionDocumentationUrlName,
-                                        datahandlerSupervisionDocumentationUrl: $scope.usage
-                                            .DatahandlerSupervisionDocumentationUrl,
-
-                                        technicalSupervisionDocumentationUrlName: $scope.usage
-                                            .TechnicalSupervisionDocumentationUrlName,
-                                        technicalSupervisionDocumentationUrl: $scope.usage
-                                            .TechnicalSupervisionDocumentationUrl,
-
-                                        userSupervisionDocumentationUrlName: $scope.usage
-                                            .UserSupervisionDocumentationUrlName,
-                                        userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
-
-                                        riskSupervisionDocumentationUrlName: $scope.usage
-                                            .RiskSupervisionDocumentationUrlName,
-                                        riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
-
-                                        dataHearingSupervisionDocumentationUrlName: $scope.usage
-                                            .DataHearingSupervisionDocumentationUrlName,
-                                        dataHearingSupervisionDocumentationUrl: $scope.usage
-                                            .DataHearingSupervisionDocumentationUrl,
-
-                                        DPIASupervisionDocumentationUrlName: $scope.usage
-                                            .DPIASupervisionDocumentationUrlName,
-                                        DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
-
-                                        LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
-                                        LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
-                                    }
-
-                                    switch (field) {
-                                        case 'datahandlerSupervisionDocumentationUrl':
-                                            payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'technicalSupervisionDocumentationUrl':
-                                            payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.technicalSupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'UserSupervisionDocumentationUrl':
-                                            payload.userSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.userSupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'RiskSupervisionDocumentationUrl':
-                                            payload.riskSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.riskSupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'DataHearingSupervisionDocumentationUrl':
-                                            payload.dataHearingSupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'DPIASupervisionDocumentationUrl':
-                                            payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
-                                            payload.DPIASupervisionDocumentationUrl = $scope.Url;
-                                            break;
-                                        case 'LinkToDirectoryUrl':
-                                            payload.LinkToDirectoryUrlName = $scope.linkName;
-                                            payload.LinkToDirectoryUrl = $scope.Url;
-                                            break;
-                                    }
+                                $scope.ok = () => {
+                                    var payload = {};
+                                    payload[field + "Name"] = $scope.linkName;
+                                    payload[field] = $scope.Url;
 
                                     var msg = notify.addInfoMessage("Gemmer...", false);
-
-                                    $http({
-                                        method: 'PATCH',
-                                        url: 'api/itsystemusage/' +
-                                            $scope.usage.Id +
-                                            '?organizationId=' +
-                                            user.currentOrganizationId,
-                                        data: payload
-                                    })
-                                        .success(function () {
+                                    itSystemUsageService
+                                        .patchSystemUsage(usage.id, user.currentOrganizationId, payload)
+                                        .then(onSuccess => {
                                             msg.toSuccessMessage("Feltet er opdateret.");
                                             $state.reload();
-                                        })
-                                        .error(function () {
+                                        }, onError => {
                                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                         });
                                     $uibModalInstance.close();
                                 };
 
-                                $scope.cancel = function () {
-                                    $uibModalInstance.dismiss('cancel');
+                                $scope.cancel = () => {
+                                    $uibModalInstance.dismiss("cancel");
                                 };
                             }
                         ],
-                        resolve: {
-                            usage: [function () { return $scope.systemUsage; }]
-                        }
                     });
                 }
 
@@ -281,84 +170,41 @@
                     }
                 };
 
-                $scope.delete = function (dataworkerId) {
-                    $http.delete("api/UsageDataWorker/" + dataworkerId + "?organizationid=" + $scope.usage.organizationId)
-                        .success(function () {
-                            notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
-                            reload();
-                        })
-                        .error(function () {
-                            notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
-                        });
-                };
-                function selectLazyLoading(url, excludeSelf, paramAry) {
-                    return {
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        placeholder: ' ',
-                        initSelection: function (elem, callback) {
-                        },
-                        ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
-                            quietMillis: 500,
-                            transport: function (queryParams) {
-                                var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                                res.abort = function () {
-                                    return null;
-                                };
-
-                                return res;
-                            },
-
-                            results: function (data, page) {
-                                var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; cvr; }) {
-                                    if (excludeSelf && obj.id == itSystemUsage.id)
-                                        return; // don't add self to result
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvr
-                                    });
-                                });
-
-                                return { results: results };
-                            }
-                        }
-                    };
-                }
-
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(function () {
-                        $scope.hideContent = true;
-                        return $timeout(function () {
-                            return $scope.hideContent = false;
-                        }, 1);
-                    });
-                }
-                $scope.save = function () {
-
+                $scope.saveDataworker = () => {
                     var data = {
                         ItSystemUsageId: $scope.usage.id,
                         DataWorkerId: $scope.selectedDataWorker.id
                     }
-
                     $http.post("api/UsageDataworker/", data)
-                        .success(function () {
+                        .success(() => {
                             notify.addSuccessMessage("Databehandleren er tilknyttet.");
                             reload();
                         })
-                        .error(function () {
+                        .error(() => {
                             notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
                         });
                 };
+
+                $scope.deleteDataworker = dataworkerId => {
+                    $http.delete(`api/UsageDataWorker/${dataworkerId}?organizationid=${$scope.usage.organizationId}`)
+                        .success(() => {
+                            notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
+                            reload();
+                        })
+                        .error(() => {
+                            notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
+                        });
+                };
+
+                function reload() {
+                    return $state.transitionTo($state.current, $stateParams, {
+                        reload: true
+                    }).then(() => {
+                        $scope.hideContent = true;
+                        return $timeout(() => $scope.hideContent = false, 1);
+                    });
+                }
+                
 
                 $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {
@@ -381,12 +227,12 @@
 
                 function updateDataLevels(dataLevel: number, selected: boolean) {
                     if (selected) {
-                        GDPRService.addDataLevel(itSystemUsage.id, dataLevel)
+                        itSystemUsageService.addDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }
                     else {
-                        GDPRService.removeDataLevel(itSystemUsage.id, dataLevel)
+                        itSystemUsageService.removeDataLevel(itSystemUsage.id, dataLevel)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!"),
                                 onError => notify.addErrorMessage("Kunne ikke opdatere feltet!"));
                     }

@@ -355,79 +355,62 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
 
-        #region GDPR
 
-        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        #endregion
-        public string GeneralPurpose { get; set; }
-        public DataOptions isBusinessCritical { get; set; }
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }
 
+
+        #region GDPR
+        public string GeneralPurpose { get; set; }
+        public DataOptions? isBusinessCritical { get; set; }
+
         public string dataProcessor { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
-        public int dataProcessorControl { get; set; }
-
+        public DataOptions? dataProcessorControl { get; set; }
         public DateTime? lastControl { get; set; }
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
 
         public string noteUsage { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
 
-        public int precautions { get; set; }
 
-        public int riskAssessment { get; set; }
+        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        public DateTime? riskAssesmentDate { get; set; }
-
-        public int preriskAssessment { get; set; }
-
-        public string noteRisks { get; set; }
-
-        public int DPIAhearing { get; set; }
-
-        public DateTime? DPIADate { get; set; }
-
-        public int DPIA { get; set; }
-
-        public DateTime? DPIADateFor { get; set; }
-
-        public int answeringDataDPIA { get; set; }
-
-        public DateTime? DPIAdeleteDate { get; set; }
-
-        public int numberDPIA { get; set; }
-
+        public DataOptions? precautions { get; set; }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
         public bool precautionsOptionsLogning { get; set; }
-
-        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
-
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
         public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? UserSupervision { get; set; }
+        public DateTime? UserSupervisionDate { get; set; }
         public string UserSupervisionDocumentationUrlName { get; set; }
         public string UserSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? riskAssessment { get; set; }
+        public DateTime? riskAssesmentDate { get; set; }
+        public RiskLevel? preriskAssessment { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
+        public string noteRisks { get; set; }
 
+        public DataOptions? DPIA { get; set; }
+        public DateTime? DPIADateFor { get; set; }
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
-        public string DataHearingSupervisionDocumentationUrlName { get; set; }
-        public string DataHearingSupervisionDocumentationUrl { get; set; }
+        public DataOptions? answeringDataDPIA { get; set; }
+        public DateTime? DPIAdeleteDate { get; set; }
+        public int numberDPIA { get; set; }
+        #endregion
 
-        public DateTime? UserSupervisionDate { get; set; }
-
-        public int UserSupervision { get; set; }
-        public string LinkToDirectoryUrl { get; set; }
-        public string LinkToDirectoryUrlName { get; set; }
 
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 

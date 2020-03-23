@@ -579,6 +579,10 @@
     <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.Designer.cs">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.cs" />
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.Designer.cs">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -941,6 +945,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.resx">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.resx">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

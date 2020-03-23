@@ -4,7 +4,16 @@
     {
         NO = 0,
         YES = 1,
-        DONTKNOW = 2
+        DONTKNOW = 2,
+        UNDECIDED = 3
+    }
+
+    public enum RiskLevel
+    {
+        LOW = 0,
+        MIDDLE = 1,
+        HIGH = 2,
+        UNDECIDED = 3
     }
 
     public enum UserCount
