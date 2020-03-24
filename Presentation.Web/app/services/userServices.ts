@@ -309,7 +309,7 @@
 
         failedUserAuth = (result) => {
             this._loadUserDeferred.reject(result.data);
-            //this._loadUserDeferred = null;
+            this._loadUserDeferred = null;
             this.clearSavedOrgId();
         }
 
