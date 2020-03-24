@@ -148,6 +148,8 @@
     <Compile Include="SSO\State\UserSignedInState.cs" />
     <Compile Include="SSO\State\UserWithNoPrivilegesState.cs" />
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
+    <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
+    <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />

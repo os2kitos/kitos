@@ -86,8 +86,12 @@
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\GDPR\ISensitivePersonalDataTypeRepository.cs" />
+    <Compile Include="Repositories\GDPR\SensitivePersonalDataTypeRepository.cs" />
     <Compile Include="SSO\IStsBrugerEmailService.cs" />
     <Compile Include="SSO\StsAdresseHelpers.cs" />
     <Compile Include="SSO\StsOrganisationConstants.cs" />
