@@ -1,6 +1,5 @@
 ﻿using System.Web.Mvc;
 using Core.ApplicationServices.SSO.Model;
-using Core.DomainModel.Result;
 using Presentation.Web.Models.FeatureToggle;
 using Presentation.Web.Properties;
 
@@ -14,27 +13,8 @@ namespace Presentation.Web.Controllers.Web
         public ActionResult Index()
         {
             ViewBag.Environment = Settings.Default.Environment;
-            AppendSsoError();
-            AppendFeatureToggles();
+
             return View();
-        }
-
-        private void AppendSsoError()
-        {
-            if (TempData[SsoErrorKey] != null)
-            {
-                var ssoError = (SsoErrorCode)TempData[SsoErrorKey];
-                ViewBag.SsoErrorCode = ssoError;
-            }
-        }
-
-        private void AppendFeatureToggles()
-        {
-            if (TempData[FeatureToggleKey] != null)
-            {
-                var feature = (TemporaryFeature)TempData[FeatureToggleKey];
-                ViewBag.FeatureToggle = feature;
-            }
         }
 
         public ActionResult SsoError(SsoErrorCode? ssoErrorCode)
@@ -43,7 +23,6 @@ namespace Presentation.Web.Controllers.Web
             {
                 TempData[FeatureToggleKey] = TemporaryFeature.Sso;
                 TempData[SsoErrorKey] = ssoErrorCode;
-                TempData.Keep();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -53,7 +32,6 @@ namespace Presentation.Web.Controllers.Web
             if (feature.HasValue)
             {
                 TempData[FeatureToggleKey] = feature;
-                TempData.Keep();
             }
             return RedirectToAction(nameof(Index));
         }
