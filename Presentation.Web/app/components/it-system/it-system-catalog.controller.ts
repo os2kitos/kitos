@@ -523,12 +523,8 @@
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem => this.showUsagesAsNumberOrNothing(dataItem),
                         excelTemplate: dataItem => {
-                            var value = "";
-                            if (dataItem && dataItem.Usages.length > 0) {
-                                var sorted = this._.orderBy(dataItem.Usages, ['Organization.Name'], ['asc']);
-                                value = this._.map(sorted, "Organization.Name").join(", ");
-                            }
-                            return value;
+                            var sorted = this._.orderBy(dataItem.Usages, ['Organization.Name'], ['asc']);
+                            return _.map(sorted, "Organization.Name").join(", ");
                         },
                         filterable: false,
                         sortable: false,
@@ -560,12 +556,11 @@
                         title: "Sidst redigeret: Bruger",
                         width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName
-                            }`,
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
+                                template: customFilter, 
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -685,30 +680,23 @@
                         title: "Beskrivelse",
                         width: 150,
                         persistId: "description",
-                        excelTemplate: dataItem => dataItem.Description,
+                        template: dataItem => dataItem.Description ? dataItem.Description : "",
                         hidden: true
                     },
                     {
-                        field: "ArchiveDuty", title: "Rigsarkivets vejledning til arkivering", width: 150,
+                        field: "ArchiveDuty",
+                        title: "Rigsarkivets vejledning til arkivering",
+                        width: 150,
                         persistId: "archiveDuty",
-                        template: dataItem => {
-                            if (dataItem.ArchiveDuty != null) {
-                                return `${dataItem.ArchiveDuty}`;
-                            } else return "";
-                        },
-                        excelTemplate: dataItem => {
-                            if (dataItem.ArchiveDuty != null) {
-                                return `${dataItem.ArchiveDuty}`;
-                            } else {
-                                return "";
-                            }
-                        },
+                        template: dataItem => dataItem.ArchiveDuty ? dataItem.ArchiveDuty.toString() : "",
                         hidden: true
                     },
                     {
-                        field: "ArchiveDutyComment", title: "Bemærkning fra Rigsarkivet", width: 150,
+                        field: "ArchiveDutyComment",
+                        title: "Bemærkning fra Rigsarkivet",
+                        width: 150,
                         persistId: "archiveDutyComment",
-                        excelTemplate: dataItem => dataItem.ArchiveDutyComment,
+                        template: dataItem => dataItem.ArchiveDutyComment ? dataItem.ArchiveDutyComment : "",
                         hidden: true
                     }
                 ]
