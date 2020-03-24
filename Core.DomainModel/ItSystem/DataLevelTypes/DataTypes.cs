@@ -23,4 +23,11 @@
         FIFTYTOHUNDRED = 2,
         HUNDREDPLUS = 3
     }
+
+    public enum HostedAt
+    {
+        UNDECIDED = 0,
+        ONPREMISE = 1,
+        EXTERNAL = 2,
+    }
 }

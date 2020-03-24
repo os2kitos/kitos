@@ -19,7 +19,7 @@ describe("Global admin is able to", () => {
 
     var dropdownYes = "Ja";
     var preRiskAssessmentMiddle = "Mellem risiko";
-
+    var hostedValue = "Eksternt";
     var dateValue = getDate();
     var testUrl = "https://www.strongminds.dk/";
     var numberValue = new Date().getDay().toString();
@@ -89,6 +89,7 @@ describe("Global admin is able to", () => {
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprRiskAssessmentSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprPrecautionsSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprsUserSupervisionSelect2Id))
+            .then(() => Select2Helper.selectWithNoSearch(hostedValue, consts.hostedAtSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment));
     }
 
@@ -159,6 +160,7 @@ describe("Global admin is able to", () => {
         expectDropdownValueToEqual(dropdownYes, consts.gdprRiskAssessmentSelect2Id);
         expectDropdownValueToEqual(dropdownYes, consts.gdprDPIASelect2Id);
         expectDropdownValueToEqual(dropdownYes, consts.gdprAnsweringDataDPIASelect2Id);
+        expectDropdownValueToEqual(hostedValue, consts.hostedAtSelect2Id);
         expectDropdownValueToEqual(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment);
     }
 

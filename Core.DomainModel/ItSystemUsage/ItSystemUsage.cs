@@ -409,6 +409,8 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions? answeringDataDPIA { get; set; }
         public DateTime? DPIAdeleteDate { get; set; }
         public int numberDPIA { get; set; }
+
+        public HostedAt? HostedAt { get; set; }
         #endregion
 
 

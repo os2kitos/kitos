@@ -28,6 +28,7 @@
                 $scope.autoSaveUrl = `/api/itsystemusage/${itSystemUsage.id}`;
                 $scope.dataOptions = new Kitos.Models.ViewModel.ItSystemUsage.DataOptions().options;
                 $scope.riskLevelOptions = new Kitos.Models.ViewModel.ItSystemUsage.RiskLevelOptions().options;
+                $scope.hostedAtOptions = new Kitos.Models.ViewModel.ItSystemUsage.HostedAtOptions().options;
                 $scope.noSearchNoClearSelect2 = { minimumResultsForSearch: -1, allowClear: false };
 
                 $scope.registerTypes = registerTypes;

@@ -21,6 +21,14 @@
         UNDECIDED = 3
     }
 
+    export enum HostedAt {
+        UNDECIDED = 0,
+        ONPREMISE = 1,
+        EXTERNAL = 2,
+    }
+
+    
+
     export class DataOptions {
         options: Select2OptionViewModel[];
         constructor() {
@@ -43,6 +51,7 @@
                 <Select2OptionViewModel>{ id: 2, text: "Høj risiko" }
             ];
         }
+
     }
 
 
@@ -67,6 +76,17 @@
     }
 
 
+    export class HostedAtOptions {
+        options: Select2OptionViewModel[];
+        constructor() {
+            this.options = [
+                <Select2OptionViewModel>{ id: 0, text: "&nbsp" },
+                <Select2OptionViewModel>{ id: 1, text: "On-premise" },
+                <Select2OptionViewModel>{ id: 2, text: "Eksternt" }
+            ];
+        }
+    }
+
     export interface ISystemUsageViewModel {
         id: number;
         organizationId: number;
@@ -87,6 +107,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
+        hostedAt: HostedAt;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
@@ -109,6 +130,7 @@
         preRiskAssessment: RiskLevel;
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
+        hostedAt: HostedAt;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -133,7 +155,23 @@
             this.preRiskAssessment = this.mapRiskLevelOption(itSystemUsage.preRiskAssessment);
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
+            this.hostedAt = this.mapHostedAtOption(itSystemUsage.hostedAt);
 
+        }
+
+        mapHostedAtOption(hostedAtOption: number) {
+            switch (hostedAtOption) {
+                case null:
+                    return HostedAt.UNDECIDED;
+                case 0:
+                    return HostedAt.UNDECIDED;
+                case 1:
+                    return HostedAt.ONPREMISE;
+                case 2:
+                    return HostedAt.EXTERNAL;
+                default:
+                    throw new RangeError(`${hostedAtOption} is not a valid hostedAt Option`);
+            }
         }
 
         mapDataLevels(dataLevel: any): number {
