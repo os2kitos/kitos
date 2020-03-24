@@ -836,10 +836,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         persistId: "riskSupervisionDocumentationUrlName",
                         template: dataItem => {
                             if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
-                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
                             }
                             else if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName == null) {
-                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
                             }
                             else if (dataItem.RiskSupervisionDocumentationUrlName != null) {
                                 return dataItem.RiskSupervisionDocumentationUrlName;
@@ -868,10 +868,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         persistId: "LinkToDirectoryUrlName",
                         template: dataItem => {
                             if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
-                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
                             }
                             else if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName == null) {
-                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
                             }
                             else if (dataItem.LinkToDirectoryUrlName != null) {
                                 return dataItem.LinkToDirectoryUrlName;

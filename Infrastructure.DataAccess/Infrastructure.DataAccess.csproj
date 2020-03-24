@@ -581,6 +581,14 @@
     <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.Designer.cs">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs" />
+    <Compile Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.Designer.cs">
+      <DependentUpon>202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.cs" />
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.Designer.cs">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202003191124414_SSO_Identities.cs" />
     <Compile Include="Migrations\202003191124414_SSO_Identities.Designer.cs">
       <DependentUpon>202003191124414_SSO_Identities.cs</DependentUpon>
@@ -947,6 +955,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.resx">
       <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.resx">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.resx">
+      <DependentUpon>202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003191124414_SSO_Identities.resx">
       <DependentUpon>202003191124414_SSO_Identities.cs</DependentUpon>

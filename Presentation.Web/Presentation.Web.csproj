@@ -419,7 +419,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
-    <TypeScriptCompile Include="app\services\ItSystemUsage\GDPRService.ts" />
+    <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -433,7 +433,6 @@
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
-    <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

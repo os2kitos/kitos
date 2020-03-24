@@ -31,6 +31,7 @@
             $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule;
             $scope.usage = itSystemUsage;
 
+            $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel(itSystemUsage);
             $scope.systemUsageName = itSystemUsage.itSystem.disabled ? itSystemUsage.itSystem.name + " - i " + itSystemUsage.organization.name + " (Slettes)" : itSystemUsage.itSystem.name + " - i " + itSystemUsage.organization.name;
 
             $scope.allowClearOption = {

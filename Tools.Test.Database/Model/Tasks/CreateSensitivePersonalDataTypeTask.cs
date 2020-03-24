@@ -24,9 +24,8 @@ namespace Tools.Test.Database.Model.Tasks
                 IsLocallyAvailable = true,
                 IsObligatory = true,
                 IsEnabled = true,
-                LastChangedByUser = globalAdmin.LastChangedByUser,
-                LastChangedByUserId = globalAdmin.LastChangedByUserId,
-                LastChanged = DateTime.Now
+                LastChanged = DateTime.Now,
+                LastChangedByUserId = globalAdmin.Id
             };
             context.SensitivePersonalDataTypes.Add(sensitiveDataType);
 
