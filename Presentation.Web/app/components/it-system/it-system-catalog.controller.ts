@@ -305,14 +305,19 @@
                 page: this.onPaging,
                 columns: [
                     {
-                        field: "Usages", title: "Anvendes", width: 40,
+                        field: "Usages",
+                        title: "Anvendes",
+                        width: 40,
                         persistId: "command", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // true if system is being used by system within current context, else false
-                            var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
+                            var systemHasUsages = this._.find(dataItem.Usages,
+                                (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${
+                                    dataItem.Id
+                                    })"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
@@ -327,14 +332,19 @@
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
-                            var systemHasUsages = dataItem ? this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId)) : false;
+                            var systemHasUsages = dataItem
+                                ? this._.find(dataItem.Usages,
+                                    (d: any) => (d.OrganizationId == this.user.currentOrganizationId))
+                                : false;
                             return systemHasUsages ? "Anvendt" : "Ikke anvendt";
                         },
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "Parent.Name", title: "Overordnet IT System", width: 150,
+                        field: "Parent.Name",
+                        title: "Overordnet IT System",
+                        width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
                         hidden: true,
@@ -348,7 +358,9 @@
                         }
                     },
                     {
-                        field: "PreviousName", title: "Tidligere Systemnavn", width: 285,
+                        field: "PreviousName",
+                        title: "Tidligere Systemnavn",
+                        width: 285,
                         persistId: "previousname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
                         filterable: {
@@ -361,13 +373,17 @@
                         }
                     },
                     {
-                        field: "Name", title: "It System", width: 285,
+                        field: "Name",
+                        title: "It System",
+                        width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes) </a>`;
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
+                                    } (Slettes) </a>`;
                             else
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
+                                    }</a>`;
                         },
                         attributes: {
                             "data-element-type": "catalogNameObject"
@@ -395,7 +411,9 @@
                         }
                     },
                     {
-                        field: "Disabled", title: "Slettes", width: 120,
+                        field: "Disabled",
+                        title: "Slettes",
+                        width: 120,
                         persistId: "Disabled", // DON'T YOU DARE RENAME!
                         template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },
                         hidden: false,
@@ -414,7 +432,9 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 120,
+                        field: "AccessModifier",
+                        title: "Synlighed",
+                        width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
@@ -427,7 +447,9 @@
                         }
                     },
                     {
-                        field: "BusinessType.Name", title: "Forretningstype", width: 150,
+                        field: "BusinessType.Name",
+                        title: "Forretningstype",
+                        width: 150,
                         persistId: "busitype", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BusinessType ? dataItem.BusinessType.Name : "",
                         attributes: { "class": "might-overflow" },
@@ -441,7 +463,9 @@
                         }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 210,
+                        field: "BelongsTo.Name",
+                        title: "Rettighedshaver",
+                        width: 210,
                         persistId: "belongsto", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
@@ -454,9 +478,13 @@
                         }
                     },
                     {
-                        field: "TaskKey", title: "KLE ID", width: 150,
+                        field: "TaskKey",
+                        title: "KLE ID",
+                        width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "TaskKey").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0
+                            ? this._.map(dataItem.TaskRefs, "TaskKey").join(", ")
+                            : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -470,9 +498,13 @@
                         sortable: false
                     },
                     {
-                        field: "TaskName", title: "KLE Navn", width: 155,
+                        field: "TaskName",
+                        title: "KLE Navn",
+                        width: 155,
                         persistId: "taskname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "Description").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0
+                            ? this._.map(dataItem.TaskRefs, "Description").join(", ")
+                            : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
@@ -485,10 +517,15 @@
                         sortable: false
                     },
                     {
-                        field: "Usages.length", title: "IT System: Anvendes af", width: 95,
+                        field: "Usages.length",
+                        title: "IT System: Anvendes af",
+                        width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem => this.showUsagesAsNumberOrNothing(dataItem),
-                        excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
+                        excelTemplate: dataItem => {
+                            var sorted = this._.orderBy(dataItem.Usages, ['Organization.Name'], ['asc']);
+                            return _.map(sorted, "Organization.Name").join(", ");
+                        },
                         filterable: false,
                         sortable: false,
                         attributes: {
@@ -499,7 +536,9 @@
                         },
                     },
                     {
-                        field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
+                        field: "Organization.Name",
+                        title: "Oprettet af: Organisation",
+                        width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Organization ? dataItem.Organization.Name : "",
                         hidden: true,
@@ -513,13 +552,15 @@
                         }
                     },
                     {
-                        field: "LastChangedByUser.Name", title: "Sidst redigeret: Bruger", width: 150,
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
+                                template: customFilter, 
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -527,18 +568,25 @@
                         }
                     },
                     {
-                        field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
+                        field: "LastChanged",
+                        title: "Sidst redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // handles null cases
-                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
                                 return "";
                             }
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
                             // handles null cases
-                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
                                 return "";
                             }
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
@@ -561,9 +609,12 @@
                             if (reference != null) {
                                 var url = reference.URL;
                                 if (Utility.Validation.validateUrl(url)) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
-                                }
-                                else {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        url +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
                                     return reference.Title;
                                 }
                             }
@@ -583,7 +634,9 @@
                         }
                     },
                     {
-                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId",
+                        title: "Mappe ref",
+                        width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
@@ -615,18 +668,36 @@
                         }
                     },
                     {
-                        field: "Uuid", title: "UUID", width: 150,
+                        field: "Uuid",
+                        title: "UUID",
+                        width: 150,
                         persistId: "uuid", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem.Uuid,
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        hidden: true
+                    },
+                    {
+                        field: "Description",
+                        title: "Beskrivelse",
+                        width: 150,
+                        persistId: "description",
+                        template: dataItem => dataItem.Description ? dataItem.Description : "",
+                        hidden: true
+                    },
+                    {
+                        field: "ArchiveDuty",
+                        title: "Rigsarkivets vejledning til arkivering",
+                        width: 150,
+                        persistId: "archiveDuty",
+                        template: dataItem => dataItem.ArchiveDuty ? dataItem.ArchiveDuty.toString() : "",
+                        hidden: true
+                    },
+                    {
+                        field: "ArchiveDutyComment",
+                        title: "Bemærkning fra Rigsarkivet",
+                        width: 150,
+                        persistId: "archiveDutyComment",
+                        template: dataItem => dataItem.ArchiveDutyComment ? dataItem.ArchiveDutyComment : "",
+                        hidden: true
                     }
                 ]
             };

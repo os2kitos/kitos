@@ -28,11 +28,6 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.dataLevelTypeLegalCheckbox));
     }
 
-    static getDefaultPersonalSensitiveDataCheckbox1() {
-        return element(this.cssHelper.byDataElementType(this.consts.defaultSensitivData1));
-    }
-
-
     static getPrecautionsEncryptionCheckbox() {
         return element(this.cssHelper.byDataElementType(this.consts.precautionsEncryptionCheckbox));
     }
@@ -49,11 +44,11 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.precautionsLogningCheckbox));
     }
 
-    static getDefaultSensitiveData1Checkbox() {
+    static getSensitiveDataOption1Checkbox() {
         return element(this.cssHelper.byDataElementType(this.consts.defaultSensitivData1));
     }
 
-    static getDefaultSensitiveData2Checkbox() {
+    static getSensitiveDataOption2Checkbox() {
         return element(this.cssHelper.byDataElementType(this.consts.defaultSensitivData2));
     }
 

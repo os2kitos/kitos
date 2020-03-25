@@ -45,6 +45,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,18 +93,27 @@
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
+    <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
+    <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
+    <Compile Include="SSO\StsBrugerInfo.cs" />
+    <Compile Include="SSO\IStsBrugerInfoService.cs" />
     <Compile Include="Repositories\GDPR\ISensitivePersonalDataTypeRepository.cs" />
     <Compile Include="Repositories\GDPR\SensitivePersonalDataTypeRepository.cs" />
-    <Compile Include="SSO\IStsBrugerEmailService.cs" />
     <Compile Include="SSO\StsAdresseHelpers.cs" />
     <Compile Include="SSO\StsOrganisationConstants.cs" />
+    <Compile Include="SSO\StsOrganisationHelpers.cs" />
     <Compile Include="SSO\StsOrganisationIntegrationConfiguration.cs" />
-    <Compile Include="SSO\StsBrugerEmailService.cs" />
+    <Compile Include="SSO\StsBrugerInfoService.cs" />
     <Compile Include="SSO\StsBrugerHelpers.cs" />
     <Compile Include="Repositories\Interface\IInterfaceRepository.cs" />
     <Compile Include="Repositories\Interface\InterfaceRepository.cs" />
     <Compile Include="Repositories\Qa\BrokenExternalReferencesReportRepository.cs" />
     <Compile Include="Repositories\Qa\IBrokenExternalReferencesReportRepository.cs" />
+    <Compile Include="SSO\StsVirksomhedHelpers.cs" />
     <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />

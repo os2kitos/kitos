@@ -13,9 +13,9 @@ namespace Core.ApplicationServices.SSO.Model
             _navigator = navigator;
         }
 
-        public static Saml20IdentityParser CreateFromContext()
+        public static Saml20IdentityParser CreateFrom(ISaml20Identity sourceIdentity)
         {
-            return new Saml20IdentityParser(new Saml20IdentityNavigator(Saml20Identity.Current));
+            return new Saml20IdentityParser(new Saml20IdentityNavigator(sourceIdentity));
         }
 
         public Maybe<KitosSamlPrivilege> MatchPrivilege(string privilegeId)

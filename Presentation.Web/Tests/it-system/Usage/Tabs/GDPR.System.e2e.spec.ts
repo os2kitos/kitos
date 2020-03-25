@@ -1,6 +1,6 @@
 ﻿import login = require("../../../Helpers/LoginHelper");
 import ItSystemCatalogHelper = require("../../../Helpers/SystemCatalogHelper");
-import itSystemHelper = require("../../../Helpers/SystemUsageHelper");
+import ItSystemHelper = require("../../../Helpers/SystemUsageHelper");
 import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
 import ItSystemUsageGDPRPage = require("../../../PageObjects/It-system/Usage/Tabs/ItSystemUsageGDPR.po");
 import LocalSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
@@ -35,7 +35,7 @@ describe("Global admin is able to", () => {
         loginHelper.loginAsGlobalAdmin()
             .then(() => ItSystemCatalogHelper.createSystem(itSystem1))
             .then(() => ItSystemCatalogHelper.getActivationToggleButton(itSystem1).click())
-            .then(() => itSystemHelper.openLocalSystem(itSystem1));
+            .then(() => ItSystemHelper.openLocalSystem(itSystem1));
     }, testFixture.longRunningSetup());
 
     beforeEach(() => {
@@ -69,7 +69,7 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getSensitiveDataLevelCheckBox().click()
             .then(() => ItSystemUsageGDPRPage.getRegularDataLevelCheckBox().click())
             .then(() => ItSystemUsageGDPRPage.getLegalDataLevelCheckBox().click())
-            .then(() => ItSystemUsageGDPRPage.getDefaultPersonalSensitiveDataCheckbox1().click());
+            .then(() => ItSystemUsageGDPRPage.getSensitiveDataOption1Checkbox().click());
 
     }
 

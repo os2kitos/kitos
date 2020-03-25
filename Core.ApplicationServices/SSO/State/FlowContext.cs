@@ -1,4 +1,7 @@
-﻿namespace Core.ApplicationServices.SSO.State
+﻿using System;
+using NotImplementedException = System.NotImplementedException;
+
+namespace Core.ApplicationServices.SSO.State
 {
     public class FlowContext
     {
@@ -9,39 +12,91 @@
             CurrentState = currentState;
         }
 
-        public void TransitionTo(AbstractState nextState)
+        public void TransitionTo(AbstractState nextState, Action<FlowContext> withAction)
         {
             CurrentState = nextState;
+            withAction?.Invoke(this);
         }
 
         public void HandleLoginCompleted()
         {
-            CurrentState.Handle(FlowEvent.LoginCompleted, this);
+            Handle(FlowEvent.LoginCompleted);
         }
 
-        public void HandleUserHasValidAccessRoleInSamlToken()
+        public void HandleUserPrivilegeVerified()
         {
-            CurrentState.Handle(FlowEvent.UserHasValidAccessRole, this);
+            Handle(FlowEvent.UserPrivilegeVerified);
         }
 
-        public void HandleUserWithEmailExists()
+        public void HandleUserPrivilegeInvalid()
         {
-            CurrentState.Handle(FlowEvent.UserExists, this);
+            Handle(FlowEvent.UserPrivilegeInvalid);
         }
 
-        public void HandleUserAlreadyAssociated()
+        public void HandleUserSeenBefore()
         {
-            CurrentState.Handle(FlowEvent.UserAlreadyAssociated, this);
+            Handle(FlowEvent.UserSeenBefore);
         }
 
-        public void HandleUserInKnownOrganization()
+        public void HandleUserFirstTimeSsoVisit()
         {
-            CurrentState.Handle(FlowEvent.UserInKnownOrganization, this);
+            Handle(FlowEvent.UserFirstTimeSsoVisit);
         }
 
-        public void HandleUserHasRole()
+        public void HandleOrganizationFound()
         {
-            CurrentState.Handle(FlowEvent.UserHasRole, this);
+            Handle(FlowEvent.OrganizationFound);
+        }
+
+        public void HandleOrganizationNotFound()
+        {
+            Handle(FlowEvent.OrganizationNotFound);
+        }
+
+        public void HandleUserHasRoleInOrganization()
+        {
+            Handle(FlowEvent.UserHasRoleInOrganization);
+        }
+
+        public void HandleUserHasNoRoleInOrganization()
+        {
+            Handle(FlowEvent.UserHasNoRoleInOrganization);
+        }
+
+        public void HandleRoleAssigned()
+        {
+            Handle(FlowEvent.RoleAssigned);
+        }
+
+        public void HandleUnableToResolveUserInStsOrganisation()
+        {
+            Handle(FlowEvent.UnableToResolveUserInStsOrganisation);
+        }
+
+        public void HandleUnsupportedFlow()
+        {
+            //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning)
+            Handle(FlowEvent.UnsupportedFlow);
+        }
+
+        public void HandleUnknownError()
+        {
+            Handle(FlowEvent.UnknownError);
+        }
+
+        private void Handle(FlowEvent eventToHandle)
+        {
+            CurrentState.Handle(eventToHandle, this);
+        }
+
+        public void HandleNoRoleAndOrganization()
+        {
+            Handle(FlowEvent.NoOrganizationAndRole);
+        }
+
+        public void HandleExistingSsoUserWithoutRoles()
+        {
+            Handle(FlowEvent.ExistingSsoUserWithoutRoles);
         }
     }
 }

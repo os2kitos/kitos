@@ -37,5 +37,11 @@ namespace Core.DomainServices.SSO
             };
             return client;
         }
+
+        public static bool IsStsAdresseObsolete(this RegistreringType1 registreringType1)
+        {
+            return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
+                   registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
+        }
     }
 }

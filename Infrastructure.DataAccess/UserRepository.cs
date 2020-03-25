@@ -19,11 +19,6 @@ namespace Infrastructure.DataAccess
             return _context.Users.SingleOrDefault(u => u.Email == email);
         }
 
-        public User GetByUuid(string uniqueId)
-        {
-            return _context.Users.SingleOrDefault(u => u.UniqueId == uniqueId);
-        }
-
         public User GetById(int id)
         {
             return _context.Users.SingleOrDefault(u => u.Id == id);

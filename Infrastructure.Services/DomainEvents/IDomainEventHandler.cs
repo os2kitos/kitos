@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Services.DomainEvents
 {
-    public interface IDomainEventHandler<in T> where T: IDomainEvent
+    public interface IDomainEventHandler<in T>
     {
         void Handle(T domainEvent);
     }

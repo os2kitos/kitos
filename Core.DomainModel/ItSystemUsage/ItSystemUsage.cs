@@ -410,7 +410,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? DPIAdeleteDate { get; set; }
         public int numberDPIA { get; set; }
 
-        public HostedAt? hostedAt { get; set; }
+        public HostedAt? HostedAt { get; set; }
         #endregion
 
 
