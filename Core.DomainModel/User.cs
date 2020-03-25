@@ -5,6 +5,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.SSO;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -37,7 +38,6 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public string UniqueId { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
         public int? DefaultOrganizationId { get; set; }
@@ -109,6 +109,8 @@ namespace Core.DomainModel
         ///     Handovers associated with this user
         /// </summary>
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
+
+        public virtual ICollection<SsoUserIdentity> SsoIdentities { get; set; }
 
         public DateTime? LockedOutDate { get; set; }
 

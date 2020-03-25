@@ -14,6 +14,7 @@ using Core.DomainModel.AdviceSent;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
+using Core.DomainModel.SSO;
 
 namespace Infrastructure.DataAccess
 {
@@ -139,6 +140,8 @@ namespace Infrastructure.DataAccess
         public DbSet<SystemRelation> SystemRelations { get; set; }
         public DbSet<BrokenExternalReferencesReport> BrokenExternalReferencesReports { get; set; }
         public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels{ get; set; }
+        public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
+        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities{ get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -224,6 +227,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BrokenLinkInExternalReferenceMap());
             modelBuilder.Configurations.Add(new BrokenLinkInInterfaceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
+            modelBuilder.Configurations.Add(new SsoUserIdentityMap());
+            modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
         }
     }
 }

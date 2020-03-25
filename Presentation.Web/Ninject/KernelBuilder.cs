@@ -16,6 +16,7 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SSO;
+using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -38,13 +39,16 @@ using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Qa;
 using Core.DomainServices.Repositories.Reference;
+using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.SSO;
 using Core.DomainServices.Time;
+using dk.nita.saml20.identity;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
@@ -181,8 +185,10 @@ namespace Presentation.Web.Ninject
                     Settings.Default.StsOrganisationAuthorizedMunicipalityCvr))
                 .InSingletonScope();
 
+            kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
-            kernel.Bind<IStsBrugerEmailService>().To<StsBrugerEmailService>().InCommandScope(Mode);
+            kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
+            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_=>Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)
@@ -237,10 +243,14 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportRepository>().To<BrokenExternalReferencesReportRepository>().InCommandScope(Mode);
             kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationRepository>().To<OrganizationRepository>().InCommandScope(Mode);
+            kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
+            kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
         {
+            kernel.Bind<IApplicationAuthenticationState>().To<ApplicationAuthenticationState>().InCommandScope(Mode);
             kernel.Bind<IAuthenticationContextFactory>().To<OwinAuthenticationContextFactory>().InCommandScope(Mode);
             kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InCommandScope(Mode);
         }

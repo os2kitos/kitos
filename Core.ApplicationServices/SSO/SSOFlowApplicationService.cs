@@ -1,22 +1,20 @@
-﻿using Core.ApplicationServices.SSO.State;
-using Core.DomainServices.SSO;
+﻿using Core.ApplicationServices.SSO.Factories;
+using Core.ApplicationServices.SSO.State;
 
 namespace Core.ApplicationServices.SSO
 {
     public class SsoFlowApplicationService : ISsoFlowApplicationService
     {
-        private readonly IStsBrugerEmailService _emailService;
-        private readonly SsoFlowConfiguration _configuration;
+        private readonly ISsoStateFactory _stateFactory;
 
-        public SsoFlowApplicationService(IStsBrugerEmailService emailService, SsoFlowConfiguration configuration)
+        public SsoFlowApplicationService(ISsoStateFactory stateFactory)
         {
-            _emailService = emailService;
-            _configuration = configuration;
+            _stateFactory = stateFactory;
         }
 
         public AbstractState StartSsoLoginFlow()
         {
-            AbstractState initialState = new InitialFlowState(_emailService, _configuration);
+            var initialState = _stateFactory.CreateInitialState();
             var flowContext = new FlowContext(initialState);
             flowContext.HandleLoginCompleted();
             return flowContext.CurrentState;

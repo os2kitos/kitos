@@ -14,7 +14,6 @@ namespace Presentation.Web.Models
         public int? DefaultOrganizationUnitId { get; set; }
         public string DefaultOrganizationUnitName { get; set; }
         public bool IsGlobalAdmin { get; set; }
-        public Guid? Uuid { get; set; }
         public List<OrganizationRightDTO> OrganizationRights { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
@@ -23,9 +22,6 @@ namespace Presentation.Web.Models
         public int? LastChangedByUserId { get; set; }
         public bool? HasApiAccess { get; set; }
 
-        public string FullName
-        {
-            get { return Name + " " + LastName; }
-        }
+        public string FullName => Name + " " + LastName;
     }
 }

@@ -2,10 +2,9 @@
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.SSO;
+using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
-using dk.nita.saml20.identity;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.SSO;
 
 namespace Presentation.Web.Controllers.SSO
 {
@@ -25,21 +24,28 @@ namespace Presentation.Web.Controllers.SSO
         public IHttpActionResult SSO()
         {
             var result = "User not authenticated";
-            if (Saml20Identity.IsInitialized())
+            var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
+            switch (finalState)
             {
-                var currentIdentityName = Saml20Identity.Current.Name;
-                var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
+                case ErrorState errorState:
+                    return SsoError(errorState.ErrorCode);
 
-                switch (finalState)
-                {
-                    case UserWithNoPrivilegesState _:
-                        return SsoError(SsoErrorCode.MissingPrivilege);
-                    case UserSignedInState _:
-                        result = $"User '{currentIdentityName}' has Kitos read access";
-                        break;
-                }
+                case UserLoggedInState _:
+                    return LoggedIn();
+
+                default:
+                    return SsoError(SsoErrorCode.Unknown);
             }
-            return Ok(result);
+        }
+
+        private IHttpActionResult LoggedIn()
+        {
+            //Redirect to front page
+            var uriBuilder = new UriBuilder(Request.RequestUri)
+            {
+                Path = string.Empty,
+            };
+            return Redirect(uriBuilder.Uri);
         }
 
         private RedirectResult SsoError(SsoErrorCode error)

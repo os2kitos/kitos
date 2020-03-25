@@ -1,19 +1,23 @@
-﻿using Core.ApplicationServices.SSO.Model;
+﻿using System;
+using Core.ApplicationServices.SSO.Factories;
+using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
-using Core.DomainServices.SSO;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class InitialFlowState : AbstractState
     {
-        private readonly IStsBrugerEmailService _stsBrugerEmailService;
         private readonly string _samlKitosReadAccessRoleIdentifier;
         private readonly Saml20IdentityParser _parser;
+        private readonly ISsoStateFactory _stateFactory;
 
-        public InitialFlowState(IStsBrugerEmailService stsBrugerEmailService, SsoFlowConfiguration configuration)
+        public InitialFlowState(
+            SsoFlowConfiguration configuration, 
+            Saml20IdentityParser parser,
+            ISsoStateFactory stateFactory)
         {
-            _stsBrugerEmailService = stsBrugerEmailService;
-            _parser = Saml20IdentityParser.CreateFromContext();
+            _parser = parser;
+            _stateFactory = stateFactory;
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
 
@@ -21,23 +25,22 @@ namespace Core.ApplicationServices.SSO.State
         {
             if (@event.Equals(FlowEvent.LoginCompleted))
             {
-                var userUuid = GetCurrentUserUuid();
-                if (userUuid.HasValue && CurrentUserHasKitosPrivilege())
+                var externalUserUuid = GetUserExternalUuid();
+                if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege())
                 {
-                    var stsBrugerEmails = _stsBrugerEmailService.GetStsBrugerEmails(userUuid.Value);
-                    context.TransitionTo(new LookupStsUserEmailState(stsBrugerEmails));
-                    context.HandleUserHasValidAccessRoleInSamlToken();
+                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value), 
+                        _ => _.HandleUserPrivilegeVerified());
                 }
                 else
                 {
-                    context.TransitionTo(new UserWithNoPrivilegesState());
+                    context.TransitionTo(new ErrorState(), _ => _.HandleUserPrivilegeInvalid());
                 }
             }
         }
 
-        private Maybe<string> GetCurrentUserUuid()
+        private Maybe<Guid> GetUserExternalUuid()
         {
-            return _parser.MatchUuid().Select(uuid => uuid.Value.ToString());
+            return _parser.MatchUuid().Select(x => x.Value);
         }
 
         private bool CurrentUserHasKitosPrivilege()
