@@ -154,6 +154,7 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         };
+        
 
         private reload() {
             this.$state.go(".", null, { reload: true });
@@ -304,6 +305,11 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
+                    },
+                    {
+                        name: "exportGDPR",
+                        text: "Exportér GPDR data til Excel",
+                        template: `<a role='button' class='k-button k-button-icontext' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
                     }
                 ],
                 excel: {
