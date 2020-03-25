@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202003191124414_SSO_Identities"; }
+            get { return "202003251349232_SSO_Identities"; }
         }
         
         string IMigrationMetadata.Source
