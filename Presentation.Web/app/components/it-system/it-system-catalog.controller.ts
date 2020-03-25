@@ -681,15 +681,35 @@
                         width: 150,
                         persistId: "description",
                         template: dataItem => dataItem.Description ? dataItem.Description : "",
-                        hidden: true
+                        hidden: true,
+
                     },
                     {
                         field: "ArchiveDuty",
                         title: "Rigsarkivets vejledning til arkivering",
                         width: 150,
                         persistId: "archiveDuty",
-                        template: dataItem => dataItem.ArchiveDuty ? dataItem.ArchiveDuty.toString() : "",
-                        hidden: true
+                        template: dataItem => Models.Odata.ItSystem.ArchiveDutyRecommendationMapper.map(dataItem.ArchiveDuty),
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [
+                                            Models.ViewModel.ItSystem.ArchiveDutyRecommendationViewModel.archiveDuties.Undecided,
+                                            Models.ViewModel.ItSystem.ArchiveDutyRecommendationViewModel.archiveDuties.B,
+                                            Models.ViewModel.ItSystem.ArchiveDutyRecommendationViewModel.archiveDuties.K,
+                                            Models.ViewModel.ItSystem.ArchiveDutyRecommendationViewModel.archiveDuties.NoRecommendation
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false,
+                                operator: "eq"
+                            }
+                        }
                     },
                     {
                         field: "ArchiveDutyComment",
