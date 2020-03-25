@@ -681,7 +681,7 @@
                         width: 150,
                         persistId: "description",
                         template: dataItem => dataItem.Description ? dataItem.Description : "",
-                        hidden: true,
+                        hidden: true
 
                     },
                     {

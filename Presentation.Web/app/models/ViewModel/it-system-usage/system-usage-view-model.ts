@@ -72,7 +72,6 @@
                 },
                 <any>{});
         }
-
     }
 
     export class HostedAtOptions {
