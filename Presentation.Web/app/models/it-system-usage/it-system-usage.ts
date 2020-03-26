@@ -50,8 +50,6 @@
         UsedBy: Array<IItSystemUsageOrgUnitUsage>;
         /** Gets or sets the tasks this instance supports. */
         TaskRefs: Array<ITaskRef>;
-        /** The local usages of interfaces. */
-        InterfaceUsages: Array<IInterfaceUsage>;
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
 

@@ -46,7 +46,6 @@ namespace Presentation.Web.Models
         public int InterfaceExhibitCount { get; set; }
         public int InterfaceUseCount { get; set; }
         public int ActiveInterfaceUseCount { get; set; }
-        public IEnumerable<ItInterfaceExposureDTO> InterfaceExposures { get; set; }
         public IEnumerable<ItProjectDTO> ItProjects { get; set; }
         public int? MainContractId { get; set; }
         public IEnumerable<ItContractSystemDTO> Contracts { get; set; }
