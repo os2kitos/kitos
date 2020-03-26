@@ -12,8 +12,6 @@ namespace Core.DomainModel.ItSystem
         public ItInterface()
         {
             DataRows = new List<DataRow>();
-            InterfaceLocalUsages = new List<ItInterfaceUsage>();
-            InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
         }
         public string Url { get; set; }
         /// <summary>
@@ -56,22 +54,6 @@ namespace Core.DomainModel.ItSystem
         ///     The it system that exhibits this instance.
         /// </value>
         public virtual ItInterfaceExhibit ExhibitedBy { get; set; }
-
-        /// <summary>
-        ///     Gets or sets local usages of the system, in case the system is an interface.
-        /// </summary>
-        /// <value>
-        ///     The interface local usages.
-        /// </value>
-        public virtual ICollection<ItInterfaceUsage> InterfaceLocalUsages { get; set; }
-
-        /// <summary>
-        ///     Gets or sets local exposure of the system, in case the system is an interface.
-        /// </summary>
-        /// <value>
-        ///     The interface local exposure.
-        /// </value>
-        public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
 
         public virtual ICollection<BrokenLinkInInterface> BrokenLinkReports { get; set; }
 

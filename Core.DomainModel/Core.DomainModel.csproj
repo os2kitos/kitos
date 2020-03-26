@@ -159,8 +159,6 @@
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
     <Compile Include="ItSystem\DataType.cs" />
-    <Compile Include="ItSystemUsage\ItInterfaceExhibitUsage.cs" />
-    <Compile Include="ItSystemUsage\ItInterfaceUsage.cs" />
     <Compile Include="ItSystem\ItInterface.cs" />
     <Compile Include="ItSystem\ItSystemBase.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageOrgUnitUsage.cs" />

@@ -19,35 +19,6 @@ namespace Core.DomainServices.Repositories.Contract
             _systemUsageRepository = systemUsageRepository ?? throw new ArgumentNullException(nameof(systemUsageRepository));
         }
 
-        public IQueryable<ItContract> GetBySystemUsageAssociation(int systemUsageId)
-        {
-            var usage = _systemUsageRepository.GetByKey(systemUsageId);
-            if (usage == null)
-            {
-                throw new ArgumentException("No system usage found", nameof(systemUsageId));
-            }
-
-            var idsOfContractsWithDirectAssociations = usage.Contracts.Select(x => x.ItContractId);
-            var interfaceExhibitUsages = usage.ItInterfaceExhibitUsages.ToList();
-            var interfaceUsages = usage.ItInterfaceUsages.ToList();
-
-            //Join all contract references wrt. the system usage
-            var allContractIds =
-                idsOfContractsWithDirectAssociations
-                    .Concat(
-                        interfaceUsages
-                            .Select(x => x.ItContractId)
-                            .Concat(interfaceExhibitUsages.Select(x => x.ItContractId))
-                            .Where(id => id.HasValue)
-                            .Select(x => x.Value))
-                    .Distinct()
-                    .ToList();
-
-            return _contractRepository
-                .AsQueryable()
-                .ByIds(allContractIds);
-        }
-
         public ItContract GetById(int contractId)
         {
             return _contractRepository.AsQueryable().ById(contractId);

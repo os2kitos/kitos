@@ -20,8 +20,6 @@ namespace Core.DomainModel.ItContract
             Children = new List<ItContract>();
             AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
-            AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
-            AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
             PaymentMilestones = new List<PaymentMilestone>();
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
@@ -540,22 +538,6 @@ namespace Core.DomainModel.ItContract
         ///     The associated system usages.
         /// </value>
         public virtual ICollection<ItContractItSystemUsage> AssociatedSystemUsages { get; set; }
-
-        /// <summary>
-        ///     The interface usages that the contract is associated to.
-        /// </summary>
-        /// <value>
-        ///     The associated interface usages.
-        /// </value>
-        public virtual ICollection<ItInterfaceUsage> AssociatedInterfaceUsages { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the associated interface exposures.
-        /// </summary>
-        /// <value>
-        ///     The associated interface exposures.
-        /// </value>
-        public virtual ICollection<ItInterfaceExhibitUsage> AssociatedInterfaceExposures { get; set; }
 
         #endregion
 

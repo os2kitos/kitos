@@ -62,7 +62,6 @@ namespace Presentation.Web.Models
         public IEnumerable<OptionDTO> AgreementElements { get; set; }
 
         public IEnumerable<ItSystemUsageSimpleDTO> AssociatedSystemUsages { get; set; }
-        public IEnumerable<ItInterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
         public IEnumerable<ItInterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
 
         public IEnumerable<AdviceDTO> Advices { get; set; }

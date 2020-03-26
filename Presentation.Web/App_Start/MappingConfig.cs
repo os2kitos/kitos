@@ -322,9 +322,6 @@ namespace Presentation.Web
             Mapper.CreateMap<ItInterfaceExhibit, ItInterfaceExhibitDTO>()
                 .ReverseMap();
 
-            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExhibitUsageDTO>()
-                .ReverseMap();
-
             Mapper.CreateMap<DataRow, DataRowDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
@@ -344,16 +341,6 @@ namespace Presentation.Web
                 .ForMember(dest => dest.BelongsToId, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Id))
                 .ForMember(dest => dest.BelongsToName, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Name))
                 .ReverseMap();
-
-            Mapper.CreateMap<ItInterfaceUsage, ItInterfaceUsageDTO>()
-                  .ForMember(dest => dest.ItInterfaceItInterfaceName, opt => opt.MapFrom(src => src.ItInterface.Name))
-                  .ForMember(dest => dest.ItInterfaceItInterfaceDisabled, opt => opt.MapFrom(src => src.ItInterface.Disabled))
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
-
-            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExposureDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                 .ForMember(dest => dest.ResponsibleOrgUnitName,
@@ -445,8 +432,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore());
 
             //Output only - this mapping should not be reversed

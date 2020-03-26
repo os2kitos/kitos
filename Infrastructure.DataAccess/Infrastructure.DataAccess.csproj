@@ -102,14 +102,12 @@
     <Compile Include="Mapping\PaymentModelTypeMap.cs" />
     <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
-    <Compile Include="Mapping\ItInterfaceExhibitUsageMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\ReportMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />

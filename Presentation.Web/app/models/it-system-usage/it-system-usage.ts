@@ -52,8 +52,6 @@
         TaskRefs: Array<ITaskRef>;
         /** The local usages of interfaces. */
         InterfaceUsages: Array<IInterfaceUsage>;
-        /** The local exposures of interfaces. */
-        ItInterfaceExhibitUsages: Array<ItSystemUsage.IItInterfaceExhibitUsage>;
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
 

@@ -131,9 +131,6 @@ namespace Presentation.Web
             itProject.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             itProject.EntityType.HasKey(x => x.Id);
 
-            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
-            interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
-
             BindEntitySet<DataType, DataTypesController>(builder);
 
             var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
@@ -263,11 +260,6 @@ namespace Presentation.Web
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
             itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, entitySetItSystems);
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
-
-            var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages"); // no controller yet
-            itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
-                .HasKey(x => x.ItInterfaceExhibitId)
-                .HasKey(x => x.ItSystemUsageId);
 
             BindEntitySet<SensitiveDataType, SensitiveDataTypesController>(builder);
 

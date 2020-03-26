@@ -447,7 +447,6 @@
     <Compile Include="Controllers\API\HealthCheckController.cs" />
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
-    <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />
     <Compile Include="Controllers\API\ItInterfaceController.cs" />
@@ -586,7 +585,6 @@
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItInterfaceDTO.cs" />
     <Compile Include="Models\ItInterfaceExhibitDTO.cs" />
-    <Compile Include="Models\ItInterfaceExhibitUsageDTO.cs" />
     <Compile Include="Models\ItInterfaceUseDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
@@ -621,7 +619,6 @@
     <Compile Include="Controllers\API\GoalController.cs" />
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GenericRightsController.cs" />
-    <Compile Include="Controllers\API\ItInterfaceUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
@@ -638,7 +635,6 @@
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
-    <Compile Include="Models\ItInterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
@@ -1146,13 +1142,11 @@
     <TypeScriptCompile Include="app\models\it-system-usage\data-row-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\frequency.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\interface-usage.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\interface.ts" />
-    <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
