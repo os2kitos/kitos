@@ -97,5 +97,10 @@ namespace Core.ApplicationServices.SSO.State
         {
             Handle(FlowEvent.UnableToLocateUser);
         }
+
+        public void HandleUserAutoProvisioned()
+        {
+            Handle(FlowEvent.UserAutoProvisioned);
+        }
     }
 }

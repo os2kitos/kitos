@@ -16,6 +16,7 @@
         UnableToResolveUserInStsOrganization = 11,
         ExistingSsoUserWithoutRoles = 12,
         UnableToLocateUser = 13,
-        UnknownError = 14
+        UserAutoProvisioned = 14,
+        UnknownError = 15
     }
 }

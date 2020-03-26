@@ -4,6 +4,7 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
@@ -43,20 +44,35 @@ namespace Core.ApplicationServices.SSO.State
                     var organizationByCvrResult = _organizationRepository.GetByCvr(_stsBrugerInfo.MunicipalityCvr);
                     if (organizationByCvrResult.HasValue)
                     {
-                        context.TransitionTo(new ErrorState(), _ => _.HandleUnableToLocateUser());
+                        var user = CreateAutoProvisonedUser(organizationByCvrResult);
+                        _organizationRoleService.MakeUser(user, organizationByCvrResult.Value);
+
+                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user), 
+                            _ => _.HandleUserAutoProvisioned());
                     }
                     else
                     {
-                        // TODO Create user
-                        var user = new User();
-                        context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user), 
-                            _ => _.HandleOrganizationFound());
+                        context.TransitionTo(new ErrorState(), 
+                            _ => _.HandleUnableToLocateUser());
                     }
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(@event), @event, null);
             }
+        }
+
+        private User CreateAutoProvisonedUser(Maybe<Organization> organizationByCvrResult)
+        {
+            var user = _userRepository.Create();
+            user.Email = _stsBrugerInfo.Emails.First();
+            user.Name = _stsBrugerInfo.FirstName;
+            user.LastName = _stsBrugerInfo.LastName;
+            user.DefaultOrganization = organizationByCvrResult.Value;
+            user.Salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
+            user.Password = "default123"; // TODO: Change this to encrypted version
+            _userRepository.Save();
+            return user;
         }
     }
 }
