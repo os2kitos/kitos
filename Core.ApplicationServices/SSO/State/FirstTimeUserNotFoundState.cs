@@ -1,38 +1,36 @@
 ﻿using System;
 using System.Linq;
-using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
+using Infrastructure.Services.Cryptography;
 
 namespace Core.ApplicationServices.SSO.State
 {
     public class FirstTimeUserNotFoundState : AbstractState
     {
         private readonly StsBrugerInfo _stsBrugerInfo;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUserRepository _userRepository;
         private readonly IOrganizationRoleService _organizationRoleService;
+        private readonly ICryptoService _cryptoService;
         private readonly SsoStateFactory _ssoStateFactory;
 
         public FirstTimeUserNotFoundState(StsBrugerInfo stsBrugerInfo,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
             IOrganizationRepository organizationRepository,
             IUserRepository userRepository,
             IOrganizationRoleService organizationRoleService,
+            ICryptoService cryptoService,
             SsoStateFactory ssoStateFactory)
         {
             _stsBrugerInfo = stsBrugerInfo;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
             _organizationRepository = organizationRepository;
             _userRepository = userRepository;
             _organizationRoleService = organizationRoleService;
+            _cryptoService = cryptoService;
             _ssoStateFactory = ssoStateFactory;
         }
 
@@ -44,8 +42,9 @@ namespace Core.ApplicationServices.SSO.State
                     var organizationByCvrResult = _organizationRepository.GetByCvr(_stsBrugerInfo.MunicipalityCvr);
                     if (organizationByCvrResult.HasValue)
                     {
-                        var user = CreateAutoProvisonedUser(organizationByCvrResult);
-                        _organizationRoleService.MakeUser(user, organizationByCvrResult.Value);
+                        var organization = organizationByCvrResult.Value;
+                        var user = CreateAutoProvisonedUser(organization);
+                        _organizationRoleService.MakeUser(user, organization);
 
                         context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user), 
                             _ => _.HandleUserAutoProvisioned());
@@ -62,15 +61,15 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private User CreateAutoProvisonedUser(Maybe<Organization> organizationByCvrResult)
+        private User CreateAutoProvisonedUser(Organization organizationByCvrResult)
         {
             var user = _userRepository.Create();
             user.Email = _stsBrugerInfo.Emails.First();
             user.Name = _stsBrugerInfo.FirstName;
             user.LastName = _stsBrugerInfo.LastName;
-            user.DefaultOrganization = organizationByCvrResult.Value;
+            user.DefaultOrganization = organizationByCvrResult;
             user.Salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
-            user.Password = "default123"; // TODO: Change this to encrypted version
+            user.Password = _cryptoService.Encrypt(string.Empty);
             _userRepository.Save();
             return user;
         }
