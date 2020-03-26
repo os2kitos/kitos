@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using Presentation.Web.Models;
+using Tests.Integration.Presentation.Web.Qa;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
@@ -253,8 +262,188 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task Can_Get_GDPRExportReport()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var sensitiveDataLevel = A<SensitiveDataLevel>();
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            var body = new
+            {
+                HostedAt = A<HostedAt>(),
+                IsBusinessCritical = A<DataOptions>(),
+                DataProcessorControl = A<DataOptions>(),
+                RiskAssessment = A<DataOptions>(),
+                PreRiskAssessment = A<RiskLevel>(),
+                DPIA = A<DataOptions>()
 
+            };
+            await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
+            await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitiveDataLevel);
 
+            var expectedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
 
+            //Act
+            using (var response =
+                await HttpApi.GetWithCookieAsync(
+                    TestEnvironment.CreateUrl($"api/v1/gdpr-report/csv/{organizationId}"),
+                    cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                using (var csvReader = new CsvReader(new StringReader(await response.Content.ReadAsStringAsync()),
+                    new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = ";",
+                        HasHeaderRecord = true
+                    }))
+                {
+                    var report = csvReader.GetRecords<GdprExportReportCsvFormat>().ToList();
+                    Assert.NotEmpty(report);
+                    var gdprExportReport = Assert.Single(report.Where(x => x.Name == system.Name));
+                    AssertDataOption(expectedUsage.IsBusinessCritical, gdprExportReport.BusinessCritical);
+                    AssertDataOption(expectedUsage.DataProcessorControl, gdprExportReport.DatahandlerControl);
+                    AssertDataOption(expectedUsage.RiskAssessment, gdprExportReport.RiskAssessment);
+                    AssertDataOption(expectedUsage.DPIA, gdprExportReport.DPIA);
+                    AssertRiskLevel(expectedUsage.PreRiskAssessment, gdprExportReport.PreRiskAssessment);
+                    AssertHostedAt(expectedUsage.HostedAt, gdprExportReport.HostedAt);
+                    AssertSensitiveDataLevel(sensitiveDataLevel, gdprExportReport);
+                }
+            }
+        }
+        
+
+        private void AssertSensitiveDataLevel(SensitiveDataLevel expected, GdprExportReportCsvFormat actual)
+        {
+            switch (expected)
+            {
+                case SensitiveDataLevel.NONE:
+                    Assert.Equal("Ja", actual.NoData);
+                    Assert.Equal("Nej", actual.PersonalData);
+                    Assert.Equal("Nej", actual.SensitiveData);
+                    Assert.Equal("Nej", actual.LegalData);
+                    return;
+                case SensitiveDataLevel.PERSONALDATA:
+                    Assert.Equal("Nej", actual.NoData);
+                    Assert.Equal("Ja", actual.PersonalData);
+                    Assert.Equal("Nej", actual.SensitiveData);
+                    Assert.Equal("Nej", actual.LegalData);
+                    return;
+                case SensitiveDataLevel.SENSITIVEDATA:
+                    Assert.Equal("Nej", actual.NoData);
+                    Assert.Equal("Nej", actual.PersonalData);
+                    Assert.Equal("Ja", actual.SensitiveData);
+                    Assert.Equal("Nej", actual.LegalData);
+                    return;
+                case SensitiveDataLevel.LEGALDATA:
+                    Assert.Equal("Nej", actual.NoData);
+                    Assert.Equal("Nej", actual.PersonalData);
+                    Assert.Equal("Nej", actual.SensitiveData);
+                    Assert.Equal("Ja", actual.LegalData);
+                    return;
+                default:
+                    throw new AssertActualExpectedException(expected, actual, "Expected is not a correct SensitiveDataLevel");
+
+            }
+        }
+
+        private void AssertHostedAt(HostedAt? expected, string actual)
+        {
+            switch (expected)
+            {
+                case HostedAt.UNDECIDED:
+                    Assert.Equal("", actual);
+                    return;
+                case HostedAt.ONPREMISE:
+                    Assert.Equal("On-premise", actual);
+                    return;
+                case HostedAt.EXTERNAL:
+                    Assert.Equal("Eksternt", actual);
+                    return;
+                case null:
+                    break;
+                default:
+                    throw new AssertActualExpectedException(expected, actual, "Expected is not a correct HostedAt");
+            }
+        }
+
+        private void AssertRiskLevel(RiskLevel? expected, string actual)
+        {
+            switch (expected)
+            {
+                case RiskLevel.LOW:
+                    Assert.Equal("Lav", actual);
+                    return;
+                case RiskLevel.MIDDLE:
+                    Assert.Equal("Middel", actual);
+                    return;
+                case RiskLevel.HIGH:
+                    Assert.Equal("Høj", actual);
+                    return;
+                case RiskLevel.UNDECIDED:
+                    Assert.Equal("", actual);
+                    return;
+                case null:
+                    break;
+                default:
+                    throw new AssertActualExpectedException(expected, actual, "Expected is not a correct RiskLevel");
+            }
+        }
+
+        private void AssertDataOption(DataOptions? expected, string actual)
+        {
+            switch (expected)
+            {
+                case DataOptions.NO:
+                    Assert.Equal("Nej", actual);
+                    return;
+                case DataOptions.YES:
+                    Assert.Equal("Ja", actual);
+                    return;
+                case DataOptions.DONTKNOW:
+                    Assert.Equal("Ved ikke", actual);
+                    return;
+                case DataOptions.UNDECIDED:
+                    Assert.Equal("", actual);
+                    return;
+                default:
+                    throw new AssertActualExpectedException(expected, actual, "Expected is not a correct DataOption");
+            }
+        }
+
+    }
+
+    public class GdprExportReportCsvFormat
+    {
+        [Name("Navn")]
+        public string Name { get; set; }
+        [Name("Ingen persondata")]
+        public string NoData { get; set; }
+        [Name("Almindelige persondata")]
+        public string PersonalData { get; set; }
+        [Name("Følsomme persondata")]
+        public string SensitiveData { get; set; }
+        [Name("Straffesager og lovovertrædelser")]
+        public string LegalData { get; set; }
+        [Name("Valgte følsomme persondata")]
+        public string SensitiveDataTypes { get; set; }
+        [Name("Forretningskritisk IT-System")]
+        public string BusinessCritical { get; set; }
+        [Name("Databehandleraftale")]
+        public string Datahandler { get; set; }
+        [Name("Tilsyn/kontrol af databehandleren")]
+        public string DatahandlerControl { get; set; }
+        [Name("Link til fortegnelse")]
+        public string DirectoryUrl { get; set; }
+        [Name("Foretaget risikovurdering")]
+        public string RiskAssessment { get; set; }
+        [Name("Hvad viste seneste risikovurdering")]
+        public string PreRiskAssessment { get; set; }
+        [Name("Gennemført DPIA / Konsekvensanalyse")]
+        public string DPIA { get; set; }
+        [Name("IT-Systemet driftes")]
+        public string HostedAt { get; set; }
     }
 }

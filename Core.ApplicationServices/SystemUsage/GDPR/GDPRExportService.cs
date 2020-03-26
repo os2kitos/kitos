@@ -9,7 +9,6 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SystemUsage.GDPR
 {
@@ -55,7 +54,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 DataProcessorContract = input.Contracts.Any(x => x.ItContract.ContractType.Name == "Databehandleraftale"),
                 DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
-                HostedAt = input.hostedAt,
+                HostedAt = input.HostedAt,
                 NoData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE),
                 PersonalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA),
                 SensitiveData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA),

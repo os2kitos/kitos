@@ -309,7 +309,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         name: "exportGDPR",
                         text: "Exportér GPDR data til Excel",
-                        template: `<a role='button' class='k-button k-button-icontext' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
+                        template: `<a role='button' class='k-button k-button-icontext pull-right' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
                     }
                 ],
                 excel: {
