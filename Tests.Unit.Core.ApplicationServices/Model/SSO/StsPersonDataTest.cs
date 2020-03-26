@@ -8,6 +8,7 @@ namespace Tests.Unit.Core.Model.SSO
         [Theory]
         [InlineData("Ib Ibbermand", "Ib", "Ibbermand")]
         [InlineData("Niels Erik Nordberg", "Niels", "Erik Nordberg")]
+        [InlineData("Niels Erik  Nordberg", "Niels", "Erik Nordberg")]
         [InlineData("JustMe", "JustMe", "")]
         [InlineData("Tra la la", "Tra", "la la")]
         [InlineData("", "", "")]

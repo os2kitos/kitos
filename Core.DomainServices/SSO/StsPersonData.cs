@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Core.DomainServices.SSO
 {
@@ -9,8 +10,8 @@ namespace Core.DomainServices.SSO
 
         public StsPersonData(string fullName)
         {
-            var nameParts = fullName.Split(' ');
-            FirstName = nameParts.First();
+            var nameParts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            FirstName = nameParts.Length > 0 ? nameParts.First() : string.Empty;
             LastName = string.Join(" ", nameParts.Skip(1));
         }
     }
