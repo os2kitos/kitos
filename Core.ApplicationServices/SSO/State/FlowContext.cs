@@ -70,13 +70,7 @@ namespace Core.ApplicationServices.SSO.State
 
         public void HandleUnableToResolveUserInStsOrganisation()
         {
-            Handle(FlowEvent.UnableToResolveUserInStsOrganisation);
-        }
-
-        public void HandleUnsupportedFlow()
-        {
-            //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning)
-            Handle(FlowEvent.UnsupportedFlow);
+            Handle(FlowEvent.UnableToResolveUserInStsOrganization);
         }
 
         public void HandleUnknownError()
@@ -97,6 +91,11 @@ namespace Core.ApplicationServices.SSO.State
         public void HandleExistingSsoUserWithoutRoles()
         {
             Handle(FlowEvent.ExistingSsoUserWithoutRoles);
+        }
+
+        public void HandleUnableToLocateUser()
+        {
+            Handle(FlowEvent.UnableToLocateUser);
         }
     }
 }

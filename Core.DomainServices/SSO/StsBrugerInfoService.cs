@@ -33,7 +33,7 @@ namespace Core.DomainServices.SSO
 
         public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid)
         {
-            var organizationUuids = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
+            var organizationUuids = GetStsBrugerEmailAdresseAndOrganizationAndPersonUuids(uuid);
             if (organizationUuids.Failed)
             {
                 _logger.Error("Failed to resolve UUIDS '{error}'", organizationUuids.Error);
@@ -42,19 +42,30 @@ namespace Core.DomainServices.SSO
 
             var (emailAdresseUuid, organisationUuid) = organizationUuids.Value;
             var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid);
-
             if (emailsResult.Failed)
             {
                 _logger.Error("Failed to resolve Emails '{error}'", emailsResult.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
+            //var personData = GetStsPersonFrom(personUuid);
+            //if (personData.Failed)
+            //{
+            //    _logger.Error("Failed to resolve Person '{error}'", emailsResult.Error);
+            //    return Maybe<StsBrugerInfo>.None;
+            //}
+
             return
                 GetStsVirksomhedFromUuid(organisationUuid)
                     .Select(GetStsBrugerMunicipalityCvrFromUuid)
                     .Match
                     (
-                        onSuccess: municipalityCvr => new StsBrugerInfo(uuid, emailsResult.Value, Guid.Parse(organisationUuid), municipalityCvr),
+                        onSuccess: municipalityCvr => 
+                            new StsBrugerInfo(
+                                uuid, 
+                                emailsResult.Value, 
+                                Guid.Parse(organisationUuid), 
+                                municipalityCvr),
                         onFailure: error =>
                         {
                             _logger.Error("Failed to resolve CVR '{error}'", error);
@@ -63,7 +74,7 @@ namespace Core.DomainServices.SSO
                     );
         }
 
-        private Result<(string emailAdresseUuid, string organisationUuid), string> GetStsBrugerEmailAdresseAndOrganizationUuids(Guid uuid)
+        private Result<(string emailAdresseUuid, string organisationUuid), string> GetStsBrugerEmailAdresseAndOrganizationAndPersonUuids(Guid uuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -86,6 +97,7 @@ namespace Core.DomainServices.SSO
                         if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
                         {
                             emailUuid = adresse.ReferenceID.Item;
+                            break;
                         }
                     }
 
