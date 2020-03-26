@@ -53,7 +53,7 @@ namespace Core.DomainServices.SSO
             var personData = GetStsPersonFromUuid(personUuid);
             if (personData.Failed)
             {
-                _logger.Error("Failed to resolve Person '{error}'", emailsResult.Error);
+                _logger.Error("Failed to resolve Person '{error}'", personData.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
