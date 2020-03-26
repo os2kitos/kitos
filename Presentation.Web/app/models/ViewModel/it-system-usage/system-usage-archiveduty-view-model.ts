@@ -1,17 +1,16 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
 
     export interface IArchiveDutyModel {
-        value: number;
         textValue: string;
         text: string;
     }
 
     export class ArchiveDutyViewModel {
         static readonly archiveDuties = {
-            Undecided: <IArchiveDutyModel>{ value: 0, textValue: "Undecided", text: "Ikke besluttet" },
-            B: <IArchiveDutyModel>{ value: 1, textValue: "B", text: "B" },
-            K: <IArchiveDutyModel>{ value: 2, textValue: "K", text: "K" },
-            Unknown: <IArchiveDutyModel>{ value: 3, textValue: "Unknown", text: "Ved ikke" },
+            Undecided: <IArchiveDutyModel>{ textValue: "Undecided", text: "Ikke besluttet" },
+            B: <IArchiveDutyModel>{ textValue: "B", text: "B" },
+            K: <IArchiveDutyModel>{ textValue: "K", text: "K" },
+            Unknown: <IArchiveDutyModel>{ textValue: "Unknown", text: "Ved ikke" },
         };
 
         static getTextValueToTextMap() {
