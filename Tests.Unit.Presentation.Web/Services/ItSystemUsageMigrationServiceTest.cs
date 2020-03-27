@@ -718,9 +718,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         private ItContract CreateItContract(
-            IEnumerable<int> idsOfAssociatedSystemUsages = null,
-            IEnumerable<int> idsOfSystemUsagesInInterfaceUsages = null,
-            IEnumerable<int> idsOfSystemUsagesInInterfaceExposures = null)
+            IEnumerable<int> idsOfAssociatedSystemUsages = null)
         {
             return new ItContract
             {

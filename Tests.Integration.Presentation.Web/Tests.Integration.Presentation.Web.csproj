@@ -132,10 +132,10 @@
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
-    <Compile Include="Tools\InterfaceUsageHelper.cs" />
     <Compile Include="Tools\ItContractHelper.cs" />
     <Compile Include="Tools\ItProjectHelper.cs" />
     <Compile Include="Tools\ItSystemHelper.cs" />
+    <Compile Include="Tools\ItSystemUsageHelper.cs" />
     <Compile Include="Tools\KitosApiConstants.cs" />
     <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
