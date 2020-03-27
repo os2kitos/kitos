@@ -5,7 +5,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
@@ -27,6 +26,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IAttachedOptionRepository> _attachedOptionRepository;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepository;
+
+        private const string datahandlerContractTypeName = "Databehandleraftale";
+        private const int datahandlerContractTypeId = 5;
 
         public GDPRExportReportServiceTest()
         {
@@ -60,7 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Arrange
             var orgId = Math.Abs(A<int>());
             var system = CreateItSystem(orgId);
-            var contract = CreateItContract("Databehandleraftale");
+            var contract = CreateItContract(datahandlerContractTypeId, datahandlerContractTypeName);
             var usage = CreateSystemUsage(system, contract, orgId);
 
             var sensitivePersonalDataType = CreateSensitivePersonalDataType();
@@ -128,7 +130,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            if (usage.Contracts.Any(x => x.ItContract.ContractType.Name == "Databehandleraftale"))
+            if (usage.Contracts.Any(x => x.ItContract.ContractType.Id == datahandlerContractTypeId))
             {
                 Assert.True(gdprExportReport.DataProcessorContract);
             }
@@ -195,12 +197,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
         }
 
-        private ItContract CreateItContract(string contractTypeName)
+        private ItContract CreateItContract(int contractTypeId, string contractTypeName)
         {
             return new ItContract()
             {
                 ContractType = new ItContractType()
                 {
+                    Id = contractTypeId,
                     Name = contractTypeName
                 }
             };

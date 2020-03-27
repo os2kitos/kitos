@@ -19,6 +19,8 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
         private readonly IAttachedOptionRepository _attachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
 
+        private const int dataHandlerContractTypeId = 5;
+
         public GDPRExportService(
             IItSystemUsageRepository systemUsageRepository, 
             IAuthorizationContext authorizationContext, 
@@ -51,7 +53,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             return new GDPRExportReport
             {
                 BusinessCritical = input.isBusinessCritical,
-                DataProcessorContract = input.Contracts.Any(x => x.ItContract.ContractType.Name == "Databehandleraftale"),
+                DataProcessorContract = input.Contracts.Any(x => x.ItContract.ContractType.Id == dataHandlerContractTypeId),
                 DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
                 HostedAt = input.HostedAt,
