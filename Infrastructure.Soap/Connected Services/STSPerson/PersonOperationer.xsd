@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:sts="urn:oio:sts:1.1.3.0" xmlns:person="urn:oio:sts:organisation:person:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:person:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+  <import schemaLocation="GenerelleDefinitioner.xsd" namespace="urn:oio:sts:1.1.3.0" />
+  <include schemaLocation="Person.xsd" />
+  <element oio:definition="urn:oio:sts:personimportinput:ADD:2.0.0" name="ImportInput" type="person:ImportInputType" />
+  <element oio:definition="urn:oio:sts:personimportoutput:ASDD:2.0.0" name="ImportOutput" type="sd:BasicOutputType" />
+  <element oio:definition="urn:oio:sts:personopretinput:ADD:2.0.0" name="OpretInput" type="person:OpretInputType" />
+  <element oio:definition="urn:oio:sts:personopretoutput:ADD:2.0.0" name="OpretOutput" type="sd:OpretOutputType" />
+  <element oio:definition="urn:oio:sts:personretinput:ADD:2.0.0" name="RetInput" type="person:RetInputType" />
+  <element oio:definition="urn:oio:sts:personretoutput:ASDD:1.0.0" name="RetOutput" type="sd:BasicOutputType" />
+  <element oio:definition="urn:oio:sts:personpassiverinput:ASDD:1.0.0" name="PassiverInput" type="sd:UuidNoteInputType" />
+  <element oio:definition="urn:oio:sts:personpassiveroutput:ASDD:1.0.0" name="PassiverOutput" type="sd:BasicOutputType" />
+  <element oio:definition="urn:oio:sts:personsletinput:ASDD:1.0.0" name="SletInput" type="sd:UuidNoteInputType" />
+  <element oio:definition="urn:oio:sts:personsletoutput:ASDD:1.0.0" name="SletOutput" type="sd:BasicOutputType" />
+  <element oio:definition="urn:oio:sts:personlaesinput:ASDD:1.0.0" name="LaesInput" type="sd:LaesInputType" />
+  <element oio:definition="urn:oio:sts:personlaesoutput:ADD:2.0.0" name="LaesOutput" type="person:LaesOutputType" />
+  <element oio:definition="urn:oio:sts:personlistinput:ASDD:1.0.0" name="ListInput" type="sd:ListInputType" />
+  <element oio:definition="urn:oio:sts:personlistoutput:ADD:2.0.0" name="ListOutput" type="person:ListOutputType" />
+  <element oio:definition="urn:oio:sts:personsoeginput:ADD:2.0.0" name="SoegInput" type="person:SoegInputType" />
+  <element oio:definition="urn:oio:sts:personsoegoutput:ASDD:1.0.0" name="SoegOutput" type="sd:SoegOutputType" />
+  <complexType oio:definition="urn:oio:sts:personimportinput:ADD:2.0.0" name="ImportInputType">
+    <sequence>
+      <element oio:content="person" ref="person:Person" />
+    </sequence>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personopretinput:ADD:2.0.0" name="OpretInputType">
+    <complexContent mixed="false">
+      <extension base="sd:OpretInputType">
+        <sequence>
+          <element oio:content="attributter" ref="person:AttributListe" />
+          <element oio:content="tilstande" ref="person:TilstandListe" />
+          <element oio:content="relationer" ref="person:RelationListe" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personretinput:ADD:2.0.0" name="RetInputType">
+    <complexContent mixed="false">
+      <extension base="sd:RetInputType">
+        <sequence>
+          <element oio:content="attributter" minOccurs="0" ref="person:AttributListe" />
+          <element oio:content="tilstande" minOccurs="0" ref="person:TilstandListe" />
+          <element oio:content="relationer" minOccurs="0" ref="person:RelationListe" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personlaesoutput:ADD:2.0.0" name="LaesOutputType">
+    <complexContent mixed="false">
+      <extension base="sd:BasicOutputType">
+        <sequence>
+          <element oio:content="filtreretoejebliksbillede" minOccurs="0" name="FiltreretOejebliksbillede" type="person:FiltreretOejebliksbilledeType" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personlistoutput:ADD:2.0.0" name="ListOutputType">
+    <complexContent mixed="false">
+      <extension base="sd:ListOutputType">
+        <sequence>
+          <element oio:content="filtreretoejebliksbillede" minOccurs="0" maxOccurs="unbounded" name="FiltreretOejebliksbillede" type="person:FiltreretOejebliksbilledeType" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personlistoutput:ADD:1.0.0" name="FiltreretOejebliksbilledeType">
+    <sequence>
+      <element oio:content="objekt" name="ObjektType" type="sd:SagDokObjektType" />
+      <element oio:content="registrering" minOccurs="0" maxOccurs="unbounded" name="Registrering" type="person:RegistreringType" />
+    </sequence>
+  </complexType>
+  <complexType oio:definition="urn:oio:sts:personsoeginput:ADD:2.0.0" name="SoegInputType">
+    <complexContent mixed="false">
+      <extension base="sd:SoegInputType">
+        <sequence>
+          <sequence>
+            <element oio:content="soegattributter" ref="person:AttributListe" />
+            <element oio:content="soegtilstande" ref="person:TilstandListe" />
+            <element oio:content="soegrelationer" ref="person:RelationListe" />
+          </sequence>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+</schema>

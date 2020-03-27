@@ -19,6 +19,8 @@ namespace Tests.Unit.Core.DomainServices.SSO
             Assert.Contains("neno@balk.dk", result.Emails);
             Assert.Equal("58271713", result.MunicipalityCvr);
             Assert.Equal(Guid.Parse("4c5c9482-cab6-4a85-8491-88f98e61d161"), result.BelongsToOrganizationUuid);
+            Assert.Equal("Niels", result.FirstName);
+            Assert.Equal("Erik Nordberg", result.LastName);
         }
     }
 }

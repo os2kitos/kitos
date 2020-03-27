@@ -17,6 +17,7 @@ namespace Core.DomainServices.SSO
         private readonly string _urlServicePlatformAdresseService;
         private readonly string _urlServicePlatformOrganisationService;
         private readonly string _urlServicePlatformVirksomhedService;
+        private readonly string _urlServicePlatformPersonService;
         private readonly string _certificateThumbprint;
         private readonly string _authorizedMunicipalityCvr;
 
@@ -28,24 +29,31 @@ namespace Core.DomainServices.SSO
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
             _urlServicePlatformOrganisationService = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
             _urlServicePlatformVirksomhedService = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
+            _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/service/Organisation/Person/5";
             _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
         public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid)
         {
-            var organizationUuids = GetStsBrugerEmailAdresseAndOrganizationUuids(uuid);
-            if (organizationUuids.Failed)
+            var brugerInfo = CollectStsBrugerInformationFromUuid(uuid);
+            if (brugerInfo.Failed)
             {
-                _logger.Error("Failed to resolve UUIDS '{error}'", organizationUuids.Error);
+                _logger.Error("Failed to resolve UUIDS '{error}'", brugerInfo.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
-            var (emailAdresseUuid, organisationUuid) = organizationUuids.Value;
+            var (emailAdresseUuid, organisationUuid, personUuid) = brugerInfo.Value;
             var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid);
-
             if (emailsResult.Failed)
             {
                 _logger.Error("Failed to resolve Emails '{error}'", emailsResult.Error);
+                return Maybe<StsBrugerInfo>.None;
+            }
+
+            var personData = GetStsPersonFromUuid(personUuid);
+            if (personData.Failed)
+            {
+                _logger.Error("Failed to resolve Person '{error}'", personData.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
@@ -54,7 +62,14 @@ namespace Core.DomainServices.SSO
                     .Select(GetStsBrugerMunicipalityCvrFromUuid)
                     .Match
                     (
-                        onSuccess: municipalityCvr => new StsBrugerInfo(uuid, emailsResult.Value, Guid.Parse(organisationUuid), municipalityCvr),
+                        onSuccess: municipalityCvr => 
+                            new StsBrugerInfo(
+                                uuid, 
+                                emailsResult.Value, 
+                                Guid.Parse(organisationUuid), 
+                                municipalityCvr, 
+                                personData.Value.FirstName, 
+                                personData.Value.LastName),
                         onFailure: error =>
                         {
                             _logger.Error("Failed to resolve CVR '{error}'", error);
@@ -63,7 +78,7 @@ namespace Core.DomainServices.SSO
                     );
         }
 
-        private Result<(string emailAdresseUuid, string organisationUuid), string> GetStsBrugerEmailAdresseAndOrganizationUuids(Guid uuid)
+        private Result<(string emailAdresseUuid, string organisationUuid, string personUuid), string> CollectStsBrugerInformationFromUuid(Guid uuid)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
@@ -86,10 +101,14 @@ namespace Core.DomainServices.SSO
                         if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
                         {
                             emailUuid = adresse.ReferenceID.Item;
+                            break;
                         }
                     }
 
-                    return (emailUuid, organizationUuid);
+                    var lastKnownPerson = registreringType1.RelationListe.TilknyttedePersoner.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    var personUuid = lastKnownPerson.ReferenceID.Item;
+
+                    return (emailUuid, organizationUuid, personUuid);
                 }
                 return "Unable to resolve email and organization UUID";
             }
@@ -168,6 +187,30 @@ namespace Core.DomainServices.SSO
                     return Result<string, string>.Success(latest.CVRNummerTekst);
                 }
                 return Result<string, string>.Failure("Unable to resolve cvr");
+            }
+        }
+
+        private Result<StsPersonData, string> GetStsPersonFromUuid(string personUuid)
+        {
+            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
+            {
+                var client = StsPersonHelpers.CreatePersonPortTypeClient(CreateHttpBinding(),
+                    _urlServicePlatformPersonService, clientCertificate);
+                var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(_authorizedMunicipalityCvr, personUuid);
+                var virksomhedPortType = client.ChannelFactory.CreateChannel();
+                var laesResponse = virksomhedPortType.laes(laesRequest);
+                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+                foreach (var registreringType1 in registreringType1s)
+                {
+                    if (registreringType1.IsStsPersonObsolete())
+                    {
+                        continue;
+                    }
+
+                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    return Result<StsPersonData, string>.Success(new StsPersonData(latest.NavnTekst));
+                }
+                return Result<StsPersonData, string>.Failure("Unable to resolve cvr");
             }
         }
 

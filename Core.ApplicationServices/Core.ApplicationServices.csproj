@@ -157,6 +157,7 @@
     <Compile Include="SSO\State\UserIdentifiedState.cs" />
     <Compile Include="SSO\State\UserLoggedInState.cs" />
     <Compile Include="SSO\State\ErrorState.cs" />
+    <Compile Include="SSO\State\FirstTimeUserNotFoundState.cs" />
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
