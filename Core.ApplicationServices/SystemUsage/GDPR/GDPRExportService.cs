@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
@@ -9,6 +10,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
+using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.GDPR
 {
@@ -53,7 +55,14 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             return new GDPRExportReport
             {
                 BusinessCritical = input.isBusinessCritical,
-                DataProcessorContract = input.Contracts.Any(x => x.ItContract.ContractType.Id == dataHandlerContractTypeId),
+                DataProcessorContract = input.Contracts.Any(x =>
+                {
+                    if (x.ItContract.ContractType != null)
+                    {
+                        return x.ItContract.ContractType.Id == dataHandlerContractTypeId;
+                    }
+                    return false;
+                }),
                 DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
                 HostedAt = input.HostedAt,

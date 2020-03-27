@@ -112,6 +112,62 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(sensitivePersonalDataType.Name, gdprExportReport1.SensitiveDataTypes.First());
         }
 
+        [Fact]
+        public void GetGDPRData_Returns_List_Of_GDPR_Data_From_System_Usages_In_Organization_With_Contract_With_No_ContractType()
+        {
+            //Arrange
+            var orgId = Math.Abs(A<int>());
+            var system = CreateItSystem(orgId);
+            var contract = CreateItContract(null, null);
+            var usage = CreateSystemUsage(system, contract, orgId);
+
+            var sensitivePersonalDataType = CreateSensitivePersonalDataType();
+
+            var attachedOption = CreateAttachedOption(usage.Id, sensitivePersonalDataType.Id);
+
+
+            var system2 = CreateItSystem(orgId);
+            var usage2 = CreateSystemUsage(system2, null, orgId);
+
+            IEnumerable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
+            {
+                usage,
+                usage2
+            };
+
+            IEnumerable<AttachedOption> attachedOptions = new List<AttachedOption>()
+            {
+                attachedOption
+            };
+
+            IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes = new List<SensitivePersonalDataType>()
+            {
+                sensitivePersonalDataType
+            };
+
+            _usageRepository.Setup(x => x.GetSystemUsagesFromOrganization(orgId))
+                .Returns(itSystemUsages);
+            _attachedOptionRepository.Setup(x => x.GetAttachedOptions())
+                .Returns(attachedOptions);
+            _sensitivePersonalDataTypeRepository.Setup(x => x.GetSensitivePersonalDataTypes())
+                .Returns(sensitivePersonalDataTypes);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId))
+                .Returns(OrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.GetGDPRData(orgId);
+
+            //Assert
+            Assert.True(result.Ok);
+            var gdprExportReports = result.Value;
+            var gdprExportReport1 = gdprExportReports.First();
+            var gdprExportReport2 = gdprExportReports.Last();
+
+            AssertGdprExportReportExtracted(usage, gdprExportReport1);
+            AssertGdprExportReportExtracted(usage2, gdprExportReport2);
+            Assert.Equal(sensitivePersonalDataType.Name, gdprExportReport1.SensitiveDataTypes.First());
+        }
+
         private void AssertGdprExportReportExtracted(ItSystemUsage usage, GDPRExportReport gdprExportReport)
         {
             Assert.Equal(usage.ItSystem.Name, gdprExportReport.SystemName);
@@ -130,7 +186,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            if (usage.Contracts.Any(x => x.ItContract.ContractType.Id == datahandlerContractTypeId))
+            if (usage.Contracts.Any(x =>
+            {
+                if (x.ItContract.ContractType != null)
+                {
+                    return x.ItContract.ContractType.Id == datahandlerContractTypeId;
+                }
+                return false;
+            }))
             {
                 Assert.True(gdprExportReport.DataProcessorContract);
             }
@@ -197,13 +260,17 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
         }
 
-        private ItContract CreateItContract(int contractTypeId, string contractTypeName)
+        private ItContract CreateItContract(int? contractTypeId, string contractTypeName)
         {
+            if (contractTypeId == null)
+            {
+                return new ItContract();
+            }
             return new ItContract()
             {
                 ContractType = new ItContractType()
                 {
-                    Id = contractTypeId,
+                    Id = contractTypeId.Value,
                     Name = contractTypeName
                 }
             };
