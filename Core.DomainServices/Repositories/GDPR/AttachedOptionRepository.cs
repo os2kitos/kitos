@@ -17,5 +17,4 @@ namespace Core.DomainServices.Repositories.GDPR
             return _attachedOptionRepository.Get();
         }
     }
-    
 }
