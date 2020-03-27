@@ -52,8 +52,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var dataOption = A<DataOptions>();
-            var body = new {IsBusinessCritical = dataOption};
-            
+            var body = new { IsBusinessCritical = dataOption };
+
             //Act
             var itSystemUsageDTO = await Create_System_Usage_And_Change_Value_By_Body(body);
 
@@ -263,11 +263,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task Can_Get_GDPRExportReport()
+        public async Task Can_Get_GDPRExportReport_With_All_Fields_Set()
         {
             //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var sensitiveDataLevel = A<SensitiveDataLevel>();
+            var datahandlerContractTypeId = "5";
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
@@ -281,67 +281,89 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 DPIA = A<DataOptions>()
 
             };
+            var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
+            await ItContractHelper.PatchContract(contract.Id, organizationId, new {contractTypeId = datahandlerContractTypeId });
+            await ItContractHelper.AddItSystemUsage(contract.Id, usage.Id, organizationId);
             await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitiveDataLevel);
 
             var expectedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
 
             //Act
-            using (var response =
-                await HttpApi.GetWithCookieAsync(
-                    TestEnvironment.CreateUrl($"api/v1/gdpr-report/csv/{organizationId}"),
-                    cookie))
+            var report = await ItSystemUsageHelper.GetGDPRExportReport(organizationId);
+
+            //Assert
+            var gdprExportReport = Assert.Single(report.Where(x => x.Name == system.Name));
+            AssertCorrectGdprExportReport(expectedUsage, gdprExportReport, true);
+            AssertSensitiveDataLevel(sensitiveDataLevel, gdprExportReport);
+
+        }
+
+        [Fact]
+        public async Task Can_Get_GDPRExportReport_With_Fresh_Usage()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            
+            var expectedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
+
+            //Act
+            var report = await ItSystemUsageHelper.GetGDPRExportReport(organizationId);
+
+            //Assert
+            var gdprExportReport = Assert.Single(report.Where(x => x.Name == system.Name));
+            AssertCorrectGdprExportReport(expectedUsage, gdprExportReport, false);
+            AssertEmptyString(gdprExportReport.SensitiveDataTypes);
+        }
+
+
+        private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasDatahandlerContract)
+        {
+            AssertDataOption(expected.IsBusinessCritical, actual.BusinessCritical);
+            AssertDataOption(expected.DataProcessorControl, actual.DatahandlerControl);
+            AssertDataOption(expected.RiskAssessment, actual.RiskAssessment);
+            AssertDataOption(expected.DPIA, actual.DPIA);
+            AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
+            AssertHostedAt(expected.HostedAt, actual.HostedAt);
+            if (hasDatahandlerContract)
             {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                using (var csvReader = new CsvReader(new StringReader(await response.Content.ReadAsStringAsync()),
-                    new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        Delimiter = ";",
-                        HasHeaderRecord = true
-                    }))
-                {
-                    var report = csvReader.GetRecords<GdprExportReportCsvFormat>().ToList();
-                    Assert.NotEmpty(report);
-                    var gdprExportReport = Assert.Single(report.Where(x => x.Name == system.Name));
-                    AssertDataOption(expectedUsage.IsBusinessCritical, gdprExportReport.BusinessCritical);
-                    AssertDataOption(expectedUsage.DataProcessorControl, gdprExportReport.DatahandlerControl);
-                    AssertDataOption(expectedUsage.RiskAssessment, gdprExportReport.RiskAssessment);
-                    AssertDataOption(expectedUsage.DPIA, gdprExportReport.DPIA);
-                    AssertRiskLevel(expectedUsage.PreRiskAssessment, gdprExportReport.PreRiskAssessment);
-                    AssertHostedAt(expectedUsage.HostedAt, gdprExportReport.HostedAt);
-                    AssertSensitiveDataLevel(sensitiveDataLevel, gdprExportReport);
-                }
+                AssertYes(actual.Datahandler);
+            }
+            else
+            {
+                AssertNo(actual.Datahandler);
             }
         }
-        
 
         private void AssertSensitiveDataLevel(SensitiveDataLevel expected, GdprExportReportCsvFormat actual)
         {
             switch (expected)
             {
                 case SensitiveDataLevel.NONE:
-                    Assert.Equal("Ja", actual.NoData);
-                    Assert.Equal("Nej", actual.PersonalData);
-                    Assert.Equal("Nej", actual.SensitiveData);
-                    Assert.Equal("Nej", actual.LegalData);
+                    AssertYes(actual.NoData);
+                    AssertNo(actual.PersonalData);
+                    AssertNo(actual.SensitiveData);
+                    AssertNo(actual.LegalData);
                     return;
                 case SensitiveDataLevel.PERSONALDATA:
-                    Assert.Equal("Nej", actual.NoData);
-                    Assert.Equal("Ja", actual.PersonalData);
-                    Assert.Equal("Nej", actual.SensitiveData);
-                    Assert.Equal("Nej", actual.LegalData);
+                    AssertNo(actual.NoData);
+                    AssertYes(actual.PersonalData);
+                    AssertNo(actual.SensitiveData);
+                    AssertNo(actual.LegalData);
                     return;
                 case SensitiveDataLevel.SENSITIVEDATA:
-                    Assert.Equal("Nej", actual.NoData);
-                    Assert.Equal("Nej", actual.PersonalData);
-                    Assert.Equal("Ja", actual.SensitiveData);
-                    Assert.Equal("Nej", actual.LegalData);
+                    AssertNo(actual.NoData);
+                    AssertNo(actual.PersonalData);
+                    AssertYes(actual.SensitiveData);
+                    AssertNo(actual.LegalData);
                     return;
                 case SensitiveDataLevel.LEGALDATA:
-                    Assert.Equal("Nej", actual.NoData);
-                    Assert.Equal("Nej", actual.PersonalData);
-                    Assert.Equal("Nej", actual.SensitiveData);
-                    Assert.Equal("Ja", actual.LegalData);
+                    AssertNo(actual.NoData);
+                    AssertNo(actual.PersonalData);
+                    AssertNo(actual.SensitiveData);
+                    AssertYes(actual.LegalData);
                     return;
                 default:
                     throw new AssertActualExpectedException(expected, actual, "Expected is not a correct SensitiveDataLevel");
@@ -351,10 +373,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private void AssertHostedAt(HostedAt? expected, string actual)
         {
+            if (expected == null)
+            {
+                AssertEmptyString(actual);
+                return;
+            }
             switch (expected)
             {
                 case HostedAt.UNDECIDED:
-                    Assert.Equal("", actual);
+                    AssertEmptyString(actual);
                     return;
                 case HostedAt.ONPREMISE:
                     Assert.Equal("On-premise", actual);
@@ -371,6 +398,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private void AssertRiskLevel(RiskLevel? expected, string actual)
         {
+            if (expected == null)
+            {
+                AssertEmptyString(actual);
+                return;
+            }
             switch (expected)
             {
                 case RiskLevel.LOW:
@@ -383,7 +415,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                     Assert.Equal("Høj", actual);
                     return;
                 case RiskLevel.UNDECIDED:
-                    Assert.Equal("", actual);
+                    AssertEmptyString(actual);
                     return;
                 case null:
                     break;
@@ -394,23 +426,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private void AssertDataOption(DataOptions? expected, string actual)
         {
+            if (expected == null)
+            {
+                AssertEmptyString(actual);
+                return;
+            }
             switch (expected)
             {
                 case DataOptions.NO:
-                    Assert.Equal("Nej", actual);
+                    AssertNo(actual);
                     return;
                 case DataOptions.YES:
-                    Assert.Equal("Ja", actual);
+                    AssertYes(actual);
                     return;
                 case DataOptions.DONTKNOW:
                     Assert.Equal("Ved ikke", actual);
                     return;
                 case DataOptions.UNDECIDED:
-                    Assert.Equal("", actual);
+                    AssertEmptyString(actual);
                     return;
                 default:
                     throw new AssertActualExpectedException(expected, actual, "Expected is not a correct DataOption");
             }
+        }
+
+        private void AssertYes(string actual)
+        {
+            Assert.Equal("Ja", actual);
+        }
+
+        private void AssertNo(string actual)
+        {
+            Assert.Equal("Nej", actual);
+        }
+
+        private void AssertEmptyString(string actual)
+        {
+            Assert.Equal("", actual);
         }
 
     }

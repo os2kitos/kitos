@@ -10,16 +10,16 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
 {
     public class GDPRExportReportCsvMapper
     {
-        private static string no = "Nej";
-        private static string yes = "Ja";
-        private static string dontKnow = "Ved ikke";
+        private const string No = "Nej";
+        private const string Yes = "Ja";
+        private const string DontKnow = "Ved ikke";
 
-        private static string low = "Lav";
-        private static string middle = "middel";
-        private static string high = "Høj";
+        private const string Low = "Lav";
+        private const string Middle = "Middel";
+        private const string High = "Høj";
 
-        private static string onPremise = "On-premise";
-        private static string external = "Eksternt";
+        private const string OnPremise = "On-premise";
+        private const string External = "Eksternt";
 
         public static HttpResponseMessage CreateReportCsvResponse(IEnumerable<GDPRExportReport> report)
         {
@@ -56,7 +56,7 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
 
         private static string MapBoolean(bool input)
         {
-            return input ? yes : no;
+            return input ? Yes : No;
         }
 
         private static string MapSensitiveDataTypes(IEnumerable<string> input)
@@ -71,11 +71,11 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
             switch (input.Value)
             {
                 case DataOptions.NO:
-                    return no;
+                    return No;
                 case DataOptions.YES:
-                    return yes;
+                    return Yes;
                 case DataOptions.DONTKNOW:
-                    return dontKnow;
+                    return DontKnow;
                 case DataOptions.UNDECIDED:
                     return "";
                 default:
@@ -90,11 +90,11 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
             switch (input.Value)
             {
                 case RiskLevel.LOW:
-                    return low;
+                    return Low;
                 case RiskLevel.MIDDLE:
-                    return middle;
+                    return Middle;
                 case RiskLevel.HIGH:
-                    return high;
+                    return High;
                 case RiskLevel.UNDECIDED:
                     return "";
                 default:
@@ -111,9 +111,9 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
                 case HostedAt.UNDECIDED:
                     return "";
                 case HostedAt.ONPREMISE:
-                    return onPremise;
+                    return OnPremise;
                 case HostedAt.EXTERNAL:
-                    return external;
+                    return External;
                 default:
                     return "";
             }
