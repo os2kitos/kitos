@@ -48,8 +48,9 @@ namespace Tools.SSOWithKombitSts
             Console.WriteLine();
             Console.WriteLine("SSOWithKombitSts [file.cer] [entityID]");
             Console.WriteLine();
-            Console.WriteLine("file.cer\tFilename for public part of exported FOCES certificate (DER-binary X509 .cer format)");
-            Console.WriteLine("entityID\tEntityID identifying system in KOMBIT STS Administration module");
+            Console.WriteLine("file.cer\tFilename for public part of exported FOCES certificate (Base64 X509 .cer format)");
+            Console.WriteLine("entityID\tEntityID identifying system in KOMBIT STS Administration module (eg https://kitos-internal.strongminds.dk)");
+            Console.WriteLine();
         }
 
         private static XmlDocument PatchCertificatesInSamlMetadataXml(XmlDocument samlMetadataTemplate, string certificateFilename)
