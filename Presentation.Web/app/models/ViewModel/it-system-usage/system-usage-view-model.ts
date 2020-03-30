@@ -72,9 +72,7 @@
                 },
                 <any>{});
         }
-
     }
-
 
     export class HostedAtOptions {
         options: Select2OptionViewModel[];

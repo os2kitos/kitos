@@ -113,6 +113,8 @@
     <Compile Include="Repositories\Interface\InterfaceRepository.cs" />
     <Compile Include="Repositories\Qa\BrokenExternalReferencesReportRepository.cs" />
     <Compile Include="Repositories\Qa\IBrokenExternalReferencesReportRepository.cs" />
+    <Compile Include="SSO\StsPersonData.cs" />
+    <Compile Include="SSO\StsPersonHelpers.cs" />
     <Compile Include="SSO\StsVirksomhedHelpers.cs" />
     <Compile Include="Time\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />

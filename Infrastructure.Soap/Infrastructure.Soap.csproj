@@ -70,6 +70,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Connected Services\STSPerson\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Connected Services\STSVirksomhed\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -418,6 +423,90 @@
     <None Include="Connected Services\STSOrganisation\ServiceplatformFault_1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Connected Services\STSPerson\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.importerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.ImporterResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.laesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.LaesResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.listResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.ListResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.opretResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.OpretResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.passiverResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.PassiverResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.RequestHeaderType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.retResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.RetResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.sletResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.SletResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.soegResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.SoegResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSPerson\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\Person.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\PersonService.wsdl" />
+    <None Include="Connected Services\STSPerson\PersonServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\policies.wsdl" />
+    <None Include="Connected Services\STSPerson\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\ServiceplatformFaultMessage.wsdl" />
+    <None Include="Connected Services\STSPerson\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Connected Services\STSVirksomhed\AuthorityContext_1.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -547,6 +636,51 @@
     <None Include="Organisation\wsdl\context\policies.wsdl" />
     <None Include="Organisation\wsdl\token\OrganisationService.wsdl" />
     <None Include="Organisation\wsdl\token\policies.wsdl" />
+    <None Include="Person\PersonServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\Person.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\PersonBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\common\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\SF1500_EP_FS10\xsd\common\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\sp\AuthorityContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\sp\CallContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\sp\InvocationContext_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\sp\service.properties" />
+    <None Include="Person\sp\ServiceplatformFaultMessage_1.wsdl" />
+    <None Include="Person\sp\ServiceplatformFault_1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\context\PersonService.wsdl" />
+    <None Include="Person\wsdl\context\policies.wsdl" />
+    <None Include="Person\wsdl\token\PersonService.wsdl" />
+    <None Include="Person\wsdl\token\policies.wsdl" />
     <None Include="Virksomhed\SF1500_EP_FS11\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -600,6 +734,7 @@
     <WCFMetadataStorage Include="Connected Services\STSAdresse\" />
     <WCFMetadataStorage Include="Connected Services\STSBruger\" />
     <WCFMetadataStorage Include="Connected Services\STSOrganisation\" />
+    <WCFMetadataStorage Include="Connected Services\STSPerson\" />
     <WCFMetadataStorage Include="Connected Services\STSVirksomhed\" />
   </ItemGroup>
   <ItemGroup>
@@ -646,6 +781,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\STSVirksomhed\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSPerson\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSPerson\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSPerson\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

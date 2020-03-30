@@ -20,7 +20,7 @@
         Usages: Array<ItSystemUsage.IItSystemUsage>;
         Reference: any;
         PreviousName: string;
-        ArchiveDuty: ArchiveDutyRecommendationTypes;
+        ArchiveDuty: string;
         ArchiveDutyComment: string;
 
     }

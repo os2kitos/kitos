@@ -16,11 +16,11 @@ namespace Core.ApplicationServices.SSO.State
                 case FlowEvent.NoOrganizationAndRole:
                     ErrorCode = SsoErrorCode.NoOrganizationAndRole;
                     break;
-                case FlowEvent.UnableToResolveUserInStsOrganisation:
+                case FlowEvent.UnableToResolveUserInStsOrganization:
                     ErrorCode = SsoErrorCode.UserNotFoundInSTS;
                     break;
-                case FlowEvent.UnsupportedFlow:
-                    ErrorCode = SsoErrorCode.UnsupportedFlow;
+                case FlowEvent.UnableToLocateUser:
+                    ErrorCode = SsoErrorCode.UnableToCreateUserWithUnknownOrganization;
                     break;
                 default:
                     ErrorCode = SsoErrorCode.Unknown;

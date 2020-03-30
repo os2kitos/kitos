@@ -159,7 +159,7 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-        
+
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
@@ -245,7 +245,6 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             fields: {
                                 LastChanged: { type: "date" },
                                 Concluded: { type: "date" },
-                                ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 SystemName: { from: "ItSystem.Name", type: "string" },
@@ -753,42 +752,25 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
                         persistId: "ArchiveDuty",
-                        template: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
-                        excelTemplate: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
+                        template: dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty),
                         hidden: false,
                         filterable: {
                             cell: {
-                                template: function (args) {
+                                template: (args) => {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Undecided,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.B,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.K,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Unknown
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
                                         valuePrimitive: true
                                     });
                                 },
-                                showOperators: false
+                                showOperators: false,
+                                operator: "eq"
                             }
                         }
                     },
