@@ -109,7 +109,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             AssertGdprExportReportExtracted(usage, gdprExportReport1);
             AssertGdprExportReportExtracted(usage2, gdprExportReport2);
-            Assert.Equal(sensitivePersonalDataType.Name, gdprExportReport1.SensitiveDataTypes.First());
+            AssertSensitivePersonalDataType(sensitivePersonalDataType, gdprExportReport1);
         }
 
         [Fact]
@@ -165,7 +165,19 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             AssertGdprExportReportExtracted(usage, gdprExportReport1);
             AssertGdprExportReportExtracted(usage2, gdprExportReport2);
-            Assert.Equal(sensitivePersonalDataType.Name, gdprExportReport1.SensitiveDataTypes.First());
+            AssertSensitivePersonalDataType(sensitivePersonalDataType, gdprExportReport1);
+        }
+
+        private void AssertSensitivePersonalDataType(SensitivePersonalDataType expected, GDPRExportReport actual)
+        {
+            if (actual.SensitiveData)
+            {
+                Assert.Equal(expected.Name, actual.SensitiveDataTypes.First());
+            }
+            else
+            {
+                Assert.Empty(actual.SensitiveDataTypes);
+            }
         }
 
         private void AssertGdprExportReportExtracted(ItSystemUsage usage, GDPRExportReport gdprExportReport)
