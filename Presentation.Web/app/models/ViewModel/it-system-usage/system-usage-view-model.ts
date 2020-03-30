@@ -27,7 +27,7 @@
         EXTERNAL = 2,
     }
 
-    
+
 
     export class DataOptions {
         options: Select2OptionViewModel[];
@@ -61,6 +61,13 @@
             personal: <ISensitiveDataLevelModel>{ value: 1, textValue: "PERSONALDATA", text: "Almindelige persondata" },
             sensitive: <ISensitiveDataLevelModel>{ value: 2, textValue: "SENSITIVEDATA", text: "Følsomme persondata" },
             legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
+        };
+
+        static readonly levelOrder = {
+            "NONE": 0,
+            "PERSONALDATA": 1,
+            "SENSITIVEDATA": 2,
+            "LEGALDATA": 3
         };
 
         static getTextValueToTextMap() {

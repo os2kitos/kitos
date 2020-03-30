@@ -154,7 +154,7 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         };
-        
+
 
         private reload() {
             this.$state.go(".", null, { reload: true });
@@ -581,7 +581,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            return _.map(dataItem.SensitiveDataLevels,
+                            return _.map(
+                                _.orderBy(
+                                    dataItem.SensitiveDataLevels,
+                                    dataLevel => Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levelOrder[dataLevel.SensitivityDataLevel]),
                                 dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
                                     .SensitivityDataLevel))
                                 .toString();

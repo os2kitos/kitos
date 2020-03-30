@@ -74,13 +74,14 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 SystemName = input.ItSystem.Name,
-                SensitiveDataTypes = attachedOptions
+                SensitiveDataTypes = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA) ? 
+                    attachedOptions
                     .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && x.ObjectId == input.Id && x.OptionType == OptionType.SENSITIVEPERSONALDATA)
                     .Select(x => x.OptionId)
                     .Join(sensitivePersonalDataTypes, 
                         optionId => optionId,
                         sensitivePersonalDataType => sensitivePersonalDataType.Id, 
-                        (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name)
+                        (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name) : new List<string>()
             };
         }
     }
