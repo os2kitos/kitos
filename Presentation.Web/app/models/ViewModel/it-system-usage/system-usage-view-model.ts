@@ -27,7 +27,7 @@
         EXTERNAL = 2,
     }
 
-    
+
 
     export class DataOptions {
         options: Select2OptionViewModel[];
@@ -63,6 +63,13 @@
             legal: <ISensitiveDataLevelModel>{ value: 3, textValue: "LEGALDATA", text: "Straffedomme og lovovertrædelser" },
         };
 
+        static readonly levelOrder = {
+            "NONE": 0,
+            "PERSONALDATA": 1,
+            "SENSITIVEDATA": 2,
+            "LEGALDATA": 3
+        };
+
         static getTextValueToTextMap() {
             return _.reduce(this.levels,
                 (acc: any, current) => {
@@ -72,9 +79,7 @@
                 },
                 <any>{});
         }
-
     }
-
 
     export class HostedAtOptions {
         options: Select2OptionViewModel[];

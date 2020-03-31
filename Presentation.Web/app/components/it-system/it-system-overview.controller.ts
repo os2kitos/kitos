@@ -155,10 +155,11 @@
             this.reload();
         };
 
+
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-        
+
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
@@ -244,7 +245,6 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             fields: {
                                 LastChanged: { type: "date" },
                                 Concluded: { type: "date" },
-                                ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 SystemName: { from: "ItSystem.Name", type: "string" },
@@ -304,6 +304,11 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
+                    },
+                    {
+                        name: "exportGDPR",
+                        text: "Exportér GPDR data til Excel",
+                        template: `<a role='button' class='k-button k-button-icontext pull-right' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
                     }
                 ],
                 excel: {
@@ -576,7 +581,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            return _.map(dataItem.SensitiveDataLevels,
+                            return _.map(
+                                _.orderBy(
+                                    dataItem.SensitiveDataLevels,
+                                    dataLevel => Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levelOrder[dataLevel.SensitivityDataLevel]),
                                 dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
                                     .SensitivityDataLevel))
                                 .toString();
@@ -747,42 +755,25 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
                         persistId: "ArchiveDuty",
-                        template: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
-                        excelTemplate: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
+                        template: dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty),
                         hidden: false,
                         filterable: {
                             cell: {
-                                template: function (args) {
+                                template: (args) => {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Undecided,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.B,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.K,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Unknown
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
                                         valuePrimitive: true
                                     });
                                 },
-                                showOperators: false
+                                showOperators: false,
+                                operator: "eq"
                             }
                         }
                     },

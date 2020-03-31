@@ -13,11 +13,10 @@
         UserHasRoleInOrganization = 8,
         UserHasNoRoleInOrganization = 9,
         RoleAssigned = 10,
-        UnableToResolveUserInStsOrganisation = 11,
+        UnableToResolveUserInStsOrganization = 11,
         ExistingSsoUserWithoutRoles = 12,
-
-        //TODO: Remove in KITOSUDV-627: User creation flow (runtime provisioning
-        UnsupportedFlow = 13,
-        UnknownError = 14
+        UnableToLocateUser = 13,
+        UserAutoProvisioned = 14,
+        UnknownError = 15
     }
 }

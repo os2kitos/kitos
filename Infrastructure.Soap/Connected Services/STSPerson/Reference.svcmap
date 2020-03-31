@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="66ddcdf4-e3fe-4dc1-acab-344fd2de52e4" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\Projects\kitos\Infrastructure.Soap\Person\wsdl\context\PersonService.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="Person.xsd" MetadataType="Schema" ID="713ad34b-097c-4be1-8c0c-1cb1ae4165f9" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/1.1.STS-3/Person.xsd" />
+    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="e9ca6939-bc64-4b1d-b48a-f53f34836b36" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/sp/AuthorityContext_1.xsd" />
+    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="631740c1-d12c-4f7c-bb55-2853ca47c8ab" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/sp/CallContext_1.xsd" />
+    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="500aae4d-a3d2-49d5-8d5a-fe9f3e839094" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/sp/ServiceplatformFault_1.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="5e0b7945-0c03-4742-a49c-cb8368a1791c" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="04e311d3-a838-40ee-831a-421f0b607366" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="b966f114-69b9-41a5-aa1f-6e367b1cafd7" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/1.1.STS-3/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="4a28a572-5e7d-4aa1-8586-251c73c872eb" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/1.1.STS-3/Part.xsd" />
+    <MetadataFile FileName="PersonServiceMsg.xsd" MetadataType="Schema" ID="372afb62-6813-41e4-af39-8e7305f0c086" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/PersonServiceMsg.xsd" />
+    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="93bdd1da-61c1-4ee3-8b36-901feb4b7652" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/wsdl/context/policies.wsdl" />
+    <MetadataFile FileName="PersonService.wsdl" MetadataType="Wsdl" ID="4db3a27e-a0b0-4bf5-801b-aca39880d77d" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/wsdl/context/PersonService.wsdl" />
+    <MetadataFile FileName="PersonOperationer.xsd" MetadataType="Schema" ID="167160ea-39b5-4d82-ac3c-98a6d5b22b82" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/SF1500_EP_FS10/xsd/1.1.STS-3/PersonOperationer.xsd" />
+    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="6ad9db10-d992-4014-b7aa-0f49a0c22d7c" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Person/sp/ServiceplatformFaultMessage_1.wsdl" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

@@ -17,6 +17,7 @@ using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
 using Core.BackgroundJobs.Factory;
@@ -35,6 +36,7 @@ using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Organization;
@@ -154,6 +156,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IReferenceService>().To<ReferenceService>().InCommandScope(Mode);
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
+            kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -242,6 +245,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRepository>().To<OrganizationRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
+            kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
+            kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

@@ -59,7 +59,7 @@
         Reference: IReference;
 
         Concluded?: Date;
-        ArchiveDuty: number;
+        ArchiveDuty: string;
         Registertype: boolean;
 
         IsActive: boolean;

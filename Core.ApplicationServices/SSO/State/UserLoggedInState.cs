@@ -22,6 +22,7 @@ namespace Core.ApplicationServices.SSO.State
                 case FlowEvent.UserSeenBefore:
                 case FlowEvent.UserHasRoleInOrganization:
                 case FlowEvent.RoleAssigned:
+                case FlowEvent.UserAutoProvisioned:
                     _authenticationState.SetAuthenticatedUser(_user, AuthenticationScope.Session);
                     break;
                 default:

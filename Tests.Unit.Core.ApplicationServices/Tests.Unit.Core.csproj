@@ -134,6 +134,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandlerTest.cs" />
+    <Compile Include="Model\SSO\StsPersonDataTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

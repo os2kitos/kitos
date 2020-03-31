@@ -15,13 +15,12 @@
         /// </summary>
         NoOrganizationAndRole = 2,
         /// <summary>
-        /// The user can not yet be auto provisioned
-        /// </summary>
-        UnsupportedFlow = 3,
-        /// <summary>
         /// The user cannot be found in STS Organisation
         /// </summary>
-        UserNotFoundInSTS = 4,
-        
+        UserNotFoundInSTS = 3,
+        /// <summary>
+        /// The user can not be auto provisioned
+        /// </summary>
+        UnableToCreateUserWithUnknownOrganization = 4
     }
 }

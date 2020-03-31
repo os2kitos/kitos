@@ -10,6 +10,7 @@ using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using dk.nita.saml20.identity;
+using Infrastructure.Services.Cryptography;
 using Serilog;
 
 namespace Core.ApplicationServices.SSO.Factories
@@ -25,6 +26,7 @@ namespace Core.ApplicationServices.SSO.Factories
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationRoleService _organizationRoleService;
+        private readonly ICryptoService _cryptoService;
         private readonly ILogger _logger;
 
         public SsoStateFactory(
@@ -37,7 +39,7 @@ namespace Core.ApplicationServices.SSO.Factories
             IApplicationAuthenticationState applicationAuthenticationState,
             IOrganizationRepository organizationRepository,
             IOrganizationRoleService organizationRoleService,
-            ILogger logger)
+            ILogger logger, ICryptoService cryptoService)
         {
             _infoService = infoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
@@ -49,6 +51,7 @@ namespace Core.ApplicationServices.SSO.Factories
             _organizationRepository = organizationRepository;
             _organizationRoleService = organizationRoleService;
             _logger = logger;
+            _cryptoService = cryptoService;
         }
 
         public AbstractState CreateInitialState()
@@ -62,7 +65,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid)
         {
-            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, this);
+            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, _organizationRepository, this);
         }
 
         public AbstractState CreateUserLoggedIn(User user)
@@ -88,6 +91,11 @@ namespace Core.ApplicationServices.SSO.Factories
         public AbstractState CreateAssigningRoleState(User user, Organization ssoOrganization)
         {
             return new AssigningRoleState(user,ssoOrganization,_organizationRoleService,this);
+        }
+
+        public AbstractState CreateFirstTimeUserNotFoundState(StsBrugerInfo stsBrugerInfo)
+        {
+            return new FirstTimeUserNotFoundState(stsBrugerInfo, _organizationRepository, _userRepository, _organizationRoleService, _cryptoService, this);
         }
     }
 }
