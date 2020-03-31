@@ -223,7 +223,7 @@ describe("Global admin is able to", () => {
 
     function getDate() {
         const currentDay = new Date().getDate();
-        const currentMonth = new Date().getMonth();
+        const currentMonth = new Date().getMonth() + 1; // getMonth gets counts 0. So January is 0.
 
         if (currentDay <= 9) {
             if (currentMonth <= 9) {

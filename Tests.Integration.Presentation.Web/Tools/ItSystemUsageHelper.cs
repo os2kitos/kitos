@@ -1,9 +1,16 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystemUsage;
+using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -41,7 +48,28 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
                 return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
             }
+        }
 
+        public static async Task<List<GdprExportReportCsvFormat>> GetGDPRExportReport(int organizationId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var okResponse =
+                await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/gdpr-report/csv/{organizationId}"),
+                    cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                using (var csvReader = new CsvReader(new StringReader(await okResponse.Content.ReadAsStringAsync()),
+                    new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = ";",
+                        HasHeaderRecord = true
+                    }))
+                {
+                    var report = csvReader.GetRecords<GdprExportReportCsvFormat>().ToList();
+                    return report;
+                }
+            }
         }
     }
 }

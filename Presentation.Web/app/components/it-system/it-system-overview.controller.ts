@@ -155,6 +155,7 @@
             this.reload();
         };
 
+
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
@@ -303,6 +304,11 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
+                    },
+                    {
+                        name: "exportGDPR",
+                        text: "Exportér GPDR data til Excel",
+                        template: `<a role='button' class='k-button k-button-icontext pull-right' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
                     }
                 ],
                 excel: {
@@ -575,7 +581,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            return _.map(dataItem.SensitiveDataLevels,
+                            return _.map(
+                                _.orderBy(
+                                    dataItem.SensitiveDataLevels,
+                                    dataLevel => Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levelOrder[dataLevel.SensitivityDataLevel]),
                                 dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
                                     .SensitivityDataLevel))
                                 .toString();

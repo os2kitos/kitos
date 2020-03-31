@@ -34,7 +34,7 @@
                 $scope.registerTypes = registerTypes;
                 $scope.sensitivityLevels = Kitos.Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels;
                 $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
-                $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
+                $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale"));
                 $scope.filterDataProcessor = $scope.contracts.length > 0;
 
                 $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(

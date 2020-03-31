@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.ItSystemUsage;
+﻿using System.Collections.Generic;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainServices.Repositories.SystemUsage
 {
@@ -7,5 +8,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
         void Update(ItSystemUsage systemUsage);
 
         ItSystemUsage GetSystemUsage(int systemId);
+
+        IEnumerable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId);
     }
 }
