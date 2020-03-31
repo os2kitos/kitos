@@ -24,9 +24,9 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
         private const int dataHandlerContractTypeId = 5;
 
         public GDPRExportService(
-            IItSystemUsageRepository systemUsageRepository, 
-            IAuthorizationContext authorizationContext, 
-            IAttachedOptionRepository attachedOptionRepository, 
+            IItSystemUsageRepository systemUsageRepository,
+            IAuthorizationContext authorizationContext,
+            IAttachedOptionRepository attachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository)
         {
             _systemUsageRepository = systemUsageRepository;
@@ -48,8 +48,8 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             return Result<IEnumerable<GDPRExportReport>, OperationError>.Success(gdpExportReports);
         }
 
-        private GDPRExportReport Map(ItSystemUsage input, 
-            IEnumerable<AttachedOption> attachedOptions, 
+        private GDPRExportReport Map(ItSystemUsage input,
+            IEnumerable<AttachedOption> attachedOptions,
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
             return new GDPRExportReport
@@ -70,19 +70,30 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PersonalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA),
                 SensitiveData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA),
                 LegalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.LEGALDATA),
-                LinkToDirectory = ! string.IsNullOrEmpty(input.LinkToDirectoryUrl),
+                LinkToDirectory = !string.IsNullOrEmpty(input.LinkToDirectoryUrl),
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 SystemName = input.ItSystem.Name,
-                SensitiveDataTypes = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA) ? 
-                    attachedOptions
-                    .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && x.ObjectId == input.Id && x.OptionType == OptionType.SENSITIVEPERSONALDATA)
-                    .Select(x => x.OptionId)
-                    .Join(sensitivePersonalDataTypes, 
-                        optionId => optionId,
-                        sensitivePersonalDataType => sensitivePersonalDataType.Id, 
-                        (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name) : new List<string>()
+                SensitiveDataTypes = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA)
+                        ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes)
+                        : new List<string>()
             };
+        }
+
+        private IEnumerable<string> GetSensitiveDataTypes(
+            int usageId,
+            IEnumerable<AttachedOption> attachedOptions,
+            IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
+        {
+            return attachedOptions
+                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && 
+                            x.ObjectId == usageId &&
+                            x.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                .Select(x => x.OptionId)
+                .Join(sensitivePersonalDataTypes,
+                    optionId => optionId,
+                    sensitivePersonalDataType => sensitivePersonalDataType.Id,
+                    (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name);
         }
     }
 }
