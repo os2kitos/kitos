@@ -717,6 +717,7 @@
                         width: 150,
                         persistId: "archiveDutyComment",
                         template: dataItem => dataItem.ArchiveDutyComment ? dataItem.ArchiveDutyComment : "",
+                        attributes: { "class": "might-overflow" },
                         hidden: true
                     }
                 ]
