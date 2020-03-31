@@ -51,7 +51,7 @@ namespace Core.ApplicationServices.SSO.State
                     }
                     else
                     {
-                        context.TransitionTo(new ErrorState(), 
+                        context.TransitionTo(_ssoStateFactory.CreateErrorState(), 
                             _ => _.HandleUnableToLocateUser());
                     }
                     break;

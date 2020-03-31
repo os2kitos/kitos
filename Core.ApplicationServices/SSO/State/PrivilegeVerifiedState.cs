@@ -51,7 +51,7 @@ namespace Core.ApplicationServices.SSO.State
                         var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                         if (!stsBrugerInfo.HasValue)
                         {
-                            context.TransitionTo(new ErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
+                            context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                         }
                         else
                         {
@@ -65,7 +65,7 @@ namespace Core.ApplicationServices.SSO.State
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                     if (!stsBrugerInfo.HasValue)
                     {
-                        context.TransitionTo(new ErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
+                        context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                     }
                     else
                     {

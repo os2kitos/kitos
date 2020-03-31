@@ -97,5 +97,10 @@ namespace Core.ApplicationServices.SSO.Factories
         {
             return new FirstTimeUserNotFoundState(stsBrugerInfo, _organizationRepository, _userRepository, _organizationRoleService, _cryptoService, this);
         }
+
+        public AbstractState CreateErrorState()
+        {
+            return new ErrorState();
+        }
     }
 }
