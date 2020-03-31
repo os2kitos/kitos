@@ -149,7 +149,6 @@
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
-    <Compile Include="DomainServices\SSO\StsBrugerInfoServiceTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
