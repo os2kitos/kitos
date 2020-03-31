@@ -33,7 +33,7 @@ namespace Core.ApplicationServices.SSO.State
                 }
                 else
                 {
-                    context.TransitionTo(new ErrorState(), _ => _.HandleUserPrivilegeInvalid());
+                    context.TransitionTo(_stateFactory.CreateErrorState(), _ => _.HandleUserPrivilegeInvalid());
                 }
             }
         }

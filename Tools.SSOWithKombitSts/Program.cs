@@ -9,7 +9,7 @@ namespace Tools.SSOWithKombitSts
     {
         private static int Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length < 2 || args.Length > 3)
             {
                 WriteUsageExplanation();
                 return 1;
@@ -17,12 +17,13 @@ namespace Tools.SSOWithKombitSts
 
             var certificateFilename = args[0];
             var entityId = args[1];
+            var callbackUrl = args[2] ?? entityId;
             var samlMetadataTemplate = new XmlDocument {PreserveWhitespace = true};
             samlMetadataTemplate.Load("SamlMetadataTemplate.xml");
             try
             {
                 var patchedCertificateSamlXml = PatchCertificatesInSamlMetadataXml(samlMetadataTemplate, certificateFilename);
-                var patchedEntityIdSamlXml = PatchEntityIdInSamlMetadataXml(patchedCertificateSamlXml, entityId);
+                var patchedEntityIdSamlXml = PatchEntityIdInSamlMetadataXml(patchedCertificateSamlXml, entityId, callbackUrl);
                 var meta = new dk.nita.saml20.Saml20MetadataDocument(patchedEntityIdSamlXml);
                 var metaAsXmlString = meta.ToXml();
                 const string samlMetadataXmlFilename = "kitosids-saml-metadata.xml";
@@ -46,10 +47,11 @@ namespace Tools.SSOWithKombitSts
         {
             Console.WriteLine("SSOWithKombitSts outputs a KOMBIT compliant SAML configuration file");
             Console.WriteLine();
-            Console.WriteLine("SSOWithKombitSts [file.cer] [entityID]");
+            Console.WriteLine("SSOWithKombitSts [file.cer] [entityID] {callbackUrl}");
             Console.WriteLine();
             Console.WriteLine("file.cer\tFilename for public part of exported FOCES certificate (Base64 X509 .cer format)");
             Console.WriteLine("entityID\tEntityID identifying system in KOMBIT STS Administration module (eg https://kitos-internal.strongminds.dk)");
+            Console.WriteLine("callbackUrl\tServer for STS Organisation to callback, if different from entityID (eg https://kitostest.miracle.dk)");
             Console.WriteLine();
         }
 
@@ -73,13 +75,14 @@ namespace Tools.SSOWithKombitSts
           return namespaceManager;
         }
 
-        private static XmlDocument PatchEntityIdInSamlMetadataXml(XmlDocument patchedCertificateSamlXml, string entityId)
+        private static XmlDocument PatchEntityIdInSamlMetadataXml(XmlDocument patchedCertificateSamlXml,
+            string entityId, string callbackUrl)
         {
           var xmlNamespaceManager = GetXmlNamespaceManager(patchedCertificateSamlXml);
           var entityIdAttr = patchedCertificateSamlXml.SelectSingleNode("//md:EntityDescriptor/@entityID", xmlNamespaceManager);
           entityIdAttr.Value = entityId;
           var acsLocation = patchedCertificateSamlXml.SelectSingleNode("//md:AssertionConsumerService/@Location", xmlNamespaceManager);
-          acsLocation.Value = entityId + "/Login.ashx";
+          acsLocation.Value = callbackUrl + "/Login.ashx";
           return patchedCertificateSamlXml;
         }
 

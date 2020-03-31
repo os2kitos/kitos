@@ -29,10 +29,6 @@ namespace Core.ApplicationServices.SSO.Model
 
         public Maybe<SamlAttribute> GetAttribute(string attributeName)
         {
-            if (!_sourceIdentity.HasAttribute(attributeName))
-            {
-                throw new ApplicationException($"Key '{attributeName}' not found");
-            }
             return _sourceIdentity[attributeName].FirstOrDefault();
         }
 
