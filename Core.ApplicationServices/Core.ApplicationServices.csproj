@@ -124,10 +124,6 @@
     <Compile Include="KLE\IKLEApplicationService.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
     <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />
-    <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
-    <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
-    <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
-    <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
     <Compile Include="KLE\KLEApplicationService.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />

@@ -7,8 +7,6 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
-using Core.ApplicationServices.Interface.ExhibitUsage;
-using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
@@ -155,8 +153,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InCommandScope(Mode);
-            kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InCommandScope(Mode);
-            kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InCommandScope(Mode);
             kernel.Bind<IReferenceService>().To<ReferenceService>().InCommandScope(Mode);
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);

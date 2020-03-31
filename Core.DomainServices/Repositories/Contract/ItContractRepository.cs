@@ -28,18 +28,11 @@ namespace Core.DomainServices.Repositories.Contract
             }
 
             var idsOfContractsWithDirectAssociations = usage.Contracts.Select(x => x.ItContractId);
-            var interfaceExhibitUsages = usage.ItInterfaceExhibitUsages.ToList();
-            var interfaceUsages = usage.ItInterfaceUsages.ToList();
+
 
             //Join all contract references wrt. the system usage
             var allContractIds =
                 idsOfContractsWithDirectAssociations
-                    .Concat(
-                        interfaceUsages
-                            .Select(x => x.ItContractId)
-                            .Concat(interfaceExhibitUsages.Select(x => x.ItContractId))
-                            .Where(id => id.HasValue)
-                            .Select(x => x.Value))
                     .Distinct()
                     .ToList();
 

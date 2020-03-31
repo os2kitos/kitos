@@ -28,8 +28,6 @@ namespace Core.DomainModel.ItSystemUsage
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
             this.TaskRefsOptOut = new List<TaskRef>();
-            this.ItInterfaceUsages = new List<ItInterfaceUsage>();
-            this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
@@ -265,14 +263,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// Gets or sets the tasks that has been opted out from by an organization.
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
-        /// <summary>
-        /// The local usages of interfaces.
-        /// </summary>
-        public virtual ICollection<ItInterfaceUsage> ItInterfaceUsages { get; set; }
-        /// <summary>
-        /// The local exposures of interfaces.
-        /// </summary>
-        public virtual ICollection<ItInterfaceExhibitUsage> ItInterfaceExhibitUsages { get; set; }
         /// <summary>
         /// Gets or sets the associated it projects.
         /// </summary>

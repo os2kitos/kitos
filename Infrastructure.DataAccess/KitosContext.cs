@@ -54,9 +54,7 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-        public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -175,10 +173,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
-            modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
-            modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItContractMap());
 
             modelBuilder.Configurations.Add(new ItContractRightMap());

@@ -3,6 +3,5 @@
         ItSystemId: number;
         ItSystem: IItSystem;
         ItInterface: IItInterface;
-        ItInterfaceExhibitUsage: Array<IItInterfaceExhibitUsage>;
     }
 }

@@ -89,7 +89,7 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,Organization,ExhibitedBy($expand=ItSystem,ItSystem($expand=BelongsTo)),LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,Organization,ExhibitedBy($expand=ItSystem,ItSystem($expand=BelongsTo)),LastChangedByUser,DataRows($expand=DataType)";
             this.canCreate = userAccessRights.canCreate;
 
             this.mainGridOptions = {
