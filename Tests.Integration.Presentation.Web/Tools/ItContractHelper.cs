@@ -38,7 +38,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.DeleteWithCookieAsync(
-                TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId=-1"), cookie);
+                TestEnvironment.CreateUrl($"api/itcontract/{contractId}?{KitosApiConstants.UnusedOrganizationIdParameter}"), cookie);
         }
 
         public static async Task<ItContractDTO> GetItContract(int contractId)
@@ -122,6 +122,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<ItContractDTO> PatchContract(int contractId, int orgId, object body)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"/api/itcontract/{contractId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
+            }
         }
     }
 }

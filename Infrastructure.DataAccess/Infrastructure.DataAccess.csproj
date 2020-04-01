@@ -62,12 +62,16 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\SsoUserIdentityMap.cs" />
+    <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
+    <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
+    <Compile Include="Mapping\BrokenLinkInInterfaceMap.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageSensitiveDataLevelMap.cs" />
     <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
-    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
-    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -98,14 +102,12 @@
     <Compile Include="Mapping\PaymentModelTypeMap.cs" />
     <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
-    <Compile Include="Mapping\ItInterfaceExhibitUsageMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
     <Compile Include="Mapping\ReportMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
@@ -561,6 +563,38 @@
     <Compile Include="Migrations\202003021344549_Archive_Duty_Changes.Designer.cs">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.cs" />
+    <Compile Include="Migrations\202003091419426_BelongsToRemovedFromInterface.Designer.cs">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003111405293_removedRegularPersonData.cs" />
+    <Compile Include="Migrations\202003111405293_removedRegularPersonData.Designer.cs">
+      <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003121331451_BrokenLinkReport.cs" />
+    <Compile Include="Migrations\202003121331451_BrokenLinkReport.Designer.cs">
+      <DependentUpon>202003121331451_BrokenLinkReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.cs" />
+    <Compile Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.Designer.cs">
+      <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs" />
+    <Compile Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.Designer.cs">
+      <DependentUpon>202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.cs" />
+    <Compile Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.Designer.cs">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003251349232_SSO_Identities.cs" />
+    <Compile Include="Migrations\202003251349232_SSO_Identities.Designer.cs">
+      <DependentUpon>202003251349232_SSO_Identities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs" />
+    <Compile Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.Designer.cs">
+      <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -893,16 +927,7 @@
       <DependentUpon>202002100739397_Relation_UUID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="Migrations\SQLScripts\1.Kitos_script.sql" />
-    <Content Include="Migrations\SQLScripts\2.udfaldsrum.sql" />
-    <Content Include="Migrations\SQLScripts\3.LokaleUdfaldsrum.sql" />
-    <Content Include="Migrations\SQLScripts\4.CleanUp.sql" />
-    <Content Include="Migrations\SQLScripts\6.dbFix.sql" />
-    <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
-    <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
-    <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
     <EmbeddedResource Include="Migrations\202002180557441_Migrate_InterfaceUsage_To_SystemRelations.resx">
       <DependentUpon>202002180557441_Migrate_InterfaceUsage_To_SystemRelations.cs</DependentUpon>
     </EmbeddedResource>
@@ -921,12 +946,36 @@
     <EmbeddedResource Include="Migrations\202003021344549_Archive_Duty_Changes.resx">
       <DependentUpon>202003021344549_Archive_Duty_Changes.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003091419426_BelongsToRemovedFromInterface.resx">
+      <DependentUpon>202003091419426_BelongsToRemovedFromInterface.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003111405293_removedRegularPersonData.resx">
+      <DependentUpon>202003111405293_removedRegularPersonData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003121331451_BrokenLinkReport.resx">
+      <DependentUpon>202003121331451_BrokenLinkReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003170825284_Data_Sensitivity_Level_Changes.resx">
+      <DependentUpon>202003170825284_Data_Sensitivity_Level_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003170843508_GDPR_Fields_Nullable_Changes.resx">
+      <DependentUpon>202003170843508_GDPR_Fields_Nullable_Changes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003230947529_AddedHostedAtEnumValueToItSystemUsage.resx">
+      <DependentUpon>202003230947529_AddedHostedAtEnumValueToItSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003251349232_SSO_Identities.resx">
+      <DependentUpon>202003251349232_SSO_Identities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.resx">
+      <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
-    <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
-    <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Remove_Orphaned_AttachedOptions.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -22,6 +22,11 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:KitosDbConnectionStringForIIsApp = $parameters["KitosDbConnectionStringForIIsApp"]
     $Env:HangfireDbConnectionStringForIIsApp = $parameters["HangfireDbConnectionStringForIIsApp"]
     $Env:KitosDbConnectionStringForTeamCity = $parameters["KitosDbConnectionStringForTeamCity"]
+    $Env:SsoServiceProviderServer = $parameters["SsoServiceProviderServer"]
+    $Env:SsoIDPEndPoints = $parameters["SsoIDPEndPoints"]
+    $Env:SsoServiceProviderId = $parameters["SsoServiceProviderId"]
+    $Env:SsoCertificateThumbPrint = $parameters["SsoCertificateThumbPrint"]
+    $Env:StsOrganisationEndpointHost = $parameters["StsOrganisationEndpointHost"]
     
     if($loadTcHangfireConnectionString -eq $true) {
         $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]

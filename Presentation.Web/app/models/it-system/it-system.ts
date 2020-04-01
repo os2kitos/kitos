@@ -20,5 +20,8 @@
         Usages: Array<ItSystemUsage.IItSystemUsage>;
         Reference: any;
         PreviousName: string;
+        ArchiveDuty: string;
+        ArchiveDutyComment: string;
+
     }
 }

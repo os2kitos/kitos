@@ -718,41 +718,16 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         private ItContract CreateItContract(
-            IEnumerable<int> idsOfAssociatedSystemUsages = null,
-            IEnumerable<int> idsOfSystemUsagesInInterfaceUsages = null,
-            IEnumerable<int> idsOfSystemUsagesInInterfaceExposures = null)
+            IEnumerable<int> idsOfAssociatedSystemUsages = null)
         {
             return new ItContract
             {
                 Id = A<int>(),
                 AssociatedSystemUsages = CreateAssociatedSystemUsages(idsOfAssociatedSystemUsages ?? Enumerable.Empty<int>()),
-                AssociatedInterfaceUsages = CreateAssociatedInterfaceUsages(idsOfSystemUsagesInInterfaceUsages ?? Enumerable.Empty<int>()),
-                AssociatedInterfaceExposures = CreateAssociatedInterfaceExposures(idsOfSystemUsagesInInterfaceExposures ?? Enumerable.Empty<int>()),
             };
         }
 
-        private List<ItInterfaceExhibitUsage> CreateAssociatedInterfaceExposures(IEnumerable<int> systemUsageIds)
-        {
-            return systemUsageIds.Select(usageId =>
-                new ItInterfaceExhibitUsage
-                {
-                    ItSystemUsageId = usageId,
-                    ItContractId = A<int>(),
-                    ItInterfaceExhibitId = A<int>()
-                }).ToList();
-        }
 
-        private List<ItInterfaceUsage> CreateAssociatedInterfaceUsages(IEnumerable<int> systemUsageIds)
-        {
-            return systemUsageIds.Select(usageId => new ItInterfaceUsage
-            {
-                ItSystemUsageId = usageId,
-                ItSystemId = A<int>(),
-                ItInterfaceId = A<int>(),
-                InfrastructureId = A<int>(),
-                IsWishedFor = A<bool>()
-            }).ToList();
-        }
 
         private static List<ItContractItSystemUsage> CreateAssociatedSystemUsages(IEnumerable<int> systemUsageIds)
         {

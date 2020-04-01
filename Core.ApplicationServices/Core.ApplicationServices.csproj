@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="dk.nita.saml20, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.2.0.1\lib\net45\dk.nita.saml20.dll</HintPath>
+    </Reference>
     <Reference Include="Hangfire.Core, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.Core.1.6.6\lib\net45\Hangfire.Core.dll</HintPath>
       <Private>True</Private>
@@ -83,13 +86,18 @@
     <Compile Include="ApplicationServiceModule.cs" />
     <Compile Include="Authentication\AuthenticationContext.cs" />
     <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\AuthenticationScope.cs" />
+    <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
+    <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
+    <Compile Include="Authorization\Permissions\ViewBrokenExternalReferencesReportPermission.cs" />
     <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
     <Compile Include="Authorization\Policies\IModuleCreationPolicy.cs" />
     <Compile Include="Authorization\Policies\IModuleModificationPolicy.cs" />
@@ -113,12 +121,10 @@
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\OptionsService.cs" />
-    <Compile Include="TaskRefs\IKLEApplicationService.cs" />
-    <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
-    <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
-    <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
-    <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
-    <Compile Include="TaskRefs\KLEApplicationService.cs" />
+    <Compile Include="KLE\IKLEApplicationService.cs" />
+    <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
+    <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />
+    <Compile Include="KLE\KLEApplicationService.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
@@ -126,6 +132,31 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
+    <Compile Include="SSO\Factories\SsoStateFactory.cs" />
+    <Compile Include="SSO\ISsoFlowApplicationService.cs" />
+    <Compile Include="SSO\Model\SsoErrorCodes.cs" />
+    <Compile Include="SSO\SsoFlowConfiguration.cs" />
+    <Compile Include="SSO\SsoFlowApplicationService.cs" />
+    <Compile Include="SSO\State\AbstractState.cs" />
+    <Compile Include="SSO\State\AssigningRoleState.cs" />
+    <Compile Include="SSO\State\AuthorizingUserFromUnknownOrgState.cs" />
+    <Compile Include="SSO\State\AuthorizingUserState.cs" />
+    <Compile Include="SSO\State\FlowContext.cs" />
+    <Compile Include="SSO\State\FlowEvent.cs" />
+    <Compile Include="SSO\State\InitialFlowState.cs" />
+    <Compile Include="SSO\State\PrivilegeVerifiedState.cs" />
+    <Compile Include="SSO\Model\KitosSamlPrivilege.cs" />
+    <Compile Include="SSO\Model\Saml20IdentityNavigator.cs" />
+    <Compile Include="SSO\Model\Saml20IdentityParser.cs" />
+    <Compile Include="SSO\Model\SamlUserUuid.cs" />
+    <Compile Include="SSO\State\UserIdentifiedState.cs" />
+    <Compile Include="SSO\State\UserLoggedInState.cs" />
+    <Compile Include="SSO\State\ErrorState.cs" />
+    <Compile Include="SSO\State\FirstTimeUserNotFoundState.cs" />
+    <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
+    <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
+    <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
@@ -164,6 +195,10 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
+      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
+      <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

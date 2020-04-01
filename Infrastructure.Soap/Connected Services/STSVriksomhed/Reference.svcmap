@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="d52711b1-da91-47a7-95d6-a67ee0ce3139" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\Projects\kitos\Infrastructure.Soap\Virksomhed\wsdl\context\VirksomhedService.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="VirksomhedOperationer.xsd" MetadataType="Schema" ID="f0bafdb9-03e5-4d8d-9297-371795b3c0ac" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/1.1.STS-3/VirksomhedOperationer.xsd" />
+    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="39c345b8-645f-435b-bee9-ab7c10b2ae62" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/wsdl/context/policies.wsdl" />
+    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="4e51a864-246b-4a9d-9bcc-a4dd216d7d6b" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/sp/ServiceplatformFaultMessage_1.wsdl" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="b45dc728-7c26-4bda-bf2f-07d2be63bfe5" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="bef5846b-adf6-4993-ba4a-5d36a176eed8" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/sp/ServiceplatformFault_1.xsd" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="2433fa49-5801-49ad-88ae-279660466c11" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/1.1.STS-3/Part.xsd" />
+    <MetadataFile FileName="Virksomhed.xsd" MetadataType="Schema" ID="4569dc89-2ac2-4122-a24b-84957eaa4770" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/1.1.STS-3/Virksomhed.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="843a4247-ead9-4391-86a7-8eeffb5c67fa" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/1.1.STS-3/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="344e41ef-8016-4527-b23c-5288b72cbffc" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/sp/AuthorityContext_1.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="b7ee6da0-3776-4b74-a9d1-d18edef0d097" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/SF1500_EP_FS11/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="VirksomhedService.wsdl" MetadataType="Wsdl" ID="381cc572-cdb4-4508-9b7c-bac9449af0cc" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/wsdl/context/VirksomhedService.wsdl" />
+    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="a6983443-cd43-41ba-9274-91e3e50f99a5" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/sp/CallContext_1.xsd" />
+    <MetadataFile FileName="VirksomhedServiceMsg.xsd" MetadataType="Schema" ID="582a35f7-d5ba-4695-bfdc-0bf0b5ee8f20" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Virksomhed/VirksomhedServiceMsg.xsd" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

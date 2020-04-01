@@ -14,9 +14,5 @@
         CanBeUsedBy: Array<IItInterfaceUse>;
         /** Gets or sets it system that exhibits this interface instance. */
         ExhibitedBy: IItInterfaceExhibit;
-        /** Gets or sets local usages of the system, in case the system is an interface. */
-        InterfaceLocalUsages: Array<ItSystemUsage.IInterfaceUsage>;
-        /** Gets or sets local exposure of the system, in case the system is an interface. */
-        InterfaceLocalExposure: Array<IItInterfaceExhibitUsage>;
     }
 }

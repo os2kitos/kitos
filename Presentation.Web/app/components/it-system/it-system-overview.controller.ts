@@ -93,6 +93,11 @@
             return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
         }
 
+        private fixDataTypeFilter(filterUrl, column) {
+            var pattern = new RegExp(`${column} eq ('\\w+')`, "i");
+            return filterUrl.replace(pattern, "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq Core.DomainModel.ItSystemUsage.GDPR.SensitiveDataLevel$1)");
+        }
+
         // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
@@ -150,6 +155,7 @@
             this.reload();
         };
 
+
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
@@ -180,7 +186,8 @@ ArchiveType,\
 SensitiveDataType,\
 ObjectOwner,\
 LastChangedByUser,\
-ItProjects($select=Name)`;
+ItProjects($select=Name),\
+SensitiveDataLevels($select=SensitivityDataLevel)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -214,6 +221,7 @@ ItProjects($select=Name)`;
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
                                 parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+                                parameterMap.$filter = this.fixDataTypeFilter(parameterMap.$filter, "SensitiveDataLevels/SensitivityDataLevel");
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
@@ -237,7 +245,6 @@ ItProjects($select=Name)`;
                             fields: {
                                 LastChanged: { type: "date" },
                                 Concluded: { type: "date" },
-                                ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 SystemName: { from: "ItSystem.Name", type: "string" },
@@ -297,6 +304,11 @@ ItProjects($select=Name)`;
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
+                    },
+                    {
+                        name: "exportGDPR",
+                        text: "Exportér GPDR data til Excel",
+                        template: `<a role='button' class='k-button k-button-icontext pull-right' id='gdprExportAnchor' href='api/v1/gdpr-report/csv/${this.user.currentOrganizationId}' data-element-type='exportGDPRButtonLink'>#: text #</a>`
                     }
                 ],
                 excel: {
@@ -566,33 +578,39 @@ ItProjects($select=Name)`;
                         }
                     },
                     {
-                        field: "DataLevel", title: "Datatype", width: 150,
+                        field: "SensitiveDataLevels.SensitivityDataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel",
                         template: dataItem => {
-                            switch (dataItem.DataLevel) {
-                                case "PERSONALDATA":
-                                    return "Persondata";
-                                case "PERSONALDATANDSENSITIVEDATA":
-                                    return "Persondata og følsomme persondata";
-                                default:
-                                    return "Ingen persondata";
-                            }
+                            return _.map(
+                                _.orderBy(
+                                    dataItem.SensitiveDataLevels,
+                                    dataLevel => Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levelOrder[dataLevel.SensitivityDataLevel]),
+                                dataLevel => Models.Odata.ItSystemUsage.SensitiveDataLevelMapper.map(dataLevel
+                                    .SensitivityDataLevel))
+                                .toString();
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: function (args) {
+                                template: (args) => {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive,
+                                            Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
                                         valuePrimitive: true
                                     });
                                 },
-                                showOperators: false
+                                showOperators: false,
+                                operator: "eq"
                             }
-                        }
+                        },
+                        sortable: false
                     },
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
@@ -737,42 +755,25 @@ ItProjects($select=Name)`;
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
                         persistId: "ArchiveDuty",
-                        template: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
-                        excelTemplate: dataItem => {
-                            switch (dataItem.ArchiveDuty) {
-                                case 1:
-                                    return "B";
-                                case 2:
-                                    return "K";
-                                case 3:
-                                    return "Ved ikke";
-                                default:
-                                    return "";
-                            }
-                        },
+                        template: dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty),
                         hidden: false,
                         filterable: {
                             cell: {
-                                template: function (args) {
+                                template: (args) => {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
+                                        dataSource: [
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Undecided,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.B,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.K,
+                                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Unknown
+                                        ],
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
                                         valuePrimitive: true
                                     });
                                 },
-                                showOperators: false
+                                showOperators: false,
+                                operator: "eq"
                             }
                         }
                     },
@@ -826,10 +827,10 @@ ItProjects($select=Name)`;
                         persistId: "riskSupervisionDocumentationUrlName",
                         template: dataItem => {
                             if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
-                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
                             }
                             else if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName == null) {
-                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
                             }
                             else if (dataItem.RiskSupervisionDocumentationUrlName != null) {
                                 return dataItem.RiskSupervisionDocumentationUrlName;
@@ -858,10 +859,10 @@ ItProjects($select=Name)`;
                         persistId: "LinkToDirectoryUrlName",
                         template: dataItem => {
                             if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
-                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
                             }
                             else if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName == null) {
-                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
+                                return "<a target=\"_blank\" href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
                             }
                             else if (dataItem.LinkToDirectoryUrlName != null) {
                                 return dataItem.LinkToDirectoryUrlName;

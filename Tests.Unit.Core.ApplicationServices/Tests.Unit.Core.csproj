@@ -92,6 +92,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -133,6 +134,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
@@ -145,8 +147,13 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
+    <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
+    <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
+    <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
+    <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
@@ -155,6 +162,7 @@
     <Compile Include="Model\MaybeTest.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandlerTest.cs" />
+    <Compile Include="Model\SSO\StsPersonDataTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +175,10 @@
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
+      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
+      <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
@@ -187,6 +199,10 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
+      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
+      <Name>Infrastructure.Soap</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
       <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:adresse="urn:oio:sts:organisation:adresse:1.1.3.0" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:sts="urn:oio:sts:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:adresse:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+  <import schemaLocation="GenerelleDefinitioner.xsd" namespace="urn:oio:sts:1.1.3.0" />
+  <element oio:definition="urn:oio:sagdok:adresse:ADD:2.0.0" name="Adresse" type="adresse:AdresseType" />
+  <complexType oio:definition="urn:oio:sagdok:adresse:ADD:2.0.0" name="AdresseType">
+    <complexContent mixed="false">
+      <extension base="sd:SagDokObjektType">
+        <sequence>
+          <element oio:content="registreringer" maxOccurs="unbounded" ref="adresse:Registrering" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:adresseattributliste:ADD:2.0.0" name="AttributListe" type="adresse:AttributListeType" />
+  <complexType oio:definition="urn:oio:sagdok:adresseattributliste:ADD:2.0.0" name="AttributListeType">
+    <sequence>
+      <element oio:content="egenskaber" minOccurs="0" maxOccurs="unbounded" ref="adresse:Egenskab" />
+    </sequence>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:adressetilstandliste:ADD:2.0.0" name="TilstandListe" type="adresse:TilstandListeType" />
+  <complexType oio:definition="urn:oio:sagdok:adressetilstandliste:ADD:2.0.0" name="TilstandListeType">
+    <sequence />
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:adresserelationliste:ADD:2.0.0" name="RelationListe" type="adresse:RelationListeType" />
+  <complexType oio:definition="urn:oio:sagdok:adresserelationliste:ADD:2.0.0" name="RelationListeType">
+    <sequence />
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:adresseregistrering:ADD:2.0.0" name="Registrering" type="adresse:RegistreringType" />
+  <complexType oio:definition="urn:oio:sagdok:adresseregistrering:ADD:2.0.0" name="RegistreringType">
+    <complexContent mixed="false">
+      <extension base="sd:RegistreringType">
+        <sequence>
+          <element oio:content="attributter" ref="adresse:AttributListe" />
+          <element oio:content="tilstande" ref="adresse:TilstandListe" />
+          <element oio:content="relationer" ref="adresse:RelationListe" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:adresseegenskaber:ADD:1.0.0" name="Egenskab" type="adresse:EgenskabType" />
+  <complexType oio:definition="urn:oio:sagdok:adresseegenskaber:ADD:1.0.0" name="EgenskabType">
+    <sequence>
+      <element oio:content="virkning" minOccurs="0" ref="sd:Virkning" />
+      <element oio:content="brugervendtnoegle" minOccurs="0" ref="sd:BrugervendtNoegleTekst" />
+      <element oio:content="adresse" minOccurs="0" ref="sts:AdresseTekst" />
+    </sequence>
+  </complexType>
+</schema>

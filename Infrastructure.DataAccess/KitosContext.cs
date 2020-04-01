@@ -11,13 +11,16 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
+using Core.DomainModel.Qa.References;
+using Core.DomainModel.SSO;
 
 namespace Infrastructure.DataAccess
 {
     public class KitosContext : DbContext
     {
-        public KitosContext(): this("KitosContext") {}
+        public KitosContext() : this("KitosContext") { }
 
         public KitosContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
@@ -51,9 +54,7 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-        public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -122,12 +123,10 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
-        public DbSet<LocalRegularPersonalDataType> LocalRegularPersonalDataTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
         public DbSet<AdviceSent> AdviceSent { get; set; }
-        public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
         public DbSet<DataResponsible> DataResponsibles { get; set; }
@@ -137,6 +136,10 @@ namespace Infrastructure.DataAccess
         public DbSet<ContactPerson> ContactPersons { get; set; }
         public DbSet<KLEUpdateHistoryItem> KLEUpdateHistoryItems { get; set; }
         public DbSet<SystemRelation> SystemRelations { get; set; }
+        public DbSet<BrokenExternalReferencesReport> BrokenExternalReferencesReports { get; set; }
+        public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels{ get; set; }
+        public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
+        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities{ get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -170,12 +173,10 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new HandoverTrialMap());
             modelBuilder.Configurations.Add(new HandoverTrialTypeMap());
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
-            modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
-            modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItContractMap());
-    
+
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
@@ -214,11 +215,16 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
             modelBuilder.Configurations.Add(new SystemRelationMap());
+            modelBuilder.Configurations.Add(new BrokenExternalReferencesReportMap());
+            modelBuilder.Configurations.Add(new BrokenLinkInExternalReferenceMap());
+            modelBuilder.Configurations.Add(new BrokenLinkInInterfaceMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
+            modelBuilder.Configurations.Add(new SsoUserIdentityMap());
+            modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
         }
     }
 }

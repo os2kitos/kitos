@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Qa.References;
 
 namespace Core.DomainModel
 {
@@ -44,5 +46,7 @@ namespace Core.DomainModel
                 ItProject ??
                 (IEntityWithExternalReferences)ItSystem;
         }
+
+        public virtual ICollection<BrokenLinkInExternalReference> BrokenLinkReports { get; set; }
     }
 }

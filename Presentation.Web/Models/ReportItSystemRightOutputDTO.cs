@@ -42,7 +42,6 @@ namespace Presentation.Web.Models
         public DateTime userLockedOutDate { get; set; }
         public int userFailedAttempts { get; set; }
         public string userDefaultUserStartPreference { get; set; }
-        public string userUniqueId { get; set; }
 
         public int ItSystemUsageId { get; set; }
         public bool ItSystemUsageIsStatusActive { get; set; }

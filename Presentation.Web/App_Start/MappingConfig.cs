@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -10,6 +11,8 @@ using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
+using Core.DomainModel.ItSystemUsage.GDPR;
+using Presentation.Web.Models.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
@@ -253,7 +256,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.userLockedOutDate, opt => opt.MapFrom(src => src.User.LockedOutDate))
                .ForMember(dto => dto.userFailedAttempts, opt => opt.MapFrom(src => src.User.FailedAttempts))
                .ForMember(dto => dto.userDefaultUserStartPreference, opt => opt.MapFrom(src => src.User.DefaultUserStartPreference))
-               .ForMember(dto => dto.userUniqueId, opt => opt.MapFrom(src => src.User.UniqueId))
                .ForMember(dto => dto.ItSystemUsageId, opt => opt.MapFrom(src => src.Object.Id))
                .ForMember(dto => dto.ItSystemUsageIsStatusActive, opt => opt.MapFrom(src => src.Object.IsStatusActive))
                .ForMember(dto => dto.ItSystemUsageNote, opt => opt.MapFrom(src => src.Object.Note))
@@ -320,9 +322,6 @@ namespace Presentation.Web
             Mapper.CreateMap<ItInterfaceExhibit, ItInterfaceExhibitDTO>()
                 .ReverseMap();
 
-            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExhibitUsageDTO>()
-                .ReverseMap();
-
             Mapper.CreateMap<DataRow, DataRowDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.DataType, opt => opt.Ignore());
@@ -339,17 +338,9 @@ namespace Presentation.Web
 
             Mapper.CreateMap<ItInterface, ItInterfaceDTO>()
                 .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.Usages.Any()))
+                .ForMember(dest => dest.BelongsToId, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Id))
+                .ForMember(dest => dest.BelongsToName, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Name))
                 .ReverseMap();
-
-            Mapper.CreateMap<ItInterfaceUsage, ItInterfaceUsageDTO>()
-                  .ForMember(dest => dest.ItInterfaceItInterfaceName, opt => opt.MapFrom(src => src.ItInterface.Name))
-                  .ForMember(dest => dest.ItInterfaceItInterfaceDisabled, opt => opt.MapFrom(src => src.ItInterface.Disabled))
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
-
-            Mapper.CreateMap<ItInterfaceExhibitUsage, ItInterfaceExposureDTO>()
-                  .ReverseMap()
-                  .ForMember(dest => dest.ItContract, opt => opt.Ignore());
 
             Mapper.CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                 .ForMember(dest => dest.ResponsibleOrgUnitName,
@@ -441,8 +432,6 @@ namespace Presentation.Web
                   .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore());
 
             //Output only - this mapping should not be reversed
@@ -473,6 +462,9 @@ namespace Presentation.Web
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ExcelImportError, ExcelImportErrorDTO>();
+
+            Mapper.CreateMap<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>()
+                .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitivityDataLevel));
         }
     }
 }

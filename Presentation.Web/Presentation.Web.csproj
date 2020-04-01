@@ -70,6 +70,9 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="dk.nita.saml20, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.2.0.1\lib\net45\dk.nita.saml20.dll</HintPath>
+    </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
@@ -319,13 +322,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
+    <Compile Include="Controllers\API\GDPRExportReportController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
+    <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
+    <Content Include="Logout.ashx" />
+    <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
+    <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
+    <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
+    <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
+    <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
+    <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
+    <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
@@ -353,10 +371,16 @@
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportColumns.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
+    <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
+    <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
+    <Compile Include="Ninject\KernelBuilder.cs" />
+    <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -371,7 +395,11 @@
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
+    <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
@@ -388,10 +416,17 @@
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\UrlViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-misc-brokenlinks-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-archiveduty-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-relation-view-models.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\exposed-interface-view-model.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system\system-archiveduty-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
+    <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
+    <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\optionsService.ts" />
@@ -405,7 +440,6 @@
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
-    <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -419,7 +453,6 @@
     <Compile Include="Controllers\API\HealthCheckController.cs" />
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
-    <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />
     <Compile Include="Controllers\API\ItInterfaceController.cs" />
@@ -443,8 +476,7 @@
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsFunctionController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsRegularPersonalDataController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsSensitivePersonalDataController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsSensitivePersonalDataController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
     <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
@@ -488,7 +520,6 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
@@ -517,7 +548,6 @@
     <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
@@ -561,7 +591,6 @@
     <Compile Include="Models\HandoverTrialDTO.cs" />
     <Compile Include="Models\ItInterfaceDTO.cs" />
     <Compile Include="Models\ItInterfaceExhibitDTO.cs" />
-    <Compile Include="Models\ItInterfaceExhibitUsageDTO.cs" />
     <Compile Include="Models\ItInterfaceUseDTO.cs" />
     <Compile Include="Models\ItProjectOverviewDTO.cs" />
     <Compile Include="Models\ItProjectPhaseDTO.cs" />
@@ -596,7 +625,6 @@
     <Compile Include="Controllers\API\GoalController.cs" />
     <Compile Include="Controllers\API\GoalStatusController.cs" />
     <Compile Include="Controllers\API\GenericRightsController.cs" />
-    <Compile Include="Controllers\API\ItInterfaceUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectController.cs" />
     <Compile Include="Controllers\API\ItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageController.cs" />
@@ -613,7 +641,6 @@
     <Compile Include="Models\DataRowDTO.cs" />
     <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
-    <Compile Include="Models\ItInterfaceUsageDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
     <Compile Include="Controllers\API\TaskUsageController.cs" />
@@ -675,6 +702,7 @@
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
+    <TypeScriptCompile Include="app\utility\view-data-state.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -699,6 +727,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\RegularUser.ExposedInterfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Interfaces\GlobalAdmin.Interface.Creation.e2e.spec.ts" />
@@ -719,6 +748,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageGDPR.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageMain.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageRelation.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Local-admin\LocalProject.po.ts" />
@@ -1118,13 +1148,11 @@
     <TypeScriptCompile Include="app\models\it-system-usage\data-row-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\frequency.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\interface-usage.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\interface.ts" />
-    <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
@@ -1248,6 +1276,7 @@
     <Content Include="Content\notify\notify.less" />
     <Content Include="Content\kendo.default.min.css" />
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
+    <Content Include="Metadata.ashx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1299,6 +1328,10 @@
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
+      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
+      <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>

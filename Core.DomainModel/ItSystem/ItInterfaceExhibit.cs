@@ -10,17 +10,10 @@ namespace Core.DomainModel.ItSystem
     /// </summary>
     public class ItInterfaceExhibit : Entity, IContextAware
     {
-        public ItInterfaceExhibit()
-        {
-            this.ItInterfaceExhibitUsage = new List<ItInterfaceExhibitUsage>();
-        }
-
         public int ItSystemId { get; set; }
         public virtual ItSystem ItSystem { get; set; }
 
         public virtual ItInterface ItInterface { get; set; }
-
-        public virtual ICollection<ItInterfaceExhibitUsage> ItInterfaceExhibitUsage { get; set; }
 
         /// <summary>
         /// Determines whether a user has write access to this instance.

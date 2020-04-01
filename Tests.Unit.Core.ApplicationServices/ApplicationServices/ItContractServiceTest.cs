@@ -2,6 +2,8 @@
 using System.Data;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.References;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
@@ -22,6 +24,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
+        private readonly Mock<IReferenceService> _referenceService;
 
         public ItContractServiceTest()
         {
@@ -30,9 +33,11 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager = new Mock<ITransactionManager>();
             _domainEvents = new Mock<IDomainEvents>();
             _authorizationContext = new Mock<IAuthorizationContext>();
+            _referenceService = new Mock<IReferenceService>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
+                _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
                 _authorizationContext.Object);
@@ -88,6 +93,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetContractReturns(contractId, itContract);
             ExpectAllowDeleteReturns(itContract, true);
             _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
 
             //Act
             var result = _sut.Delete(contractId);
@@ -101,6 +107,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
             _contractRepository.Verify(x => x.DeleteWithReferencePreload(itContract), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<ContractDeleted>(cd => cd.DeletedContract == itContract)), Times.Once);
+            _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 

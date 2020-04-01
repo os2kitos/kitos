@@ -511,10 +511,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await AddProjectSystemBindingAsync(project, _oldSystemUsage);
             var contract = await CreateContractAsync();
             await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
-            var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
-            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
-            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
 
             var createdContract = await GetItContractAsync(contract.Id);
 
@@ -523,8 +519,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 AssertMigrationSucceeded(response);
-                await AssertExhibitExists(contract, exhibitUsage, true);
-                await AssertInterfaceUsageSystemBinding(interfaceUsage, _oldSystemInUse.Id);
                 await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
                 await AssertAssociatedProjectExists(_oldSystemUsage, project);
             }
@@ -654,19 +648,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
-        private static void AssertInterfaceMapping(ItInterfaceUsageDTO createdBinding, NamedEntityDTO affectedUsage)
-        {
-            Assert.Equal(createdBinding.ItInterfaceId, affectedUsage.Id);
-            Assert.Equal(createdBinding.ItInterfaceItInterfaceName, affectedUsage.Name);
-        }
-
-        private static void AssertInterfaceMapping(ItInterfaceExhibitUsageDTO createdBinding, NamedEntityDTO affectedUsage)
-        {
-            Assert.Equal(createdBinding.ItInterfaceExhibitItInterfaceId, affectedUsage.Id);
-            Assert.Equal(createdBinding.ItInterfaceExhibitItInterfaceName, affectedUsage.Name);
-        }
-
-
         private static async Task<ItSystemUsageMigrationDTO> AssertMigrationReturned(HttpResponseMessage response)
         {
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -695,12 +676,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(usage.Id, result.TargetUsage.Id);
             Assert.Equal(oldSystem.Id, result.FromSystem.Id);
             Assert.Equal(newSystem.Id, result.ToSystem.Id);
-        }
-
-        private static async Task AssertExhibitExists(ItContractDTO contract, ItInterfaceExhibitUsageDTO exhibit, bool exists)
-        {
-            var exhibitUsages = await InterfaceExhibitHelper.GetExhibitInterfaceUsages(contract.Id);
-            Assert.Equal(exists ? 1 : 0, exhibitUsages.Count(x => x.ItSystemUsageId == exhibit.ItSystemUsageId && x.ItInterfaceExhibitItInterfaceId == exhibit.ItInterfaceExhibitItInterfaceId));
         }
 
         private static async Task AssertRelationExists(SystemRelationDTO expectedRelation, ItSystemUsageDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
@@ -735,18 +710,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 Assert.Null(relation.Contract);
             }
-        }
-
-        private static async Task AssertInterfaceUsageSystemBinding(ItInterfaceUsageDTO interfaceUsage, int sysId)
-        {
-            var newInterfaceUsage = await InterfaceUsageHelper.GetItInterfaceUsage(
-                interfaceUsage.ItSystemUsageId,
-                sysId,
-                interfaceUsage.ItInterfaceId);
-
-            Assert.Equal(interfaceUsage.ItSystemUsageId, newInterfaceUsage.ItSystemUsageId);
-            Assert.Equal(sysId, newInterfaceUsage.ItSystemId);
-            Assert.Equal(interfaceUsage.ItInterfaceId, newInterfaceUsage.ItInterfaceId);
         }
 
         private static async Task AssertSystemUsageAssociationExistsInContract(ItContractDTO contract, ItSystemUsageDTO usage)
@@ -811,18 +774,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private static async Task<ItInterfaceDTO> CreateInterfaceAsync()
         {
             var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(),
-                CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+                CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             return createdInterface;
-        }
-
-        private static async Task<ItInterfaceUsageDTO> CreateInterfaceUsageAsync(ItContractDTO contract, ItInterfaceDTO targetInterface, ItSystemUsageDTO usage, ItSystemDTO system)
-        {
-            return await InterfaceUsageHelper.CreateAsync(contract.Id, usage.Id, system.Id, targetInterface.Id, TestEnvironment.DefaultOrganizationId);
-        }
-
-        private static async Task<ItInterfaceExhibitUsageDTO> CreateExhibitUsageAsync(ItContractDTO contract, ItInterfaceExhibitDTO exhibit, ItSystemUsageDTO systemUsage)
-        {
-            return await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, systemUsage.Id, exhibit.Id);
         }
 
         private static async Task<ItProjectDTO> CreateProjectAsync(int organizationId = TestEnvironment.DefaultOrganizationId)

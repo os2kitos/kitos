@@ -30,7 +30,12 @@ namespace Core.ApplicationServices
             var kitosUser = _userRepository.GetById(_authenticationContext.UserId.GetValueOrDefault(EntityConstants.InvalidId));
             if (kitosUser == null)
             {
-                throw new InvalidOperationException($"Cannot determine who is adding the role to the user with id:{user.Id}");
+                //Fallback to a global admin
+                kitosUser = _userRepository.AsQueryable().FirstOrDefault(x => x.IsGlobalAdmin);
+                if (kitosUser == null)
+                {
+                    throw new InvalidOperationException($"Cannot determine who is adding the role to the user with id:{user.Id}");
+                }
             }
             var result = _organizationRights.Insert(new OrganizationRight
             {

@@ -70,7 +70,7 @@
                                     </label>
                                 </div>
                                 <div class="col-xs-3">
-                                    <input type="submit" class="btn btn-default btn-sm pull-right" data-ng-click="submitLogin()" value="Log ind", data-element-type="loginButton">
+                                    <input type="submit" class="btn btn-default btn-sm pull-right" data-ng-click="submitLogin()" value="Log ind" , data-element-type="loginButton">
                                 </div>
                             </div>
                         </form>
@@ -80,20 +80,39 @@
                     Hvis du har glemt dit password, <a data-ui-sref="forgot-password">kan du anmode om at nulstille det.</a>
                 </div>
             </div>
-            
-            <!-- TODO: Re-enable once we add SSO back -->
-            <!--<div class="panel panel-default" data-ng-show="!user" data-ng-if="true">
+
+            <div class="panel panel-default" ng-if="ssoVm.show && !user">
                 <div class="panel-heading">
                     <h3 class="panel-title">Log ind via SSO</h3>
                 </div>
                 <div class="panel-body">
                     <div class="text-left col-xs-10">
-                        <div class="form-group">
-                            <input type="button" class="btn btn-default btn-sm" data-ng-click="SSOLogin()" value="Log ind via SSO">
+                        <div>
+                            <a href="Login.ashx?forceAuthn=true" class="btn btn-default btn-sm">Log ind via STS Adgangsstyring</a>
                         </div>
                     </div>
                 </div>
-            </div>-->
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'MissingPrivilege'">
+                    <strong>Den bruger, som du er logget på med, har ikke adgang til Kitos</strong>
+                    <br />
+                    Kontakt venligst din lokale IT administrator for at få tildelt adgang til Kitos
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'NoOrganizationAndRole'">
+                    <strong>Den bruger, som du forsøger at logge på med, kan ikke autooprettes i Kitos da brugerens organisation er ukendt</strong>
+                    <br />
+                    Kontakt venligst Kitos sekretariatet, hvis I ønsker at tilslutte jer samarbejdet omkring Kitos
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'UserNotFoundInSTS'">
+                    <strong>Den bruger, som du forsøger at logge på med, er ukendt i det fælleskommunale organisation</strong>
+                    <br />
+                    Kontakt venligst din lokale IT administrator
+                </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'UnableToCreateUserWithUnknownOrganization'">
+                    <strong>Den bruger, som du forsøger at logge på med, kan ikke autooprettes i Kitos da brugerens organisation er ukendt</strong>
+                    <br />
+                    Kontakt venligst Kitos sekretariatet, hvis I ønsker at tilslutte jer samarbejdet omkring Kitos
+                </div>
+            </div>
 
             <!-- Support -->
             <div class="panel panel-default">

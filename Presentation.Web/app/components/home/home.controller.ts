@@ -16,8 +16,8 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location", "$",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location, $) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -27,7 +27,7 @@
             $scope.texts.support = _.find(texts, (textObj: { id; value; }) => (textObj.id == 4));
             $scope.texts.join = _.find(texts, (textObj: { id; value; }) => (textObj.id == 5));
 
-            /* Fix html to enabe alignment etc. */
+            /* Fix html to enable alignment etc. */
             $scope.texts.about.value = $sce.trustAsHtml($scope.texts.about.value);
             $scope.texts.status.value = $sce.trustAsHtml($scope.texts.status.value);
             $scope.texts.guide.value = $sce.trustAsHtml($scope.texts.guide.value);
@@ -41,6 +41,13 @@
                 convert_urls: false
             };
 
+            const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
+            $scope.ssoVm = factory.createFromViewState();
+
+            const resetSsoError = () => {
+                $scope.ssoVm.error = null;
+            }
+
             $scope.text = {};
 
             var token = $location.search()["id_token"];
@@ -52,13 +59,9 @@
                 userService.loginSSO(token).then(user => $scope.loginResult(user));
             }
 
-            $scope.SSOLogin = () => {
-                notify.addInfoMessage("Should do redirect to OS2SSO...");
-                $auth.signIn();
-            };
-
             // login
             $scope.submitLogin = () => {
+                resetSsoError();
 
                 if ($scope.loginForm.$invalid) return;
 
@@ -93,7 +96,7 @@
                     })
                     .error(function (result, status) {
                         if (status === 409) {
-                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien allerede findes i KITOS!");
                         } else {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         }

@@ -50,10 +50,6 @@
         UsedBy: Array<IItSystemUsageOrgUnitUsage>;
         /** Gets or sets the tasks this instance supports. */
         TaskRefs: Array<ITaskRef>;
-        /** The local usages of interfaces. */
-        InterfaceUsages: Array<IInterfaceUsage>;
-        /** The local exposures of interfaces. */
-        ItInterfaceExhibitUsages: Array<ItSystemUsage.IItInterfaceExhibitUsage>;
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
 
@@ -63,7 +59,7 @@
         Reference: IReference;
 
         Concluded?: Date;
-        ArchiveDuty: number;
+        ArchiveDuty: string;
         Registertype: boolean;
 
         IsActive: boolean;
@@ -73,6 +69,7 @@
         LinkToDirectoryUrl: string;
         LinkToDirectoryUrlName: string;
 
-        DataLevel: string;
+        SensitiveDataLevels: Models.Odata.ItSystemUsage.IItSystemUsageSensitiveDataLevelDTO[];
+        
     }
 }

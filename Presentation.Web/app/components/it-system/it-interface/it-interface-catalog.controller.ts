@@ -89,7 +89,7 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,BelongsTo,Organization,ExhibitedBy($expand=ItSystem),LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,Organization,ExhibitedBy($expand=ItSystem,ItSystem($expand=BelongsTo)),LastChangedByUser,DataRows($expand=DataType)";
             this.canCreate = userAccessRights.canCreate;
 
             this.mainGridOptions = {
@@ -131,8 +131,10 @@
                             // iterrate each usage
                             this._.forEach(response.value, ItInterface => {
                                 if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
-                                if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
-                                if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
+                                if (!ItInterface.ExhibitedBy) {
+                                    ItInterface.ExhibitedBy = { ItSystem: { Name: "" } };
+                                    ItInterface.ExhibitedBy.ItSystem.BelongsTo = { Name: "" };
+                                }
                                 if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
                                 if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
                             });
@@ -270,9 +272,10 @@
                         }
                     },
                     {
-                        field: "BelongsTo.Name", title: "Rettighedshaver", width: 150,
+                        field: "ExhibitedBy.ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
+                        template: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
+                        excelTemplate: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {

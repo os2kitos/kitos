@@ -131,9 +131,6 @@ namespace Presentation.Web
             itProject.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             itProject.EntityType.HasKey(x => x.Id);
 
-            var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
-            interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
-
             BindEntitySet<DataType, DataTypesController>(builder);
 
             var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
@@ -259,16 +256,10 @@ namespace Presentation.Web
 
             var itInterfaces = BindEntitySet<ItInterface, ItInterfacesController>(builder);
             itInterfaces.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            itInterfaces.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
             itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, entitySetItSystems);
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
-
-            var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages"); // no controller yet
-            itInterfaceExhibitUsage.EntityType.HasKey(x => x.ItContractId)
-                .HasKey(x => x.ItInterfaceExhibitId)
-                .HasKey(x => x.ItSystemUsageId);
 
             BindEntitySet<SensitiveDataType, SensitiveDataTypesController>(builder);
 
@@ -390,22 +381,6 @@ namespace Presentation.Web
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
             getSensitivePersonalDataByUsageId.Namespace = "gdpr";
 
-            var getSensitivePersonalDataBySystemId = builder.Function("GetSensitivePersonalDataBySystemId");
-            getSensitivePersonalDataBySystemId.Parameter<int>("id");
-            getSensitivePersonalDataBySystemId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
-            builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
-            getSensitivePersonalDataBySystemId.Namespace = "gdpr";
-
-            var getRegularPersonalDataBySystemId = builder.Function("GetRegularPersonalDataBySystemId");
-            getRegularPersonalDataBySystemId.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes")
-                .Parameter<int>("id");
-            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
-
-            var getRegularPersonalDataByUsageId = builder.Function("GetRegularPersonalDataByUsageId");
-            getRegularPersonalDataByUsageId.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes")
-                .Parameter<int>("id");
-            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
-
             var getRegisterTypeByObjectId = builder.Function("GetRegisterTypesByObjectID");
             getRegisterTypeByObjectId.Parameter<int>("id");
             getRegisterTypeByObjectId.ReturnsCollectionFromEntitySet<RegisterType>("RegisterTypes");
@@ -416,9 +391,6 @@ namespace Presentation.Web
 
             var localSensistivePersonalDataTypes = BindEntitySet<LocalSensitivePersonalDataType, LocalSensistivePersonalDataTypesController>(builder);
             localSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
-            var localRegularPersonalDataTypes = BindEntitySet<LocalRegularPersonalDataType, LocalRegularPersonalDataTypesController>(builder);
-            localRegularPersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localRegisterTypes = BindEntitySet<LocalRegisterType, LocalRegisterTypesController>(builder);
             localRegisterTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);

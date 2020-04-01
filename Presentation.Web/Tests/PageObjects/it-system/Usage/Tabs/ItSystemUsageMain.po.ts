@@ -71,7 +71,6 @@ class ItSystemUsageMain {
     static getKLE() {
         return element(by.id(this.consts.mainKLE)).all(by.tagName("td"));
     }
-
 }
 
 export = ItSystemUsageMain;

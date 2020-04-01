@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -17,7 +18,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
     {
         public ItSystemUsage()
         {
@@ -27,14 +28,13 @@ namespace Core.DomainModel.ItSystemUsage
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
             this.TaskRefsOptOut = new List<TaskRef>();
-            this.ItInterfaceUsages = new List<ItInterfaceUsage>();
-            this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
+            SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
         }
 
         public bool IsActive
@@ -264,14 +264,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
         /// <summary>
-        /// The local usages of interfaces.
-        /// </summary>
-        public virtual ICollection<ItInterfaceUsage> ItInterfaceUsages { get; set; }
-        /// <summary>
-        /// The local exposures of interfaces.
-        /// </summary>
-        public virtual ICollection<ItInterfaceExhibitUsage> ItInterfaceExhibitUsages { get; set; }
-        /// <summary>
         /// Gets or sets the associated it projects.
         /// </summary>
         /// <remarks>
@@ -352,76 +344,65 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-        public string GeneralPurpose { get; set; }
-        public DataOptions isBusinessCritical { get; set; }
-        public DataOptions ContainsLegalInfo { get; set; }
-        public DataSensitivityLevel DataLevel { get; set; }
+
+
+
         public UserCount UserCount { get; set; }
 
         public string systemCategories { get; set; }
 
+
+        #region GDPR
+        public string GeneralPurpose { get; set; }
+        public DataOptions? isBusinessCritical { get; set; }
+
         public string dataProcessor { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
-        public int dataProcessorControl { get; set; }
-
+        public DataOptions? dataProcessorControl { get; set; }
         public DateTime? lastControl { get; set; }
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
 
         public string noteUsage { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
 
-        public int precautions { get; set; }
 
-        public int riskAssessment { get; set; }
+        public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        public DateTime? riskAssesmentDate { get; set; }
-
-        public int preriskAssessment { get; set; }
-
-        public string noteRisks { get; set; }
-
-        public int DPIAhearing { get; set; }
-
-        public DateTime? DPIADate { get; set; }
-
-        public int DPIA { get; set; }
-
-        public DateTime? DPIADateFor { get; set; }
-
-        public int answeringDataDPIA { get; set; }
-
-        public DateTime? DPIAdeleteDate { get; set; }
-
-        public int numberDPIA { get; set; }
-
+        public DataOptions? precautions { get; set; }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
         public bool precautionsOptionsLogning { get; set; }
-
-        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
-
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
         public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? UserSupervision { get; set; }
+        public DateTime? UserSupervisionDate { get; set; }
         public string UserSupervisionDocumentationUrlName { get; set; }
         public string UserSupervisionDocumentationUrl { get; set; }
 
+        public DataOptions? riskAssessment { get; set; }
+        public DateTime? riskAssesmentDate { get; set; }
+        public RiskLevel? preriskAssessment { get; set; }
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
+        public string noteRisks { get; set; }
 
+        public DataOptions? DPIA { get; set; }
+        public DateTime? DPIADateFor { get; set; }
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
-        public string DataHearingSupervisionDocumentationUrlName { get; set; }
-        public string DataHearingSupervisionDocumentationUrl { get; set; }
+        public DataOptions? answeringDataDPIA { get; set; }
+        public DateTime? DPIAdeleteDate { get; set; }
+        public int numberDPIA { get; set; }
 
-        public DateTime? UserSupervisionDate { get; set; }
+        public HostedAt? HostedAt { get; set; }
+        #endregion
 
-        public int UserSupervision { get; set; }
-        public string LinkToDirectoryUrl { get; set; }
-        public string LinkToDirectoryUrlName { get; set; }
 
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
@@ -478,7 +459,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             if (activeUser == null)
@@ -542,7 +523,7 @@ namespace Core.DomainModel.ItSystemUsage
             string changedDescription,
             string changedReference,
             Maybe<ItInterface> relationInterface,
-            Maybe<ItContract.ItContract> toContract, 
+            Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
             return relation
@@ -552,6 +533,58 @@ namespace Core.DomainModel.ItSystemUsage
                 .Select(_ => _.SetContract(toContract))
                 .Select(_ => _.SetFrequency(toFrequency))
                 .Select(_ => _.SetReference(changedReference));
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
+            User activeUser,
+            SensitiveDataLevel sensitiveDataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (SensitiveDataLevelExists(sensitiveDataLevel))
+            {
+                return new OperationError("Data sensitivity level already exists", OperationFailure.Conflict);
+            }
+
+            var newDataLevel = new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            };
+
+            SensitiveDataLevels.Add(newDataLevel);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newDataLevel;
+        }
+
+        public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
+            User activeUser,
+            SensitiveDataLevel sensitiveDataLevel)
+        {
+            if (activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
+            if (!SensitiveDataLevelExists(sensitiveDataLevel))
+            {
+                return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
+            }
+
+            var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
+            SensitiveDataLevels.Remove(dataLevelToRemove);
+
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return dataLevelToRemove;
+        }
+
+        private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
+        {
+            return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == sensitiveDataLevel);
         }
     }
 }

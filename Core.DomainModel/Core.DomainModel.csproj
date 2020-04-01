@@ -63,12 +63,16 @@
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
+    <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
+    <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
+    <Compile Include="ItSystemUsage\GDPR\SensitiveDataLevel.cs" />
+    <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
@@ -100,7 +104,6 @@
     <Compile Include="ItSystem\DataLevelTypes\DataTypes.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="ItSystem\SensitivePersonalDataType.cs" />
-    <Compile Include="ItSystem\RegularPersonalDataType.cs" />
     <Compile Include="ItSystem\ItSystemCategories.cs" />
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
@@ -128,7 +131,6 @@
     <Compile Include="LocalOptions\LocalTerminationDeadlineType.cs" />
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
-    <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
@@ -158,8 +160,6 @@
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
     <Compile Include="ItSystem\DataType.cs" />
-    <Compile Include="ItSystemUsage\ItInterfaceExhibitUsage.cs" />
-    <Compile Include="ItSystemUsage\ItInterfaceUsage.cs" />
     <Compile Include="ItSystem\ItInterface.cs" />
     <Compile Include="ItSystem\ItSystemBase.cs" />
     <Compile Include="ItSystemUsage\ItSystemUsageOrgUnitUsage.cs" />
@@ -206,7 +206,14 @@
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Organization\TaskUsage.cs" />
+    <Compile Include="Qa\References\BrokenExternalReferencesReport.cs" />
+    <Compile Include="Qa\References\BrokenLinkCause.cs" />
+    <Compile Include="Qa\References\BrokenLinkInInterface.cs" />
+    <Compile Include="Qa\References\BrokenLinkInExternalReference.cs" />
+    <Compile Include="Qa\References\IBrokenLink.cs" />
+    <Compile Include="Qa\References\IBrokenLinkWithOrigin.cs" />
     <Compile Include="References\AddReferenceCommand.cs" />
+    <Compile Include="References\DomainEvents\ExternalReferenceDeleted.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
@@ -216,6 +223,8 @@
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
+    <Compile Include="SSO\SsoOrganizationIdentity.cs" />
+    <Compile Include="SSO\SsoUserIdentity.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />

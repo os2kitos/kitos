@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="PersonService"
+                  targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/"
+                  xmlns:tns="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/"
+                  xmlns:spf="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/"
+				  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsp="http://www.w3.org/ns/ws-policy"
+                  xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies.wsdl"/>
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/"
+               location="../../sp/ServiceplatformFaultMessage_1.wsdl"/>
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/">
+      <xsd:include schemaLocation="../../PersonServiceMsg.xsd"/>
+      <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/"
+                  schemaLocation="../../SF1500_EP_FS10/xsd/common/RequestHeader.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="ImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:ImporterRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:ImporterResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ListRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:ListRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ListResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:ListResponse"/>
+  </wsdl:message>
+  <wsdl:message name="LaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:LaesRequest"/>
+  </wsdl:message>
+  <wsdl:message name="LaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:LaesResponse"/>
+  </wsdl:message>
+  <wsdl:message name="OpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:OpretRequest"/>
+  </wsdl:message>
+  <wsdl:message name="OpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:OpretResponse"/>
+  </wsdl:message>
+  <wsdl:message name="PassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:PassiverRequest"/>
+  </wsdl:message>
+  <wsdl:message name="PassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:PassiverResponse"/>
+  </wsdl:message>
+  <wsdl:message name="RetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:RetRequest"/>
+  </wsdl:message>
+  <wsdl:message name="RetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:RetResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:SletResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:SletRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:SoegRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:SoegResponse"/>
+  </wsdl:message>
+
+  <wsdl:portType name="PersonPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:OpretRequestMessage"/>
+      <wsdl:output message="tns:OpretResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:ImporterRequestMessage"/>
+      <wsdl:output message="tns:ImporterResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:PassiverRequestMessage"/>
+      <wsdl:output message="tns:PassiverResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:LaesRequestMessage"/>
+      <wsdl:output message="tns:LaesResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:RetRequestMessage"/>
+      <wsdl:output message="tns:RetResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:SletRequestMessage"/>
+      <wsdl:output message="tns:SletResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:SoegRequestMessage"/>
+      <wsdl:output message="tns:SoegResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:ListRequestMessage"/>
+      <wsdl:output message="tns:ListResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="PersonBinding" type="tns:PersonPortType">
+    <wsp:PolicyReference URI="policies.wsdl#ServiceplatformBindingPolicy"/>
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="opret">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/opret"/>
+      <wsdl:input>
+        <soap:header message="tns:OpretRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:OpretResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="importer">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/importer"/>
+      <wsdl:input>
+        <soap:header message="tns:ImporterRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:ImporterResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="passiver">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/passiver"/>
+      <wsdl:input>
+        <soap:header message="tns:PassiverRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:PassiverResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="laes">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/laes"/>
+      <wsdl:input>
+        <soap:header message="tns:LaesRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:LaesResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="ret">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/ret"/>
+      <wsdl:input>
+        <soap:header message="tns:RetRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:RetResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="slet">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/slet"/>
+      <wsdl:input>
+        <soap:header message="tns:SletRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:SletResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="soeg">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/soeg"/>
+      <wsdl:input>
+        <soap:header message="tns:SoegRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:SoegResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="list">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Person/5/list"/>
+      <wsdl:input>
+        <soap:header message="tns:ListRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:ListResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="PersonService">
+    <wsdl:port name="PersonPort" binding="tns:PersonBinding">
+      <soap:address location="https://localhost:8080/service/Organisation/Person/5"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

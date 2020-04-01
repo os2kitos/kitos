@@ -1,16 +1,19 @@
 ﻿namespace Core.DomainModel.ItSystem.DataTypes
 {
-    public enum DataSensitivityLevel
-    {
-        NONE = 0,
-        PERSONALDATA = 1,
-        PERSONALDATANDSENSITIVEDATA = 2
-    }
     public enum DataOptions
     {
         NO = 0,
         YES = 1,
-        DONTKNOW = 2
+        DONTKNOW = 2,
+        UNDECIDED = 3
+    }
+
+    public enum RiskLevel
+    {
+        LOW = 0,
+        MIDDLE = 1,
+        HIGH = 2,
+        UNDECIDED = 3
     }
 
     public enum UserCount
@@ -19,5 +22,12 @@
         TENTOFIFTY = 1,
         FIFTYTOHUNDRED = 2,
         HUNDREDPLUS = 3
+    }
+
+    public enum HostedAt
+    {
+        UNDECIDED = 0,
+        ONPREMISE = 1,
+        EXTERNAL = 2,
     }
 }

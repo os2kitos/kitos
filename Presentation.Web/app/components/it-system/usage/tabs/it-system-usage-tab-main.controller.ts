@@ -15,21 +15,15 @@
 
     app.controller("system.EditMain", ["$rootScope", "$scope", "$http", "notify", "user", "systemCategories", "autofocus",
         ($rootScope, $scope, $http, notify, user, systemCategories, autofocus) => {
-            var itSystemUsage = $scope.usage;
+            var itSystemUsage = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel($scope.usage);
             $rootScope.page.title = "IT System - Anvendelse";
             $scope.autoSaveUrl = `api/itSystemUsage/${itSystemUsage.id}`;
             $scope.hasViewAccess = user.currentOrganizationId === itSystemUsage.organizationId;
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
-            $scope.system = new Kitos.Models.ViewModel.ItSystem.SystemViewModel(itSystemUsage.itSystem);
+            $scope.system = itSystemUsage.itSystem;
             autofocus();
-
-            $scope.isValidUrl = (ref: string) => {
-                if (ref !== null) {
-                    return Kitos.Utility.Validation.validateUrl(ref);
-                }
-                return false;
-            }
+            $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.validateUrl(url);
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
