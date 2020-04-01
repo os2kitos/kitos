@@ -29,6 +29,16 @@ namespace Core.ApplicationServices.SSO.Model
 
         public Maybe<SamlAttribute> GetAttribute(string attributeName)
         {
+            if (!_sourceIdentity.HasAttribute(attributeName))
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"'{attributeName}' not found");
+                foreach (var samlAttribute in _sourceIdentity.AsQueryable())
+                {
+                    sb.AppendLine($"Attr: {samlAttribute.Name}={samlAttribute.AttributeValue}");
+                }
+                throw new ApplicationException();
+            }
             return _sourceIdentity[attributeName].FirstOrDefault();
         }
 
