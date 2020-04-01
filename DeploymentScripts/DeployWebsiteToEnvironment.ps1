@@ -8,6 +8,7 @@ $ErrorActionPreference = "Stop"
 # Load helper libraries
 .$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DeployWebsite.ps1
+.$PSScriptRoot\PrepareRobotsFile.ps1
 
 Setup-Environment -environmentName $targetEnvironment
 
@@ -35,3 +36,5 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -ssoServiceProviderId "$Env:SsoServiceProviderId" `
                 -ssoCertificateThumbPrint "$Env:SsoCertificateThumbPrint" `
                 -stsOrganisationEndpointHost "$Env:StsOrganisationEndpointHost"
+				
+Prepare-RobotsFile -environmentName $targetEnvironment			
