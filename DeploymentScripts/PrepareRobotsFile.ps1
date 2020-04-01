@@ -1,6 +1,6 @@
 Function CopyAndRenameRobots([String] $robotsFileName)
 {
-	Copy-Item "$PSScriptRoot\..\DeploymentTools\Robots\$($robotsFileName).txt" -Destination "$PSScriptRoot\..\Presentation.Web\Robots.txt"
+	Copy-Item "$PSScriptRoot\Robots\$($robotsFileName).txt" -Destination "$PSScriptRoot\..\Presentation.Web\Robots.txt"
 }
 
 Function Prepare-RobotsFile([String] $targetEnvironment)
