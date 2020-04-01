@@ -37,7 +37,7 @@ namespace Core.ApplicationServices.SSO.Model
                 {
                     sb.AppendLine($"Attr: {samlAttribute.Name}={samlAttribute.AttributeValue}");
                 }
-                throw new ApplicationException();
+                throw new ApplicationException(sb.ToString());
             }
             return _sourceIdentity[attributeName].FirstOrDefault();
         }
