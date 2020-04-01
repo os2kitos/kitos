@@ -1,18 +1,13 @@
 Function CopyAndRenameRobots([String] $robotsFileName)
 {
-	Write-Debug "Extracting files"
+	Write-Host "Extracting zip file"
 	Expand-Archive "$PSScriptRoot\..\WebPackage\Presentation.Web.csproj.zip" -DestinationPath "$PSScriptRoot\..\WebPackage\files-to-edit\"
 	
-	Write-Debug "Copying Robot file"
+	Write-Host "Copying Robots.txt"
 	Copy-Item "$PSScriptRoot\Robots\$($robotsFileName).txt" -Destination "$PSScriptRoot\..\WebPackage\files-to-edit\Content\C_C\kitos_tmp\app\Robots.txt"
 	
-	Write-Debug "Zipping file"
+	Write-Host "Rezipping"
 	Compress-Archive "$PSScriptRoot\..\WebPackage\files-to-edit\**" -DestinationPath "$PSScriptRoot\..\WebPackage\Presentation.Web.csproj.zip" -Force
-	
-	Write-Debug "Removing temp files"
-	Remove-Item "$PSScriptRoot\..\WebPackage\files-to-edit" -recurse
-	
-	Write-Debug "Robots.txt filetransfer complete"
 }
 
 Function Prepare-RobotsFile([String] $targetEnvironment)
