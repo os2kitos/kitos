@@ -37,4 +37,4 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -ssoCertificateThumbPrint "$Env:SsoCertificateThumbPrint" `
                 -stsOrganisationEndpointHost "$Env:StsOrganisationEndpointHost"
 				
-Prepare-RobotsFile -environmentName $targetEnvironment
+Prepare-RobotsFile -targetEnvironment $targetEnvironment
