@@ -12,6 +12,8 @@ $ErrorActionPreference = "Stop"
 
 Setup-Environment -environmentName $targetEnvironment
 
+Prepare-RobotsFile -targetEnvironment $targetEnvironment
+
 Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -msDeployUrl "$Env:MsDeployUrl" `
                 -msDeployUser $Env:MsDeployUserName `
@@ -37,4 +39,3 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -ssoCertificateThumbPrint "$Env:SsoCertificateThumbPrint" `
                 -stsOrganisationEndpointHost "$Env:StsOrganisationEndpointHost"
 				
-Prepare-RobotsFile -targetEnvironment $targetEnvironment
