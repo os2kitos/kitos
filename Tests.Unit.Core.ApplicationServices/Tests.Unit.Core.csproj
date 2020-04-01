@@ -45,6 +45,9 @@
     <Reference Include="Castle.Core">
       <HintPath>..\packages\Castle.Core.4.4.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
+    <Reference Include="dk.nita.saml20, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.2.0.1\lib\net45\dk.nita.saml20.dll</HintPath>
+    </Reference>
     <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
@@ -147,6 +150,8 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
+    <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
+    <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
     <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
