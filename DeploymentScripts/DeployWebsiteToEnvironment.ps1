@@ -8,9 +8,6 @@ $ErrorActionPreference = "Stop"
 # Load helper libraries
 .$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DeployWebsite.ps1
-.$PSScriptRoot\PrepareRobotsFile.ps1
-
-Prepare-RobotsFile -targetEnvironment $targetEnvironment
 
 Setup-Environment -environmentName $targetEnvironment
 
