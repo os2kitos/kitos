@@ -1,7 +1,7 @@
 Function CopyAndRenameRobots([String] $robotsFileName)
 {	
 	Write-Host "Copying Robots.txt"
-	Copy-Item "$PSScriptRoot\Robots\$($robotsFileName).txt" -Destination "C:\kitos_tmp\app\Robots.txt"
+	Copy-Item "$PSScriptRoot\Robots\$($robotsFileName).txt" -Destination "C:\kitos_tmp\Robots.txt"
 }
 
 Function Prepare-RobotsFile([String] $targetEnvironment)
