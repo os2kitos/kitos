@@ -10,9 +10,9 @@ $ErrorActionPreference = "Stop"
 .$PSScriptRoot\DeployWebsite.ps1
 .$PSScriptRoot\PrepareRobotsFile.ps1
 
-Setup-Environment -environmentName $targetEnvironment
-
 Prepare-RobotsFile -targetEnvironment $targetEnvironment
+
+Setup-Environment -environmentName $targetEnvironment
 
 Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -msDeployUrl "$Env:MsDeployUrl" `
