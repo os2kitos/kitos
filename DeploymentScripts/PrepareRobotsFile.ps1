@@ -9,7 +9,9 @@ Function CopyAndRenameRobots([String] $robotsFileName)
 	Write-Host "Rezipping"
 	Compress-Archive "$PSScriptRoot\..\WebPackage\files-to-edit\**" -DestinationPath "$PSScriptRoot\..\WebPackage\Presentation.Web.csproj.zip" -Force
 	
-	Write-Host "Robots import complete"
+	Write-Host "Robots import complete waiting"
+	Start-Sleep -s 15
+	Write-Host "Wait finish"
 }
 
 Function Prepare-RobotsFile([String] $targetEnvironment)
