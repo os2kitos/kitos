@@ -5,6 +5,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-verb:sync " +
                     "-source:package=`"{1}\Presentation.Web.csproj.zip`" " +
                     "-dest:auto,computerName=`"{2}`",userName=`"{3}`",password=`"{4}`",authtype=`"Basic`",includeAcls=`"False`" " +
+                    "-replace:objectName=Default Web \Site\\App_Data$,match=.*Robots\.Prod\.txt,replace=Robots.txt -verbose" +
                     "-disableLink:AppPoolExtension " +
                     "-disableLink:ContentExtension " + 
                     "-disableLink:CertificateExtension " + 
@@ -34,6 +35,6 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
     -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost)
     
     & cmd.exe /C $fullCommand
-    
+ 
     if($LASTEXITCODE -ne 0)	{ throw "FAILED TO DEPLOY" } 
 }
