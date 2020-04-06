@@ -5,7 +5,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-verb:sync " +
                     "-source:package=`"{1}\Presentation.Web.csproj.zip`" " +
                     "-dest:auto,computerName=`"{2}`",userName=`"{3}`",password=`"{4}`",authtype=`"Basic`",includeAcls=`"False`" " +
-                    "-replace:objectName=filePath,match=`"{23}`",replace=Robots.txt " +
+                    "-replace:objectName=filePath,match=`"{25}`",replace=Robots.txt " +
                     "-disableLink:AppPoolExtension " +
                     "-disableLink:ContentExtension " + 
                     "-disableLink:CertificateExtension " + 
