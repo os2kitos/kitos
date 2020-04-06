@@ -50,6 +50,7 @@ using Core.DomainServices.SSO;
 using Core.DomainServices.Time;
 using dk.nita.saml20.identity;
 using Infrastructure.DataAccess;
+using Infrastructure.DataAccess.Interceptors;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
 using Infrastructure.Services.BackgroundJobs;
@@ -62,8 +63,11 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
+using Ninject.Modules;
+using Ninject.Syntax;
 using Ninject.Web.Common;
 using Presentation.Web.Infrastructure;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Properties;
 using Serilog;
@@ -157,6 +161,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
+            kernel.Bind<IEFEntityInterceptor>().To<EFEntityInterceptor>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
