@@ -74,7 +74,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
             $Env:UseDefaultUserPassword = "true"
-			$Env:Robots = ".*Robots\.Prod\.Txt"
+			$Env:Robots = ".*Robots\.Test\.Txt"
             break;
         }
         "test"
