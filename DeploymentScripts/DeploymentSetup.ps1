@@ -74,7 +74,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
             $Env:UseDefaultUserPassword = "true"
-			$Env:Robots = "Robots.Test.txt"
+			$Env:Robots = "Test"
             break;
         }
         "test"
@@ -82,7 +82,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
             $Env:UseDefaultUserPassword = "false"
-			$Env:Robots = "Robots.Test.txt"
+			$Env:Robots = "Test"
             break;
         }
         "production"
@@ -90,7 +90,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
             $Env:UseDefaultUserPassword = "false"
-			$Env:Robots = "Robots.Prod.txt"
+			$Env:Robots = "Prod"
             break;
         }
         default { Throw "Error: Unknown environment provided: $environmentName" }

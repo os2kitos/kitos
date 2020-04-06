@@ -1,11 +1,11 @@
-Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robots ) {
+Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost ) {
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
                     "-source:package=`"{1}\Presentation.Web.csproj.zip`" " +
                     "-dest:auto,computerName=`"{2}`",userName=`"{3}`",password=`"{4}`",authtype=`"Basic`",includeAcls=`"False`" " +
-                    "-replace:objectName=filePath,match=.`"{23}`",replace=Robots.txt " +
+                    "-replace:objectName=filePath,match=.*Robots\.`"{23}`"\.Txt,replace=Robots.txt " +
                     "-disableLink:AppPoolExtension " +
                     "-disableLink:ContentExtension " + 
                     "-disableLink:CertificateExtension " + 
