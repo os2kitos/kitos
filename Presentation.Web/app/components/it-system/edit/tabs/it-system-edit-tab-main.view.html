@@ -160,12 +160,13 @@
                             <p ng-if="!system.archiveDuty || system.archiveDuty < 1">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
                         <div class="form-group" ng-if="system.archiveDuty && system.archiveDuty > 0">
-                            <input placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
-                                   data-field="archiveDutyComment"
-                                   data-ng-model="system.archiveDutyComment"
-                                   data-element-type="archiveDutyRecommendationComment">
+                            <textarea placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm archiveComments"
+                                      data-ng-disabled="!hasWriteAccess"
+                                      data-autosave="{{system.updateUrl}}"
+                                      data-field="archiveDutyComment"
+                                      data-ng-model="system.archiveDutyComment"
+                                      data-element-type="archiveDutyRecommendationComment">
+                            </textarea>
                             <p>Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
                         <!-- UUID -->
