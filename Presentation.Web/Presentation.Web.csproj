@@ -1285,6 +1285,8 @@
     <None Include="Parameters.xml">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Robots.Prod.txt" />
+    <Content Include="Robots.Test.txt" />
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\appReport-bundle.min.js" />
