@@ -4,7 +4,7 @@
             if (url == null) {
                 return false;
             }
-            const regexp = /(^https?):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/])$)?/;
+            const regexp = /^(kmdsageraabn|kmdedhvis|sbsyslauncher):.*|(^https?):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/])$)?/;
             return regexp.test(url.toLowerCase());
         }
 
