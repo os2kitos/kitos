@@ -1672,8 +1672,8 @@ namespace Infrastructure.Soap.STSOrganisation {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1710,29 +1710,6 @@ namespace Infrastructure.Soap.STSOrganisation {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class OpretOutputType : BasicOutputType {
-        
-        private string uUIDIdentifikatorField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
-            get {
-                return this.uUIDIdentifikatorField;
-            }
-            set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
     public partial class LaesOutputType : BasicOutputType {
         
@@ -1747,6 +1724,29 @@ namespace Infrastructure.Soap.STSOrganisation {
             set {
                 this.filtreretOejebliksbilledeField = value;
                 this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class OpretOutputType : BasicOutputType {
+        
+        private string uUIDIdentifikatorField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
+            get {
+                return this.uUIDIdentifikatorField;
+            }
+            set {
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
             }
         }
     }
