@@ -5,11 +5,12 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     Write-Host "Loading environment configuration from SSM"
     
     $parameters = Get-SSM-Parameters -environmentName "$envName"
+    $migrationParameters = Get-SSM-Parameters -environmentName "test-migration" #TODO: Remove before merging
 
     $Env:KitosHostName = $parameters["HostName"]
-    $Env:MsDeployUserName = $parameters["MsDeployUserName"]
-    $Env:MsDeployPassword = $parameters["MsDeployPassword"]
-    $Env:MsDeployUrl = $parameters["MsDeployUrl"]
+    $Env:MsDeployUserName = $migrationParameters["MsDeployUserName"] #TODO: Revert before merge
+    $Env:MsDeployPassword = $migrationParameters["MsDeployPassword"] #TODO: Revert before merge
+    $Env:MsDeployUrl = $migrationParameters["MsDeployUrl"] #TODO: Revert before merge
     $Env:LogLevel = $parameters["LogLevel"]
     $Env:EsUrl = $parameters["EsUrl"]
     $Env:SsoGateway = $parameters["SsoGateway"]
@@ -19,9 +20,9 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]
     $Env:MailSuffix = $parameters["MailSuffix"]
     $Env:KitosEnvName = $parameters["KitosEnvName"]
-    $Env:KitosDbConnectionStringForIIsApp = $parameters["KitosDbConnectionStringForIIsApp"]
-    $Env:HangfireDbConnectionStringForIIsApp = $parameters["HangfireDbConnectionStringForIIsApp"]
-    $Env:KitosDbConnectionStringForTeamCity = $parameters["KitosDbConnectionStringForTeamCity"]
+    $Env:KitosDbConnectionStringForIIsApp = $migrationParameters["KitosDbConnectionStringForIIsApp"] #TODO: Revert before merge
+    $Env:HangfireDbConnectionStringForIIsApp = $migrationParameters["HangfireDbConnectionStringForIIsApp"] #TODO: Revert before merge
+    $Env:KitosDbConnectionStringForTeamCity = $migrationParameters["KitosDbConnectionStringForTeamCity"] #TODO: Revert before merge
     $Env:SsoServiceProviderServer = $parameters["SsoServiceProviderServer"]
     $Env:SsoIDPEndPoints = $parameters["SsoIDPEndPoints"]
     $Env:SsoServiceProviderId = $parameters["SsoServiceProviderId"]
@@ -98,6 +99,9 @@ Function Setup-Environment([String] $environmentName) {
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"
     Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUsers $loadTestUsers
-    
+
     Write-Host "Finished configuring $environmentName"
+
+    #TODO: Remove again once branch testing is completed
+    #Overriding test vars
 }
