@@ -608,7 +608,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 var url = reference.URL;
-                                if (Utility.Validation.validateUrl(url)) {
+                                if (Utility.Validation.isValidExternalReference(url)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         url +
                                         "\">" +
@@ -641,7 +641,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
+                                if (Utility.Validation.isValidExternalReference(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +

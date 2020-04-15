@@ -524,7 +524,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (Utility.Validation.validateUrl(reference.URL)) {
+                                if (Utility.Validation.isValidExternalReference(reference.URL)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
@@ -551,7 +551,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
+                                if (Utility.Validation.isValidExternalReference(reference.ExternalReferenceId)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +

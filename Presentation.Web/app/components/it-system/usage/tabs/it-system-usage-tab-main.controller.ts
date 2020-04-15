@@ -23,7 +23,7 @@
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
             autofocus();
-            $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.validateUrl(url);
+            $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
