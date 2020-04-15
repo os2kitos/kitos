@@ -101,7 +101,4 @@ Function Setup-Environment([String] $environmentName) {
     Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUsers $loadTestUsers
 
     Write-Host "Finished configuring $environmentName"
-
-    #TODO: Remove again once branch testing is completed
-    #Overriding test vars
 }
