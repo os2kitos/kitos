@@ -503,7 +503,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (reference.URL && Kitos.Utility.Validation.isValidExternalReference(reference.URL)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.URL +
                                         "\">" +
