@@ -1,42 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="kitos_ids" entityID="TO_BE_REPLACED" validUntil="2023-02-01T08:00:00.0000000Z">
-    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
-        <md:KeyDescriptor use="signing">
-            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-                <X509Data>
-                    <X509Certificate>TO_BE_REPLACED</X509Certificate>
-                </X509Data>
-            </KeyInfo>
-        </md:KeyDescriptor>
-        <md:KeyDescriptor use="encryption">
-            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-                <X509Data>
-                    <X509Certificate>TO_BE_REPLACED</X509Certificate>
-                </X509Data>
-            </KeyInfo>
-        </md:KeyDescriptor>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://kitostest.miracle.dk/Logout.ashx" ResponseLocation="https://kitostest.miracle.dk/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://kitostest.miracle.dk/Logout.ashx" ResponseLocation="https://kitostest.miracle.dk/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://kitostest.miracle.dk/Logout.ashx" ResponseLocation="https://kitostest.miracle.dk/Logout.ashx" />
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="TO_BE_REPLACED" index="0" isDefault="true" />
-        <md:AttributeConsumingService index="0" isDefault="true">
-            <md:ServiceName xml:lang="da">SP</md:ServiceName>
-            <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" isRequired="true" />
-        </md:AttributeConsumingService>
-    </md:SPSSODescriptor>
-    <md:ContactPerson contactType="administrative">
-        <md:Company>STRONGMINDS</md:Company>
-        <md:EmailAddress>admin@strongminds.dk</md:EmailAddress>
-    </md:ContactPerson>
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="true">
+    <md:KeyDescriptor use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>TO_BE_REPLACED</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>TO_BE_REPLACED</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </md:KeyDescriptor>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://staging.kitos.dk/Logout.ashx" ResponseLocation="https://staging.kitos.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://kitos.dk/Logout.ashx" ResponseLocation="https://kitos.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://staging.kitos.dk/Logout.ashx" ResponseLocation="https://staging.kitos.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://kitos.dk/Logout.ashx" ResponseLocation="https://kitos.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://localhost:44300/Logout.ashx" ResponseLocation="https://localhost:44300/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://kitos-integration.strongminds.dk/Logout.ashx" ResponseLocation="https://kitos-integration.strongminds.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://staging.kitos.dk/Logout.ashx" ResponseLocation="https://staging.kitos.dk/Logout.ashx" />
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://kitos.dk/Logout.ashx" ResponseLocation="https://kitos.dk/Logout.ashx" />
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="TO_BE_REPLACED" index="0" isDefault="true" />
+    <md:AttributeConsumingService index="0" isDefault="true">
+      <md:ServiceName xml:lang="da">SP</md:ServiceName>
+      <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" isRequired="true" />
+    </md:AttributeConsumingService>
+  </md:SPSSODescriptor>
+  <md:ContactPerson contactType="administrative">
+    <md:Company>STRONGMINDS</md:Company>
+    <md:EmailAddress>admin@strongminds.dk</md:EmailAddress>
+  </md:ContactPerson>
 </md:EntityDescriptor>

@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 .$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DbMigrations.ps1
 
-Setup-Environment -environmentName "test"
+Setup-Environment -environmentName "staging"
 
 #-------------------------------------------------------------
 Write-Host "Running migrations"

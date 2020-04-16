@@ -28,18 +28,13 @@
     <script src="https://kendo.cdn.telerik.com/2018.1.221/js/cultures/kendo.culture.da-DK.min.js"></script>
 
 
-
-
-    @if (ViewBag.Environment != "Prod")
+    @if (ViewBag.StylingScheme == "TEST")
     {
-        if (ViewBag.Environment == "Test")
-        {
-            <style>
-                #navbar-top {
-                    background-color: purple !important;
-                }
-            </style>
-        }
+        <style>
+            #navbar-top {
+                background-color: purple !important;
+            }
+        </style>
     }
 </head>
 <body data-ng-app="app" data-ng-cloak data-ng-strict-di>
@@ -54,20 +49,20 @@
 
     <script>
         $(addCrudControls());
- 
+
         function addCrudControls() {
             $('.crud').hide();
             $('.panel').hover(
-                function() {
+                function () {
                     $(this).find('.crud').show();
                 },
-                function() {
+                function () {
                     $(this).find('.crud').hide();
                 }
             );
         };
     </script>
-    <input id="__RequestVerificationToken" type="hidden"/>
+    <input id="__RequestVerificationToken" type="hidden" />
 
 </body>
 </html>
