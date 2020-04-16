@@ -156,7 +156,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc;$top=1)`;
+                                var urlParameters = `?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,Reference,ItProjectStatusUpdates($orderby=Created desc;$top=1)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -346,14 +346,7 @@
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (reference.URL) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.UrlRenderHelper.renderReferenceUrl(reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
@@ -369,20 +362,12 @@
                         }
                     },
                     {
-                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.ExternalReferenceId) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
-                                        reference.ExternalReferenceId +
-                                        "\">" +
-                                        reference.Title +
-                                        "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
+                                return reference.ExternalReferenceId;
                             }
                             return "";
                         },

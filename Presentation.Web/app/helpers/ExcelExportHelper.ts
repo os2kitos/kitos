@@ -34,7 +34,7 @@
             if (reference.ExternalReferenceId != null) {
                 return reference.ExternalReferenceId;
             }
-            return reference.Title;
+            return "";
         }
 
         static renderUrlOrFallback(url, fallback) {

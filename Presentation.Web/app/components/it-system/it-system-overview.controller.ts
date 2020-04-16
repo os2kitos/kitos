@@ -519,18 +519,11 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         sortable: false
                     },
                     {
-                        field: "Reference.Title", title: "Reference", width: 150,
+                        field: "Reference.Title", title: "Lokal Reference", width: 150,
                         persistId: "ReferenceId",
                         template: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (Utility.Validation.isValidExternalReference(reference.URL)) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.UrlRenderHelper.renderReferenceUrl(reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
@@ -546,20 +539,12 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
                         persistId: "folderref",
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (Utility.Validation.isValidExternalReference(reference.ExternalReferenceId)) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
-                                        reference.ExternalReferenceId +
-                                        "\">" +
-                                        reference.Title +
-                                        "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
+                                return reference.ExternalReferenceId;
                             }
                             return "";
                         },
