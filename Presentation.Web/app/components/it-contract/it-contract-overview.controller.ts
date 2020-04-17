@@ -540,7 +540,7 @@
                         field: "Supplier.Name", title: "Leverandør", width: 150,
                         persistId: "suppliername", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Supplier ? dataItem.Supplier.Name : "",
-                        hidden: true,   
+                        hidden: true,
                         filterable: {
                             cell: {
                                 template: customFilter,
