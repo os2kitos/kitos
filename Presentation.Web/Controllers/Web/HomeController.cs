@@ -44,7 +44,6 @@ namespace Presentation.Web.Controllers.Web
         {
             if (ssoErrorCode.HasValue)
             {
-                PushTempVariable(TemporaryFeature.Sso, FeatureToggleKey); //enable sso toggle
                 PushTempVariable(ssoErrorCode, SsoErrorKey);
             }
 
