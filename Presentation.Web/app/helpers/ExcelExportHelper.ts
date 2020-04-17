@@ -21,7 +21,7 @@
             if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
-            if (Utility.Validation.validateUrl(reference.URL)) {
+            if (Utility.Validation.isValidExternalReference(reference.URL)) {
                 return reference.URL;
             }
             return reference.Title;
@@ -34,7 +34,7 @@
             if (reference.ExternalReferenceId != null) {
                 return reference.ExternalReferenceId;
             }
-            return reference.Title;
+            return "";
         }
 
         static renderUrlOrFallback(url, fallback) {
