@@ -77,7 +77,7 @@ Function Setup-Environment([String] $environmentName) {
             $Env:Robots = ".*Robots\.Test\.Txt"
             break;
         }
-        "test"
+        "staging"
         {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
