@@ -530,19 +530,12 @@
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (reference.URL) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.RenderFieldsHelper.renderReferenceUrl(reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
                         },
-                        attributes: { "class": "text-center" },
+                        attributes: { "class": "text-left" },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -555,23 +548,11 @@
                     },
                     {
                         field: "Reference.ExternalReferenceId",
-                        title: "Mappe ref",
+                        title: "Dokument ID / Sagsnr.",
                         width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (reference.ExternalReferenceId) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
-                                        reference.ExternalReferenceId +
-                                        "\">" +
-                                        reference.Title +
-                                        "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
