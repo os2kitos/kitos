@@ -34,6 +34,21 @@
     </parameterentry>
   </parameter>
 
+  <parameter name="SmtpPort" description="" defaultvalue="__SmtpPort__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@port">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="SmtpUserName" description="" defaultvalue="__SmtpUserName__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@userName">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="SmtpPassword" description="" defaultvalue="__SmtpPassword__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@password">
+    </parameterentry>
+  </parameter>
+
   <!-- Presentation.Web.Properties.Settings -->
   <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value/text()">
