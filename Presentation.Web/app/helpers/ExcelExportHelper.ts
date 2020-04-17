@@ -34,7 +34,7 @@
             if (reference.ExternalReferenceId != null) {
                 return reference.ExternalReferenceId;
             }
-            return "";
+            return this.noValueFallback;
         }
 
         static renderUrlOrFallback(url, fallback) {

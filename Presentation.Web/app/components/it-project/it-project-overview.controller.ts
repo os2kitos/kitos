@@ -502,7 +502,7 @@
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
-                            return Helpers.UrlRenderHelper.renderReferenceUrl(reference);
+                            return Helpers.RenderFieldsHelper.renderReferenceUrl(reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
@@ -523,11 +523,7 @@
                         width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference != null) {
-                                return reference.ExternalReferenceId;
-                            }
-                            return "";
+                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
