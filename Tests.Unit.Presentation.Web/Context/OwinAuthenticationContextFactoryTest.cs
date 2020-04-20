@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -131,7 +132,7 @@ namespace Tests.Unit.Presentation.Web.Context
             return userRepo.Object;
         }
 
-        private IOwinContext MakeMockContext(string authType, string defaultOrg, string userId, string isAuthenticated)
+        private Maybe<IOwinContext> MakeMockContext(string authType, string defaultOrg, string userId, string isAuthenticated)
         {
             var claims = new List<Claim>
             {
@@ -145,7 +146,7 @@ namespace Tests.Unit.Presentation.Web.Context
             var context = new Mock<IOwinContext>();
             context.SetupGet(c => c.Authentication).Returns(authManager.Object);
             context.SetupGet(p => p.Authentication.User).Returns(user);
-            return context.Object;
+            return context.Object.FromNullable();
         }
     }
 }

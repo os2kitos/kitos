@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
@@ -12,7 +13,7 @@ using Infrastructure.Services.Delegates;
 
 namespace Infrastructure.DataAccess.Interceptors
 {
-    public class EFEntityInterceptor : IEFEntityInterceptor
+    public class EFEntityInterceptor : IDbCommandTreeInterceptor
     {
         private readonly Factory<IOperationClock> _operationClock;
         private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
@@ -57,10 +58,15 @@ namespace Infrastructure.DataAccess.Interceptors
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
+            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            {
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName), userId),
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+            };
+
             var setClauses = insertCommand.SetClauses
-                .Select(clause => clause.UpdateIfMatch(ObjectOwnerIdColumnName, userId))
-                .Select(clause => clause.UpdateIfMatch(LastChangedByUserIdColumnName, userId))
-                .Select(clause => clause.UpdateIfMatch(LastChangedColumnName, DbExpression.FromDateTime(now)))
+                .Select(clause => ApplyUpdates(clause, updates))
                 .ToList();
 
             return new DbInsertCommandTree(
@@ -73,13 +79,18 @@ namespace Infrastructure.DataAccess.Interceptors
 
         private DbCommandTree HandleUpdateCommand(DbUpdateCommandTree updateCommand)
         {
-
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
+            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            {
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName) && MatchNull(clause), userId), //Some EF updates end up in this e.g. changing an owned child on a parent
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
+                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+            };
+
             var setClauses = updateCommand.SetClauses
-                .Select(clause => clause.UpdateIfMatch(LastChangedByUserIdColumnName, userId))
-                .Select(clause => clause.UpdateIfMatch(LastChangedColumnName, DbExpression.FromDateTime(now)))
+                .Select(clause => ApplyUpdates(clause, updates))
                 .ToList();
 
             return new DbUpdateCommandTree(
@@ -88,7 +99,12 @@ namespace Infrastructure.DataAccess.Interceptors
                 updateCommand.Target,
                 updateCommand.Predicate,
                 setClauses.AsReadOnly(),
-                null);
+                updateCommand.Returning);
+        }
+
+        private static bool MatchNull(DbSetClause clause)
+        {
+            return clause.Value is DbNullExpression;
         }
 
         private int GetActiveUserId()
@@ -102,18 +118,32 @@ namespace Infrastructure.DataAccess.Interceptors
             //Fallback to first global admin
             return _activeDbContext().Users.First(x => x.IsGlobalAdmin).Id;
         }
-    }
 
-    public static class Extensions
-    {
-        public static DbModificationClause UpdateIfMatch(this DbModificationClause clause, string property, DbExpression value)
+        private static bool MatchPropertyName(DbSetClause clause, string propertyName)
         {
-            var propertyExpression = (DbPropertyExpression)((DbSetClause)clause).Property;
-            //Check if property exist on model
-            if (propertyExpression.Property.Name == property)
+            var propertyExpression = (DbPropertyExpression)(clause).Property;
+            return propertyExpression.Property.Name == propertyName;
+        }
+
+        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<KeyValuePair<Predicate<DbSetClause>, DbExpression>> pendingUpdates)
+        {
+            //Only check for updates until pending updates has been depleted
+            if (pendingUpdates.Any())
             {
-                return DbExpressionBuilder.SetClause(propertyExpression, value);
+                foreach (var pendingUpdate in pendingUpdates.ToList())
+                {
+                    if (pendingUpdate.Key((DbSetClause)clause))
+                    {
+                        var propertyExpression = (DbPropertyExpression)((DbSetClause)clause).Property;
+
+                        //Pending update matched - apply the update and break off
+                        pendingUpdates.Remove(pendingUpdate);
+                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.Value);
+                    }
+                }
             }
+
+            //Return original
             return clause;
         }
     }

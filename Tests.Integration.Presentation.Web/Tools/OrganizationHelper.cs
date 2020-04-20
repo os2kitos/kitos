@@ -49,16 +49,16 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
 
-        public static async Task<Organization> CreateOrganizationAsync(int owningOrganizationId, int objectOwnerId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
+        public static async Task<Organization> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
-            using (var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, objectOwnerId, name, cvr, type, accessModifier, optionalLogin))
+            using (var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 return await createdResponse.ReadResponseBodyAsAsync<Organization>();
             }
         }
 
-        public static async Task<HttpResponseMessage> SendCreateOrganizationRequestAsync(int owningOrganizationId, int objectOwnerId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendCreateOrganizationRequestAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("odata/Organizations");
@@ -69,7 +69,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Cvr = cvr,
                 Id = owningOrganizationId, //This looks odd, but is checked in BaseEntityController. Id is changed once created
                 Name = name,
-                ObjectOwnerId = objectOwnerId,
                 TypeId = (int)type
             };
 

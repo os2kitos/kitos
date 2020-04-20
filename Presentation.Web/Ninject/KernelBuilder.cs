@@ -166,7 +166,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
 
-            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InCommandScope(Mode);
+            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current?.GetOwinContext()).InCommandScope(Mode);
+            kernel.Bind<Maybe<IOwinContext>>().ToMethod(_ => HttpContext.Current.FromNullable().Select(httpCtx => httpCtx.GetOwinContext())).InCommandScope(Mode);
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
