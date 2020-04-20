@@ -42,8 +42,6 @@ namespace Core.ApplicationServices
                 Organization = organization,
                 User = user,
                 Role = organizationRole,
-                LastChangedByUser = kitosUser,
-                ObjectOwner = kitosUser
             });
             _organizationRights.Save();
 

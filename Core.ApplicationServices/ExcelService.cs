@@ -251,9 +251,6 @@ namespace Core.ApplicationServices
                     ExpirationDate = contractRow.ExpirationDate,
                     Terminated = contractRow.Terminated,
                     OrganizationId = organizationId,
-                    LastChangedByUserId = kitosUser.Id,
-                    LastChanged = DateTime.UtcNow,
-                    ObjectOwnerId = kitosUser.Id
                 });
 
                 rowIndex++;
@@ -370,9 +367,6 @@ namespace Core.ApplicationServices
                         LastName = userRow.LastName,
                         Email = userRow.Email,
                         PhoneNumber = userRow.Phone,
-                        ObjectOwnerId = kitosUser.Id,
-                        LastChangedByUserId = kitosUser.Id,
-                        LastChanged = DateTime.UtcNow,
                         IsGlobalAdmin = false,
                         Password = _cryptoService.Encrypt(Guid.NewGuid().ToString("N")),
                         Salt = _cryptoService.Encrypt(Guid.NewGuid().ToString("N"))
@@ -402,9 +396,6 @@ namespace Core.ApplicationServices
                         OrganizationId = organizationId,
                         UserId = userEntity.Id,
                         Role = OrganizationRole.User,
-                        LastChangedByUserId = kitosUser.Id,
-                        LastChanged = DateTime.UtcNow,
-                        ObjectOwnerId = kitosUser.Id
                     });
                     _orgRightRepository.Save();
                 }
@@ -551,8 +542,7 @@ namespace Core.ApplicationServices
                 foreach (var orgUnitRow in unresolvedRows)
                 {
                     // try to locate a parent
-                    OrgUnitRow parent;
-                    if (resolvedRows.TryGetValue(orgUnitRow.Parent, out parent))
+                    if (resolvedRows.TryGetValue(orgUnitRow.Parent, out var parent))
                     {
 
                         // since a parent was found, insert the new org unit in the DB.
@@ -561,9 +551,6 @@ namespace Core.ApplicationServices
                             Name = orgUnitRow.Name,
                             Ean = orgUnitRow.Ean,
                             ParentId = parent.Id,
-                            ObjectOwnerId = kitosUser.Id,
-                            LastChangedByUserId = kitosUser.Id,
-                            LastChanged = DateTime.UtcNow,
                             OrganizationId = organizationId
                         });
 

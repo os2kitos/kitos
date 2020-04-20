@@ -66,6 +66,7 @@
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
     <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
+    <Compile Include="Delegates\Factory.cs" />
     <Compile Include="DomainEvents\DomainEvents.cs" />
     <Compile Include="DomainEvents\IDomainEvent.cs" />
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />

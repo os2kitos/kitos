@@ -22,12 +22,12 @@ namespace Core.DomainServices.Repositories.KLE
             return _updateHistoryItems.Get();
         }
 
-        public KLEUpdateHistoryItem Insert(DateTime version, int userId)
+        public KLEUpdateHistoryItem Insert(DateTime version)
         {
             KLEUpdateHistoryItem result;
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                result = _updateHistoryItems.Insert(new KLEUpdateHistoryItem(version, userId));
+                result = _updateHistoryItems.Insert(new KLEUpdateHistoryItem(version));
                 _updateHistoryItems.Save();
                 transaction.Commit();
             }

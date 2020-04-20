@@ -61,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
+    <Compile Include="Interceptors\EFEntityInterceptor.cs" />
+    <Compile Include="Interceptors\IEFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />

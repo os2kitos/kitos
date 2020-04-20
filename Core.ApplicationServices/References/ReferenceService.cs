@@ -77,10 +77,7 @@ namespace Core.ApplicationServices.References
                                 ExternalReferenceId = externalReferenceId,
                                 URL = url,
                                 Display = display,
-                                ObjectOwner = _userContext.UserEntity,
-                                LastChangedByUser = _userContext.UserEntity,
                                 Created = _operationClock.Now,
-                                LastChanged = _operationClock.Now
                             })
                             .Match<Result<ExternalReference, OperationError>>
                             (

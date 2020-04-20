@@ -63,11 +63,8 @@ using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
-using Ninject.Modules;
-using Ninject.Syntax;
 using Ninject.Web.Common;
 using Presentation.Web.Infrastructure;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Properties;
 using Serilog;
@@ -181,7 +178,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterSSO(IKernel kernel)
         {
-            kernel.Bind<SsoFlowConfiguration>().ToMethod(_=>new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
+            kernel.Bind<SsoFlowConfiguration>().ToMethod(_ => new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
@@ -192,7 +189,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
             kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
-            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_=>Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
+            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_ => Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)
@@ -293,6 +290,16 @@ namespace Presentation.Web.Ninject
 
                     var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
                     return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
+                });
+            kernel.Bind<Maybe<ActiveUserIdContext>>()
+                .ToMethod(ctx =>
+                {
+                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
+                    if (authentication.UserId.HasValue == false || authentication.Method == AuthenticationMethod.Anonymous)
+                    {
+                        return Maybe<ActiveUserIdContext>.None;
+                    }
+                    return new ActiveUserIdContext(authentication.UserId.Value);
                 });
 
             //Authorization context

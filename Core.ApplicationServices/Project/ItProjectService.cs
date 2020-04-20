@@ -119,8 +119,6 @@ namespace Core.ApplicationServices.Project
             }
 
             itProject.Handover.Participants.Add(user);
-            itProject.Handover.LastChanged = _operationClock.Now;
-            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
             return itProject.Handover;
@@ -159,8 +157,6 @@ namespace Core.ApplicationServices.Project
             }
 
             itProject.Handover.Participants.Remove(user);
-            itProject.Handover.LastChanged = _operationClock.Now;
-            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
             return itProject.Handover;

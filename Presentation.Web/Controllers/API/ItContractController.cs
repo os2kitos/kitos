@@ -107,8 +107,6 @@ namespace Presentation.Web.Controllers.API
                     AgreementElementType_Id = elem.Id,
                     ItContract_Id = contract.Id
                 });
-                contract.LastChanged = DateTime.UtcNow;
-                contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
 
@@ -140,9 +138,6 @@ namespace Presentation.Web.Controllers.API
 
                 var relation = contract.AssociatedAgreementElementTypes.FirstOrDefault(e => e.AgreementElementType_Id == elem.Id);
                 contract.AssociatedAgreementElementTypes.Remove(relation);
-
-                contract.LastChanged = DateTime.UtcNow;
-                contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
 
@@ -187,8 +182,6 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("The IT system usage is already associated with the contract");
 
                 contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContractId = id, ItSystemUsageId = systemUsageId });
-                contract.LastChanged = DateTime.UtcNow;
-                contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
 
@@ -228,8 +221,6 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("The IT system is not associated with the contract");
 
                 contract.AssociatedSystemUsages.Remove(contractItSystemUsage);
-                contract.LastChanged = DateTime.UtcNow;
-                contract.LastChangedByUser = KitosUser;
 
                 Repository.Save();
 

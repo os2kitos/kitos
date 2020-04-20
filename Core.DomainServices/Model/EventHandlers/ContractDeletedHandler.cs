@@ -51,7 +51,6 @@ namespace Core.DomainServices.Model.EventHandlers
                     "Contract with id {contractId} deleted. Resetting 'contract' field on all associated system relations",
                     deletedContract.Id);
 
-                var updateTime = _clock.Now;
                 var systemRelations = deletedContract.AssociatedSystemRelations.ToList();
                 if (systemRelations.Any())
                 {
@@ -73,9 +72,6 @@ namespace Core.DomainServices.Model.EventHandlers
 
                         if (result.Failed)
                             throw new InvalidOperationException($"Failed to modify system relation. Error: {result.Error}");
-
-                        fromSystemUsage.LastChangedByUser = activeUser;
-                        fromSystemUsage.LastChanged = updateTime;
                     }
 
                     _systemUsageRepository.Save();

@@ -105,8 +105,6 @@ namespace Core.ApplicationServices.SystemUsage
 
             usage.ItSystemId = newSystemUsage.ItSystemId;
             usage.OrganizationId = newSystemUsage.OrganizationId;
-            usage.ObjectOwner = objectOwner;
-            usage.LastChangedByUser = objectOwner;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 

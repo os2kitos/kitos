@@ -96,21 +96,8 @@ namespace Core.ApplicationServices.Interface
                 return OperationFailure.Conflict;
             }
 
-            var now = _operationClock.Now;
-            var user = _userContext.UserEntity;
-
-            newInterface.ObjectOwner = user;
-            newInterface.LastChangedByUser = user;
-            newInterface.LastChanged = now;
             newInterface.ItInterfaceId = newInterface.ItInterfaceId ?? "";
             newInterface.Uuid = Guid.NewGuid();
-
-            foreach (var dataRow in newInterface.DataRows)
-            {
-                dataRow.ObjectOwner = user;
-                dataRow.LastChangedByUser = user;
-                dataRow.LastChanged = now;
-            }
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
             {
@@ -163,12 +150,6 @@ namespace Core.ApplicationServices.Interface
 
                 if (changed)
                 {
-                    if (newExhibit.HasValue)
-                    {
-                        var exhibit = newExhibit.Value;
-                        exhibit.LastChangedByUser = _userContext.UserEntity;
-                        exhibit.LastChanged = _operationClock.Now;
-                    }
                     _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
 
                     _repository.Save();

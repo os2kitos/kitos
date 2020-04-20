@@ -1,7 +1,14 @@
+using System.Data.Entity.Infrastructure.Interception;
+using Core.DomainModel.Result;
+using Core.DomainServices.Context;
+using Core.DomainServices.Time;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject.Web.Common;
 using Presentation.Web;
 using Hangfire;
+using Infrastructure.DataAccess;
+using Infrastructure.DataAccess.Interceptors;
+using Ninject;
 using Presentation.Web.Ninject;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
@@ -23,9 +30,17 @@ namespace Presentation.Web
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
 
             //Setup for web application
-            bootstrapper.Initialize(()=> new KernelBuilder().ForWebApplication().Build());
+            bootstrapper.Initialize(() =>
+            {
+                var kernel = new KernelBuilder().ForWebApplication().Build();
 
-            //Setup for hangfire with a different setup
+                //Only register the interceptor once per application (Hangfire job is the same application scope)
+                DbInterception.Add(new EFEntityInterceptor(() => kernel.Get<IOperationClock>(), () => kernel.Get<Maybe<ActiveUserIdContext>>(), () => kernel.Get<KitosContext>()));
+
+                return kernel;
+            });
+
+            //Setup for Hangfire with a different setup
             GlobalConfiguration.Configuration.UseNinjectActivator(new KernelBuilder().ForHangFire().Build());
         }
 

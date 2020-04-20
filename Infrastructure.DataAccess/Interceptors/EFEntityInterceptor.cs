@@ -1,52 +1,61 @@
-﻿using System.Data.Entity.Core.Common.CommandTrees;
+﻿using System;
+using System.Data.Entity.Core.Common.CommandTrees;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
+using Infrastructure.Services.Delegates;
 
 namespace Infrastructure.DataAccess.Interceptors
 {
     public class EFEntityInterceptor : IEFEntityInterceptor
     {
-        private const string ObjectOwnerIdColumnName = "ObjectOwnerId";
-        private const string LastChangedByUserIdColumnName = "LastChangedByUserId";
-        private const string LastChangedColumnName = "LastChanged";
-        private readonly IOperationClock _operationClock;
-        private readonly Maybe<ActiveUserContext> _userContext;
+        private readonly Factory<IOperationClock> _operationClock;
+        private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
+        private readonly Factory<KitosContext> _activeDbContext;
+        private const string ObjectOwnerIdColumnName = nameof(IEntity.ObjectOwnerId);
+        private const string LastChangedByUserIdColumnName = nameof(IEntity.LastChangedByUserId);
+        private const string LastChangedColumnName = nameof(IEntity.LastChanged);
 
-        public EFEntityInterceptor(IOperationClock operationClock, Maybe<ActiveUserContext> userContext)
+        public EFEntityInterceptor(
+            Factory<IOperationClock> operationClock,
+            Factory<Maybe<ActiveUserIdContext>> userContext,
+            Factory<KitosContext> activeDbContext)
         {
             _operationClock = operationClock;
             _userContext = userContext;
-            DbInterception.Add(this);
+            _activeDbContext = activeDbContext;
         }
 
         public void TreeCreated(DbCommandTreeInterceptionContext interceptionContext)
         {
-
-            if (interceptionContext.OriginalResult.DataSpace != DataSpace.SSpace)
+            if (ShouldHandle(interceptionContext))
             {
-                return;
+                switch (interceptionContext.OriginalResult)
+                {
+                    case DbInsertCommandTree insertCommand:
+                        interceptionContext.Result = HandleInsertCommand(insertCommand);
+                        return;
+                    case DbUpdateCommandTree updateCommand:
+                        interceptionContext.Result = HandleUpdateCommand(updateCommand);
+                        return;
+                }
             }
+        }
 
-            switch (interceptionContext.OriginalResult)
-            {
-                case DbInsertCommandTree insertCommand:
-                    interceptionContext.Result = HandleInsertCommand(insertCommand);
-                    return;
-                case DbUpdateCommandTree updateCommand:
-                    interceptionContext.Result = HandleUpdateCommand(updateCommand);
-                    return;
-            }
+        private static bool ShouldHandle(DbCommandTreeInterceptionContext interceptionContext)
+        {
+            return interceptionContext.OriginalResult.DataSpace == DataSpace.SSpace;
         }
 
         private DbCommandTree HandleInsertCommand(DbInsertCommandTree insertCommand)
         {
             var userId = GetActiveUserId();
-            var now = _operationClock.Now;
+            var now = _operationClock().Now;
 
             var setClauses = insertCommand.SetClauses
                 .Select(clause => clause.UpdateIfMatch(ObjectOwnerIdColumnName, userId))
@@ -66,7 +75,7 @@ namespace Infrastructure.DataAccess.Interceptors
         {
 
             var userId = GetActiveUserId();
-            var now = _operationClock.Now;
+            var now = _operationClock().Now;
 
             var setClauses = updateCommand.SetClauses
                 .Select(clause => clause.UpdateIfMatch(LastChangedByUserIdColumnName, userId))
@@ -81,10 +90,17 @@ namespace Infrastructure.DataAccess.Interceptors
                 setClauses.AsReadOnly(),
                 null);
         }
-        
+
         private int GetActiveUserId()
         {
-            return _userContext.Value.UserEntity.Id;
+            var userContext = _userContext();
+            if (userContext.HasValue)
+            {
+                return userContext.Value.ActiveUserId;
+            }
+
+            //Fallback to first global admin
+            return _activeDbContext().Users.First(x => x.IsGlobalAdmin).Id;
         }
     }
 

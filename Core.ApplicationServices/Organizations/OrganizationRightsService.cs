@@ -28,8 +28,6 @@ namespace Core.ApplicationServices.Organizations
             var right = new OrganizationRight
             {
                 OrganizationId = organizationId,
-                ObjectOwnerId = _userContext.UserId,
-                LastChangedByUserId = _userContext.UserId,
                 Role = roleId,
                 UserId = userId
             };

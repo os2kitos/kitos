@@ -256,8 +256,6 @@ namespace Core.DomainServices.Repositories.KLE
             {
                 update.Item1.Description = update.Item2.UpdatedDescription;
                 update.Item1.Uuid = update.Item2.Uuid;
-                update.Item1.LastChanged = updateTime;
-                update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
@@ -280,9 +278,6 @@ namespace Core.DomainServices.Repositories.KLE
                     Type = kleChange.Type,
                     TaskKey = kleChange.TaskKey,
                     Description = kleChange.UpdatedDescription,
-                    ObjectOwnerId = ownerObjectId,
-                    LastChanged = updateTime,
-                    LastChangedByUserId = ownerObjectId,
                     OwnedByOrganizationUnitId = ownedByOrgnizationUnitId,
                     ActiveFrom = kleChange.ActiveFrom,
                     ActiveTo = kleChange.ActiveTo,
@@ -303,8 +298,6 @@ namespace Core.DomainServices.Repositories.KLE
             foreach (var update in updates)
             {
                 update.Item1.Uuid = update.Item2.Uuid;
-                update.Item1.LastChanged = updateTime;
-                update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
@@ -323,8 +316,6 @@ namespace Core.DomainServices.Repositories.KLE
                 {
                     var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).First();
                     existingTaskRef.ParentId = parent.Id;
-                    existingTaskRef.LastChanged = updateTime;
-                    existingTaskRef.LastChangedByUserId = ownerObjectId;
                     existingTaskRef.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 }
             }

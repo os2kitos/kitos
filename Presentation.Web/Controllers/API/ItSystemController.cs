@@ -151,8 +151,6 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
 
                 foreach (var id in dto.TaskRefIds)
@@ -213,8 +211,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Add(task);
                 }
-                system.LastChanged = DateTime.UtcNow;
-                system.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
             }
@@ -262,8 +258,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Remove(task);
                 }
-                system.LastChanged = DateTime.UtcNow;
-                system.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
             }

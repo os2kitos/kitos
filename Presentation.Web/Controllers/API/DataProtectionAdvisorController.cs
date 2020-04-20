@@ -57,9 +57,7 @@ namespace Presentation.Web.Controllers.API
                     {
                         _repository.Insert(new DataProtectionAdvisor
                         {
-                            OrganizationId = organization.Id,
-                            ObjectOwnerId = organization.ObjectOwnerId,
-                            LastChangedByUserId = KitosUser.Id
+                            OrganizationId = organization.Id
                         });
                         _repository.Save();
                         item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);

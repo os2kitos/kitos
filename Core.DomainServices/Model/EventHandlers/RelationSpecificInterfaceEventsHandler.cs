@@ -75,7 +75,6 @@ namespace Core.DomainServices.Model.EventHandlers
 
         private void ResetInterfaceOnRelations(ItInterface affectedInterface, IDatabaseTransaction transaction)
         {
-            var updateTime = _clock.Now;
             var systemRelations = affectedInterface.AssociatedSystemRelations.ToList();
             if (systemRelations.Any())
             {
@@ -97,9 +96,6 @@ namespace Core.DomainServices.Model.EventHandlers
 
                     if (result.Failed)
                         throw new InvalidOperationException($"Failed to modify system relation. Error: {result.Error}");
-
-                    fromSystemUsage.LastChangedByUser = activeUser;
-                    fromSystemUsage.LastChanged = updateTime;
                 }
 
                 _systemUsageRepository.Save();

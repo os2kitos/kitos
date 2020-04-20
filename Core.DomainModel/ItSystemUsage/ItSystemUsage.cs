@@ -425,18 +425,10 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
-            if (activeUser == null)
-                throw new ArgumentNullException(nameof(activeUser));
-
             if (toSystemUsage == null)
                 throw new ArgumentNullException(nameof(toSystemUsage));
 
-            var newRelation = new SystemRelation(this)
-            {
-                ObjectOwner = ObjectOwner,
-                LastChangedByUser = activeUser,
-                LastChanged = DateTime.Now
-            };
+            var newRelation = new SystemRelation(this);
 
             var updateRelationResult = UpdateRelation(newRelation, toSystemUsage, description, reference, relationInterface, targetContract, targetFrequency);
 
@@ -446,9 +438,6 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             UsageRelations.Add(newRelation);
-
-            LastChangedByUser = activeUser;
-            LastChanged = DateTime.Now;
 
             return newRelation;
         }
@@ -539,9 +528,6 @@ namespace Core.DomainModel.ItSystemUsage
             User activeUser,
             SensitiveDataLevel sensitiveDataLevel)
         {
-            if (activeUser == null)
-                throw new ArgumentNullException(nameof(activeUser));
-
             if (SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity level already exists", OperationFailure.Conflict);
@@ -555,9 +541,6 @@ namespace Core.DomainModel.ItSystemUsage
 
             SensitiveDataLevels.Add(newDataLevel);
 
-            LastChangedByUser = activeUser;
-            LastChanged = DateTime.Now;
-
             return newDataLevel;
         }
 
@@ -565,9 +548,6 @@ namespace Core.DomainModel.ItSystemUsage
             User activeUser,
             SensitiveDataLevel sensitiveDataLevel)
         {
-            if (activeUser == null)
-                throw new ArgumentNullException(nameof(activeUser));
-
             if (!SensitiveDataLevelExists(sensitiveDataLevel))
             {
                 return new OperationError("Data sensitivity does not exists on system usage", OperationFailure.NotFound);
@@ -575,9 +555,6 @@ namespace Core.DomainModel.ItSystemUsage
 
             var dataLevelToRemove = SensitiveDataLevels.First(x => x.SensitivityDataLevel == sensitiveDataLevel);
             SensitiveDataLevels.Remove(dataLevelToRemove);
-
-            LastChangedByUser = activeUser;
-            LastChanged = DateTime.Now;
 
             return dataLevelToRemove;
         }

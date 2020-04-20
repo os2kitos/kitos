@@ -7,7 +7,7 @@ namespace Core.DomainServices.Repositories.KLE
     public interface IKLEUpdateHistoryItemRepository
     {
         IEnumerable<KLEUpdateHistoryItem> Get();
-        KLEUpdateHistoryItem Insert(DateTime version, int userId);
+        KLEUpdateHistoryItem Insert(DateTime version);
         DateTime GetLastUpdated();
     }
 }

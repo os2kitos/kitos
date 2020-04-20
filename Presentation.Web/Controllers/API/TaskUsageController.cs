@@ -117,9 +117,6 @@ namespace Presentation.Web.Controllers.API
                     {
                         OrgUnitId = orgUnitId,
                         TaskRefId = task.Id,
-                        ObjectOwner = KitosUser,
-                        LastChanged = DateTime.UtcNow,
-                        LastChangedByUser = KitosUser
                     };
                     if (!AllowCreate<TaskUsage>(taskUsage))
                     {
@@ -143,8 +140,6 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
                 if (!AllowCreate<TaskUsage>(item))
                 {
                     return Forbidden();
