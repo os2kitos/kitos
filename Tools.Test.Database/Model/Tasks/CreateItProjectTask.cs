@@ -29,7 +29,7 @@ namespace Tools.Test.Database.Model.Tasks
                 return false;
             }
 
-            var project = ItProjectFactory.Create(_name,commonOrg.Id,globalAdmin,DateTime.Now);
+            var project = ItProjectFactory.Create(_name, commonOrg.Id, DateTime.Now);
 
             var entities = new List<IEntity>();
             entities.Add(project);

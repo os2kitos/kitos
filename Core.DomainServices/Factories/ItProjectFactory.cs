@@ -7,7 +7,7 @@ namespace Core.DomainServices.Factories
 {
     public class ItProjectFactory
     {
-        public static ItProject Create(string name, int organizationId, User activeUser, DateTime now)
+        public static ItProject Create(string name, int organizationId, DateTime now)
         {
             if (name == null)
             {
