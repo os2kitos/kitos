@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -21,13 +20,6 @@ namespace Tests.Unit.Core.Model
                 Id = A<int>(),
                 OrganizationId = A<int>()
             };
-        }
-
-        [Fact]
-        public void AddUsageRelationTo_Throws_If_ActiveUser_Is_Null()
-        {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(new ItSystemUsage(), Maybe<ItInterface>.None, 
-                A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
         }
 
         [Fact]
@@ -128,8 +120,6 @@ namespace Tests.Unit.Core.Model
         {
             //Arrange
             var interfaceId = A<int>();
-            var objectOwner = new User();
-            _sut.ObjectOwner = objectOwner;
             _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage()));
             var itInterface = new ItInterface
             {
@@ -163,7 +153,6 @@ namespace Tests.Unit.Core.Model
             var newRelation = result.Value;
             Assert.True(_sut.UsageRelations.Contains(newRelation));
             Assert.Equal(2, _sut.UsageRelations.Count); //existing + the new one
-            Assert.Equal(objectOwner, newRelation.ObjectOwner);
             Assert.Equal(itContract, newRelation.AssociatedContract);
             Assert.Equal(frequencyType, newRelation.UsageFrequency);
             Assert.Equal(destination, newRelation.ToSystemUsage);
