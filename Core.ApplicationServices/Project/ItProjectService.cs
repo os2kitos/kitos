@@ -24,7 +24,6 @@ namespace Core.ApplicationServices.Project
         private readonly IUserRepository _userRepository;
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOperationClock _operationClock;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -32,8 +31,7 @@ namespace Core.ApplicationServices.Project
             IItProjectRepository itProjectRepository,
             IUserRepository userRepository,
             IReferenceService referenceService,
-            ITransactionManager transactionManager,
-            IOperationClock operationClock)
+            ITransactionManager transactionManager)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -41,12 +39,11 @@ namespace Core.ApplicationServices.Project
             _userRepository = userRepository;
             _referenceService = referenceService;
             _transactionManager = transactionManager;
-            _operationClock = operationClock;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
         {
-            var project = ItProjectFactory.Create(name, organizationId, _operationClock.Now);
+            var project = ItProjectFactory.Create(name, organizationId);
 
             if (!_authorizationContext.AllowCreate<ItProject>(project))
             {

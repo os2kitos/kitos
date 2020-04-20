@@ -10,7 +10,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -42,8 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _specificProjectRepo.Object,
                 _userRepository.Object,
                 _referenceService.Object,
-                _transactionManager.Object,
-                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
+                _transactionManager.Object);
         }
 
         [Fact]
