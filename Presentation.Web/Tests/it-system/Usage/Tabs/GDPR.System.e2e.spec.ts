@@ -23,7 +23,7 @@ describe("Global admin is able to", () => {
     var dateValue = getDate();
     var testUrl = "https://www.strongminds.dk/";
     var numberValue = new Date().getDay().toString();
-    
+
     var purposeText = `purpose${new Date().getTime()}`;
     var dataResponsibleText = `dataResponsible${new Date().getTime()}`;
     var noteUsageText = `noteUsage${new Date().getTime()}`;
@@ -105,11 +105,12 @@ describe("Global admin is able to", () => {
 
     function fillOutTextFields() {
         console.log("Entering data into text fields");
-        return ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(purposeText)
+        return ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(protractor.Key.BACK_SPACE)
+            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(numberValue))
+            .then(() => ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(purposeText))
             .then(() => ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().sendKeys(dataResponsibleText))
             .then(() => ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().sendKeys(noteUsageText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(numberValue));
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText));
     }
 
     function fillOutLinkFields() {
