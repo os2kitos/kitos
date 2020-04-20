@@ -70,7 +70,7 @@ namespace Core.ApplicationServices.SystemUsage
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
 
-        public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
+        public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage)
         {
             // create the system usage
             var existing = GetByOrganizationAndSystemId(newSystemUsage.OrganizationId, newSystemUsage.ItSystemId);

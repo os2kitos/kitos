@@ -84,7 +84,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var systemUsage = SetupRepositoryQueryWith(organizationId, systemId);
 
             //Act
-            var result = _sut.Add(systemUsage, new User());
+            var result = _sut.Add(systemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -100,7 +100,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(false);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -117,7 +117,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(default(ItSystem));
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -136,7 +136,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(false);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -155,7 +155,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(true);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -168,7 +168,6 @@ namespace Tests.Unit.Core.ApplicationServices
         public void Add_Returns_Ok(bool sameOrg)
         {
             //Arrange
-            var objectOwner = new User();
             var input = new ItSystemUsage
             {
                 ItSystemId = A<int>(),
@@ -187,14 +186,13 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.Create()).Returns(usageCreatedByRepo);
 
             //Act
-            var result = _sut.Add(input, objectOwner);
+            var result = _sut.Add(input);
 
             //Assert
             Assert.True(result.Ok);
             var createdUsage = result.Value;
             Assert.NotSame(input, createdUsage);
             Assert.Same(usageCreatedByRepo, createdUsage);
-            Assert.Same(objectOwner, createdUsage.ObjectOwner);
             Assert.Equal(input.OrganizationId, createdUsage.OrganizationId);
             Assert.Empty(createdUsage.AssociatedDataWorkers);
             Assert.Equal(input.ItSystemId, createdUsage.ItSystemId);

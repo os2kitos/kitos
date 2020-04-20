@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                var sysUsageResult = _itSystemUsageService.Add(systemUsage, KitosUser);
+                var sysUsageResult = _itSystemUsageService.Add(systemUsage);
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
