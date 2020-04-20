@@ -417,7 +417,6 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
-            User activeUser,
             ItSystemUsage toSystemUsage,
             Maybe<ItInterface> relationInterface,
             string description,
@@ -442,7 +441,7 @@ namespace Core.DomainModel.ItSystemUsage
             return newRelation;
         }
 
-        public Result<SystemRelation, OperationError> ModifyUsageRelation(User activeUser,
+        public Result<SystemRelation, OperationError> ModifyUsageRelation(
             int relationId,
             ItSystemUsage toSystemUsage,
             string changedDescription,
@@ -451,11 +450,6 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<ItContract.ItContract> toContract,
             Maybe<RelationFrequencyType> toFrequency)
         {
-            if (activeUser == null)
-            {
-                throw new ArgumentNullException(nameof(activeUser));
-            }
-
             var relationResult = GetUsageRelation(relationId);
             if (relationResult.IsNone)
             {
@@ -525,7 +519,6 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
-            User activeUser,
             SensitiveDataLevel sensitiveDataLevel)
         {
             if (SensitiveDataLevelExists(sensitiveDataLevel))
@@ -545,7 +538,6 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> RemoveSensitiveDataLevel(
-            User activeUser,
             SensitiveDataLevel sensitiveDataLevel)
         {
             if (!SensitiveDataLevelExists(sensitiveDataLevel))

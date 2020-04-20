@@ -26,14 +26,14 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void AddUsageRelationTo_Throws_If_ActiveUser_Is_Null()
         {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(null, new ItSystemUsage(), Maybe<ItInterface>.None, 
+            Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(new ItSystemUsage(), Maybe<ItInterface>.None, 
                 A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
         }
 
         [Fact]
         public void AddUsageRelationTo_Throws_If_Destination_Is_Null()
         {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(new User(), null, Maybe<ItInterface>.None,
+            Assert.Throws<ArgumentNullException>(() => _sut.AddUsageRelationTo(null, Maybe<ItInterface>.None,
                 A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None));
         }
 
@@ -47,7 +47,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
+            var result = _sut.AddUsageRelationTo(destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
             AssertErrorResult(result, "'From' cannot equal 'To'", OperationFailure.BadInput);
@@ -64,7 +64,7 @@ namespace Tests.Unit.Core.Model
             };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
+            var result = _sut.AddUsageRelationTo(destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, Maybe<ItContract>.None);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
@@ -83,7 +83,7 @@ namespace Tests.Unit.Core.Model
             var itContract = new ItContract { OrganizationId = _sut.OrganizationId + 1 };
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(destination, Maybe<ItInterface>.None, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Attempt to create relation to it contract in a different organization", OperationFailure.BadInput);
@@ -117,7 +117,7 @@ namespace Tests.Unit.Core.Model
 
 
             //Act
-            var result = _sut.AddUsageRelationTo(new User(), destination, new ItInterface(){Id = interfaceId}, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
+            var result = _sut.AddUsageRelationTo(destination, new ItInterface(){Id = interfaceId}, A<string>(), A<string>(), Maybe<RelationFrequencyType>.None, itContract);
 
             //Assert
             AssertErrorResult(result, "Cannot set interface which is not exposed by the 'to' system", OperationFailure.BadInput);
@@ -130,7 +130,6 @@ namespace Tests.Unit.Core.Model
             var interfaceId = A<int>();
             var objectOwner = new User();
             _sut.ObjectOwner = objectOwner;
-            var activeUser = new User();
             _sut.UsageRelations.Add(new SystemRelation(new ItSystemUsage()));
             var itInterface = new ItInterface
             {
@@ -157,7 +156,7 @@ namespace Tests.Unit.Core.Model
             var reference = A<string>();
 
             //Act
-            var result = _sut.AddUsageRelationTo(activeUser, destination, itInterface, description, reference, frequencyType, itContract);
+            var result = _sut.AddUsageRelationTo(destination, itInterface, description, reference, frequencyType, itContract);
 
             //Assert
             Assert.True(result.Ok);
@@ -165,14 +164,12 @@ namespace Tests.Unit.Core.Model
             Assert.True(_sut.UsageRelations.Contains(newRelation));
             Assert.Equal(2, _sut.UsageRelations.Count); //existing + the new one
             Assert.Equal(objectOwner, newRelation.ObjectOwner);
-            Assert.Equal(activeUser, newRelation.LastChangedByUser);
             Assert.Equal(itContract, newRelation.AssociatedContract);
             Assert.Equal(frequencyType, newRelation.UsageFrequency);
             Assert.Equal(destination, newRelation.ToSystemUsage);
             Assert.Equal(description, newRelation.Description);
             Assert.NotNull(newRelation.Reference);
             Assert.Equal(reference, newRelation.Reference);
-            Assert.Equal(activeUser, _sut.LastChangedByUser);
         }
 
         [Theory]
@@ -248,11 +245,8 @@ namespace Tests.Unit.Core.Model
         [InlineData(SensitiveDataLevel.LEGALDATA)]
         public void AddSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
         {
-            //Arrange
-            var activeUser = new User();
-
             //Act
-            var result = _sut.AddSensitiveDataLevel(activeUser, sensitiveDataLevel);
+            var result = _sut.AddSensitiveDataLevel(sensitiveDataLevel);
 
             //Assert
             Assert.True(result.Ok);
@@ -266,7 +260,6 @@ namespace Tests.Unit.Core.Model
         public void AddSensitiveData_Fails_With_Conflict_If_Sensitivity_Level_Already_Exists()
         {
             //Arrange
-            var activeUser = new User();
             var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
             {
                 SensitivityDataLevel = SensitiveDataLevel.NONE
@@ -274,7 +267,7 @@ namespace Tests.Unit.Core.Model
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
             //Act
-            var result = _sut.AddSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+            var result = _sut.AddSensitiveDataLevel(SensitiveDataLevel.NONE);
 
             //Assert
             AssertErrorResult(result, "Data sensitivity level already exists", OperationFailure.Conflict);
@@ -288,7 +281,6 @@ namespace Tests.Unit.Core.Model
         public void RemoveSensitiveData_Returns_Ok(SensitiveDataLevel sensitiveDataLevel)
         {
             //Arrange
-            var activeUser = new User();
             var preAddedSensitiveDataLevel = new ItSystemUsageSensitiveDataLevel()
             {
                 ItSystemUsage = _sut,
@@ -297,7 +289,7 @@ namespace Tests.Unit.Core.Model
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(activeUser, sensitiveDataLevel);
+            var result = _sut.RemoveSensitiveDataLevel(sensitiveDataLevel);
 
             //Assert
             Assert.True(result.Ok);
@@ -310,11 +302,8 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void RemoveSensitiveData_Fails_With_NotFound_If_Sensitivity_Level_Does_Not_Exist()
         {
-            //Arrange
-            var activeUser = new User();
-
             //Act
-            var result = _sut.RemoveSensitiveDataLevel(activeUser, SensitiveDataLevel.NONE);
+            var result = _sut.RemoveSensitiveDataLevel(SensitiveDataLevel.NONE);
 
             //Assert
             AssertErrorResult(result, "Data sensitivity does not exists on system usage", OperationFailure.NotFound);
