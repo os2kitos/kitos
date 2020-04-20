@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.Web
 
         public ActionResult Index()
         {
-            ViewBag.Environment = Settings.Default.Environment;
+            ViewBag.StylingScheme = Settings.Default.Environment?.ToLowerInvariant().Contains("prod") == true ? "PROD" : "TEST";
             AppendSsoError();
             AppendFeatureToggles();
 
@@ -44,7 +44,6 @@ namespace Presentation.Web.Controllers.Web
         {
             if (ssoErrorCode.HasValue)
             {
-                PushTempVariable(TemporaryFeature.Sso, FeatureToggleKey); //enable sso toggle
                 PushTempVariable(ssoErrorCode, SsoErrorKey);
             }
 

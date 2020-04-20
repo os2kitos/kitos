@@ -64,7 +64,7 @@
                         field: "title",
                         title: "Dokumenttitel test",
                         template: data => {
-                            if (Kitos.Utility.Validation.validateUrl(data.url)) {
+                            if (Kitos.Utility.Validation.isValidExternalReference(data.url)) {
                                 return `<a target="_blank" href="${data.url}">${data.title}</a>`;
                             } else {
                                 return data.title;
@@ -93,7 +93,7 @@
                                 dataItem.id})'><i class='fa fa-trash-o' aria-hidden='true'></i></button>`;
                             
 
-                            if (Kitos.Utility.Validation.validateUrl(dataItem.url)) {
+                            if (Kitos.Utility.Validation.isValidExternalReference(dataItem.url)) {
                                 if (dataItem.id === contract.referenceId) {
                                     HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {
