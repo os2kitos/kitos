@@ -158,7 +158,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
-            kernel.Bind<IEFEntityInterceptor>().To<EFEntityInterceptor>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
