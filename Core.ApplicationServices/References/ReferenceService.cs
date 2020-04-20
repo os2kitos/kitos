@@ -24,7 +24,6 @@ namespace Core.ApplicationServices.References
         private readonly IItProjectRepository _projectRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
 
 
@@ -36,7 +35,6 @@ namespace Core.ApplicationServices.References
             IItProjectRepository projectRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            IOrganizationalUserContext userContext,
             IOperationClock operationClock)
         {
             _referenceRepository = referenceRepository;
@@ -46,7 +44,6 @@ namespace Core.ApplicationServices.References
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
-            _userContext = userContext;
             _operationClock = operationClock;
         }
 

@@ -53,7 +53,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 _projectRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
-                new Mock<IOrganizationalUserContext>().Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
             );
         }
