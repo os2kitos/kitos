@@ -81,11 +81,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
             const int activeOrganizationId = 1;
             _mockOrganizationalUserContext.Setup(r => r.ActiveOrganizationId).Returns(activeOrganizationId);
-            const int userId = 1;
-            _mockOrganizationalUserContext.Setup(r => r.UserId).Returns(userId);
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
-                .Setup(r => r.UpdateKLE(userId, activeOrganizationId))
+                .Setup(r => r.UpdateKLE(activeOrganizationId))
                 .Returns(publishedDate);
             _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<DateTime>())).Returns(
                 new KLEStatus
@@ -114,11 +112,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockOrganizationalUserContext.Setup(r => r.HasRole(OrganizationRole.GlobalAdmin)).Returns(true);
             const int activeOrganizationId = 1;
             _mockOrganizationalUserContext.Setup(r => r.ActiveOrganizationId).Returns(activeOrganizationId);
-            const int userId = 1;
-            _mockOrganizationalUserContext.Setup(r => r.UserId).Returns(userId);
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
-                .Setup(r => r.UpdateKLE(userId, activeOrganizationId))
+                .Setup(r => r.UpdateKLE(activeOrganizationId))
                 .Returns(publishedDate);
             _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<DateTime>())).Returns(
                 new KLEStatus

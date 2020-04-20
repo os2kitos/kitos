@@ -51,7 +51,7 @@ namespace Core.ApplicationServices.KLE
             {
                 return OperationFailure.BadInput;
             }
-            var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
+            var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate);
             return KLEUpdateStatus.Ok;
         }
