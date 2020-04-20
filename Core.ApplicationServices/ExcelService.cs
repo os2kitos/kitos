@@ -42,9 +42,8 @@ namespace Core.ApplicationServices
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="organizationId">The organization identifier.</param>
-        /// <param name="kitosUSer">The kitos u ser.</param>
         /// <returns></returns>
-        public Stream ExportUsers(Stream stream, int organizationId, User kitosUSer)
+        public Stream ExportUsers(Stream stream, int organizationId)
         {
             var users = _userRepository.Get(x => x.OrganizationRights.Count(r => r.OrganizationId == organizationId) > 0);
 
@@ -59,9 +58,8 @@ namespace Core.ApplicationServices
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="organizationId">The organization identifier.</param>
-        /// <param name="kitosUser">The kitos user.</param>
         /// <returns></returns>
-        public Stream ExportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
+        public Stream ExportOrganizationUnits(Stream stream, int organizationId)
         {
             var orgUnits = _orgUnitRepository
                 .AsQueryable()
@@ -74,7 +72,7 @@ namespace Core.ApplicationServices
             return _excelHandler.Export(set, stream);
         }
 
-        public void ImportUsers(Stream stream, int organizationId, User kitosUser)
+        public void ImportUsers(Stream stream, int organizationId)
         {
             var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
             using (scope)
@@ -84,7 +82,7 @@ namespace Core.ApplicationServices
 
                 // importing org units
                 var userTable = set.Tables[0];
-                errors.AddRange(ImportUsersTransaction(userTable, organizationId, kitosUser));
+                errors.AddRange(ImportUsersTransaction(userTable, organizationId));
 
                 // then finally, did we notice any errors?
                 if (errors.Any()) throw new ExcelImportException() { Errors = errors };
@@ -94,7 +92,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        public void ExportItContracts(Stream stream, int organizationId, User kitosUser)
+        public void ExportItContracts(Stream stream, int organizationId)
         {
             var contracts = _itContractRepository.Get(x => x.OrganizationId == organizationId);
 
@@ -104,21 +102,21 @@ namespace Core.ApplicationServices
             _excelHandler.Export(set, stream);
         }
 
-        public void ImportItContracts(Stream stream, int organizationId, User kitosUser)
+        public void ImportItContracts(Stream stream, int organizationId)
         {
             // read excel stream to DataSet
             var contractDataSet = _excelHandler.Import(stream);
             // get contracts table
             var contractDataTable = contractDataSet.Tables[0];
             // import contracts
-            var errors = ImportItContractsTransaction(contractDataTable, organizationId, kitosUser).ToList();
+            var errors = ImportItContractsTransaction(contractDataTable, organizationId).ToList();
 
             // then finally, did we notice any errors?
             if (errors.Any())
                 throw new ExcelImportException { Errors = errors };
         }
 
-        private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId, User kitosUser)
+        private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId)
         {
             var errors = new List<ExcelImportError>();
 
@@ -262,7 +260,7 @@ namespace Core.ApplicationServices
             return errors;
         }
 
-        private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId, User kitosUser)
+        private IEnumerable<ExcelImportError> ImportUsersTransaction(DataTable userTable, int organizationId)
         {
             var errors = new List<ExcelImportError>();
 
@@ -408,9 +406,8 @@ namespace Core.ApplicationServices
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="organizationId">The organization identifier.</param>
-        /// <param name="kitosUser">The kitos user.</param>
         /// <exception cref="ExcelImportException"></exception>
-        public void ImportOrganizationUnits(Stream stream, int organizationId, User kitosUser)
+        public void ImportOrganizationUnits(Stream stream, int organizationId)
         {
             var scope = new TransactionScope(TransactionScopeOption.RequiresNew);
             using (scope)
@@ -421,10 +418,10 @@ namespace Core.ApplicationServices
 
                 // importing org units
                 var orgTable = set.Tables[0];
-                errors.AddRange(ImportOrgUnits(orgTable, organizationId, kitosUser));
+                errors.AddRange(ImportOrgUnits(orgTable, organizationId));
 
                 // then finally, did we notice any errors?
-                if (errors.Any()) throw new ExcelImportException() { Errors = errors };
+                if (errors.Any()) throw new ExcelImportException { Errors = errors };
 
                 // if we got here, we're home frreeeee
                 scope.Complete();
@@ -452,7 +449,7 @@ namespace Core.ApplicationServices
             return Convert.ToInt32(Convert.ToDouble(s));
         }
 
-        private IEnumerable<ExcelImportError> ImportOrgUnits(DataTable orgTable, int organizationId, User kitosUser)
+        private IEnumerable<ExcelImportError> ImportOrgUnits(DataTable orgTable, int organizationId)
         {
             var errors = new List<ExcelImportError>();
 
