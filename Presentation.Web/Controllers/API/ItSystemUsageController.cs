@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                var sysUsageResult = _itSystemUsageService.Add(systemUsage, KitosUser);
+                var sysUsageResult = _itSystemUsageService.Add(systemUsage);
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
@@ -196,9 +196,6 @@ namespace Presentation.Web.Controllers.API
 
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
-                usage.LastChanged = DateTime.UtcNow;
-                usage.LastChangedByUser = KitosUser;
-
                 Repository.Save();
 
                 return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
@@ -237,9 +234,6 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 usage.UsedBy.Remove(entity);
-
-                usage.LastChanged = DateTime.UtcNow;
-                usage.LastChangedByUser = KitosUser;
 
                 Repository.Save();
 
@@ -295,8 +289,6 @@ namespace Presentation.Web.Controllers.API
                         usage.TaskRefsOptOut.Remove(task);
                     }
                 }
-                usage.LastChanged = DateTime.UtcNow;
-                usage.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
             }
@@ -359,8 +351,6 @@ namespace Presentation.Web.Controllers.API
                         usage.TaskRefsOptOut.Add(task);
                     }
                 }
-                usage.LastChanged = DateTime.UtcNow;
-                usage.LastChangedByUser = KitosUser;
                 Repository.Save();
                 return Ok();
             }

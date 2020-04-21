@@ -136,8 +136,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var resultValue = result.Value;
             Assert.Equal(organizationId, resultValue.OrganizationId);
-            Assert.Equal(userId, resultValue.ObjectOwnerId);
-            Assert.Equal(userId, resultValue.LastChangedByUserId);
             Assert.Equal(userId, resultValue.UserId);
             Assert.Equal(organizationRole, resultValue.Role);
             _organizationRightRepository.Verify(x => x.Insert(It.IsAny<OrganizationRight>()), Times.Once);

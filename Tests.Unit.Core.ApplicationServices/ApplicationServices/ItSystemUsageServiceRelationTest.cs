@@ -39,7 +39,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IItSystemRepository> _mockSystemRepository;
         private readonly Mock<IItContractRepository> _mockContractRepository;
         private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _mockOptionsService;
-        private readonly Mock<IOrganizationalUserContext> _mockOrganizationalUserContext;
         private readonly Mock<IGenericRepository<SystemRelation>> _mockSystemRelationRepository;
         private readonly Mock<ITransactionManager> _mockTransactionManager;
         private readonly Mock<ILogger> _mockLogger;
@@ -55,12 +54,10 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockSystemRepository = new Mock<IItSystemRepository>();
             _mockContractRepository = new Mock<IItContractRepository>();
             _mockOptionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
-            _mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
             _mockSystemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
             _mockSensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _mockTransactionManager = new Mock<ITransactionManager>();
             _mockLogger = new Mock<ILogger>();
-            _mockOrganizationalUserContext.SetupGet(c => c.UserEntity).Returns(new User());
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _mockOptionsService.Setup(x => x.GetAvailableOption(It.IsAny<int>(), It.IsAny<int>())).Returns(Maybe<RelationFrequencyType>.None);
             _referenceService = new Mock<IReferenceService>();
@@ -70,7 +67,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockSystemRepository.Object,
                 _mockContractRepository.Object,
                 _mockOptionsService.Object,
-                _mockOrganizationalUserContext.Object,
                 _mockSystemRelationRepository.Object,
                 _interfaceRepository.Object,
                 _referenceService.Object, 

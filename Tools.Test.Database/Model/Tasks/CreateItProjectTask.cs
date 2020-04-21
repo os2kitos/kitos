@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainServices.Factories;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
@@ -27,7 +29,19 @@ namespace Tools.Test.Database.Model.Tasks
                 return false;
             }
 
-            var project = ItProjectFactory.Create(_name,commonOrg.Id,globalAdmin,DateTime.Now);
+            var project = ItProjectFactory.Create(_name, commonOrg.Id);
+
+            var entities = new List<IEntity>();
+            entities.Add(project);
+            entities.Add(project.GoalStatus);
+            entities.Add(project.Handover);
+            entities.AddRange(project.EconomyYears);
+            entities.ForEach(entity =>
+            {
+                entity.ObjectOwner = globalAdmin;
+                entity.LastChangedByUser = globalAdmin;
+                entity.LastChanged = DateTime.Now;
+            });
 
             context.ItProjects.Add(project);
             context.SaveChanges();

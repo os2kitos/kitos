@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -23,14 +19,12 @@ namespace Tests.Unit.Core.Model.EventHandlers
         private readonly ContractDeletedHandler _sut;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly ActiveUserContext _activeUserContext;
 
         public ContractDeletedHandlerTest()
         {
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _activeUserContext = new ActiveUserContext(1337, new User());
-            _sut = new ContractDeletedHandler(_systemUsageRepository.Object, _transactionManager.Object, _activeUserContext, Mock.Of<IOperationClock>(x => x.Now == DateTime.Now), Mock.Of<ILogger>());
+            _sut = new ContractDeletedHandler(_systemUsageRepository.Object, _transactionManager.Object, Mock.Of<ILogger>());
         }
 
         [Fact]

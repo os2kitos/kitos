@@ -125,14 +125,10 @@ namespace Core.ApplicationServices.Organizations
             var user = _userContext.UserEntity;
 
             //Setup defaults
-            newOrg.ObjectOwner = user;
-            newOrg.LastChangedByUser = user;
             newOrg.Config = Config.Default(user);
             newOrg.OrgUnits.Add(new OrganizationUnit
             {
                 Name = newOrg.Name,
-                ObjectOwnerId = user.Id,
-                LastChangedByUserId = user.Id
             });
 
             if (newOrg.IsCvrInvalid())

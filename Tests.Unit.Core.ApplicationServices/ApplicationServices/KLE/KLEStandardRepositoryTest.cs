@@ -102,7 +102,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             SetupUpdateObjects();
 
-            var result = _sut.UpdateKLE(0, 0);
+            var result = _sut.UpdateKLE(0);
 
             Assert.Equal(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), result);
         }
@@ -112,7 +112,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             var updateObjects = SetupUpdateObjects();
 
-            _sut.UpdateKLE(0, 0);
+            _sut.UpdateKLE(0);
 
             Assert.Equal("HAS BEEN RENAMED", updateObjects.renamedTaskRef.Description);
             Assert.Equal(Guid.Parse("f8d6e719-e050-48d8-89e2-977d0eaba6bb"), updateObjects.renamedTaskRef.Uuid);
@@ -124,7 +124,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             var updateObjects = SetupUpdateObjects();
 
-            _sut.UpdateKLE(0, 0);
+            _sut.UpdateKLE(0);
 
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
             Assert.All(updateObjects.stubTaskRefRepository.Get(), t => Assert.Equal(DateTime.Today, t.LastChanged.Date));
@@ -140,7 +140,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             updateObjects.stubTaskRefRepository.Insert(SetupTaskRef(1, "KLE-Emne", existingItemTaskKey, "Bebyggelsens højde- og afstandsforhold i almindelighed"));
 
             //Act
-            _sut.UpdateKLE(0, 0);
+            _sut.UpdateKLE( 0);
 
             //Assert
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
@@ -164,7 +164,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             updateObjects.removedTaskRef.ItProjects = new List<ItProject> { itProject };
 
             //Act
-            _sut.UpdateKLE(0, 0);
+            _sut.UpdateKLE( 0);
 
             //Assert
             Assert.False(itProject.TaskRefs.Contains(updateObjects.removedTaskRef));
@@ -184,7 +184,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             updateObjects.removedTaskRef.ItSystems = new List<ItSystem> { itSystem };
 
             //Act
-            _sut.UpdateKLE(0,0);
+            _sut.UpdateKLE(0);
 
             //Assert
             Assert.False(itSystem.TaskRefs.Contains(updateObjects.removedTaskRef));
@@ -207,7 +207,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 .Returns(itSystemUsages.AsQueryable);
 
             //Act
-            _sut.UpdateKLE(0,0);
+            _sut.UpdateKLE(0);
 
             //Assert
             Assert.False(itSystemUsage.TaskRefs.Contains(updateObjects.removedTaskRef));
@@ -227,7 +227,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             updateObjects.removedTaskRef.ItSystemUsagesOptOut = new List<ItSystemUsage> { itSystemUsage };
 
             //Act
-            _sut.UpdateKLE(0,0);
+            _sut.UpdateKLE(0);
 
             //Assert
             Assert.False(itSystemUsage.TaskRefs.Contains(updateObjects.removedTaskRef));
@@ -251,7 +251,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockTaskUsageRepository.Setup(s => s.RemoveRange(taskUsages));
 
             //Act
-            _sut.UpdateKLE(0,0);
+            _sut.UpdateKLE(0);
 
             //Assert
             _mockTaskUsageRepository.VerifyAll();

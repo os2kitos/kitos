@@ -110,9 +110,6 @@ namespace Presentation.Web.Controllers.OData
                 organization.OrganizationId = ActiveOrganizationId;
             }
 
-            entity.ObjectOwnerId = UserId;
-            entity.LastChangedByUserId = UserId;
-
             if (AllowCreate<T>(entity) == false)
             {
                 return Forbidden();

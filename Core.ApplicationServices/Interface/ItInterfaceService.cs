@@ -8,7 +8,6 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.System;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
@@ -20,10 +19,8 @@ namespace Core.ApplicationServices.Interface
         private readonly IGenericRepository<DataRow> _dataRowRepository;
         private readonly IItSystemRepository _systemRepository;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IOperationClock _operationClock;
         private readonly IGenericRepository<ItInterface> _repository;
 
         public ItInterfaceService(
@@ -31,19 +28,15 @@ namespace Core.ApplicationServices.Interface
             IGenericRepository<DataRow> dataRowRepository,
             IItSystemRepository systemRepository,
             IAuthorizationContext authorizationContext,
-            IOrganizationalUserContext userContext,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents,
-            IOperationClock operationClock)
+            IDomainEvents domainEvents)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
             _systemRepository = systemRepository;
             _authorizationContext = authorizationContext;
-            _userContext = userContext;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _operationClock = operationClock;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -96,21 +89,8 @@ namespace Core.ApplicationServices.Interface
                 return OperationFailure.Conflict;
             }
 
-            var now = _operationClock.Now;
-            var user = _userContext.UserEntity;
-
-            newInterface.ObjectOwner = user;
-            newInterface.LastChangedByUser = user;
-            newInterface.LastChanged = now;
             newInterface.ItInterfaceId = newInterface.ItInterfaceId ?? "";
             newInterface.Uuid = Guid.NewGuid();
-
-            foreach (var dataRow in newInterface.DataRows)
-            {
-                dataRow.ObjectOwner = user;
-                dataRow.LastChangedByUser = user;
-                dataRow.LastChanged = now;
-            }
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
             {
@@ -163,12 +143,6 @@ namespace Core.ApplicationServices.Interface
 
                 if (changed)
                 {
-                    if (newExhibit.HasValue)
-                    {
-                        var exhibit = newExhibit.Value;
-                        exhibit.LastChangedByUser = _userContext.UserEntity;
-                        exhibit.LastChanged = _operationClock.Now;
-                    }
                     _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
 
                     _repository.Save();

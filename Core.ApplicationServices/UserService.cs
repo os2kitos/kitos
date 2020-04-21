@@ -69,7 +69,6 @@ namespace Core.ApplicationServices
                 ? _cryptoService.Encrypt(_defaultUserPassword + user.Salt)
                 : _cryptoService.Encrypt(utcNow + user.Salt);
 
-            user.LastChanged = utcNow;
             user.DefaultOrganizationId = orgId;
 
             if (!_authorizationContext.AllowCreate<User>(user))
@@ -135,7 +134,7 @@ namespace Core.ApplicationServices
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
 
-            var message = new MailMessage()
+            var message = new MailMessage
             {
                 Subject = (subject ?? mailSubject).Replace('\r', ' ').Replace('\n', ' '),
                 Body = content ?? mailContent,
@@ -160,7 +159,7 @@ namespace Core.ApplicationServices
 
             var hash = HttpServerUtility.UrlTokenEncode(encrypted);
 
-            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
+            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id};
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();

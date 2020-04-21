@@ -7,7 +7,7 @@ namespace Core.DomainServices.Factories
 {
     public class ItProjectFactory
     {
-        public static ItProject Create(string name, int organizationId, User activeUser, DateTime now)
+        public static ItProject Create(string name, int organizationId)
         {
             if (name == null)
             {
@@ -18,9 +18,6 @@ namespace Core.DomainServices.Factories
             {
                 Name = name,
                 OrganizationId = organizationId,
-                ObjectOwner = activeUser,
-                LastChangedByUser = activeUser,
-                LastChanged = now
             };
 
             InitializeAccessModifier(itProject);
@@ -29,31 +26,21 @@ namespace Core.DomainServices.Factories
 
             InitializeEconomyYears(itProject);
 
-            InitializeHandover(activeUser, now, itProject);
+            InitializeHandover(itProject);
 
-            InitializeGoalStatus(activeUser, now, itProject);
+            InitializeGoalStatus(itProject);
 
             return itProject;
         }
 
-        private static void InitializeGoalStatus(User activeUser, DateTime now, ItProject itProject)
+        private static void InitializeGoalStatus(ItProject itProject)
         {
-            itProject.GoalStatus = new GoalStatus
-            {
-                ObjectOwner = activeUser,
-                LastChangedByUser = activeUser,
-                LastChanged = now
-            };
+            itProject.GoalStatus = new GoalStatus();
         }
 
-        private static void InitializeHandover(User activeUser, DateTime now, ItProject itProject)
+        private static void InitializeHandover(ItProject itProject)
         {
-            itProject.Handover = new Handover
-            {
-                ObjectOwner = activeUser,
-                LastChangedByUser = activeUser,
-                LastChanged = now
-            };
+            itProject.Handover = new Handover();
         }
 
         private static void InitializePhases(ItProject itProject)
@@ -94,9 +81,6 @@ namespace Core.DomainServices.Factories
             return new EconomyYear
             {
                 YearNumber = yearNumber,
-                ObjectOwner = project.ObjectOwner,
-                LastChangedByUser = project.ObjectOwner,
-                LastChanged = project.LastChanged
             };
         }
     }

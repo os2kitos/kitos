@@ -21,21 +21,17 @@ namespace Tests.Unit.Core.Model.EventHandlers
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<SystemRelation>> _systemRelationRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly ActiveUserContext _activeUserContext;
 
         public SystemUsageDeletedHandlerTest()
         {
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _systemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _activeUserContext = new ActiveUserContext(1337, new User());
             _sut = new SystemUsageDeletedHandler(
                 _systemUsageRepository.Object,
                 _systemRelationRepository.Object,
                 _transactionManager.Object,
-                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
-                Mock.Of<ILogger>(),
-                _activeUserContext);
+                Mock.Of<ILogger>());
         }
 
         [Fact]
@@ -56,8 +52,6 @@ namespace Tests.Unit.Core.Model.EventHandlers
             //Assert that model was updated and that deleted relations were marked in repository
             Assert.False(relation1.FromSystemUsage.UsageRelations.Contains(relation1));
             Assert.False(relation2.FromSystemUsage.UsageRelations.Contains(relation2));
-            Assert.Same(_activeUserContext.UserEntity, relation1.FromSystemUsage.LastChangedByUser);
-            Assert.Same(_activeUserContext.UserEntity, relation2.FromSystemUsage.LastChangedByUser);
             _systemRelationRepository.Verify(x => x.Delete(It.IsAny<SystemRelation>()), Times.Exactly(2));
             _systemRelationRepository.Verify(x => x.Delete(relation1), Times.Once);
             _systemRelationRepository.Verify(x => x.Delete(relation2), Times.Once);
