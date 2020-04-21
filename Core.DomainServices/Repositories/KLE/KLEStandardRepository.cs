@@ -23,7 +23,6 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
-        private readonly IOperationClock _clock;
         private readonly ILogger _logger;
 
         public KLEStandardRepository(
@@ -39,7 +38,6 @@ namespace Core.DomainServices.Repositories.KLE
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
             _systemUsageRepository = systemUsageRepository;
-            _clock = clock;
             _logger = logger;
         }
 
@@ -141,7 +139,7 @@ namespace Core.DomainServices.Repositories.KLE
             return result;
         }
 
-        public DateTime UpdateKLE(int ownerObjectId, int ownedByOrgnizationUnitId)
+        public DateTime UpdateKLE(int ownedByOrgnizationUnitId)
         {
             _logger.Debug("UpdateKLE: Begin");
 
@@ -150,17 +148,15 @@ namespace Core.DomainServices.Repositories.KLE
             _logger.Debug($"Changes: {changes.Count}");
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                var updateTime = _clock.Now;
-
                 // Changes first run
                 UpdateRemovedTaskRefs(changes);
-                UpdateRenamedTaskRefs(changes, ownerObjectId, ownedByOrgnizationUnitId, updateTime);
-                UpdateAddedTaskRefs(changes, ownerObjectId, ownedByOrgnizationUnitId, updateTime);
-                PatchTaskRefUuid(changes, ownerObjectId, ownedByOrgnizationUnitId, updateTime);
+                UpdateRenamedTaskRefs(changes, ownedByOrgnizationUnitId);
+                UpdateAddedTaskRefs(changes, ownedByOrgnizationUnitId);
+                PatchTaskRefUuid(changes, ownedByOrgnizationUnitId);
                 _existingTaskRefRepository.Save();
 
                 // Changes second run, takes into account removed/added items
-                PatchTaskRefParentId(changes, ownerObjectId, ownedByOrgnizationUnitId, updateTime);
+                PatchTaskRefParentId(changes, ownedByOrgnizationUnitId);
                 _existingTaskRefRepository.Save();
 
                 transaction.Commit();
@@ -248,16 +244,14 @@ namespace Core.DomainServices.Repositories.KLE
 
         #region Renames
 
-        private void UpdateRenamedTaskRefs(IEnumerable<KLEChange> changes, int ownerObjectId,
-            int ownedByOrgnizationUnitId, DateTime updateTime)
+        private void UpdateRenamedTaskRefs(IEnumerable<KLEChange> changes,
+            int ownedByOrgnizationUnitId)
         {
             var updates = BuildChangeSet(changes, KLEChangeType.Renamed);
             foreach (var update in updates)
             {
                 update.Item1.Description = update.Item2.UpdatedDescription;
                 update.Item1.Uuid = update.Item2.Uuid;
-                update.Item1.LastChanged = updateTime;
-                update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
@@ -268,8 +262,8 @@ namespace Core.DomainServices.Repositories.KLE
 
         #region Additions
 
-        private void UpdateAddedTaskRefs(IEnumerable<KLEChange> changes, int ownerObjectId,
-            int ownedByOrgnizationUnitId, DateTime updateTime)
+        private void UpdateAddedTaskRefs(IEnumerable<KLEChange> changes,
+            int ownedByOrgnizationUnitId)
         {
             var additions = changes.Where(c => c.ChangeType == KLEChangeType.Added).ToList();
             _logger.Debug($"Additions: {additions.Count}");
@@ -280,9 +274,6 @@ namespace Core.DomainServices.Repositories.KLE
                     Type = kleChange.Type,
                     TaskKey = kleChange.TaskKey,
                     Description = kleChange.UpdatedDescription,
-                    ObjectOwnerId = ownerObjectId,
-                    LastChanged = updateTime,
-                    LastChangedByUserId = ownerObjectId,
                     OwnedByOrganizationUnitId = ownedByOrgnizationUnitId,
                     ActiveFrom = kleChange.ActiveFrom,
                     ActiveTo = kleChange.ActiveTo,
@@ -295,24 +286,22 @@ namespace Core.DomainServices.Repositories.KLE
 
         #region Patches
 
-        private void PatchTaskRefUuid(IEnumerable<KLEChange> changes, int ownerObjectId,
-            int ownedByOrgnizationUnitId, DateTime updateTime)
+        private void PatchTaskRefUuid(IEnumerable<KLEChange> changes,
+            int ownedByOrgnizationUnitId)
         {
             var updates = BuildChangeSet(changes, KLEChangeType.UuidPatched).ToList();
             _logger.Debug($"Patch-uuids: {updates.Count}");
             foreach (var update in updates)
             {
                 update.Item1.Uuid = update.Item2.Uuid;
-                update.Item1.LastChanged = updateTime;
-                update.Item1.LastChangedByUserId = ownerObjectId;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
             }
         }
 
-        private void PatchTaskRefParentId(IEnumerable<KLEChange> changes, int ownerObjectId,
-            int ownedByOrgnizationUnitId, DateTime updateTime)
+        private void PatchTaskRefParentId(IEnumerable<KLEChange> changes,
+            int ownedByOrgnizationUnitId)
         {
             var updates = BuildChangeSet(changes, KLEChangeType.Added);
 
@@ -323,8 +312,6 @@ namespace Core.DomainServices.Repositories.KLE
                 {
                     var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).First();
                     existingTaskRef.ParentId = parent.Id;
-                    existingTaskRef.LastChanged = updateTime;
-                    existingTaskRef.LastChangedByUserId = ownerObjectId;
                     existingTaskRef.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 }
             }

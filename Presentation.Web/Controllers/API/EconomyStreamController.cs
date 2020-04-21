@@ -99,9 +99,6 @@ namespace Presentation.Web.Controllers.API
                 return Forbidden();
             }
 
-            stream.ObjectOwner = KitosUser;
-            stream.LastChangedByUser = KitosUser;
-
             var savedItem = PostQuery(stream);
 
             return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));

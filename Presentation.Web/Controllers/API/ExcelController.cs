@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
 
-            _excelService.ExportUsers(stream, organizationId, KitosUser);
+            _excelService.ExportUsers(stream, organizationId);
             stream.Seek(0, SeekOrigin.Begin);
             return GetResponseMessage(stream, filename);
         }
@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API
 
             try
             {
-                _excelService.ImportUsers(stream, organizationId, KitosUser);
+                _excelService.ImportUsers(stream, organizationId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (ExcelImportException e)
@@ -84,7 +84,7 @@ namespace Presentation.Web.Controllers.API
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
 
-            _excelService.ExportOrganizationUnits(stream, organizationId, KitosUser);
+            _excelService.ExportOrganizationUnits(stream, organizationId);
             stream.Seek(0, SeekOrigin.Begin);
             return GetResponseMessage(stream, filename);
         }
@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.API
 
             try
             {
-                _excelService.ImportOrganizationUnits(stream, organizationId, KitosUser);
+                _excelService.ImportOrganizationUnits(stream, organizationId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (ExcelImportException e)
@@ -128,7 +128,7 @@ namespace Presentation.Web.Controllers.API
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
 
-            _excelService.ExportItContracts(stream, organizationId, KitosUser);
+            _excelService.ExportItContracts(stream, organizationId);
             return GetResponseMessage(stream, filename);
         }
 
@@ -147,7 +147,7 @@ namespace Presentation.Web.Controllers.API
 
             try
             {
-                _excelService.ImportItContracts(stream, organizationId, KitosUser);
+                _excelService.ImportItContracts(stream, organizationId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (ExcelImportException e)

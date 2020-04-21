@@ -157,6 +157,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEndpointValidationService>().To<EndpointValidationService>().InCommandScope(Mode);
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
+            kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -165,7 +166,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
 
-            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InCommandScope(Mode);
+            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current?.GetOwinContext()).InCommandScope(Mode);
+            kernel.Bind<Maybe<IOwinContext>>().ToMethod(_ => HttpContext.Current.FromNullable().Select(httpCtx => httpCtx.GetOwinContext())).InCommandScope(Mode);
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
@@ -176,7 +178,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterSSO(IKernel kernel)
         {
-            kernel.Bind<SsoFlowConfiguration>().ToMethod(_=>new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
+            kernel.Bind<SsoFlowConfiguration>().ToMethod(_ => new SsoFlowConfiguration(Settings.Default.SsoServiceProviderId)).InSingletonScope();
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
@@ -187,7 +189,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);
             kernel.Bind<ISsoFlowApplicationService>().To<SsoFlowApplicationService>().InCommandScope(Mode);
             kernel.Bind<IStsBrugerInfoService>().To<StsBrugerInfoService>().InCommandScope(Mode);
-            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_=>Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
+            kernel.Bind<Maybe<ISaml20Identity>>().ToMethod(_ => Saml20Identity.IsInitialized() ? Saml20Identity.Current : Maybe<ISaml20Identity>.None).InCommandScope(Mode);
         }
 
         private void RegisterDomainEventsEngine(IKernel kernel)
@@ -288,6 +290,16 @@ namespace Presentation.Web.Ninject
 
                     var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
                     return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
+                });
+            kernel.Bind<Maybe<ActiveUserIdContext>>()
+                .ToMethod(ctx =>
+                {
+                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
+                    if (authentication.UserId.HasValue == false || authentication.Method == AuthenticationMethod.Anonymous)
+                    {
+                        return Maybe<ActiveUserIdContext>.None;
+                    }
+                    return new ActiveUserIdContext(authentication.UserId.Value);
                 });
 
             //Authorization context

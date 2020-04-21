@@ -24,8 +24,6 @@ namespace Core.ApplicationServices.Project
         private readonly IUserRepository _userRepository;
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOrganizationalUserContext _userContext;
-        private readonly IOperationClock _operationClock;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -33,9 +31,7 @@ namespace Core.ApplicationServices.Project
             IItProjectRepository itProjectRepository,
             IUserRepository userRepository,
             IReferenceService referenceService,
-            ITransactionManager transactionManager,
-            IOrganizationalUserContext userContext,
-            IOperationClock operationClock)
+            ITransactionManager transactionManager)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -43,13 +39,11 @@ namespace Core.ApplicationServices.Project
             _userRepository = userRepository;
             _referenceService = referenceService;
             _transactionManager = transactionManager;
-            _userContext = userContext;
-            _operationClock = operationClock;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
         {
-            var project = ItProjectFactory.Create(name, organizationId, _userContext.UserEntity, _operationClock.Now);
+            var project = ItProjectFactory.Create(name, organizationId);
 
             if (!_authorizationContext.AllowCreate<ItProject>(project))
             {
@@ -119,8 +113,6 @@ namespace Core.ApplicationServices.Project
             }
 
             itProject.Handover.Participants.Add(user);
-            itProject.Handover.LastChanged = _operationClock.Now;
-            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
             return itProject.Handover;
@@ -159,8 +151,6 @@ namespace Core.ApplicationServices.Project
             }
 
             itProject.Handover.Participants.Remove(user);
-            itProject.Handover.LastChanged = _operationClock.Now;
-            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
             return itProject.Handover;

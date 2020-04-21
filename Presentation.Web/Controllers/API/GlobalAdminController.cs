@@ -68,8 +68,6 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 user.IsGlobalAdmin = true;
-                user.LastChanged = DateTime.UtcNow;
-                user.LastChangedByUser = KitosUser;
                 _userRepository.Save();
 
                 var outDto = AutoMapper.Mapper.Map<UserDTO>(user);

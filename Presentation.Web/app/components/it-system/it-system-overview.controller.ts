@@ -519,18 +519,11 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         sortable: false
                     },
                     {
-                        field: "Reference.Title", title: "Reference", width: 150,
+                        field: "Reference.Title", title: "Lokal Reference", width: 150,
                         persistId: "ReferenceId",
                         template: dataItem => {
                             var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (Utility.Validation.validateUrl(reference.URL)) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.RenderFieldsHelper.renderReferenceUrl(reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
@@ -546,22 +539,10 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
                         persistId: "folderref",
                         template: dataItem => {
-                            var reference = dataItem.Reference;
-                            if (reference != null) {
-                                if (Utility.Validation.validateUrl(reference.ExternalReferenceId)) {
-                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
-                                        reference.ExternalReferenceId +
-                                        "\">" +
-                                        reference.Title +
-                                        "</a>";
-                                } else {
-                                    return reference.Title;
-                                }
-                            }
-                            return "";
+                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);

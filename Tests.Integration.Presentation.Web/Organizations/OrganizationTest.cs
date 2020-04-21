@@ -68,17 +68,14 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-            var userDto = await AuthorizationHelper.GetUser(login);
-            const int objectOwnerId = TestEnvironment.DefaultUserId;
             var name = A<string>();
             var cvr = (A<int>() % 9999999999).ToString("D10");
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
-            var result = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, objectOwnerId, name, cvr, organizationType, accessModifier, login);
+            var result = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, name, cvr, organizationType, accessModifier, login);
 
             //Assert
-            Assert.Equal(userDto.Id, result.ObjectOwnerId.GetValueOrDefault()); //Even if a different id is passed in the method, the authenticated user is always set as owner
             Assert.Equal(accessModifier, result.AccessModifier);
             Assert.Equal(name, (string) result.Name);
             Assert.Equal(cvr, (string) result.Cvr);
@@ -95,13 +92,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-            const int objectOwnerId = TestEnvironment.DefaultUserId;
             var name = A<string>();
             var cvr = (A<int>() % 9999999999).ToString("D10");
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
-            using (var result = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, objectOwnerId, name, cvr, organizationType, accessModifier, login))
+            using (var result = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, name, cvr, organizationType, accessModifier, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

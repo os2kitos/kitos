@@ -80,8 +80,7 @@ namespace Core.DomainModel.ItSystem
                     ExhibitedBy = new ItInterfaceExhibit
                     {
                         ItInterface = this,
-                        ItSystem = newSystem,
-                        ObjectOwner = ObjectOwner,
+                        ItSystem = newSystem
                     };
                 }
             }

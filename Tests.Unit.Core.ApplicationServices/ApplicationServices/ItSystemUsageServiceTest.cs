@@ -34,13 +34,11 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IItContractRepository> _contractRepository;
         private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _optionsService;
-        private readonly Mock<IOrganizationalUserContext> _userContext;
-        private readonly User _activeUser;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
-        private Mock<IReferenceService> _referenceService;
+        private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
 
         public ItSystemUsageServiceTest()
@@ -50,9 +48,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _systemRepository = new Mock<IItSystemRepository>();
             _contractRepository = new Mock<IItContractRepository>();
             _optionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
-            _userContext = new Mock<IOrganizationalUserContext>();
-            _activeUser = new User();
-            _userContext.Setup(x => x.UserEntity).Returns(_activeUser);
             _transactionManager = new Mock<ITransactionManager>();
             _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
@@ -65,7 +60,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _systemRepository.Object,
                 _contractRepository.Object,
                 _optionsService.Object,
-                _userContext.Object,
                 _relationRepositoryMock.Object,
                 _interfaceRepository.Object,
                 _referenceService.Object,
@@ -84,7 +78,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var systemUsage = SetupRepositoryQueryWith(organizationId, systemId);
 
             //Act
-            var result = _sut.Add(systemUsage, new User());
+            var result = _sut.Add(systemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -100,7 +94,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(false);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -117,7 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(default(ItSystem));
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -136,7 +130,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(false);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -155,7 +149,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(true);
 
             //Act
-            var result = _sut.Add(itSystemUsage, new User());
+            var result = _sut.Add(itSystemUsage);
 
             //Assert
             Assert.False(result.Ok);
@@ -168,7 +162,6 @@ namespace Tests.Unit.Core.ApplicationServices
         public void Add_Returns_Ok(bool sameOrg)
         {
             //Arrange
-            var objectOwner = new User();
             var input = new ItSystemUsage
             {
                 ItSystemId = A<int>(),
@@ -187,14 +180,13 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Setup(x => x.Create()).Returns(usageCreatedByRepo);
 
             //Act
-            var result = _sut.Add(input, objectOwner);
+            var result = _sut.Add(input);
 
             //Assert
             Assert.True(result.Ok);
             var createdUsage = result.Value;
             Assert.NotSame(input, createdUsage);
             Assert.Same(usageCreatedByRepo, createdUsage);
-            Assert.Same(objectOwner, createdUsage.ObjectOwner);
             Assert.Equal(input.OrganizationId, createdUsage.OrganizationId);
             Assert.Empty(createdUsage.AssociatedDataWorkers);
             Assert.Equal(input.ItSystemId, createdUsage.ItSystemId);

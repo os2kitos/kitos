@@ -588,7 +588,7 @@
                         <div class="form-group">
                             <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
                             <input type="number" step="1" min="0" class="form-control input-sm"
-                                   ng-change="patch('NumberDPIA', usage.numberDPIA)"
+                                   ng-blur="patch('NumberDPIA', usage.numberDPIA)"
                                    data-field="NumberDPIA"
                                    ng-model="usage.numberDPIA"
                                    data-element-type="GDPRNumberDPIA"

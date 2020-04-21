@@ -10,8 +10,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Time;
-using Fasterflect;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -26,7 +24,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItProjectRepository> _specificProjectRepo;
         private readonly ItProjectService _sut;
         private readonly Mock<IUserRepository> _userRepository;
-        private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IReferenceService> _referenceService;
 
@@ -36,7 +33,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _specificProjectRepo = new Mock<IItProjectRepository>();
             _userRepository = new Mock<IUserRepository>();
-            _userContext = new Mock<IOrganizationalUserContext>();
             _transactionManager = new Mock<ITransactionManager>();
             _referenceService = new Mock<IReferenceService>();
             _sut = new ItProjectService(
@@ -45,9 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _specificProjectRepo.Object,
                 _userRepository.Object,
                 _referenceService.Object,
-                _transactionManager.Object,
-                _userContext.Object,
-                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
+                _transactionManager.Object);
         }
 
         [Fact]
@@ -74,8 +68,6 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Configures_New_Project_And_Returns_Ok()
         {
             //Arrange
-            var objectOwner = new User();
-            _userContext.Setup(x => x.UserEntity).Returns(objectOwner);
             _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(true);
 
             //Act
@@ -88,11 +80,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var resultValue = result.Value;
             Assert.Equal(AccessModifier.Local, resultValue.AccessModifier); //access modifier must be forced to local
             Assert.NotNull(resultValue.Handover);
-            Assert.Equal(objectOwner, resultValue.Handover.ObjectOwner);
-            Assert.Equal(objectOwner, resultValue.Handover.LastChangedByUser);
             Assert.NotNull(resultValue.GoalStatus);
-            Assert.Equal(objectOwner, resultValue.GoalStatus.ObjectOwner);
-            Assert.Equal(objectOwner, resultValue.GoalStatus.LastChangedByUser);
             Assert.True(new[] { PhaseNames.Phase1, PhaseNames.Phase2, PhaseNames.Phase3, PhaseNames.Phase4, PhaseNames.Phase5 }.SequenceEqual(new[] { resultValue.Phase1, resultValue.Phase2, resultValue.Phase3, resultValue.Phase4, resultValue.Phase5 }.Select(x => x.Name)));
             Assert.Equal(1, resultValue.CurrentPhase);
             Assert.Equal(6, resultValue.EconomyYears.Count);
@@ -100,8 +88,6 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 var year = resultValue.EconomyYears.ToList()[i];
                 Assert.Equal(i, year.YearNumber);
-                Assert.Same(objectOwner, year.ObjectOwner);
-                Assert.Same(objectOwner, year.LastChangedByUser);
             }
         }
 

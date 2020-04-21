@@ -7,7 +7,6 @@ using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Moq;
@@ -25,7 +24,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<IOrganizationalUserContext> _UserContext;
         private readonly Mock<IGenericRepository<DataRow>> _dataRowRepository;
 
         public ItInterfaceServiceTest()
@@ -35,17 +33,14 @@ namespace Tests.Unit.Core.ApplicationServices
             _systemRepository = new Mock<IItSystemRepository>();
             _domainEvents = new Mock<IDomainEvents>();
             _transactionManager = new Mock<ITransactionManager>();
-            _UserContext = new Mock<IOrganizationalUserContext>();
             _dataRowRepository = new Mock<IGenericRepository<DataRow>>();
             _sut = new ItInterfaceService(
                 _interfaceRepository.Object,
                 _dataRowRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
-                _UserContext.Object,
                 _transactionManager.Object,
-                _domainEvents.Object,
-                new Mock<IOperationClock>().Object);
+                _domainEvents.Object);
         }
 
         [Fact]

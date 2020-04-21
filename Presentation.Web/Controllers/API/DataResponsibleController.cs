@@ -53,9 +53,7 @@ namespace Presentation.Web.Controllers.API
                     {
                         _repository.Insert(new DataResponsible
                         {
-                            OrganizationId = organization.Id,
-                            ObjectOwnerId = organization.ObjectOwnerId,
-                            LastChangedByUserId = KitosUser.Id
+                            OrganizationId = organization.Id
 
                         });
                         _repository.Save();

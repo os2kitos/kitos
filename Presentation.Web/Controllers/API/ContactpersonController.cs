@@ -55,8 +55,6 @@ namespace Presentation.Web.Controllers.API
                         _repository.Insert(new ContactPerson
                         {
                             OrganizationId = organization.Id,
-                            ObjectOwnerId = organization.ObjectOwnerId,
-                            LastChangedByUserId = KitosUser.Id,
                         });
 
                         _repository.Save();

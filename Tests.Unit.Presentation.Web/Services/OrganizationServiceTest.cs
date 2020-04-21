@@ -134,12 +134,8 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             Assert.Same(newOrg, result.Value);
             transaction.Verify(x => x.Commit(), Times.Once);
-            Assert.Equal(_user, newOrg.LastChangedByUser);
-            Assert.Equal(_user, newOrg.ObjectOwner);
             Assert.Equal(1, newOrg.OrgUnits.Count);
             Assert.Equal(newOrg.Name, newOrg.OrgUnits.First().Name);
-            Assert.Equal(_user.Id, newOrg.OrgUnits.First().ObjectOwnerId);
-            Assert.Equal(_user.Id, newOrg.OrgUnits.First().LastChangedByUserId);
             Assert.NotNull(newOrg.Config);
             _organizationRepository.Verify(x => x.Save(), Times.Once);
             _roleService.Verify(x => x.MakeLocalAdmin(_user, newOrg), Times.Exactly(expectRolesAssigned ? 1 : 0));
