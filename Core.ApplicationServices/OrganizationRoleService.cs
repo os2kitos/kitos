@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
-using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 
@@ -12,31 +9,14 @@ namespace Core.ApplicationServices
     public class OrganizationRoleService : IOrganizationRoleService
     {
         private readonly IGenericRepository<OrganizationRight> _organizationRights;
-        private readonly IAuthenticationContext _authenticationContext;
-        private readonly IUserRepository _userRepository;
 
-        public OrganizationRoleService(
-            IGenericRepository<OrganizationRight> organizationRights,
-            IAuthenticationContext authenticationContext,
-            IUserRepository userRepository)
+        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights)
         {
             _organizationRights = organizationRights;
-            _authenticationContext = authenticationContext;
-            _userRepository = userRepository;
         }
 
         private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, OrganizationRole organizationRole)
         {
-            var kitosUser = _userRepository.GetById(_authenticationContext.UserId.GetValueOrDefault(EntityConstants.InvalidId));
-            if (kitosUser == null)
-            {
-                //Fallback to a global admin
-                kitosUser = _userRepository.AsQueryable().FirstOrDefault(x => x.IsGlobalAdmin);
-                if (kitosUser == null)
-                {
-                    throw new InvalidOperationException($"Cannot determine who is adding the role to the user with id:{user.Id}");
-                }
-            }
             var result = _organizationRights.Insert(new OrganizationRight
             {
                 Organization = organization,

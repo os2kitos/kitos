@@ -17,7 +17,7 @@ namespace Infrastructure.DataAccess.Interceptors
     {
         private readonly Factory<IOperationClock> _operationClock;
         private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
-        private readonly Factory<KitosContext> _activeDbContext;
+        private readonly Factory<IFallbackUserResolver> _fallbackUserResolver;
         private const string ObjectOwnerIdColumnName = nameof(IEntity.ObjectOwnerId);
         private const string LastChangedByUserIdColumnName = nameof(IEntity.LastChangedByUserId);
         private const string LastChangedColumnName = nameof(IEntity.LastChanged);
@@ -25,11 +25,11 @@ namespace Infrastructure.DataAccess.Interceptors
         public EFEntityInterceptor(
             Factory<IOperationClock> operationClock,
             Factory<Maybe<ActiveUserIdContext>> userContext,
-            Factory<KitosContext> activeDbContext)
+            Factory<IFallbackUserResolver> fallbackUserResolver)
         {
             _operationClock = operationClock;
             _userContext = userContext;
-            _activeDbContext = activeDbContext;
+            _fallbackUserResolver = fallbackUserResolver;
         }
 
         public void TreeCreated(DbCommandTreeInterceptionContext interceptionContext)
@@ -116,7 +116,7 @@ namespace Infrastructure.DataAccess.Interceptors
             }
 
             //Fallback to first global admin
-            return _activeDbContext().Users.First(x => x.IsGlobalAdmin).Id;
+            return _fallbackUserResolver().Resolve().Id;
         }
 
         private static bool MatchPropertyName(DbSetClause clause, string propertyName)

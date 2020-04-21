@@ -35,7 +35,7 @@ namespace Presentation.Web
                 var kernel = new KernelBuilder().ForWebApplication().Build();
 
                 //Only register the interceptor once per application (Hangfire job is the same application scope)
-                DbInterception.Add(new EFEntityInterceptor(() => kernel.Get<IOperationClock>(), () => kernel.Get<Maybe<ActiveUserIdContext>>(), () => kernel.Get<KitosContext>()));
+                DbInterception.Add(new EFEntityInterceptor(() => kernel.Get<IOperationClock>(), () => kernel.Get<Maybe<ActiveUserIdContext>>(), () => kernel.Get<IFallbackUserResolver>()));
 
                 return kernel;
             });
