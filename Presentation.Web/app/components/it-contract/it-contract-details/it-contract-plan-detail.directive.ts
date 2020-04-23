@@ -48,17 +48,10 @@
                         field: `${scope.fieldValue}`,
                         title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
                         template: dataItem => {
-
-                            if (angular.isUndefined(dataItem.AssociatedInterfaceUsages)) {
-                                if (dataItem[scope.detailModelType].Disabled)
-                                    return dataItem[scope.detailModelType].Name + " (Slettes)";
-                                else
-                                    return dataItem[scope.detailModelType].Name;
-                            } else {
-                                return `<table data-ng-repeat="item in dataItem.AssociatedInterfaceUsages">
-                                            <td>{{item.ItInterface.Name}} <span data-ng-if="item.ItInterface.Disabled"> (Slettes) </span></td>
-                                        </table>`;
-                            }
+                            if (dataItem[scope.detailModelType].Disabled)
+                                return dataItem[scope.detailModelType].Name + " (Slettes)";
+                            else
+                                return dataItem[scope.detailModelType].Name;
                         },
                         hidden: false
                     }
