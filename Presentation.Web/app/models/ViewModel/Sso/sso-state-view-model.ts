@@ -11,15 +11,9 @@
         }
 
         createFromViewState() {
-            let show = false;
             let error = null;
 
             const state = new Utility.ViewDataState(this.$);
-
-            const toggle = state.getStateOrNull("feature-toggle");
-            if (toggle && toggle.value === "Sso") {
-                show = true;
-            }
 
             const ssoError = state.getStateOrNull("sso-error");
             if (ssoError) {
@@ -28,7 +22,7 @@
             }
 
             return <ISsoStateViewModel>{
-                show: show,
+                show: true,
                 error: error
             };
         }

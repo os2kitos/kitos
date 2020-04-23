@@ -9,10 +9,9 @@ namespace Core.DomainModel.KLE
         // To keep EF happy
         private KLEUpdateHistoryItem() {}
 
-        public KLEUpdateHistoryItem(DateTime version, int userId)
+        public KLEUpdateHistoryItem(DateTime version)
         {
             Version = version;
-            LastChangedByUserId = userId;
         }
     }
 }

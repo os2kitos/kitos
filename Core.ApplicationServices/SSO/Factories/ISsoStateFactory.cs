@@ -16,5 +16,6 @@ namespace Core.ApplicationServices.SSO.Factories
         AbstractState CreateAuthorizingUserFromUnknownOrgState(User user);
         AbstractState CreateAssigningRoleState(User user, Organization ssoOrganization);
         AbstractState CreateFirstTimeUserNotFoundState(StsBrugerInfo stsBrugerInfo);
+        AbstractState CreateErrorState();
     }
 }

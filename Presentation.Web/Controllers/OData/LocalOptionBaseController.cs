@@ -118,8 +118,6 @@ namespace Presentation.Web.Controllers.OData
             {
                 try
                 {
-                    entity.ObjectOwnerId = UserId;
-                    entity.LastChangedByUserId = UserId;
                     entity.IsActive = true;
 
                     if (entity is IOwnedByOrganization entityWithOrganization)
@@ -181,8 +179,6 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     TLocalModelType entity = new TLocalModelType();
-                    entity.ObjectOwnerId = UserId;
-                    entity.LastChangedByUserId = UserId;
                     entity.OptionId = key;
 
                     if (entity is IOwnedByOrganization entityWithOrganization)

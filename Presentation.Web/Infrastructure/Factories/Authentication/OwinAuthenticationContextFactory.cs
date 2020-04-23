@@ -2,6 +2,7 @@
 using System.Security.Principal;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Microsoft.Owin;
 using Presentation.Web.Extensions;
@@ -12,11 +13,12 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 {
     public class OwinAuthenticationContextFactory : IAuthenticationContextFactory
     {
+        private static readonly IAuthenticationContext AnonymousAuthentication = new AuthenticationContext(AuthenticationMethod.Anonymous, false);
         private readonly ILogger _logger;
-        private readonly IOwinContext _owinContext;
+        private readonly Maybe<IOwinContext> _owinContext;
         private readonly IUserRepository _userRepository;
 
-        public OwinAuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
+        public OwinAuthenticationContextFactory(ILogger logger, Maybe<IOwinContext> owinContext, IUserRepository userRepository)
         {
             _logger = logger;
             _owinContext = owinContext;
@@ -25,11 +27,17 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 
         public IAuthenticationContext Create()
         {
-            var principal = _owinContext.Authentication.User;
-            var user = GetAuthenticatedUser(principal);
-            return user != null
-                ? new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id, MapOrganizationId(user, principal))
-                : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
+            return
+                _owinContext
+                    .Select(x => x.Authentication)
+                    .Select(x => x.User)
+                    .Match(onValue: principal =>
+                    {
+                        return GetAuthenticatedUser(principal).FromNullable()
+                            .Select(user => new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id, MapOrganizationId(user, principal)))
+                            .Match(authUser => authUser,
+                                () => AnonymousAuthentication);
+                    }, onNone: () => AnonymousAuthentication);
         }
 
         private bool MapApiAccess(User user)

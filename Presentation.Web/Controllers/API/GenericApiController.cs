@@ -193,8 +193,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Map<TDto, TModel>(dto);
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
+                
                 PrepareNewObject(item);
                 // Check CREATE access rights  
                 if (!AllowCreate<TModel>(item))
@@ -386,9 +385,6 @@ namespace Presentation.Web.Controllers.API
                         }
                     }
                 }
-
-                item.LastChanged = DateTime.UtcNow;
-                item.LastChangedByUser = KitosUser;
             }
             Repository.Update(item);
             Repository.Save();

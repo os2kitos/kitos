@@ -65,7 +65,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid)
         {
-            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, _organizationRepository, this);
+            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, this);
         }
 
         public AbstractState CreateUserLoggedIn(User user)
@@ -96,6 +96,11 @@ namespace Core.ApplicationServices.SSO.Factories
         public AbstractState CreateFirstTimeUserNotFoundState(StsBrugerInfo stsBrugerInfo)
         {
             return new FirstTimeUserNotFoundState(stsBrugerInfo, _organizationRepository, _userRepository, _organizationRoleService, _cryptoService, this);
+        }
+
+        public AbstractState CreateErrorState()
+        {
+            return new ErrorState();
         }
     }
 }

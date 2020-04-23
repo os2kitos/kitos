@@ -5,6 +5,5 @@
     /// </summary>
     public enum TemporaryFeature
     {
-        Sso = 0
     }
 }

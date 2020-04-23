@@ -3,9 +3,6 @@ using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
-using Core.DomainModel.Result;
-using Core.DomainServices.Context;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Serilog;
@@ -17,24 +14,18 @@ namespace Core.DomainServices.Model.EventHandlers
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<SystemRelation> _systemRelationRepository;
         private readonly ITransactionManager _transactionManager;
-        private readonly IOperationClock _clock;
         private readonly ILogger _logger;
-        private readonly Maybe<ActiveUserContext> _userContext;
 
         public SystemUsageDeletedHandler(
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<SystemRelation> systemRelationRepository,
             ITransactionManager transactionManager,
-            IOperationClock clock,
-            ILogger logger,
-            Maybe<ActiveUserContext> userContext)
+            ILogger logger)
         {
             _systemUsageRepository = systemUsageRepository;
             _systemRelationRepository = systemRelationRepository;
             _transactionManager = transactionManager;
-            _clock = clock;
             _logger = logger;
-            _userContext = userContext;
         }
 
         public void Handle(SystemUsageDeleted domainEvent)
@@ -45,7 +36,6 @@ namespace Core.DomainServices.Model.EventHandlers
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
                 var deletedSystemUsage = domainEvent.DeletedSystemUsage;
-                var updateTime = _clock.Now;
 
                 _logger.Debug("System usage with id {id} deleted. All relations TO from other usages will be removed", deletedSystemUsage.Id);
 
@@ -59,7 +49,6 @@ namespace Core.DomainServices.Model.EventHandlers
                 foreach (var systemRelationsByFromUsage in usedByRelationsByFromUsage)
                 {
                     var fromSystemUsage = systemRelationsByFromUsage.First().FromSystemUsage;
-                    var activeUser = _userContext.Match(ctx => ctx.UserEntity, () => fromSystemUsage.ObjectOwner);
 
                     foreach (var relationToBeRemoved in systemRelationsByFromUsage)
                     {
@@ -71,9 +60,6 @@ namespace Core.DomainServices.Model.EventHandlers
                         }
                         _systemRelationRepository.Delete(relationToBeRemoved);
                     }
-
-                    fromSystemUsage.LastChangedByUser = activeUser;
-                    fromSystemUsage.LastChanged = updateTime;
                 }
 
                 _systemUsageRepository.Save();

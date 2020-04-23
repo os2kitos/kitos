@@ -31,7 +31,7 @@ namespace Core.ApplicationServices.SSO.Model
         {
             if (!_sourceIdentity.HasAttribute(attributeName))
             {
-                throw new ApplicationException($"Key '{attributeName}' not found");
+                return Maybe<SamlAttribute>.None;
             }
             return _sourceIdentity[attributeName].FirstOrDefault();
         }

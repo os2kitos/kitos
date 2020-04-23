@@ -37,8 +37,8 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                     It.IsAny<Func<IQueryable<KLEUpdateHistoryItem>, IOrderedQueryable<KLEUpdateHistoryItem>>>(),
                     It.IsAny<string>())).Returns(new List<KLEUpdateHistoryItem>
             {
-                new KLEUpdateHistoryItem(DateTime.Parse("01-01-2020", CultureInfo.GetCultureInfo("da-DK")), 1),
-                new KLEUpdateHistoryItem(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1)
+                new KLEUpdateHistoryItem(DateTime.Parse("01-01-2020", CultureInfo.GetCultureInfo("da-DK"))),
+                new KLEUpdateHistoryItem(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")))
             });
 
             //Act
@@ -75,7 +75,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 .Returns(mockDatabaseTransaction.Object);
 
             //Act
-            sut.Insert(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1);
+            sut.Insert(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")));
 
             //Assert
             mockGenericUpdateHistoryItemRepository.VerifyAll();

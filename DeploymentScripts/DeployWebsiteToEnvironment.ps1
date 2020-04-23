@@ -34,4 +34,8 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -ssoIDPEndPoints "$Env:SsoIDPEndPoints" `
                 -ssoServiceProviderId "$Env:SsoServiceProviderId" `
                 -ssoCertificateThumbPrint "$Env:SsoCertificateThumbPrint" `
-                -stsOrganisationEndpointHost "$Env:StsOrganisationEndpointHost"
+                -stsOrganisationEndpointHost "$Env:StsOrganisationEndpointHost" `
+                -robotsFileName "$Env:robots" `
+                -smtpNetworkPort "$Env:SmtpNetworkPort" `
+                -smtpNetworkUsername "$Env:SmtpUserName" `
+                -smtpNetworkPassword "$Env:SmtpPassword"

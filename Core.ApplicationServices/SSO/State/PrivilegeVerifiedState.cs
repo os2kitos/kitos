@@ -3,7 +3,6 @@ using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 
@@ -14,7 +13,6 @@ namespace Core.ApplicationServices.SSO.State
         private readonly Guid _userUuid;
         private readonly IStsBrugerInfoService _stsBrugerInfoService;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
-        private readonly IOrganizationRepository _organizationRepository;
         private readonly ISsoStateFactory _ssoStateFactory;
         private readonly IUserRepository _userRepository;
 
@@ -22,13 +20,11 @@ namespace Core.ApplicationServices.SSO.State
             IUserRepository userRepository,
             IStsBrugerInfoService stsBrugerInfoService,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
-            IOrganizationRepository organizationRepository,
             ISsoStateFactory ssoStateFactory)
         {
             _userUuid = userUuid;
             _stsBrugerInfoService = stsBrugerInfoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
-            _organizationRepository = organizationRepository;
             _userRepository = userRepository;
             _ssoStateFactory = ssoStateFactory;
         }
@@ -51,7 +47,7 @@ namespace Core.ApplicationServices.SSO.State
                         var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                         if (!stsBrugerInfo.HasValue)
                         {
-                            context.TransitionTo(new ErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
+                            context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                         }
                         else
                         {
@@ -65,7 +61,7 @@ namespace Core.ApplicationServices.SSO.State
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
                     if (!stsBrugerInfo.HasValue)
                     {
-                        context.TransitionTo(new ErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
+                        context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                     }
                     else
                     {

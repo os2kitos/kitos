@@ -31,7 +31,6 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IItSystemRepository _systemRepository;
         private readonly IItContractRepository _contractRepository;
         private readonly IOptionsService<SystemRelation, RelationFrequencyType> _frequencyService;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<SystemRelation> _relationRepository;
@@ -46,7 +45,6 @@ namespace Core.ApplicationServices.SystemUsage
             IItSystemRepository systemRepository,
             IItContractRepository contractRepository,
             IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
-            IOrganizationalUserContext userContext,
             IGenericRepository<SystemRelation> relationRepository,
             IGenericRepository<ItInterface> interfaceRepository,
             IReferenceService referenceService,
@@ -60,7 +58,6 @@ namespace Core.ApplicationServices.SystemUsage
             _systemRepository = systemRepository;
             _contractRepository = contractRepository;
             _frequencyService = frequencyService;
-            _userContext = userContext;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _relationRepository = relationRepository;
@@ -70,7 +67,7 @@ namespace Core.ApplicationServices.SystemUsage
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
 
-        public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
+        public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage)
         {
             // create the system usage
             var existing = GetByOrganizationAndSystemId(newSystemUsage.OrganizationId, newSystemUsage.ItSystemId);
@@ -105,8 +102,6 @@ namespace Core.ApplicationServices.SystemUsage
 
             usage.ItSystemId = newSystemUsage.ItSystemId;
             usage.OrganizationId = newSystemUsage.OrganizationId;
-            usage.ObjectOwner = objectOwner;
-            usage.LastChangedByUser = objectOwner;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 
@@ -192,7 +187,7 @@ namespace Core.ApplicationServices.SystemUsage
                             var contract = context.Entities.Contract;
                             var relationInterface = context.Entities.Interface;
                             return fromSystemUsage
-                                .AddUsageRelationTo(_userContext.UserEntity, toSystemUsage, relationInterface, description, reference, frequency, contract)
+                                .AddUsageRelationTo(toSystemUsage, relationInterface, description, reference, frequency, contract)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
                                     onSuccess: createdRelation =>
@@ -239,7 +234,7 @@ namespace Core.ApplicationServices.SystemUsage
                             var relationInterface = context.Entities.Interface;
 
                             return fromSystemUsage
-                                .ModifyUsageRelation(_userContext.UserEntity, relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
+                                .ModifyUsageRelation(relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
                                     onSuccess: createdRelation =>
@@ -466,7 +461,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError(OperationFailure.Forbidden);
 
             return usage
-                .AddSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .AddSensitiveDataLevel(sensitiveDataLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
                     onSuccess: addedSensitivityLevel =>
@@ -489,7 +484,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError(OperationFailure.Forbidden);
 
             return usage
-                .RemoveSensitiveDataLevel(_userContext.UserEntity, sensitiveDataLevel)
+                .RemoveSensitiveDataLevel(sensitiveDataLevel)
                 .Match<Result<ItSystemUsageSensitiveDataLevel, OperationError>>
                 (
                     onSuccess: removedSensitivityLevel =>

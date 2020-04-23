@@ -187,6 +187,7 @@ namespace Tests.Integration.Presentation.Web.Qa
             {
                 dto = await BrokenExternalReferencesReportHelper.GetStatusAsync();
                 if (!dto.Available) await Task.Delay(TimeSpan.FromSeconds(1));
+                waitedFor = DateTime.Now.Subtract(beginning);
             } while (dto.Available == false && waitedFor < TimeSpan.FromMinutes(1));
 
             return dto;

@@ -8,6 +8,6 @@ namespace Core.DomainServices.Repositories.KLE
     {
         KLEStatus GetKLEStatus(DateTime lastUpdated);
         IOrderedEnumerable<KLEChange> GetKLEChangeSummary();
-        DateTime UpdateKLE(int ownerObjectId, int ownedByOrgnizationUnitId);
+        DateTime UpdateKLE(int ownedByOrgnizationUnitId);
     }
 }

@@ -76,9 +76,6 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            user.ObjectOwnerId = UserId;
-            user.LastChangedByUserId = UserId;
-
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
 
             return Created(createdUser);

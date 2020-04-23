@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.SSO.State
                 }
                 else
                 {
-                    context.TransitionTo(new ErrorState(), _ => _.HandleNoRoleAndOrganization());
+                    context.TransitionTo(_stateFactory.CreateErrorState(), _ => _.HandleNoRoleAndOrganization());
                 }
             }
         }
