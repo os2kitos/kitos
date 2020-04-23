@@ -4,7 +4,5 @@
         IsActive: boolean;
         IsSuggestion: boolean;
         Note: string;
-        /** The DataRowUsages that uses this frequency dropdown. */
-        References: Array<IDataRowUsage>;
     }
 }
