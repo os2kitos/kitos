@@ -8,7 +8,5 @@
         DataType: IDataType;
         /** Description/name of the data */
         Data: string;
-        /** Local usages of this exposition */
-        Usages: Array<ItSystemUsage.IDataRowUsage>;
     }
 }

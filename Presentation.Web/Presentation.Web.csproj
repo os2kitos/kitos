@@ -640,7 +640,6 @@
     <Compile Include="Models\RiskDTO.cs" />
     <Compile Include="Models\AssignmentDTO.cs" />
     <Compile Include="Models\DataRowDTO.cs" />
-    <Compile Include="Models\DataRowUsageDTO.cs" />
     <Compile Include="Models\EconomyYearDTO.cs" />
     <Compile Include="Models\ItProjectDTO.cs" />
     <Compile Include="Models\ItSystemDTO.cs" />
@@ -1146,9 +1145,7 @@
     <TypeScriptCompile Include="app\models\it-project\it-project-type.ts" />
     <TypeScriptCompile Include="app\models\it-project\risk.ts" />
     <TypeScriptCompile Include="app\models\it-project\stakeholder.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\data-row-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\frequency.ts" />
-    <TypeScriptCompile Include="app\models\it-system-usage\interface-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />

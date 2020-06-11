@@ -4,6 +4,5 @@
         ItInterface: IItInterface;
         ItSystemId: number;
         ItSystem: IItSystem;
-        InterfaceUsages: Array<ItSystemUsage.IInterfaceUsage>;
     }
 }
