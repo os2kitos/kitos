@@ -106,7 +106,7 @@ namespace Core.DomainServices.SSO
                             .Select(x => x.LaesResponse1)
                             .Select(x => x.LaesOutput)
                             .Select(x => x.StandardRetur)
-                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
                             .GetValueOrFallback("Unknown");
 
                     return $"Failed to parse STS Bruger registrations from UUID {uuid}. Error from STS Bruger: {errorMessage}";
@@ -228,7 +228,7 @@ namespace Core.DomainServices.SSO
                             .Select(x => x.LaesResponse1)
                             .Select(x => x.LaesOutput)
                             .Select(x => x.StandardRetur)
-                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
                             .GetValueOrFallback("Unknown");
 
                     return $"Failed to parse registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}. STS Returned error: {errorMessage}";
@@ -289,7 +289,7 @@ namespace Core.DomainServices.SSO
                             .Select(x => x.LaesResponse1)
                             .Select(x => x.LaesOutput)
                             .Select(x => x.StandardRetur)
-                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
                             .GetValueOrFallback("Unknown");
 
                     return Result<string, string>.Failure($"Failed to read virksomhed registrations from org uuid {organisationUuid}. Error message:{errorMessage}");
@@ -345,7 +345,7 @@ namespace Core.DomainServices.SSO
                             .Select(x => x.LaesResponse1)
                             .Select(x => x.LaesOutput)
                             .Select(x => x.StandardRetur)
-                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
                             .GetValueOrFallback("Unknown");
 
                     return Result<string, string>.Failure($"Unable to read registrations from STS Virksomhed with virksomhedUuid:{virksomhedUuid}. Error message: {errorMessage}");
@@ -400,7 +400,7 @@ namespace Core.DomainServices.SSO
                             .Select(x => x.LaesResponse1)
                             .Select(x => x.LaesOutput)
                             .Select(x => x.StandardRetur)
-                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
                             .GetValueOrFallback("Unknown");
 
                     return $"Failed to parse registrations from STS Person with personUUID:{personUuid}. Error message: {errorMessage}";
