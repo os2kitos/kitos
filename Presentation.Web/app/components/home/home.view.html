@@ -92,6 +92,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="panel-footer sso-error" ng-if="ssoVm.error == 'Unknown'">
+                    <strong>SSO fejlede med en uklassificeret fejl</strong>
+                    <br />
+                    Prøv igen og kontakt venligst Kitos sekretariatet, hvis problemet fortsætter
+                </div>
                 <div class="panel-footer sso-error" ng-if="ssoVm.error == 'MissingPrivilege'">
                     <strong>Den bruger, som du er logget på med, har ikke adgang til Kitos</strong>
                     <br />
