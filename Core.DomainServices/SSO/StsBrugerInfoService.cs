@@ -92,12 +92,9 @@ namespace Core.DomainServices.SSO
                 if (laesResponseResult.IsNone)
                     return $"Failed to fetch data from STS Bruger from uuid {uuid}";
 
-                var laesResponse = laesResponseResult.Value;
-
                 var registrations =
-                    laesResponse
-                        .LaesResponse1
-                        .FromNullable()
+                    laesResponseResult
+                        .Select(x=>x.LaesResponse1)
                         .Select(x => x.LaesOutput)
                         .Select(x => x.FiltreretOejebliksbillede)
                         .Select(x => x.Registrering);
