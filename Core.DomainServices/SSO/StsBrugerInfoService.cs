@@ -100,7 +100,17 @@ namespace Core.DomainServices.SSO
                         .Select(x => x.Registrering);
 
                 if (registrations.IsNone)
-                    return $"Failed to parse STS Bruger registrations from UUID {uuid}";
+                {
+                    var errorMessage = 
+                        laesResponseResult
+                            .Select(x => x.LaesResponse1)
+                            .Select(x => x.LaesOutput)
+                            .Select(x => x.StandardRetur)
+                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .GetValueOrFallback("Unknown");
+
+                    return $"Failed to parse STS Bruger registrations from UUID {uuid}. Error from STS Bruger: {errorMessage}";
+                }
 
                 foreach (var registreringType1 in registrations.Value)
                 {
@@ -212,7 +222,17 @@ namespace Core.DomainServices.SSO
                         .Select(x => x.Registrering);
 
                 if (registreringType1s.IsNone)
-                    return $"Failed to parse registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}";
+                {
+                    var errorMessage =
+                        laesResponse
+                            .Select(x => x.LaesResponse1)
+                            .Select(x => x.LaesOutput)
+                            .Select(x => x.StandardRetur)
+                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .GetValueOrFallback("Unknown");
+
+                    return $"Failed to parse registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}. STS Returned error: {errorMessage}";
+                }
 
                 var result = new List<string>();
                 foreach (var registreringType1 in registreringType1s.Value)
@@ -263,7 +283,17 @@ namespace Core.DomainServices.SSO
                         .Select(x => x.Registrering);
 
                 if (registreringType1s.IsNone)
-                    return Result<string, string>.Failure($"Failed to read virksomhed registrations from org uuid {organisationUuid}");
+                {
+                    var errorMessage =
+                        laesResponse
+                            .Select(x => x.LaesResponse1)
+                            .Select(x => x.LaesOutput)
+                            .Select(x => x.StandardRetur)
+                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .GetValueOrFallback("Unknown");
+
+                    return Result<string, string>.Failure($"Failed to read virksomhed registrations from org uuid {organisationUuid}. Error message:{errorMessage}");
+                }
 
                 foreach (var registreringType1 in registreringType1s.Value)
                 {
@@ -309,7 +339,17 @@ namespace Core.DomainServices.SSO
                         .Select(x => x.Registrering);
 
                 if (registreringType1s.IsNone)
-                    return Result<string, string>.Failure($"Unable to read registrations from STS Virksomhed with virksomhedUuid:{virksomhedUuid}");
+                {
+                    var errorMessage =
+                        laesResponse
+                            .Select(x => x.LaesResponse1)
+                            .Select(x => x.LaesOutput)
+                            .Select(x => x.StandardRetur)
+                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .GetValueOrFallback("Unknown");
+
+                    return Result<string, string>.Failure($"Unable to read registrations from STS Virksomhed with virksomhedUuid:{virksomhedUuid}. Error message: {errorMessage}");
+                }
 
                 foreach (var registreringType1 in registreringType1s.Value)
                 {
@@ -354,7 +394,17 @@ namespace Core.DomainServices.SSO
                         .Select(x => x.Registrering);
 
                 if (registreringType1s.IsNone)
-                    return $"Failed to parse registrations from STS Person with personUUID:{personUuid}";
+                {
+                    var errorMessage =
+                        laesResponse
+                            .Select(x => x.LaesResponse1)
+                            .Select(x => x.LaesOutput)
+                            .Select(x => x.StandardRetur)
+                            .Select(x => $"{x.StatusKode ?? ""}:{x.FejlbeskedTekst ?? ""}")
+                            .GetValueOrFallback("Unknown");
+
+                    return $"Failed to parse registrations from STS Person with personUUID:{personUuid}. Error message: {errorMessage}";
+                }
 
                 foreach (var registreringType1 in registreringType1s.Value)
                 {
