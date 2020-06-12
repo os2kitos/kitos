@@ -51,7 +51,7 @@ namespace Core.DomainModel.Result
                 throw new ArgumentNullException(nameof(selector));
 
             return HasValue ?
-                Maybe<TResult>.Some(selector(Value)) :
+                selector(Value).FromNullable() :
                 Maybe<TResult>.None;
         }
 
