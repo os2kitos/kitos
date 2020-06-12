@@ -103,7 +103,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             {
                 return asInt;
             }
-            _logger.Error("Could not parse to int: {toParse}", toParse);
+            _logger.Warning("Could not parse to int: {toParse}", toParse);
             return null;
         }
 

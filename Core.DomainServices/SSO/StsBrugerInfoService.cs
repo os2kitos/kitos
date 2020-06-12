@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.DomainModel.Result;
+using Infrastructure.Soap.STSBruger;
 using Serilog;
 
 namespace Core.DomainServices.SSO
@@ -62,13 +63,13 @@ namespace Core.DomainServices.SSO
                     .Select(GetStsBrugerMunicipalityCvrFromUuid)
                     .Match
                     (
-                        onSuccess: municipalityCvr => 
+                        onSuccess: municipalityCvr =>
                             new StsBrugerInfo(
-                                uuid, 
-                                emailsResult.Value, 
-                                Guid.Parse(organisationUuid), 
-                                municipalityCvr, 
-                                personData.Value.FirstName, 
+                                uuid,
+                                emailsResult.Value,
+                                Guid.Parse(organisationUuid),
+                                municipalityCvr,
+                                personData.Value.FirstName,
                                 personData.Value.LastName),
                         onFailure: error =>
                         {
@@ -86,31 +87,110 @@ namespace Core.DomainServices.SSO
                     _urlServicePlatformBrugerService, clientCertificate);
                 var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(_authorizedMunicipalityCvr, uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = brugerPortType.laes(laesRequest);
-                foreach (var registreringType1 in laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering)
+                var laesResponseResult = brugerPortType.laes(laesRequest).FromNullable();
+
+                if (laesResponseResult.IsNone)
+                    return $"Failed to fetch data from STS Bruger from uuid {uuid}";
+
+                var laesResponse = laesResponseResult.Value;
+
+                var registrations =
+                    laesResponse
+                        .LaesResponse1
+                        .FromNullable()
+                        .Select(x => x.LaesOutput)
+                        .Select(x => x.FiltreretOejebliksbillede)
+                        .Select(x => x.Registrering);
+
+                if (registrations.IsNone)
+                    return $"Failed to parse STS Bruger registrations from UUID {uuid}";
+
+                foreach (var registreringType1 in registrations.Value)
                 {
                     if (registreringType1.IsStsBrugerObsolete())
                     {
+                        //User info obolete, go to next registration
                         continue;
                     }
 
-                    var organizationUuid = registreringType1.RelationListe.Tilhoerer.ReferenceID.Item;
-                    var emailUuid = string.Empty;
-                    foreach (var adresse in registreringType1.RelationListe.Adresser)
+                    var organizationUuid =
+                        registreringType1
+                            .RelationListe
+                            .FromNullable()
+                            .Select(x => x.Tilhoerer)
+                            .Select(x => x.ReferenceID)
+                            .Select(x => x.Item);
+
+                    if (organizationUuid.IsNone)
                     {
-                        if (EmailTypeIdentifier.Equals(adresse.Rolle.Item))
+                        //No organization uuid
+                        continue;
+                    }
+                    string emailUuid = null;
+                    var adresses =
+                        registreringType1
+                            .RelationListe
+                            .FromNullable()
+                            .Select(x => x.Adresser)
+                            .GetValueOrFallback(new AdresseFlerRelationType[0]);
+
+                    foreach (var adresse in adresses)
+                    {
+                        var emailField =
+                            adresse
+                                .Rolle
+                                .FromNullable()
+                                .Select(x => x.Item)
+                                .GetValueOrFallback(string.Empty);
+
+                        if (EmailTypeIdentifier.Equals(emailField))
                         {
-                            emailUuid = adresse.ReferenceID.Item;
+                            emailUuid = adresse
+                                .ReferenceID
+                                .FromNullable()
+                                .Select(x => x.Item)
+                                .GetValueOrDefault();
+
+                            if (emailUuid == null)
+                            {
+                                //No uuid provided
+                                continue;
+                            }
                             break;
                         }
                     }
 
-                    var lastKnownPerson = registreringType1.RelationListe.TilknyttedePersoner.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
-                    var personUuid = lastKnownPerson.ReferenceID.Item;
+                    if (emailUuid == null)
+                    {
+                        //Email UUID could not be found - go to the next
+                        continue;
+                    }
 
-                    return (emailUuid, organizationUuid, personUuid);
+                    var lastKnownPerson = registreringType1
+                        .RelationListe
+                        .FromNullable()
+                        .Select(x => x.TilknyttedePersoner)
+                        .Select(x => x.OrderByDescending(p => p.Virkning.TilTidspunkt))
+                        .Select(x => x.FirstOrDefault())
+                        .GetValueOrDefault()
+                        .FromNullable();
+
+                    if (lastKnownPerson.IsNone)
+                    {
+                        //Unable to fetch data from last known person
+                        continue;
+                    }
+
+                    var personUuid = lastKnownPerson.Select(x => x.ReferenceID).Select(x => x.Item);
+                    if (personUuid.IsNone)
+                    {
+                        //Person UUID could not be found, bail out
+                        continue;
+                    }
+
+                    return (emailUuid, organizationUuid.Value, personUuid.Value);
                 }
-                return "Unable to resolve email and organization UUID";
+                return $"Unable to resolve email and organization UUID from uuid {uuid}";
             }
         }
 
@@ -122,24 +202,46 @@ namespace Core.DomainServices.SSO
                     _urlServicePlatformAdresseService, clientCertificate);
                 var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(_authorizedMunicipalityCvr, emailAdresseUuid);
                 var adressePortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = adressePortType.laes(laesRequest);
-                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
+                var laesResponse = adressePortType.laes(laesRequest).FromNullable();
+
+                if (laesResponse.IsNone)
+                    return $"Failed to read STS adresse from emailAdresseUUID {emailAdresseUuid}";
+
+                var registreringType1s =
+                    laesResponse
+                        .Select(x => x.LaesResponse1)
+                        .Select(x => x.LaesOutput)
+                        .Select(x => x.FiltreretOejebliksbillede)
+                        .Select(x => x.Registrering);
+
+                if (registreringType1s.IsNone)
+                    return $"Failed to parse registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}";
+
                 var result = new List<string>();
-                foreach (var registreringType1 in registreringType1s)
+                foreach (var registreringType1 in registreringType1s.Value)
                 {
                     if (registreringType1.IsStsAdresseObsolete())
+                        continue;
+
+                    var latest = registreringType1
+                        .AttributListe
+                        .FromNullable()
+                        .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
+                        .GetValueOrDefault()
+                        ?.FirstOrDefault();
+
+                    if (latest == null)
                     {
+                        //Failed to parse latest adresse
                         continue;
                     }
-
-                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
                     result.Add(latest.AdresseTekst);
                 }
 
                 if (result.Any())
                     return result;
 
-                return "No email addresses found";
+                return $"No email addresses found from emailAdresseUuid {emailAdresseUuid}";
             }
         }
 
@@ -151,18 +253,43 @@ namespace Core.DomainServices.SSO
                     _urlServicePlatformOrganisationService, clientCertificate);
                 var laesRequest = StsOrganisationHelpers.CreateStsOrganisationLaesRequest(_authorizedMunicipalityCvr, organisationUuid);
                 var organisationPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = organisationPortType.laes(laesRequest);
-                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
-                foreach (var registreringType1 in registreringType1s)
+                var laesResponse = organisationPortType.laes(laesRequest).FromNullable();
+
+                if (laesResponse.IsNone)
+                    return Result<string, string>.Failure($"Failed to read virksomhed from org uuid {organisationUuid}");
+
+                var registreringType1s =
+                    laesResponse
+                        .Value
+                        .LaesResponse1
+                        .FromNullable()
+                        .Select(x => x.LaesOutput)
+                        .Select(x => x.FiltreretOejebliksbillede)
+                        .Select(x => x.Registrering);
+
+                if (registreringType1s.IsNone)
+                    return Result<string, string>.Failure($"Failed to read virksomhed registrations from org uuid {organisationUuid}");
+
+                foreach (var registreringType1 in registreringType1s.Value)
                 {
                     if (registreringType1.IsStsOrganisationObsolete())
-                    {
                         continue;
-                    }
 
-                    return Result<string, string>.Success(registreringType1.RelationListe.Virksomhed.ReferenceID.Item);
+                    var referenceIdItem =
+                        registreringType1
+                            .RelationListe
+                            .FromNullable()
+                            .Select(x => x.Virksomhed)
+                            .Select(x => x.ReferenceID)
+                            .Select(x => x.Item);
+
+                    if (referenceIdItem.IsNone)
+                        continue;
+
+                    return Result<string, string>.Success(referenceIdItem.Value);
                 }
-                return Result<string, string>.Failure("UUID not found");
+
+                return Result<string, string>.Failure($"Unable to find virksomhed uuid from org uuid {organisationUuid}");
             }
         }
 
@@ -174,19 +301,42 @@ namespace Core.DomainServices.SSO
                     _urlServicePlatformVirksomhedService, clientCertificate);
                 var laesRequest = StsVirksomhedHelpers.CreateStsVirksomhedLaesRequest(_authorizedMunicipalityCvr, virksomhedUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = virksomhedPortType.laes(laesRequest);
-                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
-                foreach (var registreringType1 in registreringType1s)
+                var laesResponse = virksomhedPortType.laes(laesRequest).FromNullable();
+
+                if (laesResponse.IsNone)
+                    return Result<string, string>.Failure($"Unable to read from STS Virksomhed with virksomhedUuid:{virksomhedUuid}");
+
+                var registreringType1s =
+                    laesResponse
+                        .Value
+                        .LaesResponse1
+                        .FromNullable()
+                        .Select(x => x.LaesOutput)
+                        .Select(x => x.FiltreretOejebliksbillede)
+                        .Select(x => x.Registrering);
+
+                if (registreringType1s.IsNone)
+                    return Result<string, string>.Failure($"Unable to read registrations from STS Virksomhed with virksomhedUuid:{virksomhedUuid}");
+
+                foreach (var registreringType1 in registreringType1s.Value)
                 {
                     if (registreringType1.IsStsVirksomhedObsolete())
-                    {
                         continue;
-                    }
 
-                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    var latest =
+                        registreringType1
+                            .AttributListe
+                            .FromNullable()
+                            .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
+                            .GetValueOrDefault()
+                            ?.FirstOrDefault();
+
+                    if (latest == null)
+                        continue;
+
                     return Result<string, string>.Success(latest.CVRNummerTekst);
                 }
-                return Result<string, string>.Failure("Unable to resolve cvr");
+                return Result<string, string>.Failure($"Unable to resolve cvr from virksomhedUuid:{virksomhedUuid}");
             }
         }
 
@@ -198,19 +348,41 @@ namespace Core.DomainServices.SSO
                     _urlServicePlatformPersonService, clientCertificate);
                 var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(_authorizedMunicipalityCvr, personUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = virksomhedPortType.laes(laesRequest);
-                var registreringType1s = laesResponse.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering;
-                foreach (var registreringType1 in registreringType1s)
+                var laesResponse = virksomhedPortType.laes(laesRequest).FromNullable();
+
+                if (laesResponse.IsNone)
+                    return $"Failed to read from STS Person with personUUID:{personUuid}";
+
+                var registreringType1s =
+                    laesResponse
+                        .Select(x => x.LaesResponse1)
+                        .Select(x => x.LaesOutput)
+                        .Select(x => x.FiltreretOejebliksbillede)
+                        .Select(x => x.Registrering);
+
+                if (registreringType1s.IsNone)
+                    return $"Failed to parse registrations from STS Person with personUUID:{personUuid}";
+
+                foreach (var registreringType1 in registreringType1s.Value)
                 {
                     if (registreringType1.IsStsPersonObsolete())
                     {
                         continue;
                     }
 
-                    var latest = registreringType1.AttributListe.OrderByDescending(a => a.Virkning.TilTidspunkt).First();
+                    var latest = registreringType1
+                        .AttributListe
+                        .FromNullable()
+                        .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
+                        .GetValueOrDefault()?
+                        .FirstOrDefault();
+
+                    if (latest == null)
+                        continue;
+
                     return Result<StsPersonData, string>.Success(new StsPersonData(latest.NavnTekst));
                 }
-                return Result<StsPersonData, string>.Failure("Unable to resolve cvr");
+                return Result<StsPersonData, string>.Failure($"Unable to resolve person from personuuid:{personUuid}");
             }
         }
 
