@@ -257,9 +257,7 @@ namespace Core.DomainServices.SSO
 
                 var registreringType1s =
                     laesResponse
-                        .Value
-                        .LaesResponse1
-                        .FromNullable()
+                        .Select(x=>x.LaesResponse1)
                         .Select(x => x.LaesOutput)
                         .Select(x => x.FiltreretOejebliksbillede)
                         .Select(x => x.Registrering);
@@ -305,9 +303,7 @@ namespace Core.DomainServices.SSO
 
                 var registreringType1s =
                     laesResponse
-                        .Value
-                        .LaesResponse1
-                        .FromNullable()
+                        .Select(x=>x.LaesResponse1)
                         .Select(x => x.LaesOutput)
                         .Select(x => x.FiltreretOejebliksbillede)
                         .Select(x => x.Registrering);
