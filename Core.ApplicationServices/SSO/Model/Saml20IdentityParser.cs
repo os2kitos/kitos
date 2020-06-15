@@ -18,6 +18,19 @@ namespace Core.ApplicationServices.SSO.Model
             return new Saml20IdentityParser(new Saml20IdentityNavigator(sourceIdentity));
         }
 
+        public Maybe<string> MatchCvrNumber()
+        {
+            var cvrNumberAttributes = _navigator.GetAttribute(StsAdgangsStyringConstants.Attributes.CvrNumber).Select(x => x.AttributeValue).GetValueOrFallback(new string[0]);
+            foreach (var cvrNumber in cvrNumberAttributes)
+            {
+                if (!string.IsNullOrEmpty(cvrNumber))
+                {
+                    return cvrNumber;
+                }
+            }
+            return Maybe<string>.None;
+        }
+
         public Maybe<KitosSamlPrivilege> MatchPrivilege(string privilegeId)
         {
             return

@@ -63,9 +63,9 @@ namespace Core.ApplicationServices.SSO.Factories
             return new InitialFlowState(_configuration, Saml20IdentityParser.CreateFrom(_samlState.Value), this);
         }
 
-        public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid)
+        public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid, string cvrNumber)
         {
-            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, this);
+            return new PrivilegeVerifiedState(userExternalUuid, cvrNumber,_userRepository, _infoService, _ssoUserIdentityRepository, this);
         }
 
         public AbstractState CreateUserLoggedIn(User user)

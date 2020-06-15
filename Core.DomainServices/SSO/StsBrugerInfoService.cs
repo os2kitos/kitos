@@ -13,14 +13,12 @@ namespace Core.DomainServices.SSO
     {
         private readonly ILogger _logger;
         private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
+        private const string StsStandardNotFoundResultCode = "44";
 
         private readonly string _urlServicePlatformBrugerService;
         private readonly string _urlServicePlatformAdresseService;
-        private readonly string _urlServicePlatformOrganisationService;
-        private readonly string _urlServicePlatformVirksomhedService;
         private readonly string _urlServicePlatformPersonService;
         private readonly string _certificateThumbprint;
-        private readonly string _authorizedMunicipalityCvr;
 
         public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
@@ -28,15 +26,12 @@ namespace Core.DomainServices.SSO
             _certificateThumbprint = configuration.CertificateThumbprint;
             _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
-            _urlServicePlatformOrganisationService = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
-            _urlServicePlatformVirksomhedService = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
             _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/service/Organisation/Person/5";
-            _authorizedMunicipalityCvr = configuration.AuthorizedMunicipalityCvr;
         }
 
-        public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid)
+        public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid, string cvrNumber)
         {
-            var brugerInfo = CollectStsBrugerInformationFromUuid(uuid);
+            var brugerInfo = CollectStsBrugerInformationFromUuid(uuid, cvrNumber);
             if (brugerInfo.Failed)
             {
                 _logger.Error("Failed to resolve UUIDS '{error}'", brugerInfo.Error);
@@ -44,119 +39,93 @@ namespace Core.DomainServices.SSO
             }
 
             var (emailAdresseUuid, organisationUuid, personUuid) = brugerInfo.Value;
-            var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid);
+            var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid, cvrNumber);
             if (emailsResult.Failed)
             {
                 _logger.Error("Failed to resolve Emails '{error}'", emailsResult.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
-            var personData = GetStsPersonFromUuid(personUuid);
+            var personData = GetStsPersonFromUuid(personUuid, cvrNumber);
             if (personData.Failed)
             {
                 _logger.Error("Failed to resolve Person '{error}'", personData.Error);
                 return Maybe<StsBrugerInfo>.None;
             }
 
-            return
-                GetStsVirksomhedFromUuid(organisationUuid)
-                    .Select(GetStsBrugerMunicipalityCvrFromUuid)
-                    .Match
-                    (
-                        onSuccess: municipalityCvr =>
-                            new StsBrugerInfo(
-                                uuid,
-                                emailsResult.Value,
-                                Guid.Parse(organisationUuid),
-                                municipalityCvr,
-                                personData.Value.FirstName,
-                                personData.Value.LastName),
-                        onFailure: error =>
-                        {
-                            _logger.Error("Failed to resolve CVR '{error}'", error);
-                            return Maybe<StsBrugerInfo>.None;
-                        }
-                    );
+            return new StsBrugerInfo(
+                uuid,
+                emailsResult.Value,
+                Guid.Parse(organisationUuid),
+                cvrNumber,
+                personData.Value.FirstName,
+                personData.Value.LastName);
         }
 
-        private Result<(string emailAdresseUuid, string organisationUuid, string personUuid), string> CollectStsBrugerInformationFromUuid(Guid uuid)
+        private Result<(string emailAdresseUuid, string organisationUuid, string personUuid), string> CollectStsBrugerInformationFromUuid(Guid uuid, string cvrNumber)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
                 var client = StsBrugerHelpers.CreateBrugerPortTypeClient(CreateHttpBinding(),
                     _urlServicePlatformBrugerService, clientCertificate);
-                var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(_authorizedMunicipalityCvr, uuid);
+                var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(cvrNumber, uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
-                var laesResponseResult = brugerPortType.laes(laesRequest).FromNullable();
+                var laesResponseResult = brugerPortType.laes(laesRequest);
 
-                if (laesResponseResult.IsNone)
+                if (laesResponseResult == null)
                     return $"Failed to fetch data from STS Bruger from uuid {uuid}";
+
+                var stdOutput = laesResponseResult.LaesResponse1?.LaesOutput?.StandardRetur;
+                var returnCode = stdOutput?.StatusKode ?? "unknown";
+                var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
+
+                if (returnCode == StsStandardNotFoundResultCode)
+                    return $"Requested user '{uuid}' from cvr '{cvrNumber}' was not found. STS Bruger endpoint returned '{returnCode}:{errorCode}'";
 
                 var registrations =
                     laesResponseResult
-                        .Select(x=>x.LaesResponse1)
-                        .Select(x => x.LaesOutput)
-                        .Select(x => x.FiltreretOejebliksbillede)
-                        .Select(x => x.Registrering);
+                        .LaesResponse1
+                        ?.LaesOutput
+                        ?.FiltreretOejebliksbillede
+                        ?.Registrering
+                        ?.ToList() ?? new List<RegistreringType1>();
 
-                if (registrations.IsNone)
-                {
-                    var errorMessage = 
-                        laesResponseResult
-                            .Select(x => x.LaesResponse1)
-                            .Select(x => x.LaesOutput)
-                            .Select(x => x.StandardRetur)
-                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
-                            .GetValueOrFallback("Unknown");
+                if (registrations.Any() == false)
+                    return $"No STS Bruger registrations from UUID {uuid}";
 
-                    return $"Failed to parse STS Bruger registrations from UUID {uuid}. Error from STS Bruger: {errorMessage}";
-                }
-
-                foreach (var registreringType1 in registrations.Value)
+                foreach (var registreringType1 in registrations)
                 {
                     if (registreringType1.IsStsBrugerObsolete())
                     {
-                        //User info obolete, go to next registration
+                        //User info obsolete, go to next registration
                         continue;
                     }
 
                     var organizationUuid =
                         registreringType1
                             .RelationListe
-                            .FromNullable()
-                            .Select(x => x.Tilhoerer)
-                            .Select(x => x.ReferenceID)
-                            .Select(x => x.Item);
+                            ?.Tilhoerer
+                            ?.ReferenceID
+                            ?.Item;
 
-                    if (organizationUuid.IsNone)
+                    if (organizationUuid == null)
                     {
                         //No organization uuid
                         continue;
                     }
                     string emailUuid = null;
-                    var adresses =
-                        registreringType1
-                            .RelationListe
-                            .FromNullable()
-                            .Select(x => x.Adresser)
-                            .GetValueOrFallback(new AdresseFlerRelationType[0]);
+                    var adresses = registreringType1
+                        .RelationListe
+                        ?.Adresser
+                        ?.ToList() ?? new List<AdresseFlerRelationType>();
 
                     foreach (var adresse in adresses)
                     {
-                        var emailField =
-                            adresse
-                                .Rolle
-                                .FromNullable()
-                                .Select(x => x.Item)
-                                .GetValueOrFallback(string.Empty);
+                        var emailField = adresse.Rolle?.Item ?? string.Empty;
 
                         if (EmailTypeIdentifier.Equals(emailField))
                         {
-                            emailUuid = adresse
-                                .ReferenceID
-                                .FromNullable()
-                                .Select(x => x.Item)
-                                .GetValueOrDefault();
+                            emailUuid = adresse.ReferenceID?.Item;
 
                             if (emailUuid == null)
                             {
@@ -173,86 +142,75 @@ namespace Core.DomainServices.SSO
                         continue;
                     }
 
-                    var lastKnownPerson = registreringType1
+                    var personUuid = registreringType1
                         .RelationListe
-                        .FromNullable()
-                        .Select(x => x.TilknyttedePersoner)
-                        .Select(x => x.OrderByDescending(p => p.Virkning.TilTidspunkt))
-                        .Select(x => x.FirstOrDefault())
-                        .GetValueOrDefault()
-                        .FromNullable();
+                        ?.TilknyttedePersoner
+                        ?.OrderByDescending(p => p.Virkning.TilTidspunkt)
+                        ?.FirstOrDefault()
+                        ?.ReferenceID
+                        ?.Item;
 
-                    if (lastKnownPerson.IsNone)
-                    {
-                        //Unable to fetch data from last known person
-                        continue;
-                    }
 
-                    var personUuid = lastKnownPerson.Select(x => x.ReferenceID).Select(x => x.Item);
-                    if (personUuid.IsNone)
+                    if (personUuid == null)
                     {
                         //Person UUID could not be found, bail out
                         continue;
                     }
 
-                    return (emailUuid, organizationUuid.Value, personUuid.Value);
+                    return (emailUuid, organizationUuid, personUuid);
                 }
                 return $"Unable to resolve email and organization UUID from uuid {uuid}";
             }
         }
 
-        private Result<IEnumerable<string>, string> GetStsAdresseEmailFromUuid(string emailAdresseUuid)
+        private Result<IEnumerable<string>, string> GetStsAdresseEmailFromUuid(string emailAdresseUuid, string cvrNumber)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
                 var client = StsAdresseHelpers.CreateAdressePortTypeClient(CreateHttpBinding(),
                     _urlServicePlatformAdresseService, clientCertificate);
-                var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(_authorizedMunicipalityCvr, emailAdresseUuid);
+                var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(cvrNumber, emailAdresseUuid);
                 var adressePortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = adressePortType.laes(laesRequest).FromNullable();
+                var laesResponse = adressePortType.laes(laesRequest);
 
-                if (laesResponse.IsNone)
-                    return $"Failed to read STS adresse from emailAdresseUUID {emailAdresseUuid}";
+                if (laesResponse == null)
+                    return $"Failed to read STS Adresse from emailAdresseUUID {emailAdresseUuid}";
+
+                var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
+                var returnCode = stdOutput?.StatusKode ?? "unknown";
+                var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
+
+                if (returnCode == StsStandardNotFoundResultCode)
+                    return $"Requested email address '{emailAdresseUuid}' from cvr '{cvrNumber}' was not found. STS Adresse endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =
                     laesResponse
-                        .Select(x => x.LaesResponse1)
-                        .Select(x => x.LaesOutput)
-                        .Select(x => x.FiltreretOejebliksbillede)
-                        .Select(x => x.Registrering);
+                        .LaesResponse1
+                        ?.LaesOutput
+                        ?.FiltreretOejebliksbillede
+                        ?.Registrering ?? new Infrastructure.Soap.STSAdresse.RegistreringType1[0];
 
-                if (registreringType1s.IsNone)
-                {
-                    var errorMessage =
-                        laesResponse
-                            .Select(x => x.LaesResponse1)
-                            .Select(x => x.LaesOutput)
-                            .Select(x => x.StandardRetur)
-                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
-                            .GetValueOrFallback("Unknown");
-
-                    return $"Failed to parse registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}. STS Returned error: {errorMessage}";
-                }
+                if (registreringType1s.Any() == false)
+                    return $"No registrations from laesResponse for emailAdresseUuid:{emailAdresseUuid}";
 
                 var result = new List<string>();
-                foreach (var registreringType1 in registreringType1s.Value)
+                foreach (var registreringType1 in registreringType1s)
                 {
                     if (registreringType1.IsStsAdresseObsolete())
                         continue;
 
                     var latest = registreringType1
                         .AttributListe
-                        .FromNullable()
-                        .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
-                        .GetValueOrDefault()
-                        ?.FirstOrDefault();
+                        ?.OrderByDescending(y => y.Virkning.TilTidspunkt)
+                        ?.FirstOrDefault()
+                        ?.AdresseTekst;
 
                     if (latest == null)
                     {
                         //Failed to parse latest adresse
                         continue;
                     }
-                    result.Add(latest.AdresseTekst);
+                    result.Add(latest);
                 }
 
                 if (result.Any())
@@ -262,151 +220,39 @@ namespace Core.DomainServices.SSO
             }
         }
 
-        private Result<string, string> GetStsVirksomhedFromUuid(string organisationUuid)
-        {
-            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
-            {
-                var client = StsOrganisationHelpers.CreateOrganisationPortTypeClient(CreateHttpBinding(),
-                    _urlServicePlatformOrganisationService, clientCertificate);
-                var laesRequest = StsOrganisationHelpers.CreateStsOrganisationLaesRequest(_authorizedMunicipalityCvr, organisationUuid);
-                var organisationPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = organisationPortType.laes(laesRequest).FromNullable();
-
-                if (laesResponse.IsNone)
-                    return Result<string, string>.Failure($"Failed to read virksomhed from org uuid {organisationUuid}");
-
-                var registreringType1s =
-                    laesResponse
-                        .Select(x=>x.LaesResponse1)
-                        .Select(x => x.LaesOutput)
-                        .Select(x => x.FiltreretOejebliksbillede)
-                        .Select(x => x.Registrering);
-
-                if (registreringType1s.IsNone)
-                {
-                    var errorMessage =
-                        laesResponse
-                            .Select(x => x.LaesResponse1)
-                            .Select(x => x.LaesOutput)
-                            .Select(x => x.StandardRetur)
-                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
-                            .GetValueOrFallback("Unknown");
-
-                    return Result<string, string>.Failure($"Failed to read virksomhed registrations from org uuid {organisationUuid}. Error message:{errorMessage}");
-                }
-
-                foreach (var registreringType1 in registreringType1s.Value)
-                {
-                    if (registreringType1.IsStsOrganisationObsolete())
-                        continue;
-
-                    var referenceIdItem =
-                        registreringType1
-                            .RelationListe
-                            .FromNullable()
-                            .Select(x => x.Virksomhed)
-                            .Select(x => x.ReferenceID)
-                            .Select(x => x.Item);
-
-                    if (referenceIdItem.IsNone)
-                        continue;
-
-                    return Result<string, string>.Success(referenceIdItem.Value);
-                }
-
-                return Result<string, string>.Failure($"Unable to find virksomhed uuid from org uuid {organisationUuid}");
-            }
-        }
-
-        private Result<string, string> GetStsBrugerMunicipalityCvrFromUuid(string virksomhedUuid)
-        {
-            using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
-            {
-                var client = StsVirksomhedHelpers.CreateVirksomhedPortTypeClient(CreateHttpBinding(),
-                    _urlServicePlatformVirksomhedService, clientCertificate);
-                var laesRequest = StsVirksomhedHelpers.CreateStsVirksomhedLaesRequest(_authorizedMunicipalityCvr, virksomhedUuid);
-                var virksomhedPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = virksomhedPortType.laes(laesRequest).FromNullable();
-
-                if (laesResponse.IsNone)
-                    return Result<string, string>.Failure($"Unable to read from STS Virksomhed with virksomhedUuid:{virksomhedUuid}");
-
-                var registreringType1s =
-                    laesResponse
-                        .Select(x=>x.LaesResponse1)
-                        .Select(x => x.LaesOutput)
-                        .Select(x => x.FiltreretOejebliksbillede)
-                        .Select(x => x.Registrering);
-
-                if (registreringType1s.IsNone)
-                {
-                    var errorMessage =
-                        laesResponse
-                            .Select(x => x.LaesResponse1)
-                            .Select(x => x.LaesOutput)
-                            .Select(x => x.StandardRetur)
-                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
-                            .GetValueOrFallback("Unknown");
-
-                    return Result<string, string>.Failure($"Unable to read registrations from STS Virksomhed with virksomhedUuid:{virksomhedUuid}. Error message: {errorMessage}");
-                }
-
-                foreach (var registreringType1 in registreringType1s.Value)
-                {
-                    if (registreringType1.IsStsVirksomhedObsolete())
-                        continue;
-
-                    var latest =
-                        registreringType1
-                            .AttributListe
-                            .FromNullable()
-                            .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
-                            .GetValueOrDefault()
-                            ?.FirstOrDefault();
-
-                    if (latest == null)
-                        continue;
-
-                    return Result<string, string>.Success(latest.CVRNummerTekst);
-                }
-                return Result<string, string>.Failure($"Unable to resolve cvr from virksomhedUuid:{virksomhedUuid}");
-            }
-        }
-
-        private Result<StsPersonData, string> GetStsPersonFromUuid(string personUuid)
+        private Result<StsPersonData, string> GetStsPersonFromUuid(string personUuid, string cvrNumber)
         {
             using (var clientCertificate = GetClientCertificate(_certificateThumbprint))
             {
                 var client = StsPersonHelpers.CreatePersonPortTypeClient(CreateHttpBinding(),
                     _urlServicePlatformPersonService, clientCertificate);
-                var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(_authorizedMunicipalityCvr, personUuid);
+                var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(cvrNumber, personUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();
-                var laesResponse = virksomhedPortType.laes(laesRequest).FromNullable();
+                var laesResponse = virksomhedPortType.laes(laesRequest);
 
-                if (laesResponse.IsNone)
+                if (laesResponse == null)
                     return $"Failed to read from STS Person with personUUID:{personUuid}";
+
+                var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
+                var returnCode = stdOutput?.StatusKode ?? "unknown";
+                var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
+
+                if (returnCode == StsStandardNotFoundResultCode)
+                    return $"Requested person '{personUuid}' from cvr '{cvrNumber}' was not found. STS Person endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =
                     laesResponse
-                        .Select(x => x.LaesResponse1)
-                        .Select(x => x.LaesOutput)
-                        .Select(x => x.FiltreretOejebliksbillede)
-                        .Select(x => x.Registrering);
+                        .LaesResponse1
+                        ?.LaesOutput
+                        ?.FiltreretOejebliksbillede
+                        ?.Registrering ?? new Infrastructure.Soap.STSPerson.RegistreringType1[0];
 
-                if (registreringType1s.IsNone)
+                if (registreringType1s.Any() == false)
                 {
-                    var errorMessage =
-                        laesResponse
-                            .Select(x => x.LaesResponse1)
-                            .Select(x => x.LaesOutput)
-                            .Select(x => x.StandardRetur)
-                            .Select(x => $"'Code:{x.StatusKode ?? ""} Message:{x.FejlbeskedTekst ?? ""}'")
-                            .GetValueOrFallback("Unknown");
-
-                    return $"Failed to parse registrations from STS Person with personUUID:{personUuid}. Error message: {errorMessage}";
+                    return $"Failed to parse registrations from STS Person with personUUID:{personUuid}";
                 }
 
-                foreach (var registreringType1 in registreringType1s.Value)
+                foreach (var registreringType1 in registreringType1s)
                 {
                     if (registreringType1.IsStsPersonObsolete())
                     {
@@ -415,15 +261,14 @@ namespace Core.DomainServices.SSO
 
                     var latest = registreringType1
                         .AttributListe
-                        .FromNullable()
-                        .Select(x => x.OrderByDescending(y => y.Virkning.TilTidspunkt))
-                        .GetValueOrDefault()?
-                        .FirstOrDefault();
+                        ?.OrderByDescending(y => y.Virkning.TilTidspunkt)
+                        ?.FirstOrDefault()
+                        ?.NavnTekst;
 
                     if (latest == null)
                         continue;
 
-                    return Result<StsPersonData, string>.Success(new StsPersonData(latest.NavnTekst));
+                    return Result<StsPersonData, string>.Success(new StsPersonData(latest));
                 }
                 return Result<StsPersonData, string>.Failure($"Unable to resolve person from personuuid:{personUuid}");
             }

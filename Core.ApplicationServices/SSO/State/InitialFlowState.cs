@@ -26,10 +26,10 @@ namespace Core.ApplicationServices.SSO.State
             if (@event.Equals(FlowEvent.LoginCompleted))
             {
                 var externalUserUuid = GetUserExternalUuid();
-                if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege())
+                var cvrNumber = _parser.MatchCvrNumber();
+                if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege() && cvrNumber.HasValue)
                 {
-                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value), 
-                        _ => _.HandleUserPrivilegeVerified());
+                    context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value, cvrNumber.Value), _ => _.HandleUserPrivilegeVerified());
                 }
                 else
                 {
