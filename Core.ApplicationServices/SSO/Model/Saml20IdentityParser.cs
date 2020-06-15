@@ -20,7 +20,11 @@ namespace Core.ApplicationServices.SSO.Model
 
         public Maybe<string> MatchCvrNumber()
         {
-            var cvrNumberAttributes = _navigator.GetAttribute(StsAdgangsStyringConstants.Attributes.CvrNumber).Select(x => x.AttributeValue).GetValueOrFallback(new string[0]);
+            var cvrNumberAttributes = _navigator
+                .GetAttribute(StsAdgangsStyringConstants.Attributes.CvrNumber)
+                .Select(x => x.AttributeValue)
+                .GetValueOrFallback(new string[0]);
+
             foreach (var cvrNumber in cvrNumberAttributes)
             {
                 if (!string.IsNullOrEmpty(cvrNumber))
