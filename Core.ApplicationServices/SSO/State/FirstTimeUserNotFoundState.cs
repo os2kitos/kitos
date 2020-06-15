@@ -68,7 +68,7 @@ namespace Core.ApplicationServices.SSO.State
             user.Name = _stsBrugerInfo.FirstName;
             user.LastName = _stsBrugerInfo.LastName;
             user.DefaultOrganization = organizationByCvrResult;
-            user.Salt = $"{Guid.NewGuid():N}{Guid.NewGuid():N}";
+            user.Salt = _cryptoService.Encrypt($"{Guid.NewGuid():N}{Guid.NewGuid():N}");
             user.Password = _cryptoService.Encrypt(string.Empty);
             _userRepository.Save();
             return user;
