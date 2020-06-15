@@ -2,6 +2,7 @@
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainModel.Result;
+using Serilog;
 
 namespace Core.ApplicationServices.SSO.State
 {
@@ -10,14 +11,17 @@ namespace Core.ApplicationServices.SSO.State
         private readonly string _samlKitosReadAccessRoleIdentifier;
         private readonly Saml20IdentityParser _parser;
         private readonly ISsoStateFactory _stateFactory;
+        private readonly ILogger _logger;
 
         public InitialFlowState(
-            SsoFlowConfiguration configuration, 
+            SsoFlowConfiguration configuration,
             Saml20IdentityParser parser,
-            ISsoStateFactory stateFactory)
+            ISsoStateFactory stateFactory,
+            ILogger logger)
         {
             _parser = parser;
             _stateFactory = stateFactory;
+            _logger = logger;
             _samlKitosReadAccessRoleIdentifier = $"{configuration.PrivilegePrefix}/roles/usersystemrole/readaccess/1";
         }
 
@@ -27,7 +31,17 @@ namespace Core.ApplicationServices.SSO.State
             {
                 var externalUserUuid = GetUserExternalUuid();
                 var cvrNumber = _parser.MatchCvrNumber();
-                if (externalUserUuid.HasValue && CurrentUserHasKitosPrivilege() && cvrNumber.HasValue)
+                if (externalUserUuid.IsNone)
+                {
+                    _logger.Error("No external UUID passed from STS Adgangsstyring");
+                    context.TransitionTo(_stateFactory.CreateErrorState(), _ => _.HandleUnknownError());
+                }
+                else if (cvrNumber.IsNone)
+                {
+                    _logger.Error("CVR number not provided from STS Adgangsstyring");
+                    context.TransitionTo(_stateFactory.CreateErrorState(), _ => _.HandleUnknownError());
+                }
+                else if (CurrentUserHasKitosPrivilege())
                 {
                     context.TransitionTo(_stateFactory.CreatePrivilegeVerifiedState(externalUserUuid.Value, cvrNumber.Value), _ => _.HandleUserPrivilegeVerified());
                 }
