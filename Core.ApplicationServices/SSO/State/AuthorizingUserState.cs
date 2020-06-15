@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.SSO.State
         private readonly IOrganizationRoleService _organizationRoleService;
         private readonly ISsoStateFactory _ssoStateFactory;
 
-        public AuthorizingUserState(User user, Organization ssoOrganization, IOrganizationRoleService organizationRoleService,ISsoStateFactory ssoStateFactory)
+        public AuthorizingUserState(User user, Organization ssoOrganization, IOrganizationRoleService organizationRoleService, ISsoStateFactory ssoStateFactory)
         {
             _user = user;
             _ssoOrganization = ssoOrganization;
@@ -25,14 +25,14 @@ namespace Core.ApplicationServices.SSO.State
         {
             if (@event.Equals(FlowEvent.OrganizationFound))
             {
-                var rolesInOrganization = _organizationRoleService.GetRolesInOrganization(_user,_ssoOrganization.Id);
+                var rolesInOrganization = _organizationRoleService.GetRolesInOrganization(_user, _ssoOrganization.Id);
                 if (rolesInOrganization.Any())
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(_user),_=>_.HandleUserHasRoleInOrganization());
+                    context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(_user), _ => _.HandleUserHasRoleInOrganization());
                 }
                 else
                 {
-                    context.TransitionTo(_ssoStateFactory.CreateAssigningRoleState(_user,_ssoOrganization),_=>_.HandleUserHasNoRoleInOrganization());
+                    context.TransitionTo(_ssoStateFactory.CreateAssigningRoleState(_user, _ssoOrganization), _ => _.HandleUserHasNoRoleInOrganization());
                 }
             }
         }

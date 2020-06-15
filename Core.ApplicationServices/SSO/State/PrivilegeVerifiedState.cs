@@ -11,18 +11,22 @@ namespace Core.ApplicationServices.SSO.State
     public class PrivilegeVerifiedState : AbstractState
     {
         private readonly Guid _userUuid;
+        private readonly string _cvrNumber;
         private readonly IStsBrugerInfoService _stsBrugerInfoService;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
         private readonly ISsoStateFactory _ssoStateFactory;
         private readonly IUserRepository _userRepository;
 
-        public PrivilegeVerifiedState(Guid userUuid,
+        public PrivilegeVerifiedState(
+            Guid userUuid,
+            string cvrNumber,
             IUserRepository userRepository,
             IStsBrugerInfoService stsBrugerInfoService,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
             ISsoStateFactory ssoStateFactory)
         {
             _userUuid = userUuid;
+            _cvrNumber = cvrNumber;
             _stsBrugerInfoService = stsBrugerInfoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
             _userRepository = userRepository;
@@ -44,7 +48,7 @@ namespace Core.ApplicationServices.SSO.State
                     }
                     else
                     {
-                        var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
+                        var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid, _cvrNumber);
                         if (!stsBrugerInfo.HasValue)
                         {
                             context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
@@ -58,7 +62,7 @@ namespace Core.ApplicationServices.SSO.State
                 }
                 else // Try to find the user by email
                 {
-                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid);
+                    var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid, _cvrNumber);
                     if (!stsBrugerInfo.HasValue)
                     {
                         context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());

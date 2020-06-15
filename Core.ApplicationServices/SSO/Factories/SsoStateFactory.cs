@@ -60,12 +60,12 @@ namespace Core.ApplicationServices.SSO.Factories
             {
                 throw new InvalidOperationException("Error: No SAML state");
             }
-            return new InitialFlowState(_configuration, Saml20IdentityParser.CreateFrom(_samlState.Value), this);
+            return new InitialFlowState(_configuration, Saml20IdentityParser.CreateFrom(_samlState.Value), this, _logger);
         }
 
-        public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid)
+        public AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid, string cvrNumber)
         {
-            return new PrivilegeVerifiedState(userExternalUuid, _userRepository, _infoService, _ssoUserIdentityRepository, this);
+            return new PrivilegeVerifiedState(userExternalUuid, cvrNumber, _userRepository, _infoService, _ssoUserIdentityRepository, this);
         }
 
         public AbstractState CreateUserLoggedIn(User user)
@@ -75,12 +75,12 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo)
         {
-            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository, _organizationRepository,this,_logger);
+            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository, _organizationRepository, this, _logger);
         }
 
         public AbstractState CreateAuthorizingUserState(User user, Organization organization)
         {
-            return new AuthorizingUserState(user, organization, _organizationRoleService,this);
+            return new AuthorizingUserState(user, organization, _organizationRoleService, this);
         }
 
         public AbstractState CreateAuthorizingUserFromUnknownOrgState(User user)
@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateAssigningRoleState(User user, Organization ssoOrganization)
         {
-            return new AssigningRoleState(user,ssoOrganization,_organizationRoleService,this);
+            return new AssigningRoleState(user, ssoOrganization, _organizationRoleService, this);
         }
 
         public AbstractState CreateFirstTimeUserNotFoundState(StsBrugerInfo stsBrugerInfo)

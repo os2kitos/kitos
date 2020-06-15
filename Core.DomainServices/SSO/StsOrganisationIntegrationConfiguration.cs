@@ -4,13 +4,11 @@
     {
         public string CertificateThumbprint { get; }
         public string EndpointHost { get; }
-        public string AuthorizedMunicipalityCvr { get; }
 
-        public StsOrganisationIntegrationConfiguration(string certificateThumbprint, string endpointHost, string authorizedMunicipalityCvr)
+        public StsOrganisationIntegrationConfiguration(string certificateThumbprint, string endpointHost)
         {
             CertificateThumbprint = certificateThumbprint;
             EndpointHost = endpointHost;
-            AuthorizedMunicipalityCvr = authorizedMunicipalityCvr;
         }
     }
 }

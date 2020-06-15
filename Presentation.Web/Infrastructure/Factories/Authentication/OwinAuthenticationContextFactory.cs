@@ -97,20 +97,20 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             return null;
         }
 
-        private int? ParseInteger(string toParse)
+        private int? ParseUserIdInteger(string toParse)
         {
             if (int.TryParse(toParse, out var asInt))
             {
                 return asInt;
             }
-            _logger.Error("Could not parse to int: {toParse}", toParse);
+            _logger.Debug("Could not parse user id to int: {toParse}", toParse);
             return null;
         }
 
         private int? GetUserId(IPrincipal user)
         {
             var userId = user.Identity.Name;
-            var id = ParseInteger(userId);
+            var id = ParseUserIdInteger(userId);
             return id;
         }
     }

@@ -106,15 +106,6 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("58271713")]
-        public string StsOrganisationAuthorizedMunicipalityCvr {
-            get {
-                return ((string)(this["StsOrganisationAuthorizedMunicipalityCvr"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-local.strongminds.dk")]
         public string SsoServiceProviderId {
             get {

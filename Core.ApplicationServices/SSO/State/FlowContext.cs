@@ -1,5 +1,4 @@
 ﻿using System;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.SSO.State
 {
