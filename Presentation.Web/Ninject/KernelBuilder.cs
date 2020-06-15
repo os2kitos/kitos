@@ -182,8 +182,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
-                    Settings.Default.StsOrganisationEndpointHost,
-                    Settings.Default.StsOrganisationAuthorizedMunicipalityCvr))
+                    Settings.Default.StsOrganisationEndpointHost))
                 .InSingletonScope();
 
             kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);

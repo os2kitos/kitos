@@ -9,7 +9,7 @@ namespace Core.ApplicationServices.SSO.Factories
     public interface ISsoStateFactory
     {
         AbstractState CreateInitialState();
-        AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid);
+        AbstractState CreatePrivilegeVerifiedState(Guid userExternalUuid, string cvrNumber);
         AbstractState CreateUserLoggedIn(User valueUser);
         AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo);
         AbstractState CreateAuthorizingUserState(User user, Organization organization);
