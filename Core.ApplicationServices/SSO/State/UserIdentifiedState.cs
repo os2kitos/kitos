@@ -72,7 +72,7 @@ namespace Core.ApplicationServices.SSO.State
             }
             else
             {
-                //If not sso binding exists for the organization, try to create one by finding the org by cvr and adding the sso relation
+                //If no sso binding exists for the organization, try to create one by finding the org by cvr and adding the sso relation
                 var organizationByCvrResult = _organizationRepository.GetByCvr(_externalUser.MunicipalityCvr);
                 if (organizationByCvrResult.HasValue)
                 {
