@@ -51,13 +51,16 @@ namespace Presentation.Web.Controllers.API
 
                 var usages = Repository
                     .AsQueryable()
-                    .ByOrganizationId(organizationId)
-                    .Take(take);
+                    .ByOrganizationId(organizationId);
 
                 if (!string.IsNullOrWhiteSpace(q))
                 {
                     usages = usages.Where(usage => usage.ItSystem.Name.Contains(q));
                 }
+
+                usages = usages
+                    .OrderBy(_ => _.ItSystem.Name)
+                    .Take(take);
 
                 return Ok(Map(usages));
             }
@@ -87,7 +90,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != ActiveOrganizationId)
+                if (GetOrganizationReadAccessLevel(item.OrganizationId) < OrganizationDataReadAccessLevel.All)
                 {
                     dto.Note = "";
                 }
