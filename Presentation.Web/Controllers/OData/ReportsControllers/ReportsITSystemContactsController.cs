@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
             var result = Repository.Get();
             try
             {
-                var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
+                var dtos = Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
                 return Ok(dtos);
             }
             catch (Exception e)

@@ -130,7 +130,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var systemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
                 if (!AllowCreate<ItSystemUsage>(systemUsage))
                 {

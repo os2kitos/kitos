@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Security.Claims;
 using Serilog;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Principal;
 using Core.DomainModel.Constants;
 using Presentation.Web.Infrastructure.Model.Authentication;
@@ -36,8 +37,9 @@ namespace Presentation.Web.Infrastructure
                 var securityToken = handler.CreateToken(new SecurityTokenDescriptor
                 {
                     Subject = identity,
-                    TokenIssuerName = BearerTokenConfig.Issuer,
-                    Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(validFrom, expires),
+                    Issuer = BearerTokenConfig.Issuer,
+                    IssuedAt = validFrom,
+                    Expires = expires,
                     SigningCredentials = new SigningCredentials(BearerTokenConfig.SecurityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
                 });
                 var tokenString = handler.WriteToken(securityToken);

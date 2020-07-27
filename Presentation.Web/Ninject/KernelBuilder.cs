@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Security;
+using AutoMapper;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
@@ -94,6 +95,9 @@ namespace Presentation.Web.Ninject
 
             _builderActions.Add(kernel => kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel));
             _builderActions.Add(kernel => kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>());
+
+            //Register automapper
+            _builderActions.Add(kernel => kernel.Bind<IMapper>().ToMethod(_ => MappingConfig.CreateMapper()).InSingletonScope());
 
             return this;
         }

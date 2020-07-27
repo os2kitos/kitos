@@ -300,7 +300,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var itemType = item.GetType();
                 // get name of mapped property
-                var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
+                var map = Mapper.ConfigurationProvider.FindTypeMapFor<TDto, TModel>().PropertyMaps;
                 var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
                 foreach (var valuePair in obj)
@@ -311,7 +311,7 @@ namespace Presentation.Web.Controllers.API
                         continue; // abort if no map found
                     }
 
-                    var destName = mapMember.DestinationProperty.Name;
+                    var destName = mapMember.DestinationName;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")

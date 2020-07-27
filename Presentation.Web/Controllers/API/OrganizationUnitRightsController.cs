@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.API
 
                 var pagedRights = theRights.Skip(skip).Take(take).ToList();
 
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationUnitRight>, ICollection<RightOutputDTO>>(pagedRights);
+                var dtos = Map<ICollection<OrganizationUnitRight>, ICollection<RightOutputDTO>>(pagedRights);
 
                 return Ok(dtos);
             }

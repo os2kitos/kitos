@@ -173,9 +173,9 @@ namespace Presentation.Web.Controllers.API
             return result;
         }
 
-        private static IEnumerable<ExcelImportErrorDTO> GetErrorMessages(ExcelImportException e)
+        private IEnumerable<ExcelImportErrorDTO> GetErrorMessages(ExcelImportException e)
         {
-            return AutoMapper.Mapper.Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
+            return Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
         }
 
         private async Task<MemoryStream> ReadMultipartRequestAsync()

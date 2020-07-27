@@ -98,7 +98,8 @@ namespace Presentation.Web.Controllers.API
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // get name of mapped property
-            var map = Mapper.FindTypeMapFor<UserDTO, User>().GetPropertyMaps();
+            var map = Mapper.ConfigurationProvider.FindTypeMapFor<UserDTO, User>().PropertyMaps;
+
             var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
             foreach (var valuePair in obj)
@@ -107,7 +108,7 @@ namespace Presentation.Web.Controllers.API
                 if (mapMember == null)
                     continue; // abort if no map found
 
-                var destName = mapMember.DestinationProperty.Name;
+                var destName = mapMember.DestinationName;
 
                 if (destName == "IsGlobalAdmin")
                     if (valuePair.Value.Value<bool>()) // check if value is being set to true

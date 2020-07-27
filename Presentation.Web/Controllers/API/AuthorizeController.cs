@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.API
         {
             var user = KitosUser;
             var orgs = _organizationService.GetOrganizations(user);
-            var dtos = AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
             return Ok(dtos);
         }
 
@@ -80,8 +80,8 @@ namespace Presentation.Web.Controllers.API
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
             var dto = new OrganizationAndDefaultUnitDTO
             {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+                Organization = Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             };
             return Ok(dto);
         }

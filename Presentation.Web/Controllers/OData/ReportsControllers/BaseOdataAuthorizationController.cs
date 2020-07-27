@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using AutoMapper;
 using Microsoft.AspNet.OData;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices;
@@ -16,6 +17,9 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
 
         [Inject]
         public IAuthorizationContext AuthorizationContext { get; set; }
+
+        [Inject]
+        public IMapper Mapper { get; set; }
 
         protected int UserId => UserContext.UserId;
 

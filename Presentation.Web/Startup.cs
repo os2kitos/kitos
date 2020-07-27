@@ -2,11 +2,11 @@
 using Microsoft.Owin;
 using Owin;
 using Hangfire;
-using System.IdentityModel.Tokens;
 using Core.BackgroundJobs.Model;
 using Hangfire.Common;
 using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
+using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
