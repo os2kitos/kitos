@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Query;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Query;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;

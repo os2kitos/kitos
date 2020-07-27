@@ -1,6 +1,7 @@
 ﻿using System;
 using Serilog;
 using Serilog.Events;
+using Serilog.Exceptions.Core;
 using Serilog.Exceptions.Destructurers;
 using SerilogWeb.Classic;
 using SerilogWeb.Classic.Enrichers;

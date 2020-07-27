@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Presentation.Web.Infrastructure.Attributes;
 using static System.String;
 
