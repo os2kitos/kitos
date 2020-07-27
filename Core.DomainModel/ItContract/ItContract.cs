@@ -460,7 +460,6 @@ namespace Core.DomainModel.ItContract
         /// <remarks>
         ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
         ///     It's a string but should be treated as an int.
-        ///     TODO perhaps a redesign of OptionEntity is in order
         /// </remarks>
         /// <value>
         ///     The termination deadline.

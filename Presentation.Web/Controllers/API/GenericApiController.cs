@@ -316,7 +316,7 @@ namespace Presentation.Web.Controllers.API
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
                     {
-                        continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                        continue; // don't allow writing to these.
                     }
 
                     var propRef = itemType.GetProperty(destName);

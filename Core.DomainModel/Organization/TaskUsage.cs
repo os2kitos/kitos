@@ -7,8 +7,6 @@ namespace Core.DomainModel.Organization
     /// <see><cref>OrganizationUnit</cref></see>.
     /// Helper object which can hold comments and status property
     /// </summary>
-    /// TODO this really should be a composite key entity
-    /// TODO why is this a hierarchy?
     public class TaskUsage : Entity, IHierarchy<TaskUsage>, IContextAware, IOrganizationModule
     {
         public TaskUsage()

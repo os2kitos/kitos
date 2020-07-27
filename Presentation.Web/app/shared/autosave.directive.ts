@@ -8,7 +8,7 @@
                 require: 'ngModel',
                 priority: 0,
                 link: function (scope, element, attrs, ctrl) {
-                    var user; // TODO this isn't always ready when needed and will result in an error from time to time... angular 2 support resolve on directives so yeah...
+                    var user;
 
                     userService.getUser().then(function (result) {
                         user = result;

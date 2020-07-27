@@ -83,7 +83,6 @@
                 },
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretHjælpeTekst",
                         text: "Opret hjælpetekst",
                         template: "<a ui-sref='global-admin.help-texts.create' class='btn btn-success pull-right'>#: text #</a>"

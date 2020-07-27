@@ -49,7 +49,6 @@ namespace Presentation.Web.Controllers.OData
             if (parameters.ContainsKey("organizationId"))
             {
                 organizationId = (int)parameters["organizationId"];
-                // TODO check if user is allowed to add users to this organization
             }
 
             var sendMailOnCreation = false;

@@ -249,7 +249,6 @@ namespace Presentation.Web
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
             contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
 
-            // TODO this field is causing issues.
             // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);

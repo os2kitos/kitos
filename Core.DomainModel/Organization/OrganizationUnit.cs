@@ -57,7 +57,6 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
         /// <summary>
         /// Gets or sets the delegated system usages.
-        /// TODO write better summary
         /// </summary>
         /// <value>
         /// The delegated system usages.
@@ -66,7 +65,6 @@ namespace Core.DomainModel.Organization
 
         /// <summary>
         /// Gets or sets it system usages.
-        /// TODO write better summary
         /// </summary>
         /// <value>
         /// It system usages.

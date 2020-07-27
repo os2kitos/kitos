@@ -79,7 +79,7 @@ module Kitos.Reports {
         };
 
         buildDesignerOptions = () => {
-            // set designer options TODO load from db
+            // set designer options
             let options = this.stimulsoftService.getDesignerOptions();
             options.appearance.fullScreenMode = true;
             options.appearance.showSaveDialog = false;

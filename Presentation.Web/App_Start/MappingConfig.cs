@@ -38,8 +38,6 @@ namespace Presentation.Web
     {
         public DropdownProfile()
         {
-            // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
-            // like IsActive and Description
 
             CreateMap<ContactPerson, ContactPersonDTO>()
                  .ReverseMap();

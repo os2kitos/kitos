@@ -88,7 +88,6 @@ namespace Presentation.Web.Controllers.API
                 right = RightRepository.Insert(right);
                 RightRepository.Save();
 
-                //TODO: FIX navigation properties not loading properly!!!
                 right.User = UserRepository.GetByKey(right.UserId);
 
                 var outputDTO = Map<TRight, RightOutputDTO>(right);

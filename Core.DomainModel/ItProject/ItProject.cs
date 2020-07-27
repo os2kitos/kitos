@@ -30,7 +30,6 @@ namespace Core.DomainModel.ItProject
             Phase4 = new ItProjectPhase();
             Phase5 = new ItProjectPhase();
             
-            // default value(s) TODO does these have an effect? Aren't they overwritten when mapped
             Priority = ItProjectPriority.None;
             PriorityPf = ItProjectPriority.None;
             AccessModifier = AccessModifier.Local;

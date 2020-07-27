@@ -18,9 +18,9 @@
         /** Local tasks that was created in this unit */
         TaskRefs: Array<ITaskRef>;
         OwnedTasks: Array<ITaskRef>;
-        /** Gets or sets the delegated system usages.TODO write better summary */
+        /** Gets or sets the delegated system usages. */
         DelegatedSystemUsages: Array<IItSystemUsage>;
-        /** Gets or sets it system usages.TODO write better summary */
+        /** Gets or sets it system usages. */
         ItSystemUsages: Array<IItSystemUsage>;
         /** Users which have set this as their default OrganizationUnit. */
         DefaultUsers: Array<IOrganizationRight>;

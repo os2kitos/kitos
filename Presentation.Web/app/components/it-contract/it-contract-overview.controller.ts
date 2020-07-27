@@ -365,7 +365,6 @@
                 },
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
