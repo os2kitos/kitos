@@ -17,7 +17,7 @@ namespace Presentation.Web
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
-                .WriteTo.File(new CompactJsonFormatter(),path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit:10, rollingInterval:RollingInterval.Day)
+                .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
 
