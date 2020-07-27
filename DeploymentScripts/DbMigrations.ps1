@@ -9,7 +9,13 @@ Function Run-DB-Migrations([bool]$newDb = $false, [string]$migrationsFolder, [st
         $Env:SeedNewDb="no"
     }
     
-    & "$migrationsFolder\migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$connectionString" /connectionProviderName="System.Data.SqlClient" /verbose /startupDirectory="$migrationsFolder"
+    & "$migrationsFolder\ef6.exe"  `
+        database update  `
+        --assembly "$migrationsFolder\Infrastructure.DataAccess.dll"  `
+        --connection-string "$connectionString"  `
+        --connection-provider "System.Data.SqlClient"  `
+        --verbose  `
+        --project-dir "$migrationsFolder"
     
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO MIGRATE DB" }
 }
