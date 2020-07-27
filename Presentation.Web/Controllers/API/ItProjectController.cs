@@ -77,7 +77,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q).Take(take);
+                var projectsQuery = _itProjectService
+                    .GetAvailableProjects(orgId, q)
+                    .OrderBy(_=>_.Name)
+                    .Take(take);
 
                 return Ok(Map(projectsQuery));
             }
