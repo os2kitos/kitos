@@ -40,7 +40,7 @@
                 $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(
                     "api/organization",
                     true,
-                    ["public=true", `orgId=${user.currentOrganizationId}`],
+                    ['take=25',`orgId=${user.currentOrganizationId}`],
                     (item,
                         items) => {
                         items.push({

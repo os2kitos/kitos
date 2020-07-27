@@ -62,6 +62,6 @@
                     };
                 }
 
-                $scope.parentSelectOptions = $scope.selectLazyLoading("api/itproject", true, ["overview=true", `orgId=${user.currentOrganizationId}`]);
+                $scope.parentSelectOptions = $scope.selectLazyLoading("api/itproject", true, ["take=25", `orgId=${user.currentOrganizationId}`]);
             }]);
 })(angular, app);

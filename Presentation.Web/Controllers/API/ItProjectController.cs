@@ -119,25 +119,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
-        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
-
-                var projects = Page(projectsQuery, pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {

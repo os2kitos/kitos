@@ -167,7 +167,7 @@
                 notify.addSuccessMessage("Slettet!");
             };
 
-            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['public=true', 'orgId=' + user.currentOrganizationId], (item,
+            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25','orgId=' + user.currentOrganizationId], (item,
                 items) => {
                 items.push({
                     id: item.id,
