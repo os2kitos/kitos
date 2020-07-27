@@ -147,19 +147,12 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
                 }
 
-                var item = Map(dto);
-                if (dto.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(item))
+                var item = new ItSystem
                 {
-                    return Forbidden();
-                }
-
-                item.Uuid = Guid.NewGuid();
-
-                foreach (var id in dto.TaskRefIds)
-                {
-                    var task = _taskRepository.GetByKey(id);
-                    item.TaskRefs.Add(task);
-                }
+                    Name = dto.Name,
+                    OrganizationId = dto.OrganizationId,
+                    Uuid = Guid.NewGuid()
+                };
 
                 if (!AllowCreate<ItSystem>(item))
                 {

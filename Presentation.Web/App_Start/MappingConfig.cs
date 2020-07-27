@@ -26,6 +26,9 @@ namespace Presentation.Web
         {
             var mappingconfig = new MapperConfiguration(configure: cfg =>
             {
+                //TODO: Fix the automapper crazyness - we use the map<dto,model> in the base controllers so it is critical that it works and does not go about creating random objects which fails
+                //cfg.AllowNullDestinationValues = true;
+                //cfg.ForAllPropertyMaps(x=>x.DestinationType.IsClass && x.IsMapped == false,(opt,expr)=>opt.UseDestinationValue = true);
                 cfg.AddProfile<MappingProfile>();
                 cfg.AddProfile<DropdownProfile>();
             });
@@ -38,7 +41,6 @@ namespace Presentation.Web
     {
         public DropdownProfile()
         {
-
             CreateMap<ContactPerson, ContactPersonDTO>()
                  .ReverseMap();
 
@@ -333,6 +335,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.BelongsToId, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Id))
                 .ForMember(dest => dest.BelongsToName, opt => opt.MapFrom(src => src.ExhibitedBy.ItSystem.BelongsTo.Name))
                 .ReverseMap();
+                //.ForMember(dest=>dest.ExhibitedBy,opt=>opt.Ignore());
 
             CreateMap<ItSystemUsage, ItSystemUsageDTO>()
                 .ForMember(dest => dest.ResponsibleOrgUnitName,

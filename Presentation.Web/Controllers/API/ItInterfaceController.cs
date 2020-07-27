@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var result = _itInterfaceService.Create(Map(dto));
+                var result = _itInterfaceService.Create(dto.OrganizationId, dto.Name, dto.ItInterfaceId);
                 return result.Ok ?
                     Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
                     FromOperationFailure(result.Error);

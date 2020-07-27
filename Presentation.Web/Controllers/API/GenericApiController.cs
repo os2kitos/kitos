@@ -462,22 +462,10 @@ namespace Presentation.Web.Controllers.API
             return Map<TModel, TDto>(model);
         }
 
-        //for easy access
-        protected virtual TModel Map(TDto inputDto)
-        {
-            return Map<TDto, TModel>(inputDto);
-        }
-
         //for easy access (list)
         protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
         {
             return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
-        {
-            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
         }
 
         #endregion
