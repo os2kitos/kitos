@@ -73,11 +73,11 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        public virtual HttpResponseMessage Get(string q, int orgId)
+        public virtual HttpResponseMessage Get(string q, int orgId, int take = 25)
         {
             try
             {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
+                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q).Take(take);
 
                 return Ok(Map(projectsQuery));
             }

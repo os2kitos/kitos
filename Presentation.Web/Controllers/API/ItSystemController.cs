@@ -91,13 +91,15 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
+        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId, int take = 25)
         {
             try
             {
                 var systems = _systemService
                     .GetAvailableSystems(orgId, q)
-                    .ExceptEntitiesWithIds(excludeId);
+                    .ExceptEntitiesWithIds(excludeId)
+                    .OrderBy(_ => _.Name)
+                    .Take(take);
 
                 var dtos = Map(systems);
                 return Ok(dtos);

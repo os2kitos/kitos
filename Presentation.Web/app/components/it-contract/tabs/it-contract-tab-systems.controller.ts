@@ -112,7 +112,7 @@
                     },
                     quietMillis: 500,
                     transport(queryParams) {
-                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query).then(queryParams.success);
+                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query + "&take=25").then(queryParams.success);
                         res.abort = () => null;
 
                         return res;

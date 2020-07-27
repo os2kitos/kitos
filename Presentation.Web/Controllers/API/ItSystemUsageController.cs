@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
-        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
+        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q, int take = 25)
         {
             try
             {
@@ -51,7 +51,8 @@ namespace Presentation.Web.Controllers.API
 
                 var usages = Repository
                     .AsQueryable()
-                    .ByOrganizationId(organizationId);
+                    .ByOrganizationId(organizationId)
+                    .Take(take);
 
                 if (!string.IsNullOrWhiteSpace(q))
                 {
