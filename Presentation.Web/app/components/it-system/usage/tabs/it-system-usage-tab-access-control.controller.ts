@@ -38,12 +38,9 @@
 
 //            $scope.toggle = function (accessType, e) {
 //                if (e.currentTarget.checked) {
-//                    var payload: any = {};
-//                    payload["@odata.id"] = window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")";
-
 //                    var msg = notify.addInfoMessage("Opdaterer ...", false);
 
-//                    return $http.post("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref", payload).success(function (result) {
+//                    return $http.post("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/" + accessType.Id, {}).success(function (result) {
 //                        msg.toSuccessMessage("Feltet er opdateret!");
 //                    }).error(function () {
 //                        msg.toErrorMessage("Fejl!");
@@ -51,7 +48,7 @@
 //                } else {
 //                    var msg = notify.addInfoMessage("Opdaterer ...", false);
 
-//                    return $http.delete("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref?$id=" + window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")").success(function (result) {
+//                    return $http.delete("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/" + accessType.Id).success(function (result) {
 //                        msg.toSuccessMessage("Feltet er opdateret!");
 //                    }).error(function () {
 //                        msg.toErrorMessage("Fejl!");

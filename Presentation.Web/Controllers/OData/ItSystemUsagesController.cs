@@ -6,16 +6,12 @@ using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using System.Net;
-using System.Net.Http;
-using System.Web.Http.Routing;
-using Microsoft.AspNet.OData.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Microsoft.OData.UriParser;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -105,7 +101,8 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [AcceptVerbs("POST", "PUT")]
-        public IHttpActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
+        [ODataRoute("ItSystemUsages({key})/AccessTypes/{accessTypeId}")]
+        public IHttpActionResult CreateRef(int key, int accessTypeId)
         {
             var itSystemUsage = Repository.GetByKey(key);
             if (itSystemUsage == null)
@@ -118,53 +115,22 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            switch (navigationProperty)
+            var accessType = _accessTypeRepository.GetByKey(accessTypeId);
+            if (accessType == null)
             {
-                case "AccessTypes":
-                    var relatedKey = GetKeyFromUri<int>(Request, link);
-                    var accessType = _accessTypeRepository.GetByKey(relatedKey);
-                    if (accessType == null)
-                    {
-                        return NotFound();
-                    }
-
-                    itSystemUsage.AccessTypes.Add(accessType);
-                    break;
-
-                default:
-                    return StatusCode(HttpStatusCode.NotImplemented);
+                return BadRequest("Invalid accessTypeId");
             }
+
+            itSystemUsage.AccessTypes.Add(accessType);
 
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        private static TKey GetKeyFromUri<TKey>(HttpRequestMessage request, Uri uri)
-        {
-            if (uri == null)
-            {
-                throw new ArgumentNullException("uri");
-            }
-
-            var urlHelper = request.GetUrlHelper() ?? new UrlHelper(request);
-            var pathHandler = (IODataPathHandler)request.GetRequestContainer().GetService(typeof(IODataPathHandler));
-
-            string serviceRoot = urlHelper.CreateODataLink(request.ODataProperties().RouteName, pathHandler, new List<ODataPathSegment>());
-
-            var odataPath = pathHandler.Parse(serviceRoot, uri.LocalPath, request.GetRequestContainer());
-
-            var keySegment = odataPath.Segments.OfType<KeySegment>().FirstOrDefault();
-            if (keySegment == null)
-            {
-                throw new InvalidOperationException("The link does not contain a key.");
-            }
-
-            var value = keySegment.Keys.FirstOrDefault().Value;
-            return (TKey)value;
-        }
-
-        public IHttpActionResult DeleteRef([FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty)
+        [AcceptVerbs("DELETE")]
+        [ODataRoute("ItSystemUsages({key})/AccessTypes/{accessTypeId}")]
+        public IHttpActionResult DeleteRef(int key, int accessTypeId)
         {
             var itSystemUsage = Repository.GetByKey(key);
             if (itSystemUsage == null)
@@ -177,27 +143,18 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            switch (navigationProperty)
+            var accessType = _accessTypeRepository.GetByKey(accessTypeId);
+
+            if (accessType == null)
             {
-                case "AccessTypes":
-                    var accessTypeId = Convert.ToInt32(relatedKey);
-                    var accessType = _accessTypeRepository.GetByKey(accessTypeId);
-
-                    if (accessType == null)
-                    {
-                        return NotFound();
-                    }
-                    itSystemUsage.AccessTypes.Remove(accessType);
-                    break;
-                default:
-                    return StatusCode(HttpStatusCode.NotImplemented);
-
+                return BadRequest("Invalid accessTypeId");
             }
+
+            itSystemUsage.AccessTypes.Remove(accessType);
 
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
-
     }
 }

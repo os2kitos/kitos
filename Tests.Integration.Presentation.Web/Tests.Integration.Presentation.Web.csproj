@@ -147,7 +147,6 @@
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\CSRFTokenDTO.cs" />
-    <Compile Include="Tools\Model\EnableAccessTypeInput.cs" />
     <Compile Include="Tools\Model\GetAccessTypesResponse.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
