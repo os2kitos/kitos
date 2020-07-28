@@ -34,7 +34,8 @@ namespace Infrastructure.Services.Http
             Client = new HttpClient(new HttpClientHandler
             {
                 AllowAutoRedirect = true,
-                UseCookies = false
+                UseCookies = false,
+                ServerCertificateCustomValidationCallback = (sender, certificate, chain, errors) => true
             });
 
             //Set max timeout to 30 in stead of the default 100
