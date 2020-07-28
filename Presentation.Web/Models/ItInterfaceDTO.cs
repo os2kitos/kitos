@@ -21,7 +21,7 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
-        public AccessModifier AccessModifier { get; set; }
+        public AccessModifier? AccessModifier { get; set; }
         public int? ExhibitedById { get; set; }
         public int? ExhibitedByItSystemId { get; set; }
         public string ExhibitedByItSystemName { get; set; }

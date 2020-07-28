@@ -153,7 +153,7 @@ namespace Presentation.Web.Controllers.API
                     OrganizationId = dto.OrganizationId,
                     BelongsToId = dto.OrganizationId,
                     Uuid = Guid.NewGuid(),
-                    AccessModifier = AccessModifier.Public
+                    AccessModifier = dto.AccessModifier ?? AccessModifier.Public
                 };
 
                 if (!AllowCreate<ItSystem>(item))

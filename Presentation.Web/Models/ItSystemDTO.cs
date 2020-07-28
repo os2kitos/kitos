@@ -42,7 +42,7 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
-        public AccessModifier AccessModifier { get; set; }
+        public AccessModifier? AccessModifier { get; set; }
 
         public string Description { get; set; }
 

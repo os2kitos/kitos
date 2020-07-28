@@ -77,7 +77,7 @@ namespace Core.ApplicationServices.Interface
             }
         }
 
-        public Result<ItInterface, OperationFailure> Create(int organizationId, string name, string interfaceId)
+        public Result<ItInterface, OperationFailure> Create(int organizationId, string name, string interfaceId, AccessModifier? accessModifier = default)
         {
             if (name == null)
             {
@@ -95,7 +95,7 @@ namespace Core.ApplicationServices.Interface
                 OrganizationId = organizationId,
                 ItInterfaceId = interfaceId ?? string.Empty,
                 Uuid = Guid.NewGuid(),
-                AccessModifier = AccessModifier.Public
+                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public)
             };
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
