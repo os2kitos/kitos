@@ -151,7 +151,9 @@ namespace Presentation.Web.Controllers.API
                 {
                     Name = dto.Name,
                     OrganizationId = dto.OrganizationId,
-                    Uuid = Guid.NewGuid()
+                    BelongsToId = dto.OrganizationId,
+                    Uuid = Guid.NewGuid(),
+                    AccessModifier = AccessModifier.Public
                 };
 
                 if (!AllowCreate<ItSystem>(item))

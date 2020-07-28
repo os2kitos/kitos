@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
@@ -88,12 +89,13 @@ namespace Core.ApplicationServices.Interface
             {
                 return OperationFailure.Conflict;
             }
-            var newInterface = new ItInterface()
+            var newInterface = new ItInterface
             {
                 Name = name,
                 OrganizationId = organizationId,
                 ItInterfaceId = interfaceId ?? string.Empty,
-                Uuid = Guid.NewGuid()
+                Uuid = Guid.NewGuid(),
+                AccessModifier = AccessModifier.Public
             };
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))

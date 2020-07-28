@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel.ItSystemUsage;
-
-namespace Core.DomainModel.ItSystem
+﻿namespace Core.DomainModel.ItSystem
 {
     /// <summary>
     /// Represents what <see cref="DomainModel.ItSystem.ItInterface"/>
