@@ -61,16 +61,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organization && o.Parent == null).FirstOrDefault();
+                var root = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organization)
+                    .FirstOrDefault(unit => unit.Parent == null);
 
-                if (orgUnit == null) return NotFound();
+                if (root == null) return NotFound();
 
-                if (!AllowRead(orgUnit))
+                if (!AllowRead(root))
                 {
                     return Forbidden();
                 }
 
-                var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
+                var item = Map<OrganizationUnit, OrgUnitDTO>(root);
 
                 return Ok(item);
             }
