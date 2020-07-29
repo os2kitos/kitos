@@ -355,7 +355,6 @@
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Extensions\AutoMapperExtensions.cs" />
-    <Compile Include="Infrastructure\Attributes\CacheApiResponseAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />

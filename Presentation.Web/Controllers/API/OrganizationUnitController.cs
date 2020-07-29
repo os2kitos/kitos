@@ -56,7 +56,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [CacheApiResponse(DurationInMiliSeconds = 5000)]
         public HttpResponseMessage GetByOrganization(int organization)
         {
             try
