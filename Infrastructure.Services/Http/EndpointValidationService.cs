@@ -79,11 +79,13 @@ namespace Infrastructure.Services.Http
 
                 using (var response = await LoadEndpointWithBackOffRetryAsync(uri).ConfigureAwait(false))
                 {
-                    switch (response.StatusCode)
+                    switch ((int)response.StatusCode)
                     {
-                        case HttpStatusCode.OK:
-                        case HttpStatusCode.Redirect:
-                        case HttpStatusCode.MovedPermanently:
+                        case (int)HttpStatusCode.OK:
+                        case (int)HttpStatusCode.Redirect:
+                        case (int)HttpStatusCode.TemporaryRedirect:
+                        case 308: //Permanent redirect: https://tools.ietf.org/html/rfc7238
+                        case (int)HttpStatusCode.MovedPermanently:
                             //Will result in pages being shown - redirect might be a "short link" which redirects to the real link
                             return new EndpointValidation(url);
                         default:
