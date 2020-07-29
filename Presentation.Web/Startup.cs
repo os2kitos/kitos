@@ -9,6 +9,7 @@ using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
+using Presentation.Web.Ninject;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -43,6 +44,9 @@ namespace Presentation.Web
         private static void InitializeHangfire(IAppBuilder app)
         {
             // Initializing the Hangfire scheduler
+            var standardKernel = new KernelBuilder().ForHangFire().Build();
+
+            GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
 
             app.UseHangfireDashboard();

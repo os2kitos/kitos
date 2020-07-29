@@ -39,9 +39,6 @@ namespace Presentation.Web
 
                 return kernel;
             });
-
-            //Setup for Hangfire with a different setup
-            GlobalConfiguration.Configuration.UseNinjectActivator(new KernelBuilder().ForHangFire().Build());
         }
 
         /// <summary>
