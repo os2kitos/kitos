@@ -82,6 +82,7 @@
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
     <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
+    <Compile Include="Authorization\CachingUserContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />

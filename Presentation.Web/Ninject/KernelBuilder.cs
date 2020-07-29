@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using System.Web.Caching;
 using System.Web.Security;
 using AutoMapper;
 using Core.ApplicationServices;
@@ -59,6 +60,7 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
@@ -133,6 +135,7 @@ namespace Presentation.Web.Ninject
         {
             RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
+            kernel.Bind<Cache>().ToConstant(new Cache()); //TODO: To seperate wrapper
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
             kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
@@ -263,7 +266,12 @@ namespace Presentation.Web.Ninject
         private void RegisterAccessContext(IKernel kernel)
         {
             //User context
-            kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InCommandScope(Mode);
+            kernel.Bind<UserContextFactory>().ToSelf();
+            kernel.Bind<IUserContextFactory>().ToMethod(context =>
+                    new CachingUserContextFactory(context.Kernel.GetRequiredService<UserContextFactory>(),
+                        context.Kernel.GetRequiredService<Cache>(), context.Kernel.GetRequiredService<ILogger>()))
+                .InCommandScope(Mode);
+
             kernel.Bind<IOrganizationalUserContext>()
                 .ToMethod(ctx =>
                 {
