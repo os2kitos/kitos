@@ -135,7 +135,7 @@ namespace Infrastructure.Services.Http
 
         private void HandleFailedRequest(Exception exception, TimeSpan timeSpan, int retryCount, Context context)
         {
-            _logger.Warning("{correlationId}: Request failed exception chain: '{exnChain}'. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), BuildExceptionChain(exception), timeSpan, retryCount);
+            _logger.Warning("EndpointValidation: {correlationId}: Request failed exception chain: '{exnChain}'. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), BuildExceptionChain(exception), timeSpan, retryCount);
         }
 
         private static string BuildExceptionChain(Exception exception)
@@ -147,7 +147,7 @@ namespace Infrastructure.Services.Http
 
         private void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
         {
-            _logger.Warning("{correlationId}: Request failed with {statusCode}. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), result.Result.StatusCode, timeSpan, retryCount);
+            _logger.Warning("EndpointValidation: {correlationId}: Request failed with {statusCode}. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), result.Result.StatusCode, timeSpan, retryCount);
             result.Result.Dispose();
         }
 
