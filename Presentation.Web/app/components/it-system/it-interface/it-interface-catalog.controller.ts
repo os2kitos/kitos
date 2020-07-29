@@ -479,7 +479,6 @@
                         var payload = {
                             name: $scope.formData.name,
                             itInterfaceId: $scope.formData.itInterfaceId,
-                            belongsToId: self.user.currentOrganizationId,
                             organizationId: self.user.currentOrganizationId
                         };
 

@@ -300,7 +300,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var itemType = item.GetType();
                 // get name of mapped property
-                var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
+                var map = Mapper.ConfigurationProvider.FindTypeMapFor<TDto, TModel>().PropertyMaps;
                 var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
                 foreach (var valuePair in obj)
@@ -311,12 +311,12 @@ namespace Presentation.Web.Controllers.API
                         continue; // abort if no map found
                     }
 
-                    var destName = mapMember.DestinationProperty.Name;
+                    var destName = mapMember.DestinationName;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
                     {
-                        continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                        continue; // don't allow writing to these.
                     }
 
                     var propRef = itemType.GetProperty(destName);
@@ -462,22 +462,10 @@ namespace Presentation.Web.Controllers.API
             return Map<TModel, TDto>(model);
         }
 
-        //for easy access
-        protected virtual TModel Map(TDto inputDto)
-        {
-            return Map<TDto, TModel>(inputDto);
-        }
-
         //for easy access (list)
         protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
         {
             return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
-        {
-            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
         }
 
         #endregion

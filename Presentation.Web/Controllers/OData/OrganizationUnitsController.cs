@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;

@@ -82,9 +82,9 @@
                     });
                 };
 
-                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`], true);
+                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`, `take=25`], true);
 
-                $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`], false);
+                $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`, 'take=25'], false);
 
 
                 function reload() {

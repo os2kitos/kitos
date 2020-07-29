@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
-using System.Web.OData.Builder;
-using System.Web.OData.Extensions;
+using Microsoft.AspNet.OData.Builder;
+using Microsoft.AspNet.OData.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -24,7 +24,7 @@ using Presentation.Web.Controllers.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
-using System.Web.OData.Routing.Conventions;
+using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
@@ -184,12 +184,12 @@ namespace Presentation.Web
             organizations.HasManyBinding(o => o.BelongingSystems, entitySetItSystems);
 
             var removeUserAction = organizations.EntityType.Collection.Action("RemoveUser");
-            removeUserAction.Parameter<int>("orgKey").OptionalParameter = false;
-            removeUserAction.Parameter<int>("userId").OptionalParameter = false;
+            removeUserAction.Parameter<int>("orgKey").Required();
+            removeUserAction.Parameter<int>("userId").Required();
             removeUserAction.Namespace = orgNameSpace;
 
             var getAdviceByOrgFunction = organizations.EntityType.Collection.Function("GetByOrganization").ReturnsCollectionFromEntitySet<Advice>("Advice");
-            getAdviceByOrgFunction.Parameter<int>("userId").OptionalParameter = false;
+            getAdviceByOrgFunction.Parameter<int>("userId").Required();
             getAdviceByOrgFunction.ReturnsCollectionFromEntitySet<Advice>(nameof(Controllers.OData.AdviceController).Replace(ControllerSuffix, string.Empty));
             getAdviceByOrgFunction.Namespace = orgNameSpace;
 
@@ -216,16 +216,16 @@ namespace Presentation.Web
 
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Namespace = userNameSpace;
-            userCreateAction.Parameter<User>("user").OptionalParameter = false;
-            userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
-            userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
+            userCreateAction.Parameter<User>("user").Required();
+            userCreateAction.Parameter<int>("organizationId").Required();
+            userCreateAction.Parameter<bool>("sendMailOnCreation").Optional();
 
             var userCheckEmailFunction = users.EntityType.Collection.Function("IsEmailAvailable").Returns<bool>();
-            userCheckEmailFunction.Parameter<string>("email").OptionalParameter = false;
+            userCheckEmailFunction.Parameter<string>("email").Required();
             userCheckEmailFunction.Namespace = userNameSpace;
 
             var userGetByMailFunction = builder.Function("GetUserByEmail").ReturnsFromEntitySet<User>(userEntitySetName);
-            userGetByMailFunction.Parameter<string>("email").OptionalParameter = false;
+            userGetByMailFunction.Parameter<string>("email").Required();
 
             var usages = BindEntitySet<ItSystemUsage, ItSystemUsagesController>(builder);
             usages.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
@@ -249,7 +249,6 @@ namespace Presentation.Web
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
             contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
 
-            // TODO this field is causing issues.
             // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);

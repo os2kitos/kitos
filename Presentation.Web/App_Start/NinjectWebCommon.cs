@@ -6,9 +6,9 @@ using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject.Web.Common;
 using Presentation.Web;
 using Hangfire;
-using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Interceptors;
 using Ninject;
+using Ninject.Web.Common.WebHost;
 using Presentation.Web.Ninject;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
@@ -39,9 +39,6 @@ namespace Presentation.Web
 
                 return kernel;
             });
-
-            //Setup for Hangfire with a different setup
-            GlobalConfiguration.Configuration.UseNinjectActivator(new KernelBuilder().ForHangFire().Build());
         }
 
         /// <summary>

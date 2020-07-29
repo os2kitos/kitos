@@ -1,6 +1,7 @@
-﻿using System.IdentityModel.Tokens;
-using System.Text;
+﻿using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Properties;
+using SecurityKey = Microsoft.IdentityModel.Tokens.SecurityKey;
 
 namespace Presentation.Web.Infrastructure.Model.Authentication
 {
@@ -9,8 +10,8 @@ namespace Presentation.Web.Infrastructure.Model.Authentication
         public const string DefaultOrganizationClaimName = "DefaultOrganization";
         public static string Issuer => Settings.Default.BaseUrl;
 
-        public static InMemorySymmetricSecurityKey SecurityKey =>
-            new InMemorySymmetricSecurityKey(
+        public static SecurityKey SecurityKey =>
+            new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
                     System.Web.Configuration.WebConfigurationManager.AppSettings["SecurityKeyString"]
                 )

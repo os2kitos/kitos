@@ -4,7 +4,7 @@ using Core.DomainServices;
 using System.Net;
 using System.Security;
 using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using System.Linq;
 using Core.ApplicationServices.Organizations;

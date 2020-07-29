@@ -91,13 +91,15 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
+        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId, int take = 25)
         {
             try
             {
                 var systems = _systemService
                     .GetAvailableSystems(orgId, q)
-                    .ExceptEntitiesWithIds(excludeId);
+                    .ExceptEntitiesWithIds(excludeId)
+                    .OrderBy(_ => _.Name)
+                    .Take(take);
 
                 var dtos = Map(systems);
                 return Ok(dtos);
@@ -145,19 +147,14 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
                 }
 
-                var item = Map(dto);
-                if (dto.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(item))
+                var item = new ItSystem
                 {
-                    return Forbidden();
-                }
-
-                item.Uuid = Guid.NewGuid();
-
-                foreach (var id in dto.TaskRefIds)
-                {
-                    var task = _taskRepository.GetByKey(id);
-                    item.TaskRefs.Add(task);
-                }
+                    Name = dto.Name,
+                    OrganizationId = dto.OrganizationId,
+                    BelongsToId = dto.OrganizationId,
+                    Uuid = Guid.NewGuid(),
+                    AccessModifier = dto.AccessModifier ?? AccessModifier.Public
+                };
 
                 if (!AllowCreate<ItSystem>(item))
                 {

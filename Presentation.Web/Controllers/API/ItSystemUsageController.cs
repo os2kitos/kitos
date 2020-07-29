@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
-        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
+        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q, int take = 25)
         {
             try
             {
@@ -57,6 +57,10 @@ namespace Presentation.Web.Controllers.API
                 {
                     usages = usages.Where(usage => usage.ItSystem.Name.Contains(q));
                 }
+
+                usages = usages
+                    .OrderBy(_ => _.ItSystem.Name)
+                    .Take(take);
 
                 return Ok(Map(usages));
             }
@@ -86,7 +90,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != ActiveOrganizationId)
+                if (GetOrganizationReadAccessLevel(item.OrganizationId) < OrganizationDataReadAccessLevel.All)
                 {
                     dto.Note = "";
                 }
@@ -130,7 +134,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var systemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
                 if (!AllowCreate<ItSystemUsage>(systemUsage))
                 {

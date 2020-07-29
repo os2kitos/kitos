@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var request = _userService.GetPasswordReset(requestId);
                 if (request == null) return NotFound();
-                var dto = AutoMapper.Mapper.Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
+                var dto = Map<PasswordResetRequest, PasswordResetRequestDTO>(request);
 
                 var msg = CreateResponse(HttpStatusCode.OK, dto);
                 return msg;

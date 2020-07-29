@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
@@ -23,8 +22,8 @@ namespace Presentation.Web.Controllers.API
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, 
-            IGenericRepository<TaskRef> taskRepository, 
+            IOrgUnitService orgUnitService,
+            IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<TaskUsage> taskUsageRepository)
             : base(repository)
         {
@@ -61,16 +60,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organization && o.Parent == null).FirstOrDefault();
+                var root = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organization)
+                    .FirstOrDefault(unit => unit.Parent == null);
 
-                if (orgUnit == null) return NotFound();
+                if (root == null) return NotFound();
 
-                if (!AllowRead(orgUnit))
+                if (!AllowRead(root))
                 {
                     return Forbidden();
                 }
 
-                var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
+                var item = Map<OrganizationUnit, OrgUnitDTO>(root);
 
                 return Ok(item);
             }
@@ -84,7 +86,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = 
+                var orgUnit =
                     Repository
                         .AsQueryable()
                         .ByOrganizationId(organizationId)
@@ -182,12 +184,12 @@ namespace Presentation.Web.Controllers.API
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
                 var dtos = (from taskRef in theTasks
-                           let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
-                           select new TaskRefUsageDTO()
-                               {
-                                   TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
-                                   Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
-                               }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
+                            let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
+                            select new TaskRefUsageDTO()
+                            {
+                                TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
+                                Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
+                            }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }

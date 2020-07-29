@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
+using AutoMapper;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -31,6 +32,9 @@ namespace Presentation.Web.Controllers.API
 
         [Inject]
         public IAuthorizationContext AuthorizationContext { get; set; }
+
+        [Inject]
+        public IMapper Mapper { get; set; }
 
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
@@ -185,7 +189,7 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
-            return AutoMapper.Mapper.Map<TDest>(item);
+            return Mapper.Map<TDest>(item);
         }
 
         protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)

@@ -24,11 +24,13 @@ var testFixture = new TestFixtureWrapper();
 describe("For user without additional roles", () => {
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsRegularUser();
     });
 
     afterAll(() => {
         testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
     });
 
     it("Create IT contract is disabled", () => {

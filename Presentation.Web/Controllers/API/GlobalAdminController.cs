@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
 
                 var users = _userRepository.Get(u => u.IsGlobalAdmin);
 
-                var dtos = AutoMapper.Mapper.Map<IEnumerable<UserDTO>>(users);
+                var dtos = Mapper.Map<IEnumerable<UserDTO>>(users);
 
                 return Ok(dtos);
 
@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API
                 user.IsGlobalAdmin = true;
                 _userRepository.Save();
 
-                var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
+                var outDto = Mapper.Map<UserDTO>(user);
 
                 return Created(outDto);
 
@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.API
                     user.IsGlobalAdmin = false;
                     _userRepository.Save();
 
-                    var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
+                    var outDto = Mapper.Map<UserDTO>(user);
 
                     return Ok(outDto);
                 }

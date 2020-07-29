@@ -73,11 +73,14 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        public virtual HttpResponseMessage Get(string q, int orgId)
+        public virtual HttpResponseMessage Get(string q, int orgId, int take = 25)
         {
             try
             {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
+                var projectsQuery = _itProjectService
+                    .GetAvailableProjects(orgId, q)
+                    .OrderBy(_=>_.Name)
+                    .Take(take);
 
                 return Ok(Map(projectsQuery));
             }
@@ -109,25 +112,6 @@ namespace Presentation.Web.Controllers.API
                 // put it all in one result
                 var contracts = children.Union(parents);
                 return Ok(Map(contracts));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
-        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
-
-                var projects = Page(projectsQuery, pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
-
-                return Ok(dtos);
             }
             catch (Exception e)
             {

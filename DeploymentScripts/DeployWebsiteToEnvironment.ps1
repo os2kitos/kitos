@@ -17,7 +17,6 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -msDeployPassword $Env:MsDeployPassword `
                 -logLevel "$Env:LogLevel" `
                 -esUrl "$Env:EsUrl" `
-                -ssoGateway "$Env:SsoGateway" `
                 -securityKeyString "$Env:SecurityKeyString" `
                 -smtpFromMail "$Env:SmtpFromMail" `
                 -smtpNwHost "$Env:SmtpNetworkHost" `

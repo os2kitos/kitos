@@ -1,5 +1,5 @@
 ﻿using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Core.DomainServices;
 using System.Net;
 using System;

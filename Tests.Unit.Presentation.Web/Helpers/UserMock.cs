@@ -1,5 +1,5 @@
 ﻿using System.Security.Principal;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 
 namespace Tests.Unit.Presentation.Web.Helpers
 {

@@ -4,8 +4,8 @@ using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
@@ -49,7 +49,6 @@ namespace Presentation.Web.Controllers.OData
             if (parameters.ContainsKey("organizationId"))
             {
                 organizationId = (int)parameters["organizationId"];
-                // TODO check if user is allowed to add users to this organization
             }
 
             var sendMailOnCreation = false;

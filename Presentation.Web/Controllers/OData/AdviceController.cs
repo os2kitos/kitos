@@ -5,8 +5,8 @@ using Hangfire;
 using System;
 using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Results;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Results;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData

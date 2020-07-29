@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
-using Core.BackgroundJobs.Factory;
+﻿using System;
+using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
+using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.DomainModel.Result;
 using Infrastructure.Services.BackgroundJobs;
 using Serilog;
@@ -9,18 +10,20 @@ namespace Core.BackgroundJobs.Services
 {
     public class BackgroundJobLauncher : IBackgroundJobLauncher
     {
-        private readonly IBackgroundJobFactory _backgroundJobFactory;
         private readonly ILogger _logger;
+        private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
 
-        public BackgroundJobLauncher(IBackgroundJobFactory backgroundJobFactory, ILogger logger)
+        public BackgroundJobLauncher(
+            ILogger logger,
+            CheckExternalLinksBackgroundJob checkExternalLinksJob)
         {
-            _backgroundJobFactory = backgroundJobFactory;
             _logger = logger;
+            _checkExternalLinksJob = checkExternalLinksJob;
         }
 
         public async Task LaunchLinkCheckAsync()
         {
-            await Launch(_backgroundJobFactory.CreateExternalReferenceCheck());
+            await Launch(_checkExternalLinksJob);
         }
 
         private async Task Launch(IAsyncBackgroundJob job)
@@ -28,9 +31,16 @@ namespace Core.BackgroundJobs.Services
             var jobId = job.Id;
 
             LogJobStarted(jobId);
-            var result = await job.ExecuteAsync();
-
-            LogJobResult(jobId, result);
+            try
+            {
+                var result = await job.ExecuteAsync();
+                LogJobResult(jobId, result);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error during execution of job {jobId}", jobId);
+                throw;
+            }
         }
 
         private void LogJobStarted(string jobId)

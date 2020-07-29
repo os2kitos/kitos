@@ -118,14 +118,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task EnableAccessTypeAsync(int systemUsageId, int accessTypeId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})/AccessTypes/$ref");
-            var linkUrl = TestEnvironment.CreateUrl($"odata/AccessTypes({accessTypeId})");
-            var body = new EnableAccessTypeInput
-            {
-                Id = linkUrl.AbsoluteUri
-            };
+            var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})/AccessTypes/{accessTypeId}");
 
-            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
+            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, new{ }))
             {
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }

@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
+                var right = Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
 
                 if (!AllowCreate<TRight>(right))
@@ -88,10 +88,9 @@ namespace Presentation.Web.Controllers.API
                 right = RightRepository.Insert(right);
                 RightRepository.Save();
 
-                //TODO: FIX navigation properties not loading properly!!!
                 right.User = UserRepository.GetByKey(right.UserId);
 
-                var outputDTO = AutoMapper.Mapper.Map<TRight, RightOutputDTO>(right);
+                var outputDTO = Map<TRight, RightOutputDTO>(right);
 
                 return Created(outputDTO);
             }

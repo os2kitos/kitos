@@ -721,9 +721,7 @@
                     $scope.saveAndProceed = function () {
                         var payload = {
                             name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: []
+                            organizationId: self.user.currentOrganizationId
                         };
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);
@@ -743,9 +741,7 @@
                     $scope.save = function () {
                         var payload = {
                             name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: []
+                            organizationId: self.user.currentOrganizationId
                         };
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);

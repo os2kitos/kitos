@@ -119,7 +119,6 @@
 
         public attachUser() {
             var msg = this.notify.addInfoMessage("Tilknytter bruger", false);
-            // TODO: When cannot handle + character in the email. It should be encoded as %2B. in order for the filter to function
             this.$http.get<Models.IODataResult<Models.IUser>>(`odata/Users?$filter=Email eq '${this.vm.email}'`).then((response) => {
                 var userResult = this._.first(response.data.value);
 
