@@ -8,6 +8,12 @@ namespace Infrastructure.DataAccess.Mapping
         public ItContractMap()
         {
             // Properties
+
+            this.Property(x => x.Name)
+                .HasMaxLength(200) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
+                .IsRequired()
+                .HasIndexAnnotation("Contract_Index_Name", 0);
+
             // Table & Column Mappings
             ToTable("ItContract");
 

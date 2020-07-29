@@ -26,11 +26,17 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Properties
             this.Property(t => t.Name)
-                .IsRequired();
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasIndexAnnotation("User_Index_Name", 0);
+            this.Property(t => t.LastName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasIndexAnnotation("User_Index_Name", 1);
             this.Property(t => t.Email)
                 .HasMaxLength(100)
                 .IsRequired()
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] {new IndexAttribute("IX_Email") {IsUnique = true}}));
+                .HasUniqueIndexAnnotation("User_Index_Email", 2);
             this.Property(t => t.Password)
                 .IsRequired();
             this.Property(t => t.Salt)

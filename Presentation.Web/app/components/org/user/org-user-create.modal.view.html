@@ -11,7 +11,7 @@
                 Email-adresse
             </label>
             <div class="col-xs-8">
-                <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy">
+                <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy" maxlength="100">
                 <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': ctrl.createForm.name.$invalid && ctrl.createForm.name.$dirty, 'glyphicon-ok': ctrl.createForm.name.$valid }"></span>
             </div>
         </div>
@@ -20,7 +20,7 @@
                 Gentag email-adresse
             </label>
             <div class="col-xs-8">
-                <input type="email" name="repeatEmail" id="repeatEmail" data-ng-model="ctrl.repeatEmail" class="form-control" data-match="ctrl.vm.email" data-ng-required="true" data-ng-disabled="ctrl.busy">
+                <input type="email" name="repeatEmail" id="repeatEmail" data-ng-model="ctrl.repeatEmail" class="form-control" data-match="ctrl.vm.email" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
@@ -28,7 +28,7 @@
                 Fornavn
             </label>
             <div class="col-xs-8">
-                <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy">
+                <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
@@ -36,7 +36,7 @@
                 Efternavn
             </label>
             <div class="col-xs-8">
-                <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy">
+                <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy" maxlength="100">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
