@@ -199,23 +199,23 @@
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
-      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
+      <Project>{7f765808-5258-4e41-8b27-6e7d4667aa24}</Project>
       <Name>Core.BackgroundJobs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
+      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
+      <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
