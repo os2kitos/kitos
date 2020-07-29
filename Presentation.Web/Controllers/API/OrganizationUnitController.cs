@@ -22,8 +22,8 @@ namespace Presentation.Web.Controllers.API
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, 
-            IGenericRepository<TaskRef> taskRepository, 
+            IOrgUnitService orgUnitService,
+            IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<TaskUsage> taskUsageRepository)
             : base(repository)
         {
@@ -56,6 +56,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [CacheApiResponse(DurationInMiliSeconds = 5000)]
         public HttpResponseMessage GetByOrganization(int organization)
         {
             try
@@ -86,7 +87,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = 
+                var orgUnit =
                     Repository
                         .AsQueryable()
                         .ByOrganizationId(organizationId)
@@ -184,12 +185,12 @@ namespace Presentation.Web.Controllers.API
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
                 var dtos = (from taskRef in theTasks
-                           let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
-                           select new TaskRefUsageDTO()
-                               {
-                                   TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
-                                   Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
-                               }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
+                            let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
+                            select new TaskRefUsageDTO()
+                            {
+                                TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
+                                Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
+                            }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
