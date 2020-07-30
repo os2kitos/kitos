@@ -54,7 +54,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Returns_Forbidden()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(false);
 
             //Act
             var result = _sut.AddProject(A<string>(), A<int>());
@@ -68,7 +68,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Configures_New_Project_And_Returns_Ok()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<ItProject>())).Returns(true);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(true);
 
             //Act
             var result = _sut.AddProject(A<string>(), A<int>());

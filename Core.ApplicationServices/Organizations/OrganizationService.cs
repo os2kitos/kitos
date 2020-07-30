@@ -127,6 +127,11 @@ namespace Core.ApplicationServices.Organizations
             }
             var user = _userRepository.GetByKey(_userContext.UserId);
 
+            if (user == null)
+            {
+                return OperationFailure.Forbidden;
+            }
+
             //Setup defaults
             newOrg.Config = Config.Default(user);
             newOrg.OrgUnits.Add(new OrganizationUnit

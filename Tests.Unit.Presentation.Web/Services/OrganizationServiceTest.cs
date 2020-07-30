@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using AutoFixture;
@@ -26,6 +27,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly User _user;
         private readonly Mock<IGenericRepository<Organization>> _organizationRepository;
         private readonly Mock<IGenericRepository<OrganizationRight>> _orgRightRepository;
+        private readonly Mock<IGenericRepository<User>> _userRepository;
 
         public OrganizationServiceTest()
         {
@@ -34,12 +36,15 @@ namespace Tests.Unit.Presentation.Web.Services
             var userContext = new Mock<IOrganizationalUserContext>();
             _roleService = new Mock<IOrganizationRoleService>();
             _transactionManager = new Mock<ITransactionManager>();
-            userContext.Setup(x => x.UserEntity).Returns(_user);
+            userContext.Setup(x => x.UserId).Returns(_user.Id);
+            userContext.Setup(x => x.OrganizationIds).Returns(new Fixture().Create<IEnumerable<int>>());
             _organizationRepository = new Mock<IGenericRepository<Organization>>();
             _orgRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
+            _userRepository = new Mock<IGenericRepository<User>>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
+                _userRepository.Object,
                 _authorizationContext.Object,
                 userContext.Object,
                 Mock.Of<ILogger>(),
@@ -122,6 +127,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = A<string>(),
                 TypeId = (int)organizationType
             };
+            _userRepository.Setup(x => x.GetByKey(_user.Id)).Returns(_user);
             ExpectAllowCreateReturns(newOrg, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
@@ -214,7 +220,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectAllowCreateReturns<T>(T newOrg, bool value) where T : IEntity
         {
-            _authorizationContext.Setup(x => x.AllowCreate<T>(newOrg)).Returns(value);
+            _authorizationContext.Setup(x => x.AllowCreate<T>(It.IsAny<int>(), newOrg)).Returns(value);
         }
 
         private void ExpectGetOrganizationByKeyReturns(int organizationId, Organization organization = null)

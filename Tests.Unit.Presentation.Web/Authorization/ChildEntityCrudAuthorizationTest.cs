@@ -2,12 +2,13 @@
 using Core.DomainModel;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
 {
     public interface IRoot : IEntity { }
-    public class ChildEntityCrudAuthorizationTest
+    public class ChildEntityCrudAuthorizationTest : WithAutoFixture
     {
         private readonly IEntity _inputEntity;
         private readonly IRoot _rootEntity;
@@ -80,7 +81,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _nextAuth.Setup(x => x.AllowModify(_rootEntity)).Returns(strategyResponse);
 
             //Act
-            var allowRead = _sut.AllowCreate<IEntity>(_inputEntity);
+            var allowRead = _sut.AllowCreate<IEntity>(A<int>(), _inputEntity);
 
             //Assert
             Assert.Equal(strategyResponse, allowRead);
@@ -144,7 +145,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _nextAuth.Setup(x => x.AllowModify(_rootEntity)).Returns(strategyResponse);
 
             //Act
-            var allowRead = _sut.AllowCreate<IEntity>(_rootEntity);
+            var allowRead = _sut.AllowCreate<IEntity>(A<int>(), _rootEntity);
 
             //Assert
             Assert.Equal(strategyResponse, allowRead);

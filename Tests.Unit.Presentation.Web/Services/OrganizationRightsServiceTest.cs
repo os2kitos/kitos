@@ -108,7 +108,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<int>();
-            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(It.IsAny<OrganizationRight>())).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationId, It.IsAny<OrganizationRight>())).Returns(false);
 
             //Act
             var result = _sut.AssignRole(organizationId, A<int>(), A<OrganizationRole>());
@@ -126,7 +126,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var userId = A<int>();
             var organizationRole = A<OrganizationRole>();
             _organizationUserContext.Setup(x => x.UserId).Returns(userId);
-            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(It.IsAny<OrganizationRight>())).Returns(true);
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationId, It.IsAny<OrganizationRight>())).Returns(true);
             _organizationRightRepository.Setup(x => x.Insert(It.IsAny<OrganizationRight>())).Returns<OrganizationRight>(right => right);
 
             //Act
