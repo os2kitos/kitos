@@ -1,7 +1,6 @@
 ﻿using System;
 using Core.DomainModel;
 using Core.DomainModel.Result;
-using Core.DomainServices.Extensions;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 {
@@ -23,7 +22,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
             return DelegateToRootEntity(entity, _crudAuthorization.AllowRead);
         }
 
-        public bool AllowCreate<T1>(IEntity entity)
+        public bool AllowCreate<T1>(int organizationId, IEntity entity)
         {
             return AllowModify(entity);
         }

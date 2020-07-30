@@ -28,15 +28,15 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
             return _authorizationContext.AllowReads(entity);
         }
 
-        public bool AllowCreate<T>(IEntity entity)
+        public bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             //Entity instance is not used going forward
-            return _authorizationContext.AllowCreate<T>(entity);
+            return _authorizationContext.AllowCreate<T>(organizationId, entity);
         }
 
-        public bool AllowCreate<T>()
+        public bool AllowCreate<T>(int organizationId)
         {
-            return _authorizationContext.AllowCreate<T>();
+            return _authorizationContext.AllowCreate<T>(organizationId);
         }
 
         public bool AllowModify(IEntity entity)

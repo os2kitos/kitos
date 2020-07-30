@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var role = (OrganizationRole)Enum.Parse(typeof(OrganizationRole), roleName, true);
-                var theRights = 
+                var theRights =
                     _rightRepository
                         .Get(x => x.Role == role)
                         .Where(AllowRead);
@@ -56,7 +57,12 @@ namespace Presentation.Web.Controllers.API
             return _rightRepository.Get(right => right.OrganizationId == id);
         }
 
-        public override HttpResponseMessage Post(OrganizationRightDTO dto)
+        public override HttpResponseMessage Post(int organizationId, OrganizationRightDTO dto)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public HttpResponseMessage Post(OrganizationRightDTO dto)
         {
             var organizationRight = Map<OrganizationRightDTO, OrganizationRight>(dto);
 

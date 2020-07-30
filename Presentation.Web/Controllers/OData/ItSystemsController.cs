@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
-        public override IHttpActionResult Post(ItSystem entity)
+        public override IHttpActionResult Post(int organizationId, ItSystem entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }

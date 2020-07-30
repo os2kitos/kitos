@@ -192,7 +192,6 @@
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
             this.saveUser(user, orgAndDefaultUnit);
-            this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
         };
 
         auth = (adminRoles) => {
@@ -211,20 +210,19 @@
         };
 
         getSavedOrgId = () => {
+            //TODO: Scope to user id so that different users can be using the same machine
             var orgId = localStorage.getItem("currentOrgId");
             return orgId != null && JSON.parse(orgId);
         };
 
         setSavedOrgId = (orgId) => {
+            //TODO: Scope to user id so that different users can be using the same machine
             localStorage.setItem("currentOrgId", JSON.stringify(orgId));
         };
 
         clearSavedOrgId = () => {
+            //TODO: Scope to user id so that different users can be using the same machine
             localStorage.setItem("currentOrgId", null);
-        };
-
-        setDefaultOrganizationInBackend = (organizationId) => {
-            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
         };
 
         login = (email: string, password: string, rememberMe: boolean) => {

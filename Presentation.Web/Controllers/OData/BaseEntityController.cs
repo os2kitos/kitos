@@ -30,7 +30,10 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var organizationId = ActiveOrganizationId;
+            //TODO-MRJ_FRONTEND: Inspect all that use this endpoint and consider killing it in favor of scoped endpoints.
+            //TODO: Beware of this very broad endpoint - might break existing flows once we extend the scope of the organization scope from one to many
+
+            var organizationIds = UserContext.OrganizationIds;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -38,21 +41,13 @@ namespace Presentation.Web.Controllers.OData
 
             var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
                 Maybe<QueryAllByRestrictionCapabilities<T>>.None :
-                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId));
+                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationIds));
 
             var mainQuery = Repository.AsQueryable();
 
             var result = refinement
                 .Select(x => x.Apply(mainQuery))
                 .GetValueOrFallback(mainQuery);
-
-            if (refinement.Select(x => x.RequiresPostFiltering()).GetValueOrFallback(false))
-            {
-                result = result
-                    .AsEnumerable()
-                    .Where(AllowRead)
-                    .AsQueryable();
-            }
 
             return Ok(result);
         }
@@ -97,8 +92,9 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]
-        public virtual IHttpActionResult Post(T entity)
+        public virtual IHttpActionResult Post(int organizationId, T entity)
         {
+            //TODO-MRJ_FRONTEND: Update front-end
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -107,10 +103,10 @@ namespace Presentation.Web.Controllers.OData
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IOwnedByOrganization organization && organization.OrganizationId == 0)
             {
-                organization.OrganizationId = ActiveOrganizationId;
+                organization.OrganizationId = organizationId;
             }
 
-            if (AllowCreate<T>(entity) == false)
+            if (AllowCreate<T>(organizationId, entity) == false)
             {
                 return Forbidden();
             }
@@ -144,7 +140,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (AllowWrite(entity) == false)
+            if (AllowModify(entity) == false)
             {
                 return Forbidden();
             }
@@ -224,19 +220,14 @@ namespace Presentation.Web.Controllers.OData
             return CrudAuthorization.AllowRead(entity);
         }
 
-        protected bool AllowWrite(T entity)
+        protected bool AllowModify(T entity)
         {
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>()
+        protected bool AllowCreate<T>(int organizationId, IEntity entity)
         {
-            return _authorizationStrategy.Value.AllowCreate<T>();
-        }
-
-        protected bool AllowCreate<T>(IEntity entity)
-        {
-            return CrudAuthorization.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
 
         protected bool AllowDelete(IEntity entity)

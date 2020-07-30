@@ -6,7 +6,6 @@ using System.Net;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
-using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -17,7 +16,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<User> _repository;
 
         public UsersController(
-            IGenericRepository<User> repository, 
+            IGenericRepository<User> repository,
             IUserService userService)
             : base(repository)
         {
@@ -25,7 +24,7 @@ namespace Presentation.Web.Controllers.OData
             _repository = repository;
         }
 
-        public override IHttpActionResult Post(User entity)
+        public override IHttpActionResult Post(int organizationId, User entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
@@ -66,7 +65,7 @@ namespace Presentation.Web.Controllers.OData
             if (user?.IsGlobalAdmin == true)
             {
                 // only other global admins can create global admin users
-                if (!UserContext.HasRole(OrganizationRole.GlobalAdmin))
+                if (!UserContext.IsGlobalAdmin())
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
                 }

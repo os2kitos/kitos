@@ -204,7 +204,6 @@ namespace Presentation.Web
             var userNameSpace = "Users";
             var userEntitySetName = nameof(UsersController).Replace(ControllerSuffix, string.Empty);
             var users = builder.EntitySet<User>(userEntitySetName);
-            users.HasRequiredBinding(u => u.DefaultOrganization, entitySetOrganizations);
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);

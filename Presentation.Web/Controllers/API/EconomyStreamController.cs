@@ -6,8 +6,12 @@ using System.Net.Http;
 using Core.DomainModel;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Net;
+using System.Security;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -26,25 +30,36 @@ namespace Presentation.Web.Controllers.API
             _contracts = contracts;
         }
 
+        public override HttpResponseMessage GetAll(PagingModel<EconomyStream> paging)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
+        }
+
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<EconomyStreamDTO>>))]
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
-            var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
-            var currentOrgId = ActiveOrganizationId;
+            var contract = _contracts
+                .AsQueryable()
+                .Include(x => x.ExternEconomyStreams)
+                .ById(externPaymentForContractWithId);
 
-            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
-
-            if (crossOrganizationReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public)
+            if (contract == null)
             {
-                if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && result.Any())
-                {
-                    // all users may view economy streams marked Public or if they are part of the organization
-                    result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.ExternPaymentFor.OrganizationId == currentOrgId);
-                }
+                return NotFound();
             }
-            else
+
+            if (!AllowRead(contract))
             {
-                result = result.Where(x => x.OrganizationUnit.OrganizationId == currentOrgId);
+                return Forbidden();
+            }
+
+            IEnumerable<EconomyStream> result = contract.ExternEconomyStreams;
+
+            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(contract.OrganizationId);
+
+            if (organizationDataReadAccessLevel == OrganizationDataReadAccessLevel.Public)
+            {
+                result = result.Where(x => x.AccessModifier == AccessModifier.Public);
             }
 
             return Ok(Map(result));
@@ -53,22 +68,28 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
-            var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
-            var currentOrgId = ActiveOrganizationId;
+            var contract = _contracts
+                .AsQueryable()
+                .Include(x => x.InternEconomyStreams)
+                .ById(internPaymentForContractWithId);
 
-            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
-
-            if (crossOrganizationReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public)
+            if (contract == null)
             {
-                if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && result.Any())
-                {
-                    // all users may view economy streams marked Public or if they are part of the organization
-                    result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.InternPaymentFor.OrganizationId == currentOrgId);
-                }
+                return NotFound();
             }
-            else
+
+            if (!AllowRead(contract))
             {
-                result = result.Where(x => x.OrganizationUnit.OrganizationId == currentOrgId);
+                return Forbidden();
+            }
+
+            IEnumerable<EconomyStream> result = contract.InternEconomyStreams;
+
+            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(contract.OrganizationId);
+
+            if (organizationDataReadAccessLevel == OrganizationDataReadAccessLevel.Public)
+            {
+                result = result.Where(x => x.AccessModifier == AccessModifier.Public);
             }
 
             return Ok(Map(result));
@@ -83,6 +104,11 @@ namespace Presentation.Web.Controllers.API
                 return NotFound();
             }
 
+            if (!AllowModify(contract))
+            {
+                return Forbidden();
+            }
+
             var stream = Map<EconomyStreamDTO, EconomyStream>(streamDTO);
 
             if (streamDTO.ExternPaymentForId != null)
@@ -94,14 +120,18 @@ namespace Presentation.Web.Controllers.API
                 stream.InternPaymentFor = contract;
             }
 
-            if (!AllowCreate<EconomyStream>(stream))
-            {
-                return Forbidden();
-            }
-
             var savedItem = PostQuery(stream);
 
             return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+        }
+
+        protected override EconomyStream PatchQuery(EconomyStream item, JObject obj)
+        {
+            if (item.InternPaymentFor != null && !AllowModify(item.InternPaymentFor))
+                throw new SecurityException();
+            if (item.ExternPaymentFor != null && !AllowModify(item.ExternPaymentFor))
+                throw new SecurityException();
+            return base.PatchQuery(item, obj);
         }
     }
 }

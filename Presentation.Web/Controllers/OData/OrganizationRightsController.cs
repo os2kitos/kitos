@@ -72,7 +72,7 @@ namespace Presentation.Web.Controllers.OData
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public override IHttpActionResult Post(OrganizationRight entity)
+        public override IHttpActionResult Post(int organizationId, OrganizationRight entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }

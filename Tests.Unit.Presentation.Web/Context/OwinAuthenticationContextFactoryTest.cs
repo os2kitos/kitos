@@ -54,7 +54,6 @@ namespace Tests.Unit.Presentation.Web.Context
 
             //Assert
             Assert.Equal(authMethod, authContext.Method);
-            Assert.Equal(defaultOrg, authContext.ActiveOrganizationId);
             Assert.Equal(_validUserId, authContext.UserId);
         }
 
@@ -70,7 +69,6 @@ namespace Tests.Unit.Presentation.Web.Context
             var authContext = authenticationContextFactory.Create();
 
             //Assert
-            Assert.Null(authContext.ActiveOrganizationId);
             Assert.Equal(AuthenticationMethod.KitosToken, authContext.Method);
         }
 
@@ -125,7 +123,6 @@ namespace Tests.Unit.Presentation.Web.Context
             var user = new User();
             user.HasApiAccess = apiAccess;
             user.Id = userId;
-            user.DefaultOrganizationId = defaultOrgId;
 
             var userRepo = new Mock<IUserRepository>();
             userRepo.Setup(_ => _.GetById(userId)).Returns(user);
@@ -136,7 +133,6 @@ namespace Tests.Unit.Presentation.Web.Context
         {
             var claims = new List<Claim>
             {
-                new Claim(BearerTokenConfig.DefaultOrganizationClaimName, defaultOrg),
                 new Claim(ClaimTypes.Name, userId),
                 new Claim(ClaimTypes.Authentication, isAuthenticated, ClaimValueTypes.Boolean)
             };

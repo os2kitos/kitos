@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API
 
         private bool HasAccess()
         {
-            return _organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin);
+            return _organizationalUserContext.IsGlobalAdmin();
         }
 
         public HttpResponseMessage Get()

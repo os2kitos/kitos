@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -36,6 +37,25 @@ namespace Core.ApplicationServices
         public OrganizationRight MakeLocalAdmin(User user, Organization organization)
         {
             return AddOrganizationRoleToUser(user, organization, OrganizationRole.LocalAdmin);
+        }
+
+        public IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> GetOrganizationRoles(User user)
+        {
+            var rolesByRights = user.OrganizationRights
+                .Select(x => new {x.OrganizationId, x.Role})
+                .GroupBy(x => x.OrganizationId, x => x.Role)
+                .ToDictionary<IGrouping<int, OrganizationRole>, int, IEnumerable<OrganizationRole>>(
+                    organizationRoles => organizationRoles.Key, organizationRoles => organizationRoles.ToList());
+
+            if (user.IsGlobalAdmin)
+            {
+                foreach (var rolesByRight in rolesByRights.ToList())
+                {
+                    rolesByRights[rolesByRight.Key] = rolesByRight.Value.Append(OrganizationRole.GlobalAdmin).ToList();
+                }
+            }
+
+            return rolesByRights.AsReadOnly();
         }
 
         public IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId)

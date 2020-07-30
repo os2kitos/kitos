@@ -8,7 +8,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
     {
         public ItProject()
         {
@@ -130,18 +130,6 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<ItProject> Clones { get; set; } // TODO this isn't used anymore, we should probably remove it
 
         public virtual GoalStatus GoalStatus { get; set; }
-
-        /// <summary>
-        ///     Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///     <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return OrganizationId == organizationId;
-        }
 
         #region Master
 

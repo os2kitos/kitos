@@ -7,6 +7,7 @@ using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using System.Linq;
+using System.Net.Http;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -55,7 +56,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(Organization organization)
+        public IHttpActionResult Post(Organization organization)
         {
             if (organization == null)
             {
@@ -67,6 +68,12 @@ namespace Presentation.Web.Controllers.OData
             return result.Ok ? 
                 Created(result.Value) : 
                 FromOperationFailure(result.Error);
+        }
+
+        [EnableQuery]
+        public override IHttpActionResult Post(int organizationId, Organization organization)
+        {
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
         }
 
         [EnableQuery]

@@ -8,6 +8,5 @@ namespace Presentation.Web.Models
         public string Email { get; set; }
         public bool LoginSuccessful { get; set; }
         public DateTime Expires { get; set; }
-        public int ActiveOrganizationId { get; set; }
     }
 }

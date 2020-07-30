@@ -4,6 +4,6 @@ namespace Core.ApplicationServices.Authorization.Policies
 {
     public interface IModuleCreationPolicy
     {
-        bool AllowCreation(Type type);
+        bool AllowCreation(int organizationId, Type type);
     }
 }

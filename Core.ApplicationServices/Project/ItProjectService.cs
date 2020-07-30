@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.Project
         {
             var project = ItProjectFactory.Create(name, organizationId);
 
-            if (!_authorizationContext.AllowCreate<ItProject>(project))
+            if (!_authorizationContext.AllowCreate<ItProject>(organizationId, project))
             {
                 return OperationFailure.Forbidden;
             }

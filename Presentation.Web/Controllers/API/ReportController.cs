@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
-        public override HttpResponseMessage Post(NamedEntityDTO dto)
+        public override HttpResponseMessage Post(int organizationId, NamedEntityDTO dto)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }

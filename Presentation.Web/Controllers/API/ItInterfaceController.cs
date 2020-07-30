@@ -41,7 +41,12 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItInterfaceDTO dto)
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try
             {

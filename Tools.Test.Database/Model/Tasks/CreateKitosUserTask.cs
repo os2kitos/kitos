@@ -41,9 +41,7 @@ namespace Tools.Test.Database.Model.Tasks
         /// <returns></returns>
         public override bool Execute(KitosContext context)
         {
-            var firstOrg = context.GetOrganization(_organizationNames[0]);
-
-            var newUser = CreateUser(firstOrg, context);
+            var newUser = CreateUser(context);
 
             foreach (var orgName in _organizationNames)
             {
@@ -55,7 +53,7 @@ namespace Tools.Test.Database.Model.Tasks
             return true;
         }
 
-        private User CreateUser(Organization commonOrg, KitosContext context)
+        private User CreateUser(KitosContext context)
         {
             var globalAdmin = context.GetGlobalAdmin();
             var apiUser = "Api ";
@@ -65,7 +63,6 @@ namespace Tools.Test.Database.Model.Tasks
                 LastName = $"({((_apiAccess) ? apiUser : "")}{_role:G})",
                 Salt = _salt,
                 Email = _email,
-                DefaultOrganizationId = commonOrg.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id,
                 IsGlobalAdmin = _role == OrganizationRole.GlobalAdmin,

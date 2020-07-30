@@ -21,10 +21,8 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
-using Core.ApplicationServices.TaskRefs;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Services;
-using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
@@ -135,7 +133,7 @@ namespace Presentation.Web.Ninject
         {
             RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
-            kernel.Bind<Cache>().ToConstant(new Cache()); //TODO: To seperate wrapper
+            kernel.Bind<Cache>().ToConstant(new Cache()); //TODO-MRJ: To seperate wrapper
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
             kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
@@ -281,7 +279,7 @@ namespace Presentation.Web.Ninject
 
                     if (canCreateContext)
                     {
-                        return factory.Create(authentication.UserId.GetValueOrDefault(), authentication.ActiveOrganizationId.GetValueOrDefault(EntityConstants.InvalidActiveOrganizationId));
+                        return factory.Create(authentication.UserId.GetValueOrDefault());
                     }
 
                     return new UnauthenticatedUserContext();
@@ -289,18 +287,6 @@ namespace Presentation.Web.Ninject
                 .InCommandScope(Mode);
 
             //Injecting it as a maybe since service calls and background processes do not have an active user
-            kernel.Bind<Maybe<ActiveUserContext>>()
-                .ToMethod(ctx =>
-                {
-                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
-                    if (authentication.Method == AuthenticationMethod.Anonymous)
-                    {
-                        return Maybe<ActiveUserContext>.None;
-                    }
-
-                    var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
-                    return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
-                });
             kernel.Bind<Maybe<ActiveUserIdContext>>()
                 .ToMethod(ctx =>
                 {

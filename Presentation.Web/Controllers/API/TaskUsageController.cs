@@ -9,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -118,7 +117,7 @@ namespace Presentation.Web.Controllers.API
                         OrgUnitId = orgUnitId,
                         TaskRefId = task.Id,
                     };
-                    if (!AllowCreate<TaskUsage>(taskUsage))
+                    if (!AllowCreate<TaskUsage>(orgUnit.OrganizationId, taskUsage))
                     {
                         return Forbidden();
                     }
@@ -135,12 +134,14 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route("api/taskUsage/")]
-        public override HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
+        public override HttpResponseMessage Post(int organizationId, TaskUsageDTO taskUsageDto)
         {
+            //TODO-MRJ_FRONTEND: Update frontend
             try
             {
                 var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
-                if (!AllowCreate<TaskUsage>(item))
+
+                if (!AllowCreate<TaskUsage>(organizationId, item))
                 {
                     return Forbidden();
                 }

@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetUsers(int organizationId, bool? exportUsers)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostUsers(int organizationId, bool? importUsers)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetOrgUnits(int organizationId, bool? exportOrgUnits)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostOrgUnits(int organizationId, bool? importOrgUnits)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetContracts(int organizationId, bool? exportContracts)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -134,7 +134,7 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostContracts(int organizationId, bool? importContracts)
         {
-            if (!AllowAccess())
+            if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
@@ -191,9 +191,9 @@ namespace Presentation.Web.Controllers.API
             return stream;
         }
 
-        private bool AllowAccess()
+        private bool AllowAccess(int organizationId)
         {
-            return _authorizationContext.HasPermission(new BatchImportPermission());
+            return _authorizationContext.HasPermission(new BatchImportPermission(organizationId));
         }
 
         #endregion

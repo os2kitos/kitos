@@ -130,13 +130,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItSystemUsageDTO dto)
+        public HttpResponseMessage Post(ItSystemUsageDTO dto)
         {
+            //TODO-MRJ_FRONTEND: Update frontend
             try
             {
                 var systemUsage = Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!AllowCreate<ItSystemUsage>(systemUsage))
+                if (!AllowCreate<ItSystemUsage>(systemUsage.OrganizationId, systemUsage))
                 {
                     return Forbidden();
                 }
@@ -155,6 +156,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
         }
 
         public HttpResponseMessage DeleteByItSystemId(int itSystemId, int organizationId)

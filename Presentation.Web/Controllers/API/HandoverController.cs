@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
-        public override HttpResponseMessage Post(HandoverDTO dto)
+        public override HttpResponseMessage Post(int organizationId, HandoverDTO dto)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }

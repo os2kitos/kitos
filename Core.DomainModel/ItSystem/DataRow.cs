@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel.ItSystemUsage;
-
-namespace Core.DomainModel.ItSystem
+﻿namespace Core.DomainModel.ItSystem
 {
     /// <summary>
     /// Represents that an interface exposes some data.
     /// The interface will have a datarow for each piece of data that the
     /// interface exposes.
     /// </summary>
-    public class DataRow : Entity, IContextAware, ISystemModule
+    public class DataRow : Entity, ISystemModule
     {
         public DataRow()
         {
@@ -44,21 +41,6 @@ namespace Core.DomainModel.ItSystem
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            if (ItInterface != null)
-                return ItInterface.IsInContext(organizationId);
-
-            return false;
         }
     }
 }

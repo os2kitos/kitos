@@ -23,7 +23,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             var sut = new OrganizationalUserContext(Many<OrganizationRole>(), new User(), activeOrganizationId);
 
             //Act
-            var result = sut.IsActiveInOrganization(activeOrganizationId);
+            var result = sut.HasRoleIn(activeOrganizationId);
 
             //Assert
             Assert.True(result);
@@ -38,27 +38,27 @@ namespace Tests.Unit.Presentation.Web.Authorization
             var sut = new OrganizationalUserContext(Many<OrganizationRole>(), new User(), activeOrganizationId);
 
             //Act
-            var result = sut.IsActiveInOrganization(otherOrgId);
+            var result = sut.HasRoleIn(otherOrgId);
 
             //Assert
             Assert.False(result);
         }
 
-        public interface IEntityWithContextAware : IEntity, IContextAware { }
+        public interface IEntityWithOrganizationMembership : IEntity, IIsPartOfOrganization { }
 
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void IsActiveInSameOrganizationAs_Returns_Result_Based_On_Active_Context_Query(bool contextResult)
+        public void IsActiveInSameOrganizationAs_Returns_Result(bool contextResult)
         {
             //Arrange
             var activeOrganizationId = A<int>();
             var sut = new OrganizationalUserContext(Many<OrganizationRole>(), new User(), activeOrganizationId);
-            var target = new Mock<IEntityWithContextAware>();
-            target.Setup(x => x.IsInContext(activeOrganizationId)).Returns(contextResult);
+            var target = new Mock<IEntityWithOrganizationMembership>();
+            target.Setup(x => x.IsPartOfOrganization(activeOrganizationId)).Returns(contextResult);
 
             //Act
-            var result = sut.IsActiveInSameOrganizationAs(target.Object);
+            var result = sut.HasRoleInSameOrganizationAs(target.Object);
 
             //Assert
             target.Verify();
@@ -79,7 +79,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             target.Setup(x => x.OrganizationId).Returns(sameOrg ? activeOrganizationId : A<int>());
 
             //Act
-            var result = sut.IsActiveInSameOrganizationAs(target.Object);
+            var result = sut.HasRoleInSameOrganizationAs(target.Object);
 
             //Assert
             target.Verify();
@@ -130,32 +130,33 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(organizationId, sut.ActiveOrganizationId);
         }
 
-        [Theory]
-        [InlineData(OrganizationCategory.Municipality, OrganizationCategory.Municipality, true)]
-        [InlineData(OrganizationCategory.Municipality, OrganizationCategory.Other, false)]
-        [InlineData(OrganizationCategory.Other, OrganizationCategory.Other, true)]
-        [InlineData(OrganizationCategory.Other, OrganizationCategory.Municipality, false)]
-        public void IsActiveInOrganizationOfType_Returns(OrganizationCategory inputCategory, OrganizationCategory activeCategory, bool expectedResult)
-        {
-            //Arrange
-            var user = new User
-            {
-                DefaultOrganization = new Organization
-                {
-                    Type = new OrganizationType
-                    {
-                        Category = activeCategory
-                    }
-                }
-            };
-            var sut = new OrganizationalUserContext(Many<OrganizationRole>(), user, A<int>());
+        //TODO: Remove if question no longer makes sense - otherwise OK
+        //[Theory]
+        //[InlineData(OrganizationCategory.Municipality, OrganizationCategory.Municipality, true)]
+        //[InlineData(OrganizationCategory.Municipality, OrganizationCategory.Other, false)]
+        //[InlineData(OrganizationCategory.Other, OrganizationCategory.Other, true)]
+        //[InlineData(OrganizationCategory.Other, OrganizationCategory.Municipality, false)]
+        //public void IsActiveInOrganizationOfType_Returns(OrganizationCategory inputCategory, OrganizationCategory activeCategory, bool expectedResult)
+        //{
+        //    //Arrange
+        //    var user = new User
+        //    {
+        //        DefaultOrganization = new Organization
+        //        {
+        //            Type = new OrganizationType
+        //            {
+        //                Category = activeCategory
+        //            }
+        //        }
+        //    };
+        //    var sut = new OrganizationalUserContext(Many<OrganizationRole>(), user, A<int>());
 
-            //Act
-            var result = sut.IsActiveInOrganizationOfType(inputCategory);
+        //    //Act
+        //    var result = sut.IsActiveInOrganizationOfType(inputCategory);
 
-            //Assert
-            Assert.Equal(expectedResult, result);
-        }
+        //    //Assert
+        //    Assert.Equal(expectedResult, result);
+        //}
 
         [Theory]
         [InlineData(true)]

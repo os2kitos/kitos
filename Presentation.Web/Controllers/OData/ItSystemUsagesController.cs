@@ -110,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AllowWrite(itSystemUsage))
+            if (!AllowModify(itSystemUsage))
             {
                 return Forbidden();
             }
@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AllowWrite(itSystemUsage))
+            if (!AllowModify(itSystemUsage))
             {
                 return Forbidden();
             }

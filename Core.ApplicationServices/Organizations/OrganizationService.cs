@@ -18,6 +18,7 @@ namespace Core.ApplicationServices.Organizations
     {
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ILogger _logger;
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices.Organizations
         public OrganizationService(
             IGenericRepository<Organization> orgRepository,
             IGenericRepository<OrganizationRight> orgRightRepository,
+            IGenericRepository<User> userRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
             ILogger logger,
@@ -35,6 +37,7 @@ namespace Core.ApplicationServices.Organizations
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
+            _userRepository = userRepository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
             _logger = logger;
@@ -113,7 +116,7 @@ namespace Core.ApplicationServices.Organizations
             }
             return
                 _authorizationContext.AllowModify(organization) &&
-                _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType));
+                _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
         }
 
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
@@ -122,7 +125,7 @@ namespace Core.ApplicationServices.Organizations
             {
                 throw new ArgumentNullException(nameof(newOrg));
             }
-            var user = _userContext.UserEntity;
+            var user = _userRepository.GetByKey(_userContext.UserId);
 
             //Setup defaults
             newOrg.Config = Config.Default(user);
@@ -137,7 +140,7 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.BadInput;
             }
 
-            if (!_authorizationContext.AllowCreate<Organization>(newOrg))
+            if (!_userContext.OrganizationIds.Any(id => _authorizationContext.AllowCreate<Organization>(id, newOrg)))
             {
                 return OperationFailure.Forbidden;
             }

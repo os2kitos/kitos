@@ -10,6 +10,8 @@ namespace Core.DomainServices
 
         OrganizationRight MakeLocalAdmin(User user, Organization organization);
 
+        IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> GetOrganizationRoles(User user);
+
         IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId);
     }
 }

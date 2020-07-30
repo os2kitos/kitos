@@ -40,31 +40,23 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var organizationId = ActiveOrganizationId;
+                //TODO-MRJ_FRONTEND:
+                //TODO-MRJ: If frontend uses broad queries where it expects "current" + public behavior, rewrite to use another - scoped endpoint which takes proper org scoping
+                //TODO-MRJ: Beware of this very broad endpoint - might break existing flows once we extend the scope of the organization scope from one to many
 
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
-
+                var organizationIds = UserContext.OrganizationIds.ToList();
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
                 var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
                     Maybe<QueryAllByRestrictionCapabilities<TModel>>.None :
-                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationIds));
 
                 var mainQuery = Repository.AsQueryable();
 
                 var result = refinement
                     .Select(x => x.Apply(mainQuery))
                     .GetValueOrFallback(mainQuery);
-
-                var requiresPostFiltering =
-                    refinement
-                        .Select(x => x.RequiresPostFiltering())
-                        .GetValueOrFallback(false);
-
-                if (requiresPostFiltering)
-                {
-                    paging = paging.WithPostProcessingFilter(AllowRead);
-                }
 
                 var query = Page(result, paging);
 
@@ -113,15 +105,16 @@ namespace Presentation.Web.Controllers.API
         /// GET api/T/GetAccessRights
         /// Checks what access rights the user has for the given entities
         /// </summary>
-        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
         {
-            if (GetOrganizationReadAccessLevel(ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
+            //TODO-MRJ_FRONTEND: Update the call from the frontend
+            if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
             return Ok(new EntitiesAccessRightsDTO
             {
-                CanCreate = AllowCreate<TModel>(),
+                CanCreate = AllowCreate<TModel>(organizationId),
                 CanView = true
             });
         }
@@ -158,7 +151,7 @@ namespace Presentation.Web.Controllers.API
         /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
         /// </summary>
         /// <param name="ids">The ids of the objects</param>
-        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]int[] ids, bool? getEntityListAccessRights)
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
         {
             if (ids == null || ids.Length == 0)
             {
@@ -188,15 +181,16 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="dto"></param>
         /// <returns>HTML code for success or failure</returns>
-        public virtual HttpResponseMessage Post(TDto dto)
+        public virtual HttpResponseMessage Post(int organizationId, TDto dto)
         {
+            //TODO-MRJ_FRONTEND: Update front-end
             try
             {
                 var item = Map<TDto, TModel>(dto);
-                
+
                 PrepareNewObject(item);
-                // Check CREATE access rights  
-                if (!AllowCreate<TModel>(item))
+                // Check CREATE access rights
+                if (!AllowCreate<TModel>(organizationId, item))
                 {
                     return Forbidden();
                 }

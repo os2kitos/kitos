@@ -3,7 +3,10 @@ using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
+using Core.DomainServices.Extensions;
 using Microsoft.AspNet.OData;
 using Presentation.Web.Infrastructure.Attributes;
 using static System.String;
@@ -24,8 +27,14 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var orgId = ActiveOrganizationId;
-            var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
+        }
+
+        [EnableQuery]
+        public IHttpActionResult GetByOrganizationId(int organizationId)
+        {
+            //TODO-MRJ_FRONTEND: Update front-end
+            var localOptionsResult = Repository.AsQueryable().ByOrganizationId(organizationId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
             var returnList = new List<TOptionType>();
 
@@ -55,7 +64,14 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get(int key)
         {
-            var orgId = ActiveOrganizationId;
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
+        }
+
+        [EnableQuery]
+        public IHttpActionResult Get(int organizationId, int key)
+        {
+            //TODO-MRJ_FRONTEND: Update front-end
+            var orgId = organizationId;
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -63,7 +79,11 @@ namespace Presentation.Web.Controllers.OData
 
             var option = globalOptionResult.First();
 
-            var localOptionResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+            var localOptionResult =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .Where(x => x.OptionId == key);
 
             if (localOptionResult.Any())
             {
@@ -82,23 +102,23 @@ namespace Presentation.Web.Controllers.OData
             return Ok(option);
         }
 
-        public override IHttpActionResult Post(TLocalModelType entity)
+        public override IHttpActionResult Post(int organizationId, TLocalModelType entity)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var orgId = ActiveOrganizationId;
+            // TODO-MRJ_FRONTEND: Update frontend (perhaps patch using an interceptor)?
 
-            entity.OrganizationId = orgId;
+            entity.OrganizationId = organizationId;
 
-            if (!AllowCreate<TLocalModelType>(entity))
+            if (!AllowCreate<TLocalModelType>(organizationId, entity))
             {
                 return Forbidden();
             }
 
-            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == entity.OptionId);
+            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == organizationId && x.OptionId == entity.OptionId);
 
             if (localOptionSearch.Any())
             {
@@ -122,7 +142,7 @@ namespace Presentation.Web.Controllers.OData
 
                     if (entity is IOwnedByOrganization entityWithOrganization)
                     {
-                        entityWithOrganization.OrganizationId = orgId;
+                        entityWithOrganization.OrganizationId = organizationId;
                     }
 
                     entity = Repository.Insert(entity);
@@ -139,8 +159,18 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
         {
-            var orgId = ActiveOrganizationId;
-            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
+        }
+
+        public IHttpActionResult Patch(int organizationId, int key, Delta<TLocalModelType> delta)
+        {
+            //TODO-MRJ_FRONTEND: Update front-end
+            var orgId = organizationId;
+            var localOptionSearch =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .Where(x => x.OptionId == key);
 
             if (localOptionSearch.Any())
             {
@@ -152,7 +182,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 // check if user is allowed to write to the entity
-                if (!AllowWrite(localOption))
+                if (!AllowModify(localOption))
                 {
                     return Forbidden();
                 }
@@ -201,7 +231,13 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Delete(int key)
         {
-            var orgId = ActiveOrganizationId;
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
+        }
+
+        public IHttpActionResult Delete(int organizationId, int key)
+        {
+            //TODO-MRJ_FRONTEND: Update front-end
+            var orgId = organizationId;
             LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOption == null)

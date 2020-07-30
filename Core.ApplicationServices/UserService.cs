@@ -69,9 +69,7 @@ namespace Core.ApplicationServices
                 ? _cryptoService.Encrypt(_defaultUserPassword + user.Salt)
                 : _cryptoService.Encrypt(utcNow + user.Salt);
 
-            user.DefaultOrganizationId = orgId;
-
-            if (!_authorizationContext.AllowCreate<User>(user))
+            if (!_authorizationContext.AllowCreate<User>(orgId, user))
             {
                 throw new SecurityException();
             }
@@ -159,7 +157,7 @@ namespace Core.ApplicationServices
 
             var hash = HttpServerUtility.UrlTokenEncode(encrypted);
 
-            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id};
+            var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id };
 
             _passwordResetRequestRepository.Insert(request);
             _passwordResetRequestRepository.Save();

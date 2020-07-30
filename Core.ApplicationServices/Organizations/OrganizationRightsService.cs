@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.Organizations
                 UserId = userId
             };
 
-            if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
+            if (!_authorizationContext.AllowCreate<OrganizationRight>(organizationId, right))
             {
                 return OperationFailure.Forbidden;
             }

@@ -41,7 +41,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
+                var userId = UserId;
+                var orgUnits = Repository
+                    .Get(x => x.Rights.Any(y => y.UserId == userId) && x.OrganizationId == organizationId)
+                    .SelectNestedChildren(x => x.Children).ToList();
 
                 orgUnits = orgUnits
                     .Distinct()

@@ -617,7 +617,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private void ExpectIsActiveInSameOrganizationAsReturns(IEntity entity, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInSameOrganizationAs(entity)).Returns(value);
+            _userContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
         }
 
         private void ExpectGetUserIdReturns(int userId)
@@ -627,12 +627,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private void ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory organizationCategory, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInOrganizationOfType(organizationCategory)).Returns(value);
+            _userContextMock.Setup(x => x.HasRoleInOrganizationOfType(organizationCategory)).Returns(value);
         }
 
         private void ExpectIsActiveInOrganizationReturns(int targetOrganization, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInOrganization(targetOrganization)).Returns(value);
+            _userContextMock.Setup(x => x.HasRoleIn(targetOrganization)).Returns(value);
         }
 
         private void ExpectHasRoleReturns(OrganizationRole role, bool value)

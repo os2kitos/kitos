@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItSystemDTO dto)
+        public HttpResponseMessage Post(ItSystemDTO dto)
         {
             try
             {
@@ -156,7 +156,7 @@ namespace Presentation.Web.Controllers.API
                     AccessModifier = dto.AccessModifier ?? AccessModifier.Public
                 };
 
-                if (!AllowCreate<ItSystem>(item))
+                if (!AllowCreate<ItSystem>(dto.OrganizationId, item))
                 {
                     return Forbidden();
                 }
@@ -169,6 +169,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        public override HttpResponseMessage Post(int organizationId, ItSystemDTO dto)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
         }
 
         public HttpResponseMessage PostTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)

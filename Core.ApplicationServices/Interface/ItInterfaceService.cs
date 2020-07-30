@@ -98,7 +98,7 @@ namespace Core.ApplicationServices.Interface
                 AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public)
             };
 
-            if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
+            if (!_authorizationContext.AllowCreate<ItInterface>(organizationId, newInterface))
             {
                 return OperationFailure.Forbidden;
             }

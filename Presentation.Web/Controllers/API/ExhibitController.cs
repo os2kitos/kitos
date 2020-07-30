@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using AutoMapper;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -66,11 +65,16 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
+        public HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
         {
             return _interfaceService
                 .ChangeExposingSystem(dto.ItInterfaceId, dto.ItSystemId)
                 .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
+        }
+
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceExhibitDTO dto)
+        {
+            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
         }
 
         /// <param name="id">Interface id</param>

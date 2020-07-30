@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
@@ -13,14 +14,14 @@ namespace Core.DomainServices.Queries
     where T : class
     {
         private readonly CrossOrganizationDataReadAccessLevel _crossOrganizationAccess;
-        private readonly int _activeOrganizationId;
+        private readonly IEnumerable<int> _organizationIds;
         private readonly bool _hasOrganization;
         private readonly bool _hasAccessModifier;
 
-        public QueryAllByRestrictionCapabilities(CrossOrganizationDataReadAccessLevel crossOrganizationAccess, int activeOrganizationId)
+        public QueryAllByRestrictionCapabilities(CrossOrganizationDataReadAccessLevel crossOrganizationAccess, IEnumerable<int> organizationIds)
         {
             _crossOrganizationAccess = crossOrganizationAccess;
-            _activeOrganizationId = activeOrganizationId;
+            _organizationIds = organizationIds;
             _hasOrganization = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
             _hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
         }
@@ -35,36 +36,19 @@ namespace Core.DomainServices.Queries
                 {
                     refine = Maybe<IDomainQuery<T>>
                         .Some(_hasOrganization
-                            ? QueryFactory.ByPublicAccessOrOrganizationId<T>(_activeOrganizationId)
+                            ? QueryFactory.ByPublicAccessOrOrganizationIds<T>(_organizationIds)
                             : QueryFactory.ByPublicAccessModifier<T>()
                         );
                 }
                 else if (_hasOrganization)
                 {
-                    refine = Maybe<IDomainQuery<T>>.Some(QueryFactory.ByOrganizationId<T>(_activeOrganizationId));
+                    refine = Maybe<IDomainQuery<T>>.Some(QueryFactory.ByOrganizationIds<T>(_organizationIds));
                 }
             }
 
             return refine
                 .Select(r => r.Apply(source))
                 .GetValueOrFallback(source);
-        }
-
-        public bool RequiresPostFiltering()
-        {
-            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
-
-            if (hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationDataReadAccessLevel.Public)
-            {
-                //Supported by query - shared data is returned and filtered by organization if target has organization reference
-                return false;
-            }
-
-            var hasOrg = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
-            var contextAware = typeof(IContextAware).IsAssignableFrom(typeof(T));
-
-            //Unsupported by db query since object does not have org reference but has access modifier and is context aware (belongs in an organization)
-            return hasOrg == false && (hasAccessModifier && contextAware);
         }
     }
 }

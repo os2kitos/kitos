@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
@@ -18,12 +19,18 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
+        //TODO-MRJ_FRONTEND: Post/Patch?
         private readonly IGenericRepository<EconomyStream> _repository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository) 
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository)
             : base(repository)
         {
             _repository = repository;
+        }
+
+        public override IHttpActionResult Get()
+        {
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
         }
 
         // GET /Organizations(1)/ItContracts
@@ -59,7 +66,7 @@ namespace Presentation.Web.Controllers.OData
                 {
                     return Forbidden();
                 }
-                
+
             }
             //No access to organization -> forbidden, not empty response
             else if (accessLevel < OrganizationDataReadAccessLevel.Public)

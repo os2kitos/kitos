@@ -1,15 +1,15 @@
-﻿using Core.DomainModel;
+﻿using System.Threading.Tasks;
+using System.Web.Http;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using System.Threading.Tasks;
-using System.Web.Http;
+using Core.DomainServices.Repositories.SystemUsage;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
-using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
-namespace Presentation.Web.Controllers.OData.AttachedOptions
+namespace Presentation.Web.Controllers.OData.AttachedOptions.ItsystemUsage
 {
     [InternalApi]
     public class AttachedOptionsRegisterTypesController : AttachedOptionsFunctionController<ItSystemUsage, RegisterType, LocalRegisterType>
@@ -33,11 +33,12 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         }
 
 
-        [System.Web.Http.HttpPost]
-        [ODataRoute("AttachedOptions")]
-        public async Task<IHttpActionResult> Post([FromODataUri] int key, AttachedOption dto)
+        [HttpPost]
+        [ODataRoute("Organizations(organizationId)/AttachedOptions")]
+        public async Task<IHttpActionResult> Post([FromODataUri] int organizationId, [FromODataUri] int key, AttachedOption dto)
         {
-            return base.Post(dto);
+            //TODO-MRJ_FRONTEND: Update front-end
+            return base.Post(organizationId,dto);
         }
     }
 }

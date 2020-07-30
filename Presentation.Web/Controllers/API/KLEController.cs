@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.TaskRefs;
+using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -65,9 +65,10 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPut]
         [Route("update")]
-        public HttpResponseMessage PutKLEChanges()
+        public HttpResponseMessage PutKLEChanges(int organizationId)
         {
-            var result = _kleApplicationService.UpdateKLE();
+            //TODO-MRJ_FRONTEND: Update frontend
+            var result = _kleApplicationService.UpdateKLE(organizationId);
             
             return result.Ok ? 
                 Ok(

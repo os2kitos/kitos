@@ -22,8 +22,8 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
         public AdviceController(
-            IAdviceService adviceService, 
-            IGenericRepository<Advice> repository, 
+            IAdviceService adviceService,
+            IGenericRepository<Advice> repository,
             IGenericRepository<AdviceSent> sentRepository)
             : base(repository)
         {
@@ -33,13 +33,15 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(Advice advice)
+        public override IHttpActionResult Post(int organizationId, Advice advice)
         {
-            var response = base.Post(advice);
+            //TODO-MRJ_FRONTEND: Update front-end
+            var response = base.Post(organizationId, advice);
 
-            if (response.GetType() == typeof(CreatedODataResult<Advice>)) {
-                
-                var createdRepsonse = (CreatedODataResult<Advice>)response ;
+            if (response.GetType() == typeof(CreatedODataResult<Advice>))
+            {
+
+                var createdRepsonse = (CreatedODataResult<Advice>)response;
                 var name = "Advice: " + createdRepsonse.Entity.Id;
 
                 advice = createdRepsonse.Entity;
@@ -50,45 +52,47 @@ namespace Presentation.Web.Controllers.OData
                     _repository.Update(advice);
                     _repository.Save();
                 }
-                catch (Exception e) {
-                    Logger.ErrorException("Failed to add advice",e);
+                catch (Exception e)
+                {
+                    Logger.ErrorException("Failed to add advice", e);
                     return InternalServerError(e);
                 }
 
                 try
                 {
-                   switch (advice.Scheduling) {
-                            case Scheduling.Immediate:
+                    switch (advice.Scheduling)
+                    {
+                        case Scheduling.Immediate:
                             var jobId = BackgroundJob.Enqueue(
                     () => _adviceService.SendAdvice(createdRepsonse.Entity.Id));
-                                break;
-                            case Scheduling.Hour:
-                            
+                            break;
+                        case Scheduling.Hour:
+
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(name,
                     () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
-                                break;
-                            case Scheduling.Day:
+                            break;
+                        case Scheduling.Day:
 
-                             var month = advice.AlarmDate.Value.Month;
-                             var day = advice.AlarmDate.Value.Day;
-                             cron = "0 8 * * *";
+                            var month = advice.AlarmDate.Value.Month;
+                            var day = advice.AlarmDate.Value.Day;
+                            cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(name,
                     () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
-                                break;
-                            case Scheduling.Week:
+                            break;
+                        case Scheduling.Week:
                             string weekDay = advice.AlarmDate.Value.DayOfWeek.ToString().Substring(0, 3);
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(name,
                     () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
-                                break;
-                            case Scheduling.Month:
+                            break;
+                        case Scheduling.Month:
 
                             day = advice.AlarmDate.Value.Day;
                             cron = "0 8 " + day + " * *";
@@ -96,20 +100,21 @@ namespace Presentation.Web.Controllers.OData
                             RecurringJob.AddOrUpdate(name,
                     () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
-                                break;
-                            case Scheduling.Year:
-
-                             month = advice.AlarmDate.Value.Month;
-                             day = advice.AlarmDate.Value.Day;
-                             cron = "0 8 " + day + " " + month + " *";
-                                
-                                RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
-                    cron);
                             break;
-                        }
+                        case Scheduling.Year:
+
+                            month = advice.AlarmDate.Value.Month;
+                            day = advice.AlarmDate.Value.Day;
+                            cron = "0 8 " + day + " " + month + " *";
+
+                            RecurringJob.AddOrUpdate(name,
+                () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
+                cron);
+                            break;
+                    }
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Logger.ErrorException("Failed to schedule advice", e);
                     return InternalServerError(e);
                 }
@@ -122,7 +127,7 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
             var response = base.Patch(key, delta);
-            
+
             if (response.GetType() == typeof(UpdatedODataResult<Advice>))
             {
                 try
@@ -140,7 +145,7 @@ namespace Presentation.Web.Controllers.OData
                     cron);
                             break;
                         case Scheduling.Day:
-                            
+
                             cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
@@ -182,7 +187,7 @@ namespace Presentation.Web.Controllers.OData
                     return InternalServerError(e);
                 }
             }
-            
+
             return response;
         }
 
@@ -197,7 +202,8 @@ namespace Presentation.Web.Controllers.OData
 
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
-            if (anySents) {
+            if (anySents)
+            {
                 return Forbidden();
             }
 

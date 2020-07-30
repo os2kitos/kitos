@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;

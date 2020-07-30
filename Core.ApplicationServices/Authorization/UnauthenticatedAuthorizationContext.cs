@@ -25,12 +25,12 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
-        public bool AllowCreate<T>()
+        public bool AllowCreate<T>(int organizationId)
         {
             return false;
         }
 
-        public bool AllowCreate<T>(IEntity entity)
+        public bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return false;
         }

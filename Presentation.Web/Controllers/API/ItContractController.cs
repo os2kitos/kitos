@@ -11,6 +11,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -70,7 +71,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != ActiveOrganizationId)
+                if (GetOrganizationReadAccessLevel(item.OrganizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     dto.Note = "";
                 }
