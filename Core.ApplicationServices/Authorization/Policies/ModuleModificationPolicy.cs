@@ -41,12 +41,19 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return IsGlobalAdmin();
             }
 
+            var possibleConditions = GetPossibleModificationConditions(target).ToList();
+            
+            if (possibleConditions.Any() == false)
+            {
+                //This target is not subject to module level access
+                return false;
+            }
+
+            //Global or local admin overrides any of the other conditinos
             if (IsGlobalAdmin() || IsLocalAdmin(target))
             {
                 return true;
             }
-
-            var possibleConditions = GetPossibleModificationConditions(target).ToList();
 
             return possibleConditions.Any(condition => condition.Invoke(target));
         }
