@@ -97,7 +97,7 @@
                             var userStrings = queryParams.split(' ', 3);
                             var index: number = 0;
 
-                            var urlAddition: string = "?$filter=";
+                            var urlAddition: string = "$filter=";
 
                             if ($scope.orgId === undefined)
                                 urlAddition += 'OrganizationRights/any()';
@@ -116,14 +116,17 @@
                                 }
                                 index++;
                             }
+
+                            
+
                             var result;
                             if ($scope.orgId === undefined) {
                                 result = $http
-                                    .get(`/odata/Users` + urlAddition,
+                                    .get(`/odata/Users` + "?$select=Id,Name,LastName,Email&" + urlAddition,
                                     { ignoreLoadingBar: true });
                             } else {
                                 result = $http
-                                    .get(`/odata/Organizations(${$scope.orgId})/Organizations.GetUsers` + urlAddition,
+                                    .get(`/odata/Organizations(${$scope.orgId})/Organizations.GetUsers` + "?$select=Id,Name,LastName,Email&" + urlAddition,
                                     { ignoreLoadingBar: true });
                             }
                             return result;

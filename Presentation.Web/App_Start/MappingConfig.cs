@@ -507,6 +507,9 @@ namespace Presentation.Web
 
             CreateMap<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>()
                 .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitivityDataLevel));
+
+            //NamedEntityDTO Mappings
+            CreateMap<ItProject, NamedEntityDTO>();
         }
     }
 }

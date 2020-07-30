@@ -15,6 +15,8 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
+using Ninject.Infrastructure.Language;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -72,7 +74,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="q"></param>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
         public virtual HttpResponseMessage Get(string q, int orgId, int take = 25)
         {
             try
@@ -80,9 +82,11 @@ namespace Presentation.Web.Controllers.API
                 var projectsQuery = _itProjectService
                     .GetAvailableProjects(orgId, q)
                     .OrderBy(_=>_.Name)
-                    .Take(take);
+                    .Take(take)
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                return Ok(Map(projectsQuery));
+                return Ok(projectsQuery);
             }
             catch (Exception e)
             {
