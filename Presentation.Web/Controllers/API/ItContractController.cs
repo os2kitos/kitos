@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Henter alle IT-Contractor i organisationen 
+        /// Henter alle IT-kontrakter i organisationen 
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="paging"></param>

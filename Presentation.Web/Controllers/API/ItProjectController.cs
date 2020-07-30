@@ -83,6 +83,7 @@ namespace Presentation.Web.Controllers.API
                     .GetAvailableProjects(orgId, q)
                     .OrderBy(_=>_.Name)
                     .Take(take)
+                    .AsEnumerable()
                     .MapToNamedEntityDTOs()
                     .ToList();
 
