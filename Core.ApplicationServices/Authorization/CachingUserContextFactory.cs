@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 _logger.Information("GETTING NEW ONE"); //TODO-MRJ: Remove
                 cachedContext = _userContextFactory.Create(userId);
-                _cache.Insert(key, cachedContext, null, DateTime.UtcNow.AddSeconds(5), Cache.NoSlidingExpiration);
+                _cache.Insert(key, cachedContext, null, DateTime.UtcNow.AddMinutes(1), Cache.NoSlidingExpiration);
             }
             else
             {
