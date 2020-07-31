@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
@@ -28,6 +29,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             var organizationId = ActiveOrganizationId;
@@ -77,6 +79,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery(MaxExpansionDepth = 5)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByOrganizationKey(int key)
         {
             if (typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T)) == false)

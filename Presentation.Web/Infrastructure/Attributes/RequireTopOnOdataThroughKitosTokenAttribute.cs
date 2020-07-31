@@ -1,27 +1,30 @@
-﻿using System.Linq;
-using System.Web.Http.Controllers;
+﻿using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Core.ApplicationServices.Authentication;
-using Core.ApplicationServices.Model;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Query;
+using Serilog;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
     public class RequireTopOnOdataThroughKitosTokenAttribute : ActionFilterAttribute
     {
-        private const int MaxPageSize = 100;
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var authContext = (IAuthenticationContext)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(IAuthenticationContext));
+            var logger = (ILogger)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(ILogger));
             if (actionContext.Request.RequestUri.AbsoluteUri.Contains("/odata/") && authContext.Method == AuthenticationMethod.KitosToken)
             {
-                var enableQueryAttributes = actionContext.ActionDescriptor.GetCustomAttributes<EnableQueryAttribute>().First();
-                enableQueryAttributes.PageSize = MaxPageSize;
+                if (!actionContext.Request.RequestUri.AbsoluteUri.Contains("$top="))
+                {
+                    logger.Warning("Request asks for data via ODATA without \"top\" argument to limit entries");
+                }
+                base.OnActionExecuting(actionContext);
             }
-            base.OnActionExecuting(actionContext);
-            
+            else
+            {
+                base.OnActionExecuting(actionContext);
+            }
         }
+
     }
 }

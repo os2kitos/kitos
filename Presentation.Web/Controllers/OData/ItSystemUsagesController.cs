@@ -43,6 +43,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             //Usages are local so full access is required
@@ -69,6 +70,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
             //Usages are local so full access is required
