@@ -32,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
         {
             //TODO-MRJ_FRONTEND: Inspect all that use this endpoint and consider killing it in favor of scoped endpoints.
             //TODO: Beware of this very broad endpoint - might break existing flows once we extend the scope of the organization scope from one to many
+            //TODO: Reports is calling the wrong one - should call scoped one for non-global admin
 
             var organizationIds = UserContext.OrganizationIds;
 
@@ -69,26 +70,6 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return Ok(SingleResult.Create(result));
-        }
-
-        [EnableQuery(MaxExpansionDepth = 5)]
-        public IHttpActionResult GetByOrganizationKey(int key)
-        {
-            if (typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T)) == false)
-            {
-                return BadRequest("Entity does not belong to an organization");
-            }
-
-            var accessLevel = GetOrganizationReadAccessLevel(key);
-
-            if (accessLevel == OrganizationDataReadAccessLevel.None)
-            {
-                return Forbidden();
-            }
-
-            var entities = QueryFactory.ByOrganizationId<T>(key, accessLevel).Apply(Repository.AsQueryable());
-
-            return Ok(entities);
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]

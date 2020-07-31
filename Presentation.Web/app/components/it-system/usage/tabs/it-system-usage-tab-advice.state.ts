@@ -6,7 +6,7 @@
             controller: "object.EditAdviceCtrl",
             controllerAs: "Vm",
             resolve: {
-                Roles: ["$http", $http => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                Roles: ["$http", "user", ($http, user: Kitos.Services.IUser) => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
                     .then(result => result.data.value)],
                 advices: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itSystemUsage/${$stateParams.id}`).then(result => result.data.response.advices)],
                 object: ["itSystemUsage", itSystemUsage => itSystemUsage],

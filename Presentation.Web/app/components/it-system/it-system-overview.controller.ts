@@ -1125,7 +1125,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     controllerAs: "systemOverviewVm",
                     resolve: {
                         systemRoles: [
-                            "$http", $http => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                            "$http", "user", ($http, user: Services.IUser) => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId).then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()

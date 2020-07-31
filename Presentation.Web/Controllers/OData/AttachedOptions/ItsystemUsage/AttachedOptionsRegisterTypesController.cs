@@ -32,13 +32,11 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions.ItsystemUsage
             return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGISTERTYPEDATA);
         }
 
-
         [HttpPost]
-        [ODataRoute("Organizations(organizationId)/AttachedOptions")]
-        public async Task<IHttpActionResult> Post([FromODataUri] int organizationId, [FromODataUri] int key, AttachedOption dto)
+        [ODataRoute("AttachedOptions")]
+        public override IHttpActionResult Post([FromUri]int organizationId, AttachedOption entity)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
-            return base.Post(organizationId,dto);
+            return base.Post(organizationId, entity);
         }
     }
 }

@@ -11,8 +11,8 @@
                             return result.data.value;
                         });
                 }],
-                localItSystemRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                localItSystemRoles: ['$http', 'user', function ($http, user : Kitos.Services.IUser) {
+                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
                         .then(function (result) {
                             return result.data.value;
                         });

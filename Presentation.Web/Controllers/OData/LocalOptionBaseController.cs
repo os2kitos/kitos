@@ -3,35 +3,27 @@ using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Core.DomainServices.Extensions;
 using Microsoft.AspNet.OData;
-using Presentation.Web.Infrastructure.Attributes;
 using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
-    public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
+    public abstract class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
     {
         private readonly IGenericRepository<TOptionType> _optionsRepository;
 
-        public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IGenericRepository<TOptionType> optionsRepository)
+        protected LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IGenericRepository<TOptionType> optionsRepository)
             : base(repository)
         {
             _optionsRepository = optionsRepository;
         }
 
-        [EnableQuery]
-        public override IHttpActionResult Get()
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        [NonAction]
+        public override IHttpActionResult Get() => throw new NotSupportedException();
 
-        [EnableQuery]
-        public IHttpActionResult GetByOrganizationId(int organizationId)
+        public virtual IHttpActionResult GetByOrganizationId(int organizationId)
         {
             //TODO-MRJ_FRONTEND: Update front-end
             var localOptionsResult = Repository.AsQueryable().ByOrganizationId(organizationId).ToList();
@@ -61,17 +53,12 @@ namespace Presentation.Web.Controllers.OData
             return Ok(returnList);
         }
 
-        [EnableQuery]
-        public override IHttpActionResult Get(int key)
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        [NonAction]
+        public override IHttpActionResult Get(int key) => throw new NotSupportedException();
 
-        [EnableQuery]
-        public IHttpActionResult Get(int organizationId, int key)
+        public virtual IHttpActionResult Get(int organizationId, int key)
         {
             //TODO-MRJ_FRONTEND: Update front-end
-            var orgId = organizationId;
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -157,12 +144,10 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta) => throw new NotSupportedException();
 
-        public IHttpActionResult Patch(int organizationId, int key, Delta<TLocalModelType> delta)
+        public virtual IHttpActionResult Patch(int organizationId, int key, Delta<TLocalModelType> delta)
         {
             //TODO-MRJ_FRONTEND: Update front-end
             var orgId = organizationId;
@@ -229,12 +214,10 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        public override IHttpActionResult Delete(int key)
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        [NonAction] //TODO-MRJ: Consider if we could just use the actual id in stead of optionid?
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-        public IHttpActionResult Delete(int organizationId, int key)
+        public virtual IHttpActionResult Delete(int organizationId, int key)
         {
             //TODO-MRJ_FRONTEND: Update front-end
             var orgId = organizationId;

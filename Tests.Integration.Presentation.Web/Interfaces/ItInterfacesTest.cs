@@ -47,10 +47,11 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interFacePrefixName = CreateInterFacePrefixName();
             var token = await HttpApi.GetTokenAsync(role);
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
+            //TODO-MRJ: Might be totally off
             var expectedResults = interfacesCreated.Where(x =>
-                (x.OrganizationId == orgId &&
-                 (orgId == token.ActiveOrganizationId || role == OrganizationRole.GlobalAdmin)) ||
-                x.AccessModifier == AccessModifier.Public).ToList();
+                (x.OrganizationId == orgId || role == OrganizationRole.GlobalAdmin) ||  x.AccessModifier == AccessModifier.Public)
+                .ToList();
+
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act

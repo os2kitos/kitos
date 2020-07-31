@@ -159,6 +159,10 @@
 
         // the object returned contains the user, user rights and user organizations
         getUser = () => {
+            //Use existing in-memory user if it already exists
+            if (this._user) {
+                return this.$q.resolve(this._user);
+            }
             return this.reAuthorize();
         };
 

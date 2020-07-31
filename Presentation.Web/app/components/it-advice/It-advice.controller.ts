@@ -154,7 +154,7 @@
                         notify.addSuccessMessage("Advisen er slettet!");
                         $("#mainGrid").data("kendoGrid").dataSource.read();
                     },
-                    () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
+                        () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
 
             var modalOpen = false;
@@ -259,7 +259,7 @@
                                             $("#mainGrid").data("kendoGrid").dataSource.read();
                                             $scope.$close(true);
                                         },
-                                        () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
+                                            () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
                                         );
 
                                 }
@@ -289,7 +289,7 @@
                                     $scope.errMessage = 'Begge dato felter skal udfyldes!';
                                     return false;
                                 }
-                                
+
                                 $scope.startDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;
@@ -311,7 +311,7 @@
                                     $scope.errMessage = 'Begge dato felter skal udfyldes!';
                                     return false;
                                 }
-                                
+
                                 $scope.stopDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;
@@ -431,26 +431,26 @@
                             modalOpen = false;
                         }],
                         resolve: {
-                            Roles: ['$http', function ($http) {
-                                if (type == "itSystemUsage") {
-                                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            Roles: ['$http', 'user', function ($http, user: Kitos.Services.IUser) {
+                                if (type === "itSystemUsage") {
+                                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
                                         .then(function (result) {
                                             return result;
                                         });
                                 }
-                                if (type == "itContract") {
-                                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                if (type === "itContract") {
+                                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
                                         .then(function (result) {
                                             return result;
                                         });
                                 }
-                                if (type == "itProject") {
-                                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                if (type === "itProject") {
+                                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
                                         .then(function (result) {
                                             return result;
                                         });
                                 }
-                                if (type == "itInterface") {
+                                if (type === "itInterface") {
                                     return [];
                                 }
                             }],
@@ -463,8 +463,8 @@
                             object: [function () {
                                 return $scope.object;
                             }],
-                            currentUser: ["userService",
-                                (userService) => userService.getUser()
+                            currentUser: ["user",
+                                (user) => user
                             ],
                             advicename: [() => {
                                 return $scope.advicename;

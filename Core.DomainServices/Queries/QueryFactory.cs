@@ -80,7 +80,7 @@ namespace Core.DomainServices.Queries
             var constructor =
                 typeof(QueryByPublicAccessOrOrganizationIds<>)
                     .MakeGenericType(typeof(T))
-                    .GetConstructor(new[] { typeof(int) });
+                    .GetConstructor(new[] { typeof(IEnumerable<int>) });
             return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationIds });
         }
     }
