@@ -34,7 +34,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                         else
                         {
                             context.Response.StatusCode = 400;
-                            context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {MaxPageSize}");
+                            context.Response.Write($"Værdien af \"top\" parameteren skal være et nummer mellem 0 og {MaxPageSize}");
                             return;
                         }
                     case PageSizer.Take:
@@ -46,7 +46,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                         else
                         {
                             context.Response.StatusCode = 400;
-                            context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {MaxPageSize}");
+                            context.Response.Write($"Værdien af \"take\" parameteren skal være et nummer mellem 0 og {MaxPageSize}");
                             return;
                         }
                     case PageSizer.None:

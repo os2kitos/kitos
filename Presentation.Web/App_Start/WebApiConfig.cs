@@ -62,7 +62,8 @@ namespace Presentation.Web
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Filters.Add(new RequireValidatedCSRFAttributed());
-            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
+            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null).SkipToken();
+            config.Filters.Add(new RequireTopOnOdataThroughKitosTokenAttribute());
         }
 
         public static IEdmModel GetModel()
