@@ -113,7 +113,7 @@ namespace Core.ApplicationServices.Authorization
         {
             return
                 AllowCreate<T>(organizationId) &&
-                CheckNewObjectAccessModifierPolicy(entity) &&
+                CheckNewObjectAccessModifierPolicy(organizationId, entity) &&
                 CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
         }
@@ -136,7 +136,7 @@ namespace Core.ApplicationServices.Authorization
             return EntityReadAccessLevel.None;
         }
 
-        private bool CheckNewObjectAccessModifierPolicy(IEntity entity)
+        private bool CheckNewObjectAccessModifierPolicy(int organizationId, IEntity entity)
         {
             if (entity is User user)
             {
@@ -148,12 +148,7 @@ namespace Core.ApplicationServices.Authorization
 
             if (entity is IHasAccessModifier accessModifier)
             {
-                var org = (entity as IOwnedByOrganization)?.OrganizationId;
-                if (!org.HasValue)
-                {
-                    throw new InvalidOperationException($"An object which has {nameof(IHasAccessModifier)} must also provide information about it's organizational relationship.");
-                }
-                return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity, org.Value));
+                return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity, organizationId));
             }
 
             return true;

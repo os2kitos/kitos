@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.Authorization.Policies
             }
 
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
-            
+
             if (possibleConditions.Any() == false)
             {
                 //This target is not subject to module level access
@@ -184,7 +184,11 @@ namespace Core.ApplicationServices.Authorization.Policies
             (target as IIsPartOfOrganization)?.GetOrganizationIds()?.ToList().ForEach(id => organizationIds.Add(id));
             if (target is IOwnedByOrganization ownedByOrganization)
             {
-                organizationIds.Add(ownedByOrganization.OrganizationId);
+                //If organization is unknown, the object will be fresh and validation must be in the context of the users other rights
+                if (ownedByOrganization.Organization != null)
+                {
+                    organizationIds.Add(ownedByOrganization.Organization.Id);
+                }
             }
 
             if (!organizationIds.Any())

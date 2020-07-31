@@ -90,7 +90,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _userContext.Setup(x => x.OrganizationIds).Returns(new[] { orgId });
             SetupUserContext(orgId, isLocalAdmin, isGlobalAdmin, otherRole);
 
-            var entity = (IEntity)MoqTools.MockOf(entityType);
+            var entity = (IEntity)MoqTools.MockedObjectFrom(entityType);
 
             //Act
             var allow = _sut.AllowModification(entity);
