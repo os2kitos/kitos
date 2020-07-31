@@ -89,6 +89,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var newOrg = new Organization { Cvr = "monkey" };
+            _userRepository.Setup(x => x.GetByKey(_user.Id)).Returns(_user);
 
             //Act
             var result = _sut.CreateNewOrganization(newOrg);
@@ -96,6 +97,21 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.False(result.Ok);
             Assert.Equal(OperationFailure.BadInput, result.Error);
+        }
+
+        [Fact]
+        public void CreateNewOrganization_Returns_Forbidden_On_Lost_User()
+        {
+            //Arrange
+            var newOrg = new Organization { Cvr = "monkey" };
+            _userRepository.Setup(x => x.GetByKey(_user.Id)).Returns(default(User));
+
+            //Act
+            var result = _sut.CreateNewOrganization(newOrg);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Theory]

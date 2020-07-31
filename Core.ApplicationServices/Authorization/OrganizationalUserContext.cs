@@ -15,6 +15,7 @@ namespace Core.ApplicationServices.Authorization
         private readonly IReadOnlyDictionary<int, HashSet<OrganizationRole>> _roles;
         private readonly IReadOnlyDictionary<int, OrganizationCategory> _categoriesOfMemberOrganizations;
         private readonly HashSet<OrganizationCategory> _membershipCategories;
+        private readonly bool _isGlobalAdmin;
 
         public OrganizationalUserContext(
             int userId,
@@ -27,10 +28,11 @@ namespace Core.ApplicationServices.Authorization
             _roles = roles
                 .ToDictionary(kvp => kvp.Key, kvp => new HashSet<OrganizationRole>(kvp.Value))
                 .AsReadOnly();
+            _isGlobalAdmin = _roles.Values.Any(x => x.Contains(OrganizationRole.GlobalAdmin));
         }
 
         public int UserId { get; }
-        
+
         public IEnumerable<int> OrganizationIds => _roles.Keys;
 
         public bool HasRoleInOrganizationOfType(OrganizationCategory category)
@@ -40,7 +42,7 @@ namespace Core.ApplicationServices.Authorization
 
         public bool IsGlobalAdmin()
         {
-            return _roles.Values.FirstOrDefault()?.Any(x => x == OrganizationRole.GlobalAdmin) == true;
+            return _isGlobalAdmin;
         }
 
         public bool HasRole(int organizationId, OrganizationRole role)
