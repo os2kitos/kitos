@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
 
@@ -15,7 +16,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName
+    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization
     {
         public Organization()
         {
@@ -101,5 +102,7 @@ namespace Core.DomainModel.Organization
         {
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
         }
+
+        public IEnumerable<int> GetOrganizationIds() => new []{Id};
     }
 }
