@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.ApplicationServices.Model;
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
@@ -76,6 +77,27 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        public virtual HttpResponseMessage PostGetFromIds([FromBody] int[] ids)
+        {
+            if (ids.Length > MaxLength.OneHundred)
+            {
+                return BadRequest("Venligst begræns mængden af id's du spørger efter. Max er 100 id per request");
+            }
+            var result = ids
+                .Distinct()
+                .Select(id => Repository.GetByKey(id))
+                .ToList();
+
+            if (!result.Any(AllowRead))
+            {
+                var noReadAccessIds = result.Where(x => AllowRead(x) == false);
+                return Forbidden($"Du har ikke tilladelse til at læse informationerne på objekterne med id: {ids}");
+            }
+
+            return Ok(Map(result));
+
         }
 
         // GET api/T

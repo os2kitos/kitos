@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
 using Serilog;
@@ -11,55 +12,58 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
-        private static int _maxPageSize = 100;
+        private const int MaxPageSize = 100;
 
         public override async Task Invoke(IOwinContext context)
         {
             var kernel = context.GetNinjectKernel();
             var logger = kernel.Get<ILogger>();
-
-            var query = context.Request.Query;
-            var resultLimiter = ContainsResultLimit(query);
-            switch (resultLimiter)
+            var authenticationContext = kernel.Get<IAuthenticationContext>();
+            if (authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
-                case PageSizer.Top:
-                    if (int.TryParse(query.Get("top"), out var topPageSize))
-                    {
-                        logIfExcessivePageSize(topPageSize, logger);
-                        await Next.Invoke(context);
+                var query = context.Request.Query;
+                var resultLimiter = ContainsResultLimit(query);
+                switch (resultLimiter)
+                {
+                    case PageSizer.Top:
+                        if (int.TryParse(query.Get("top"), out var topPageSize))
+                        {
+                            LogIfExcessivePageSize(topPageSize, logger);
+                            break;
+                        }
+                        else
+                        {
+                            context.Response.StatusCode = 400;
+                            context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {MaxPageSize}");
+                            return;
+                        }
+                    case PageSizer.Take:
+                        if (int.TryParse(query.Get("take"), out var takePageSize))
+                        {
+                            LogIfExcessivePageSize(takePageSize, logger);
+                            break;
+                        }
+                        else
+                        {
+                            context.Response.StatusCode = 400;
+                            context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {MaxPageSize}");
+                            return;
+                        }
+                    case PageSizer.None:
+                    default:
                         break;
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = 400;
-                        context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {_maxPageSize}");
-                        break;
-                    }
-                case PageSizer.Take:
-                    if (int.TryParse(query.Get("take"), out var takePageSize))
-                    {
-                        logIfExcessivePageSize(takePageSize, logger);
-                        await Next.Invoke(context);
-                        break;
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = 400;
-                        context.Response.Write($"Værdien af \"top\" parameteret skal være et nummer mellem 0 og {_maxPageSize}");
-                        break;
-                    }
-                case PageSizer.None:
-                default:
-                    await Next.Invoke(context);
-                    break;
+                }
             }
+            
+            await Next.Invoke(context);
+
         }
 
-        private void logIfExcessivePageSize(int pageSize, ILogger logger)
+        private static void LogIfExcessivePageSize(int pageSize, ILogger logger)
         {
-            if (pageSize >= _maxPageSize)
+            if (pageSize >= MaxPageSize)
             {
-                logger.Warning($"Request asks for too large a pagesize, size is {_maxPageSize}");
+                logger.Warning($"Request asks for too large a pagesize, size is {MaxPageSize}");
             }
         }
 
