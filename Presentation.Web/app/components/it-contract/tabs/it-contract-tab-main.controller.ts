@@ -22,11 +22,8 @@
                         }
                     ],
                     procurementStrategies: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
                     ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
