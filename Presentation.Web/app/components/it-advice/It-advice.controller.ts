@@ -175,8 +175,8 @@
                             $scope.showRoleFields = true;
                             modalOpen = true;
 
-                            if (roles.data) {
-                                $scope.recieverRoles = roles.data.value;
+                            if (roles) {
+                                $scope.recieverRoles = roles;
                             } else {
                                 $scope.showRoleFields = false;
                                 $scope.collapsed = false;

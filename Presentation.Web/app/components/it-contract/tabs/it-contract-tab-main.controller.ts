@@ -55,7 +55,7 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            '$scope', '$http', '_', '$stateParams', '$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
             function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;

@@ -31,7 +31,7 @@
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
-                $scope.businessTypes = businessTypes.data.value;
+                $scope.businessTypes = businessTypes;
 
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2(
                     "api/itsystem",
