@@ -7,7 +7,8 @@
                 controller: "system.SystemMainCtrl",
                 resolve: {
                     businessTypes: [
-                        "$http", $http => $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.BusinessTypes).getAll()
                     ],
                     itSystem: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itsystem/${$stateParams.id}`)
                         .then(result => result.data.response)]
