@@ -130,6 +130,7 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
+        [NonAction]
         public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
         {
             return NotAllowed();

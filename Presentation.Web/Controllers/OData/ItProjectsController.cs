@@ -108,11 +108,13 @@ namespace Presentation.Web.Controllers.OData
             return Ok(projects);
         }
 
+        [NonAction]
         public override IHttpActionResult Delete(int key)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
+        [NonAction]
         public override IHttpActionResult Post(int organizationId, ItProject entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);

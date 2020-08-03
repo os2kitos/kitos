@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -41,6 +42,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

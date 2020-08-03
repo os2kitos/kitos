@@ -28,6 +28,7 @@ namespace Presentation.Web.Controllers.OData
             _repository = repository;
         }
 
+        [NonAction]
         public override IHttpActionResult Get()
         {
             return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));

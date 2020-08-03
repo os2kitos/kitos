@@ -38,15 +38,12 @@
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
+        public static $inject: string[] = ["_", "$", "$state", "$scope"];
 
         constructor(
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private notify,
             private $scope) {
 
             this.$scope.$state = $state;
@@ -148,7 +145,7 @@
                 });
             }
         }
-
+        //NOTE: Referenced from kendo configuration above - static analysis will say it is unused
         private editOption = (e: JQueryEventObject) => {
             e.preventDefault();
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");

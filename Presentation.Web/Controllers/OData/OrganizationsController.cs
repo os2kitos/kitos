@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.OData
                 FromOperationFailure(result.Error);
         }
 
-        [EnableQuery]
+        [NonAction]
         public override IHttpActionResult Post(int organizationId, Organization organization)
         {
             return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));

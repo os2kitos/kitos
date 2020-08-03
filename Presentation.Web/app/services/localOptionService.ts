@@ -1,0 +1,68 @@
+﻿module Kitos.Services.LocalOptions {
+    "use strict";
+    import Services = Kitos.Services;
+
+    export interface ILocalOptionService {
+        getAll(): ng.IPromise<Models.IOptionEntity[]>
+    }
+
+    class LocalOptionService implements ILocalOptionService {
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly userService: IUserService,
+        private readonly routePrefix: string) {
+        }
+
+        private getBasePath() {
+            return `odata/${this.routePrefix}`;
+        }
+
+        getAll(): ng.IPromise<Models.IOptionEntity[]> {
+            return this
+                .userService
+                .getUser()
+                .then(user => this.$http.get(
+                    `${this.getBasePath()
+                    }?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=${user.currentOrganizationId}`))
+                .then(result => result.data.value as Models.IOptionEntity[]);
+        }
+    }
+
+    export enum LocalOptionType {
+        ItSystemRoles,
+        ItContractRoles,
+        ItProjectRoles
+    }
+
+    export interface ILocalOptionServiceFactory {
+        create(type: LocalOptionType): ILocalOptionService;
+    }
+
+    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
+        static $inject = ["$http","userService"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly userService: IUserService) {
+
+        }
+
+        private getPrefix(type: LocalOptionType) : string {
+            switch (type) {
+                case LocalOptionType.ItSystemRoles:
+                    return "LocalItSystemRoles";
+                case LocalOptionType.ItContractRoles:
+                    return "LocalItContractRoles";
+                case LocalOptionType.ItProjectRoles:
+                    return "LocalItProjectRoles";
+            default:
+                throw new Error(`Unknown option type ${type}`);
+            }
+        }
+
+        create(type: LocalOptionType): ILocalOptionService {
+            return new LocalOptionService(this.$http, this.userService, this.getPrefix(type));
+        }
+    }
+
+    app.service("localOptionServiceFactory", LocalOptionServiceFactory);
+}

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -16,16 +17,19 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, NamedEntityDTO dto)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
+        [NonAction]
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
+        [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);

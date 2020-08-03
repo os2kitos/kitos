@@ -922,7 +922,8 @@
                     controllerAs: "contractOverviewVm",
                     resolve: {
                         itContractRoles: [
-                            "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                            "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()

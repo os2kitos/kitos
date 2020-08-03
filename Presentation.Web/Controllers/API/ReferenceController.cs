@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.References;
@@ -39,6 +40,7 @@ namespace Presentation.Web.Controllers.API
                 .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, ExternalReferenceDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

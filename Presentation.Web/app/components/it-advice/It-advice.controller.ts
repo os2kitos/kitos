@@ -431,24 +431,15 @@
                             modalOpen = false;
                         }],
                         resolve: {
-                            Roles: ['$http', 'user', function ($http, user: Kitos.Services.IUser) {
+                            Roles: ['localOptionServiceFactory', (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
                                 if (type === "itSystemUsage") {
-                                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll();
                                 }
                                 if (type === "itContract") {
-                                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll();
                                 }
                                 if (type === "itProject") {
-                                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=" + user.currentOrganizationId)
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll();
                                 }
                                 if (type === "itInterface") {
                                     return [];

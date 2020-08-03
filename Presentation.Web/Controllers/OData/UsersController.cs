@@ -24,6 +24,7 @@ namespace Presentation.Web.Controllers.OData
             _repository = repository;
         }
 
+        [NonAction]
         public override IHttpActionResult Post(int organizationId, User entity)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);
@@ -102,6 +103,7 @@ namespace Presentation.Web.Controllers.OData
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
+        [NonAction]
         public override IHttpActionResult Delete(int key)
         {
             return StatusCode(HttpStatusCode.MethodNotAllowed);

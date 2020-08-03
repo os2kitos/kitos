@@ -1,5 +1,5 @@
 ﻿module Kitos.Services {
-
+    //TODO-MRJ_FRONTEND: Use the new local options type
     export interface IOptionsService {
         getLocalInterfaceTypes();
         getLocalDataTypes();

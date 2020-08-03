@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -72,6 +73,7 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, ItInterfaceExhibitDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
@@ -94,6 +96,7 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
+        [NonAction]
         public override HttpResponseMessage GetSingle(int id)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -32,6 +33,7 @@ namespace Presentation.Web.Controllers.API
             _userContext = userContext;
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, UserDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

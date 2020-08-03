@@ -57,6 +57,7 @@ namespace Presentation.Web.Controllers.API
             return _rightRepository.Get(right => right.OrganizationId == id);
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, OrganizationRightDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

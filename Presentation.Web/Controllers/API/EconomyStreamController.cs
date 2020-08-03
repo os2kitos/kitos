@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Net;
 using System.Security;
+using System.Web.Http;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
@@ -30,6 +31,7 @@ namespace Presentation.Web.Controllers.API
             _contracts = contracts;
         }
 
+        [NonAction]
         public override HttpResponseMessage GetAll(PagingModel<EconomyStream> paging)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

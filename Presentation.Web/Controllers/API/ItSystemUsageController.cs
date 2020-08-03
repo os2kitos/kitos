@@ -158,6 +158,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto)
         {
             return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);

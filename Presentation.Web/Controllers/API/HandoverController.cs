@@ -34,11 +34,13 @@ namespace Presentation.Web.Controllers.API
             return new ChildEntityCrudAuthorization<Handover, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? EntityConstants.InvalidId), base.GetCrudAuthorization());
         }
 
+        [NonAction]
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
+        [NonAction]
         public override HttpResponseMessage Post(int organizationId, HandoverDTO dto)
         {
             return CreateResponse(HttpStatusCode.MethodNotAllowed);
