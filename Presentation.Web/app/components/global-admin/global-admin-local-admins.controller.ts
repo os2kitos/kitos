@@ -50,7 +50,7 @@
                     role: rId,
                     organizationId: oId
                 };
-
+                //TODO-MRJ_FRONTEND: If owner of new right is current user, call reauthorize/purge cache on auth service
                 var msg = notify.addInfoMessage("Arbejder ...", false);
                 $http.post("api/OrganizationRight/" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
@@ -80,7 +80,7 @@
                 var oId = right.organizationId;
                 var rId = right.role;
                 var uId = right.userId;
-
+                //TODO-MRJ_FRONTEND: If owner of new right is current user, call reauthorize/purge cache on auth service
                 var msg = notify.addInfoMessage("Arbejder ...", false);
                 $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
                     msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
