@@ -10,7 +10,8 @@
                         "userService", userService => userService.getUser()
                     ],
                     agreementElements: [
-                        "$http", $http => $http.get("odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.AgreementElementTypes).getAll()
                     ]
                 }
             });

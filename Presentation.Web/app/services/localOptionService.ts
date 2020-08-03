@@ -31,7 +31,8 @@
     export enum LocalOptionType {
         ItSystemRoles,
         ItContractRoles,
-        ItProjectRoles
+        ItProjectRoles,
+        AgreementElementTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -54,6 +55,8 @@
                     return "LocalItContractRoles";
                 case LocalOptionType.ItProjectRoles:
                     return "LocalItProjectRoles";
+                case LocalOptionType.AgreementElementTypes:
+                    return "LocalAgreementElementTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
