@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.API
             return Ok(Map(result));
         }
 
-        public HttpResponseMessage Post(int contractId, EconomyStreamDTO streamDTO)
+        public override HttpResponseMessage Post(int contractId, EconomyStreamDTO streamDTO)
         {
             var contract = _contracts.GetByKey(contractId);
 

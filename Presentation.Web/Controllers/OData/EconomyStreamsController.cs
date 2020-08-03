@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
@@ -19,7 +19,6 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
-        //TODO-MRJ_FRONTEND: Post/Patch?
         private readonly IGenericRepository<EconomyStream> _repository;
 
         public EconomyStreamsController(IGenericRepository<EconomyStream> repository)
@@ -29,10 +28,19 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [NonAction]
-        public override IHttpActionResult Get()
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        public override IHttpActionResult Post(int organizationId, EconomyStream entity) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<EconomyStream> delta) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Get() => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Get(int key) => throw new NotSupportedException();
 
         // GET /Organizations(1)/ItContracts
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
