@@ -108,7 +108,6 @@
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="IAdviceService.cs" />
-    <Compile Include="Model\MaxLength.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\OptionsService.cs" />

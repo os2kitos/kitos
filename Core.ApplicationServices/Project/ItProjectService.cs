@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.Project
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
         {
-            if (name.Length > MaxLength.OneHundredFifty)
+            if (name.Length > ItProjectConstraints.MaxNameLength)
             {
                 return OperationFailure.BadInput;
             }
