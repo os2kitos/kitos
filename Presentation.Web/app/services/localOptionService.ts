@@ -34,7 +34,8 @@
         ItProjectRoles,
         AgreementElementTypes,
         ArchiveLocations,
-        ArchiveTestLocations
+        ArchiveTestLocations,
+        ArchiveTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -63,6 +64,8 @@
                     return "LocalArchiveLocations";
                 case LocalOptionType.ArchiveTestLocations:
                     return "LocalArchiveTestLocations";
+                case LocalOptionType.ArchiveTypes:
+                    return "LocalArchiveTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }

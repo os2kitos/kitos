@@ -6,12 +6,11 @@
             controller: "system.EditArchiving",
             resolve: {
                 archiveTypes: [
-                    "$http", $http =>
-                        $http.get("odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(result => result.data.value)
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTypes).getAll()
                 ],
                 archiveLocations: [
-                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.LocalOptionServiceFactory) =>
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveLocations).getAll()
                 ],
                 archiveTestLocations: [
