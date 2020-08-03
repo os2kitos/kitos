@@ -53,7 +53,8 @@
         PriceRegulationTypes,
         ProcurementStrategyTypes,
         PurchaseFormTypes,
-        RegisterTypes
+        RegisterTypes,
+        ReportCategoryTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -120,6 +121,8 @@
                     return "LocalPurchaseFormTypes";
                 case LocalOptionType.RegisterTypes:
                     return "LocalRegisterTypes";
+                case LocalOptionType.ReportCategoryTypes:
+                    return "LocalReportCategoryTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
