@@ -170,7 +170,7 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, roles, $window, type, action, object, currentUser) {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", ($scope, $modalInstance, roles, $window, type, action, object, currentUser : Kitos.Services.IUser) => {
 
                             $scope.showRoleFields = true;
                             modalOpen = true;
@@ -238,7 +238,7 @@
                                 payload.StopDate.setHours(23, 59, 59, 99);
 
                                 if (action == 'POST') {
-                                    url = "Odata/advice";
+                                    url = `Odata/advice?organizationId=${currentUser.id}`;
 
                                     httpCall(payload, action, url);
                                 } else if (action == 'PATCH') {
@@ -249,16 +249,16 @@
 
                                     for (var i = 0; i < payload.Reciepients.length; i++) {
                                         payload.Reciepients[i].adviceId = id;
-                                        $http.post('/api/AdviceUserRelation', payload.Reciepients[i]);
+                                        $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, payload.Reciepients[i]);
                                     }
                                     payload.Reciepients = undefined;
                                     $http.patch(url, JSON.stringify(payload))
                                         .then(() => {
-                                            notify.addSuccessMessage("Advisen er opdateret!");
+                                                notify.addSuccessMessage("Advisen er opdateret!");
 
-                                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                                            $scope.$close(true);
-                                        },
+                                                $("#mainGrid").data("kendoGrid").dataSource.read();
+                                                $scope.$close(true);
+                                            },
                                             () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
                                         );
 
@@ -454,8 +454,8 @@
                             object: [function () {
                                 return $scope.object;
                             }],
-                            currentUser: ["user",
-                                (user) => user
+                            currentUser: ["userService",
+                                (userService: Kitos.Services.IUserService) => userService.getUser()
                             ],
                             advicename: [() => {
                                 return $scope.advicename;

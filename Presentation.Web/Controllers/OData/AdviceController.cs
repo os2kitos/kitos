@@ -35,7 +35,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))

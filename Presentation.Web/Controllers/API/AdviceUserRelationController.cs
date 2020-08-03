@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId))
+                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId).ToList())
                 {
                     if (AllowDelete(d))
                     {
