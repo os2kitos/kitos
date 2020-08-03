@@ -558,9 +558,9 @@
             function addUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
 
-                var url = "api/taskUsage/";
+                const url = `api/taskUsage`;
 
-                var payload = {
+                const payload = {
                     taskRefId: refUsage.taskRef.id,
                     orgUnitId: $scope.chosenOrgUnit.id
                 };
@@ -576,7 +576,7 @@
             function removeUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
 
-                var url = "api/taskUsage/" + refUsage.usage.id + "?organizationId=" + user.currentOrganizationId;
+                const url = `api/taskUsage/${refUsage.usage.id}?organizationId=${user.currentOrganizationId}`;
 
                 $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
                     refUsage.usage = null;

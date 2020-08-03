@@ -132,16 +132,26 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, TaskUsageDTO taskUsageDto) => throw new NotSupportedException();
+
         [HttpPost]
         [Route("api/taskUsage/")]
-        public override HttpResponseMessage Post(int organizationId, TaskUsageDTO taskUsageDto)
+        public HttpResponseMessage Post(CreateTaskUsageDTO taskUsageDto)
         {
-            //TODO-MRJ_FRONTEND: Update frontend
             try
             {
-                var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
-
-                if (!AllowCreate<TaskUsage>(organizationId, item))
+                var item = new TaskUsage
+                {
+                    TaskRefId = taskUsageDto.TaskRefId,
+                    OrgUnitId = taskUsageDto.OrgUnitId,
+                };
+                var organizationUnit = _orgUnitRepository.GetByKey(taskUsageDto.OrgUnitId);
+                if (organizationUnit == null)
+                {
+                    return BadRequest("Invalid organizationId");
+                }
+                if (!AllowCreate<TaskUsage>(organizationUnit.OrganizationId, item))
                 {
                     return Forbidden();
                 }

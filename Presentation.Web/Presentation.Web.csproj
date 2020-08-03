@@ -360,6 +360,7 @@
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Models\CreateItSystemDTO.cs" />
     <Compile Include="Models\CreateItsystemUsageDTO.cs" />
+    <Compile Include="Models\CreateTaskUsageDTO.cs" />
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
