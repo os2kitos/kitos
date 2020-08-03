@@ -40,7 +40,8 @@
         DataTypes,
         FrequencyTypes,
         GoalTypes,
-        HandoverTrialTypes
+        HandoverTrialTypes,
+        InterfaceTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -81,6 +82,8 @@
                     return "LocalGoalTypes";
                 case LocalOptionType.HandoverTrialTypes:
                     return "LocalHandoverTrialTypes";
+                case LocalOptionType.InterfaceTypes:
+                    return "LocalInterfaceTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }

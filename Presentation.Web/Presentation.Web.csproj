@@ -453,7 +453,6 @@
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
-    <TypeScriptCompile Include="app\services\optionsService.ts" />
     <TypeScriptCompile Include="app\services\referenceService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
