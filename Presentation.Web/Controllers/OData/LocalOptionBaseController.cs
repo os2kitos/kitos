@@ -25,7 +25,6 @@ namespace Presentation.Web.Controllers.OData
 
         public virtual IHttpActionResult GetByOrganizationId(int organizationId)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             var localOptionsResult = Repository.AsQueryable().ByOrganizationId(organizationId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
             var returnList = new List<TOptionType>();
