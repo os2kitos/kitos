@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
-using Core.ApplicationServices.Model;
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
@@ -21,6 +20,7 @@ namespace Presentation.Web.Controllers.API
         where TModel : class, IEntity
     {
         protected readonly IGenericRepository<TModel> Repository;
+        private const int MaxEntities = 100;
 
         protected GenericApiController(IGenericRepository<TModel> repository)
         {
@@ -79,11 +79,16 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public virtual HttpResponseMessage PostGetFromIds([FromBody] int[] ids)
+        /// <summary>
+        /// POST api/T?getDetailedInfo
+        /// </summary>
+        /// <param name="ids">ID's of entities to retrieve</param>
+        /// <returns>HTML code for success or failure</returns>
+        public virtual HttpResponseMessage PostGetFromIds([FromBody] int[] ids, [FromUri] bool? getDetailedInfo)
         {
-            if (ids.Length > MaxLength.OneHundred)
+            if (ids.Length > MaxEntities)
             {
-                return BadRequest("Please limit the number of ID's you are asking for. Max is 100 ID's per request");
+                return BadRequest($"Please limit the number of ID's you are asking for. Max is {MaxEntities} ID's per request");
             }
             var result = ids
                 .Distinct()

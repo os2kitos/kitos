@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -44,6 +45,10 @@ namespace Core.ApplicationServices.Project
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
         {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
             if (name.Length > ItProjectConstraints.MaxNameLength)
             {
                 return OperationFailure.BadInput;

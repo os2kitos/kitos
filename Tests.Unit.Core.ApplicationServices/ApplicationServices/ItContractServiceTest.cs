@@ -8,9 +8,11 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -19,28 +21,31 @@ namespace Tests.Unit.Core.ApplicationServices
     public class ItContractServiceTest : WithAutoFixture
     {
         private readonly ItContractService _sut;
-        private readonly Mock<IGenericRepository<ItContract>> _contractRepository;
+        private readonly Mock<IItContractRepository> _contractRepository;
         private readonly Mock<IGenericRepository<EconomyStream>> _economyStreamRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IReferenceService> _referenceService;
+        private readonly Mock<ILogger> _logger;
 
         public ItContractServiceTest()
         {
-            _contractRepository = new Mock<IGenericRepository<ItContract>>();
+            _contractRepository = new Mock<IItContractRepository>();
             _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
             _transactionManager = new Mock<ITransactionManager>();
             _domainEvents = new Mock<IDomainEvents>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _referenceService = new Mock<IReferenceService>();
+            _logger = new Mock<ILogger>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
                 _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
-                _authorizationContext.Object);
+                _authorizationContext.Object,
+                _logger.Object);
         }
 
         [Fact]
@@ -105,7 +110,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(externEconomyStream2), Times.Once);
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
-            _contractRepository.Verify(x => x.DeleteWithReferencePreload(itContract), Times.Once);
+            _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
             _domainEvents.Verify(x => x.Raise(It.Is<ContractDeleted>(cd => cd.DeletedContract == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
@@ -123,7 +128,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void ExpectGetContractReturns(int contractId, ItContract itContract)
         {
-            _contractRepository.Setup(x => x.GetByKey(contractId)).Returns(itContract);
+            _contractRepository.Setup(x => x.GetById(contractId)).Returns(itContract);
         }
     }
 }
