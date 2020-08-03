@@ -11,9 +11,8 @@
                             .then(result => result.data.value)
                 ],
                 archiveLocations: [
-                    "$http", $http =>
-                        $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(result => result.data.value)
+                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.LocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveLocations).getAll()
                 ],
                 archiveTestLocations: [
                     "$http", $http =>

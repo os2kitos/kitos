@@ -32,7 +32,8 @@
         ItSystemRoles,
         ItContractRoles,
         ItProjectRoles,
-        AgreementElementTypes
+        AgreementElementTypes,
+        ArchiveLocations
     }
 
     export interface ILocalOptionServiceFactory {
@@ -57,6 +58,8 @@
                     return "LocalItProjectRoles";
                 case LocalOptionType.AgreementElementTypes:
                     return "LocalAgreementElementTypes";
+                case LocalOptionType.ArchiveLocations:
+                    return "LocalArchiveLocations";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
