@@ -2,7 +2,6 @@
     //TODO-MRJ_FRONTEND: Use the new local options type
     export interface IOptionsService {
         getLocalInterfaceTypes();
-        getLocalDataTypes();
     }
 
     export class OptionsService implements IOptionsService {
@@ -15,12 +14,6 @@
         getLocalInterfaceTypes() {
             return this.$http
                 .get<Models.IODataResult<Models.IOptionEntity>>("odata/LocalInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                .then(result => result.data.value);
-        }
-
-        getLocalDataTypes() {
-            return this.$http
-                .get<Models.IODataResult<Models.IOptionEntity>>("odata/LocalDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                 .then(result => result.data.value);
         }
 

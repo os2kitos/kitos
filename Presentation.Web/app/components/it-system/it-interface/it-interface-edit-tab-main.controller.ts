@@ -10,8 +10,8 @@
                         optionsService.getLocalInterfaceTypes()
                 ],
                 dataTypes: [
-                    "optionsService", optionsService =>
-                        optionsService.getLocalDataTypes()
+                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataTypes).getAll()
                 ],
                 dataRows: [
                     "$http", "itInterface",
