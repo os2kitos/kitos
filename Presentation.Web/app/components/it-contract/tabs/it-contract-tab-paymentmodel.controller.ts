@@ -5,11 +5,9 @@
             templateUrl: 'app/components/it-contract/tabs/it-contract-tab-paymentmodel.view.html',
             controller: 'contract.PaymentmodelCtrl',
             resolve: {
-                paymentFrequencies: ['$http', function ($http) {
-                    return $http.get('odata/LocalPaymentFrequencyTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                        return result.data.value;
-                    });
-                }],
+                paymentFrequencies: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PaymentFrequencyTypes).getAll()
+                ],
                 paymentModels: ['$http', function ($http) {
                     return $http.get('odata/LocalPaymentModelTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                         return result.data.value;

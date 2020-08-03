@@ -47,7 +47,8 @@
         ItProjectTypes,
         ItSystemCategories,
         OptionExtendTypes,
-        OrganizationUnitRoles
+        OrganizationUnitRoles,
+        PaymentFrequencyTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -102,6 +103,8 @@
                     return "LocalOptionExtendTypes";
                 case LocalOptionType.OrganizationUnitRoles:
                     return "LocalOrganizationUnitRoles";
+                case LocalOptionType.PaymentFrequencyTypes:
+                    return "LocalPaymentFrequencyTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
