@@ -52,7 +52,8 @@
         PaymentModelTypes,
         PriceRegulationTypes,
         ProcurementStrategyTypes,
-        PurchaseFormTypes
+        PurchaseFormTypes,
+        RegisterTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -117,6 +118,8 @@
                     return "LocalProcurementStrategyTypes";
                 case LocalOptionType.PurchaseFormTypes:
                     return "LocalPurchaseFormTypes";
+                case LocalOptionType.RegisterTypes:
+                    return "LocalRegisterTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
