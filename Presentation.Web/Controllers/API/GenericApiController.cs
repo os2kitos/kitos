@@ -83,7 +83,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (ids.Length > MaxLength.OneHundred)
             {
-                return BadRequest("Venligst begræns mængden af id's du spørger efter. Max er 100 id per request");
+                return BadRequest("Please limit the number of ID's you are asking for. Max is 100 ID's per request");
             }
             var result = ids
                 .Distinct()
@@ -93,7 +93,7 @@ namespace Presentation.Web.Controllers.API
             if (!result.Any(AllowRead))
             {
                 var noReadAccessIds = result.Where(x => AllowRead(x) == false);
-                return Forbidden($"Du har ikke tilladelse til at læse informationerne på objekterne med id: {ids}");
+                return Forbidden($"You are now allowed to read the information on items with the following ID's: {noReadAccessIds}");
             }
 
             return Ok(Map(result));

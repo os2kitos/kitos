@@ -69,6 +69,8 @@
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
+    <Compile Include="ItContract\ItContractConstraints.cs" />
+    <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
     <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
@@ -229,6 +231,7 @@
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

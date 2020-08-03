@@ -26,27 +26,27 @@ namespace Presentation.Web.Infrastructure.Middleware
                 switch (resultLimiter)
                 {
                     case PageSizer.Top:
-                        if (int.TryParse(query.Get("top"), out var topPageSize))
+                        if (int.TryParse(query.Get("$top"), out var topPageSize))
                         {
-                            LogIfExcessivePageSize(topPageSize, logger);
+                            LogIfExcessivePageSize(topPageSize, PageSizer.Top, logger);
                             break;
                         }
                         else
                         {
                             context.Response.StatusCode = 400;
-                            context.Response.Write($"Værdien af \"top\" parameteren skal være et nummer mellem 0 og {MaxPageSize}");
+                            context.Response.Write($"The value of the \"$top\" parameter must be a number between 0 and {MaxPageSize}");
                             return;
                         }
                     case PageSizer.Take:
                         if (int.TryParse(query.Get("take"), out var takePageSize))
                         {
-                            LogIfExcessivePageSize(takePageSize, logger);
+                            LogIfExcessivePageSize(takePageSize, PageSizer.Take, logger);
                             break;
                         }
                         else
                         {
                             context.Response.StatusCode = 400;
-                            context.Response.Write($"Værdien af \"take\" parameteren skal være et nummer mellem 0 og {MaxPageSize}");
+                            context.Response.Write($"The value of the \"take\" parameter must be a number between 0 and {MaxPageSize}");
                             return;
                         }
                     case PageSizer.None:
@@ -59,11 +59,11 @@ namespace Presentation.Web.Infrastructure.Middleware
 
         }
 
-        private static void LogIfExcessivePageSize(int pageSize, ILogger logger)
+        private static void LogIfExcessivePageSize(int pageSize, PageSizer pageSizeType, ILogger logger)
         {
             if (pageSize >= MaxPageSize)
             {
-                logger.Warning($"Requestet spørger med en pagesize på: {pageSize}, hvilket er større end vores max på: {MaxPageSize}");
+                logger.Warning($"Request asks with a paging type of: {pageSizeType.ToString()}, pagesize of: {pageSize}, which is larger than the max of: {MaxPageSize}");
             }
         }
 
@@ -74,7 +74,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                 return PageSizer.Take;
             }
 
-            if (collection.Get("top") != null)
+            if (collection.Get("$top") != null)
             {
                 return PageSizer.Top;
             }

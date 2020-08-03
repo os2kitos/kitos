@@ -438,6 +438,5 @@ namespace Presentation.Web.Controllers.API
                 throw new InvalidOperationException(result.Error.ToString("G"));
             }
         }
-
     }
 }
