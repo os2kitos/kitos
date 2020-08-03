@@ -16,7 +16,7 @@ namespace Presentation.Web.Infrastructure.Attributes
             {
                 if (!actionContext.Request.RequestUri.AbsoluteUri.Contains("$top="))
                 {
-                    logger.Warning("Request asks for data via ODATA without \"top\" argument to limit entries");
+                    logger.Warning("Request spørger om data gennem ODATA uden \"top\" argumentet til at begrænse udtrækket (paging fejl)");
                 }
                 base.OnActionExecuting(actionContext);
             }

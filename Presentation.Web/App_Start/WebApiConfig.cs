@@ -62,7 +62,7 @@ namespace Presentation.Web
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Filters.Add(new RequireValidatedCSRFAttributed());
-            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null).SkipToken();
+            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
         }
 
         public static IEdmModel GetModel()

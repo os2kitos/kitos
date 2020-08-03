@@ -63,7 +63,7 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
             if (pageSize >= MaxPageSize)
             {
-                logger.Warning($"Request asks for too large a pagesize, size is {MaxPageSize}");
+                logger.Warning($"Requestet spørger med en pagesize på: {pageSize}, hvilket er større end vores max på: {MaxPageSize}");
             }
         }
 
