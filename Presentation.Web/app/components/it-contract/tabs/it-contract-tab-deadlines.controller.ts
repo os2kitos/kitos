@@ -20,11 +20,8 @@
                         return result.data.response;
                     });
                 }],
-                handoverTrialTypes: ["$http", function ($http) {
-                    return $http.get("odata/LocalHandoverTrialTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
+                handoverTrialTypes: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.HandoverTrialTypes).getAll()],
                 handoverTrials: ["$http", "$stateParams", function ($http, $stateParams) {
                     return $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
                         return result.data.response;
