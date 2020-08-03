@@ -55,7 +55,8 @@
         PurchaseFormTypes,
         RegisterTypes,
         ReportCategoryTypes,
-        SensistivePersonalDataTypes
+        SensistivePersonalDataTypes,
+        SensitiveDataTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -126,6 +127,8 @@
                     return "LocalReportCategoryTypes";
                 case LocalOptionType.SensistivePersonalDataTypes:
                     return "LocalSensistivePersonalDataTypes";
+                case LocalOptionType.SensitiveDataTypes:
+                    return "LocalSensitiveDataTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
