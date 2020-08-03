@@ -38,7 +38,8 @@
         ArchiveTypes,
         BusinessTypes,
         DataTypes,
-        FrequencyTypes
+        FrequencyTypes,
+        GoalTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -75,6 +76,8 @@
                     return "LocalDataTypes";
                 case LocalOptionType.FrequencyTypes:
                     return "LocalFrequencyTypes";
+                case LocalOptionType.GoalTypes:
+                    return "LocalGoalTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
