@@ -15,11 +15,8 @@
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTemplateTypes).getAll()
                     ],
                     purchaseForms: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PurchaseFormTypes).getAll()
                     ],
                     procurementStrategies: [
                         "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
