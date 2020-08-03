@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202007291241505_Add-Length-Constraint-And-Index-On-Name"; }
+            get { return "202008030914491_AddLengthConstraintAndIndexOnName"; }
         }
         
         string IMigrationMetadata.Source

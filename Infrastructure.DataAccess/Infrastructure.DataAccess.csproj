@@ -595,9 +595,9 @@
     <Compile Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.Designer.cs">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202007291241505_Add-Length-Constraint-And-Index-On-Name.cs" />
-    <Compile Include="Migrations\202007291241505_Add-Length-Constraint-And-Index-On-Name.designer.cs">
-      <DependentUpon>202007291241505_Add-Length-Constraint-And-Index-On-Name.cs</DependentUpon>
+    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.cs" />
+    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.designer.cs">
+      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -974,8 +974,8 @@
     <EmbeddedResource Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.resx">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202007291241505_Add-Length-Constraint-And-Index-On-Name.resx">
-      <DependentUpon>202007291241505_Add-Length-Constraint-And-Index-On-Name.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.resx">
+      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
