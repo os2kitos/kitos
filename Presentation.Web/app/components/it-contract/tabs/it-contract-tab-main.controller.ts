@@ -7,11 +7,8 @@
                 controller: 'contract.EditMainCtrl',
                 resolve: {
                     contractTypes: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalItContractTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        'localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTypes).getAll()
                     ],
                     contractTemplates: [
                         'localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
