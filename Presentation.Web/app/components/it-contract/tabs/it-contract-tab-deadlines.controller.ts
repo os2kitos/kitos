@@ -1,5 +1,5 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-contract.edit.deadlines", {
             url: "/deadlines",
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-deadlines.view.html",
@@ -8,23 +8,18 @@
                 optionExtensions: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OptionExtendTypes).getAll()
                 ],
-                terminationDeadlines: ["$http", function ($http) {
-                    return $http.get("odata/LocalTerminationDeadlineTypes").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                paymentMilestones: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(function (result) {
+                terminationDeadlines: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.TerminationDeadlineTypes).getAll()
+                ],
+                paymentMilestones: ["$http", "$stateParams", ($http, $stateParams) =>
+                    $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(function (result) {
                         return result.data.response;
-                    });
-                }],
+                    })],
                 handoverTrialTypes: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.HandoverTrialTypes).getAll()],
-                handoverTrials: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
-                        return result.data.response;
-                    });
-                }]
+                handoverTrials: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
+                    return result.data.response;
+                })]
             }
         });
     }]);

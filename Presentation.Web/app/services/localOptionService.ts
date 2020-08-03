@@ -56,7 +56,8 @@
         RegisterTypes,
         ReportCategoryTypes,
         SensistivePersonalDataTypes,
-        SensitiveDataTypes
+        SensitiveDataTypes,
+        TerminationDeadlineTypes
     }
 
     export interface ILocalOptionServiceFactory {
@@ -129,6 +130,8 @@
                     return "LocalSensistivePersonalDataTypes";
                 case LocalOptionType.SensitiveDataTypes:
                     return "LocalSensitiveDataTypes";
+                case LocalOptionType.TerminationDeadlineTypes:
+                    return "LocalTerminationDeadlineTypes";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
