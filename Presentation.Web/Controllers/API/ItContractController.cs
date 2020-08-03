@@ -11,6 +11,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Presentation.Web.Extensions;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -40,13 +41,19 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            paging.Where(x => x.OrganizationId == orgId && x.Name.Contains(q));
-            return base.GetAll(paging);
+            var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
+            
+            var contractDTO = Page(contractQuery, paging)
+                .AsEnumerable()
+                .MapToNamedEntityDTOs()
+                .ToList();
+
+            return Ok(contractDTO);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]

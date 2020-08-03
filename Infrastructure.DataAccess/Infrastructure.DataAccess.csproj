@@ -595,9 +595,13 @@
     <Compile Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.Designer.cs">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202007301241392_Remove-DefaultOrganization.cs" />
-    <Compile Include="Migrations\202007301241392_Remove-DefaultOrganization.designer.cs">
-      <DependentUpon>202007301241392_Remove-DefaultOrganization.cs</DependentUpon>
+    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.cs" />
+    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.designer.cs">
+      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202008031345025_RemoveDefaultOrganization.cs" />
+    <Compile Include="Migrations\202008031345025_RemoveDefaultOrganization.designer.cs">
+      <DependentUpon>202008031345025_RemoveDefaultOrganization.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -614,6 +618,20 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
+      <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201607110712126_Initial.resx">
@@ -960,8 +978,11 @@
     <EmbeddedResource Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.resx">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202007301241392_Remove-DefaultOrganization.resx">
-      <DependentUpon>202007301241392_Remove-DefaultOrganization.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.resx">
+      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202008031345025_RemoveDefaultOrganization.resx">
+      <DependentUpon>202008031345025_RemoveDefaultOrganization.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
@@ -969,20 +990,6 @@
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_Orphaned_AttachedOptions.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
-      <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

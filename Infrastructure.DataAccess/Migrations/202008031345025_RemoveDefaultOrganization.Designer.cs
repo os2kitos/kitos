@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202007301241392_Remove-DefaultOrganization"; }
+            get { return "202008031345025_RemoveDefaultOrganization"; }
         }
         
         string IMigrationMetadata.Source

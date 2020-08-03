@@ -123,15 +123,13 @@
                         var results = [];
 
                         // for each system usages
-                        _.each(data.data.response, (usage: { id; itSystem; }) => {
-                            if (!usage.itSystem.disabled) {
+                        _.each(data.data.response, (usage: { id; itSystemName; itSystemDisabled; }) => {
+                            if (!usage.itSystemDisabled) {
                                 results.push({
                                     // the id of the system usage id, that is selected
                                     id: usage.id,
                                     // name of the system is the label for the select2
-                                    text: $filter('limitToDots')(usage.itSystem.name, 30),
-                                    // the if the system id that is selected
-                                    itSystemId: usage.itSystem.id
+                                    text: $filter('limitToDots')(usage.itSystemName, 30),
                                 });
                             }
                         });

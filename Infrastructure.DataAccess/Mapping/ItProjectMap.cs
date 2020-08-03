@@ -6,6 +6,13 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ItProjectMap()
         {
+            // Properties
+
+            this.Property(x => x.Name)
+                .HasMaxLength(ItProjectConstraints.MaxNameLength)
+                .IsRequired()
+                .HasIndexAnnotation("Project_Index_Name", 0);
+
             // Table & Column Mappings
             ToTable("ItProject");
 

@@ -73,16 +73,19 @@ namespace Presentation.Web.Controllers.API
         /// <param name="paging"></param>
         /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
             {
                 var systemQuery = _systemService.GetAvailableSystems(organizationId, q);
 
-                var query = Page(systemQuery, paging);
+                var query = Page(systemQuery, paging)
+                    .AsEnumerable()
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                return Ok(Map(query));
+                return Ok(query);
             }
             catch (Exception e)
             {
@@ -90,7 +93,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId, int take = 25)
         {
             try
@@ -99,10 +102,12 @@ namespace Presentation.Web.Controllers.API
                     .GetAvailableSystems(orgId, q)
                     .ExceptEntitiesWithIds(excludeId)
                     .OrderBy(_ => _.Name)
-                    .Take(take);
+                    .Take(take)
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                var dtos = Map(systems);
-                return Ok(dtos);
+                
+                return Ok(systems);
             }
             catch (Exception e)
             {
