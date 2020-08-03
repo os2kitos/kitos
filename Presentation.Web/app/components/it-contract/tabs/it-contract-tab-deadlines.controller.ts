@@ -5,11 +5,9 @@
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-deadlines.view.html",
             controller: "contract.DeadlinesCtrl",
             resolve: {
-                optionExtensions: ["$http", function ($http) {
-                    return $http.get("odata/LocalOptionExtendTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
+                optionExtensions: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OptionExtendTypes).getAll()
+                ],
                 terminationDeadlines: ["$http", function ($http) {
                     return $http.get("odata/LocalTerminationDeadlineTypes").then(function (result) {
                         return result.data.value;
