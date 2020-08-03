@@ -31,6 +31,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             var readAccessLevel = GetOrganizationReadAccessLevel(orgKey);
@@ -48,6 +49,7 @@ namespace Presentation.Web.Controllers.OData
 
         [ODataRoute("ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();

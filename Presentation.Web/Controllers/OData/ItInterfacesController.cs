@@ -25,6 +25,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -38,6 +39,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItInterface>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItInterfaces(int key)
         {
             var result = Repository

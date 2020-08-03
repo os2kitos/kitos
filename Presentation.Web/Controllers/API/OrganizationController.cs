@@ -10,6 +10,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -56,7 +57,7 @@ namespace Presentation.Web.Controllers.API
                         .Where(AllowRead)
                         .OrderBy(_=>_.Name)
                         .Take(take)
-                        .Select(Map)
+                        .MapToNamedEntityDTOs()
                         .ToList();
 
                 return Ok(dtos);

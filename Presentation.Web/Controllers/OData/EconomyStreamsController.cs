@@ -31,6 +31,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ExternEconomyStreams(Organization={orgKey})")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
             var result =

@@ -52,5 +52,11 @@ namespace Core.DomainServices.Repositories.Contract
                 .AsQueryable()
                 .ByOrganizationId(organizationId);
         }
+
+        public void DeleteContract(ItContract contract)
+        {
+            _contractRepository.DeleteWithReferencePreload(contract);
+            _contractRepository.Save();
+        }
     }
 }

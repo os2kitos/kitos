@@ -13,6 +13,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -38,7 +39,7 @@ namespace Presentation.Web.Controllers.API
             _itSystemUsageService = itSystemUsageService;
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageSimpleDTO>>))]
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q, int take = 25)
         {
             try
@@ -62,7 +63,7 @@ namespace Presentation.Web.Controllers.API
                     .OrderBy(_ => _.ItSystem.Name)
                     .Take(take);
 
-                return Ok(Map(usages));
+                return Ok(Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(usages));
             }
             catch (Exception e)
             {
