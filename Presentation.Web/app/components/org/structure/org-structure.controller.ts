@@ -11,8 +11,9 @@
                             return result.data.response;
                         })
                     ],
-                    localOrgUnitRoles: ['$http', $http => $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                        .then(result => result.data.value)],
+                    localOrgUnitRoles: ['localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OrganizationUnitRoles).getAll()
+                    ],
                     orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
                         .then(result => result.data.value)],
                     user: [
