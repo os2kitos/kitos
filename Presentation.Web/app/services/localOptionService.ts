@@ -44,7 +44,8 @@
         InterfaceTypes,
         ItContractTemplateTypes,
         ItContractTypes,
-        ItProjectTypes
+        ItProjectTypes,
+        ItSystemCategories
     }
 
     export interface ILocalOptionServiceFactory {
@@ -93,6 +94,8 @@
                     return "LocalItContractTypes";
                 case LocalOptionType.ItProjectTypes:
                     return "LocalItProjectTypes";
+                case LocalOptionType.ItSystemCategories:
+                    return "LocalItSystemCategories";
             default:
                 throw new Error(`Unknown option type ${type}`);
             }
