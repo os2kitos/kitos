@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
+using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -67,10 +68,9 @@ namespace Presentation.Web.Controllers.API
         [Route("update")]
         public HttpResponseMessage PutKLEChanges(int organizationId)
         {
-            //TODO-MRJ_FRONTEND: Update frontend
             var result = _kleApplicationService.UpdateKLE(organizationId);
-            
-            return result.Ok ? 
+
+            return result.Ok ?
                 Ok(
                     new KLEUpdateDTO
                     {

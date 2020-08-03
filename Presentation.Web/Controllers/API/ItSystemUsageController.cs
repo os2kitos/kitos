@@ -130,14 +130,17 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage Post(ItSystemUsageDTO dto)
+        public HttpResponseMessage Post(CreateItsystemUsageDTO dto)
         {
-            //TODO-MRJ_FRONTEND: Update frontend
             try
             {
-                var systemUsage = Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = new ItSystemUsage
+                {
+                    OrganizationId = dto.OrganizationId,
+                    ItSystemId = dto.ItSystemId
+                };
 
-                if (!AllowCreate<ItSystemUsage>(systemUsage.OrganizationId, systemUsage))
+                if (!AllowCreate<ItSystemUsage>(dto.OrganizationId, systemUsage))
                 {
                     return Forbidden();
                 }

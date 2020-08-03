@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage Post(ItSystemDTO dto)
+        public HttpResponseMessage Post(CreateItSystemDTO dto)
         {
             try
             {

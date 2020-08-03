@@ -69,7 +69,7 @@
             private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
-            private user,
+            private user : Services.IUser,
             private userAccessRights,
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
