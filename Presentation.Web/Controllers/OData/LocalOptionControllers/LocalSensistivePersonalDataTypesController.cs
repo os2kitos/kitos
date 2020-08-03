@@ -1,6 +1,5 @@
 ﻿using System.Web.Http;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
