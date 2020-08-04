@@ -124,7 +124,7 @@
                 };
 
                 var msg = notify.addInfoMessage("Gemmer række", false);
-                $http.post("api/risk", data)
+                $http.post(`api/risk?organizationId=${user.currentOrganizationId}`, data)
                     .success(function (result) {
 
                         var responseRisk = result.response;

@@ -40,7 +40,6 @@ namespace Presentation.Web.Controllers.OData
         [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
-            //TODO-MRJ_FRONTEND: If front end calls this it might be incorrect and it should call the organization scoped in stead
             return base.Get();
         }
 
