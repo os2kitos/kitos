@@ -39,15 +39,11 @@
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
+        public static $inject: string[] = ["$", "$state", "$scope"];
 
         constructor(
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
-            private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private notify,
             private $scope) {
 
             this.$scope.$state = $state;

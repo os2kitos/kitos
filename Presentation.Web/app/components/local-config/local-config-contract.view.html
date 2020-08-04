@@ -22,16 +22,16 @@
     </div>
 
     <!--TODO-MRJ_FRONTEND update to use ser services and the data prop takes an option type in stead0-->
-    <div data-local-option-role-list="" title="Roller" dir-id="localItContractRoleId" state="local-config.contract.edit-contract-roles" data-options-url="odata/LocalItContractRoles"></div>
-    <div data-local-option-list="" title="Kontrakttyper" dir-id="localItContractTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalItContractTypes"></div>
-    <div data-local-option-list="" title="Kontraktskabeloner" dir-id="localItContractTemplateTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalItContractTemplateTypes"></div>
-    <div data-local-option-list="" title="Indkøbsformer" dir-id="localPurchaseFormTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPurchaseFormTypes"></div>
-    <div data-local-option-list="" title="Betalingsmodeller" dir-id="localPaymentModelTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPaymentModelTypes"></div>
-    <div data-local-option-list="" title="Aftaleelementer" dir-id="localAgreementElementTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalAgreementElementTypes"></div>
-    <div data-local-option-list="" title="Option forlæng" dir-id="localOptionExtendTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalOptionExtendTypes"></div>
-    <div data-local-option-list="" title="Betalingsfrekvenser" dir-id="localPaymentFrequencyTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPaymentFrequencyTypes"></div>
-    <div data-local-option-list="" title="Pris reguleringer" dir-id="localPriceRegulationTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPriceRegulationTypes"></div>
-    <div data-local-option-list="" title="Indkøbsstrategier" dir-id="localProcurementStrategyTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalProcurementStrategyTypes"></div>
-    <div data-local-option-list="" title="Opsigelsesfrister" dir-id="localTerminationDeadlineTypId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalTerminationDeadlineTypes"></div>
-    <div data-local-option-list="" title="Overtagelsesprøver" dir-id="localHandoverTrialTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalHandoverTrialTypes"></div>
+    <div data-local-option-role-list="" title="Roller" dir-id="localItContractRoleId" state="local-config.contract.edit-contract-roles" option-type="{{localOptionType.ItContractRoles}}" data-options-url="odata/LocalItContractRoles"></div>
+    <div data-local-option-list="" title="Kontrakttyper" dir-id="localItContractTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.ItContractTypes}}" data-options-url="odata/LocalItContractTypes"></div>
+    <div data-local-option-list="" title="Kontraktskabeloner" dir-id="localItContractTemplateTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.ItContractTemplateTypes}}" data-options-url="odata/LocalItContractTemplateTypes"></div>
+    <div data-local-option-list="" title="Indkøbsformer" dir-id="localPurchaseFormTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.PurchaseFormTypes}}" data-options-url="odata/LocalPurchaseFormTypes"></div>
+    <div data-local-option-list="" title="Betalingsmodeller" dir-id="localPaymentModelTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.PaymentModelTypes}}" data-options-url="odata/LocalPaymentModelTypes"></div>
+    <div data-local-option-list="" title="Aftaleelementer" dir-id="localAgreementElementTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.AgreementElementTypes}}" data-options-url="odata/LocalAgreementElementTypes"></div>
+    <div data-local-option-list="" title="Option forlæng" dir-id="localOptionExtendTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.OptionExtendTypes}}" data-options-url="odata/LocalOptionExtendTypes"></div>
+    <div data-local-option-list="" title="Betalingsfrekvenser" dir-id="localPaymentFrequencyTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.PaymentFrequencyTypes}}" data-options-url="odata/LocalPaymentFrequencyTypes"></div>
+    <div data-local-option-list="" title="Pris reguleringer" dir-id="localPriceRegulationTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.PriceRegulationTypes}}" data-options-url="odata/LocalPriceRegulationTypes"></div>
+    <div data-local-option-list="" title="Indkøbsstrategier" dir-id="localProcurementStrategyTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.ProcurementStrategyTypes}}" data-options-url="odata/LocalProcurementStrategyTypes"></div>
+    <div data-local-option-list="" title="Opsigelsesfrister" dir-id="localTerminationDeadlineTypId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.TerminationDeadlineTypes}}" data-options-url="odata/LocalTerminationDeadlineTypes"></div>
+    <div data-local-option-list="" title="Overtagelsesprøver" dir-id="localHandoverTrialTypeId" state="local-config.contract.edit-contract-types" option-type="{{localOptionType.HandoverTrialTypes}}" data-options-url="odata/LocalHandoverTrialTypes"></div>
 </form>

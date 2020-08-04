@@ -38,10 +38,9 @@
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
-        public static $inject: string[] = ["_", "$", "$state", "$scope"];
+        public static $inject: string[] = ["$", "$state", "$scope"];
 
         constructor(
-            private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
             private $scope) {
@@ -57,7 +56,7 @@
                     transport: {
                         read: {
                             //TODO: Fix this JMO
-                            url: this.optionsUrl,
+                            url: this.optionsUrl + `?organizationId=1`,
                             dataType: "json"
                         }
                     },
@@ -152,7 +151,7 @@
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             this.optionId = selectedItem.get("id");
-            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionType: this.optionType });
         }
     }
     angular.module("app")

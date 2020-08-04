@@ -4,9 +4,9 @@
     export class CurrentOrganizationController {
         public orgAutosaveUrl: string;
         public typeName: string;
-        public static $inject: string[] = ['$scope', '$http', 'notify', 'organization'];
+        public static $inject: string[] = ['$scope', 'organization'];
 
-        constructor(private $scope, private $http, private notify, public organization) {
+        constructor(private $scope, public organization) {
             switch (organization.typeId) {
                 case 1: this.typeName = 'Kommune'; break;
                 case 2: this.typeName = 'Interessefællesskab'; break;
@@ -15,6 +15,7 @@
             }
 
             this.orgAutosaveUrl = 'api/organization/' + organization.id;
+            this.$scope.localOptionType = Kitos.Services.LocalOptions.LocalOptionType;
         }
     }
 
