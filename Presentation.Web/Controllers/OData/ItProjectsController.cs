@@ -31,6 +31,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -45,6 +46,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProject>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItProjects(int key)
         {
             var all = Repository.AsQueryable();
@@ -73,6 +75,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItProject>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             if (GetOrganizationReadAccessLevel(orgKey) < OrganizationDataReadAccessLevel.All)

@@ -73,13 +73,13 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, function (usage: { id; itSystem; }) {
-                            if (!usage.itSystem.disabled) {
+                        _.each(data.data.response, function (usage: { id; itSystemName; itSystemDisabled;}) {
+                            if (!usage.itSystemDisabled) {
                                 results.push({
                                     //the id of the system usage is the id, that is selected
                                     id: usage.id,
                                     //but the name of the system is the label for the select2
-                                    text: usage.itSystem.name,
+                                    text: usage.itSystemName,
                                     //saving the usage for later use
                                     usage: usage
                                 });

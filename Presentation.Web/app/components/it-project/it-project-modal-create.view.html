@@ -8,7 +8,7 @@
     <div class="modal-body">
         <div class="form-group has-feedback" data-show-errors>
             <label class="control-label" for="name">Navn</label>
-            <input type="text" class="form-control" name="name" id="name" placeholder="navn" required data-ng-model="formData.name" data-unique="{{checkAvailbleUrl}}">
+            <input type="text" class="form-control" name="name" id="name" placeholder="navn" required data-ng-model="formData.name" data-unique="{{checkAvailbleUrl}}" maxlength="150">
             <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.name.$invalid && createForm.name.$dirty, 'glyphicon-ok': createForm.name.$valid }"></span>
             <span class="help-block" data-ng-show="createForm.name.$error.required">Navn er påkrævet!</span>
             <span class="help-block" data-ng-show="createForm.name.$error.available">Navnet er brugt!</span>

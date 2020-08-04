@@ -37,6 +37,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             //TODO-MRJ_FRONTEND: If front end calls this it might be incorrect and it should call the organization scoped in stead
@@ -52,6 +53,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItContracts(int key)
         {
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(key);
@@ -70,6 +72,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgKey);

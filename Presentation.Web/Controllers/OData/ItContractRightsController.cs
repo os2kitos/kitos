@@ -34,6 +34,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Users({userId})/ItContractRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
             var result = Repository
