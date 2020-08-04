@@ -7,23 +7,25 @@
             resolve: {
                 archiveTypes: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTypes).getAll()
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTypes).getAll()
                 ],
                 archiveLocations: [
                     "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveLocations).getAll()
                 ],
                 archiveTestLocations: [
-                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTestLocations).getAll()
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ArchiveTestLocations).getAll()
                 ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
                 ],
-                archivePeriod: ["$http", "$stateParams", ($http, $stateParams) =>
-                    $http.get(`odata/ArchivePeriods?$filter=ItSystemUsageId eq ${$stateParams.id}&$orderby=StartDate`)
+                user: ["userService", (userService: Kitos.Services.IUserService) => userService.getUser()
+                ],
+                archivePeriod: ["$http", "$stateParams", "user", ($http, $stateParams, user: Kitos.Services.IUser) =>
+                    $http.get(`odata/Organizations(${user.currentOrganizationId})/ItSystemUsages(${$stateParams.id})/ArchivePeriods?$orderby=StartDate`)
                         .then(result => result.data.value)]
             }
         });
@@ -164,7 +166,7 @@
                 notify.addSuccessMessage("Slettet!");
             };
 
-            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25','orgId=' + user.currentOrganizationId], (item,
+            $scope.suppliersSelectOptions = select2LoadingService.loadSelect2WithDataHandler("api/organization", true, ['take=25', 'orgId=' + user.currentOrganizationId], (item,
                 items) => {
                 items.push({
                     id: item.id,

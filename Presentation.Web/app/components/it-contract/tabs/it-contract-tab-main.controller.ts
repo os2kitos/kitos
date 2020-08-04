@@ -31,7 +31,7 @@
                     ],
                     kitosUsers: [
                         '$http', 'user', '_', function ($http, user, _) {
-                            return $http.get(`odata/organizationRights?$filter=OrganizationId eq ${user.currentOrganizationId}&$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
+                            return $http.get(`odata/Organizations(${user.currentOrganizationId})/Rights?$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
                                 let uniqueUsers = _.uniqBy(result.data.value, "User.Id");
 
                                 let results = [];
