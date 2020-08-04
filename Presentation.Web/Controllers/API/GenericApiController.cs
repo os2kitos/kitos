@@ -107,7 +107,6 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
         {
-            //TODO-MRJ_FRONTEND: Update the call from the frontend
             if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();

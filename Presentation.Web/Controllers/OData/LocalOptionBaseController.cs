@@ -95,8 +95,6 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            // TODO-MRJ_FRONTEND: Update frontend (perhaps patch using an interceptor)?
-
             entity.OrganizationId = organizationId;
 
             if (!AllowCreate<TLocalModelType>(organizationId, entity))
