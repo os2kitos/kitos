@@ -146,7 +146,7 @@
                     payload["ItSystemUsageId"] = $stateParams.id;
                     payload["Approved"] = $scope.archivePeriod.approved;
 
-                    $http.post(`odata/ArchivePeriods`, payload).finally(reload);
+                    $http.post(`odata/ArchivePeriods?organizationId=${user.currentOrganizationId}`, payload).finally(reload);
                 }
             };
 
