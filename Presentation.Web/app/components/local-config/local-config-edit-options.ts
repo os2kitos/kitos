@@ -7,49 +7,49 @@
         public optionName: string;
         public description: string;
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "_"];
+        private optionId: number;
+        private localOptionService: Kitos.Services.LocalOptions.ILocalOptionService;
+
+        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "localOptionServiceFactory"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $stateParams: ng.ui.IStateParamsService,
             private $http: ng.IHttpService,
             private notify,
-            private reportService: Services.ReportService,
-            private _: ILoDashWithMixins,
-            private optionsUrl: string,
-            private optionId: number,
-            private optionType: string) {
-
-            this.optionsUrl = this.$stateParams["optionsUrl"];
+            localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory,
+        ) {
+            this.localOptionService = localOptionServiceFactory.create(this.$stateParams["optionType"]);
             this.optionId = this.$stateParams["id"];
-            this.optionType = this.$stateParams["optionType"];
-            this.initModal(this.optionId, this.optionsUrl);
+            this.initModal(this.optionId);
         }
 
-        private initModal = (optionId: number, optionsUrl: string) => {
+        private initModal = (optionId: number) => {
 
             this.pageTitle = "Redigér";
 
-            const option = this.$http.get<Models.IOptionEntity>(`${optionsUrl}(${optionId})`);
+            const option = this.localOptionService.get(optionId);
 
             option.then((result) => {
-                const opt = result.data;
-
-                this.optionName = opt.Name;
-                this.description = opt.Description;
+                this.optionName = result.Name;
+                this.description = result.Description;
             });
         };
 
         public ok() {
-            const payload = {
+            const payload: Models.IEditedLocalOptionEntity = {
                 Description: this.description
             };
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload)
-                .then((response) => {
-                    this.$uibModalInstance.close();
-                    this.notify.addSuccessMessage("Værdien blev redigeret.");
-                }).catch((response) => {
-                    this.notify.addErrorMessage("Værdien blev ikke redigeret.");
-                });
+
+            this.localOptionService.update(this.optionId, payload)
+                .then((isSuccess) => {
+                    if (isSuccess) {
+                        this.$uibModalInstance.close();
+                        this.notify.addSuccessMessage("Værdien blev redigeret.");
+                    } else {
+                        this.notify.addErrorMessage("Værdien blev ikke redigeret.");
+                    }
+                }
+            );
         };
 
         public cancel() {
@@ -57,8 +57,20 @@
         };
 
         public resetDescription() {
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, { Description: null });
-            this.$uibModalInstance.close();
+            const payload: Models.IEditedLocalOptionEntity = {
+                Description: null
+            };
+
+            this.localOptionService.update(this.optionId, payload)
+                .then((isSuccess) => {
+                        if (isSuccess) {
+                            this.$uibModalInstance.close();
+                            this.notify.addSuccessMessage("Værdien blev redigeret.");
+                        } else {
+                            this.notify.addErrorMessage("Værdien blev ikke redigeret.");
+                        }
+                    }
+                );
         };
     }
 
@@ -90,7 +102,7 @@
                 }
             ]
         }).state("local-config.project.edit-project-roles", {
-            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-roles",
+            url: "/{id:int}/{optionType:int}/edit-project-roles",
             onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,

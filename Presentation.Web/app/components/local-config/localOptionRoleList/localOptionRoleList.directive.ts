@@ -1,4 +1,5 @@
 ﻿module Kitos.LocalAdmin.Directives {
+    import LocalOptionType = Services.LocalOptions.LocalOptionType;
     "use strict";
 
     function setupDirective(): ng.IDirective {
@@ -22,8 +23,8 @@
         title: string;
         editState: string;
         optionsUrl: string;
-        optionId: string;
-        optionType: string;
+        optionId: number;
+        optionType: LocalOptionType;
         dirId: string;
     }
 
@@ -31,9 +32,9 @@
         public optionsUrl: string;
         public title: string;
         public editState: string;
-        public optionId: string;
+        public optionId: number;
         public dirId: string;
-        public optionType: string;
+        public optionType: LocalOptionType;
 
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
@@ -59,7 +60,8 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: this.optionsUrl,
+                            //TODO: Fix this JMO
+                            url: this.optionsUrl + `?organizationId=1`,
                             dataType: "json"
                         }
                     },
@@ -163,7 +165,7 @@
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             this.optionId = selectedItem.get("id");
-            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionType: this.optionType });
         }
     }
     angular.module("app")

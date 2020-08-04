@@ -3,10 +3,13 @@
     import Services = Kitos.Services;
 
     export interface ILocalOptionService {
-        getAll(): ng.IPromise<Models.IOptionEntity[]>
+        getAll(): ng.IPromise<Models.IOptionEntity[]>,
+        get(id: number): ng.IPromise<Models.IOptionEntity>,
+        update(id: number, entity: Models.IEditedLocalOptionEntity): ng.IPromise<boolean>,
     }
 
     class LocalOptionService implements ILocalOptionService {
+
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly userService: IUserService,
@@ -25,6 +28,30 @@
                     `${this.getBasePath()
                     }?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=${user.currentOrganizationId}`))
                 .then(result => result.data.value as Models.IOptionEntity[]);
+        }
+
+
+        get(id: number): angular.IPromise<Models.IOptionEntity> {
+            return this
+                .userService
+                .getUser()
+                .then(user => this.$http.get(`${this.getBasePath()}(${id})?organizationId=${user.currentOrganizationId}`))
+                .then(result => result.data as Models.IOptionEntity);
+        }
+
+        update(id: number, entity: Models.IEditedLocalOptionEntity): angular.IPromise<boolean> {
+            return this
+                .userService
+                .getUser()
+                .then(user => this.$http.patch(
+                    `${this.getBasePath()}(${id})?organizationId=${user.currentOrganizationId}`, entity))
+                .then(result => {
+                    if (result.status === 200) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
         }
     }
 
