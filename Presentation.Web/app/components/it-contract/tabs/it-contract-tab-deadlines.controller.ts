@@ -161,7 +161,7 @@
                 }
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.post("api/paymentMilestone", paymentMilestone)
+                $http.post(`api/paymentMilestone?organizationId=${user.currentOrganizationId}`, paymentMilestone)
                     .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
@@ -209,7 +209,7 @@
                 }
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.post("api/handoverTrial", handoverTrial)
+                $http.post(`api/handoverTrial?organizationId=${user.currentOrganizationId}`, handoverTrial)
                     .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
