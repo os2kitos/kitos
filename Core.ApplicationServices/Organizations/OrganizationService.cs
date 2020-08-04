@@ -145,7 +145,7 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.BadInput;
             }
 
-            if (!_userContext.OrganizationIds.Any(id => _authorizationContext.AllowCreate<Organization>(id, newOrg)))
+            if (!_userContext.OrganizationIds.Any(id => _authorizationContext.AllowCreate<Organization>(id)))
             {
                 return OperationFailure.Forbidden;
             }

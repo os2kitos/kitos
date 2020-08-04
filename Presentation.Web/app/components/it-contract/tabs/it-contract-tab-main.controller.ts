@@ -56,7 +56,7 @@
     app.controller('contract.EditMainCtrl',
         [
             '$scope', '$http', '_', '$stateParams', '$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user : Kitos.Services.IUser, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -258,7 +258,7 @@
                         resolve: {
                             contracts: [
                                 '$http', function ($http) {
-                                    return $http.get('odata/ItContracts?$filter=Active eq true').then(function (result) {
+                                    return $http.get(`odata/Organizations(${user.currentOrganizationId})/ItContracts?$filter=Active eq true`).then(function (result) {
                                         return result.data.value;
                                     });
                                 }],

@@ -121,7 +121,7 @@
                         var orgId = self.user.currentOrganizationId;
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
-                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                        self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
                             .success((result: any) => {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
                                 var contract = result.response;
@@ -138,7 +138,7 @@
                         var orgId = self.user.currentOrganizationId;
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
-                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                        self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
                             .success((result: any) => {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
                                 var contract = result.response;

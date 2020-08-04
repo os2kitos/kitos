@@ -32,6 +32,11 @@ namespace Presentation.Web.Controllers.API
             _taskUsageRepository = taskUsageRepository;
         }
 
+        public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, OrgUnitDTO dto) => throw new NotSupportedException();
+
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit
         /// </summary>
@@ -131,10 +136,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
-        {
-            return NotAllowed();
-        }
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
 
         /// <summary>
         /// Returns every task that a given OrgUnit can use. This depends on the task usages of the parent OrgUnit.

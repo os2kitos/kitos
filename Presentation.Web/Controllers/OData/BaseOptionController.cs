@@ -78,7 +78,6 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Post(int organizationId, TType entity)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             if (_repository.AsQueryable().Any())
             {
                 entity.Priority = _repository.AsQueryable().Max(x => x.Priority) + 1;

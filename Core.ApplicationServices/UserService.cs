@@ -69,7 +69,7 @@ namespace Core.ApplicationServices
                 ? _cryptoService.Encrypt(_defaultUserPassword + user.Salt)
                 : _cryptoService.Encrypt(utcNow + user.Salt);
 
-            if (!_authorizationContext.AllowCreate<User>(orgId, user))
+            if (!_authorizationContext.AllowCreate<User>(orgId))
             {
                 throw new SecurityException();
             }
