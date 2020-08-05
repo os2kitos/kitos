@@ -439,8 +439,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var accessType1 = CreateName();
             var accessType2 = CreateName();
-            var type1 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.Id, accessType1);
-            var type2 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.Id, accessType2);
+            var type1 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.OrganizationId, _oldSystemInUse.Id, accessType1);
+            var type2 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.OrganizationId, _oldSystemInUse.Id, accessType2);
 
             await ItSystemHelper.EnableAccessTypeAsync(_oldSystemUsage.Id, type1.Id);
             await ItSystemHelper.EnableAccessTypeAsync(_oldSystemUsage.Id, type2.Id);
