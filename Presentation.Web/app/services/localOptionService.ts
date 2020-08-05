@@ -3,10 +3,13 @@
     import Services = Kitos.Services;
 
     export interface ILocalOptionService {
-        getAll(): ng.IPromise<Models.IOptionEntity[]>
+        getAll(): ng.IPromise<Models.IOptionEntity[]>,
+        get(id: number): ng.IPromise<Models.IOptionEntity>,
+        update(id: number, entity: Models.IEditedLocalOptionEntity): ng.IPromise<boolean>,
     }
 
     class LocalOptionService implements ILocalOptionService {
+
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly userService: IUserService,
@@ -25,6 +28,30 @@
                     `${this.getBasePath()
                     }?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId=${user.currentOrganizationId}`))
                 .then(result => result.data.value as Models.IOptionEntity[]);
+        }
+
+
+        get(id: number): angular.IPromise<Models.IOptionEntity> {
+            return this
+                .userService
+                .getUser()
+                .then(user => this.$http.get(`${this.getBasePath()}(${id})?organizationId=${user.currentOrganizationId}`))
+                .then(result => result.data as Models.IOptionEntity);
+        }
+
+        update(id: number, entity: Models.IEditedLocalOptionEntity): angular.IPromise<boolean> {
+            return this
+                .userService
+                .getUser()
+                .then(user => this.$http.patch(
+                    `${this.getBasePath()}(${id})?organizationId=${user.currentOrganizationId}`, entity))
+                .then(result => {
+                    if (result.status === 200) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
         }
     }
 
@@ -60,19 +87,33 @@
         TerminationDeadlineTypes
     }
 
-    export interface ILocalOptionServiceFactory {
-        create(type: LocalOptionType): ILocalOptionService;
+    export interface ILocalOptionUrlResolver {
+        resolveKendoGridGetUrl(type: LocalOptionType, orgId: number): string;
+        resolveAutosaveUrl(type: LocalOptionType): string;
     }
 
-    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
-        static $inject = ["$http","userService"];
+    export class LocalOptionUrlResolver implements ILocalOptionUrlResolver {
+        static $inject = ["localOptionTypeMapper"];
         constructor(
-            private readonly $http: ng.IHttpService,
-            private readonly userService: IUserService) {
-
+            private readonly localOptionTypeMapper: ILocalOptionTypeMapper) {
         }
 
-        private getPrefix(type: LocalOptionType) : string {
+        resolveKendoGridGetUrl(type: LocalOptionType, orgId: number): string {
+            return `/odata/${this.localOptionTypeMapper.getOdataController(type)}?organizationId=${orgId}`;
+        }
+
+        resolveAutosaveUrl(type: LocalOptionType): string {
+            return `/odata/${this.localOptionTypeMapper.getOdataController(type)}`;
+        }
+    }
+    app.service("localOptionUrlResolver", LocalOptionUrlResolver);
+
+    export interface ILocalOptionTypeMapper {
+        getOdataController(type: LocalOptionType): string;
+    }
+
+    export class LocalOptionTypeMapper implements ILocalOptionTypeMapper {
+        getOdataController(type: LocalOptionType) {
             switch (type) {
                 case LocalOptionType.ItSystemRoles:
                     return "LocalItSystemRoles";
@@ -132,13 +173,27 @@
                     return "LocalSensitiveDataTypes";
                 case LocalOptionType.TerminationDeadlineTypes:
                     return "LocalTerminationDeadlineTypes";
-            default:
-                throw new Error(`Unknown option type ${type}`);
+                default:
+                    throw new Error(`Unknown option type ${type}`);
             }
+        }
+    }
+    app.service("localOptionTypeMapper", LocalOptionTypeMapper);
+
+    export interface ILocalOptionServiceFactory {
+        create(type: LocalOptionType): ILocalOptionService;
+    }
+
+    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
+        static $inject = ["$http", "userService", "localOptionTypeMapper"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly userService: IUserService,
+            private readonly localOptionTypeMapper: ILocalOptionTypeMapper) {
         }
 
         create(type: LocalOptionType): ILocalOptionService {
-            return new LocalOptionService(this.$http, this.userService, this.getPrefix(type));
+            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getOdataController(type));
         }
     }
 
