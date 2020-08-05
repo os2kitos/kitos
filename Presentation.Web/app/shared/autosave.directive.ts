@@ -74,36 +74,27 @@
                         var isActive = ctrl.$modelValue;
                         var payload = {};
                         payload[attrs.field] = globalOptionId;
+                        var msg = notify.addInfoMessage("Gemmer...", false);
 
                         if (isActive) {
-                            var msg = notify.addInfoMessage("Gemmer...", false);
-                            if (!attrs.appendurl)
-                                attrs.appendurl = '';
-
-                            $http({ method: 'POST', url: `${attrs.autosave}?organizationId=${user.currentOrganizationId}`, data: payload, ignoreLoadingBar: true })
-                                .success(function () {
+                            $http({ method: "POST", url: `${attrs.autosave}?organizationId=${user.currentOrganizationId}`, data: payload, ignoreLoadingBar: true })
+                                .then((successResponse) => {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
-                                })
-                                .error(function (result, status) {
-                                    if (status === 409) {
+                                }, (errorResponse) => {
+                                        if (errorResponse.status === 409) {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                     } else {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                     }
                                 });
                         } else {
-                            var msg = notify.addInfoMessage("Gemmer...", false);
-                            if (!attrs.appendurl)
-                                attrs.appendurl = '';
-
-                            $http({ method: 'DELETE', url: `${attrs.autosave}(${globalOptionId})?organizationId=${user.currentOrganizationId}`, ignoreLoadingBar: true })
-                                .success(function () {
+                            $http({ method: "DELETE", url: `${attrs.autosave}(${globalOptionId})?organizationId=${user.currentOrganizationId}`, ignoreLoadingBar: true })
+                                .then((successResponse) => {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
-                                })
-                                .error(function (result, status) {
-                                    if (status === 409) {
+                                }, (errorResponse) => {
+                                    if (errorResponse.status === 409) {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                     } else {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
