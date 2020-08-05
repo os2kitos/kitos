@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies
 {
@@ -73,6 +74,8 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (target is IReportModule _)
                 yield return IsReportModuleAdmin;
             if (target is Config _)
+                yield return IsLocalAdmin;
+            if (target.GetType().IsImplementationOfGenericType(typeof(LocalOptionEntity<>)))
                 yield return IsLocalAdmin;
         }
 
