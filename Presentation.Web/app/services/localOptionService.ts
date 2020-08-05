@@ -87,19 +87,33 @@
         TerminationDeadlineTypes
     }
 
-    export interface ILocalOptionServiceFactory {
-        create(type: LocalOptionType): ILocalOptionService;
+    export interface ILocalOptionUrlResolver {
+        resolveKendoGridGetUrl(type: LocalOptionType, orgId: number): string;
+        resolveAutosaveUrl(type: LocalOptionType): string;
     }
 
-    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
-        static $inject = ["$http","userService"];
+    export class LocalOptionUrlResolver implements ILocalOptionUrlResolver {
+        static $inject = ["localOptionTypeMapper"];
         constructor(
-            private readonly $http: ng.IHttpService,
-            private readonly userService: IUserService) {
-
+            private readonly localOptionTypeMapper: ILocalOptionTypeMapper) {
         }
 
-        private getPrefix(type: LocalOptionType) : string {
+        resolveKendoGridGetUrl(type: LocalOptionType, orgId: number): string {
+            return `/odata/${this.localOptionTypeMapper.getAsString(type)}?organizationId=${orgId}`;
+        }
+
+        resolveAutosaveUrl(type: LocalOptionType): string {
+            return `/odata/${this.localOptionTypeMapper.getAsString(type)}`;
+        }
+    }
+    app.service("localOptionUrlResolver", LocalOptionUrlResolver);
+
+    export interface ILocalOptionTypeMapper {
+        getAsString(type: LocalOptionType): string;
+    }
+
+    export class LocalOptionTypeMapper implements ILocalOptionTypeMapper {
+        getAsString(type: LocalOptionType) {
             switch (type) {
                 case LocalOptionType.ItSystemRoles:
                     return "LocalItSystemRoles";
@@ -159,13 +173,27 @@
                     return "LocalSensitiveDataTypes";
                 case LocalOptionType.TerminationDeadlineTypes:
                     return "LocalTerminationDeadlineTypes";
-            default:
-                throw new Error(`Unknown option type ${type}`);
+                default:
+                    throw new Error(`Unknown option type ${type}`);
             }
+        }
+    }
+    app.service("localOptionTypeMapper", LocalOptionTypeMapper);
+
+    export interface ILocalOptionServiceFactory {
+        create(type: LocalOptionType): ILocalOptionService;
+    }
+
+    export class LocalOptionServiceFactory implements ILocalOptionServiceFactory{
+        static $inject = ["$http", "userService", "localOptionTypeMapper"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly userService: IUserService,
+            private readonly localOptionTypeMapper: ILocalOptionTypeMapper) {
         }
 
         create(type: LocalOptionType): ILocalOptionService {
-            return new LocalOptionService(this.$http, this.userService, this.getPrefix(type));
+            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getAsString(type));
         }
     }
 

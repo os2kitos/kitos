@@ -6,7 +6,8 @@
             scope: {
                 editState: "@state",
                 dirId: "@",
-                optionType: "@"
+                optionType: "@",
+                currentOrgId: "@"
             },
             controller: LocalOptionListDirective,
             controllerAs: "ctrl",
@@ -38,12 +39,13 @@
         public mainGrid: IKendoGrid<Models.IOptionEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
-        public static $inject: string[] = ["$", "$state", "$scope"];
+        public static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver"];
 
         constructor(
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private $scope) {
+            private $scope,
+            private localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -55,8 +57,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            //TODO: Fix this JMO
-                            url: this.optionsUrl + `?organizationId=1`,
+                            url: localOptionUrlResolver.resolveKendoGridGetUrl(parseInt(this.optionType.toString()), $scope.currentOrgId),
                             dataType: "json"
                         }
                     },
@@ -97,7 +98,7 @@
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
                         persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> # } #`,
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${localOptionUrlResolver.resolveAutosaveUrl(parseInt(this.optionType.toString()))}" data-field="OptionId"> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false

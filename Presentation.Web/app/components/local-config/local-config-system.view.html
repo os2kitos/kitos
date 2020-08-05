@@ -22,16 +22,16 @@
     </div>
     
     <!--TODO-MRJ_FRONTEND - these directive should take an enum of the type in stead of a base path. Then they can use the service-->
-    <div data-local-option-role-list="" title="Roller" dir-id="localSystemRoleId" state="local-config.system.edit-system-roles" option-type="{{localOptionType.ItSystemRoles}}" data-options-url="odata/LocalItSystemRoles"></div>
-    <div data-local-option-list="" title="Forretningstyper" dir-id="localBusinessTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.BusinessTypes}}" data-options-url="odata/LocalBusinessTypes"></div>
-    <div data-local-option-list="" title="Arkiveringstyper" dir-id="localArchiveTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveTypes}}" data-options-url="odata/LocalArchiveTypes"></div>
-    <div data-local-option-list="" title="Arkiveringssted" dir-id="localArchiveLocationId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveLocations}}" data-options-url="odata/LocalArchiveLocations"></div>
-    <div data-local-option-list="" title="Arkiveringsteststed" dir-id="localArchiveTestLocationId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveTestLocations}}" data-options-url="odata/LocalArchiveTestLocations"></div>
-    <div data-local-option-list="" title="Datatyper" dir-id="localDataTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.DataTypes}}" data-options-url="odata/LocalDataTypes"></div>
-    <div data-local-option-list="" title="Frekvenser" dir-id="localFrequencyTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.FrequencyTypes}}" data-options-url="odata/LocalFrequencyTypes"></div>
-    <div data-local-option-list="" title="Grænseflader" dir-id="localInterfaceTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.InterfaceTypes}}" data-options-url="odata/LocalInterfaceTypes"></div>
-    <div data-local-option-list="" title="Følsomme persondata" dir-id="sensitivePersonalDataTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.SensistivePersonalDataTypes}}" data-options-url="odata/LocalSensistivePersonalDataTypes"></div>
-    <div data-local-option-list="" title="Klassifikation af data i systemet" dir-id="ItSystemCategoriesId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ItSystemCategories}}" data-options-url="odata/LocalItSystemCategories"></div>
-    <div data-local-option-list="" title="Registrerede individer" dir-id="registerTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.RegisterTypes}}" data-options-url="odata/LocalRegisterTypes"></div>
+    <div data-local-option-role-list="" title="Roller" dir-id="localSystemRoleId" state="local-config.system.edit-system-roles" option-type="{{localOptionType.ItSystemRoles}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Forretningstyper" dir-id="localBusinessTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.BusinessTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Arkiveringstyper" dir-id="localArchiveTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Arkiveringssted" dir-id="localArchiveLocationId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveLocations}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Arkiveringsteststed" dir-id="localArchiveTestLocationId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ArchiveTestLocations}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Datatyper" dir-id="localDataTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.DataTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Frekvenser" dir-id="localFrequencyTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.FrequencyTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Grænseflader" dir-id="localInterfaceTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.InterfaceTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Følsomme persondata" dir-id="sensitivePersonalDataTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.SensistivePersonalDataTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Klassifikation af data i systemet" dir-id="ItSystemCategoriesId" state="local-config.system.edit-system-types" option-type="{{localOptionType.ItSystemCategories}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Registrerede individer" dir-id="registerTypeId" state="local-config.system.edit-system-types" option-type="{{localOptionType.RegisterTypes}}" current-org-id="{{currentOrganizationId}}"></div>
 </form>
 

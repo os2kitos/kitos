@@ -80,7 +80,7 @@
                             if (!attrs.appendurl)
                                 attrs.appendurl = '';
 
-                            $http({ method: 'POST', url: attrs.autosave, data: payload, ignoreLoadingBar: true })
+                            $http({ method: 'POST', url: `${attrs.autosave}?organizationId=${user.currentOrganizationId}`, data: payload, ignoreLoadingBar: true })
                                 .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
@@ -97,7 +97,7 @@
                             if (!attrs.appendurl)
                                 attrs.appendurl = '';
 
-                            $http({ method: 'DELETE', url: attrs.autosave + "(" + globalOptionId + ")", ignoreLoadingBar: true })
+                            $http({ method: 'DELETE', url: `${attrs.autosave}(${globalOptionId})?organizationId=${user.currentOrganizationId}`, ignoreLoadingBar: true })
                                 .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
