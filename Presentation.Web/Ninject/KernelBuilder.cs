@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using System.Web.Caching;
 using System.Web.Security;
 using AutoMapper;
 using Core.ApplicationServices;
@@ -10,6 +9,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -29,8 +29,8 @@ using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.References.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
@@ -52,12 +52,14 @@ using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
 using Infrastructure.Services.BackgroundJobs;
+using Infrastructure.Services.Caching;
 using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
+using Infrastructure.Services.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
@@ -133,7 +135,7 @@ namespace Presentation.Web.Ninject
         {
             RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
-            kernel.Bind<Cache>().ToConstant(new Cache()); //TODO-MRJ: To seperate wrapper
+            kernel.Bind<IObjectCache>().To<AspNetObjectCache>().InSingletonScope();
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
             kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
@@ -204,7 +206,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
+            RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -267,7 +269,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<UserContextFactory>().ToSelf();
             kernel.Bind<IUserContextFactory>().ToMethod(context =>
                     new CachingUserContextFactory(context.Kernel.GetRequiredService<UserContextFactory>(),
-                        context.Kernel.GetRequiredService<Cache>(), context.Kernel.GetRequiredService<ILogger>()))
+                        context.Kernel.GetRequiredService<IObjectCache>()))
                 .InCommandScope(Mode);
 
             kernel.Bind<IOrganizationalUserContext>()

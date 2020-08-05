@@ -150,6 +150,21 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.Forbidden;
             }
 
+            if (newOrg.TypeId > 0)
+            {
+                var organizationType = (OrganizationTypeKeys)newOrg.TypeId;
+                var allowOrganizationTypeCreation = _userContext.OrganizationIds.Any(id => _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, id)));
+                if (!allowOrganizationTypeCreation)
+                {
+                    return OperationFailure.Forbidden;
+                }
+            }
+            else
+            {
+                //Invalid org key
+                return OperationFailure.BadInput;
+            }
+
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
                 newOrg = _orgRepository.Insert(newOrg);

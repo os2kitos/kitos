@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 using Infrastructure.Soap.STSBruger;
 using Serilog;
 

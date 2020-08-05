@@ -4,6 +4,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

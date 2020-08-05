@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Qa.References;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 // ReSharper disable VirtualMemberCallInConstructor
 

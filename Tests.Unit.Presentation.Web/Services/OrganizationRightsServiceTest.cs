@@ -3,6 +3,7 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -22,7 +23,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _organizationUserContext = new Mock<IOrganizationalUserContext>();
             _sut = new OrganizationRightsService(_authorizationContext.Object,
-                _organizationRightRepository.Object, _organizationUserContext.Object);
+                _organizationRightRepository.Object, _organizationUserContext.Object,Mock.Of<IDomainEvents>());
         }
 
         [Fact]

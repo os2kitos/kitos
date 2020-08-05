@@ -1,6 +1,6 @@
 ﻿using System;
 using Core.DomainModel;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 {

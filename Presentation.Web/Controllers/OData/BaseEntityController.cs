@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -32,10 +33,6 @@ namespace Presentation.Web.Controllers.OData
         [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
-            //TODO-MRJ_FRONTEND: Inspect all that use this endpoint and consider killing it in favor of scoped endpoints.
-            //TODO: Beware of this very broad endpoint - might break existing flows once we extend the scope of the organization scope from one to many
-            //TODO: Reports is calling the wrong one - should call scoped one for non-global admin
-
             var organizationIds = UserContext.OrganizationIds;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
@@ -77,7 +74,6 @@ namespace Presentation.Web.Controllers.OData
         [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Post(int organizationId, T entity)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

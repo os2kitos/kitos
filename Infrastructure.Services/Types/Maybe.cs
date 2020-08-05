@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainModel.Result
+namespace Infrastructure.Services.Types
 {
     public sealed class Maybe<T>
     {

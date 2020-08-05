@@ -7,8 +7,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainModel.References.DomainEvents;
-using Core.DomainModel.Result;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Reference
 {

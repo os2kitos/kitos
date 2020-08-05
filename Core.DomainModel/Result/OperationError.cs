@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel.Result
+﻿using Infrastructure.Services.Types;
+
+namespace Core.DomainModel.Result
 {
     public class OperationError
     {

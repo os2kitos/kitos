@@ -6,10 +6,10 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -158,26 +158,11 @@ namespace Core.ApplicationServices.Authorization
         {
             switch (entity)
             {
-                case Organization newOrganization:
-                    return CheckOrganizationCreationPolicy(newOrganization);
                 case OrganizationRight newOrganizationRight:
                     return AllowAdministerOrganizationRight(newOrganizationRight);
                 default:
                     return true;
             }
-        }
-
-        private bool CheckOrganizationCreationPolicy(Organization newOrganization)
-        {
-            var result = true;
-
-            if (newOrganization.TypeId > 0)
-            {
-                var organizationType = (OrganizationTypeKeys)newOrganization.TypeId;
-                result = _activeUserContext.OrganizationIds.Any(id => HasPermission(new DefineOrganizationTypePermission(organizationType, id)));
-            }
-
-            return result;
         }
 
         public bool AllowModify(IEntity entity)

@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var goalDate3 = A<DateTime>().Date;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddGoalAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login);
+            var result = await ItProjectHelper.AddGoalAsync(OrganizationId, _project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login);
 
             //Assert
             Assert.Equal(_project.Id, result.GoalStatusId);
@@ -65,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var goalDate3 = A<DateTime>().Date;
 
             //Act - perform the action with the actual role
-            using (var result = await ItProjectHelper.SendAddGoalRequestAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login))
+            using (var result = await ItProjectHelper.SendAddGoalRequestAsync(OrganizationId, _project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -188,7 +188,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var significance = A<int>() % 5;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddStakeholderAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
+            var result = await ItProjectHelper.AddStakeholderAsync(OrganizationId,_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
 
             //Assert
             Assert.Equal(_project.Id, result.ItProjectId);
@@ -214,7 +214,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var significance = A<int>() % 5;
 
             //Act - perform the action with the actual role
-            using (var result = await ItProjectHelper.SendAddStakeholderRequestAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login))
+            using (var result = await ItProjectHelper.SendAddStakeholderRequestAsync(OrganizationId, _project.Id, name, roleName, downsides, benefits, howToHandle, significance, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -235,7 +235,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var responsibleUserId = TestEnvironment.DefaultUserId;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddRiskAsync(_project.Id, name, action, consequence, probability, responsibleUserId, login);
+            var result = await ItProjectHelper.AddRiskAsync(OrganizationId,_project.Id, name, action, consequence, probability, responsibleUserId, login);
 
             //Assert
             Assert.Equal(_project.Id, result.ItProjectId);
@@ -254,7 +254,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var login = await HttpApi.GetCookieAsync(role);
 
             //Act - perform the action with the actual role
-            using (var result = await ItProjectHelper.SendAddRiskRequestAsync(_project.Id, A<string>(), A<string>(), A<int>() % 5, A<int>() % 5, TestEnvironment.DefaultUserId, login))
+            using (var result = await ItProjectHelper.SendAddRiskRequestAsync(OrganizationId, _project.Id, A<string>(), A<string>(), A<int>() % 5, A<int>() % 5, TestEnvironment.DefaultUserId, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -276,7 +276,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var responsibleUserId = TestEnvironment.DefaultUserId;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddCommunicationAsync(_project.Id, media, message, purpose, responsibleUserId, targetAudience, date, login);
+            var result = await ItProjectHelper.AddCommunicationAsync(OrganizationId, _project.Id, media, message, purpose, responsibleUserId, targetAudience, date, login);
 
             //Assert
             Assert.Equal(_project.Id, result.ItProjectId);
@@ -296,7 +296,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var login = await HttpApi.GetCookieAsync(role);
 
             //Act - perform the action with the actual role
-            using (var result = await ItProjectHelper.SendAddCommunicationRequestAsync(_project.Id, A<string>(), A<string>(), A<string>(), TestEnvironment.DefaultUserId, A<string>(), A<DateTime>().Date, login))
+            using (var result = await ItProjectHelper.SendAddCommunicationRequestAsync(OrganizationId, _project.Id, A<string>(), A<string>(), A<string>(), TestEnvironment.DefaultUserId, A<string>(), A<DateTime>().Date, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

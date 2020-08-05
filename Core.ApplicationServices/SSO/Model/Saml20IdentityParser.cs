@@ -1,6 +1,6 @@
 ﻿using System;
-using Core.DomainModel.Result;
 using dk.nita.saml20.identity;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.SSO.Model
 {

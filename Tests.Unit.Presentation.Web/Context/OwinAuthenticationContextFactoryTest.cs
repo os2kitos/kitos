@@ -2,13 +2,12 @@
 using System.Security.Claims;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.Types;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Moq;
 using Presentation.Web.Infrastructure.Factories.Authentication;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
