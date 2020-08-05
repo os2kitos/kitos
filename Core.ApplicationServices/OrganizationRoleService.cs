@@ -2,18 +2,23 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices
 {
     public class OrganizationRoleService : IOrganizationRoleService
     {
         private readonly IGenericRepository<OrganizationRight> _organizationRights;
+        private readonly IDomainEvents _domainEvents;
 
-        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights)
+        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights,
+            IDomainEvents domainEvents)
         {
             _organizationRights = organizationRights;
+            _domainEvents = domainEvents;
         }
 
         private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, OrganizationRole organizationRole)
@@ -24,6 +29,7 @@ namespace Core.ApplicationServices
                 User = user,
                 Role = organizationRole,
             });
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
             _organizationRights.Save();
 
             return result;

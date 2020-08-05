@@ -46,6 +46,7 @@
             this.$http.post("odata/Organizations", payload).success((organization) => {
                 if (this.org.TypeId === 2) {
                     this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet med ${this.currentUser.fullName} som lokal admin.`);
+                    this.userService.reAuthorize();
                 } else {
                     this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet!`);
                 }
