@@ -99,21 +99,21 @@
         }
 
         resolveKendoGridGetUrl(type: LocalOptionType, orgId: number): string {
-            return `/odata/${this.localOptionTypeMapper.getAsString(type)}?organizationId=${orgId}`;
+            return `/odata/${this.localOptionTypeMapper.getOdataController(type)}?organizationId=${orgId}`;
         }
 
         resolveAutosaveUrl(type: LocalOptionType): string {
-            return `/odata/${this.localOptionTypeMapper.getAsString(type)}`;
+            return `/odata/${this.localOptionTypeMapper.getOdataController(type)}`;
         }
     }
     app.service("localOptionUrlResolver", LocalOptionUrlResolver);
 
     export interface ILocalOptionTypeMapper {
-        getAsString(type: LocalOptionType): string;
+        getOdataController(type: LocalOptionType): string;
     }
 
     export class LocalOptionTypeMapper implements ILocalOptionTypeMapper {
-        getAsString(type: LocalOptionType) {
+        getOdataController(type: LocalOptionType) {
             switch (type) {
                 case LocalOptionType.ItSystemRoles:
                     return "LocalItSystemRoles";
@@ -193,7 +193,7 @@
         }
 
         create(type: LocalOptionType): ILocalOptionService {
-            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getAsString(type));
+            return new LocalOptionService(this.$http, this.userService, this.localOptionTypeMapper.getOdataController(type));
         }
     }
 
