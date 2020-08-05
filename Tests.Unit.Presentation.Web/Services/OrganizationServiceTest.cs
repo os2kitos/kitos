@@ -120,7 +120,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var newOrg = new Organization { Cvr = cvr };
-            ExpectAllowCreateReturns(newOrg, false);
+            ExpectAllowCreateReturns<Organization>(false);
 
             //Act
             var result = _sut.CreateNewOrganization(newOrg);
@@ -144,7 +144,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 TypeId = (int)organizationType
             };
             _userRepository.Setup(x => x.GetByKey(_user.Id)).Returns(_user);
-            ExpectAllowCreateReturns(newOrg, true);
+            ExpectAllowCreateReturns<Organization>(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
             _organizationRepository.Setup(x => x.Insert(newOrg)).Returns(newOrg);
@@ -234,9 +234,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(organization)).Returns(value);
         }
 
-        private void ExpectAllowCreateReturns<T>(T newOrg, bool value) where T : IEntity
+        private void ExpectAllowCreateReturns<T>(bool value) where T : IEntity
         {
-            _authorizationContext.Setup(x => x.AllowCreate<T>(It.IsAny<int>(), newOrg)).Returns(value);
+            _authorizationContext.Setup(x => x.AllowCreate<T>(It.IsAny<int>())).Returns(value);
         }
 
         private void ExpectGetOrganizationByKeyReturns(int organizationId, Organization organization = null)
