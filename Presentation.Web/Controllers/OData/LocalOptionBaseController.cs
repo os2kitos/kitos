@@ -57,7 +57,6 @@ namespace Presentation.Web.Controllers.OData
 
         public virtual IHttpActionResult Get(int organizationId, int key)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -146,7 +145,6 @@ namespace Presentation.Web.Controllers.OData
 
         public virtual IHttpActionResult Patch(int organizationId, int key, Delta<TLocalModelType> delta)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             var orgId = organizationId;
             var localOptionSearch =
                 Repository
@@ -211,12 +209,11 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        [NonAction] //TODO-MRJ: Consider if we could just use the actual id in stead of optionid?
+        [NonAction]
         public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
         public virtual IHttpActionResult Delete(int organizationId, int key)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             var orgId = organizationId;
             LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
 

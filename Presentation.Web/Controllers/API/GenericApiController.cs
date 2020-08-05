@@ -41,10 +41,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //TODO-MRJ_FRONTEND:
-                //TODO-MRJ: If frontend uses broad queries where it expects "current" + public behavior, rewrite to use another - scoped endpoint which takes proper org scoping
-                //TODO-MRJ: Beware of this very broad endpoint - might break existing flows once we extend the scope of the organization scope from one to many
-
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
                 var organizationIds = UserContext.OrganizationIds.ToList();
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
@@ -209,7 +205,6 @@ namespace Presentation.Web.Controllers.API
         /// <returns>HTML code for success or failure</returns>
         public virtual HttpResponseMessage Post(int organizationId, TDto dto)
         {
-            //TODO-MRJ_FRONTEND: Update front-end
             try
             {
                 var item = Map<TDto, TModel>(dto);
