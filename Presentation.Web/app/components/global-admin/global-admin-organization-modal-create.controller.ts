@@ -6,9 +6,9 @@
         public org;
         public buttonDisabled: boolean;
 
-        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify'];
+        public static $inject: string[] = ["$rootScope", "$scope", "$http", "notify", "user"];
 
-        constructor(private $rootScope, private $scope, private $http, private notify) {
+        constructor(private $rootScope, private $scope, private $http, private notify, private user: Kitos.Services.IUser) {
             var orgViewModel = new Models.ViewModel.GlobalAdmin.Organization.OrganizationModalViewModel();
             orgViewModel.configureAsNewOrganizationDialog();
             $rootScope.page.title = orgViewModel.title;
@@ -24,12 +24,11 @@
         public submit() {
             this.buttonDisabled = true;
             var payload = this.$scope.org;
-            this.$http.post('api/organization', payload)
-                .success((result) => {
-                    this.notify.addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet!`);
+            this.$http.post(`api/organization?organizationId=${this.user.currentOrganizationId}`, payload)
+                .then((successResponse) => {
+                    this.notify.addSuccessMessage(`Organisationen ${successResponse.data.response.name} er blevet oprettet!`);
                     this.$scope.$close(true);
-                })
-                .error((result) => {
+                }, (errorResponse) => {
                     this.notify.addErrorMessage(`Organisationen ${this.org.name} kunne ikke oprettes!`);
                 });
         }
@@ -38,28 +37,31 @@
     angular
         .module("app")
         .config([
-            '$stateProvider', ($stateProvider) => {
-                $stateProvider.state('global-admin.organizations.create', {
-                    url: '/create',
-                    authRoles: ['GlobalAdmin'],
-                    onEnter: ['$state', '$stateParams', '$uibModal',
+            "$stateProvider", ($stateProvider) => {
+                $stateProvider.state("global-admin.organizations.create", {
+                    url: "/create",
+                    authRoles: ["GlobalAdmin"],
+                    onEnter: ["$state", "$stateParams", "$uibModal",
                         ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: ng.ui.bootstrap.IModalService) => {
                             $modal.open({
-                                size: 'lg',
-                                templateUrl: 'app/components/global-admin/global-admin-organization-modal.view.html',
+                                size: "lg",
+                                templateUrl: "app/components/global-admin/global-admin-organization-modal.view.html",
                                 // fade in instead of slide from top, fixes strange cursor placement in IE
                                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                                windowClass: 'modal fade in',
+                                windowClass: "modal fade in",
                                 controller: CreateOrganizationController,
-                                controllerAs: "ctrl"
+                                controllerAs: "ctrl",
+                                resolve: {
+                                    user: ["userService", userService => userService.getUser()],
+                                }
                             }).result.then(() => {
                                 // OK
                                 // GOTO parent state and reload
-                                $state.go('^', null, { reload: true });
+                                $state.go("^", null, { reload: true });
                             }, () => {
                                 // Cancel
                                 // GOTO parent state
-                                $state.go('^');
+                                $state.go("^");
                             });
                         }
                     ]

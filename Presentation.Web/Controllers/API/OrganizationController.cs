@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API
                                       org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == userId)))
                         .AsEnumerable()
                         .Where(AllowRead)
-                        .OrderBy(_=>_.Name)
+                        .OrderBy(_ => _.Name)
                         .Take(take)
                         .MapToNamedEntityDTOs()
                         .ToList();
@@ -66,6 +66,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        protected override bool AllowCreate<T>(int organizationId, IEntity entity)
+        {
+            return AuthorizationContext.AllowCreate<Organization>(organizationId);
         }
 
         protected override Organization PostQuery(Organization item)

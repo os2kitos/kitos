@@ -246,7 +246,7 @@ namespace Presentation.Web.Controllers.API
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(int organizationId ,IEntity entity)
+        protected virtual bool AllowCreate<T>(int organizationId ,IEntity entity)
         {
             return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
