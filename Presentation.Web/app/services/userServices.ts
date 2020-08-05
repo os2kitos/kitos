@@ -214,18 +214,15 @@
         };
 
         getSavedOrgId = () => {
-            //TODO: Scope to user id so that different users can be using the same machine
             var orgId = localStorage.getItem("currentOrgId");
             return orgId != null && JSON.parse(orgId);
         };
 
         setSavedOrgId = (orgId) => {
-            //TODO: Scope to user id so that different users can be using the same machine
             localStorage.setItem("currentOrgId", JSON.stringify(orgId));
         };
 
         clearSavedOrgId = () => {
-            //TODO: Scope to user id so that different users can be using the same machine
             localStorage.setItem("currentOrgId", null);
         };
 
