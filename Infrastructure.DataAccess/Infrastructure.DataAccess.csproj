@@ -595,13 +595,9 @@
     <Compile Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.Designer.cs">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.cs" />
-    <Compile Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.designer.cs">
-      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202008031345025_RemoveDefaultOrganization.cs" />
-    <Compile Include="Migrations\202008031345025_RemoveDefaultOrganization.designer.cs">
-      <DependentUpon>202008031345025_RemoveDefaultOrganization.cs</DependentUpon>
+    <Compile Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.cs" />
+    <Compile Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.designer.cs">
+      <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -978,11 +974,8 @@
     <EmbeddedResource Include="Migrations\202003261025311_RemovedInterfaceUsageAndExhibitUsage.resx">
       <DependentUpon>202003261025311_RemovedInterfaceUsageAndExhibitUsage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202008030914491_AddLengthConstraintAndIndexOnName.resx">
-      <DependentUpon>202008030914491_AddLengthConstraintAndIndexOnName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202008031345025_RemoveDefaultOrganization.resx">
-      <DependentUpon>202008031345025_RemoveDefaultOrganization.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.resx">
+      <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class RemoveDefaultOrganization : IMigrationMetadata
+    public sealed partial class Indexes_And_Remove_Default_Organization_Id : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(RemoveDefaultOrganization));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Indexes_And_Remove_Default_Organization_Id));
         
         string IMigrationMetadata.Id
         {
-            get { return "202008031345025_RemoveDefaultOrganization"; }
+            get { return "202008051206316_Indexes_And_Remove_Default_Organization_Id"; }
         }
         
         string IMigrationMetadata.Source

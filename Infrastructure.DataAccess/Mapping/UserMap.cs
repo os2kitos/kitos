@@ -27,7 +27,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("User_Index_Name", 0);
             this.Property(t => t.LastName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
-                .IsRequired()
+                .IsOptional()
                 .HasIndexAnnotation("User_Index_Name", 1);
             this.Property(t => t.Email)
                 .HasMaxLength(UserConstraints.MaxEmailLength)
