@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using Core.DomainModel.Result;
 using dk.nita.saml20.identity;
+using Infrastructure.Services.Types;
 using SamlAttribute = dk.nita.saml20.Schema.Core.SamlAttribute;
 
 namespace Core.ApplicationServices.SSO.Model

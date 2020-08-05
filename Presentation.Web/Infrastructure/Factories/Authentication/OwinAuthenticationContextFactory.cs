@@ -1,12 +1,9 @@
-﻿using System.Security.Claims;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.Types;
 using Microsoft.Owin;
-using Presentation.Web.Extensions;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Factories.Authentication

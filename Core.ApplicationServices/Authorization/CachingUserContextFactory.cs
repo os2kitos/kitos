@@ -1,38 +1,30 @@
 ﻿using System;
-using System.Web.Caching;
-using Serilog;
+using Infrastructure.Services.Caching;
 
 namespace Core.ApplicationServices.Authorization
 {
-    //TODO-MRJ: Purge the cache for the affected user when roles / rights change (GlobalAdmin flad, Org roles and Project, System and Contract roles)
-    public class CachingUserContextFactory : IUserContextFactory 
+    public class CachingUserContextFactory : IUserContextFactory
     {
         private readonly IUserContextFactory _userContextFactory;
-        private readonly Cache _cache; //TODO-MRJ: Wrap that interface with something simple
-        private readonly ILogger _logger;
+        private readonly IObjectCache _cache;
 
-        public CachingUserContextFactory(IUserContextFactory userContextFactory, Cache cache, ILogger logger)
+        public CachingUserContextFactory(IUserContextFactory userContextFactory, IObjectCache cache)
         {
             _userContextFactory = userContextFactory;
             _cache = cache;
-            _logger = logger;
         }
 
         public IOrganizationalUserContext Create(int userId)
         {
-            var key = $"{nameof(IOrganizationalUserContext)}_{userId}";
-            var cachedContext = (IOrganizationalUserContext)_cache.Get(key);
-            if (cachedContext == null)
+            var key = OrganizationalUserContextCacheKeyFactory.Create(userId);
+            var cachedContext = _cache.Read<IOrganizationalUserContext>(key);
+            if (cachedContext.HasValue)
             {
-                _logger.Information("GETTING NEW ONE"); //TODO-MRJ: Remove
-                cachedContext = _userContextFactory.Create(userId);
-                _cache.Insert(key, cachedContext, null, DateTime.UtcNow.AddMinutes(1), Cache.NoSlidingExpiration);
+                return cachedContext.Value;
             }
-            else
-            {
-                _logger.Information("USING CACHED"); //TODO-MRJ: Remove
-            }
-            return cachedContext;
+            var newEntry = _userContextFactory.Create(userId);
+            _cache.Write(newEntry, key, TimeSpan.FromMinutes(20));
+            return newEntry;
         }
     }
 }

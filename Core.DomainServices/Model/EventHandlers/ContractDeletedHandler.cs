@@ -4,9 +4,9 @@ using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.DomainServices.Model.EventHandlers

@@ -6,6 +6,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
 {

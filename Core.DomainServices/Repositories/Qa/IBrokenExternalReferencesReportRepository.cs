@@ -1,5 +1,5 @@
 ﻿using Core.DomainModel.Qa.References;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Qa
 {

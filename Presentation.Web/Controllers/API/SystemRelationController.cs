@@ -6,7 +6,7 @@ using System.Web.Http;
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.SystemRelations;

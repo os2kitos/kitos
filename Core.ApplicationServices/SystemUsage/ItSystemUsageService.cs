@@ -20,6 +20,7 @@ using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage

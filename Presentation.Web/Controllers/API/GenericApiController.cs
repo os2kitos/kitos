@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API

@@ -1,5 +1,5 @@
-﻿using Core.DomainModel.Result;
-using Infrastructure.Services.DomainEvents;
+﻿using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem.DomainEvents
 {

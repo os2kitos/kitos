@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SSO
 {

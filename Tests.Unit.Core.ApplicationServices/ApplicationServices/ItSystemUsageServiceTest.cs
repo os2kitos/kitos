@@ -19,6 +19,7 @@ using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;

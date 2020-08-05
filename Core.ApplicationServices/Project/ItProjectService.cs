@@ -13,6 +13,7 @@ using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Project
 {

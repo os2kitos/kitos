@@ -16,6 +16,7 @@ using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

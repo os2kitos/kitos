@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.Result
 {
