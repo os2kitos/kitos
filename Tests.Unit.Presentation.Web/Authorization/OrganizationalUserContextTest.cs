@@ -181,12 +181,19 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void HasRoleInOrganizationOfType_Returns_False(OrganizationCategory unsupportedCategory)
         {
             //Arrange
-            var supportedCategory = unsupportedCategory switch
+            OrganizationCategory supportedCategory;
+            switch (unsupportedCategory)
             {
-                OrganizationCategory.Other => OrganizationCategory.Municipality,
-                OrganizationCategory.Municipality => OrganizationCategory.Other,
-                _ => throw new ArgumentOutOfRangeException(nameof(unsupportedCategory), unsupportedCategory, null)
-            };
+                case OrganizationCategory.Other:
+                    supportedCategory = OrganizationCategory.Municipality;
+                    break;
+                case OrganizationCategory.Municipality:
+                    supportedCategory = OrganizationCategory.Other;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(unsupportedCategory), unsupportedCategory, null);
+            }
+
             SetupSut(categoryMap: new Dictionary<int, OrganizationCategory> { { _municipalityOrganizationId, supportedCategory }, { _otherOrgTypeOrganizationId, supportedCategory } });
 
             //Act
@@ -231,12 +238,15 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private int GetOrganizationId(OrganizationCategory category)
         {
-            return category switch
+            switch (category)
             {
-                OrganizationCategory.Other => _otherOrgTypeOrganizationId,
-                OrganizationCategory.Municipality => _municipalityOrganizationId,
-                _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
-            };
+                case OrganizationCategory.Other:
+                    return _otherOrgTypeOrganizationId;
+                case OrganizationCategory.Municipality:
+                    return _municipalityOrganizationId;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(category), category, null);
+            }
         }
     }
 }
