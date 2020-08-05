@@ -158,26 +158,11 @@ namespace Core.ApplicationServices.Authorization
         {
             switch (entity)
             {
-                case Organization newOrganization:
-                    return CheckOrganizationCreationPolicy(newOrganization);
                 case OrganizationRight newOrganizationRight:
                     return AllowAdministerOrganizationRight(newOrganizationRight);
                 default:
                     return true;
             }
-        }
-
-        private bool CheckOrganizationCreationPolicy(Organization newOrganization)
-        {
-            var result = true;
-
-            if (newOrganization.TypeId > 0)
-            {
-                var organizationType = (OrganizationTypeKeys)newOrganization.TypeId;
-                result = _activeUserContext.OrganizationIds.Any(id => HasPermission(new DefineOrganizationTypePermission(organizationType, id)));
-            }
-
-            return result;
         }
 
         public bool AllowModify(IEntity entity)

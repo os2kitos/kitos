@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 organizationId = organizationId,
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itcontract"), cookie, body))
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract?organizationId={organizationId}"), cookie, body))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
