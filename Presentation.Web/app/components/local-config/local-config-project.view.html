@@ -21,8 +21,7 @@
         </div>
     </div>
 
-    <!--TODO-MRJ_FRONTEND - update to use service on directive in stead of this-->
-    <div data-local-option-role-list="" title="Roller" dir-id="localProjectRoleId" state="local-config.project.edit-project-roles" data-options-url="/odata/LocalItProjectRoles"></div>
-    <div data-local-option-list="" title="Projekttyper" dir-id="localProjectTypeId" state="local-config.project.edit-project-types" data-options-url="/odata/LocalItProjectTypes"></div>
-    <div data-local-option-list="" title="Måltyper" dir-id="localGoalTypeId" state="local-config.project.edit-project-types" data-options-url="/odata/LocalGoalTypes"></div>
+    <div data-local-option-role-list="" title="Roller" dir-id="localProjectRoleId" state="local-config.project.edit-project-roles" option-type="{{localOptionType.ItProjectRoles}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Projekttyper" dir-id="localProjectTypeId" state="local-config.project.edit-project-types" option-type="{{localOptionType.ItProjectTypes}}" current-org-id="{{currentOrganizationId}}"></div>
+    <div data-local-option-list="" title="Måltyper" dir-id="localGoalTypeId" state="local-config.project.edit-project-types" option-type="{{localOptionType.GoalTypes}}" current-org-id="{{currentOrganizationId}}"></div>
 </form>

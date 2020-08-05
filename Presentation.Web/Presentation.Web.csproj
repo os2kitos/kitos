@@ -425,6 +425,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
