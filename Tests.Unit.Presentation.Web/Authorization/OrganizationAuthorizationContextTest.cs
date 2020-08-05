@@ -569,42 +569,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, true, false)]
         [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true)]
         [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true)]
-        public void AllowCreateOrganizationOfType_Returns(
-            OrganizationTypeKeys organizationType,
-            bool globalAdmin,
-            bool localAdmin,
-            bool expectedResult)
-        {
-            //Arrange
-            var actionOrganizationId = A<int>();
-            _userContextMock.Setup(x => x.OrganizationIds).Returns(new[] { actionOrganizationId });
-            var newOrganization = new Organization { TypeId = (int)organizationType, Id = A<int>() };
-
-            ExpectUserIsGlobalAdmin(globalAdmin);
-            ExpectHasRoleReturns(actionOrganizationId, OrganizationRole.LocalAdmin, localAdmin);
-            ExpectHasRoleInSameOrganizationAsReturns(newOrganization, localAdmin); //local admin test - always in same org in this scope
-            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(newOrganization)).Returns(localAdmin);
-
-            //Act
-            var result = _sut.AllowCreate<Organization>(actionOrganizationId, newOrganization);
-
-            //Assert
-            Assert.Equal(expectedResult, result);
-        }
-
-        [Theory]
-        [InlineData(OrganizationTypeKeys.Kommune, false, false, false)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Kommune, true, false, true)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Kommune, false, true, false)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, true, false)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true)]
         public void AllowChangeOrganizationType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool expectedResult)
         {
             //Arrange

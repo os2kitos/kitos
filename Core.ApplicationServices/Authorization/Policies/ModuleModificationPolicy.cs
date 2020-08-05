@@ -72,6 +72,8 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsSystemModuleAdmin;
             if (target is IReportModule _)
                 yield return IsReportModuleAdmin;
+            if (target is Config _)
+                yield return IsLocalAdmin;
         }
 
         /// <summary>

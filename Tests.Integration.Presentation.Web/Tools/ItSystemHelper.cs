@@ -87,7 +87,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendSetUsageDataWorkerRequestAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("/api/UsageDataworker/");
+            var url = TestEnvironment.CreateUrl($"/api/UsageDataworker?organizationId={organizationId}");
 
             var body = new
             {
@@ -98,10 +98,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<AccessType> CreateAccessTypeAsync(int id, string name, Cookie optionalLogin = null)
+        public static async Task<AccessType> CreateAccessTypeAsync(int organizationId, int id, string name, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("odata/AccessTypes");
+            var url = TestEnvironment.CreateUrl($"odata/AccessTypes?organizationId={organizationId}");
             var body = new
             {
                 ItSystemId = id,
@@ -120,7 +120,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})/AccessTypes/{accessTypeId}");
 
-            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, new{ }))
+            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, new { }))
             {
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }

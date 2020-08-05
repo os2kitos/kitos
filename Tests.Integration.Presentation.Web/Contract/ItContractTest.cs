@@ -24,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var expected = A<DateTime>().Date;
 
             //Act - perform the action with the actual role
-            var result = await ItContractHelper.AddHandOverTrialAsync(contract.Id, approved, expected, login);
+            var result = await ItContractHelper.AddHandOverTrialAsync(contract.OrganizationId, contract.Id, approved, expected, login);
 
             //Assert
             Assert.Equal(contract.Id, result.ItContractId);
@@ -43,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var expected = A<DateTime>().Date;
 
             //Act - perform the action with the actual role
-            using (var result = await ItContractHelper.SendAddHandOverTrialAsync(contract.Id, approved, expected, login))
+            using (var result = await ItContractHelper.SendAddHandOverTrialAsync(contract.OrganizationId, contract.Id, approved, expected, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var title = A<string>();
 
             //Act - perform the action with the actual role
-            var result = await ItContractHelper.AddPaymentMilestoneAsync(contract.Id, approved, expected, title, login);
+            var result = await ItContractHelper.AddPaymentMilestoneAsync(contract.OrganizationId, contract.Id, approved, expected, title, login);
 
             //Assert
             Assert.Equal(contract.Id, result.ItContractId);
@@ -83,7 +83,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var title = A<string>();
 
             //Act - perform the action with the actual role
-            using (var result = await ItContractHelper.SendAddPaymentMilestoneRequestAsync(contract.Id, approved, expected, title, login))
+            using (var result = await ItContractHelper.SendAddPaymentMilestoneRequestAsync(contract.OrganizationId, contract.Id, approved, expected, title, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
