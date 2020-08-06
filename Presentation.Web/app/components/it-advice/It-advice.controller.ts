@@ -238,7 +238,7 @@
                                 payload.StopDate.setHours(23, 59, 59, 99);
 
                                 if (action == 'POST') {
-                                    url = `Odata/advice?organizationId=${currentUser.id}`;
+                                    url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
 
                                     httpCall(payload, action, url);
                                 } else if (action == 'PATCH') {

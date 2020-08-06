@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -112,15 +113,9 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [NonAction]
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, ItProject entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        public override IHttpActionResult Post(int organizationId, ItProject entity) => throw new NotSupportedException();
     }
 }

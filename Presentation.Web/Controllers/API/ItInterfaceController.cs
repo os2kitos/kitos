@@ -43,11 +43,8 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto)
-        {
-            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
-        }
-
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto) => throw  new NotSupportedException();
+        
         public HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try

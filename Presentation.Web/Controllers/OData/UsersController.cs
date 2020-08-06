@@ -1,8 +1,8 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -25,10 +25,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, User entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        public override IHttpActionResult Post(int organizationId, User entity) => throw new NotSupportedException();
 
         [HttpPost]
         public IHttpActionResult Create(ODataActionParameters parameters)
@@ -104,10 +101,7 @@ namespace Presentation.Web.Controllers.OData
         /// <param name="key"></param>
         /// <returns></returns>
         [NonAction]
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
         private bool EmailExists(string email)
         {

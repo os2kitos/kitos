@@ -163,10 +163,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto)
-        {
-            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
-        }
+        public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto) => throw new NotSupportedException();
 
         public HttpResponseMessage DeleteByItSystemId(int itSystemId, int organizationId)
         {

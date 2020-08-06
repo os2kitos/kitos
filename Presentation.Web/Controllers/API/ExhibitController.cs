@@ -74,10 +74,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage Post(int organizationId, ItInterfaceExhibitDTO dto)
-        {
-            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
-        }
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceExhibitDTO dto) => throw new NotSupportedException();
 
         /// <param name="id">Interface id</param>
         /// <param name="organizationId">Not used</param>
@@ -97,10 +94,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage GetSingle(int id)
-        {
-            return CreateResponse(HttpStatusCode.MethodNotAllowed);
-        }
+        public override HttpResponseMessage GetSingle(int id) => throw new NotSupportedException();
 
         /// <param name="id">Interface id</param>
         /// <param name="organizationId">Not used</param>

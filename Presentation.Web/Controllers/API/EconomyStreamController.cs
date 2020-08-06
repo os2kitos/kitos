@@ -32,10 +32,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [NonAction]
-        public override HttpResponseMessage GetAll(PagingModel<EconomyStream> paging)
-        {
-            return new HttpResponseMessage(HttpStatusCode.MethodNotAllowed);
-        }
+        public override HttpResponseMessage GetAll(PagingModel<EconomyStream> paging) => throw new NotSupportedException();
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<EconomyStreamDTO>>))]
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)

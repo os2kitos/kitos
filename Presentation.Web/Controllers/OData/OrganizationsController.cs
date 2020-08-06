@@ -71,10 +71,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, Organization organization)
-        {
-            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.MethodNotAllowed));
-        }
+        public override IHttpActionResult Post(int organizationId, Organization organization) => throw new NotSupportedException();
 
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)
