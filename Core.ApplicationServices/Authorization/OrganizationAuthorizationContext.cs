@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -328,6 +329,8 @@ namespace Core.ApplicationServices.Authorization
 
                 switch (target)
                 {
+                    case IReportModule _:
+                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsReportModuleAdmin(ownedByOrganization.OrganizationId);
                     case IContractModule _:
                         return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsContractModuleAdmin(ownedByOrganization.OrganizationId);
                     case IOrganizationModule _:
@@ -339,6 +342,11 @@ namespace Core.ApplicationServices.Authorization
 
             //No-one can control access modifiers that are not there
             return false;
+        }
+
+        private bool IsReportModuleAdmin(int organizationId)
+        {
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
         }
 
         bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)
