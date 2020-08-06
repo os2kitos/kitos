@@ -6,10 +6,10 @@ using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
 using Infrastructure.Services.Delegates;
+using Infrastructure.Services.Types;
 
 namespace Infrastructure.DataAccess.Interceptors
 {

@@ -32,6 +32,11 @@ namespace Presentation.Web.Controllers.API
             _taskUsageRepository = taskUsageRepository;
         }
 
+        public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, OrgUnitDTO dto) => throw new NotSupportedException();
+
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit
         /// </summary>
@@ -41,7 +46,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
+                var userId = UserId;
+                var orgUnits = Repository
+                    .Get(x => x.Rights.Any(y => y.UserId == userId) && x.OrganizationId == organizationId)
+                    .SelectNestedChildren(x => x.Children).ToList();
 
                 orgUnits = orgUnits
                     .Distinct()
@@ -127,10 +135,8 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
-        {
-            return NotAllowed();
-        }
+        [NonAction]
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
 
         /// <summary>
         /// Returns every task that a given OrgUnit can use. This depends on the task usages of the parent OrgUnit.

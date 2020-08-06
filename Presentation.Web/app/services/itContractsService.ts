@@ -12,10 +12,6 @@
             return this.$http.get(`odata/ItContracts(${id})`);
         }
 
-        GetAllItContracts = () => {
-            return this.$http.get(`odata/ItContracts`);
-        }
-
         GetItContractRoleById = (roleId: number) => {
             return this.$http.get(`odata/ItContractRoles(${roleId})`);
         }

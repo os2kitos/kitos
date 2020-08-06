@@ -2,9 +2,9 @@
 using System.Linq;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -12,12 +12,17 @@ namespace Core.ApplicationServices.Authorization
     {
         private readonly IEntityTypeResolver _typeResolver;
         private readonly IGenericRepository<GlobalConfig> _globalConfigurationRepository;
+        private readonly IUserRepository _userRepository;
         private static readonly GlobalReadAccessPolicy GlobalReadAccessPolicy = new GlobalReadAccessPolicy();
 
-        public AuthorizationContextFactory(IEntityTypeResolver typeResolver, IGenericRepository<GlobalConfig> globalConfigurationRepository)
+        public AuthorizationContextFactory(
+            IEntityTypeResolver typeResolver,
+            IGenericRepository<GlobalConfig> globalConfigurationRepository,
+            IUserRepository userRepository)
         {
             _typeResolver = typeResolver;
             _globalConfigurationRepository = globalConfigurationRepository;
+            _userRepository = userRepository;
         }
 
         public IAuthorizationContext Create(IOrganizationalUserContext userContext)
@@ -35,7 +40,7 @@ namespace Core.ApplicationServices.Authorization
                     .FirstOrDefault(gc => gc.key == GlobalConfigKeys.OnlyGlobalAdminMayEditReports);
 
             //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
-            var onlyGlobalAdminMayEditReports = globalConfig.Select(x => bool.TrueString.Equals(x.value,StringComparison.OrdinalIgnoreCase)).GetValueOrFallback(false);
+            var onlyGlobalAdminMayEditReports = globalConfig.Select(x => bool.TrueString.Equals(x.value, StringComparison.OrdinalIgnoreCase)).GetValueOrFallback(false);
             var moduleLevelAccessPolicy = new ModuleModificationPolicy(userContext, onlyGlobalAdminMayEditReports);
 
             return new OrganizationAuthorizationContext(
@@ -43,7 +48,9 @@ namespace Core.ApplicationServices.Authorization
                 _typeResolver,
                 moduleLevelAccessPolicy,
                 GlobalReadAccessPolicy,
-                moduleLevelAccessPolicy);
+                moduleLevelAccessPolicy,
+                _userRepository
+            );
         }
     }
 }

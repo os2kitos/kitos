@@ -29,10 +29,9 @@ namespace Presentation.Web.Infrastructure.Middleware
                 var method = context.Request.Method;
                 var queryParameters = GetQueryParameters(context.Request.Query);
                 var userId = authenticationContext.UserId.GetValueOrDefault(INVALID_ID);
-                var loggedIntoOrganizationId = authenticationContext.ActiveOrganizationId.GetValueOrDefault(INVALID_ID);
                 using (LogContext.PushProperty("CorrelationId", guid.ToString()))
                 {
-                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} LoggedIntoOrganizationId: {loggedIntoOrganizationId} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, loggedIntoOrganizationId, requestStart);
+                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, requestStart);
                     try
                     {
                         await Next.Invoke(context);
@@ -40,7 +39,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                     finally
                     {
                         var requestEnd = DateTime.UtcNow;
-                        logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} LoggedIntoOrganizationId: {loggedIntoOrganizationId} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, loggedIntoOrganizationId, requestEnd);
+                        logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, requestEnd);
                     }
                 }
             }

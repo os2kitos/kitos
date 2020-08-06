@@ -137,9 +137,9 @@
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
+    <Compile Include="Organization\DomainEvents\AccessRightsChanged.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="IContextAware.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="IHierarchy.cs" />
     <Compile Include="ItContract\HandoverTrial.cs" />
@@ -221,8 +221,7 @@
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
-    <Compile Include="Result\Maybe.cs" />
-    <Compile Include="Result\ObjectExtensions.cs" />
+    <Compile Include="Result\DictionaryExtensions.cs" />
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />

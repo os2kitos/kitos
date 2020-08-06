@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.OData
         [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
-            var organizationId = ActiveOrganizationId;
+            var organizationIds = UserContext.OrganizationIds;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -40,21 +41,13 @@ namespace Presentation.Web.Controllers.OData
 
             var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
                 Maybe<QueryAllByRestrictionCapabilities<T>>.None :
-                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId));
+                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationIds));
 
             var mainQuery = Repository.AsQueryable();
 
             var result = refinement
                 .Select(x => x.Apply(mainQuery))
                 .GetValueOrFallback(mainQuery);
-
-            if (refinement.Select(x => x.RequiresPostFiltering()).GetValueOrFallback(false))
-            {
-                result = result
-                    .AsEnumerable()
-                    .Where(AllowRead)
-                    .AsQueryable();
-            }
 
             return Ok(result);
         }
@@ -78,29 +71,8 @@ namespace Presentation.Web.Controllers.OData
             return Ok(SingleResult.Create(result));
         }
 
-        [EnableQuery(MaxExpansionDepth = 5)]
-        [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetByOrganizationKey(int key)
-        {
-            if (typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T)) == false)
-            {
-                return BadRequest("Entity does not belong to an organization");
-            }
-
-            var accessLevel = GetOrganizationReadAccessLevel(key);
-
-            if (accessLevel == OrganizationDataReadAccessLevel.None)
-            {
-                return Forbidden();
-            }
-
-            var entities = QueryFactory.ByOrganizationId<T>(key, accessLevel).Apply(Repository.AsQueryable());
-
-            return Ok(entities);
-        }
-
         [System.Web.Http.Description.ApiExplorerSettings]
-        public virtual IHttpActionResult Post(T entity)
+        public virtual IHttpActionResult Post(int organizationId, T entity)
         {
             if (!ModelState.IsValid)
             {
@@ -110,10 +82,10 @@ namespace Presentation.Web.Controllers.OData
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IOwnedByOrganization organization && organization.OrganizationId == 0)
             {
-                organization.OrganizationId = ActiveOrganizationId;
+                organization.OrganizationId = organizationId;
             }
 
-            if (AllowCreate<T>(entity) == false)
+            if (AllowCreate<T>(organizationId, entity) == false)
             {
                 return Forbidden();
             }
@@ -147,7 +119,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (AllowWrite(entity) == false)
+            if (AllowModify(entity) == false)
             {
                 return Forbidden();
             }
@@ -227,19 +199,14 @@ namespace Presentation.Web.Controllers.OData
             return CrudAuthorization.AllowRead(entity);
         }
 
-        protected bool AllowWrite(T entity)
+        protected bool AllowModify(T entity)
         {
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>()
+        protected bool AllowCreate<T>(int organizationId, IEntity entity)
         {
-            return _authorizationStrategy.Value.AllowCreate<T>();
-        }
-
-        protected bool AllowCreate<T>(IEntity entity)
-        {
-            return CrudAuthorization.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
 
         protected bool AllowDelete(IEntity entity)

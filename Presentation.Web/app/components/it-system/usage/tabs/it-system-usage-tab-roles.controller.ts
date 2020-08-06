@@ -11,12 +11,8 @@
                             return result.data.value;
                         });
                 }],
-                localItSystemRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                        .then(function (result) {
-                            return result.data.value;
-                        });
-                }],
+                localItSystemRoles: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()],
                 user: ["userService", function (userService) {
                     return userService.getUser().then(function (user) {
                         return user;
@@ -145,7 +141,7 @@
 
                     right.role = _.find(localItSystemRoles, { Id: right.roleId }),
 
-                    right.edit = false;
+                        right.edit = false;
 
                     notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
 

@@ -159,6 +159,10 @@
 
         // the object returned contains the user, user rights and user organizations
         getUser = () => {
+            //Use existing in-memory user if it already exists
+            if (this._user) {
+                return this.$q.resolve(this._user);
+            }
             return this.reAuthorize();
         };
 
@@ -192,7 +196,6 @@
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
             this.saveUser(user, orgAndDefaultUnit);
-            this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
         };
 
         auth = (adminRoles) => {
@@ -221,10 +224,6 @@
 
         clearSavedOrgId = () => {
             localStorage.setItem("currentOrgId", null);
-        };
-
-        setDefaultOrganizationInBackend = (organizationId) => {
-            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
         };
 
         login = (email: string, password: string, rememberMe: boolean) => {

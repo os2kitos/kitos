@@ -41,9 +41,8 @@ namespace Presentation.Web.Controllers.API
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
 
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
-        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
+        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
         protected BaseApiController()
         {
@@ -183,8 +182,6 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
 
-        protected User KitosUser => UserContext.UserEntity;
-
         protected int UserId => UserContext.UserId;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
@@ -249,14 +246,14 @@ namespace Presentation.Web.Controllers.API
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(IEntity entity)
+        protected virtual bool AllowCreate<T>(int organizationId ,IEntity entity)
         {
-            return CrudAuthorization.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
 
-        protected bool AllowCreate<T>()
+        protected bool AllowCreate<T>(int organizationId)
         {
-            return AuthorizationStrategy.AllowCreate<T>();
+            return AuthorizationStrategy.AllowCreate<T>(organizationId);
         }
 
         protected bool AllowDelete(IEntity entity)

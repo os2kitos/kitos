@@ -3,7 +3,6 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
@@ -13,8 +12,8 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Project
 {
@@ -55,7 +54,7 @@ namespace Core.ApplicationServices.Project
             }
             var project = ItProjectFactory.Create(name, organizationId);
 
-            if (!_authorizationContext.AllowCreate<ItProject>(project))
+            if (!_authorizationContext.AllowCreate<ItProject>(organizationId, project))
             {
                 return OperationFailure.Forbidden;
             }

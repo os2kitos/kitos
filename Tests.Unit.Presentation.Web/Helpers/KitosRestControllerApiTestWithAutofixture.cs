@@ -40,12 +40,8 @@ namespace Tests.Unit.Presentation.Web.Helpers
             principal.Setup(x => x.Identity).Returns(identity.Object);
             sut.User = principal.Object;
             CurrentOrganizationId = A<int>();
-            KitosUser = new User
-            {
-                DefaultOrganizationId = A<int>()
-            };
-            userMock.Setup(x => x.UserEntity).Returns(KitosUser);
-            userMock.Setup(x => x.ActiveOrganizationId).Returns(CurrentOrganizationId);
+            KitosUser = new User();
+            userMock.Setup(x => x.UserId).Returns(KitosUser.Id);
         }
 
         protected T ExpectResponseOf<T>(HttpResponseMessage message)

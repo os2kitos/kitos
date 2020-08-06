@@ -1,15 +1,14 @@
-﻿using Core.DomainModel;
+﻿using System.Web.Http;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using System.Threading.Tasks;
-using System.Web.Http;
+using Core.DomainServices.Repositories.SystemUsage;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
-using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
-namespace Presentation.Web.Controllers.OData.AttachedOptions
+namespace Presentation.Web.Controllers.OData.AttachedOptions.ItsystemUsage
 {
     [InternalApi]
     public class AttachedOptionsRegisterTypesController : AttachedOptionsFunctionController<ItSystemUsage, RegisterType, LocalRegisterType>
@@ -32,12 +31,11 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGISTERTYPEDATA);
         }
 
-
-        [System.Web.Http.HttpPost]
+        [HttpPost]
         [ODataRoute("AttachedOptions")]
-        public async Task<IHttpActionResult> Post([FromODataUri] int key, AttachedOption dto)
+        public override IHttpActionResult Post([FromUri]int organizationId, AttachedOption entity)
         {
-            return base.Post(dto);
+            return base.Post(organizationId, entity);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.TaskRefs;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -41,7 +40,7 @@ namespace Core.ApplicationServices.KLE
             return Result<IEnumerable<KLEChange>, OperationFailure>.Success(_kleStandardRepository.GetKLEChangeSummary());
         }
 
-        public Result<KLEUpdateStatus, OperationFailure> UpdateKLE()
+        public Result<KLEUpdateStatus, OperationFailure> UpdateKLE(int organizationId)
         {
             if (!HasAccess())
             {
@@ -51,14 +50,15 @@ namespace Core.ApplicationServices.KLE
             {
                 return OperationFailure.BadInput;
             }
-            var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.ActiveOrganizationId);
+
+            var publishedDate = _kleStandardRepository.UpdateKLE(organizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate);
             return KLEUpdateStatus.Ok;
         }
 
         private bool HasAccess()
         {
-            return _organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin);
+            return _organizationalUserContext.IsGlobalAdmin();
         }
 
         #region Helpers

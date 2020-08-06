@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
@@ -41,31 +41,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var organizationId = ActiveOrganizationId;
-
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
-
+                var organizationIds = UserContext.OrganizationIds.ToList();
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
                 var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
                     Maybe<QueryAllByRestrictionCapabilities<TModel>>.None :
-                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationIds));
 
                 var mainQuery = Repository.AsQueryable();
 
                 var result = refinement
                     .Select(x => x.Apply(mainQuery))
                     .GetValueOrFallback(mainQuery);
-
-                var requiresPostFiltering =
-                    refinement
-                        .Select(x => x.RequiresPostFiltering())
-                        .GetValueOrFallback(false);
-
-                if (requiresPostFiltering)
-                {
-                    paging = paging.WithPostProcessingFilter(AllowRead);
-                }
 
                 var query = Page(result, paging);
 
@@ -140,15 +128,15 @@ namespace Presentation.Web.Controllers.API
         /// GET api/T/GetAccessRights
         /// Checks what access rights the user has for the given entities
         /// </summary>
-        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
         {
-            if (GetOrganizationReadAccessLevel(ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
+            if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
             return Ok(new EntitiesAccessRightsDTO
             {
-                CanCreate = AllowCreate<TModel>(),
+                CanCreate = AllowCreate<TModel>(organizationId),
                 CanView = true
             });
         }
@@ -185,7 +173,7 @@ namespace Presentation.Web.Controllers.API
         /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
         /// </summary>
         /// <param name="ids">The ids of the objects</param>
-        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]int[] ids, bool? getEntityListAccessRights)
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
         {
             if (ids == null || ids.Length == 0)
             {
@@ -215,15 +203,15 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="dto"></param>
         /// <returns>HTML code for success or failure</returns>
-        public virtual HttpResponseMessage Post(TDto dto)
+        public virtual HttpResponseMessage Post(int organizationId, TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
-                
+
                 PrepareNewObject(item);
-                // Check CREATE access rights  
-                if (!AllowCreate<TModel>(item))
+                // Check CREATE access rights
+                if (!AllowCreate<TModel>(organizationId, item))
                 {
                     return Forbidden();
                 }

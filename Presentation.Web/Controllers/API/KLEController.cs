@@ -9,8 +9,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.TaskRefs;
+using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
+using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -65,11 +66,11 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPut]
         [Route("update")]
-        public HttpResponseMessage PutKLEChanges()
+        public HttpResponseMessage PutKLEChanges(int organizationId)
         {
-            var result = _kleApplicationService.UpdateKLE();
-            
-            return result.Ok ? 
+            var result = _kleApplicationService.UpdateKLE(organizationId);
+
+            return result.Ok ?
                 Ok(
                     new KLEUpdateDTO
                     {

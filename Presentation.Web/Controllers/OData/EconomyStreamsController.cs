@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
@@ -20,11 +21,26 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IGenericRepository<EconomyStream> _repository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository) 
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository)
             : base(repository)
         {
             _repository = repository;
         }
+
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, EconomyStream entity) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<EconomyStream> delta) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Get() => throw new NotSupportedException();
+
+        [NonAction]
+        public override IHttpActionResult Get(int key) => throw new NotSupportedException();
 
         // GET /Organizations(1)/ItContracts
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
@@ -60,7 +76,7 @@ namespace Presentation.Web.Controllers.OData
                 {
                     return Forbidden();
                 }
-                
+
             }
             //No access to organization -> forbidden, not empty response
             else if (accessLevel < OrganizationDataReadAccessLevel.Public)

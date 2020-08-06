@@ -5,7 +5,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
 {
     public static class MoqTools
     {
-        public static object MockOf(Type type)
+        public static object MockedObjectFrom(Type type)
         {
             var mockType = typeof(Mock<>).MakeGenericType(type);
             var baseCtor = mockType.GetConstructor(new Type[0]);

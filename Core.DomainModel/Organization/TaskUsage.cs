@@ -7,7 +7,7 @@ namespace Core.DomainModel.Organization
     /// <see><cref>OrganizationUnit</cref></see>.
     /// Helper object which can hold comments and status property
     /// </summary>
-    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IContextAware, IOrganizationModule
+    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IOrganizationModule
     {
         public TaskUsage()
         {
@@ -61,18 +61,6 @@ namespace Core.DomainModel.Organization
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return OrgUnit.IsInContext(organizationId);
         }
     }
 }

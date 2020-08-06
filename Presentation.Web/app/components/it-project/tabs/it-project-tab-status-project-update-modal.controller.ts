@@ -87,7 +87,7 @@
                     var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                     $http({
                         method: "POST",
-                        url: "odata/ItProjectStatusUpdates",
+                        url: `odata/ItProjectStatusUpdates?organizationId=${user.currentOrganizationId}`,
                         data: payload
                     }).success(function () {
                         msg.toSuccessMessage("Ændringerne er gemt!");

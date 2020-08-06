@@ -360,6 +360,9 @@
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\Middleware\DenyTooLargeQueriesMiddleware.cs" />
+    <Compile Include="Models\CreateItSystemDTO.cs" />
+    <Compile Include="Models\CreateItsystemUsageDTO.cs" />
+    <Compile Include="Models\CreateTaskUsageDTO.cs" />
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
@@ -422,6 +425,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
@@ -450,11 +454,11 @@
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-archiveduty-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
+    <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
-    <TypeScriptCompile Include="app\services\optionsService.ts" />
     <TypeScriptCompile Include="app\services\referenceService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
@@ -1341,36 +1345,6 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
-      <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
-      <Name>Core.ApplicationServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
-      <Project>{7F765808-5258-4E41-8B27-6E7D4667AA24}</Project>
-      <Name>Core.BackgroundJobs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
-      <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
-      <Name>Infrastructure.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
-      <Project>{5AE358F5-4F11-47FE-94BE-1588F357DCDC}</Project>
-      <Name>Infrastructure.OpenXML</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
@@ -1383,6 +1357,36 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
+      <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
+      <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.BackgroundJobs\Core.BackgroundJobs.csproj">
+      <Project>{7f765808-5258-4e41-8b27-6e7d4667aa24}</Project>
+      <Name>Core.BackgroundJobs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
+      <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
+      <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
+      <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
+      <Project>{5ae358f5-4f11-47fe-94be-1588f357dcdc}</Project>
+      <Name>Infrastructure.OpenXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

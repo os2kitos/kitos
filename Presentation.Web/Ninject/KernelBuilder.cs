@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -20,18 +21,16 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
-using Core.ApplicationServices.TaskRefs;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Services;
-using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.References.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
@@ -53,12 +52,15 @@ using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.OpenXML;
 using Infrastructure.Services.BackgroundJobs;
+using Infrastructure.Services.Caching;
 using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
+using Infrastructure.Services.Types;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
 using Ninject.Extensions.Interception.Infrastructure.Language;
@@ -133,6 +135,7 @@ namespace Presentation.Web.Ninject
         {
             RegisterDomainEventsEngine(kernel);
             RegisterDataAccess(kernel);
+            kernel.Bind<IObjectCache>().To<AspNetObjectCache>().InSingletonScope();
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
             kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
@@ -203,7 +206,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
+            RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -263,7 +266,12 @@ namespace Presentation.Web.Ninject
         private void RegisterAccessContext(IKernel kernel)
         {
             //User context
-            kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InCommandScope(Mode);
+            kernel.Bind<UserContextFactory>().ToSelf();
+            kernel.Bind<IUserContextFactory>().ToMethod(context =>
+                    new CachingUserContextFactory(context.Kernel.GetRequiredService<UserContextFactory>(),
+                        context.Kernel.GetRequiredService<IObjectCache>()))
+                .InCommandScope(Mode);
+
             kernel.Bind<IOrganizationalUserContext>()
                 .ToMethod(ctx =>
                 {
@@ -273,7 +281,7 @@ namespace Presentation.Web.Ninject
 
                     if (canCreateContext)
                     {
-                        return factory.Create(authentication.UserId.GetValueOrDefault(), authentication.ActiveOrganizationId.GetValueOrDefault(EntityConstants.InvalidActiveOrganizationId));
+                        return factory.Create(authentication.UserId.GetValueOrDefault());
                     }
 
                     return new UnauthenticatedUserContext();
@@ -281,18 +289,6 @@ namespace Presentation.Web.Ninject
                 .InCommandScope(Mode);
 
             //Injecting it as a maybe since service calls and background processes do not have an active user
-            kernel.Bind<Maybe<ActiveUserContext>>()
-                .ToMethod(ctx =>
-                {
-                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
-                    if (authentication.Method == AuthenticationMethod.Anonymous)
-                    {
-                        return Maybe<ActiveUserContext>.None;
-                    }
-
-                    var userContext = ctx.Kernel.Get<IOrganizationalUserContext>();
-                    return new ActiveUserContext(userContext.ActiveOrganizationId, userContext.UserEntity);
-                });
             kernel.Bind<Maybe<ActiveUserIdContext>>()
                 .ToMethod(ctx =>
                 {

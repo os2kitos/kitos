@@ -1,50 +1,43 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.Authorization
 {
     public class UnauthenticatedUserContext : IOrganizationalUserContext
-
     {
         private const int INVALID_ID = -1;
 
-        public int ActiveOrganizationId { get; } = INVALID_ID;
-
         public int UserId { get; } = INVALID_ID;
 
-        public User UserEntity { get; } = null;
+        public IEnumerable<int> OrganizationIds => new int[0];
 
-        public bool IsActiveInOrganizationOfType(OrganizationCategory category)
+        public bool HasRoleInOrganizationOfType(OrganizationCategory category)
         {
             return false;
         }
 
-        public bool HasRole(OrganizationRole role)
+        public bool IsGlobalAdmin()
         {
             return false;
         }
 
-        public bool HasModuleLevelAccessTo(IEntity entity)
+        public bool HasRole(int organizationId, OrganizationRole role)
         {
             return false;
         }
 
-        public bool IsActiveInOrganization(int organizationId)
+        public bool HasRoleIn(int organizationId)
         {
             return false;
         }
 
-        public bool IsActiveInSameOrganizationAs(IEntity entity)
+        public bool HasRoleInSameOrganizationAs(IEntity entity)
         {
             return false;
         }
 
         public bool HasAssignedWriteAccess(IEntity entity)
-        {
-            return false;
-        }
-
-        public bool CanChangeVisibilityOf(IEntity entity)
         {
             return false;
         }

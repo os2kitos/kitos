@@ -131,13 +131,17 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItSystemUsageDTO dto)
+        public HttpResponseMessage Post(CreateItsystemUsageDTO dto)
         {
             try
             {
-                var systemUsage = Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = new ItSystemUsage
+                {
+                    OrganizationId = dto.OrganizationId,
+                    ItSystemId = dto.ItSystemId
+                };
 
-                if (!AllowCreate<ItSystemUsage>(systemUsage))
+                if (!AllowCreate<ItSystemUsage>(dto.OrganizationId, systemUsage))
                 {
                     return Forbidden();
                 }
@@ -157,6 +161,9 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto) => throw new NotSupportedException();
 
         public HttpResponseMessage DeleteByItSystemId(int itSystemId, int organizationId)
         {

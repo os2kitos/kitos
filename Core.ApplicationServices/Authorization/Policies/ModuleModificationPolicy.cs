@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -9,11 +8,12 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
+using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices.Authorization
+namespace Core.ApplicationServices.Authorization.Policies
 {
-    public class ModuleModificationPolicy : 
-        IModuleModificationPolicy, 
+    public class ModuleModificationPolicy :
+        IModuleModificationPolicy,
         IModuleCreationPolicy
     {
         private readonly IOrganizationalUserContext _userContext;
@@ -41,22 +41,25 @@ namespace Core.ApplicationServices.Authorization
             {
                 return IsGlobalAdmin();
             }
+
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
-            if (!possibleConditions.Any())
+
+            if (possibleConditions.Any() == false)
             {
-                //Unknown module
+                //This target is not subject to module level access
                 return false;
             }
 
-            if (IsGlobalAdmin() || IsLocalAdmin())
+            //Global or local admin overrides any of the other conditinos
+            if (IsGlobalAdmin() || IsLocalAdmin(target))
             {
                 return true;
             }
 
-            return possibleConditions.Any(condition => condition.Invoke());
+            return possibleConditions.Any(condition => condition.Invoke(target));
         }
 
-        private IEnumerable<Func<bool>> GetPossibleModificationConditions(IEntity target)
+        private IEnumerable<Func<IEntity, bool>> GetPossibleModificationConditions(IEntity target)
         {
             //An entity may be marked for several different modules (e.g. Advice), so we must check each
             //Must not be converted to switch since that will only match on the first option. We must check all
@@ -70,14 +73,17 @@ namespace Core.ApplicationServices.Authorization
                 yield return IsSystemModuleAdmin;
             if (target is IReportModule _)
                 yield return IsReportModuleAdmin;
+            if (target is Config _)
+                yield return IsLocalAdmin;
+            if (target.GetType().IsImplementationOfGenericType(typeof(LocalOptionEntity<>)))
+                yield return IsLocalAdmin;
         }
 
         /// <summary>
         /// Creation policy
         /// </summary>
-        /// <param name="target"></param>
         /// <returns></returns>
-        public bool AllowCreation(Type target)
+        public bool AllowCreation(int organizationId, Type target)
         {
             if (IsGlobalAdmin())
             {
@@ -100,24 +106,24 @@ namespace Core.ApplicationServices.Authorization
             }
 
             //If local admin, all types from this point on are allowed
-            if (IsLocalAdmin())
+            if (IsLocalAdmin(organizationId))
             {
                 return true;
             }
 
             if (MatchType<ItSystemUsage>(target))
             {
-                return IsSystemModuleAdmin();
+                return IsSystemModuleAdmin(organizationId);
             }
 
             if (MatchType<ItProject>(target))
             {
-                return IsProjectModuleAdmin();
+                return IsProjectModuleAdmin(organizationId);
             }
 
             if (MatchType<ItContract>(target))
             {
-                return IsContractModuleAdmin();
+                return IsContractModuleAdmin(organizationId);
             }
 
             if (MatchType<Organization>(target))
@@ -128,16 +134,46 @@ namespace Core.ApplicationServices.Authorization
 
             if (MatchType<User>(target))
             {
-                return IsOrganizationModuleAdmin();
+                return IsOrganizationModuleAdmin(organizationId);
             }
 
             if (MatchType<Report>(target))
             {
-                return IsReportModuleAdmin();
+                return IsReportModuleAdmin(organizationId);
             }
 
             //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system
             return true;
+        }
+
+        private bool IsReportModuleAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
+        }
+
+        private bool IsOrganizationModuleAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.OrganizationModuleAdmin);
+        }
+
+        private bool IsContractModuleAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.ContractModuleAdmin);
+        }
+
+        private bool IsProjectModuleAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.ProjectModuleAdmin);
+        }
+
+        private bool IsSystemModuleAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.SystemModuleAdmin);
+        }
+
+        private bool IsLocalAdmin(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.LocalAdmin);
         }
 
         private static bool MatchType<T>(Type type)
@@ -145,39 +181,66 @@ namespace Core.ApplicationServices.Authorization
             return type == typeof(T);
         }
 
-        private bool IsReportModuleAdmin()
+        private bool CheckRequiredRoleInRelationTo(IEntity target, OrganizationRole role)
         {
-            return _userContext.HasRole(OrganizationRole.ReportModuleAdmin);
+            var organizationIds = new HashSet<int>();
+
+            //If the entity has organizational relationship(s), we check permissions against that
+            (target as IIsPartOfOrganization)?.GetOrganizationIds()?.ToList().ForEach(id => organizationIds.Add(id));
+            if (target is IOwnedByOrganization ownedByOrganization)
+            {
+                //If organization is unknown, the object will be fresh and validation must be in the context of the users other rights
+                if (ownedByOrganization.Organization != null)
+                {
+                    organizationIds.Add(ownedByOrganization.Organization.Id);
+                }
+            }
+
+            if (!organizationIds.Any())
+            {
+                //Target is not specific to organization so base the check on any role in any of the users organizations
+                foreach (var organizationId in _userContext.OrganizationIds)
+                {
+                    organizationIds.Add(organizationId);
+                }
+            }
+
+            return organizationIds.Any(id => _userContext.HasRole(id, role));
         }
 
-        private bool IsSystemModuleAdmin()
+        private bool IsReportModuleAdmin(IEntity target)
         {
-            return _userContext.HasRole(OrganizationRole.SystemModuleAdmin);
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.ReportModuleAdmin);
         }
 
-        private bool IsProjectModuleAdmin()
+        private bool IsSystemModuleAdmin(IEntity target)
         {
-            return _userContext.HasRole(OrganizationRole.ProjectModuleAdmin);
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.SystemModuleAdmin);
         }
 
-        private bool IsOrganizationModuleAdmin()
+        private bool IsProjectModuleAdmin(IEntity target)
         {
-            return _userContext.HasRole(OrganizationRole.OrganizationModuleAdmin);
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.ProjectModuleAdmin);
         }
 
-        private bool IsContractModuleAdmin()
+        private bool IsOrganizationModuleAdmin(IEntity target)
         {
-            return _userContext.HasRole(OrganizationRole.ContractModuleAdmin);
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.OrganizationModuleAdmin);
         }
 
-        private bool IsLocalAdmin()
+        private bool IsContractModuleAdmin(IEntity target)
         {
-            return _userContext.HasRole(OrganizationRole.LocalAdmin);
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.ContractModuleAdmin);
+        }
+
+        private bool IsLocalAdmin(IEntity target)
+        {
+            return CheckRequiredRoleInRelationTo(target, OrganizationRole.LocalAdmin);
         }
 
         private bool IsGlobalAdmin()
         {
-            return _userContext.HasRole(OrganizationRole.GlobalAdmin);
+            return _userContext.IsGlobalAdmin();
         }
     }
 }

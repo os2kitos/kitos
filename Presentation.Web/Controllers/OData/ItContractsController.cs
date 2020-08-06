@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.OData
 
         /// <summary>
         /// Hvis den autentificerede bruger er Global Admin, returneres alle kontrakter.
-        /// Ellers returneres organisationens kontrakter.
+        /// Ellers returneres de kontrakter som brugeren har rettigheder til at se.
         /// </summary>
         /// <returns></returns>
         [EnableQuery]
@@ -40,16 +40,7 @@ namespace Presentation.Web.Controllers.OData
         [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
-            var all = Repository.AsQueryable();
-
-            if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All)
-            {
-                return Ok(all);
-            }
-
-            var byOrganizationId = all.ByOrganizationId(ActiveOrganizationId);
-
-            return Ok(byOrganizationId);
+            return base.Get();
         }
 
         /// <summary>

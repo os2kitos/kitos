@@ -30,7 +30,6 @@
             "_",
             "notify",
             "user",
-            "reports",
             "$confirm",
             "gridStateService",
             "reportCategoryTypes",
@@ -46,7 +45,6 @@
             private _: Kitos.ILoDashWithMixins,
             private notify,
             private user: Services.IUser,
-            public reports,
             private $confirm,
             private gridStateService: Services.IGridStateFactory,
             private reportCategoryTypes,
@@ -510,8 +508,6 @@
                     controllerAs: "vm",
                     resolve: {
                         user: ["userService", userService => userService.getUser()
-                        ],
-                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)
                         ],
                         reportCategoryTypes: [
                             "reportService", reportService => reportService.getReportCategories().then(result => result.data.value)

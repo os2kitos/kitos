@@ -2,6 +2,7 @@
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.SSO
 {

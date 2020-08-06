@@ -154,7 +154,7 @@
                         notify.addSuccessMessage("Advisen er slettet!");
                         $("#mainGrid").data("kendoGrid").dataSource.read();
                     },
-                    () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
+                        () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
 
             var modalOpen = false;
@@ -170,13 +170,13 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, roles, $window, type, action, object, currentUser) {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", ($scope, $modalInstance, roles, $window, type, action, object, currentUser : Kitos.Services.IUser) => {
 
                             $scope.showRoleFields = true;
                             modalOpen = true;
 
-                            if (roles.data) {
-                                $scope.recieverRoles = roles.data.value;
+                            if (roles) {
+                                $scope.recieverRoles = roles;
                             } else {
                                 $scope.showRoleFields = false;
                                 $scope.collapsed = false;
@@ -238,7 +238,7 @@
                                 payload.StopDate.setHours(23, 59, 59, 99);
 
                                 if (action == 'POST') {
-                                    url = "Odata/advice";
+                                    url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
 
                                     httpCall(payload, action, url);
                                 } else if (action == 'PATCH') {
@@ -249,17 +249,17 @@
 
                                     for (var i = 0; i < payload.Reciepients.length; i++) {
                                         payload.Reciepients[i].adviceId = id;
-                                        $http.post('/api/AdviceUserRelation', payload.Reciepients[i]);
+                                        $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, payload.Reciepients[i]);
                                     }
                                     payload.Reciepients = undefined;
                                     $http.patch(url, JSON.stringify(payload))
                                         .then(() => {
-                                            notify.addSuccessMessage("Advisen er opdateret!");
+                                                notify.addSuccessMessage("Advisen er opdateret!");
 
-                                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                                            $scope.$close(true);
-                                        },
-                                        () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
+                                                $("#mainGrid").data("kendoGrid").dataSource.read();
+                                                $scope.$close(true);
+                                            },
+                                            () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
                                         );
 
                                 }
@@ -289,7 +289,7 @@
                                     $scope.errMessage = 'Begge dato felter skal udfyldes!';
                                     return false;
                                 }
-                                
+
                                 $scope.startDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;
@@ -311,7 +311,7 @@
                                     $scope.errMessage = 'Begge dato felter skal udfyldes!';
                                     return false;
                                 }
-                                
+
                                 $scope.stopDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;
@@ -431,26 +431,17 @@
                             modalOpen = false;
                         }],
                         resolve: {
-                            Roles: ['$http', function ($http) {
-                                if (type == "itSystemUsage") {
-                                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                            Roles: ['localOptionServiceFactory', (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
+                                if (type === "itSystemUsage") {
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll();
                                 }
-                                if (type == "itContract") {
-                                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                                if (type === "itContract") {
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll();
                                 }
-                                if (type == "itProject") {
-                                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                                        .then(function (result) {
-                                            return result;
-                                        });
+                                if (type === "itProject") {
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll();
                                 }
-                                if (type == "itInterface") {
+                                if (type === "itInterface") {
                                     return [];
                                 }
                             }],
@@ -464,7 +455,7 @@
                                 return $scope.object;
                             }],
                             currentUser: ["userService",
-                                (userService) => userService.getUser()
+                                (userService: Kitos.Services.IUserService) => userService.getUser()
                             ],
                             advicename: [() => {
                                 return $scope.advicename;

@@ -5,6 +5,5 @@ namespace Presentation.Web.Models
     public class UserOrganizationsDTO
     {
         public ICollection<OrganizationDTO> Organizations { get; set; }
-        public int DefaultOrganizationId { get; set; }
     }
 }

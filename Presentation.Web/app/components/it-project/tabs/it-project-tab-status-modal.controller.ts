@@ -132,7 +132,7 @@
                 var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                 $http({
                     method: isNewActivity ? "POST" : "PATCH",
-                    url: "api/" + activityType + "/" + activityId + "?organizationId=" + user.currentOrganizationId,
+                    url: `api/${activityType}/${activityId}?organizationId=${user.currentOrganizationId}`,
                     data: payload
                 }).success(function () {
                     msg.toSuccessMessage("Ændringerne er gemt!");

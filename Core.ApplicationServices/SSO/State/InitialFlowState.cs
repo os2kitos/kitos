@@ -1,7 +1,7 @@
 ﻿using System;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.SSO.Model;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.SSO.State

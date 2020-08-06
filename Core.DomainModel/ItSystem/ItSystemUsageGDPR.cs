@@ -4,7 +4,7 @@ namespace Core.DomainModel.ItSystem
 {
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class ItSystemUsageGDPR : Entity, IContextAware, ISystemModule
+    public class ItSystemUsageGDPR : Entity, ISystemModule
     {
         public int? systemCategoriesId;
 
@@ -19,13 +19,6 @@ namespace Core.DomainModel.ItSystem
 
 
         public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
-        public bool IsInContext(int organizationId)
-        {
-            if (ItSystemUsage != null)
-                return ItSystemUsage.IsInContext(organizationId);
-
-            return false;
-        }
 
         public override bool HasUserWriteAccess(User user)
         {

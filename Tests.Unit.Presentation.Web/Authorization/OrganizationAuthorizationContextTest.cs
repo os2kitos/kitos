@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
@@ -9,11 +11,11 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
-using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
@@ -25,17 +27,23 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private readonly Mock<IModuleModificationPolicy> _moduleLevelAccessPolicy;
         private readonly Mock<IGlobalReadAccessPolicy> _globalAccessPolicy;
         private readonly Mock<IModuleCreationPolicy> _creationPolicy;
+        private readonly Mock<IUserRepository> _userRepository;
+        private readonly int _userId;
 
         public OrganizationAuthorizationContextTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _userId = new Fixture().Create<int>();
+            _userContextMock.Setup(x => x.UserId).Returns(_userId);
             _moduleLevelAccessPolicy = new Mock<IModuleModificationPolicy>();
             _globalAccessPolicy = new Mock<IGlobalReadAccessPolicy>();
             var typeResolver = new Mock<IEntityTypeResolver>();
             typeResolver.Setup(x => x.Resolve(It.IsAny<Type>())).Returns<Type>(t => t);
             _creationPolicy = new Mock<IModuleCreationPolicy>();
-            _creationPolicy.Setup(x => x.AllowCreation(It.IsAny<Type>())).Returns(true);
-            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object, _creationPolicy.Object);
+            _creationPolicy.Setup(x => x.AllowCreation(It.IsAny<int>(), It.IsAny<Type>())).Returns(true);
+            _userRepository = new Mock<IUserRepository>();
+            _userRepository.Setup(x => x.GetById(_userId)).Returns(new User { Id = _userId });
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object, _creationPolicy.Object, _userRepository.Object);
         }
 
         [Theory]
@@ -45,8 +53,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, organizationCategory == OrganizationCategory.Municipality);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, organizationCategory == OrganizationCategory.Municipality);
 
             //Act
             var result = _sut.GetCrossOrganizationReadAccess();
@@ -64,9 +72,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             //Arrange
             var targetOrganization = A<int>();
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectIsActiveInOrganizationReturns(targetOrganization, isActiveInOrganization);
-            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isMunicipality);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasRoleIn(targetOrganization, isActiveInOrganization);
+            ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, isMunicipality);
 
             //Act
             var hasAccess = _sut.GetOrganizationReadAccessLevel(targetOrganization);
@@ -85,13 +93,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowReads_For_Context_Dependent_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool isInSameOrg, bool isUserActiveInMunicipality, AccessModifier accessModifier, bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var entity = inputIsActiveUser ? CreateUserEntity(userId) : CreateTestItSystem(accessModifier);
+            var entity = inputIsActiveUser ? CreateUserEntity(_userId) : CreateTestItSystem(accessModifier);
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
-            ExpectIsActiveInSameOrganizationAsReturns(entity, isInSameOrg);
-            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isUserActiveInMunicipality);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectHasRoleInSameOrganizationAsReturns(entity, isInSameOrg);
+            ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, isUserActiveInMunicipality);
 
             //Act
             var result = _sut.AllowReads(entity);
@@ -107,11 +113,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowReads_For_Context_Independent_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool expectedResult)
         {
             //Arrange
-            var activeUserId = A<int>();
-            var inputEntity = inputIsActiveUser ? CreateUserEntity(activeUserId) : Mock.Of<IEntity>();
+            var inputEntity = inputIsActiveUser ? CreateUserEntity(_userId) : Mock.Of<IEntity>();
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(activeUserId);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
 
             //Act
             var result = _sut.AllowReads(inputEntity);
@@ -159,13 +163,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
             bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? userId : A<int>()) : CreateTestItSystem(AccessModifier.Public);
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateTestItSystem(AccessModifier.Public, hasAssignedWriteAccess);
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
-            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
-            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
 
             //Act
@@ -187,11 +188,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var inputEntity = inputIsActiveUser ? CreateUserEntity(userId) : Mock.Of<IEntity>();
+            var inputEntity = inputIsActiveUser ? CreateUserEntity(_userId) : Mock.Of<IEntity>();
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
 
             //Act
@@ -201,47 +200,79 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allowUpdates);
         }
 
-        public interface ISimpleEntityWithAccessModifier : IEntity, IHasAccessModifier { }
-        public interface IContractElement : IEntity, IHasAccessModifier, IContractModule { }
-        public interface IOrganizationElement : IEntity, IHasAccessModifier, IOrganizationModule { }
+        public interface ISimpleEntityWithAccessModifier : IEntity, IHasAccessModifier, IOwnedByOrganization { }
+        public interface IContractElement : IEntity, IHasAccessModifier, IContractModule, IOwnedByOrganization { }
+        public interface IOrganizationElement : IEntity, IHasAccessModifier, IOrganizationModule, IOwnedByOrganization { }
 
-        [Theory]
-        [InlineData(typeof(IEntity), OrganizationRole.GlobalAdmin, false)] //Type does not allow access modification, so false regardless of roles
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.GlobalAdmin, true)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.LocalAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ProjectModuleAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ReportModuleAdmin, false)]
-        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.User, false)]
-        [InlineData(typeof(IContractElement), OrganizationRole.GlobalAdmin, true)]
-        [InlineData(typeof(IContractElement), OrganizationRole.LocalAdmin, true)]
-        [InlineData(typeof(IContractElement), OrganizationRole.ContractModuleAdmin, true)]
-        [InlineData(typeof(IContractElement), OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IContractElement), OrganizationRole.ProjectModuleAdmin, false)]
-        [InlineData(typeof(IContractElement), OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(typeof(IContractElement), OrganizationRole.ReportModuleAdmin, false)]
-        [InlineData(typeof(IContractElement), OrganizationRole.User, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.GlobalAdmin, true)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.LocalAdmin, true)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.ProjectModuleAdmin, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.ReportModuleAdmin, false)]
-        [InlineData(typeof(IOrganizationElement), OrganizationRole.User, false)]
-        public void HasPermission_With_VisibilityControlPermission_Returns(Type entityType, OrganizationRole userRole, bool expectedResult)
+        [Fact]
+        public void HasPermission_With_VisibilityControlPermission_Returns_False_If_Input_Does_Not_Have_AccessModifier()
         {
             //Arrange
-            var inputEntity = (IEntity)MoqTools.MockOf(entityType);
-            ExpectUserHasRoles(userRole);
+            var inputEntity = Mock.Of<IEntity>();
+
+            //Act
+            var actual = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
+
+            //Assert
+            Assert.False(actual);
+        }
+
+        private void Test_HasPermission_With_VisibilityControlPermission_Returns<T>(OrganizationRole userRole, bool expectedResult) where T : class, IEntity, IHasAccessModifier, IOwnedByOrganization
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var inputEntity = Mock.Of<T>(x => x.OrganizationId == organizationId);
+
+            ExpectUserIsGlobalAdmin(userRole == OrganizationRole.GlobalAdmin);
+            ExpectUserHasRoles(organizationId, userRole);
 
             //Act
             var actual = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
 
             //Assert
             Assert.Equal(expectedResult, actual);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public void HasPermission_With_VisibilityControlPermission_Returns_For_SimpleEntityWithAccessModifier(OrganizationRole userRole, bool expectedResult)
+        {
+            Test_HasPermission_With_VisibilityControlPermission_Returns<ISimpleEntityWithAccessModifier>(userRole, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public void HasPermission_With_VisibilityControlPermission_Returns_For_IContractElement(OrganizationRole userRole, bool expectedResult)
+        {
+            Test_HasPermission_With_VisibilityControlPermission_Returns<IContractElement>(userRole, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public void HasPermission_With_VisibilityControlPermission_Returns_For_IOrganizationElement(OrganizationRole userRole, bool expectedResult)
+        {
+            Test_HasPermission_With_VisibilityControlPermission_Returns<IOrganizationElement>(userRole, expectedResult);
         }
 
         [Theory]
@@ -256,10 +287,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void HasPermission_With_DefineOrganizationTypePermission_Returns(OrganizationTypeKeys organizationType, OrganizationRole userRole, bool expectedResult)
         {
             //Arrange
-            ExpectUserHasRoles(userRole);
+            var organizationId = A<int>();
+            ExpectUserHasRoles(organizationId, userRole);
+            ExpectUserIsGlobalAdmin(userRole == OrganizationRole.GlobalAdmin);
 
             //Act
-            var actual = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType));
+            var actual = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType, organizationId));
 
             //Assert
             Assert.Equal(expectedResult, actual);
@@ -333,11 +366,17 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void HasPermission_With_AdministerOrganizationRightPermission_Returns(OrganizationRole administeredRole, OrganizationRole userRole, bool expectedResult)
         {
             //Arrange
-
-            ExpectUserHasRoles(userRole);
+            var organizationId = A<int>();
+            var right = new OrganizationRight
+            {
+                Role = administeredRole,
+                OrganizationId = organizationId
+            };
+            ExpectUserIsGlobalAdmin(userRole == OrganizationRole.GlobalAdmin);
+            ExpectUserHasRoles(organizationId, userRole);
 
             //Act
-            var actual = _sut.HasPermission(new AdministerOrganizationRightPermission(new OrganizationRight() { Role = administeredRole }));
+            var actual = _sut.HasPermission(new AdministerOrganizationRightPermission(right));
 
             //Assert
             Assert.Equal(expectedResult, actual);
@@ -424,13 +463,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? userId : A<int>()) : CreateItProject(AccessModifier.Public);
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateItProject(AccessModifier.Public, hasAssignedWriteAccess);
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
-            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
-            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
 
             //Act
@@ -452,11 +488,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var inputEntity = inputIsActiveUser ? CreateUserEntity(userId) : Mock.Of<IEntity>();
+            var inputEntity = inputIsActiveUser ? CreateUserEntity(_userId) : Mock.Of<IEntity>();
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
 
             //Act
@@ -476,12 +510,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
             var inputEntity = CreateTestItSystem(AccessModifier.Public);
 
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
-            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
+            ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
 
             //Act
             var allowUpdates = _sut.AllowDelete(inputEntity);
@@ -496,7 +528,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowSystemUsageMigration_Returns(bool globalAdmin, bool expectedResult)
         {
             //Arrange
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
+            ExpectUserIsGlobalAdmin(globalAdmin);
 
             //Act
             var result = _sut.HasPermission(new SystemUsageMigrationPermission());
@@ -513,45 +545,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowBatchImport_Returns(bool globalAdmin, bool localAdmin, bool expectedResult)
         {
             //Arrange
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
+            var organizationId = A<int>();
+            ExpectUserIsGlobalAdmin(globalAdmin);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, localAdmin);
 
             //Act
-            var result = _sut.HasPermission(new BatchImportPermission());
-
-            //Assert
-            Assert.Equal(expectedResult, result);
-        }
-
-        [Theory]
-        [InlineData(OrganizationTypeKeys.Kommune, false, false, false)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, false, false, false)]
-        [InlineData(OrganizationTypeKeys.Kommune, true, false, true)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, true, false, true)]
-        [InlineData(OrganizationTypeKeys.Kommune, false, true, false)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, true, false)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true)]
-        public void AllowCreateOrganizationOfType_Returns(
-            OrganizationTypeKeys organizationType,
-            bool globalAdmin,
-            bool localAdmin,
-            bool expectedResult)
-        {
-            //Arrange
-            var organization = new Organization { TypeId = (int)organizationType };
-
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
-            ExpectIsActiveInSameOrganizationAsReturns(organization, localAdmin); //local admin test - always in same org in this scope
-            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(organization)).Returns(localAdmin);
-
-            //Act
-            var result = _sut.AllowCreate<Organization>(organization);
+            var result = _sut.HasPermission(new BatchImportPermission(organizationId));
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -573,11 +572,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowChangeOrganizationType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool expectedResult)
         {
             //Arrange
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
+            var organizationId = A<int>();
+            ExpectUserIsGlobalAdmin(globalAdmin);
+            ExpectHasRoleReturns(organizationId, OrganizationRole.LocalAdmin, localAdmin);
 
             //Act
-            var result = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType));
+            var result = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType, organizationId));
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -586,10 +586,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void Allow_Create_Returns<T>(bool expectedResult)
         {
             //Arrange
-            _creationPolicy.Setup(x => x.AllowCreation(typeof(T))).Returns(expectedResult);
+            var organizationId = A<int>();
+            _creationPolicy.Setup(x => x.AllowCreation(organizationId, typeof(T))).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowCreate<T>();
+            var result = _sut.AllowCreate<T>(organizationId);
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -600,51 +601,63 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _moduleLevelAccessPolicy.Setup(x => x.AllowModification(inputEntity)).Returns(hasModuleLevelAccess);
         }
 
-        private void ExpectHasAssignedWriteAccessReturns(IEntity inputEntity, bool value)
+        private ItSystem CreateTestItSystem(AccessModifier accessModifier, bool hasAssignedWriteAccess = false)
         {
-            _userContextMock.Setup(x => x.HasAssignedWriteAccess(inputEntity)).Returns(value);
+            var testItSystem = new ItSystem { AccessModifier = accessModifier };
+            if (hasAssignedWriteAccess)
+            {
+                testItSystem.ObjectOwnerId = _userId;
+            }
+            return testItSystem;
         }
 
-        private static ItSystem CreateTestItSystem(AccessModifier accessModifier)
+        private ItProject CreateItProject(AccessModifier accessModifier, bool hasAssignedWriteAccess)
         {
-            return new ItSystem { AccessModifier = accessModifier };
+            var itProject = new ItProject
+            {
+                AccessModifier = accessModifier
+            };
+            if (hasAssignedWriteAccess)
+            {
+                itProject.Rights = new List<ItProjectRight>()
+                {
+                    new ItProjectRight {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
+
+                };
+            }
+            return itProject;
         }
 
-        private static ItProject CreateItProject(AccessModifier accessModifier)
+        private void ExpectHasRoleInSameOrganizationAsReturns(IEntity entity, bool value)
         {
-            return new ItProject { AccessModifier = accessModifier };
+            _userContextMock.Setup(x => x.HasRoleInSameOrganizationAs(entity)).Returns(value);
         }
 
-        private void ExpectIsActiveInSameOrganizationAsReturns(IEntity entity, bool value)
+        private void ExpectUserHasRoleInOrganizationOfType(OrganizationCategory organizationCategory, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInSameOrganizationAs(entity)).Returns(value);
+            _userContextMock.Setup(x => x.HasRoleInOrganizationOfType(organizationCategory)).Returns(value);
         }
 
-        private void ExpectGetUserIdReturns(int userId)
+        private void ExpectUserIsGlobalAdmin(bool isGlobalAdmin)
         {
-            _userContextMock.Setup(x => x.UserId).Returns(userId);
+            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(isGlobalAdmin);
         }
 
-        private void ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory organizationCategory, bool value)
+        private void ExpectUserHasRoleIn(int targetOrganization, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInOrganizationOfType(organizationCategory)).Returns(value);
+            _userContextMock.Setup(x => x.HasRoleIn(targetOrganization)).Returns(value);
         }
 
-        private void ExpectIsActiveInOrganizationReturns(int targetOrganization, bool value)
+        private void ExpectHasRoleReturns(int organizationId, OrganizationRole role, bool value)
         {
-            _userContextMock.Setup(x => x.IsActiveInOrganization(targetOrganization)).Returns(value);
+            _userContextMock.Setup(x => x.HasRole(organizationId, role)).Returns(value);
         }
 
-        private void ExpectHasRoleReturns(OrganizationRole role, bool value)
-        {
-            _userContextMock.Setup(x => x.HasRole(role)).Returns(value);
-        }
-
-        private void ExpectUserHasRoles(params OrganizationRole[] targetRoles)
+        private void ExpectUserHasRoles(int organizationId, params OrganizationRole[] targetRoles)
         {
             foreach (var organizationRole in Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>())
             {
-                ExpectHasRoleReturns(organizationRole, targetRoles.Contains(organizationRole));
+                ExpectHasRoleReturns(organizationId, organizationRole, targetRoles.Contains(organizationRole));
             }
         }
 

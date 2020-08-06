@@ -286,7 +286,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.userObjectOwnerId, opt => opt.MapFrom(src => src.User.ObjectOwnerId))
                .ForMember(dto => dto.userLastChanged, opt => opt.MapFrom(src => src.User.LastChanged))
                .ForMember(dto => dto.userLastChangedByUserId, opt => opt.MapFrom(src => src.User.LastChangedByUserId))
-               .ForMember(dto => dto.userDefaultOrganizationId, opt => opt.MapFrom(src => src.User.DefaultOrganizationId))
                .ForMember(dto => dto.userLockedOutDate, opt => opt.MapFrom(src => src.User.LockedOutDate))
                .ForMember(dto => dto.userFailedAttempts, opt => opt.MapFrom(src => src.User.FailedAttempts))
                .ForMember(dto => dto.userDefaultUserStartPreference, opt => opt.MapFrom(src => src.User.DefaultUserStartPreference))

@@ -17,9 +17,9 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
             return _mainStrategy.AllowRead(entity);
         }
 
-        public bool AllowCreate<T>(IEntity entity)
+        public bool AllowCreate<T>(int organizationId, IEntity entity)
         {
-            return _mainStrategy.AllowCreate<T>(entity);
+            return _mainStrategy.AllowCreate<T>(organizationId, entity);
         }
 
         public bool AllowModify(IEntity entity)

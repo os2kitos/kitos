@@ -34,14 +34,15 @@ namespace Core.ApplicationServices.Authorization
         /// Determines if create-access is allowed for the provided entity type
         /// </summary>
         /// <returns></returns>
-        bool AllowCreate<T>();
+        bool AllowCreate<T>(int organizationId);
         /// <summary>
         /// Determines if create-access is allowed for the provided entity type and with the representation passed in <paramref name="entity"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="organizationId"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        bool AllowCreate<T>(IEntity entity);
+        bool AllowCreate<T>(int organizationId, IEntity entity);
         /// <summary>
         /// Determines if update-access is allowed for the provided entity
         /// </summary>

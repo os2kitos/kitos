@@ -20,11 +20,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId);
 
-            this.HasOptional(t => t.DefaultOrganization)
-                .WithMany(t => t.DefaultOrganizationForUsers)
-                .HasForeignKey(d => d.DefaultOrganizationId)
-                .WillCascadeOnDelete(false);
-
             // Properties
             this.Property(t => t.Name)
                 .HasMaxLength(UserConstraints.MaxNameLength)
@@ -32,7 +27,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("User_Index_Name", 0);
             this.Property(t => t.LastName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
-                .IsRequired()
+                .IsOptional()
                 .HasIndexAnnotation("User_Index_Name", 1);
             this.Property(t => t.Email)
                 .HasMaxLength(UserConstraints.MaxEmailLength)

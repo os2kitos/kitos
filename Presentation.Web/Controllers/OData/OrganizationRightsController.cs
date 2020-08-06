@@ -72,10 +72,8 @@ namespace Presentation.Web.Controllers.OData
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public override IHttpActionResult Post(OrganizationRight entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, OrganizationRight entity) => throw new NotSupportedException();
 
         // DELETE /Organizations(1)/Rights(1)
         [ODataRoute("Organizations({orgKey})/Rights({key})")]

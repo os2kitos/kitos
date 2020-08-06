@@ -1,12 +1,9 @@
-﻿using System.Security.Claims;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.Types;
 using Microsoft.Owin;
-using Presentation.Web.Extensions;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Factories.Authentication
@@ -34,7 +31,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
                     .Match(onValue: principal =>
                     {
                         return GetAuthenticatedUser(principal).FromNullable()
-                            .Select(user => new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id, MapOrganizationId(user, principal)))
+                            .Select(user => new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id))
                             .Match(authUser => authUser,
                                 () => AnonymousAuthentication);
                     }, onNone: () => AnonymousAuthentication);
@@ -43,29 +40,6 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
         private bool MapApiAccess(User user)
         {
             return user.HasApiAccess == true;
-        }
-
-        private int? MapOrganizationId(User user, IPrincipal principal)
-        {
-            var method = MapAuthenticationMethod(principal);
-            if (method == AuthenticationMethod.KitosToken)
-            {
-                var orgId = (principal.Identity as ClaimsIdentity).GetClaimOrNull(BearerTokenConfig.DefaultOrganizationClaimName);
-
-                if (orgId != null)
-                {
-                    if (int.TryParse(orgId.Value, out var id))
-                    {
-                        return id;
-                    }
-                    _logger.Error("Found Claim {claimName}, but could not parse it to an integer", BearerTokenConfig.DefaultOrganizationClaimName);
-                }
-            }
-            else if (method == AuthenticationMethod.Forms)
-            {
-                return user.DefaultOrganizationId;
-            }
-            return default(int?);
         }
 
         private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)

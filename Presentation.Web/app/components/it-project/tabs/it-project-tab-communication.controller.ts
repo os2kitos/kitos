@@ -73,7 +73,7 @@
                     $scope.comm.dueDate = null;
                 }
 
-                $http.post("api/communication", $scope.comm).finally(reload);
+                $http.post(`api/communication?organizationId=${user.currentOrganizationId}`, $scope.comm).finally(reload);
             };
 
             $scope.delete = function (id) {

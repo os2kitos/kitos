@@ -46,10 +46,11 @@ namespace Tests.Unit.Presentation.Web.Controllers
         public void GetAccessRights_Returns_Forbidden_If_No_Access_In_Organization()
         {
             //Arrange
-            ExpectAllowReadInOrganization(false);
+            var organizationId = A<int>();
+            ExpectAllowReadInOrganization(organizationId, false);
 
             //Act
-            var accessRights = _sut.GetAccessRights(true);
+            var accessRights = _sut.GetAccessRights(true, organizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, accessRights.StatusCode);
@@ -61,11 +62,12 @@ namespace Tests.Unit.Presentation.Web.Controllers
         public void GetAccessRights_With_Organization_Access_Returns_Based_On_AccessRights(bool allowCreate)
         {
             //Arrange
-            ExpectAllowReadInOrganization(true);
-            ExpectAllowCreateReturns(allowCreate);
+            var organizationId = A<int>();
+            ExpectAllowReadInOrganization(organizationId, true);
+            ExpectAllowCreateReturns(organizationId, allowCreate);
 
             //Act
-            var responseMessage = _sut.GetAccessRights(true);
+            var responseMessage = _sut.GetAccessRights(true, organizationId);
 
             //Assert
             var dto = ExpectResponseOf<EntitiesAccessRightsDTO>(responseMessage);
@@ -245,7 +247,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
 
         private void ExpectGetUsingOrganizationsReturn(
             int itSystemId,
-            Result<IReadOnlyList<UsingOrganization>,OperationFailure > result)
+            Result<IReadOnlyList<UsingOrganization>, OperationFailure> result)
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);
@@ -272,14 +274,14 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(allowRead);
         }
 
-        private void ExpectAllowCreateReturns(bool allowWrite)
+        private void ExpectAllowCreateReturns(int organizationId, bool allowWrite)
         {
-            _authorizationContext.Setup(x => x.AllowCreate<ItSystem>()).Returns(allowWrite);
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystem>(organizationId)).Returns(allowWrite);
         }
 
-        private void ExpectAllowReadInOrganization(bool success)
+        private void ExpectAllowReadInOrganization(int organizationId, bool success)
         {
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(It.IsAny<int>()))
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId))
                 .Returns(success ? OrganizationDataReadAccessLevel.All : OrganizationDataReadAccessLevel.None);
         }
     }

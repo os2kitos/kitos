@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -16,19 +18,13 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
-        public override HttpResponseMessage Post(NamedEntityDTO dto)
-        {
-            return CreateResponse(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, NamedEntityDTO dto) => throw new NotSupportedException();
 
-        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
-        {
-            return CreateResponse(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj) => throw new NotSupportedException();
 
-        public override HttpResponseMessage Delete(int id, int organizationId)
-        {
-            return CreateResponse(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();
     }
 }

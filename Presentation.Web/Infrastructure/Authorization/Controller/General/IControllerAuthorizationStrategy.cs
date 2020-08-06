@@ -9,8 +9,8 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
         CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess();
         OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
         bool AllowRead(IEntity entity);
-        bool AllowCreate<T>(IEntity entity);
-        bool AllowCreate<T>();
+        bool AllowCreate<T>(int organizationId, IEntity entity);
+        bool AllowCreate<T>(int organizationId);
         bool AllowModify(IEntity entity);
         bool AllowDelete(IEntity entity);
         bool HasPermission(Permission permission);

@@ -8,14 +8,12 @@ namespace Presentation.Web.Infrastructure.Model.Authentication
         public User User { get; }
         public string Value { get; }
         public DateTime Expiration { get; }
-        public int ActiveOrganizationId { get; }
 
-        public KitosApiToken(User user, string value, DateTime expiration, int activeOrganizationId)
+        public KitosApiToken(User user, string value, DateTime expiration)
         {
             User = user;
             Value = value;
             Expiration = expiration;
-            ActiveOrganizationId = activeOrganizationId;
         }
     }
 }

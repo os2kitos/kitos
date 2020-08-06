@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using AutoMapper;
+using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
@@ -22,8 +22,8 @@ namespace Presentation.Web.Controllers.API
         private readonly IOrganizationalUserContext _userContext;
 
         public UserController(
-            IGenericRepository<User> repository, 
-            IUserService userService, 
+            IGenericRepository<User> repository,
+            IUserService userService,
             IOrganizationService organizationService,
             IOrganizationalUserContext userContext)
             : base(repository)
@@ -33,7 +33,10 @@ namespace Presentation.Web.Controllers.API
             _userContext = userContext;
         }
 
-        public override HttpResponseMessage Post(UserDTO dto)
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, UserDTO dto) => throw new NotSupportedException();
+
+        public HttpResponseMessage Post(UserDTO dto)
         {
             try
             {
@@ -112,7 +115,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (destName == "IsGlobalAdmin")
                     if (valuePair.Value.Value<bool>()) // check if value is being set to true
-                        if (!_userContext.HasRole(OrganizationRole.GlobalAdmin))
+                        if (!_userContext.IsGlobalAdmin())
                             return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
             }
 
@@ -130,7 +133,7 @@ namespace Presentation.Web.Controllers.API
                 if (!AllowModify(user))
                     return Forbidden();
 
-                _organizationService.SetDefaultOrgUnit(KitosUser, dto.OrgId, dto.OrgUnitId);
+                _organizationService.SetDefaultOrgUnit(user, dto.OrgId, dto.OrgUnitId);
 
                 return Ok();
             }
@@ -138,21 +141,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        public HttpResponseMessage PostDefaultOrganization(bool? updateDefaultOrganization, int organizationId)
-        {
-            var user = Repository.GetByKey(UserId);
-
-            if (user == null)
-                return NotFound();
-
-            if (!AllowModify(user))
-                return Forbidden();
-
-            user.DefaultOrganizationId = organizationId;
-            Repository.Save();
-            return Ok();
         }
 
         /// <summary>

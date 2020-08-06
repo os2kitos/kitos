@@ -78,10 +78,8 @@
                             }
                         ],
                         projectTypes: [
-                            "$http", $http => {
-                                return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.value);
-                            }
+                            "localOptionServiceFactory", (localOptionServiceFactory : Services.LocalOptions.ILocalOptionServiceFactory) => 
+                            localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItProjectTypes).getAll()
                         ]
                     }
                 });

@@ -11,7 +11,7 @@
         public selectedCategory: any;
         reportId: number;
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "$state", "$window", "notify", "reportService", "_", "hasWriteAccess"];
+        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "$state", "$window", "notify", "reportService", "_", "hasWriteAccess", "user"];
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $stateParams: ng.ui.IStateParamsService,
             private $http: ng.IHttpService,
@@ -21,7 +21,8 @@
             private notify,
             private reportService: Services.ReportService,
             private _: ILoDashWithMixins,
-            private hasWriteAccess: boolean) {
+            private hasWriteAccess: boolean,
+            private user : Services.IUser) {
 
             var hasPermission = hasWriteAccess;
 
@@ -80,7 +81,7 @@
                     CategoryTypeId: this.categoryTypeId,
                     AccessModifier: this.accessModifier
                 }
-                this.$http.post("/odata/reports", payload).then((response) => {
+                this.$http.post(`/odata/reports?organizationId=${this.user.currentOrganizationId}`, payload).then((response) => {
                     this.$uibModalInstance.close();
                 });
             }
@@ -134,6 +135,7 @@
 
                                     }
                                 ],
+                                user: ["userService", (userService: Services.IUserService) =>userService.getUser() ],
                             },
                             controller: EditReportController,
                             controllerAs: "vm",

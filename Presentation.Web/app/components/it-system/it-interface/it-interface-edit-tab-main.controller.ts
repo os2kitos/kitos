@@ -6,12 +6,12 @@
             controller: "system.SystemInterfaceMainCtrl",
             resolve: {
                 interfaces: [
-                    "optionsService", optionsService =>
-                        optionsService.getLocalInterfaceTypes()
+                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.InterfaceTypes).getAll()
                 ],
                 dataTypes: [
-                    "optionsService", optionsService =>
-                        optionsService.getLocalDataTypes()
+                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataTypes).getAll()
                 ],
                 dataRows: [
                     "$http", "itInterface",
@@ -74,7 +74,7 @@
                     var payload = { itInterfaceId: itInterface.id };
 
                     var msg = notify.addInfoMessage("Tilføjer række...", false);
-                    $http.post("api/dataRow", payload).success(result => {
+                    $http.post(`api/dataRow?organizationId=${user.currentOrganizationId}`, payload).success(result => {
                         pushDataRow(result.response);
                         msg.toSuccessMessage("Rækken er tilføjet!");
                     }).error(() => {

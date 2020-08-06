@@ -1,4 +1,5 @@
 ﻿using System;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.Result
 {

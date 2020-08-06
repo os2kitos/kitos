@@ -12,6 +12,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Presentation.Web.Extensions;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -40,14 +41,9 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
-        /// <summary>
-        /// Henter alle IT-kontrakter i organisationen 
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="paging"></param>
-        /// <param name="q">Mulighed for søgning på navneindhold</param>
-        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
             var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
@@ -82,7 +78,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != ActiveOrganizationId)
+                if (GetOrganizationReadAccessLevel(item.OrganizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     dto.Note = "";
                 }
@@ -94,7 +90,6 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
 
         public virtual HttpResponseMessage PostAgreementElement(int id, int organizationId, int elemId)
         {

@@ -11,8 +11,9 @@
                             return result.data.response;
                         })
                     ],
-                    localOrgUnitRoles: ['$http', $http => $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                        .then(result => result.data.value)],
+                    localOrgUnitRoles: ['localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OrganizationUnitRoles).getAll()
+                    ],
                     orgUnitRoles: ['$http', $http => $http.get("odata/OrganizationUnitRoles")
                         .then(result => result.data.value)],
                     user: [
@@ -557,9 +558,9 @@
             function addUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Opretter tilknytning...", false);
 
-                var url = "api/taskUsage/";
+                const url = `api/taskUsage`;
 
-                var payload = {
+                const payload = {
                     taskRefId: refUsage.taskRef.id,
                     orgUnitId: $scope.chosenOrgUnit.id
                 };
@@ -575,7 +576,7 @@
             function removeUsage(refUsage, showMessage) {
                 if (showMessage) var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
 
-                var url = "api/taskUsage/" + refUsage.usage.id + "?organizationId=" + user.currentOrganizationId;
+                const url = `api/taskUsage/${refUsage.usage.id}?organizationId=${user.currentOrganizationId}`;
 
                 $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
                     refUsage.usage = null;

@@ -6,12 +6,8 @@
             controller: 'object.EditAdviceCtrl',
             controllerAs: 'Vm',
             resolve: {
-                Roles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                        .then(function (result) {
-                            return result.data.value;
-                        });
-                }],
+                Roles: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get('api/itProject/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;

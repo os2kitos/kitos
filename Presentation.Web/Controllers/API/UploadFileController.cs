@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web;
-using Core.ApplicationServices.Authorization.Permissions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -11,7 +10,7 @@ namespace Presentation.Web.Controllers.API
     {
         public HttpResponseMessage Post()
         {
-            if (AuthorizationContext.HasPermission(new BatchImportPermission()) == false)
+            if (UserContext.IsGlobalAdmin())
             {
                 return Forbidden();
             }

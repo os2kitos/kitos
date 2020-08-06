@@ -9,7 +9,7 @@ namespace Core.DomainModel.Organization
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IContextAware, IOrganizationModule, IOwnedByOrganization
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization
     {
         public OrganizationUnit()
         {
@@ -114,18 +114,6 @@ namespace Core.DomainModel.Organization
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return OrganizationId == organizationId;
         }
     }
 }
