@@ -153,6 +153,12 @@ namespace Presentation.Web.Controllers.API
             {
                 var orgUnit = Repository.GetByKey(id);
 
+                if (orgUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(orgUnit))
+                    return Forbidden();
+
                 IQueryable<TaskRef> taskQuery;
                 // if the org unit has a parent, only select those tasks that is in use by the parent org unit
                 if (orgUnit.ParentId.HasValue)
@@ -185,7 +191,6 @@ namespace Presentation.Web.Controllers.API
                     pagingModel.Where(taskRef => !taskRef.Children.Any());
                 }
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
@@ -218,6 +223,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var organizationUnit = Repository.GetByKey(id);
+                if (organizationUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(organizationUnit))
+                    return Forbidden();
+
                 var usageQuery = _taskUsageRepository.AsQueryable();
                 pagingModel.Where(usage => usage.OrgUnitId == id);
 
@@ -228,7 +240,6 @@ namespace Presentation.Web.Controllers.API
                                                    taskUsage.TaskRef.Parent.ParentId.Value == taskGroup.Value);
                 }
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theUsages = Page(usageQuery, pagingModel).ToList();
 
                 var dtos = (from usage in theUsages
