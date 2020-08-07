@@ -28,10 +28,16 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<HandoverTrialDTO>>))]
         public HttpResponseMessage GetByContractid(int id, bool? byContract)
         {
-            var query = Repository
-                .Get(x => x.ItContractId == id)
-                .AsEnumerable()
-                .Where(AllowRead);
+            var itContract = _contractRepository.GetById(id);
+            
+            if (itContract == null)
+                return NotFound();
+            
+            if (!AllowRead(itContract))
+                return Forbidden();
+
+            var query = Repository.Get(x => x.ItContractId == id);
+
             var dtos = Map(query);
             return Ok(dtos);
         }

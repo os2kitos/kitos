@@ -78,15 +78,22 @@ namespace Presentation.Web.Controllers.API
             {
                 return BadRequest($"Please limit the number of ID's you are asking for. Max is {MaxEntities} ID's per request");
             }
+
             var result = ids
                 .Distinct()
                 .Select(id => Repository.GetByKey(id))
                 .ToList();
 
-            if (!result.Any(AllowRead))
+            var disAllowedItemIds = result
+                .Where(x => AllowRead(x) == false)
+                .Select(x => x.Id)
+                .ToList();
+
+            if (disAllowedItemIds.Any())
             {
-                var noReadAccessIds = result.Where(x => AllowRead(x) == false);
-                return Forbidden($"You are now allowed to read the information on items with the following ID's: {noReadAccessIds}");
+                var noReadAccessIds = disAllowedItemIds.Transform(disallowedIds => string.Join(";", disallowedIds));
+
+                return Forbidden($"You are now allowed to read the information on items with the following ID's: '{noReadAccessIds}'");
             }
 
             return Ok(Map(result));

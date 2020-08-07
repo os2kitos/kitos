@@ -13,6 +13,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Ninject.Infrastructure.Language;
@@ -129,12 +130,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                if (GetOrganizationReadAccessLevel(orgId) < OrganizationDataReadAccessLevel.All)
+                    return Forbidden();
+
                 var projects = Repository
                     .AsQueryable()
                     .ByOrganizationId(orgId)
                     .Where(p => p.ItProjectTypeId == typeId)
-                    .AsEnumerable()
-                    .Where(AllowRead)
                     .ToList();
 
                 return Ok(Map(projects));
