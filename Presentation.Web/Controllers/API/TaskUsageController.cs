@@ -221,9 +221,16 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var organizationUnit = _orgUnitRepository.GetByKey(orgUnitId);
+                
+                if (organizationUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(organizationUnit))
+                    return Forbidden();
+
                 var usages = Repository
-                    .Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred)
-                    .Where(AllowRead);
+                    .Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred);
 
                 var dtos = new List<TaskUsageNestedDTO>();
 

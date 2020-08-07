@@ -30,12 +30,17 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetSingle(int id, [FromUri] bool project)
         {
-            var item = Repository.Get(x => x.ItProjectId == id);
-
-            if (item == null)
+            var itProject = _projectRepository.GetById(id);
+            
+            if (itProject == null)
                 return NotFound();
+            
+            if (!AllowRead(itProject))
+                return Forbidden();
 
-            return Ok(Map(item.Where(AllowRead)));
+            var items = Repository.Get(x => x.ItProjectId == id);
+
+            return Ok(Map(items));
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()

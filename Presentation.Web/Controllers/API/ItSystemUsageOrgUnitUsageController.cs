@@ -38,7 +38,6 @@ namespace Presentation.Web.Controllers.API
 
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
-                orgUnits = orgUnits.Where(AllowRead);
                 var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
 
                 return Ok(dtos);
