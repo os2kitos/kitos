@@ -75,7 +75,6 @@
                     // is for the one we're interested in.
                     if (widget === this.mainGrid) {
                         this.loadGridOptions();
-                        this.mainGrid.dataSource.read();
 
                         // show loadingbar when export to excel is clicked
                         // hidden again in method exportToExcel callback
@@ -85,7 +84,8 @@
                     }
                 });
 
-            this.activate();
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
         }
 
         public opretITKontrakt() {
