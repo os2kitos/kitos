@@ -90,9 +90,7 @@
             });
 
             //Defer until page change is complete
-            setTimeout(() => {
-                this.activate();
-            }, 1);
+            setTimeout(() => this.activate(), 1);
         }
         public opretITProjekt() {
             var self = this;
