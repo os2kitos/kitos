@@ -38,7 +38,6 @@ namespace Presentation.Web.Models
         public int userObjectOwnerId { get; set; }
         public DateTime userLastChanged { get; set; }
         public int userLastChangedByUserId { get; set; }
-        public int userDefaultOrganizationId { get; set; }
         public DateTime userLockedOutDate { get; set; }
         public int userFailedAttempts { get; set; }
         public string userDefaultUserStartPreference { get; set; }

@@ -50,11 +50,6 @@ namespace Core.DomainModel
         /// </returns>
         public virtual bool HasUserWriteAccess(User user)
         {
-            if (this is IContextAware && user.DefaultOrganizationId.HasValue)
-            {
-                if (((IContextAware) this).IsInContext(user.DefaultOrganizationId.Value) && user.IsLocalAdmin)
-                    return true;
-            }
             return ObjectOwnerId == user.Id;
         }
 

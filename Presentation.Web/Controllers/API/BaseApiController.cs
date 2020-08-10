@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
+using AutoMapper;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -32,14 +33,16 @@ namespace Presentation.Web.Controllers.API
         [Inject]
         public IAuthorizationContext AuthorizationContext { get; set; }
 
+        [Inject]
+        public IMapper Mapper { get; set; }
+
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
 
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
-        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
+        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
         protected BaseApiController()
         {
@@ -179,13 +182,11 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
 
-        protected User KitosUser => UserContext.UserEntity;
-
         protected int UserId => UserContext.UserId;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
-            return AutoMapper.Mapper.Map<TDest>(item);
+            return Mapper.Map<TDest>(item);
         }
 
         protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)
@@ -201,14 +202,9 @@ namespace Presentation.Web.Controllers.API
                                                                 Newtonsoft.Json.JsonConvert.SerializeObject(
                                                                     paginationHeader));
 
-            //Make sure query is ordered
-            query = query.OrderByField(paging.OrderBy, paging.Descending);
-
-            //Apply post-processing
-            query = paging.ApplyPostProcessing(query);
-
             //Load the page
             return query
+                .OrderByField(paging.OrderBy, paging.Descending)
                 .Skip(paging.Skip)
                 .Take(paging.Take);
         }
@@ -245,14 +241,14 @@ namespace Presentation.Web.Controllers.API
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(IEntity entity)
+        protected virtual bool AllowCreate<T>(int organizationId ,IEntity entity)
         {
-            return CrudAuthorization.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
 
-        protected bool AllowCreate<T>()
+        protected bool AllowCreate<T>(int organizationId)
         {
-            return AuthorizationStrategy.AllowCreate<T>();
+            return AuthorizationStrategy.AllowCreate<T>(organizationId);
         }
 
         protected bool AllowDelete(IEntity entity)

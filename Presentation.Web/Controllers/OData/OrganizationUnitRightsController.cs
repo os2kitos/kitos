@@ -1,7 +1,7 @@
 ﻿using Core.DomainServices;
 using Core.DomainModel.Organization;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using System.Web.Http;
 using System.Linq;
 using Presentation.Web.Infrastructure.Attributes;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices.Authorization
@@ -16,7 +17,7 @@ namespace Core.ApplicationServices.Authorization
             _roleService = roleService;
         }
 
-        public IOrganizationalUserContext Create(int userId, int organizationId)
+        public IOrganizationalUserContext Create(int userId)
         {
             var user = _userRepository.GetByKey(userId);
             if (user == null)
@@ -25,9 +26,16 @@ namespace Core.ApplicationServices.Authorization
             }
 
             //Get roles for the organization
-            var organizationRoles = _roleService.GetRolesInOrganization(user, organizationId);
+            var organizationRoles = _roleService.GetOrganizationRoles(user);
 
-            return new OrganizationalUserContext(organizationRoles, user, organizationId);
+            var organizationCategories = user
+                .OrganizationRights
+                .GroupBy(x => x.OrganizationId)
+                .Select(x => new { x.Key, x.First().Organization.Type.Category })
+                .ToDictionary(x => x.Key, x => x.Category);
+
+
+            return new OrganizationalUserContext(user.Id, organizationRoles, organizationCategories);
         }
     }
 }

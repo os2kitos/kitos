@@ -10,12 +10,6 @@
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
     </parameterentry>
   </parameter>
-  
-  <!-- SSO -->
-  <parameter name="SSOGateway" description="" defaultvalue="__SSOGateway__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SSOGateway']/@value">
-    </parameterentry>
-  </parameter>
 
   <!-- Kitos token configuration -->
   <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">

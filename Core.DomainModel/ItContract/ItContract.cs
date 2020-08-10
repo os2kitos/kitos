@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
     {
         public ItContract()
         {
@@ -62,18 +62,6 @@ namespace Core.DomainModel.ItContract
                 }
                 return Active;
             }
-        }
-
-        /// <summary>
-        ///     Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///     <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return OrganizationId == organizationId;
         }
 
         public int? ReferenceId { get; set; }
@@ -460,7 +448,6 @@ namespace Core.DomainModel.ItContract
         /// <remarks>
         ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
         ///     It's a string but should be treated as an int.
-        ///     TODO perhaps a redesign of OptionEntity is in order
         /// </remarks>
         /// <value>
         ///     The termination deadline.

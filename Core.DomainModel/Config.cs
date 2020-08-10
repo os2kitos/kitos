@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace Core.DomainModel
 {
     /// <summary>
     /// Configuration of KITOS for an organization
     /// </summary>
-    public class Config : Entity, IContextAware
+    public class Config : Entity, IIsPartOfOrganization
     {
         /* SHOW/HIDE MODULES */
         public bool ShowItProjectModule { get; set; }
@@ -42,17 +44,9 @@ namespace Core.DomainModel
                 };
         }
 
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
+        public IEnumerable<int> GetOrganizationIds()
         {
-            // this is a 1:0-1 relation to Organization so this.Id actually is the OrganizationId
-            return Id == organizationId;
+            yield return Id; //Same as org id due to how it is bound
         }
     }
 }

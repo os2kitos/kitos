@@ -20,6 +20,7 @@ using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage
@@ -50,7 +51,7 @@ namespace Core.ApplicationServices.SystemUsage
             IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            ILogger logger, 
+            ILogger logger,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository)
         {
             _usageRepository = usageRepository;
@@ -76,7 +77,7 @@ namespace Core.ApplicationServices.SystemUsage
                 return OperationFailure.Conflict;
             }
 
-            if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage))
+            if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage.OrganizationId, newSystemUsage))
             {
                 return OperationFailure.Forbidden;
             }

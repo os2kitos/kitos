@@ -7,7 +7,8 @@
                 controller: "system.SystemMainCtrl",
                 resolve: {
                     businessTypes: [
-                        "$http", $http => $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.BusinessTypes).getAll()
                     ],
                     itSystem: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itsystem/${$stateParams.id}`)
                         .then(result => result.data.response)]
@@ -30,17 +31,17 @@
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
-                $scope.businessTypes = businessTypes.data.value;
+                $scope.businessTypes = businessTypes;
 
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2(
                     "api/itsystem",
                     true,
-                    [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`],
+                    [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`, `take=25`],
                     true);
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
                     "api/organization",
                     true,
-                    [`orgId=${user.currentOrganizationId}`],
+                    [`orgId=${user.currentOrganizationId}`, 'take=25'],
                     true);
 
                 $scope.hasWriteAccess = hasWriteAccess;

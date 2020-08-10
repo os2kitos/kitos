@@ -73,16 +73,19 @@ namespace Presentation.Web.Controllers.API
         /// <param name="paging"></param>
         /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
             {
                 var systemQuery = _systemService.GetAvailableSystems(organizationId, q);
 
-                var query = Page(systemQuery, paging);
+                var query = Page(systemQuery, paging)
+                    .AsEnumerable()
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                return Ok(Map(query));
+                return Ok(query);
             }
             catch (Exception e)
             {
@@ -90,17 +93,21 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
+        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId, int take = 25)
         {
             try
             {
                 var systems = _systemService
                     .GetAvailableSystems(orgId, q)
-                    .ExceptEntitiesWithIds(excludeId);
+                    .ExceptEntitiesWithIds(excludeId)
+                    .OrderBy(_ => _.Name)
+                    .Take(take)
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                var dtos = Map(systems);
-                return Ok(dtos);
+                
+                return Ok(systems);
             }
             catch (Exception e)
             {
@@ -136,7 +143,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItSystemDTO dto)
+        public HttpResponseMessage Post(CreateItSystemDTO dto)
         {
             try
             {
@@ -145,21 +152,16 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
                 }
 
-                var item = Map(dto);
-                if (dto.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(item))
+                var item = new ItSystem
                 {
-                    return Forbidden();
-                }
+                    Name = dto.Name,
+                    OrganizationId = dto.OrganizationId,
+                    BelongsToId = dto.OrganizationId,
+                    Uuid = Guid.NewGuid(),
+                    AccessModifier = dto.AccessModifier ?? AccessModifier.Public
+                };
 
-                item.Uuid = Guid.NewGuid();
-
-                foreach (var id in dto.TaskRefIds)
-                {
-                    var task = _taskRepository.GetByKey(id);
-                    item.TaskRefs.Add(task);
-                }
-
-                if (!AllowCreate<ItSystem>(item))
+                if (!AllowCreate<ItSystem>(dto.OrganizationId, item))
                 {
                     return Forbidden();
                 }
@@ -173,6 +175,9 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ItSystemDTO dto) => throw new NotSupportedException();
 
         public HttpResponseMessage PostTasksUsedByThisSystem(int id, int organizationId, [FromUri] int? taskId)
         {
@@ -308,7 +313,6 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()

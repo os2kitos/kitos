@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -41,11 +42,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItInterfaceDTO dto)
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto) => throw  new NotSupportedException();
+        
+        public HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try
             {
-                var result = _itInterfaceService.Create(Map(dto));
+                var result = _itInterfaceService.Create(dto.OrganizationId, dto.Name, dto.ItInterfaceId, dto.AccessModifier);
                 return result.Ok ?
                     Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
                     FromOperationFailure(result.Error);

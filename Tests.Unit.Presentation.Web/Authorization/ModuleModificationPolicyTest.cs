@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -8,12 +9,13 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Moq;
+using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
 {
-    public class ModuleModificationPolicyTest
+    public class ModuleModificationPolicyTest : WithAutoFixture
     {
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly ModuleModificationPolicy _sut;
@@ -21,7 +23,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public ModuleModificationPolicyTest()
         {
             _userContext = new Mock<IOrganizationalUserContext>();
-            _sut = new ModuleModificationPolicy(_userContext.Object,false);
+            _sut = new ModuleModificationPolicy(_userContext.Object, false);
         }
 
         public interface IContractElement : IEntity, IContractModule { }
@@ -84,9 +86,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void Allow_With_Entity_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
-            SetupUserContext(isLocalAdmin, isGlobalAdmin, otherRole);
+            var orgId = A<int>();
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { orgId });
+            SetupUserContext(orgId, isLocalAdmin, isGlobalAdmin, otherRole);
 
-            var entity = (IEntity)MoqTools.MockOf(entityType);
+            var entity = (IEntity)MoqTools.MockedObjectFrom(entityType);
 
             //Act
             var allow = _sut.AllowModification(entity);
@@ -150,28 +154,35 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void Allow_With_Type_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
-            SetupUserContext(isLocalAdmin, isGlobalAdmin, otherRole);
+            var organizationId = A<int>();
+            SetupUserContext(organizationId, isLocalAdmin, isGlobalAdmin, otherRole);
 
             //Act
-            var allow = _sut.AllowCreation(entityType);
+            var allow = _sut.AllowCreation(organizationId, entityType);
 
             //Assert
             Assert.Equal(expectedResult, allow);
         }
 
-        private void ExpectUserHasRole(OrganizationRole organizationRole)
+
+        private void ExpectUserHasRole(int organizationId, OrganizationRole organizationRole)
         {
-            _userContext.Setup(x => x.HasRole(organizationRole)).Returns(true);
+            _userContext.Setup(x => x.HasRole(organizationId, organizationRole)).Returns(true);
         }
 
-        private void SetupUserContext(bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole)
+        private void SetupUserContext(int organizationId, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole)
         {
             if (isLocalAdmin)
-                ExpectUserHasRole(OrganizationRole.LocalAdmin);
+                ExpectUserHasRole(organizationId, OrganizationRole.LocalAdmin);
+
             if (isGlobalAdmin)
-                ExpectUserHasRole(OrganizationRole.GlobalAdmin);
+            {
+                ExpectUserHasRole(organizationId, OrganizationRole.GlobalAdmin);
+                _userContext.Setup(x => x.IsGlobalAdmin()).Returns(true);
+            }
+
             if (otherRole.HasValue)
-                ExpectUserHasRole(otherRole.Value);
+                ExpectUserHasRole(organizationId, otherRole.Value);
         }
     }
 }

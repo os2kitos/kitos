@@ -6,6 +6,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -18,7 +19,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
     {
         public ItSystemUsage()
         {
@@ -110,7 +111,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// <remarks>
         ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
         ///     It's a string but should be treated as an int.
-        ///     TODO perhaps a redesign of OptionEntity is in order
         /// </remarks>
         /// <value>
         ///     The termination deadline.
@@ -294,19 +294,6 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }
         public virtual ICollection<AccessType> AccessTypes { get; set; }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return OrganizationId == organizationId;
-        }
-
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
 

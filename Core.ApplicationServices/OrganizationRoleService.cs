@@ -2,17 +2,23 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Organization.DomainEvents;
+using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices
 {
     public class OrganizationRoleService : IOrganizationRoleService
     {
         private readonly IGenericRepository<OrganizationRight> _organizationRights;
+        private readonly IDomainEvents _domainEvents;
 
-        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights)
+        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights,
+            IDomainEvents domainEvents)
         {
             _organizationRights = organizationRights;
+            _domainEvents = domainEvents;
         }
 
         private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, OrganizationRole organizationRole)
@@ -23,6 +29,7 @@ namespace Core.ApplicationServices
                 User = user,
                 Role = organizationRole,
             });
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
             _organizationRights.Save();
 
             return result;
@@ -36,6 +43,25 @@ namespace Core.ApplicationServices
         public OrganizationRight MakeLocalAdmin(User user, Organization organization)
         {
             return AddOrganizationRoleToUser(user, organization, OrganizationRole.LocalAdmin);
+        }
+
+        public IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> GetOrganizationRoles(User user)
+        {
+            var rolesByRights = user.OrganizationRights
+                .Select(x => new {x.OrganizationId, x.Role})
+                .GroupBy(x => x.OrganizationId, x => x.Role)
+                .ToDictionary<IGrouping<int, OrganizationRole>, int, IEnumerable<OrganizationRole>>(
+                    organizationRoles => organizationRoles.Key, organizationRoles => organizationRoles.ToList());
+
+            if (user.IsGlobalAdmin)
+            {
+                foreach (var rolesByRight in rolesByRights.ToList())
+                {
+                    rolesByRights[rolesByRight.Key] = rolesByRight.Value.Append(OrganizationRole.GlobalAdmin).ToList();
+                }
+            }
+
+            return rolesByRights.AsReadOnly();
         }
 
         public IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId)

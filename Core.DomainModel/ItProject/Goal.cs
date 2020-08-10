@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project goal.
     /// </summary>
-    public class Goal : Entity, IContextAware, IProjectModule
+    public class Goal : Entity, IProjectModule
     {
         /// <summary>
         /// Human readable identifier.
@@ -54,21 +54,6 @@ namespace Core.DomainModel.ItProject
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            if (GoalStatus != null)
-                return GoalStatus.IsInContext(organizationId);
-
-            return false;
         }
     }
 }

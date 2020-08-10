@@ -13,11 +13,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static readonly KitosTestEnvironment ActiveEnvironment;
         private static readonly string DefaultUserPassword;
         public const int DefaultItSystemId = 1;
-        public const int DefaultItSystemUsageId = 1;
-        public const int SecondItSystemId = 2;
         public const int DefaultOrganizationId = 1;
         public const int SecondOrganizationId = 2;
-        public const int DefaultContractId = 1;
         public const int DefaultUserId = 1;
         public const int DefaultTaskRefId = 1;
         public const string EmptyListApiJson = "{\"msg\":\"\",\"response\":[]}";

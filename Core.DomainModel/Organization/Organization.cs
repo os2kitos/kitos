@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
 
@@ -15,7 +16,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IContextAware, IOrganizationModule, IHasReferences, IHasName
+    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization
     {
         public Organization()
         {
@@ -26,7 +27,6 @@ namespace Core.DomainModel.Organization
             ItContracts = new List<ItContract.ItContract>();
             OrgUnits = new List<OrganizationUnit>();
             Rights = new List<OrganizationRight>();
-            DefaultOrganizationForUsers = new List<User>();
             Reports = new List<Report>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
@@ -87,8 +87,6 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<OrganizationRight> Rights { get; set; }
 
-        public virtual ICollection<User> DefaultOrganizationForUsers { get; set; }
-
         public virtual ICollection<Report> Reports { get; set; }
 
         public virtual ICollection<SsoOrganizationIdentity> SsoIdentities { get; set; }
@@ -105,16 +103,6 @@ namespace Core.DomainModel.Organization
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
         }
 
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            return Id == organizationId;
-        }
+        public IEnumerable<int> GetOrganizationIds() => new []{Id};
     }
 }

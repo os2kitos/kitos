@@ -3,7 +3,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// Economy for an it project in a specific year.
     /// </summary>
-    public class EconomyYear : Entity, IContextAware, IProjectModule
+    public class EconomyYear : Entity, IProjectModule
     {
         public int YearNumber { get; set; }
 
@@ -78,14 +78,6 @@ namespace Core.DomainModel.ItProject
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        public bool IsInContext(int organizationId)
-        {
-            if (ItProject != null)
-                return ItProject.OrganizationId == organizationId;
-
-            return false;
         }
     }
 }

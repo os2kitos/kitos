@@ -16,11 +16,8 @@
                         }
                     ],
                     goalTypes: [
-                        "$http", function($http) {
-                            return $http.get("odata/LocalGoalTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function(result) {
-                                return result.data.value;
-                            });
-                        }
+                        "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.GoalTypes).getAll()
                     ]
                 }
             });

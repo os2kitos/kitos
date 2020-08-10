@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Core.DomainModel</RootNamespace>
     <AssemblyName>Core.DomainModel</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -68,6 +69,8 @@
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
+    <Compile Include="ItContract\ItContractConstraints.cs" />
+    <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
     <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
@@ -134,9 +137,9 @@
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
+    <Compile Include="Organization\DomainEvents\AccessRightsChanged.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="IContextAware.cs" />
     <Compile Include="IHasAccessModifier.cs" />
     <Compile Include="IHierarchy.cs" />
     <Compile Include="ItContract\HandoverTrial.cs" />
@@ -218,8 +221,7 @@
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
-    <Compile Include="Result\Maybe.cs" />
-    <Compile Include="Result\ObjectExtensions.cs" />
+    <Compile Include="Result\DictionaryExtensions.cs" />
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

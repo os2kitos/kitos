@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using AutoMapper;
+using System.Web.Http;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.Types;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -66,12 +66,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
+        public HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
         {
             return _interfaceService
                 .ChangeExposingSystem(dto.ItInterfaceId, dto.ItSystemId)
                 .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
         }
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceExhibitDTO dto) => throw new NotSupportedException();
 
         /// <param name="id">Interface id</param>
         /// <param name="organizationId">Not used</param>
@@ -90,10 +93,8 @@ namespace Presentation.Web.Controllers.API
                 );
         }
 
-        public override HttpResponseMessage GetSingle(int id)
-        {
-            return CreateResponse(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override HttpResponseMessage GetSingle(int id) => throw new NotSupportedException();
 
         /// <param name="id">Interface id</param>
         /// <param name="organizationId">Not used</param>

@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Core.DomainServices.Extensions;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -21,6 +22,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         private readonly IGenericRepository<AttachedOption> _attachedOptionRepository;
         private readonly IGenericRepository<TOption> _optionRepository;
         private readonly IGenericRepository<TLocalOption> _localOptionRepository;
+        private readonly IItSystemUsageRepository _usageRepository;
 
         public AttachedOptionsFunctionController(
             IGenericRepository<AttachedOption> repository,
@@ -32,14 +34,23 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             _attachedOptionRepository = repository;
             _optionRepository = optionRepository;
             _localOptionRepository = localOptionRepository;
+            _usageRepository = usageRepository;
         }
 
         public virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
-            var orgId = UserContext.ActiveOrganizationId;
+            var itSystemUsage = _usageRepository.GetSystemUsage(id);
 
-            var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
-            var localpersonalData = _localOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
+            var globalOptionData = _optionRepository
+                .AsQueryable()
+                .Where(s => s.IsEnabled);
+
+            var localpersonalData =
+                _localOptionRepository
+                    .AsQueryable()
+                    .ByOrganizationId(itSystemUsage.OrganizationId)
+                    .Where(p => p.IsActive)
+                    .ToList();
 
             var result = new List<TOption>();
             result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));
@@ -71,7 +82,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 return NotFound();
             }
 
-            if (!AllowWrite(option))
+            if (!AllowModify(option))
             {
                 return Forbidden();
             }

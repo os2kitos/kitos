@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure.Annotations;
 using Core.DomainModel;
+using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -19,18 +20,19 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId);
 
-            this.HasOptional(t => t.DefaultOrganization)
-                .WithMany(t => t.DefaultOrganizationForUsers)
-                .HasForeignKey(d => d.DefaultOrganizationId)
-                .WillCascadeOnDelete(false);
-
             // Properties
             this.Property(t => t.Name)
-                .IsRequired();
-            this.Property(t => t.Email)
-                .HasMaxLength(100)
+                .HasMaxLength(UserConstraints.MaxNameLength)
                 .IsRequired()
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new[] {new IndexAttribute("IX_Email") {IsUnique = true}}));
+                .HasIndexAnnotation("User_Index_Name", 0);
+            this.Property(t => t.LastName)
+                .HasMaxLength(UserConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("User_Index_Name", 1);
+            this.Property(t => t.Email)
+                .HasMaxLength(UserConstraints.MaxEmailLength)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("User_Index_Email", 2);
             this.Property(t => t.Password)
                 .IsRequired();
             this.Property(t => t.Salt)

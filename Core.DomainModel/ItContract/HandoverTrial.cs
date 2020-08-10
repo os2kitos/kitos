@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItContract
 {
-    public class HandoverTrial : Entity, IContextAware, IContractModule
+    public class HandoverTrial : Entity, IContractModule
     {
         public DateTime? Expected { get; set; }
         public DateTime? Approved { get; set; }
@@ -25,21 +25,6 @@ namespace Core.DomainModel.ItContract
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            if (ItContract != null)
-                return ItContract.IsInContext(organizationId);
-
-            return false;
         }
     }
 }

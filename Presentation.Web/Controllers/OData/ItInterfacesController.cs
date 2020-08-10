@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.ApplicationServices.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -25,6 +26,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -38,6 +40,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItInterface>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItInterfaces(int key)
         {
             var result = Repository
@@ -53,14 +56,10 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-        public override IHttpActionResult Post(ItInterface entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, ItInterface entity) => throw new NotSupportedException();
     }
 }

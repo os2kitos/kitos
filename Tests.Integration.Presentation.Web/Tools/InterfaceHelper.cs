@@ -54,19 +54,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<DataRowDTO> CreateDataRowAsync(int interfaceId, Cookie optionalLogin = null)
+        public static async Task<DataRowDTO> CreateDataRowAsync(int organizationId, int interfaceId, Cookie optionalLogin = null)
         {
-            using (var response = await SendCreateDataRowRequestAsync(interfaceId, optionalLogin))
+            using (var response = await SendCreateDataRowRequestAsync(organizationId, interfaceId, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<DataRowDTO>();
             }
         }
 
-        public static async Task<HttpResponseMessage> SendCreateDataRowRequestAsync(int interfaceId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendCreateDataRowRequestAsync(int organizationId, int interfaceId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("/api/dataRow/");
+            var url = TestEnvironment.CreateUrl($"/api/dataRow?organizationId={organizationId}");
 
             var body = new
             {

@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
@@ -20,6 +20,7 @@ namespace Presentation.Web.Controllers.API
         where TModel : class, IEntity
     {
         protected readonly IGenericRepository<TModel> Repository;
+        private const int MaxEntities = 100;
 
         protected GenericApiController(IGenericRepository<TModel> repository)
         {
@@ -40,31 +41,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var organizationId = ActiveOrganizationId;
-
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
-
+                var organizationIds = UserContext.OrganizationIds.ToList();
                 var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
                 var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
                     Maybe<QueryAllByRestrictionCapabilities<TModel>>.None :
-                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationIds));
 
                 var mainQuery = Repository.AsQueryable();
 
                 var result = refinement
                     .Select(x => x.Apply(mainQuery))
                     .GetValueOrFallback(mainQuery);
-
-                var requiresPostFiltering =
-                    refinement
-                        .Select(x => x.RequiresPostFiltering())
-                        .GetValueOrFallback(false);
-
-                if (requiresPostFiltering)
-                {
-                    paging = paging.WithPostProcessingFilter(AllowRead);
-                }
 
                 var query = Page(result, paging);
 
@@ -76,6 +65,39 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        /// <summary>
+        /// POST api/T?getDetailedInfo
+        /// </summary>
+        /// <param name="ids">ID's of entities to retrieve</param>
+        /// <returns>HTML code for success or failure</returns>
+        public virtual HttpResponseMessage PostGetFromIds([FromBody] int[] ids, [FromUri] bool? getDetailedInfo)
+        {
+            if (ids.Length > MaxEntities)
+            {
+                return BadRequest($"Please limit the number of ID's you are asking for. Max is {MaxEntities} ID's per request");
+            }
+
+            var result = ids
+                .Distinct()
+                .Select(id => Repository.GetByKey(id))
+                .ToList();
+
+            var disAllowedItemIds = result
+                .Where(x => AllowRead(x) == false)
+                .Select(x => x.Id)
+                .ToList();
+
+            if (disAllowedItemIds.Any())
+            {
+                var noReadAccessIds = disAllowedItemIds.Transform(disallowedIds => string.Join(";", disallowedIds));
+
+                return Forbidden($"You are now allowed to read the information on items with the following ID's: '{noReadAccessIds}'");
+            }
+
+            return Ok(Map(result));
+
         }
 
         // GET api/T
@@ -113,15 +135,15 @@ namespace Presentation.Web.Controllers.API
         /// GET api/T/GetAccessRights
         /// Checks what access rights the user has for the given entities
         /// </summary>
-        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
         {
-            if (GetOrganizationReadAccessLevel(ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
+            if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
             return Ok(new EntitiesAccessRightsDTO
             {
-                CanCreate = AllowCreate<TModel>(),
+                CanCreate = AllowCreate<TModel>(organizationId),
                 CanView = true
             });
         }
@@ -158,7 +180,7 @@ namespace Presentation.Web.Controllers.API
         /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
         /// </summary>
         /// <param name="ids">The ids of the objects</param>
-        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody]int[] ids, bool? getEntityListAccessRights)
+        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
         {
             if (ids == null || ids.Length == 0)
             {
@@ -188,15 +210,15 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="dto"></param>
         /// <returns>HTML code for success or failure</returns>
-        public virtual HttpResponseMessage Post(TDto dto)
+        public virtual HttpResponseMessage Post(int organizationId, TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
-                
+
                 PrepareNewObject(item);
-                // Check CREATE access rights  
-                if (!AllowCreate<TModel>(item))
+                // Check CREATE access rights
+                if (!AllowCreate<TModel>(organizationId, item))
                 {
                     return Forbidden();
                 }
@@ -300,7 +322,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var itemType = item.GetType();
                 // get name of mapped property
-                var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
+                var map = Mapper.ConfigurationProvider.FindTypeMapFor<TDto, TModel>().PropertyMaps;
                 var nonNullMaps = map.Where(x => x.SourceMember != null).ToList();
 
                 foreach (var valuePair in obj)
@@ -311,12 +333,12 @@ namespace Presentation.Web.Controllers.API
                         continue; // abort if no map found
                     }
 
-                    var destName = mapMember.DestinationProperty.Name;
+                    var destName = mapMember.DestinationName;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
                     {
-                        continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                        continue; // don't allow writing to these.
                     }
 
                     var propRef = itemType.GetProperty(destName);
@@ -462,22 +484,10 @@ namespace Presentation.Web.Controllers.API
             return Map<TModel, TDto>(model);
         }
 
-        //for easy access
-        protected virtual TModel Map(TDto inputDto)
-        {
-            return Map<TDto, TModel>(inputDto);
-        }
-
         //for easy access (list)
         protected virtual IEnumerable<TDto> Map(IEnumerable<TModel> models)
         {
             return Map<IEnumerable<TModel>, IEnumerable<TDto>>(models);
-        }
-
-        //for easy access (list)
-        protected virtual IEnumerable<TModel> Map(IEnumerable<TDto> inputDtos)
-        {
-            return Map<IEnumerable<TDto>, IEnumerable<TModel>>(inputDtos);
         }
 
         #endregion

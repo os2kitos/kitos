@@ -9,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -118,7 +117,7 @@ namespace Presentation.Web.Controllers.API
                         OrgUnitId = orgUnitId,
                         TaskRefId = task.Id,
                     };
-                    if (!AllowCreate<TaskUsage>(taskUsage))
+                    if (!AllowCreate<TaskUsage>(orgUnit.OrganizationId, taskUsage))
                     {
                         return Forbidden();
                     }
@@ -133,14 +132,26 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, TaskUsageDTO taskUsageDto) => throw new NotSupportedException();
+
         [HttpPost]
         [Route("api/taskUsage/")]
-        public override HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
+        public HttpResponseMessage Post(CreateTaskUsageDTO taskUsageDto)
         {
             try
             {
-                var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
-                if (!AllowCreate<TaskUsage>(item))
+                var item = new TaskUsage
+                {
+                    TaskRefId = taskUsageDto.TaskRefId,
+                    OrgUnitId = taskUsageDto.OrgUnitId,
+                };
+                var organizationUnit = _orgUnitRepository.GetByKey(taskUsageDto.OrgUnitId);
+                if (organizationUnit == null)
+                {
+                    return BadRequest("Invalid organizationId");
+                }
+                if (!AllowCreate<TaskUsage>(organizationUnit.OrganizationId, item))
                 {
                     return Forbidden();
                 }
@@ -210,9 +221,16 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var organizationUnit = _orgUnitRepository.GetByKey(orgUnitId);
+                
+                if (organizationUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(organizationUnit))
+                    return Forbidden();
+
                 var usages = Repository
-                    .Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred)
-                    .Where(AllowRead);
+                    .Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred);
 
                 var dtos = new List<TaskUsageNestedDTO>();
 

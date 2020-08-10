@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
@@ -23,8 +23,8 @@ namespace Presentation.Web.Controllers.API
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, 
-            IGenericRepository<TaskRef> taskRepository, 
+            IOrgUnitService orgUnitService,
+            IGenericRepository<TaskRef> taskRepository,
             IGenericRepository<TaskUsage> taskUsageRepository)
             : base(repository)
         {
@@ -32,6 +32,11 @@ namespace Presentation.Web.Controllers.API
             _taskRepository = taskRepository;
             _taskUsageRepository = taskUsageRepository;
         }
+
+        public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, OrgUnitDTO dto) => throw new NotSupportedException();
 
         /// <summary>
         /// Returns every OrganizationUnit that the user can select as the default unit
@@ -42,11 +47,16 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
+                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
+                    return Forbidden();
+
+                var userId = UserId;
+                var orgUnits = Repository
+                    .Get(x => x.Rights.Any(y => y.UserId == userId) && x.OrganizationId == organizationId)
+                    .SelectNestedChildren(x => x.Children).ToList();
 
                 orgUnits = orgUnits
                     .Distinct()
-                    .Where(AllowRead)
                     .ToList();
 
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));
@@ -61,16 +71,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organization && o.Parent == null).FirstOrDefault();
+                var root = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organization)
+                    .FirstOrDefault(unit => unit.Parent == null);
 
-                if (orgUnit == null) return NotFound();
+                if (root == null) return NotFound();
 
-                if (!AllowRead(orgUnit))
+                if (!AllowRead(root))
                 {
                     return Forbidden();
                 }
 
-                var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
+                var item = Map<OrganizationUnit, OrgUnitDTO>(root);
 
                 return Ok(item);
             }
@@ -84,12 +97,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = 
+                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
+                    return Forbidden();
+
+                var orgUnit =
                     Repository
                         .AsQueryable()
                         .ByOrganizationId(organizationId)
-                        .AsEnumerable()
-                        .Where(AllowRead);
+                        .ToList();
 
                 return Ok(Map(orgUnit));
             }
@@ -125,10 +140,8 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject)
-        {
-            return NotAllowed();
-        }
+        [NonAction]
+        public override HttpResponseMessage Put(int id, int organizationId, JObject jObject) => throw new NotSupportedException();
 
         /// <summary>
         /// Returns every task that a given OrgUnit can use. This depends on the task usages of the parent OrgUnit.
@@ -144,6 +157,12 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var orgUnit = Repository.GetByKey(id);
+
+                if (orgUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(orgUnit))
+                    return Forbidden();
 
                 IQueryable<TaskRef> taskQuery;
                 // if the org unit has a parent, only select those tasks that is in use by the parent org unit
@@ -177,17 +196,16 @@ namespace Presentation.Web.Controllers.API
                     pagingModel.Where(taskRef => !taskRef.Children.Any());
                 }
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
                 var dtos = (from taskRef in theTasks
-                           let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
-                           select new TaskRefUsageDTO()
-                               {
-                                   TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
-                                   Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
-                               }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
+                            let taskUsage = taskRef.Usages.FirstOrDefault(usage => usage.OrgUnitId == id)
+                            select new TaskRefUsageDTO()
+                            {
+                                TaskRef = Map<TaskRef, TaskRefDTO>(taskRef),
+                                Usage = Map<TaskUsage, TaskUsageDTO>(taskUsage)
+                            }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
@@ -210,6 +228,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var organizationUnit = Repository.GetByKey(id);
+                if (organizationUnit == null)
+                    return NotFound();
+                
+                if (!AllowRead(organizationUnit))
+                    return Forbidden();
+
                 var usageQuery = _taskUsageRepository.AsQueryable();
                 pagingModel.Where(usage => usage.OrgUnitId == id);
 
@@ -220,7 +245,6 @@ namespace Presentation.Web.Controllers.API
                                                    taskUsage.TaskRef.Parent.ParentId.Value == taskGroup.Value);
                 }
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theUsages = Page(usageQuery, pagingModel).ToList();
 
                 var dtos = (from usage in theUsages

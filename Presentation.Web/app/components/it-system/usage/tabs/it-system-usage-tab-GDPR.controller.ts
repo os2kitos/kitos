@@ -40,7 +40,7 @@
                 $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(
                     "api/organization",
                     true,
-                    ["public=true", `orgId=${user.currentOrganizationId}`],
+                    ['take=25',`orgId=${user.currentOrganizationId}`],
                     (item,
                         items) => {
                         items.push({
@@ -70,7 +70,7 @@
                             ObjectType: "ITSYSTEMUSAGE"
                         };
 
-                        $http.post("odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
+                        $http.post(`odata/AttachedOptions?organizationId=${user.currentOrganizationId}`, data, { handleBusy: true }).success(result => {
                             msg.toSuccessMessage("Feltet er Opdateret.");
                         }).error(() => {
                             msg.toErrorMessage("Fejl!");
@@ -176,7 +176,7 @@
                         ItSystemUsageId: $scope.usage.id,
                         DataWorkerId: $scope.selectedDataWorker.id
                     }
-                    $http.post("api/UsageDataworker/", data)
+                    $http.post(`api/UsageDataworker?organizationId=${user.currentOrganizationId}`, data)
                         .success(() => {
                             notify.addSuccessMessage("Databehandleren er tilknyttet.");
                             reload();

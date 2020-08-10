@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -37,6 +37,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Users({userId})/ItSystemRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
             var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();

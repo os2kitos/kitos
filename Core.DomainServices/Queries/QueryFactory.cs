@@ -20,6 +20,15 @@ namespace Core.DomainServices.Queries
             return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationId });
         }
 
+        public static IDomainQuery<T> ByOrganizationIds<T>(IEnumerable<int> organizationIds)
+        {
+            var constructor =
+                typeof(QueryByOrganizationIds<>)
+                    .MakeGenericType(typeof(T))
+                    .GetConstructor(new[] { typeof(IEnumerable<int>) });
+            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationIds });
+        }
+
         public static IDomainQuery<T> ByOrganizationId<T>(int organizationId, OrganizationDataReadAccessLevel accessLevel)
         {
             var hasOrganization = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
@@ -64,6 +73,15 @@ namespace Core.DomainServices.Queries
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(int) });
             return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationId });
+        }
+
+        public static IDomainQuery<T> ByPublicAccessOrOrganizationIds<T>(IEnumerable<int> organizationIds) where T : class
+        {
+            var constructor =
+                typeof(QueryByPublicAccessOrOrganizationIds<>)
+                    .MakeGenericType(typeof(T))
+                    .GetConstructor(new[] { typeof(IEnumerable<int>) });
+            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationIds });
         }
     }
 }

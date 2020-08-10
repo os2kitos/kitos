@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Core.DomainServices</RootNamespace>
     <AssemblyName>Core.DomainServices</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>default</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,18 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,7 +53,6 @@
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
-    <Compile Include="Context\ActiveUserContext.cs" />
     <Compile Include="Context\ActiveUserIdContext.cs" />
     <Compile Include="Context\FallbackUserResolver.cs" />
     <Compile Include="Context\IFallbackUserResolver.cs" />
@@ -82,6 +75,8 @@
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
     <Compile Include="Queries\QueryByIds.cs" />
+    <Compile Include="Queries\QueryByOrganizationIds.cs" />
+    <Compile Include="Queries\QueryByPublicAccessOrOrganizationIds.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
@@ -139,24 +134,26 @@
     <Compile Include="Repositories\KLE\KLEUpdateHistoryItemRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
-      <Project>{A05389EA-25F4-45B5-8534-0775D9671456}</Project>
-      <Name>Infrastructure.Soap</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
+      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
+      <Name>Infrastructure.Soap</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>

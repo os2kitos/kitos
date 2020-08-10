@@ -30,11 +30,17 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var item = Repository.Get(x => x.ItInterfaceId == interfaceId);
-                if (item == null) return NotFound();
+                var itInterface = _interfaceRepository.GetByKey(interfaceId);
+                
+                if (itInterface == null)
+                    return NotFound();
+                
+                if (!AllowRead(itInterface))
+                    return Forbidden();
 
+                var dataRows = Repository.Get(x => x.ItInterfaceId == interfaceId);
 
-                var dto = Map(item.Where(AllowRead));
+                var dto = Map(dataRows);
                 return Ok(dto);
             }
             catch (Exception e)

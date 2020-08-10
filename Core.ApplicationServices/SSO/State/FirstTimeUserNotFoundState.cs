@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
@@ -43,7 +42,7 @@ namespace Core.ApplicationServices.SSO.State
                     if (organizationByCvrResult.HasValue)
                     {
                         var organization = organizationByCvrResult.Value;
-                        var user = CreateAutoProvisonedUser(organization);
+                        var user = CreateAutoProvisonedUser();
                         _organizationRoleService.MakeUser(user, organization);
 
                         context.TransitionTo(_ssoStateFactory.CreateUserLoggedIn(user), 
@@ -61,13 +60,12 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private User CreateAutoProvisonedUser(Organization organizationByCvrResult)
+        private User CreateAutoProvisonedUser()
         {
             var user = _userRepository.Create();
             user.Email = _stsBrugerInfo.Emails.First();
             user.Name = _stsBrugerInfo.FirstName;
             user.LastName = _stsBrugerInfo.LastName;
-            user.DefaultOrganization = organizationByCvrResult;
             user.Salt = _cryptoService.Encrypt($"{Guid.NewGuid():N}{Guid.NewGuid():N}");
             user.Password = _cryptoService.Encrypt(string.Empty);
             _userRepository.Save();

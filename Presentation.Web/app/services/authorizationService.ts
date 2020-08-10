@@ -16,7 +16,8 @@
     class OperationAuthorizationService implements IOperationAuthorizationService {
         constructor(
             private readonly $http: ng.IHttpService,
-            private readonly entityType: string) {
+            private readonly userService: Services.IUserService,
+        private readonly entityType: string) {
         }
 
         private getBasePath() {
@@ -24,11 +25,17 @@
         }
 
         getOverviewAuthorization(): ng.IPromise<EntitiesAccessRightsDTO> {
-            return this.$http.get(`${this.getBasePath()}/?getEntitiesAccessRights=true`)
-                .then(result => {
-                    var authResponse = result.data as { msg: string, response: EntitiesAccessRightsDTO };
-                    return authResponse.response;
-                });
+            return this
+                .userService
+                .getUser()
+                .then((user : Services.IUser)=>
+                    this.$http.get(`${this.getBasePath()}/?organizationId=${user.currentOrganizationId}&getEntitiesAccessRights=true`)
+                        .then(result => {
+                            var authResponse = result.data as { msg: string, response: EntitiesAccessRightsDTO };
+                            return authResponse.response;
+                        }
+                    )
+            );
         }
 
         getAuthorizationForItem(id: number): ng.IPromise<EntityAccessRightsDTO> {
@@ -60,11 +67,15 @@
     }
 
     export class AuthorizationServiceFactory implements IAuthorizationServiceFactory{
-        static $inject = ["$http"];
-        constructor(private readonly $http: ng.IHttpService) { }
+        static $inject = ["$http","userService"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly userService: Services.IUserService) {
+
+        }
 
         private createFor(entityType: string) {
-            return new OperationAuthorizationService(this.$http, entityType);
+            return new OperationAuthorizationService(this.$http, this.userService, entityType);
         }
 
         createOrganizationAuthorization(): IOperationAuthorizationService {

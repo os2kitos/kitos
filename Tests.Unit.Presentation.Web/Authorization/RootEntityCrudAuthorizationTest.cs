@@ -2,11 +2,12 @@
 using Moq;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
 {
-    public class RootEntityCrudAuthorizationTest
+    public class RootEntityCrudAuthorizationTest : WithAutoFixture
     {
         private readonly Mock<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly RootEntityCrudAuthorization _sut;
@@ -30,7 +31,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             var allowRead = _sut.AllowRead(input);
 
             //Assert
-            Assert.Equal(strategyResponse,allowRead);
+            Assert.Equal(strategyResponse, allowRead);
         }
 
         [Theory]
@@ -72,10 +73,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             //Arrange
             var input = Mock.Of<IEntity>();
-            _authorizationStrategy.Setup(x => x.AllowCreate<IEntity>(input)).Returns(strategyResponse);
+            var organizationId = A<int>();
+            _authorizationStrategy.Setup(x => x.AllowCreate<IEntity>(organizationId, input)).Returns(strategyResponse);
 
             //Act
-            var allowRead = _sut.AllowCreate<IEntity>(input);
+            var allowRead = _sut.AllowCreate<IEntity>(organizationId, input);
 
             //Assert
             Assert.Equal(strategyResponse, allowRead);

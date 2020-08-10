@@ -1,7 +1,9 @@
-﻿namespace Core.DomainModel
+﻿using System.Collections.Generic;
+
+namespace Core.DomainModel
 {
     public interface IIsPartOfOrganization
     {
-        bool IsPartOfOrganization(int organizationId);
+        IEnumerable<int> GetOrganizationIds();
     }
 }

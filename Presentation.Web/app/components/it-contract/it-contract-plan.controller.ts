@@ -75,7 +75,6 @@
                     // is for the one we're interested in.
                     if (widget === this.mainGrid) {
                         this.loadGridOptions();
-                        this.mainGrid.dataSource.read();
 
                         // show loadingbar when export to excel is clicked
                         // hidden again in method exportToExcel callback
@@ -85,7 +84,8 @@
                     }
                 });
 
-            this.activate();
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
         }
 
         public opretITKontrakt() {
@@ -105,7 +105,7 @@
                         var orgId = self.user.currentOrganizationId;
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
-                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                        self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
                             .success((result: any) => {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
                                 var contract = result.response;
@@ -122,7 +122,7 @@
                         var orgId = self.user.currentOrganizationId;
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
-                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                        self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
                             .success((result: any) => {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
                                 var contract = result.response;
@@ -316,7 +316,6 @@
                 },
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template: "<button ng-click='contractOverviewPlanVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewPlanVm.canCreate\">#: text #</button>"
@@ -1034,7 +1033,8 @@
                 resolve: {
                     user: ["userService", userService => userService.getUser()],
                     itContractRoles: [
-                        "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                     ],
                     userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                         authorizationServiceFactory

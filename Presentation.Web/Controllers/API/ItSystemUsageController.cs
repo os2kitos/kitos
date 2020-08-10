@@ -13,6 +13,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -38,8 +39,8 @@ namespace Presentation.Web.Controllers.API
             _itSystemUsageService = itSystemUsageService;
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
-        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageSimpleDTO>>))]
+        public HttpResponseMessage GetSearchByOrganization(int organizationId, string q, int take = 25)
         {
             try
             {
@@ -58,7 +59,11 @@ namespace Presentation.Web.Controllers.API
                     usages = usages.Where(usage => usage.ItSystem.Name.Contains(q));
                 }
 
-                return Ok(Map(usages));
+                usages = usages
+                    .OrderBy(_ => _.ItSystem.Name)
+                    .Take(take);
+
+                return Ok(Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(usages));
             }
             catch (Exception e)
             {
@@ -86,7 +91,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != ActiveOrganizationId)
+                if (GetOrganizationReadAccessLevel(item.OrganizationId) < OrganizationDataReadAccessLevel.All)
                 {
                     dto.Note = "";
                 }
@@ -126,13 +131,17 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public override HttpResponseMessage Post(ItSystemUsageDTO dto)
+        public HttpResponseMessage Post(CreateItsystemUsageDTO dto)
         {
             try
             {
-                var systemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = new ItSystemUsage
+                {
+                    OrganizationId = dto.OrganizationId,
+                    ItSystemId = dto.ItSystemId
+                };
 
-                if (!AllowCreate<ItSystemUsage>(systemUsage))
+                if (!AllowCreate<ItSystemUsage>(dto.OrganizationId, systemUsage))
                 {
                     return Forbidden();
                 }
@@ -152,6 +161,9 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ItSystemUsageDTO dto) => throw new NotSupportedException();
 
         public HttpResponseMessage DeleteByItSystemId(int itSystemId, int organizationId)
         {
@@ -403,7 +415,6 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
-                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()

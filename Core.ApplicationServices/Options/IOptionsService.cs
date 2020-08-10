@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Options
 {

@@ -216,26 +216,21 @@
                                 var rights = rightResult.data.response;
 
                                 //get the role names
-                                return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                                    .then(roleResult => {
-                                        var roles = roleResult.data.value;
+                                //the resulting map
+                                var users = {};
+                                _.each(rights, (right: { userId; user; roleName; }) => {
 
-                                        //the resulting map
-                                        var users = {};
-                                        _.each(rights, (right: { userId; user; roleName; }) => {
+                                    //use the user from the map if possible
+                                    var user = users[right.userId] || right.user;
 
-                                            //use the user from the map if possible
-                                            var user = users[right.userId] || right.user;
+                                    var roleNames = user.roleNames || [];
+                                    roleNames.push(right.roleName);
+                                    user.roleNames = roleNames;
 
-                                            var roleNames = user.roleNames || [];
-                                            roleNames.push(right.roleName);
-                                            user.roleNames = roleNames;
+                                    users[right.userId] = user;
+                                });
 
-                                            users[right.userId] = user;
-                                        });
-
-                                        return users;
-                                    });
+                                return users;
                             })
                         ],
                         statusUpdates: [

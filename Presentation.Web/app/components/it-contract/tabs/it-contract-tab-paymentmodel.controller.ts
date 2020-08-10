@@ -5,21 +5,14 @@
             templateUrl: 'app/components/it-contract/tabs/it-contract-tab-paymentmodel.view.html',
             controller: 'contract.PaymentmodelCtrl',
             resolve: {
-                paymentFrequencies: ['$http', function ($http) {
-                    return $http.get('odata/LocalPaymentFrequencyTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                paymentModels: ['$http', function ($http) {
-                    return $http.get('odata/LocalPaymentModelTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                priceRegulations: ['$http', function ($http) {
-                    return $http.get('odata/LocalPriceRegulationTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                        return result.data.value;
-                    });
-                }]
+                paymentFrequencies: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PaymentFrequencyTypes).getAll()
+                ],
+                paymentModels: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PaymentModelTypes).getAll()
+                ],
+                priceRegulations: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PriceRegulationTypes).getAll()]
             }
         });
     }]);

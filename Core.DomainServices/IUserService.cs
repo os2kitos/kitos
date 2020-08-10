@@ -5,7 +5,6 @@ namespace Core.DomainServices
 {
     public interface IUserService : IDisposable
     {
-        /* TODO: This doesn't really conform to single responsibility principle */
         User AddUser(User user, bool sendMailOnCreation, int orgId);
         void IssueAdvisMail(User user, bool reminder, int orgId);
         PasswordResetRequest IssuePasswordReset(User user, string subject, string content);

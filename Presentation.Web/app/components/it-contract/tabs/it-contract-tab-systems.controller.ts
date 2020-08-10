@@ -10,7 +10,8 @@
                         "userService", userService => userService.getUser()
                     ],
                     agreementElements: [
-                        "$http", $http => $http.get("odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.AgreementElementTypes).getAll()
                     ]
                 }
             });
@@ -112,7 +113,7 @@
                     },
                     quietMillis: 500,
                     transport(queryParams) {
-                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query).then(queryParams.success);
+                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query + "&take=25").then(queryParams.success);
                         res.abort = () => null;
 
                         return res;
@@ -122,15 +123,13 @@
                         var results = [];
 
                         // for each system usages
-                        _.each(data.data.response, (usage: { id; itSystem; }) => {
-                            if (!usage.itSystem.disabled) {
+                        _.each(data.data.response, (usage: { id; itSystemName; itSystemDisabled; }) => {
+                            if (!usage.itSystemDisabled) {
                                 results.push({
                                     // the id of the system usage id, that is selected
                                     id: usage.id,
                                     // name of the system is the label for the select2
-                                    text: $filter('limitToDots')(usage.itSystem.name, 30),
-                                    // the if the system id that is selected
-                                    itSystemId: usage.itSystem.id
+                                    text: $filter('limitToDots')(usage.itSystemName, 30),
                                 });
                             }
                         });

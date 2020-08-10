@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract payment milestone
     /// </summary>
-    public class PaymentMilestone : Entity, IContextAware, IContractModule
+    public class PaymentMilestone : Entity, IContractModule
     {
         /// <summary>
         /// Gets or sets the title.
@@ -57,22 +57,6 @@ namespace Core.DomainModel.ItContract
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        /// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            // delegate to ItContract
-            if (ItContract != null)
-                return ItContract.OrganizationId == organizationId;
-
-            return false;
         }
     }
 }

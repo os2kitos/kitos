@@ -29,9 +29,15 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var risks = Repository
-                    .Get(r => r.ItProjectId == projectId)
-                    .Where(AllowRead);
+                var itProject = _projectRepository.GetById(projectId);
+                
+                if (itProject == null)
+                    return NotFound();
+                
+                if (!AllowRead(itProject))
+                    return Forbidden();
+
+                var risks = Repository.Get(r => r.ItProjectId == projectId);
 
                 return Ok(Map(risks));
             }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using AutoMapper;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -29,10 +28,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var itProject = _projectRepository.GetByKey(id);
+                
+                if (itProject == null)
+                    return NotFound();
+                
+                if (!AllowRead(itProject))
+                    return Forbidden();
+
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItProjectId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
 
-                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits.Where(AllowRead));
+                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
 
                 return Ok(dtos);
             }
@@ -49,7 +56,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var project = _projectRepository.GetByKey(id);
 
-                if (project.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
+                if (project?.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
 
                 var organizationUnit = project.ResponsibleUsage.OrganizationUnit;
 

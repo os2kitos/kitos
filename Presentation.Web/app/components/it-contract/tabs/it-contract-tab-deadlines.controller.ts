@@ -1,35 +1,25 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
+﻿((ng, app) => {
+    app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("it-contract.edit.deadlines", {
             url: "/deadlines",
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-deadlines.view.html",
             controller: "contract.DeadlinesCtrl",
             resolve: {
-                optionExtensions: ["$http", function ($http) {
-                    return $http.get("odata/LocalOptionExtendTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                terminationDeadlines: ["$http", function ($http) {
-                    return $http.get("odata/LocalTerminationDeadlineTypes").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                paymentMilestones: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(function (result) {
+                optionExtensions: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.OptionExtendTypes).getAll()
+                ],
+                terminationDeadlines: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.TerminationDeadlineTypes).getAll()
+                ],
+                paymentMilestones: ["$http", "$stateParams", ($http, $stateParams) =>
+                    $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(function (result) {
                         return result.data.response;
-                    });
-                }],
-                handoverTrialTypes: ["$http", function ($http) {
-                    return $http.get("odata/LocalHandoverTrialTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                        return result.data.value;
-                    });
-                }],
-                handoverTrials: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
-                        return result.data.response;
-                    });
-                }]
+                    })],
+                handoverTrialTypes: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.HandoverTrialTypes).getAll()],
+                handoverTrials: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
+                    return result.data.response;
+                })]
             }
         });
     }]);
@@ -171,7 +161,7 @@
                 }
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.post("api/paymentMilestone", paymentMilestone)
+                $http.post(`api/paymentMilestone?organizationId=${user.currentOrganizationId}`, paymentMilestone)
                     .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
@@ -219,7 +209,7 @@
                 }
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.post("api/handoverTrial", handoverTrial)
+                $http.post(`api/handoverTrial?organizationId=${user.currentOrganizationId}`, handoverTrial)
                     .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;

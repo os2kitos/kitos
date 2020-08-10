@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -76,7 +76,7 @@ namespace Presentation.Web.Controllers.OData
             return base.Patch(key, delta);
         }
 
-        public override IHttpActionResult Post(TType entity)
+        public override IHttpActionResult Post(int organizationId, TType entity)
         {
             if (_repository.AsQueryable().Any())
             {
@@ -87,7 +87,7 @@ namespace Presentation.Web.Controllers.OData
                 entity.Priority = 1;
             }
 
-            return base.Post(entity);
+            return base.Post(organizationId, entity);
         }
 
         public override IHttpActionResult Delete(int key)

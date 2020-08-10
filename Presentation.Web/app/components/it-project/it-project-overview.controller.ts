@@ -79,9 +79,8 @@
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
-                    this.loadGridOptions();
-                    this.mainGrid.dataSource.read();
 
+                    this.loadGridOptions();
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     $(".k-grid-excel").click(() => {
@@ -90,7 +89,8 @@
                 }
             });
 
-            this.activate();
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
         }
         public opretITProjekt() {
             var self = this;
@@ -116,7 +116,7 @@
 
                         var msg = self.notify.addInfoMessage('Opretter system...', false);
 
-                        self.$http.post("api/itproject", payload)
+                        self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
                             .success((result: any) => {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
                                 let projectId = result.response.id;
@@ -143,7 +143,7 @@
 
                         var msg = self.notify.addInfoMessage('Opretter projekt...', false);
 
-                        self.$http.post("api/itproject", payload)
+                        self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
                             .success((result: any) => {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
                                 let projectId = result.response.id;
@@ -1091,7 +1091,8 @@
                     controllerAs: "projectOverviewVm",
                     resolve: {
                         projectRoles: [
-                            "$http", $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                            "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()

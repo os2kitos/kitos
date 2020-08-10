@@ -14,7 +14,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IContextAware, IIsPartOfOrganization
+    public class User : Entity, IIsPartOfOrganization
     {
         public User()
         {
@@ -40,8 +40,6 @@ namespace Core.DomainModel
         public string Salt { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
-        public int? DefaultOrganizationId { get; set; }
-
         public string DefaultUserStartPreference { get; set; }
 
         public bool? HasApiAccess { get; set; }
@@ -50,15 +48,6 @@ namespace Core.DomainModel
         {
             return IsGlobalAdmin || OrganizationRights.Any();
         }
-
-        /// <summary>
-        ///     The organization the user will be automatically logged into.
-        /// </summary>
-        /// <remarks>
-        ///     WARN: this is currently abused to track what organization the user is logged into,
-        ///     and will change in the future.
-        /// </remarks>
-        public virtual Organization.Organization DefaultOrganization { get; set; }
 
         /// <summary>
         ///     The admin rights for the user
@@ -122,9 +111,11 @@ namespace Core.DomainModel
             return $"{Id}:{Name} {LastName}";
         }
 
-        public bool IsPartOfOrganization(int organizationId)
+        public IEnumerable<int> GetOrganizationIds()
         {
-            return IsInContext(organizationId) || OrganizationRights.Any(x => x.OrganizationId == organizationId);
+            return OrganizationRights
+                .Select(x => x.OrganizationId)
+                .Distinct();
         }
 
         #region Authentication
@@ -135,21 +126,6 @@ namespace Core.DomainModel
         {
             return (Id == user.Id) || base.HasUserWriteAccess(user);
         }
-
-        public bool IsInContext(int organizationId)
-        {
-            return DefaultOrganizationId == organizationId;
-        }
-
-        public bool IsLocalAdmin => IsLocalAdminInOrg(DefaultOrganizationId.GetValueOrDefault());
-
-        public bool IsLocalAdminInOrg(int organizationId)
-        {
-            return OrganizationRights.Any(
-                right => (right.Role == OrganizationRole.LocalAdmin) &&
-                         right.OrganizationId == organizationId);
-        }
-
 
         #endregion
     }

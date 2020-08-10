@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -29,8 +29,6 @@ namespace Presentation.Web.Controllers.OData
         }
 
         protected int UserId => UserContext.UserId;
-
-        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
 
         [EnableQuery]
         public virtual IHttpActionResult Get()

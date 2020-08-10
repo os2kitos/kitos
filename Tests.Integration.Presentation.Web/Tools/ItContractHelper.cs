@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 organizationId = organizationId,
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itcontract"), cookie, body))
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract?organizationId={organizationId}"), cookie, body))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
@@ -74,20 +74,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HandoverTrialDTO> AddHandOverTrialAsync(int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
+        public static async Task<HandoverTrialDTO> AddHandOverTrialAsync(int organizationId, int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
         {
-            using (var response = await SendAddHandOverTrialAsync(contractId, approved, expected, optionalLogin))
+            using (var response = await SendAddHandOverTrialAsync(organizationId, contractId, approved, expected, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<HandoverTrialDTO>();
             }
         }
 
-        public static async Task<HttpResponseMessage> SendAddHandOverTrialAsync(int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendAddHandOverTrialAsync(int organizationId, int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl("api/handoverTrial/");
+            var url = TestEnvironment.CreateUrl($"api/handoverTrial?organizationId={organizationId}");
             var body = new
             {
                 approved = approved,
@@ -99,20 +99,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<PaymentMilestoneDTO> AddPaymentMilestoneAsync(int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
+        public static async Task<PaymentMilestoneDTO> AddPaymentMilestoneAsync(int organizationId, int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
         {
-            using (var response = await SendAddPaymentMilestoneRequestAsync(contractId, approved, expected, title, optionalLogin))
+            using (var response = await SendAddPaymentMilestoneRequestAsync(organizationId, contractId, approved, expected, title, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<PaymentMilestoneDTO>();
             }
         }
 
-        public static async Task<HttpResponseMessage> SendAddPaymentMilestoneRequestAsync(int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendAddPaymentMilestoneRequestAsync(int organizationId, int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var url = TestEnvironment.CreateUrl("api/paymentMilestone/");
+            var url = TestEnvironment.CreateUrl($"api/paymentMilestone?organizationId={organizationId}");
             var body = new
             {
                 approved = approved,

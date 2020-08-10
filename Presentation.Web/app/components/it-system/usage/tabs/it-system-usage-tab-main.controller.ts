@@ -6,8 +6,8 @@
             controller: "system.EditMain",
             resolve: {
                 systemCategories: [
-                    "$http", $http => $http.get("odata/LocalItSystemCategories?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                    .then(result => result.data.value)
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemCategories).getAll()
                 ]
             }
         });

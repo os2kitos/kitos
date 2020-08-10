@@ -84,7 +84,8 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
             //Arrange
-            var contract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
             var payload = new
             {
                 Title = A<string>(),
@@ -95,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.Security
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/Reference"), cookie, payload))
+            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/Reference?organizationId={organizationId}"), cookie, payload))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);

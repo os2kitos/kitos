@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -12,15 +14,18 @@ namespace Core.ApplicationServices.Organizations
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<OrganizationRight> _organizationRightRepository;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IDomainEvents _domainEvents;
 
         public OrganizationRightsService(
             IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IDomainEvents domainEvents)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
             _userContext = userContext;
+            _domainEvents = domainEvents;
         }
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
@@ -32,12 +37,13 @@ namespace Core.ApplicationServices.Organizations
                 UserId = userId
             };
 
-            if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
+            if (!_authorizationContext.AllowCreate<OrganizationRight>(organizationId, right))
             {
                 return OperationFailure.Forbidden;
             }
 
             right = _organizationRightRepository.Insert(right);
+            _domainEvents.Raise(new AccessRightsChanged(userId));
             _organizationRightRepository.Save();
             return right;
         }
@@ -79,6 +85,7 @@ namespace Core.ApplicationServices.Organizations
             }
 
             _organizationRightRepository.DeleteByKey(right.Id);
+            _domainEvents.Raise(new AccessRightsChanged(right.UserId));
             _organizationRightRepository.Save();
 
             return right;

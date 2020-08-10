@@ -2,8 +2,8 @@
 using System.Data;
 using System.Linq;
 using Core.DomainModel.Qa.References;
-using Core.DomainModel.Result;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Qa
 {

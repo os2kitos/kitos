@@ -12,7 +12,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
-        where TObject : HasRightsEntity<TObject, TRight, TRole>, IContextAware
+        where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
         where TRight : Entity, IRight<TObject, TRight, TRole>
         where TRole : IRoleEntity
     {
@@ -77,10 +77,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
+                var target = _objectRepository.GetByKey(id);
+                if (target == null)
+                    return BadRequest("Object id does not point to a valid object");
+
+                var right = Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
 
-                if (!AllowCreate<TRight>(right))
+                if (!AllowModify(target))
                 {
                     return Forbidden();
                 }
@@ -88,10 +92,9 @@ namespace Presentation.Web.Controllers.API
                 right = RightRepository.Insert(right);
                 RightRepository.Save();
 
-                //TODO: FIX navigation properties not loading properly!!!
                 right.User = UserRepository.GetByKey(right.UserId);
 
-                var outputDTO = AutoMapper.Mapper.Map<TRight, RightOutputDTO>(right);
+                var outputDTO = Map<TRight, RightOutputDTO>(right);
 
                 return Created(outputDTO);
             }
@@ -117,7 +120,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (right == null) return NotFound();
 
-                if (!AllowDelete(right))
+                if (!AllowModify(right.Object))
                 {
                     return Forbidden();
                 }

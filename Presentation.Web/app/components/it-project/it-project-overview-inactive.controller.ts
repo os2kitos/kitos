@@ -28,7 +28,6 @@
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$http",
             "$timeout",
             "$window",
             "$state",
@@ -48,7 +47,6 @@
         constructor(
             private $rootScope: IRootScope,
             private $scope: ng.IScope,
-            private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
@@ -70,8 +68,8 @@
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
+
                     this.loadGridOptions();
-                    this.mainGrid.dataSource.read();
 
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
@@ -80,8 +78,9 @@
                     });
                 }
             });
-
-            this.activate();
+             
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
         }
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
@@ -807,7 +806,8 @@
                     controllerAs: "projectOverviewVm",
                     resolve: {
                         projectRoles: [
-                            "$http", $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
+                            "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()

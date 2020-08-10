@@ -73,7 +73,7 @@ function checkDefaultValues(mainSystemName: string) {
     expect(ItSystemUsageMainPage.getParentName().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getPreviousName().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getBelongsTo().getAttribute("value")).toBe("Fælles Kommune");
-    expect(ItSystemUsageMainPage.getAccessModifier().getAttribute("value")).toBe("Lokal");
+    expect(ItSystemUsageMainPage.getAccessModifier().getAttribute("value")).toBe("Offentlig");
     expect(ItSystemUsageMainPage.getDescription().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getBusinessType().getAttribute("value")).toBe("");
     expect(ItSystemUsageMainPage.getArchiveDuty().getAttribute("value")).toBe("");

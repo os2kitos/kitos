@@ -3,8 +3,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
@@ -31,24 +31,16 @@ namespace Presentation.Web.Controllers.OData
 
         /// <summary>
         /// Hvis den autentificerede bruger er Global Admin, returneres alle kontrakter.
-        /// Ellers returneres organisationens kontrakter.
+        /// Ellers returneres de kontrakter som brugeren har rettigheder til at se.
         /// </summary>
         /// <returns></returns>
         [EnableQuery]
         [ODataRoute("ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
-            var all = Repository.AsQueryable();
-
-            if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All)
-            {
-                return Ok(all);
-            }
-
-            var byOrganizationId = all.ByOrganizationId(ActiveOrganizationId);
-
-            return Ok(byOrganizationId);
+            return base.Get();
         }
 
         /// <summary>
@@ -60,6 +52,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItContracts(int key)
         {
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(key);
@@ -78,6 +71,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgKey);

@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -17,19 +21,22 @@ namespace Core.ApplicationServices.Authorization
         private readonly IModuleModificationPolicy _moduleLevelAccessPolicy;
         private readonly IGlobalReadAccessPolicy _globalReadAccessPolicy;
         private readonly IModuleCreationPolicy _typeCreationPolicy;
+        private readonly IUserRepository _userRepository;
 
         public OrganizationAuthorizationContext(
             IOrganizationalUserContext activeUserContext,
             IEntityTypeResolver typeResolver,
             IModuleModificationPolicy moduleLevelAccessPolicy,
             IGlobalReadAccessPolicy globalReadAccessPolicy,
-            IModuleCreationPolicy typeCreationPolicy)
+            IModuleCreationPolicy typeCreationPolicy,
+            IUserRepository userRepository)
         {
             _activeUserContext = activeUserContext;
             _typeResolver = typeResolver;
             _moduleLevelAccessPolicy = moduleLevelAccessPolicy;
             _globalReadAccessPolicy = globalReadAccessPolicy;
             _typeCreationPolicy = typeCreationPolicy;
+            _userRepository = userRepository;
         }
 
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
@@ -46,7 +53,7 @@ namespace Core.ApplicationServices.Authorization
 
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            if (TargetOrganizationMatchesActiveOrganization(organizationId))
+            if (HasRoleIn(organizationId))
             {
                 return OrganizationDataReadAccessLevel.All;
             }
@@ -88,9 +95,9 @@ namespace Core.ApplicationServices.Authorization
                 case EntityReadAccessLevel.None:
                     return false;
                 case EntityReadAccessLevel.OrganizationOnly:
-                    return ActiveContextIsEntityContext(entity);
+                    return HasRoleInSameOrganizationAs(entity);
                 case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
-                    return ActiveContextIsEntityContext(entity) || EntityIsShared(entity);
+                    return HasRoleInSameOrganizationAs(entity) || EntityIsShared(entity);
                 case EntityReadAccessLevel.All:
                     return true;
                 default:
@@ -98,16 +105,16 @@ namespace Core.ApplicationServices.Authorization
             }
         }
 
-        public bool AllowCreate<T>()
+        public bool AllowCreate<T>(int organizationId)
         {
-            return _typeCreationPolicy.AllowCreation(typeof(T));
+            return _typeCreationPolicy.AllowCreation(organizationId, typeof(T));
         }
 
-        public bool AllowCreate<T>(IEntity entity)
+        public bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return
-                AllowCreate<T>() &&
-                CheckNewObjectAccessModifierPolicy(entity) &&
+                AllowCreate<T>(organizationId) &&
+                CheckNewObjectAccessModifierPolicy(organizationId, entity) &&
                 CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
         }
@@ -130,7 +137,7 @@ namespace Core.ApplicationServices.Authorization
             return EntityReadAccessLevel.None;
         }
 
-        private bool CheckNewObjectAccessModifierPolicy(IEntity entity)
+        private bool CheckNewObjectAccessModifierPolicy(int organizationId, IEntity entity)
         {
             if (entity is User user)
             {
@@ -142,7 +149,7 @@ namespace Core.ApplicationServices.Authorization
 
             if (entity is IHasAccessModifier accessModifier)
             {
-                return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity));
+                return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity, organizationId));
             }
 
             return true;
@@ -152,29 +159,11 @@ namespace Core.ApplicationServices.Authorization
         {
             switch (entity)
             {
-                case Organization newOrganization:
-                    return CheckOrganizationCreationPolicy(newOrganization);
                 case OrganizationRight newOrganizationRight:
                     return AllowAdministerOrganizationRight(newOrganizationRight);
                 default:
                     return true;
             }
-        }
-
-        private bool CheckOrganizationCreationPolicy(Organization newOrganization)
-        {
-            var result = true;
-
-            if (newOrganization.TypeId > 0)
-            {
-                var organizationType = (OrganizationTypeKeys)newOrganization.TypeId;
-                if (!HasPermission(new DefineOrganizationTypePermission(organizationType)))
-                {
-                    result = false;
-                }
-            }
-
-            return result;
         }
 
         public bool AllowModify(IEntity entity)
@@ -191,7 +180,7 @@ namespace Core.ApplicationServices.Authorization
             }
             else if (IsOrganizationSpecificData(entity))
             {
-                if (ActiveContextIsEntityContext(entity))
+                if (HasRoleInSameOrganizationAs(entity))
                 {
                     result =
                         HasModuleLevelWriteAccess(entity) ||
@@ -213,8 +202,8 @@ namespace Core.ApplicationServices.Authorization
             {
                 switch (entity)
                 {
-                    case ItSystem _:
-                        result = IsGlobalAdmin() || IsLocalAdmin();
+                    case ItSystem system:
+                        result = IsGlobalAdmin() || IsLocalAdmin(system.OrganizationId);
                         break;
                     case OrganizationRight right:
                         // Only global admin can set other users as global admins
@@ -249,9 +238,9 @@ namespace Core.ApplicationServices.Authorization
             return _moduleLevelAccessPolicy.AllowModification(entity);
         }
 
-        private bool IsOrganizationModuleAdmin()
+        private bool IsOrganizationModuleAdmin(int organizationId)
         {
-            return _activeUserContext.HasRole(OrganizationRole.OrganizationModuleAdmin);
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.OrganizationModuleAdmin);
         }
 
         private static bool IsUserEntity(IEntity entity)
@@ -267,17 +256,21 @@ namespace Core.ApplicationServices.Authorization
 
         private bool IsUserInMunicipality()
         {
-            return _activeUserContext.IsActiveInOrganizationOfType(OrganizationCategory.Municipality);
+            return _activeUserContext.HasRoleInOrganizationOfType(OrganizationCategory.Municipality);
         }
 
-        private bool TargetOrganizationMatchesActiveOrganization(int targetOrganizationId)
+        private bool HasRoleIn(int targetOrganizationId)
         {
-            return _activeUserContext.IsActiveInOrganization(targetOrganizationId);
+            return _activeUserContext.HasRoleIn(targetOrganizationId);
         }
 
         private bool HasAssignedWriteAccess(IEntity entity)
         {
-            return _activeUserContext.HasAssignedWriteAccess(entity);
+            return _userRepository
+                .GetById(_activeUserContext.UserId)
+                .FromNullable()
+                .Select(entity.HasUserWriteAccess)
+                .GetValueOrFallback(false);
         }
 
         private bool IsOrganizationSpecificData(IEntity entity)
@@ -287,24 +280,23 @@ namespace Core.ApplicationServices.Authorization
 
         private static bool IsOrganizationSpecificData(Type entityType)
         {
-            return typeof(IContextAware).IsAssignableFrom(entityType) || 
-                   typeof(IOwnedByOrganization).IsAssignableFrom(entityType) ||
+            return typeof(IOwnedByOrganization).IsAssignableFrom(entityType) ||
                    typeof(IIsPartOfOrganization).IsAssignableFrom(entityType);
         }
 
-        private bool ActiveContextIsEntityContext(IEntity entity)
+        private bool HasRoleInSameOrganizationAs(IEntity entity)
         {
-            return _activeUserContext.IsActiveInSameOrganizationAs(entity);
+            return _activeUserContext.HasRoleInSameOrganizationAs(entity);
         }
 
         private bool IsGlobalAdmin()
         {
-            return _activeUserContext.HasRole(OrganizationRole.GlobalAdmin);
+            return _activeUserContext.IsGlobalAdmin();
         }
 
-        private bool IsLocalAdmin()
+        private bool IsLocalAdmin(int organizationId)
         {
-            return _activeUserContext.HasRole(OrganizationRole.LocalAdmin);
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.LocalAdmin);
         }
 
         private bool EntityEqualsActiveUser(IEntity entity)
@@ -312,20 +304,15 @@ namespace Core.ApplicationServices.Authorization
             return IsUserEntity(entity) && entity.Id == _activeUserContext.UserId;
         }
 
-        private static bool MatchType<TLeft, TRight>()
+        private bool IsContractModuleAdmin(int organizationId)
         {
-            return typeof(TLeft) == typeof(TRight);
-        }
-
-        private bool IsContractModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.ContractModuleAdmin);
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.ContractModuleAdmin);
         }
 
         #region PERMISSIONS
         bool IPermissionVisitor.Visit(BatchImportPermission permission)
         {
-            return IsGlobalAdmin() || IsLocalAdmin();
+            return IsGlobalAdmin() || IsLocalAdmin(permission.TargetOrganizationId);
         }
 
         bool IPermissionVisitor.Visit(SystemUsageMigrationPermission permission)
@@ -338,12 +325,16 @@ namespace Core.ApplicationServices.Authorization
             var target = permission.Target;
             if (target is IHasAccessModifier)
             {
+                var ownedByOrganization = (IOwnedByOrganization)target;
+
                 switch (target)
                 {
+                    case IReportModule _:
+                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsReportModuleAdmin(ownedByOrganization.OrganizationId);
                     case IContractModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin() || IsContractModuleAdmin();
+                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsContractModuleAdmin(ownedByOrganization.OrganizationId);
                     case IOrganizationModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin();
+                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId);
                 }
 
                 return IsGlobalAdmin();
@@ -351,6 +342,11 @@ namespace Core.ApplicationServices.Authorization
 
             //No-one can control access modifiers that are not there
             return false;
+        }
+
+        private bool IsReportModuleAdmin(int organizationId)
+        {
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
         }
 
         bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)
@@ -369,14 +365,14 @@ namespace Core.ApplicationServices.Authorization
             // Only local and global admins can make users local admins
             else if (right.Role == OrganizationRole.LocalAdmin)
             {
-                if (IsGlobalAdmin() || IsLocalAdmin())
+                if (IsGlobalAdmin() || IsLocalAdmin(right.OrganizationId))
                 {
                     result = true;
                 }
             }
             else
             {
-                result = IsGlobalAdmin() || IsLocalAdmin() || IsOrganizationModuleAdmin();
+                result = IsGlobalAdmin() || IsLocalAdmin(right.OrganizationId) || IsOrganizationModuleAdmin(right.OrganizationId);
             }
 
             return result;
@@ -391,7 +387,7 @@ namespace Core.ApplicationServices.Authorization
                     return IsGlobalAdmin();
                 case OrganizationTypeKeys.Interessefællesskab:
                 case OrganizationTypeKeys.Virksomhed:
-                    return IsGlobalAdmin() || IsLocalAdmin();
+                    return IsGlobalAdmin() || IsLocalAdmin(permission.ParentOrganizationId);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType), permission.TargetOrganizationType, "Unmapped organization type");
             }

@@ -7,32 +7,20 @@
                 controller: 'contract.EditMainCtrl',
                 resolve: {
                     contractTypes: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalItContractTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        'localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTypes).getAll()
                     ],
                     contractTemplates: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        'localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractTemplateTypes).getAll()
                     ],
                     purchaseForms: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.PurchaseFormTypes).getAll()
                     ],
                     procurementStrategies: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
                     ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
@@ -43,7 +31,7 @@
                     ],
                     kitosUsers: [
                         '$http', 'user', '_', function ($http, user, _) {
-                            return $http.get(`odata/organizationRights?$filter=OrganizationId eq ${user.currentOrganizationId}&$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
+                            return $http.get(`odata/Organizations(${user.currentOrganizationId})/Rights?$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
                                 let uniqueUsers = _.uniqBy(result.data.value, "User.Id");
 
                                 let results = [];
@@ -67,8 +55,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '_', '$stateParams', '$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user : Kitos.Services.IUser, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -220,7 +208,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public=true', 'orgId=' + user.currentOrganizationId]);
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['take=25','orgId=' + user.currentOrganizationId]);
 
                 function formatSupplier(supplier) {
                     var result = '<div>' + supplier.text + '</div>';
@@ -270,7 +258,7 @@
                         resolve: {
                             contracts: [
                                 '$http', function ($http) {
-                                    return $http.get('odata/ItContracts?$filter=Active eq true').then(function (result) {
+                                    return $http.get(`odata/Organizations(${user.currentOrganizationId})/ItContracts?$filter=Active eq true`).then(function (result) {
                                         return result.data.value;
                                     });
                                 }],

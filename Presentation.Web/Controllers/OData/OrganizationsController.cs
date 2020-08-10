@@ -4,9 +4,10 @@ using Core.DomainServices;
 using System.Net;
 using System.Security;
 using System.Web.Http;
-using System.Web.OData;
+using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using System.Linq;
+using System.Net.Http;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -55,7 +56,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(Organization organization)
+        public IHttpActionResult Post(Organization organization)
         {
             if (organization == null)
             {
@@ -68,6 +69,9 @@ namespace Presentation.Web.Controllers.OData
                 Created(result.Value) : 
                 FromOperationFailure(result.Error);
         }
+
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, Organization organization) => throw new NotSupportedException();
 
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)

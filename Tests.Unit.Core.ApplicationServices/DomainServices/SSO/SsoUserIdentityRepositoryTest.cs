@@ -6,7 +6,6 @@ using Core.DomainModel.SSO;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;
 using Moq;
-using Moq.Language.Flow;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

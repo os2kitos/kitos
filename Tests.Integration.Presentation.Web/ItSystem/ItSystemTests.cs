@@ -63,11 +63,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem?getEntitiesAccessRights=true"), cookie))
+            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?getEntitiesAccessRights=true&organizationId={TestEnvironment.DefaultOrganizationId}"), cookie))
             {
                 //Assert
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntitiesAccessRightsDTO>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntitiesAccessRightsDTO>();
                 Assert.Equal(canView, response.CanView);
                 Assert.Equal(canCreate, response.CanCreate);
             }

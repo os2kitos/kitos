@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainServices;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -38,7 +40,10 @@ namespace Presentation.Web.Controllers.API
                 .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
         }
 
-        public override HttpResponseMessage Post(ExternalReferenceDTO dto)
+        [NonAction]
+        public override HttpResponseMessage Post(int organizationId, ExternalReferenceDTO dto) => throw new NotSupportedException();
+
+        public HttpResponseMessage Post(ExternalReferenceDTO dto)
         {
             if (dto == null)
             {

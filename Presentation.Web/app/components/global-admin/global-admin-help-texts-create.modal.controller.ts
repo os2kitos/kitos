@@ -49,7 +49,7 @@
 
             var msg = this.notify.addInfoMessage("Opretter hjælpetekst", false);
 
-            this.$http.post("odata/HelpTexts", payload, { handleBusy: true })
+            this.$http.post(`odata/HelpTexts?organizationId=${this.user.currentOrganizationId}`, payload, { handleBusy: true })
                 .then((response) => {
                     msg.toSuccessMessage(`${this.vm.title} er oprettet i KITOS`);
                     this.cancel();

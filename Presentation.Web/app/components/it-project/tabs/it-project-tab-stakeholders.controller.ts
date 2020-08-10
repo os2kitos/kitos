@@ -68,7 +68,7 @@
                 };
 
                 var msg = notify.addInfoMessage("Gemmer... ");
-                $http.post("api/stakeholder", data).success(function(result) {
+                $http.post(`api/stakeholder?organizationId=${user.currentOrganizationId}`, data).success(function(result) {
                     msg.toSuccessMessage("Rækken er tilføjet.");
                     addStakeholder(result.response);
                     resetNew();

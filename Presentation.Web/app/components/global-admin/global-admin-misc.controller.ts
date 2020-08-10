@@ -1,4 +1,4 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("global-admin.misc", {
             url: "/misc",
@@ -15,7 +15,7 @@
             }
         });
     }]);
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", "brokenLinkStatus", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window, brokenLinkStatus:Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "kleService", "$window", "brokenLinkStatus", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, kleService, $window, brokenLinkStatus:Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO) => {
         $rootScope.page.title = "Andet";
         $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
 
@@ -23,7 +23,7 @@
         function getKleStatus() {
             $scope.KLEUpdateAvailableLabel = "Undersøger om der er en ny version af KLE...";
             toggleKleButtonsClickAbility(false, false);
-            KLEservice.getStatus().success(function (dto, status) {
+            kleService.getStatus().success((dto, status) => {
                     if (status !== 200) {
                         notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                         return;
@@ -43,39 +43,37 @@
                 });
         }
 
-        $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
-            return g.key === "CanGlobalAdminOnlyEditReports";
-        });
+        $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, g => g.key === "CanGlobalAdminOnlyEditReports");
 
-        $scope.uploadFile = function () {
+        $scope.uploadFile = () => {
             var fileToBeUploaded = $scope.myFile;   
             uploadFile.uploadFile(fileToBeUploaded);
         };
 
-        $scope.patchConfig = function (config) {
+        $scope.patchConfig = config => {
             var payload = {};
             payload["value"] = config.value;
             
-            $http.patch("/odata/GlobalConfigs(" + config.Id + ")", payload).then(function (newUser) {
+            $http.patch("/odata/GlobalConfigs(" + config.Id + ")", payload).then(newUser => {
                 notify.addSuccessMessage("Feltet er opdateret!");
-            }, function () {
+            }, () => {
                 notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
             });
         };
 
-        $scope.GetKLEChanges = function () {
+        $scope.GetKLEChanges = () => {
             toggleKleButtonsClickAbility(false, false);
-            KLEservice.getChanges().success((data, status) => {
-                if (status !== 200)
-                {
-                    toggleKleButtonsClickAbility(true, false);
-                    notify.addErrorMessage("Der skete en fejl under hentning af ændringer");
-                    return;
-                }
-                var universalBOM = "\uFEFF";
-                var anchor = angular.element(document.getElementById("KLEDownloadAnchor"));
-                anchor.attr("data-element-type", "KLEDownloadAnchor");
-                anchor.attr({
+            kleService.getChanges().success((data, status) => {
+                    if (status !== 200)
+                    {
+                        toggleKleButtonsClickAbility(true, false);
+                        notify.addErrorMessage("Der skete en fejl under hentning af ændringer");
+                        return;
+                    }
+                    var universalBOM = "\uFEFF";
+                    var anchor = angular.element(document.getElementById("KLEDownloadAnchor"));
+                    anchor.attr("data-element-type", "KLEDownloadAnchor");
+                    anchor.attr({
                         href: 'data:text/csv; charset=utf-8,' + encodeURI(universalBOM + data),
                         target: "_blank",
                         download: "KLE-Changes.csv"
@@ -89,12 +87,12 @@
                 });
         }
 
-        $scope.UpdateKLE = function () {
+        $scope.UpdateKLE = () => {
             toggleKleButtonsClickAbility(false, false);
-            if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
-                KLEservice.applyUpdateKLE().
-                    success((data, status) => {
-                        if (status !== 200) {
+            if (confirm("Er du sikker på, at du vil opdatere KLE til nyeste version?")) {
+                kleService.applyUpdateKLE().
+                    then((response) => {
+                        if (response.status !== 200) {
                             toggleKleButtonsClickAbility(true, false);
                             angular.element(document.getElementById("overlay")).remove();
                             notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
@@ -104,7 +102,7 @@
                         angular.element(document.getElementById("overlay")).remove();
                         getKleStatus();
                     }).
-                    error(() => {
+                    catch(() => {
                         toggleKleButtonsClickAbility(true, false);
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                         angular.element(document.getElementById("overlay")).remove();

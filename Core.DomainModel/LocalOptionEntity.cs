@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel
 {
-    public abstract class LocalOptionEntity<OptionType> : Entity, IOwnedByOrganization, IContextAware
+    public abstract class LocalOptionEntity<OptionType> : Entity, IOwnedByOrganization
     {
         public string Description { get; set; }
 
@@ -13,10 +13,5 @@
         public int OptionId { get; set; }
 
         public bool IsActive { get; set; }
-
-        public bool IsInContext(int organizationId)
-        {
-            return OrganizationId == organizationId;
-        }
     }
 }

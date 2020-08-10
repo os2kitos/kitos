@@ -48,9 +48,11 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var token = await HttpApi.GetTokenAsync(role);
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
             var expectedResults = interfacesCreated.Where(x =>
-                (x.OrganizationId == orgId &&
-                 (orgId == token.ActiveOrganizationId || role == OrganizationRole.GlobalAdmin)) ||
-                x.AccessModifier == AccessModifier.Public).ToList();
+                x.OrganizationId == TestEnvironment.DefaultOrganizationId && orgId == x.OrganizationId || //If queried org is same as user org and interface org it is returned even if private
+                role == OrganizationRole.GlobalAdmin && orgId == x.OrganizationId || //Both public and private of queried org are returned if global admin
+                x.AccessModifier == AccessModifier.Public //All public are included
+            ).ToList();
+
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
@@ -75,7 +77,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
 
             //Act - perform the action with the actual role
-            var result = await InterfaceHelper.CreateDataRowAsync(interfaceDto.Id, login);
+            var result = await InterfaceHelper.CreateDataRowAsync(interfaceDto.OrganizationId, interfaceDto.Id, login);
 
             //Assert
             Assert.Equal(interfaceDto.Id, result.ItInterfaceId);
@@ -91,7 +93,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
 
             //Act - perform the action with the actual role
-            using (var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.Id, login))
+            using (var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.OrganizationId, interfaceDto.Id, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

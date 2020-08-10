@@ -10,6 +10,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -35,17 +36,7 @@ namespace Presentation.Web.Controllers.API
             return GetAll(paging);
         }
 
-        public HttpResponseMessage GetBySearch(string q, int orgId)
-        {
-            return Search(q, orgId);
-        }
-
-        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public, int orgId)
-        {
-            return Search(q, orgId);
-        }
-
-        private HttpResponseMessage Search(string q, int orgId)
+        public HttpResponseMessage GetBySearch(string q, int orgId, int take = 25)
         {
             try
             {
@@ -64,7 +55,9 @@ namespace Presentation.Web.Controllers.API
                                       org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == userId)))
                         .AsEnumerable()
                         .Where(AllowRead)
-                        .Select(Map)
+                        .OrderBy(_ => _.Name)
+                        .Take(take)
+                        .MapToNamedEntityDTOs()
                         .ToList();
 
                 return Ok(dtos);
@@ -73,6 +66,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        protected override bool AllowCreate<T>(int organizationId, IEntity entity)
+        {
+            return AuthorizationContext.AllowCreate<Organization>(organizationId);
         }
 
         protected override Organization PostQuery(Organization item)

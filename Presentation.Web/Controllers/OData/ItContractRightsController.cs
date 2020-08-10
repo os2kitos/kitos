@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Repositories.Contract;
@@ -34,6 +34,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Users({userId})/ItContractRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
             var result = Repository

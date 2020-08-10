@@ -54,43 +54,50 @@
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             $rootScope.page.title = "Snitflade - Katalog";
 
-            $scope.$on("kendoWidgetCreated", (event, widget) => {
-                // the event is emitted for every widget; if we have multiple
-                // widgets in this controller, we need to check that the event
-                // is for the one we're interested in.
-                if (widget === this.mainGrid) {
-                    this.loadGridOptions();
-                    this.mainGrid.dataSource.read();
+            $scope.$on("kendoWidgetCreated",
+                (event, widget) => {
+                    // the event is emitted for every widget; if we have multiple
+                    // widgets in this controller, we need to check that the event
+                    // is for the one we're interested in.
+                    if (widget === this.mainGrid) {
+                        this.loadGridOptions();
 
-                    // find the access modifier filter row section
-                    var accessModifierFilterRow = this.$(".k-filter-row [data-field='AccessModifier']");
-                    // find the access modifier kendo widget
-                    var accessModifierFilterWidget = accessModifierFilterRow.find("input").data("kendoDropDownList");
-                    // attach a click event to the X (remove filter) button
-                    accessModifierFilterRow.find("button").on("click", () => {
-                        // set the selected filter to none, because clicking the button removes the filter
-                        accessModifierFilterWidget.select(0);
-                    });
+                        // find the access modifier filter row section
+                        var accessModifierFilterRow = this.$(".k-filter-row [data-field='AccessModifier']");
+                        // find the access modifier kendo widget
+                        var accessModifierFilterWidget =
+                            accessModifierFilterRow.find("input").data("kendoDropDownList");
+                        // attach a click event to the X (remove filter) button
+                        accessModifierFilterRow.find("button").on("click",
+                            () => {
+                                // set the selected filter to none, because clicking the button removes the filter
+                                accessModifierFilterWidget.select(0);
+                            });
 
-                    // show loadingbar when export to excel is clicked
-                    // hidden again in method exportToExcel callback
-                    $(".k-grid-excel").click(() => {
-                        kendo.ui.progress(this.mainGrid.element, true);
-                    });
-                }
-            });
+                        // show loadingbar when export to excel is clicked
+                        // hidden again in method exportToExcel callback
+                        $(".k-grid-excel").click(() => {
+                            kendo.ui.progress(this.mainGrid.element, true);
+                        });
+                    }
+                });
+
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
+        }
+        private activate() {
 
             var itInterfaceBaseUrl: string;
-            if (user.isGlobalAdmin) {
+            if (this.user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
                 itInterfaceBaseUrl = "/odata/ItInterfaces";
             } else {
                 // everyone else are limited to within organizationnal context
-                itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
+                itInterfaceBaseUrl = `/odata/Organizations(${this.user.currentOrganizationId})/ItInterfaces`;
             }
 
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,Organization,ExhibitedBy($expand=ItSystem,ItSystem($expand=BelongsTo)),LastChangedByUser,DataRows($expand=DataType)";
-            this.canCreate = userAccessRights.canCreate;
+            this.canCreate = this.userAccessRights.canCreate;
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -109,7 +116,7 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
-                                if (!user.isGlobalAdmin) {
+                                if (!this.user.isGlobalAdmin) {
                                     parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
 
                                 }
@@ -479,7 +486,6 @@
                         var payload = {
                             name: $scope.formData.name,
                             itInterfaceId: $scope.formData.itInterfaceId,
-                            belongsToId: self.user.currentOrganizationId,
                             organizationId: self.user.currentOrganizationId
                         };
 

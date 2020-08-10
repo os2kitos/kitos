@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
         public HttpResponseMessage GetLogin()
         {
-            var user = KitosUser;
+            var user = _userRepository.GetById(UserId);
             Logger.Debug($"GetLogin called for {user}");
             var response = Map<User, UserDTO>(user);
             return Ok(response);
@@ -61,9 +61,9 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
         public HttpResponseMessage GetOrganizations()
         {
-            var user = KitosUser;
+            var user = _userRepository.GetById(UserId);
             var orgs = _organizationService.GetOrganizations(user);
-            var dtos = AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
             return Ok(dtos);
         }
 
@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<OrganizationAndDefaultUnitDTO>))]
         public HttpResponseMessage GetOrganization(int orgId)
         {
-            var user = KitosUser;
+            var user = _userRepository.GetById(UserId);
             var org = _organizationService.GetOrganizations(user).SingleOrDefault(o => o.Id == orgId);
             if (org == null)
             {
@@ -80,8 +80,8 @@ namespace Presentation.Web.Controllers.API
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
             var dto = new OrganizationAndDefaultUnitDTO
             {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+                Organization = Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             };
             return Ok(dto);
         }
@@ -122,20 +122,6 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                if (user.DefaultOrganization == null)
-                {
-                    //Make sure user is associated with the org they belong to
-                    var distinctOrgMemberships = user.OrganizationRights.Select(x => x.OrganizationId).Distinct().ToList();
-                    var firstOrgId = distinctOrgMemberships.First();
-                    if (distinctOrgMemberships.Count > 1)
-                    {
-                        Logger.Warn("API user {userId} without selected default org is a member of multiple organizations. The first one is selected {orgId}", user.Id, firstOrgId);
-                    }
-
-                    user.DefaultOrganizationId = firstOrgId;
-                    _userRepository.Save();
-                }
-
                 var token = new TokenValidator().CreateToken(user);
 
                 var response = new GetTokenResponseDTO
@@ -143,8 +129,7 @@ namespace Presentation.Web.Controllers.API
                     Token = token.Value,
                     Email = loginDto.Email,
                     LoginSuccessful = true,
-                    Expires = token.Expiration,
-                    ActiveOrganizationId = token.ActiveOrganizationId
+                    Expires = token.Expiration
                 };
 
                 Logger.Info($"Created token for user with Id {user.Id}");

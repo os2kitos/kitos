@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -31,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             var readAccessLevel = GetOrganizationReadAccessLevel(orgKey);
@@ -48,19 +50,16 @@ namespace Presentation.Web.Controllers.OData
 
         [ODataRoute("ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();
         }
 
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-        public override IHttpActionResult Post(ItSystem entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, ItSystem entity) => throw new NotSupportedException();
     }
 }

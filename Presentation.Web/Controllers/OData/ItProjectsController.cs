@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
@@ -31,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -45,6 +47,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProject>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItProjects(int key)
         {
             var all = Repository.AsQueryable();
@@ -73,6 +76,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItProject>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             if (GetOrganizationReadAccessLevel(orgKey) < OrganizationDataReadAccessLevel.All)
@@ -108,14 +112,10 @@ namespace Presentation.Web.Controllers.OData
             return Ok(projects);
         }
 
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-        public override IHttpActionResult Post(ItProject entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, ItProject entity) => throw new NotSupportedException();
     }
 }

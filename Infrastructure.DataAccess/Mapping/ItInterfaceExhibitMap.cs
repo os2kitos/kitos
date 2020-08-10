@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ItInterfaceExhibitMap()
         {
             // Table & Column Mappings
-            this.ToTable("Exhibit"); // TODO bad name, it's not intuitive when looking in the databas
+            this.ToTable("Exhibit");
 
            // Relationships
             this.HasRequired(t => t.ItInterface)

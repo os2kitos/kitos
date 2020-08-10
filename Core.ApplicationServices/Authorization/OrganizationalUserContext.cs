@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -9,58 +12,64 @@ namespace Core.ApplicationServices.Authorization
     /// </summary>
     public class OrganizationalUserContext : IOrganizationalUserContext
     {
-        private readonly ISet<OrganizationRole> _roles;
+        private readonly IReadOnlyDictionary<int, HashSet<OrganizationRole>> _roles;
+        private readonly IReadOnlyDictionary<int, OrganizationCategory> _categoriesOfMemberOrganizations;
+        private readonly HashSet<OrganizationCategory> _membershipCategories;
+        private readonly bool _isGlobalAdmin;
 
         public OrganizationalUserContext(
-            IEnumerable<OrganizationRole> roles,
-            User user,
-            int activeOrganizationId)
+            int userId,
+            IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roles,
+            IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations)
         {
-            UserEntity = user;
-            ActiveOrganizationId = activeOrganizationId;
-            _roles = new HashSet<OrganizationRole>(roles);
+            UserId = userId;
+            _categoriesOfMemberOrganizations = categoriesOfMemberOrganizations;
+            _membershipCategories = new HashSet<OrganizationCategory>(_categoriesOfMemberOrganizations.Values);
+            _roles = roles
+                .ToDictionary(kvp => kvp.Key, kvp => new HashSet<OrganizationRole>(kvp.Value))
+                .AsReadOnly();
+            _isGlobalAdmin = _roles.Values.Any(x => x.Contains(OrganizationRole.GlobalAdmin));
         }
 
-        public int ActiveOrganizationId { get; }
+        public int UserId { get; }
 
-        public int UserId => UserEntity.Id;
+        public IEnumerable<int> OrganizationIds => _roles.Keys;
 
-        public User UserEntity { get; }
-
-        public bool IsActiveInOrganizationOfType(OrganizationCategory category)
+        public bool HasRoleInOrganizationOfType(OrganizationCategory category)
         {
-            return UserEntity.DefaultOrganization?.Type?.Category == category;
+            return _membershipCategories.Contains(category);
         }
 
-        public bool HasRole(OrganizationRole role)
+        public bool IsGlobalAdmin()
         {
-            return _roles.Contains(role);
+            return _isGlobalAdmin;
         }
 
-        public bool IsActiveInOrganization(int organizationId)
+        public bool HasRole(int organizationId, OrganizationRole role)
         {
-            return ActiveOrganizationId == organizationId;
+            return _roles.TryGetValue(organizationId, out var rolesInOrganization) &&
+                   rolesInOrganization.Contains(role);
         }
 
-        public bool IsActiveInSameOrganizationAs(IEntity entity)
+        public bool HasRoleIn(int organizationId)
+        {
+            return _roles.ContainsKey(organizationId);
+        }
+
+        public bool HasRoleInSameOrganizationAs(IEntity entity)
         {
             switch (entity)
             {
                 //Prefer match on hasOrganization first since it has static knowledge of organization relationship
                 case IOwnedByOrganization hasOrg:
-                    return IsActiveInOrganization(hasOrg.OrganizationId);
+                    return HasRoleIn(hasOrg.OrganizationId);
                 case IIsPartOfOrganization organizationRelationship:
-                    return organizationRelationship.IsPartOfOrganization(ActiveOrganizationId);
-                case IContextAware contextAware:
-                    return contextAware.IsInContext(ActiveOrganizationId);
+                    return organizationRelationship
+                        .GetOrganizationIds()
+                        .Any(HasRoleIn);
                 default:
                     return false;
             }
-        }
-
-        public bool HasAssignedWriteAccess(IEntity entity)
-        {
-            return entity.HasUserWriteAccess(UserEntity);
         }
     }
 }

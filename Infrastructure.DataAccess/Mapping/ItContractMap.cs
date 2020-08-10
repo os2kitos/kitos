@@ -8,6 +8,12 @@ namespace Infrastructure.DataAccess.Mapping
         public ItContractMap()
         {
             // Properties
+
+            this.Property(x => x.Name)
+                .HasMaxLength(ItContractConstraints.MaxNameLength)
+                .IsRequired()
+                .HasIndexAnnotation("Contract_Index_Name", 0);
+
             // Table & Column Mappings
             ToTable("ItContract");
 

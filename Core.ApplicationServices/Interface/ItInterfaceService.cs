@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
@@ -10,6 +11,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
 
 namespace Core.ApplicationServices.Interface
@@ -76,23 +78,28 @@ namespace Core.ApplicationServices.Interface
             }
         }
 
-        public Result<ItInterface, OperationFailure> Create(ItInterface newInterface)
+        public Result<ItInterface, OperationFailure> Create(int organizationId, string name, string interfaceId, AccessModifier? accessModifier = default)
         {
-            if (newInterface == null)
+            if (name == null)
             {
-                throw new ArgumentNullException(nameof(newInterface));
+                throw new ArgumentNullException(nameof(name));
             }
 
-            if (!IsItInterfaceIdAndNameUnique(newInterface.ItInterfaceId, newInterface.Name,
-                newInterface.OrganizationId))
+            if (!IsItInterfaceIdAndNameUnique(interfaceId, name,
+                organizationId))
             {
                 return OperationFailure.Conflict;
             }
+            var newInterface = new ItInterface
+            {
+                Name = name,
+                OrganizationId = organizationId,
+                ItInterfaceId = interfaceId ?? string.Empty,
+                Uuid = Guid.NewGuid(),
+                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public)
+            };
 
-            newInterface.ItInterfaceId = newInterface.ItInterfaceId ?? "";
-            newInterface.Uuid = Guid.NewGuid();
-
-            if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
+            if (!_authorizationContext.AllowCreate<ItInterface>(organizationId, newInterface))
             {
                 return OperationFailure.Forbidden;
             }

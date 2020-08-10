@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
             var result = Repository.Get();
             try
             {
-                var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
+                var dtos = Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
                 return Ok(dtos);
             }
             catch (Exception e)

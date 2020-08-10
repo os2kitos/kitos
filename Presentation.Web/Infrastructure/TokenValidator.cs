@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Security.Claims;
 using Serilog;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Principal;
-using Core.DomainModel.Constants;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
 namespace Presentation.Web.Infrastructure
@@ -22,11 +22,6 @@ namespace Presentation.Web.Infrastructure
             var handler = new JwtSecurityTokenHandler();
 
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
-            var organizationId = user.DefaultOrganizationId.GetValueOrDefault(EntityConstants.InvalidId);
-            if (user.DefaultOrganizationId.HasValue)
-            {
-                identity.AddClaim(new Claim(BearerTokenConfig.DefaultOrganizationClaimName, organizationId.ToString("D")));
-            }
 
             // securityKey length should be >256b
             try
@@ -36,12 +31,13 @@ namespace Presentation.Web.Infrastructure
                 var securityToken = handler.CreateToken(new SecurityTokenDescriptor
                 {
                     Subject = identity,
-                    TokenIssuerName = BearerTokenConfig.Issuer,
-                    Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(validFrom, expires),
+                    Issuer = BearerTokenConfig.Issuer,
+                    IssuedAt = validFrom,
+                    Expires = expires,
                     SigningCredentials = new SigningCredentials(BearerTokenConfig.SecurityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
                 });
                 var tokenString = handler.WriteToken(securityToken);
-                return new KitosApiToken(user, tokenString, expires, organizationId);
+                return new KitosApiToken(user, tokenString, expires);
             }
             catch (Exception exn)
             {

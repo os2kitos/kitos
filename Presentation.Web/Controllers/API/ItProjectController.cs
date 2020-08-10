@@ -13,8 +13,11 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
+using Ninject.Infrastructure.Language;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -72,14 +75,20 @@ namespace Presentation.Web.Controllers.API
         /// <param name="q"></param>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        public virtual HttpResponseMessage Get(string q, int orgId)
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
+        public virtual HttpResponseMessage Get(string q, int orgId, int take = 25)
         {
             try
             {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
+                var projectsQuery = _itProjectService
+                    .GetAvailableProjects(orgId, q)
+                    .OrderBy(_=>_.Name)
+                    .Take(take)
+                    .AsEnumerable()
+                    .MapToNamedEntityDTOs()
+                    .ToList();
 
-                return Ok(Map(projectsQuery));
+                return Ok(projectsQuery);
             }
             catch (Exception e)
             {
@@ -116,36 +125,18 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
-        public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
-
-                var projects = Page(projectsQuery, pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
             try
             {
+                if (GetOrganizationReadAccessLevel(orgId) < OrganizationDataReadAccessLevel.All)
+                    return Forbidden();
+
                 var projects = Repository
                     .AsQueryable()
                     .ByOrganizationId(orgId)
                     .Where(p => p.ItProjectTypeId == typeId)
-                    .AsEnumerable()
-                    .Where(AllowRead)
                     .ToList();
 
                 return Ok(Map(projects));

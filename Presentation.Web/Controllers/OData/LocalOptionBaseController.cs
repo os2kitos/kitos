@@ -4,42 +4,49 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.OData;
-using Presentation.Web.Infrastructure.Attributes;
+using Core.DomainServices.Extensions;
+using Microsoft.AspNet.OData;
 using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
-    public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
+    public abstract class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType>
+        where TLocalModelType : LocalOptionEntity<TOptionType>, new()
+        where TOptionType : OptionEntity<TDomainModelType>
     {
         private readonly IGenericRepository<TOptionType> _optionsRepository;
 
-        public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IGenericRepository<TOptionType> optionsRepository)
+        protected LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IGenericRepository<TOptionType> optionsRepository)
             : base(repository)
         {
             _optionsRepository = optionsRepository;
         }
 
-        [EnableQuery]
-        public override IHttpActionResult Get()
+        [NonAction]
+        public override IHttpActionResult Get() => throw new NotSupportedException();
+
+        public virtual IHttpActionResult GetByOrganizationId(int organizationId)
         {
-            var orgId = ActiveOrganizationId;
-            var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
-            var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
+            var localOptionsResult =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .ToDictionary(x => x.OptionId);
+
+            var globalOptionsResult = _optionsRepository
+                .AsQueryable()
+                .Where(x => x.IsEnabled)
+                .ToList();
+
             var returnList = new List<TOptionType>();
 
             foreach (var item in globalOptionsResult)
             {
-                if (!item.IsEnabled)
-                    continue;
-
                 var itemToAdd = item;
                 itemToAdd.IsLocallyAvailable = false;
 
-                var localOption = localOptionsResult.FirstOrDefault(x => x.OptionId == item.Id);
 
-                if (localOption != null)
+                if (localOptionsResult.TryGetValue(item.Id, out var localOption))
                 {
                     itemToAdd.IsLocallyAvailable = localOption.IsActive;
                     if (!IsNullOrEmpty(localOption.Description))
@@ -47,15 +54,17 @@ namespace Presentation.Web.Controllers.OData
                         itemToAdd.Description = localOption.Description;
                     }
                 }
+
                 returnList.Add(itemToAdd);
             }
             return Ok(returnList);
         }
 
-        [EnableQuery]
-        public override IHttpActionResult Get(int key)
+        [NonAction]
+        public override IHttpActionResult Get(int key) => throw new NotSupportedException();
+
+        public virtual IHttpActionResult Get(int organizationId, int key)
         {
-            var orgId = ActiveOrganizationId;
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -63,7 +72,11 @@ namespace Presentation.Web.Controllers.OData
 
             var option = globalOptionResult.First();
 
-            var localOptionResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+            var localOptionResult =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .Where(x => x.OptionId == key);
 
             if (localOptionResult.Any())
             {
@@ -82,30 +95,30 @@ namespace Presentation.Web.Controllers.OData
             return Ok(option);
         }
 
-        public override IHttpActionResult Post(TLocalModelType entity)
+        public override IHttpActionResult Post(int organizationId, TLocalModelType entity)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var orgId = ActiveOrganizationId;
+            entity.OrganizationId = organizationId;
+            var entityOptionId = entity.OptionId;
 
-            entity.OrganizationId = orgId;
-
-            if (!AllowCreate<TLocalModelType>(entity))
+            if (!AllowCreate<TLocalModelType>(organizationId, entity))
             {
                 return Forbidden();
             }
 
-            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == entity.OptionId);
+            var localOption = Repository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .FirstOrDefault(x => x.OptionId == entityOptionId);
 
-            if (localOptionSearch.Any())
+            if (localOption != null)
             {
                 try
                 {
-                    var localOption = localOptionSearch.First();
-
                     localOption.IsActive = true;
                     Repository.Save();
                 }
@@ -119,13 +132,9 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     entity.IsActive = true;
+                    entity.OrganizationId = organizationId;
 
-                    if (entity is IOwnedByOrganization entityWithOrganization)
-                    {
-                        entityWithOrganization.OrganizationId = orgId;
-                    }
-
-                    entity = Repository.Insert(entity);
+                    Repository.Insert(entity);
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -137,22 +146,24 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta) => throw new NotSupportedException();
+
+        public virtual IHttpActionResult Patch(int organizationId, int key, Delta<TLocalModelType> delta)
         {
-            var orgId = ActiveOrganizationId;
-            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+            var orgId = organizationId;
+            var localOptionSearch =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .Where(x => x.OptionId == key);
 
             if (localOptionSearch.Any())
             {
                 var localOption = localOptionSearch.First();
-                // does the entity exist?
-                if (localOption == null)
-                {
-                    return NotFound();
-                }
 
                 // check if user is allowed to write to the entity
-                if (!AllowWrite(localOption))
+                if (!AllowModify(localOption))
                 {
                     return Forbidden();
                 }
@@ -199,10 +210,15 @@ namespace Presentation.Web.Controllers.OData
             return Ok();
         }
 
-        public override IHttpActionResult Delete(int key)
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+
+        public virtual IHttpActionResult Delete(int organizationId, int key)
         {
-            var orgId = ActiveOrganizationId;
-            LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
+            LocalOptionEntity<TOptionType> localOption = Repository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .FirstOrDefault(x => x.OptionId == key);
 
             if (localOption == null)
                 return NotFound();

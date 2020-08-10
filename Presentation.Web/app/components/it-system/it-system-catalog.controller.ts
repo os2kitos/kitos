@@ -69,7 +69,7 @@
             private _: ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
-            private user,
+            private user: Services.IUser,
             private userAccessRights,
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
@@ -85,43 +85,45 @@
             public migrationConsequenceText) {
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
-            $scope.$on("kendoWidgetCreated", (event, widget) => {
-                // the event is emitted for every widget; if we have multiple
-                // widgets in this controller, we need to check that the event
-                // is for the one we're interested in.
-                if (widget === this.mainGrid) {
-                    this.loadGridOptions();
+            $scope.$on("kendoWidgetCreated",
+                (event, widget) => {
+                    // the event is emitted for every widget; if we have multiple
+                    // widgets in this controller, we need to check that the event
+                    // is for the one we're interested in.
+                    if (widget === this.mainGrid) {
+                        this.loadGridOptions();
 
-                    this.mainGrid.dataSource.read();
+                        // find the access modifier filter row section
+                        var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
+                        // find the access modifier kendo widget
+                        var accessModifierFilterWidget =
+                            accessModifierFilterRow.find("input").data("kendoDropDownList");
+                        // attach a click event to the X (remove filter) button
+                        accessModifierFilterRow.find("button").on("click",
+                            () => {
+                                // set the selected filter to none, because clicking the button removes the filter
+                                accessModifierFilterWidget.select(0);
+                            });
 
-                    // find the access modifier filter row section
-                    var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
-                    // find the access modifier kendo widget
-                    var accessModifierFilterWidget = accessModifierFilterRow.find("input").data("kendoDropDownList");
-                    // attach a click event to the X (remove filter) button
-                    accessModifierFilterRow.find("button").on("click", () => {
-                        // set the selected filter to none, because clicking the button removes the filter
-                        accessModifierFilterWidget.select(0);
-                    });
+                        // show loadingbar when export to excel is clicked
+                        // hidden again in method exportToExcel callback
+                        $(".k-grid-excel").click(() => {
+                            kendo.ui.progress(this.mainGrid.element, true);
+                        });
 
-                    // show loadingbar when export to excel is clicked
-                    // hidden again in method exportToExcel callback
-                    $(".k-grid-excel").click(() => {
-                        kendo.ui.progress(this.mainGrid.element, true);
-                    });
+                    }
 
-                }
+                });
 
-            });
-
-            $scope.mySelectOptions = {
+            //Initialize system migration options
+            this.$scope.mySelectOptions = {
                 minimumInputLength: 1,
                 dropdownCss: { 'z-index': 100000, },
                 ajax: {
                     data: (term, _) => { return { query: term } },
                     quietMillis: 500,
                     transport: (queryParams) => {
-                        var request = $http.get(
+                        var request = this.$http.get(
                             "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
                             `organizationId=${this.municipalityId}` +
                             `&nameContent=${queryParams.data.query}` +
@@ -157,13 +159,17 @@
                 }
             };
 
+            //Defer until page change is complete
+            setTimeout(() => this.activate(), 1);
+        }
+        private activate() {
             var itSystemBaseUrl: string;
-            if (user.isGlobalAdmin) {
+            if (this.user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
                 itSystemBaseUrl = "/odata/ItSystems";
             } else {
                 // everyone else are limited to within organizationnal context
-                itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
+                itSystemBaseUrl = `/odata/Organizations(${this.user.currentOrganizationId})/ItSystems`;
             }
             var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType,BelongsTo,TaskRefs,Parent,Organization,Usages($expand=Organization),LastChangedByUser,Reference";
             // catalog grid
@@ -721,9 +727,7 @@
                     $scope.saveAndProceed = function () {
                         var payload = {
                             name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: []
+                            organizationId: self.user.currentOrganizationId
                         };
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);
@@ -743,9 +747,7 @@
                     $scope.save = function () {
                         var payload = {
                             name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: []
+                            organizationId: self.user.currentOrganizationId
                         };
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);

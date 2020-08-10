@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectStatusUpdate: Entity, IContextAware, IOwnedByOrganization, IProjectModule
+    public class ItProjectStatusUpdate: Entity, IOwnedByOrganization, IProjectModule
     {
         public ItProjectStatusUpdate()
         {
@@ -28,9 +28,5 @@ namespace Core.DomainModel.ItProject
         public int OrganizationId { get; set; }
         public virtual Organization.Organization Organization { get; set; }
         public bool IsFinal { get; set; }
-        public bool IsInContext(int organizationId)
-        {
-            return organizationId == this.OrganizationId;
-        }
     }
 }

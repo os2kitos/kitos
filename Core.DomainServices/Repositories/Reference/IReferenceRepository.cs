@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Reference
 {

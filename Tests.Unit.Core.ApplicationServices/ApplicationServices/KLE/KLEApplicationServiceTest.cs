@@ -30,7 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.User, false)]
-        private void GetKLEStatus_Authorizes_And_Returns_Valid_KLEStatus(OrganizationRole role, bool isOk)
+        public void GetKLEStatus_Authorizes_And_Returns_Valid_KLEStatus(OrganizationRole role, bool isOk)
         {
             // Arrange
             var expectedPublishedDate = DateTime.Parse("01-11-2019");
@@ -42,7 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var lastUpdate = DateTime.Parse("01-01-1970");
             _mockUpdateHistoryItemRepository.Setup(r => r.GetLastUpdated()).Returns(lastUpdate);
             _mockKleStandardRepository.Setup(r => r.GetKLEStatus(lastUpdate)).Returns(kleStatus);
-            _mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
+            _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(role == OrganizationRole.GlobalAdmin);
 
             // Act
             var result = _sut.GetKLEStatus();
@@ -55,15 +55,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin, true, 1)]
         [InlineData(OrganizationRole.User, false, 0)]
-        private void GetKLEChangeSummary_Authorizes_And_Returns_Valid_Number_Of_Changes(OrganizationRole role, bool isOk, int expectedNumberOfChanges)
+        public void GetKLEChangeSummary_Authorizes_And_Returns_Valid_Number_Of_Changes(OrganizationRole role, bool isOk, int expectedNumberOfChanges)
         {
             // Arrange
             _mockKleStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
                 new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
             }.OrderBy(c => c.TaskKey));
-            _mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
-            
+            _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(role == OrganizationRole.GlobalAdmin);
+
             // Act
             var result = _sut.GetKLEChangeSummary();
 
@@ -75,12 +75,11 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.User, false)]
-        private void UpdateKLE_Authorizes_And_Updates(OrganizationRole role, bool isOk)
+        public void UpdateKLE_Authorizes_And_Updates(OrganizationRole role, bool isOk)
         {
             // Arrange
-            _mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
+            _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(role == OrganizationRole.GlobalAdmin);
             const int activeOrganizationId = 1;
-            _mockOrganizationalUserContext.Setup(r => r.ActiveOrganizationId).Returns(activeOrganizationId);
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
                 .Setup(r => r.UpdateKLE(activeOrganizationId))
@@ -98,7 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             }.OrderBy(c => c.TaskKey));
             
             // Act
-            var result = _sut.UpdateKLE();
+            var result = _sut.UpdateKLE(activeOrganizationId);
 
             // Assert
             Assert.Equal(isOk, result.Ok);
@@ -106,12 +105,11 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_GivenGlobalAdmin_And_UpToDateKLE_DoesNotUpdate()
+        public void UpdateKLE_GivenGlobalAdmin_And_UpToDateKLE_DoesNotUpdate()
         {
             // Arrange
-            _mockOrganizationalUserContext.Setup(r => r.HasRole(OrganizationRole.GlobalAdmin)).Returns(true);
+            _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(true);
             const int activeOrganizationId = 1;
-            _mockOrganizationalUserContext.Setup(r => r.ActiveOrganizationId).Returns(activeOrganizationId);
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
                 .Setup(r => r.UpdateKLE(activeOrganizationId))
@@ -125,7 +123,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             );
             
             // Act
-            var result = _sut.UpdateKLE();
+            var result = _sut.UpdateKLE(activeOrganizationId);
             
             // Assert
             Assert.False(result.Ok);

@@ -2,6 +2,6 @@
 {
     public interface IUserContextFactory
     {
-        IOrganizationalUserContext Create(int userId, int organizationId);
+        IOrganizationalUserContext Create(int userId);
     }
 }

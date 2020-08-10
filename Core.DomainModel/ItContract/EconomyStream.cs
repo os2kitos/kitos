@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
@@ -6,8 +7,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract economy stream.
     /// </summary>
-    /// TODO Refactor into a base class and extern & intern derived classes
-    public class EconomyStream : Entity, IContextAware, IContractModule, IHasAccessModifier
+    public class EconomyStream : Entity, IIsPartOfOrganization, IContractModule, IHasAccessModifier
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -121,16 +121,13 @@ namespace Core.DomainModel.ItContract
             return base.HasUserWriteAccess(user);
         }
 
-        public bool IsInContext(int organizationId)
+        public IEnumerable<int> GetOrganizationIds()
         {
             if (ExternPaymentFor != null)
-                return ExternPaymentFor.OrganizationId == organizationId;
+                yield return ExternPaymentFor.OrganizationId;
 
             if (InternPaymentFor != null)
-                return InternPaymentFor.OrganizationId == organizationId;
-
-            return false;
+                yield return InternPaymentFor.OrganizationId;
         }
-
     }
 }

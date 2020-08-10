@@ -27,9 +27,14 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<PaymentMilestoneDTO>>))]
         public HttpResponseMessage GetByContractId(int id, [FromUri] bool? contract)
         {
-            var items =
-                Repository.Get(x => x.ItContractId == id)
-                    .Where(AllowRead);
+            var itContract = _contractRepository.GetById(id);
+            if (contract == null)
+                return NotFound();
+            
+            if (!AllowRead(itContract))
+                return Forbidden();
+
+            var items = Repository.Get(x => x.ItContractId == id);
 
             return Ok(Map(items));
         }

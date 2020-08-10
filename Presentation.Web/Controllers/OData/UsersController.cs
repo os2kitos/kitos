@@ -1,12 +1,11 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
-using System.Web.OData;
-using System.Web.OData.Routing;
-using Core.DomainModel.Organization;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -17,7 +16,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<User> _repository;
 
         public UsersController(
-            IGenericRepository<User> repository, 
+            IGenericRepository<User> repository,
             IUserService userService)
             : base(repository)
         {
@@ -25,10 +24,8 @@ namespace Presentation.Web.Controllers.OData
             _repository = repository;
         }
 
-        public override IHttpActionResult Post(User entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, User entity) => throw new NotSupportedException();
 
         [HttpPost]
         public IHttpActionResult Create(ODataActionParameters parameters)
@@ -49,7 +46,6 @@ namespace Presentation.Web.Controllers.OData
             if (parameters.ContainsKey("organizationId"))
             {
                 organizationId = (int)parameters["organizationId"];
-                // TODO check if user is allowed to add users to this organization
             }
 
             var sendMailOnCreation = false;
@@ -67,7 +63,7 @@ namespace Presentation.Web.Controllers.OData
             if (user?.IsGlobalAdmin == true)
             {
                 // only other global admins can create global admin users
-                if (!UserContext.HasRole(OrganizationRole.GlobalAdmin))
+                if (!UserContext.IsGlobalAdmin())
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
                 }
@@ -104,10 +100,8 @@ namespace Presentation.Web.Controllers.OData
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
         private bool EmailExists(string email)
         {

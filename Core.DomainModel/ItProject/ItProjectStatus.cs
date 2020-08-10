@@ -4,7 +4,7 @@
     /// Base class of Milestone and Assignment.
     /// Called status for lack of a better word.
     /// </summary>
-    public abstract class ItProjectStatus : Entity, IContextAware, IProjectModule
+    public abstract class ItProjectStatus : Entity, IProjectModule
     {
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)
@@ -56,15 +56,6 @@
                 return true;
 
             return base.HasUserWriteAccess(user);
-        }
-
-        public bool IsInContext(int organizationId)
-        {
-            // delegate to it project
-            if (AssociatedItProject != null)
-                return AssociatedItProject.IsInContext(organizationId);
-
-            return false;
         }
     }
 }
