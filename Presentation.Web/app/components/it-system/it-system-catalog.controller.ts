@@ -352,7 +352,7 @@
                         title: "Overordnet IT System",
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? (dataItem.Parent.Name + (dataItem.Parent.Disabled ? " (Ikke aktiv)" : "")) : "",
+                        template: dataItem => dataItem.Parent ? Helpers.SystemNameFormat.apply(dataItem.Parent.Name, dataItem.Parent.Disabled) : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -384,12 +384,7 @@
                         width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
-                                    } (Ikke aktiv) </a>`;
-                            else
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
-                                    }</a>`;
+                            return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
                         },
                         attributes: {
                             "data-element-type": "catalogNameObject"
@@ -399,10 +394,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
-                                if (dataItem.Disabled)
-                                    return dataItem.Name + " (Ikke aktiv)";
-                                else
-                                    return dataItem.Name;
+                                return Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.Disabled);
                             } else {
                                 return "";
                             }

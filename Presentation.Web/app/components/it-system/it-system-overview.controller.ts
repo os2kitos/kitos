@@ -389,7 +389,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentsysname",
-                        template: dataItem => dataItem.ItSystem.Parent ? (dataItem.ItSystem.Parent.Name + (dataItem.ItSystem.Parent.Disabled ? " (Ikke aktiv)" : "")) : "",
+                        template: dataItem => dataItem.ItSystem.Parent ? Helpers.SystemNameFormat.apply(dataItem.ItSystem.Parent.Name, dataItem.ItSystem.Parent.Disabled) : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -404,10 +404,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         field: "SystemName", title: "IT System", width: 320,
                         persistId: "sysname",
                         template: dataItem => {
-                            if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Ikke aktiv) </a>`;
-                            else
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
+                            return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.ItSystem.Name, dataItem.ItSystem.Disabled)}</a>`;
                         },
                         attributes: {
                             "data-element-type": "systemNameKendoObject"
@@ -417,10 +414,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
-                                if (dataItem.ItSystem.Disabled)
-                                    return dataItem.ItSystem.Name + " (Ikke aktiv)";
-                                else
-                                    return dataItem.ItSystem.Name;
+                                return Helpers.SystemNameFormat.apply(dataItem.ItSystem.Name, dataItem.ItSystem.Disabled);
                             } else {
                                 return "";
                             }

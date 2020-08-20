@@ -29,7 +29,7 @@
                 $scope.showKLE = user.isGlobalAdmin;
                 $scope.showReference = user.isGlobalAdmin;
 
-                $scope.systemNameHeader = (itSystem.name + " - data i IT systemkatalog") + (itSystem.disabled ? " (Ikke aktiv)" : "");
+                $scope.systemNameHeader = Kitos.Helpers.SystemNameFormat.apply(itSystem.name + " - data i IT systemkatalog", itSystem.disabled);
 				
                 $scope.hasWriteAccess = hasWriteAccess;
                

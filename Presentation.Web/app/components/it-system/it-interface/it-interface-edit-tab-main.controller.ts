@@ -31,10 +31,10 @@
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
 
+                $scope.formatInterfaceName = Kitos.Helpers.InterfaceNameFormat.apply;
                 $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
 
-                const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Ikke aktiv)" : "";
-                $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
+                $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: Kitos.Helpers.SystemNameFormat.apply(itInterface.exhibitedByItSystemName, itInterface.exhibitedByItSystemDisabled) };
 
                 itInterface.updateUrl = `api/itInterface/${itInterface.id}`;
 

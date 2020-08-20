@@ -47,7 +47,7 @@
                         persistId: "fieldValue", // DON'T YOU DARE RENAME!
                         field: `${scope.fieldValue}`,
                         title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
-                        template: dataItem => dataItem[scope.detailModelType].Name + (dataItem[scope.detailModelType].Disabled ? " (Ikke aktiv)" : ""),
+                        template: dataItem => Helpers.SystemNameFormat.apply(dataItem[scope.detailModelType].Name, dataItem[scope.detailModelType].Disabled),
                         hidden: false
                     }
                 ]

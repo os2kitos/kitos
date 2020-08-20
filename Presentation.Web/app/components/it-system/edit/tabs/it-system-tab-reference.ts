@@ -14,7 +14,7 @@
         ($scope, $state, notify, hasWriteAccess, referenceService, itSystem) => {
             $scope.hasWriteAccess = hasWriteAccess;
 
-            $scope.referenceName = (itSystem.name + " - data i IT systemkatalog") + (itSystem.disabled ? " (Ikke aktiv)" : "");
+            $scope.referenceName = Kitos.Helpers.SystemNameFormat.apply(itSystem.name + " - data i IT systemkatalog", itSystem.disabled);
 
             $scope.setChosenReference = id => {
                 var referenceId = (id === itSystem.referenceId) ? null : id;

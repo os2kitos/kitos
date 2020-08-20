@@ -92,7 +92,7 @@
         private handleResults(list: any, obj: { id; name; disabled}) {
             list.push({
                 id: obj.id,
-                text: obj.name + (obj.disabled ? " (Ikke aktiv)" : "")
+                text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled)
         });
         }
 

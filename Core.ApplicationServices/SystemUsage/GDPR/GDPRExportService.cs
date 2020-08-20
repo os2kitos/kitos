@@ -73,7 +73,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 LinkToDirectory = !string.IsNullOrEmpty(input.LinkToDirectoryUrl),
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
-                SystemName = $"{input.ItSystem.Name}{(input.ItSystem.Disabled ? " (Ikke aktiv)" : "")}",
+                SystemName = $"{input.ItSystem.Name}{(input.ItSystem.Disabled ? " (Ikke aktivt)" : "")}",
                 SensitiveDataTypes = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA)
                         ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes)
                         : new List<string>()

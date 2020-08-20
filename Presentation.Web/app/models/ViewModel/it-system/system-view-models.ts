@@ -36,9 +36,9 @@
         readonly uuid: string;
 
         constructor(itSystem: any) {
-            this.name = itSystem.name + (itSystem.disabled ? " (Ikke aktiv)" : "");
+            this.name = Helpers.SystemNameFormat.apply(itSystem.name, itSystem.disabled);
             if (itSystem.parentName) {
-                this.parentName = itSystem.parentName + (itSystem.parentDisabled ? " (Ikke aktiv)" : "");
+                this.parentName = Helpers.SystemNameFormat.apply(itSystem.parentName, itSystem.parentDisabled);
             }
             this.previousName = itSystem.previousName;
             this.belongsToName = itSystem.belongsToName;

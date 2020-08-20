@@ -25,6 +25,7 @@
             $scope.autoSaveUrl = `api/itcontract/${$stateParams.id}`;
             $scope.contract = contract;
 
+            $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
             $scope.agreementElements = agreementElements;
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, "name");

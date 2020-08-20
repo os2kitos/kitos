@@ -1,7 +1,7 @@
 ﻿<script type="text/ng-template" id="tree_item_template">
     <div class="org-node" data-ng-class="{'selected': node.id == usage.itSystemId}">
         <span class="org-node-info">
-            <a data-ui-sref="it-system.edit.main({ id: node.id })">{{ node.name }} <span ng-if="node.disabled">(Ikke aktiv)</span></a>
+            <a data-ui-sref="it-system.edit.main({ id: node.id })">{{ formatSystemName(node.name, node.disabled) }}</a>
         </span>
         <ul>
             <li data-ng-repeat="node in node.children">

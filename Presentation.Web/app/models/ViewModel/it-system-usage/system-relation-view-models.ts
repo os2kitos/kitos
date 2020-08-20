@@ -65,9 +65,7 @@
             if (sourceModel != null) {
                 this.mapNameAndId(viewModel, sourceModel);
                 viewModel.Disabled = sourceModel.disabled;
-                if (viewModel.Disabled) {
-                    viewModel.Name += " (Ikke aktiv)";
-                }
+                viewModel.Name = Helpers.SystemNameFormat.apply(viewModel.Name,viewModel.Disabled);
             }
         }
 
@@ -162,7 +160,7 @@
         }
 
         configureAsEditRelationDialog(relationData: IItSystemUsageRelationDTO, optionsResult: IItSystemUsageRelationOptionsDTO) {
-            this.toSystem = <Select2OptionViewModel>{ id: relationData.toUsage.id, text: relationData.toUsage.name + (relationData.toUsage.disabled ? " (Ikke aktiv)" : ""), disabled: relationData.toUsage.disabled };
+            this.toSystem = <Select2OptionViewModel>{ id: relationData.toUsage.id, text: Helpers.SystemNameFormat.apply(relationData.toUsage.name, relationData.toUsage.disabled), disabled: relationData.toUsage.disabled };
             this.updateAvailableOptions(optionsResult);
 
             this.bindValue(this.frequency, relationData.frequencyType);

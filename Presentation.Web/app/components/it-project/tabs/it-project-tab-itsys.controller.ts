@@ -23,7 +23,7 @@
         function ($scope, $http, $timeout, $state, $stateParams, user, notify, usages) {
             var projectId = $stateParams.id;
             $scope.systemUsages = usages;
-
+            $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
             $scope.save = function () {
                 $http.post("api/itproject/" + projectId + "?usageId=" + $scope.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
                     .success(function () {

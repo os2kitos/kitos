@@ -514,7 +514,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 const system = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem;
-                                value = system.Name + (system.Disabled ? " (Ikke aktiv)" : ""); 
+                                value = Helpers.SystemNameFormat.apply(system.Name, system.Disabled); 
                             }
 
                             if (dataItem.AssociatedSystemUsages.length > 1) {

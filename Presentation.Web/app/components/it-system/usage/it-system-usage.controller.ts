@@ -32,7 +32,7 @@
             $scope.usage = itSystemUsage;
 
             $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel(itSystemUsage);
-            $scope.systemUsageName = `${itSystemUsage.itSystem.name} - i ${itSystemUsage.organization.name}${itSystemUsage.itSystem.disabled ? " (Ikke aktiv)" : ""}`;
+            $scope.systemUsageName = Kitos.Helpers.SystemNameFormat.apply(`${itSystemUsage.itSystem.name} - i ${itSystemUsage.organization.name}`, itSystemUsage.itSystem.disabled);
 
             $scope.allowClearOption = {
                 allowClear: true
