@@ -352,7 +352,7 @@
                         title: "Overordnet IT System",
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
+                        template: dataItem => dataItem.Parent ? (dataItem.Parent.Name + (dataItem.Parent.Disabled ? " (Ikke aktiv)" : "")) : "",
                         hidden: true,
                         filterable: {
                             cell: {

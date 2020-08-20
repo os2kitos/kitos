@@ -389,7 +389,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentsysname",
-                        template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
+                        template: dataItem => dataItem.ItSystem.Parent ? (dataItem.ItSystem.Parent.Name + (dataItem.ItSystem.Parent.Disabled ? " (Ikke aktiv)" : "")) : "",
                         hidden: true,
                         filterable: {
                             cell: {
