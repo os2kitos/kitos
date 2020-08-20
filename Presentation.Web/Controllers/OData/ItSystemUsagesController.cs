@@ -79,19 +79,18 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var systemUsages = new List<ItSystemUsage>();
+            var orgUnitTreeIds = new List<int>();
             var queue = new Queue<int>();
             queue.Enqueue(unitKey);
             while (queue.Count > 0)
             {
                 var orgUnitKey = queue.Dequeue();
+                orgUnitTreeIds.Add(orgUnitKey);
                 var orgUnit = _orgUnitRepository.AsQueryable()
                     .Include(x => x.Children)
-                    .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
                     .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
-                var responsible =
-                    orgUnit.Using.Select(x => x.ResponsibleItSystemUsage).Where(x => x != null).ToList();
-                systemUsages.AddRange(responsible);
+
+                //Add sub tree
                 var childIds = orgUnit.Children.Select(x => x.Id);
                 foreach (var childId in childIds)
                 {
@@ -99,7 +98,12 @@ namespace Presentation.Web.Controllers.OData
                 }
             }
 
-            return Ok(systemUsages);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey)
+                .Where(usage => usage.ResponsibleUsage != null && orgUnitTreeIds.Contains(usage.ResponsibleUsage.OrganizationUnitId));
+
+            return Ok(result);
         }
 
         [AcceptVerbs("POST", "PUT")]
