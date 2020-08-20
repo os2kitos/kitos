@@ -17,6 +17,8 @@
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
         allowToggleUsage: boolean;
+        toggleActiveSystemsMasterFilter(): void;
+        toggleActiveSystemsMasterFilterBtnText : string;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -36,6 +38,8 @@
         public canMigrate = this.userMigrationRights.canExecuteMigration;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
         public allowToggleUsage = false;
+        private showInactiveSystems: boolean;
+        public toggleActiveSystemsMasterFilterBtnText : string;
 
         public static $inject:
             Array<string> = [
@@ -55,7 +59,8 @@
                 "gridStateService",
                 "$uibModal",
                 "exportGridToExcelService",
-                "systemUsageUserAccessRights"
+                "systemUsageUserAccessRights",
+                "$window",
             ];
 
         constructor(
@@ -76,6 +81,7 @@
             private $uibModal,
             private exportGridToExcelService,
             private systemUsageUserAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private $window,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
@@ -85,6 +91,10 @@
             public migrationConsequenceText) {
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
+
+            this.showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
+            this.updateToggleActiveSystemsMasterFilterBtnText();
+
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
                     // the event is emitted for every widget; if we have multiple
@@ -162,6 +172,20 @@
             //Defer until page change is complete
             setTimeout(() => this.activate(), 1);
         }
+
+        updateToggleActiveSystemsMasterFilterBtnText(): void {
+            this.toggleActiveSystemsMasterFilterBtnText = this.showInactiveSystems
+                ? "Skjul deaktiverede systemer"
+                : "Vis også deaktiverede systemer";
+        }
+
+        toggleActiveSystemsMasterFilter(): void {
+            this.showInactiveSystems = !this.showInactiveSystems;
+            ItSystem.Settings.CatalogState.setShowInactiveSystems(this.$window, this.user.id, this.showInactiveSystems);
+            this.updateToggleActiveSystemsMasterFilterBtnText();
+            this.mainGrid.dataSource.read();
+        }
+
         private activate() {
             var itSystemBaseUrl: string;
             if (this.user.isGlobalAdmin) {
@@ -184,7 +208,6 @@
                         },
                         parameterMap: (options, type) => {
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
                             if (parameterMap.$filter) {
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/,
@@ -198,10 +221,15 @@
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/,
                                     "contains(CAST(Uuid, 'Edm.String'),");
+                            }
 
-                                //if (user.isGlobalAdmin) {
-                                //    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
-                                //}
+                            if (this.showInactiveSystems === false) {
+                                const existing = parameterMap.$filter;
+                                const hadExisting = _.isEmpty(existing) === false;
+                                parameterMap.$filter = `Disabled eq false${hadExisting ? " and (" + existing + ")" : ""}`;
+                                if (hadExisting) {
+                                    parameterMap.$filter = `(${parameterMap.$filter})`;
+                                }
                             }
 
                             return parameterMap;
@@ -279,7 +307,14 @@
                         text: "Slet filter",
                         template:
                             "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemCatalogVm.clearGridProfile()' data-ng-disabled='!systemCatalogVm.doesGridProfileExist()'>#: text #</button>"
+                    },
+                    {
+                        name: "toggleActiveSystemsMasterFilter",
+                        text: "-",
+                        template: 
+                            "<button type='button' class='k-button k-button-icontext' title='Skift mellem alle eller kun aktive systemer' data-ng-click='systemCatalogVm.toggleActiveSystemsMasterFilter()'>{{systemCatalogVm.toggleActiveSystemsMasterFilterBtnText}}</button>"
                     }
+
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
