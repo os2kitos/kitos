@@ -14,7 +14,7 @@
         ($scope, $state, notify, hasWriteAccess, referenceService, itSystem) => {
             $scope.hasWriteAccess = hasWriteAccess;
 
-            $scope.referenceName = itSystem.disabled ? itSystem.name + " - data i IT systemkatalog (Slettes)" : itSystem.name + " - data i IT systemkatalog";
+            $scope.referenceName = (itSystem.name + " - data i IT systemkatalog") + (itSystem.disabled ? " (Ikke aktiv)" : "");
 
             $scope.setChosenReference = id => {
                 var referenceId = (id === itSystem.referenceId) ? null : id;

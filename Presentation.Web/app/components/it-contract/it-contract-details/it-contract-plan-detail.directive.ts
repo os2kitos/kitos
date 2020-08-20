@@ -47,12 +47,7 @@
                         persistId: "fieldValue", // DON'T YOU DARE RENAME!
                         field: `${scope.fieldValue}`,
                         title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
-                        template: dataItem => {
-                            if (dataItem[scope.detailModelType].Disabled)
-                                return dataItem[scope.detailModelType].Name + " (Slettes)";
-                            else
-                                return dataItem[scope.detailModelType].Name;
-                        },
+                        template: dataItem => dataItem[scope.detailModelType].Name + (dataItem[scope.detailModelType].Disabled ? " (Ikke aktiv)" : ""),
                         hidden: false
                     }
                 ]

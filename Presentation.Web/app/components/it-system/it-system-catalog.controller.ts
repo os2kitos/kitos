@@ -386,7 +386,7 @@
                         template: dataItem => {
                             if (dataItem.Disabled)
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
-                                    } (Slettes) </a>`;
+                                    } (Ikke aktiv) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
                                     }</a>`;
@@ -400,7 +400,7 @@
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled)
-                                    return dataItem.Name + " (Slettes)";
+                                    return dataItem.Name + " (Ikke aktiv)";
                                 else
                                     return dataItem.Name;
                             } else {
@@ -418,7 +418,7 @@
                     },
                     {
                         field: "Disabled",
-                        title: "Slettes",
+                        title: "Ikke aktiv",
                         width: 120,
                         persistId: "Disabled", // DON'T YOU DARE RENAME!
                         template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },

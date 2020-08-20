@@ -405,7 +405,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         persistId: "sysname",
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Ikke aktiv) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
                         },
@@ -418,7 +418,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
                                 if (dataItem.ItSystem.Disabled)
-                                    return dataItem.ItSystem.Name + " (Slettes)";
+                                    return dataItem.ItSystem.Name + " (Ikke aktiv)";
                                 else
                                     return dataItem.ItSystem.Name;
                             } else {

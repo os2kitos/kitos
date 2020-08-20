@@ -29,7 +29,7 @@
                 $scope.showKLE = user.isGlobalAdmin;
                 $scope.showReference = user.isGlobalAdmin;
 
-                $scope.systemNameHeader = itSystem.disabled ? itSystem.name + " - data i IT systemkatalog (Slettes)" : itSystem.name + " - data i IT systemkatalog";
+                $scope.systemNameHeader = (itSystem.name + " - data i IT systemkatalog") + (itSystem.disabled ? " (Ikke aktiv)" : "");
 				
                 $scope.hasWriteAccess = hasWriteAccess;
                

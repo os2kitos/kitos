@@ -14,7 +14,7 @@
                 advicename: ["$http", "$stateParams",
                     ($http, $stateParams) => $http.get(`api/itSystemUsage/${$stateParams.id}`).then(result => {
                         var itSystemUsage = result.data.response;
-                        var systemName = itSystemUsage.itSystem.disabled ? itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name + " (Slettes)" : itSystemUsage.itSystem.name + " i " + itSystemUsage.organization.name;
+                        var systemName = `${itSystemUsage.itSystem.name} i ${itSystemUsage.organization.name}${itSystemUsage.itSystem.disabled ? " (Ikke aktiv)" : ""}`;
                         return { name: systemName };
                     })
                 ]

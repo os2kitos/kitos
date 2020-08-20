@@ -33,7 +33,7 @@
 
                 $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
 
-                const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Slettes)" : "";
+                const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Ikke aktiv)" : "";
                 $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
 
                 itInterface.updateUrl = `api/itInterface/${itInterface.id}`;
