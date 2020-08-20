@@ -417,27 +417,6 @@
                         }
                     },
                     {
-                        field: "Disabled",
-                        title: "Ikke aktiv",
-                        width: 120,
-                        persistId: "Disabled", // DON'T YOU DARE RENAME!
-                        template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: function (args) {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
-                            }
-                        }
-                    },
-                    {
                         field: "AccessModifier",
                         title: "Synlighed",
                         width: 120,
