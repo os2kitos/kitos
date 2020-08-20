@@ -5,10 +5,17 @@
     import IItSystemUsageRelationReferenceDto = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationReferenceDTO;
     import IItSystemUsageRelationDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
     import IItSystemUsageRelationOptionsDTO = Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationOptionsDTO;
+    import NamedEntityWithEnabledStatusDTO = Kitos.Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO;
 
     export interface IItSystemUsageRelationIdName {
         Id: number;
         Name: string;
+    }
+
+    export interface IItSystemUsageRelationIdNameWithEnabledStatus {
+        Id: number;
+        Name: string;
+        Disabled : boolean;
     }
 
     export interface ISystemRelationSelectionModel {
@@ -17,7 +24,7 @@
     }
 
     export interface ISystemRelationModalViewModel {
-        fromSystem: NamedEntityDTO;
+        fromSystem: NamedEntityWithEnabledStatusDTO;
         toSystem: Select2OptionViewModel;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
@@ -28,8 +35,8 @@
 
     export interface ISystemRelationViewModel {
         RelationId: number;
-        FromSystem: IItSystemUsageRelationIdName;
-        ToSystem: IItSystemUsageRelationIdName;
+        FromSystem: IItSystemUsageRelationIdNameWithEnabledStatus;
+        ToSystem: IItSystemUsageRelationIdNameWithEnabledStatus;
         Interface?: IItSystemUsageRelationIdName;
         Description: IGenericDescriptionViewModel;
         Reference: IItSystemUsageRelationReferenceDto;
@@ -39,8 +46,8 @@
 
     export class SystemRelationViewModel implements ISystemRelationViewModel {
         RelationId: number;
-        FromSystem: IItSystemUsageRelationIdName;
-        ToSystem: IItSystemUsageRelationIdName;
+        FromSystem: IItSystemUsageRelationIdNameWithEnabledStatus;
+        ToSystem: IItSystemUsageRelationIdNameWithEnabledStatus;
         Interface?: IItSystemUsageRelationIdName;
         Description: IGenericDescriptionViewModel;
         Reference: IItSystemUsageRelationReferenceDto;
@@ -54,9 +61,13 @@
             }
         }
 
-        private mapSystemUsage(viewModel: IItSystemUsageRelationIdName, sourceModel: Models.Generic.NamedEntity.NamedEntityDTO) {
+        private mapSystemUsage(viewModel: IItSystemUsageRelationIdNameWithEnabledStatus, sourceModel: NamedEntityWithEnabledStatusDTO) {
             if (sourceModel != null) {
                 this.mapNameAndId(viewModel, sourceModel);
+                viewModel.Disabled = sourceModel.disabled;
+                if (viewModel.Disabled) {
+                    viewModel.Name += " (Ikke aktiv)";
+                }
             }
         }
 
@@ -75,11 +86,11 @@
             this.RelationId = currentRelation.id;
 
             // From System
-            this.FromSystem = <IItSystemUsageRelationIdName>{};
+            this.FromSystem = <IItSystemUsageRelationIdNameWithEnabledStatus>{};
             this.mapSystemUsage(this.FromSystem, currentRelation.fromUsage);
 
             // To System
-            this.ToSystem = <IItSystemUsageRelationIdName>{};
+            this.ToSystem = <IItSystemUsageRelationIdNameWithEnabledStatus>{};
             this.mapSystemUsage(this.ToSystem, currentRelation.toUsage);
 
             // interface
@@ -127,7 +138,7 @@
         id: number;
         headerText: string;
         isEditDialog: boolean;
-        fromSystem: NamedEntityDTO;
+        fromSystem: NamedEntityWithEnabledStatusDTO;
         toSystem: Select2OptionViewModel;
         interface: ISystemRelationSelectionModel;
         contract: ISystemRelationSelectionModel;
@@ -135,8 +146,8 @@
         reference: Select2OptionViewModel;
         description: Select2OptionViewModel;
 
-        constructor(fromSystemId: number, fromSystemName: string) {
-            this.fromSystem = <NamedEntityDTO>{ id: fromSystemId, name: fromSystemName };
+        constructor(fromSystemId: number, fromSystemName: string, disabled : boolean) {
+            this.fromSystem = <NamedEntityWithEnabledStatusDTO>{ id: fromSystemId, name: fromSystemName, disabled : disabled };
             this.toSystem = null;
             this.interface = <ISystemRelationSelectionModel>{ value: null, options: [] };
             this.contract = <ISystemRelationSelectionModel>{ value: null, options: [] };
@@ -151,7 +162,7 @@
         }
 
         configureAsEditRelationDialog(relationData: IItSystemUsageRelationDTO, optionsResult: IItSystemUsageRelationOptionsDTO) {
-            this.toSystem = <Select2OptionViewModel>{ id: relationData.toUsage.id, text: relationData.toUsage.name };
+            this.toSystem = <Select2OptionViewModel>{ id: relationData.toUsage.id, text: relationData.toUsage.name + (relationData.toUsage.disabled ? " (Ikke aktiv)" : ""), disabled: relationData.toUsage.disabled };
             this.updateAvailableOptions(optionsResult);
 
             this.bindValue(this.frequency, relationData.frequencyType);

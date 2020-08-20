@@ -5,6 +5,7 @@
     import ISystemRelationSelectionModel = Models.ViewModel.ItSystemUsage.Relation.ISystemRelationSelectionModel;
     import SystemRelationModalViewModel = Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel;
     import Select2OptionViewModel = Models.ViewModel.Generic.Select2OptionViewModel;
+    import NamedEntityWithEnabledStatusDTO = Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO;
 
     export interface IItSystemUsageCreateRelationDTO {
         FromUsageId: number;
@@ -18,8 +19,8 @@
 
     export interface IItSystemUsageRelationDTO {
         id: number;
-        fromUsage: NamedEntityDTO;
-        toUsage: NamedEntityDTO;
+        fromUsage: NamedEntityWithEnabledStatusDTO;
+        toUsage: NamedEntityWithEnabledStatusDTO;
         interface: NamedEntityDTO;
         contract: NamedEntityDTO;
         frequencyType: NamedEntityDTO;

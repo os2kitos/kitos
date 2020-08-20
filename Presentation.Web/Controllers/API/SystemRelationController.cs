@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Model.SystemUsage;
@@ -9,7 +10,9 @@ using Core.DomainModel.ItSystemUsage;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -68,6 +71,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [HttpGet]
         [Route("from/{systemUsageId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
         {
             return _usageService.GetRelationsFrom(systemUsageId)
@@ -85,6 +89,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [HttpGet]
         [Route("to/{systemUsageId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsToSystem(int systemUsageId)
         {
             return _usageService.GetRelationsTo(systemUsageId)
@@ -102,6 +107,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [HttpGet]
         [Route("associated-with/contract/{contractId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsAssociatedWithContract(int contractId)
         {
             return _usageService.GetRelationsAssociatedWithContract(contractId)
@@ -124,6 +130,7 @@ namespace Presentation.Web.Controllers.API
         /// </returns>
         [HttpGet]
         [Route("defined-in/organization/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
         {
             return _usageService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
@@ -142,6 +149,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [HttpGet]
         [Route("from/{systemUsageId}/{relationId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
         {
             return _usageService.GetRelationFrom(systemUsageId, relationId)

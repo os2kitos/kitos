@@ -6,8 +6,8 @@ namespace Presentation.Web.Models.SystemRelations
     {
         public int Id { get; set; }
         public Guid Uuid { get; set; }
-        public NamedEntityDTO FromUsage { get; set; }
-        public NamedEntityDTO ToUsage { get; set; }
+        public NamedEntityWithEnabledStatusDTO FromUsage { get; set; }
+        public NamedEntityWithEnabledStatusDTO ToUsage { get; set; }
         public NamedEntityDTO Interface { get; set; }
         public NamedEntityDTO Contract { get; set; }
         public NamedEntityDTO FrequencyType { get; set; }
@@ -19,8 +19,8 @@ namespace Presentation.Web.Models.SystemRelations
         public SystemRelationDTO(
             int id,
             Guid uuid,
-            NamedEntityDTO fromUsage, 
-            NamedEntityDTO toUsage, 
+            NamedEntityWithEnabledStatusDTO fromUsage,
+            NamedEntityWithEnabledStatusDTO toUsage, 
             NamedEntityDTO @interface, 
             NamedEntityDTO contract, 
             NamedEntityDTO frequencyType, 

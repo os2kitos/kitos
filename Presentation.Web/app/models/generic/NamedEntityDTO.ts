@@ -4,4 +4,10 @@
         id: number;
         name: string;
     }
+
+    export interface NamedEntityWithEnabledStatusDTO {
+        id: number;
+        name: string;
+        disabled : boolean;
+    }
 }

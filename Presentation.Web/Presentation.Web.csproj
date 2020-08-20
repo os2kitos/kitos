@@ -394,6 +394,7 @@
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
     <Compile Include="Models\KLEStatusDTO.cs" />
+    <Compile Include="Models\NamedEntityWithEnabledStatusDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
