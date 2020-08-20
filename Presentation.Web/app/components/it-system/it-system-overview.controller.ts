@@ -607,7 +607,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             }
                         },
                         excelTemplate: dataItem => {
-                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract) {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
                             }
                             else {
