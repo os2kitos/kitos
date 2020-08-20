@@ -62,7 +62,7 @@
                     },
                     columns: [{
                         field: "title",
-                        title: "Dokumenttitel test",
+                        title: "Dokumenttitel",
                         template: data => {
                             if (Kitos.Utility.Validation.isValidExternalReference(data.url)) {
                                 return `<a target="_blank" href="${data.url}">${data.title}</a>`;
