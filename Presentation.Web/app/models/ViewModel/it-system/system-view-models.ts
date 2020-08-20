@@ -23,6 +23,7 @@
 
     export class SystemViewModel implements ISystemViewModel {
         readonly name: string;
+        readonly disabled : boolean;
         readonly parentName: string;
         readonly previousName: string;
         readonly belongsToName: string;
@@ -35,8 +36,10 @@
         readonly uuid: string;
 
         constructor(itSystem: any) {
-            this.name = itSystem.name;
-            this.parentName = itSystem.parentName;
+            this.name = itSystem.name + (itSystem.disabled ? " (Ikke aktiv)" : "");
+            if (itSystem.parentName) {
+                this.parentName = itSystem.parentName + (itSystem.parentDisabled ? " (Ikke aktiv)" : "");
+            }
             this.previousName = itSystem.previousName;
             this.belongsToName = itSystem.belongsToName;
             this.description = itSystem.description;
@@ -44,7 +47,7 @@
             this.taskRefs = itSystem.taskRefs;
             this.businessTypeName = itSystem.businessTypeName;
             this.uuid = itSystem.uuid;
-
+            this.disabled = itSystem.disabled;
             this.archiveDuty = this.mapArchiveDuty(itSystem);
             this.accessModifier = Mappers.AccessModifierMapper.mapAccessModifier(itSystem.accessModifier);
         }

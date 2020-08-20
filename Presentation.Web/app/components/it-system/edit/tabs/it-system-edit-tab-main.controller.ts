@@ -28,7 +28,7 @@
 
                 itSystem.updateUrl = `api/itsystem/${itSystem.id}`;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
-                itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
+                itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName + (itSystem.parentDisabled ? " (Ikke aktiv)" : ""), disabled: itSystem.parentDisabled };
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
                 $scope.businessTypes = businessTypes;

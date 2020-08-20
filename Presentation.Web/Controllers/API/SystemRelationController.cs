@@ -177,7 +177,7 @@ namespace Presentation.Web.Controllers.API
                     onSuccess: systemUsages => Ok
                     (
                         systemUsages
-                            .Select(x => x.MapToNamedEntityDTO())
+                            .Select(x => x.MapToNamedEntityWithEnabledStatusDTO())
                             .OrderBy(x => x.Name)
                             .ToList()
                     ),
@@ -271,8 +271,8 @@ namespace Presentation.Web.Controllers.API
             {
                 Id = relation.Id,
                 Uuid = relation.Uuid,
-                FromUsage = relation.FromSystemUsage.MapToNamedEntityDTO(),
-                ToUsage = relation.ToSystemUsage.MapToNamedEntityDTO(),
+                FromUsage = relation.FromSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
+                ToUsage = relation.ToSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
                 Description = relation.Description,
                 Reference = relation.Reference,
                 Contract = relation.AssociatedContract?.MapToNamedEntityDTO(),
