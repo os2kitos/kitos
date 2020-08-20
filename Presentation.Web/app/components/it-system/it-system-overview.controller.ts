@@ -606,8 +606,14 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>`;
                             }
                         },
-                        excelTemplate: dataItem =>
-                            dataItem && dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString() : "",
+                        excelTemplate: dataItem => {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
+                                return "";
+                            }
+                            else {
+                                return this.isContractActive(dataItem.MainContract.ItContract) ? "True" : "";
+                            }
+                        },
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: {
@@ -1126,7 +1132,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     resolve: {
                         systemRoles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()
+                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()
