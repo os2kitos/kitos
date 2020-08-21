@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -11,6 +10,7 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -22,11 +22,13 @@ namespace Presentation.Web.Controllers.OData
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
-        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
+        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IOrganizationUnitRepository organizationUnitRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
+            _organizationUnitRepository = organizationUnitRepository;
         }
 
         [EnableQuery]
@@ -84,32 +86,14 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var projects = new List<ItProject>();
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey);
 
-            // using iteration instead of recursion else we're running into
-            // an "multiple DataReaders open" issue and MySQL doesn't support MARS
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey)
+                .Where(usage => usage.ResponsibleUsage != null && orgUnitTreeIds.Contains(usage.ResponsibleUsage.OrganizationUnitId));
 
-            var queue = new Queue<int>();
-            queue.Enqueue(unitKey);
-            while (queue.Count > 0)
-            {
-                var orgUnitKey = queue.Dequeue();
-                var orgUnit = _orgUnitRepository.AsQueryable()
-                    .Include(x => x.Children)
-                    .Include(x => x.UsingItProjects.Select(y => y.ResponsibleItProject))
-                    .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
-
-                var responsibles = orgUnit.UsingItProjects.Select(x => x.ResponsibleItProject).Where(x => x != null);
-                projects.AddRange(responsibles);
-
-                var childIds = orgUnit.Children.Select(x => x.Id);
-                foreach (var childId in childIds)
-                {
-                    queue.Enqueue(childId);
-                }
-            }
-
-            return Ok(projects);
+            return Ok(result);
         }
 
         [NonAction]
