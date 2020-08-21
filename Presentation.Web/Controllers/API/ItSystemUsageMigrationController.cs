@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("UnusedItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemSimpleDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityWithEnabledStatusDTO>>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
             [FromUri]int organizationId,
             [FromUri]string nameContent,
@@ -105,7 +105,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new ItSystemUsageMigrationDTO
             {
-                TargetUsage = new NamedEntityDTO(input.SystemUsage.Id, input.FromItSystem.Name),
+                TargetUsage = input.SystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
                 FromSystem = input.FromItSystem.MapToNamedEntityWithEnabledStatusDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityWithEnabledStatusDTO(),
                 AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
@@ -118,8 +118,8 @@ namespace Presentation.Web.Controllers.API
         {
             return new RelationMigrationDTO
             {
-                ToSystemUsage = input.FromSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
-                FromSystemUsage = input.ToSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
+                ToSystemUsage = input.ToSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
+                FromSystemUsage = input.FromSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
                 Description = input.Description,
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
                 FrequencyType = input.UsageFrequency?.MapToNamedEntityDTO(),

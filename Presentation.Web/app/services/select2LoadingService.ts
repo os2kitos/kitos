@@ -83,16 +83,16 @@
             return config;
         }
 
-        private filterDisabledResults(list: any, obj: { id; name; disabled; }) {
-            if (!obj.disabled) {
+        private filterDisabledResults(list: any, obj: { id; name; disabled; itSystemDisabled; }) {
+            if (!obj.disabled && !obj.itSystemDisabled) {
                 this.handleResults(list, obj);
             }
         }
 
-        private handleResults(list: any, obj: { id; name; disabled}) {
+        private handleResults(list: any, obj: { id; name; disabled; itSystemDisabled}) {
             list.push({
                 id: obj.id,
-                text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled)
+                text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled || obj.itSystemDisabled)
         });
         }
 

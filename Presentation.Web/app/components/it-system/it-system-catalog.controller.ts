@@ -91,7 +91,7 @@
             public migrationConsequenceText) {
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
-
+            $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
             this.showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
             this.updateToggleActiveSystemsMasterFilterBtnText();
 
@@ -152,11 +152,11 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, (system: { id; name; }) => {
+                        _.each(data.data.response, (system: { id; name;}) => {
                             results.push({
                                 //the id of the system is the id, that is selected
                                 id: system.id,
-                                //but the name of the system is the label for the select2
+                                //the name of the system is the label for the select2
                                 text: system.name,
                                 //saving the system for later use
                                 system: system
