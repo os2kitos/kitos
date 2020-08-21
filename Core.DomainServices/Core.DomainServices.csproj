@@ -36,6 +36,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
@@ -92,7 +96,9 @@
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
+    <Compile Include="Repositories\Organization\IOrganizationUnitRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
+    <Compile Include="Repositories\Organization\OrganizationUnitRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />

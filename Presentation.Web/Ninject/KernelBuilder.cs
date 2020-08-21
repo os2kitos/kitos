@@ -250,6 +250,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBrokenExternalReferencesReportRepository>().To<BrokenExternalReferencesReportRepository>().InCommandScope(Mode);
             kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRepository>().To<OrganizationRepository>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitRepository>().To<OrganizationUnitRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
