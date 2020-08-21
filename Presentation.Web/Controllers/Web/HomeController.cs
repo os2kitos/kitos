@@ -16,6 +16,7 @@ namespace Presentation.Web.Controllers.Web
         private readonly IUserRepository _userRepository;
         private const string SsoErrorKey = "SSO_ERROR";
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
+        private const string SsoAuthenticationCompletedKey = "SSO_PREFERRED_START";
 
         public HomeController(IAuthenticationContext userContext, IUserRepository userRepository)
         {
@@ -23,19 +24,19 @@ namespace Presentation.Web.Controllers.Web
             _userRepository = userRepository;
         }
 
-        public ActionResult Index(bool? postSsoLogin = false)
+        public ActionResult Index()
         {
             ViewBag.StylingScheme = Settings.Default.Environment?.ToLowerInvariant().Contains("prod") == true ? "PROD" : "TEST";
             AppendSsoError();
             AppendFeatureToggles();
-            AppendSsoLoginInformation(postSsoLogin == true);
+            AppendSsoLoginInformation();
 
             return View();
         }
 
-        private void AppendSsoLoginInformation(bool loggedInViaSso)
+        private void AppendSsoLoginInformation()
         {
-            if (loggedInViaSso && _userContext.Method == AuthenticationMethod.Forms)
+            if (PopTempVariable<bool>(SsoAuthenticationCompletedKey).GetValueOrDefault() && _userContext.Method == AuthenticationMethod.Forms)
             {
                 var user = _userRepository.GetById(_userContext.UserId.GetValueOrDefault(-1));
                 var userStartPreference = user?.DefaultUserStartPreference;
@@ -82,9 +83,16 @@ namespace Presentation.Web.Controllers.Web
             return RedirectToAction(nameof(Index));
         }
 
-        private void PushTempVariable<T>(T ssoErrorCode, string key)
+        public ActionResult SsoAuthenticated()
         {
-            TempData[key] = ssoErrorCode;
+            PushTempVariable(true, SsoAuthenticationCompletedKey);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private void PushTempVariable<T>(T value, string key)
+        {
+            TempData[key] = value;
         }
 
         private Maybe<T> PopTempVariable<T>(string key)

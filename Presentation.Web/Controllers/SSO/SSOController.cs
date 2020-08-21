@@ -51,8 +51,7 @@ namespace Presentation.Web.Controllers.SSO
             //Redirect to front page
             var uriBuilder = new UriBuilder(Request.RequestUri)
             {
-                Path = string.Empty,
-                Query = "postSsoLogin=true"
+                Path = "Home/SsoAuthenticated"
             };
             return Redirect(uriBuilder.Uri);
         }
