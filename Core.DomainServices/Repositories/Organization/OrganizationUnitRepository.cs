@@ -23,7 +23,9 @@ namespace Core.DomainServices.Repositories.Organization
                 var orgUnitKey = queue.Dequeue();
                 orgUnitTreeIds.Add(orgUnitKey);
 
-                var childIds = _repository.AsQueryable().Where(x => x.OrganizationId == organizationId && x.Id == orgUnitKey)
+                var childIds = _repository
+                    .AsQueryable()
+                    .Where(x => x.OrganizationId == organizationId && x.Id == orgUnitKey)
                     .SelectMany(x => x.Children).Select(x => x.Id).ToList();
 
                 //Add sub tree
