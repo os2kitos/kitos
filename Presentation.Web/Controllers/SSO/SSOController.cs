@@ -52,6 +52,7 @@ namespace Presentation.Web.Controllers.SSO
             var uriBuilder = new UriBuilder(Request.RequestUri)
             {
                 Path = string.Empty,
+                Query = "postSsoLogin=true"
             };
             return Redirect(uriBuilder.Uri);
         }
