@@ -1,5 +1,4 @@
 using System.Data.Entity.Infrastructure.Interception;
-using System.Web.Http;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -9,7 +8,6 @@ using Infrastructure.DataAccess.Interceptors;
 using Infrastructure.Services.Types;
 using Ninject;
 using Ninject.Web.Common.WebHost;
-using Ninject.Web.WebApi;
 using Presentation.Web.Ninject;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
