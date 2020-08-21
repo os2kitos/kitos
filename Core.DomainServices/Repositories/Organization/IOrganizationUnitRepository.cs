@@ -4,6 +4,6 @@ namespace Core.DomainServices.Repositories.Organization
 {
     public interface IOrganizationUnitRepository
     {
-        IEnumerable<int> GetSubTree(int orgKey, int unitKey);
+        IEnumerable<int> GetIdsOfSubTree(int organizationId, int organizationUnitId);
     }
 }
