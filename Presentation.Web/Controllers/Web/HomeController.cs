@@ -4,7 +4,6 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
 using Infrastructure.Services.Types;
-using Ninject;
 using Presentation.Web.Models.FeatureToggle;
 using Presentation.Web.Properties;
 
@@ -13,16 +12,15 @@ namespace Presentation.Web.Controllers.Web
     [SessionState(SessionStateBehavior.Required)]
     public class HomeController : Controller
     {
-        [Inject]
-        public IUserRepository UserRepository { get; set; }
-
         private readonly IAuthenticationContext _userContext;
+        private readonly IUserRepository _userRepository;
         private const string SsoErrorKey = "SSO_ERROR";
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
 
-        public HomeController(IAuthenticationContext userContext)
+        public HomeController(IAuthenticationContext userContext, IUserRepository userRepository)
         {
             _userContext = userContext;
+            _userRepository = userRepository;
         }
 
         public ActionResult Index(bool? postSsoLogin = false)
@@ -39,7 +37,7 @@ namespace Presentation.Web.Controllers.Web
         {
             if (loggedInViaSso && _userContext.Method == AuthenticationMethod.Forms)
             {
-                var user = UserRepository.GetById(_userContext.UserId.GetValueOrDefault(-1));
+                var user = _userRepository.GetById(_userContext.UserId.GetValueOrDefault(-1));
                 var userStartPreference = user?.DefaultUserStartPreference;
                 if (!string.IsNullOrWhiteSpace(userStartPreference))
                 {

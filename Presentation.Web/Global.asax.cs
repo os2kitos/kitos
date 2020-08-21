@@ -4,8 +4,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Ninject.Web.Common;
-using Ninject.Web.WebApi;
+using Presentation.Web.Ninject;
 
 namespace Presentation.Web
 {
@@ -37,7 +36,7 @@ namespace Presentation.Web
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 
             //Add to MVC pipeline
-            //TODO: Make dependency injection work with MVC
+            ControllerBuilder.Current.SetControllerFactory(new DefaultControllerFactory(new NinjectControllerActivator()));
         }
     }
 }
