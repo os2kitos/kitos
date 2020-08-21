@@ -149,7 +149,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [HttpGet]
         [Route("from/{systemUsageId}/{relationId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO>))]
         public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
         {
             return _usageService.GetRelationFrom(systemUsageId, relationId)
