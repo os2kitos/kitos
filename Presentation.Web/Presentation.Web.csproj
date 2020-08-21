@@ -394,6 +394,7 @@
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
     <Compile Include="Models\KLEStatusDTO.cs" />
+    <Compile Include="Models\NamedEntityWithEnabledStatusDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
@@ -412,12 +413,14 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\settings\catalog-state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
+    <TypeScriptCompile Include="app\helpers\SystemNameFormatter.ts" />
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />

@@ -332,8 +332,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Empty(result.AffectedContracts);
                 var dto = Assert.Single(result.AffectedRelations);
-                AssertEqualNamedEntities(relation.FromUsage, dto.ToSystemUsage);
-                AssertEqualNamedEntities(relation.ToUsage, dto.FromSystemUsage);
+                AssertEqualNamedEntities(relation.FromUsage, dto.FromSystemUsage);
+                AssertEqualNamedEntities(relation.ToUsage, dto.ToSystemUsage);
                 Assert.Equal(relation.Description, dto.Description);
                 AssertEqualNamedEntities(relation.Interface, dto.Interface);
                 Assert.Null(dto.Contract);

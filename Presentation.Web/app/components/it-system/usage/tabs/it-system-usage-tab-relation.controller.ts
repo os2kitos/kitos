@@ -41,8 +41,8 @@
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
                         controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService : Kitos.Services.ISelect2LoadingService) => {
                             modalOpen = true;
-                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
-                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], false, "nameContent");
+                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name, itSystemUsage.itSystem.disabled);
                             $scope.RelationModalViewModel.configureAsNewRelationDialog();
 
                             $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
@@ -101,9 +101,9 @@
                         templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-relation-modal-view.html",
                         controller: ["$scope", "select2LoadingService", ($scope, select2LoadingService) => {
                             modalOpen = true;
-                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], true, "nameContent");
+                            $scope.RelationExposedSystemDataCall = select2LoadingService.loadSelect2(`api/v1/systemrelations/options/${usageId}/systems-which-can-be-related-to`, true, [`fromSystemUsageId=${usageId}`, `amount=10`], false, "nameContent");
 
-                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name);
+                            $scope.RelationModalViewModel = new Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationModalViewModel(usageId, itSystemUsage.itSystem.name, itSystemUsage.itSystem.disabled);
 
                             $scope.ContractOptions = select2LoadingService.select2LocalData(() => $scope.RelationModalViewModel.contract.options);
                             $scope.InterfaceOptions = select2LoadingService.select2LocalDataNoSearch(() => $scope.RelationModalViewModel.interface.options);
@@ -112,7 +112,7 @@
                             systemRelationService.getRelation(usageId, relationId)
                                 .then((response: {
                                     error: boolean;
-                                    data: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO
+                                    data: Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO;
                                 }
                                 ) => {
                                     if (response.error) {

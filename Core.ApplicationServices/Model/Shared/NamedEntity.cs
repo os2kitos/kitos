@@ -1,6 +1,4 @@
-﻿using Core.DomainModel;
-
-namespace Core.ApplicationServices.Model.Shared
+﻿namespace Core.ApplicationServices.Model.Shared
 {
     public class NamedEntity
     {

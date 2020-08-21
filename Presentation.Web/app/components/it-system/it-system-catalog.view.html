@@ -46,12 +46,12 @@
                         </tr>
                         <tr>
                             <td>
-                                Navn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
+                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.fromSystem.name,systemCatalogVm.migrationReportDTO.fromSystem.disabled) }}
                                 <br />
                                 Id: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
                             </td>
                             <td>
-                                Navn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
+                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.toSystem.name,systemCatalogVm.migrationReportDTO.toSystem.disabled) }}
                                 <br />
                                 Id: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
                             </td>
@@ -86,14 +86,14 @@
                         </tr>
                         <tr ng-repeat="relation in systemCatalogVm.migrationReportDTO.affectedRelations">
                             <td>
-                                Navn: {{relation.toSystemUsage.name }}
-                                <br />
-                                Id: {{ relation.toSystemUsage.id}}
-                            </td>
-                            <td>
-                                Navn: {{relation.fromSystemUsage.name }}
+                                Navn: {{formatSystemName(relation.fromSystemUsage.name,relation.fromSystemUsage.disabled) }}
                                 <br />
                                 Id: {{relation.fromSystemUsage.id}}
+                            </td>
+                            <td>
+                                Navn: {{formatSystemName(relation.toSystemUsage.name,relation.toSystemUsage.disabled) }}
+                                <br />
+                                Id: {{ relation.toSystemUsage.id}}
                             </td>
                             <td>
                                 {{relation.description}}

@@ -28,7 +28,7 @@
 
                 itSystem.updateUrl = `api/itsystem/${itSystem.id}`;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
-                itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
+                itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: Kitos.Helpers.SystemNameFormat.apply(itSystem.parentName, itSystem.parentDisabled), disabled: itSystem.parentDisabled };
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
                 $scope.businessTypes = businessTypes;
@@ -37,12 +37,12 @@
                     "api/itsystem",
                     true,
                     [`excludeId=${itSystem.id}`, `orgId=${user.currentOrganizationId}`, `take=25`],
-                    true);
+                    false);
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2(
                     "api/organization",
                     true,
                     [`orgId=${user.currentOrganizationId}`, 'take=25'],
-                    true);
+                    false);
 
                 $scope.hasWriteAccess = hasWriteAccess;
 

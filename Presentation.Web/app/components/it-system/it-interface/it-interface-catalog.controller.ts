@@ -228,20 +228,12 @@
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.Disabled) {
-                                return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Ikke aktiv)</a>`;
-                            } else {
-                                return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
-                            }
-                        },
+                            return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
+                            },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
-                                if (dataItem.Disabled) {
-                                    return dataItem.Name + " (Ikke aktiv)";
+                                return Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled);
                                 } else {
-                                    return dataItem.Name;
-                                }
-                            } else {
                                 return "";
                             }
                         },
@@ -320,7 +312,7 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
-                                return dataItem.ExhibitedBy.ItSystem.Name + ((dataItem.ExhibitedBy.ItSystem.Disabled ? " (Ikke aktiv)" : ""));
+                                return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name,dataItem.ExhibitedBy.ItSystem.Disabled);
                             else
                                 return "";
                         },

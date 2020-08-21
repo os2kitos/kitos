@@ -22,7 +22,7 @@
         ($scope, itSystem, exhibits) => {
 
             $scope.system = itSystem;
-            
+            $scope.formatInterfaceName = Kitos.Helpers.InterfaceNameFormat.apply;
             var exhibitViewModels = _.map(exhibits,
                 (exhibit) => new Kitos.Models.ViewModel.ItSystem.ExposedInterfaceViewModel(
                     Kitos.Configs.ExposedInterfaceTableCellParagraphSizeConfig.maxTextFieldCharCount,

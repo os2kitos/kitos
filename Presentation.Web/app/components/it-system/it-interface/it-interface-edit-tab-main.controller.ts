@@ -31,10 +31,10 @@
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
 
+                $scope.formatInterfaceName = Kitos.Helpers.InterfaceNameFormat.apply;
                 $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
 
-                const isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Ikke aktiv)" : "";
-                $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
+                $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: Kitos.Helpers.SystemNameFormat.apply(itInterface.exhibitedByItSystemName, itInterface.exhibitedByItSystemDisabled) };
 
                 itInterface.updateUrl = `api/itInterface/${itInterface.id}`;
 
@@ -82,7 +82,7 @@
                     });
                 };
 
-                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`, `take=25`], true);
+                $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`, `take=25`], false);
 
                 $scope.organizationSelectOptions = select2LoadingService.loadSelect2("api/organization", true, [`orgId=${user.currentOrganizationId}`, 'take=25'], false);
 
