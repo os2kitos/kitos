@@ -64,7 +64,6 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            //tolist requried to handle filtering on computed fields
             var result = Repository.AsQueryable().ByOrganizationId(key);
 
             return Ok(result);
@@ -83,7 +82,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey);
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
 
             var result = Repository
                 .AsQueryable()

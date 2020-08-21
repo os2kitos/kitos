@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey);
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
 
             var result = Repository
                 .AsQueryable()

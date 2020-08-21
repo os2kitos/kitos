@@ -4,6 +4,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Presentation.Web.Ninject;
 
 namespace Presentation.Web
 {
@@ -34,6 +35,8 @@ namespace Presentation.Web
             // Convert all dates to UTC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 
+            //Add to MVC pipeline
+            ControllerBuilder.Current.SetControllerFactory(new DefaultControllerFactory(new NinjectControllerActivator()));
         }
     }
 }
