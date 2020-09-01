@@ -2,7 +2,6 @@
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.DomainServices.Repositories.GDPR
 {
@@ -42,9 +41,11 @@ namespace Core.DomainServices.Repositories.GDPR
             return _repository.GetByKey(id);
         }
 
-        public IQueryable<DataProcessingAgreement> GetByOrganizationId(int organizationId)
+        public IQueryable<DataProcessingAgreement> Search(int organizationId, Maybe<string> exactName)
         {
-            return _repository.AsQueryable().ByOrganizationId(organizationId);
+            return
+                _repository.AsQueryable().ByOrganizationId(organizationId)
+                    .Transform(previousQuery => exactName.Select(previousQuery.ByNameExact).GetValueOrFallback(previousQuery));
         }
     }
 }

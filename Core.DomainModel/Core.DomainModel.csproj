@@ -58,7 +58,7 @@
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="ExternalReference.cs" />
-    <Compile Include="GDPR\Constraints.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />

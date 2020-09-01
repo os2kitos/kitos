@@ -8,7 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         public DataProcessingAgreementMap()
         {
             Property(x => x.Name)
-                .HasMaxLength(Constraints.MaxNameLength)
+                .HasMaxLength(DataProcessingAgreementConstraints.MaxNameLength)
                 .IsRequired()
                 .HasIndexAnnotation("Contract_Index_Name", 0);
 
