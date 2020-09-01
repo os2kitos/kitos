@@ -63,6 +63,7 @@
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\DataProcessingAgreementMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -599,6 +600,10 @@
     <Compile Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.designer.cs">
       <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009011039481_Introduce_DataprocessingAgreement.cs" />
+    <Compile Include="Migrations\202009011039481_Introduce_DataprocessingAgreement.designer.cs">
+      <DependentUpon>202009011039481_Introduce_DataprocessingAgreement.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -976,6 +981,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.resx">
       <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009011039481_Introduce_DataprocessingAgreement.resx">
+      <DependentUpon>202009011039481_Introduce_DataprocessingAgreement.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

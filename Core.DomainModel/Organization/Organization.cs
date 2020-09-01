@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
 
@@ -91,7 +92,10 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<SsoOrganizationIdentity> SsoIdentities { get; set; }
 
+        public virtual ICollection<DataProcessingAgreement> DataProcessingAgreements { get; set; }
+
         public virtual int? ContactPersonId { get; set; }
+        
         public virtual ContactPerson ContactPerson { get; set; }
 
         /// <summary>

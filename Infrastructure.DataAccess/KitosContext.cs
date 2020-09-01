@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
@@ -140,6 +141,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels{ get; set; }
         public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
         public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities{ get; set; }
+        public DbSet<DataProcessingAgreement> DataProcessingAgreements { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -225,6 +227,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
             modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
+            modelBuilder.Configurations.Add(new DataProcessingAgreementMap());
         }
     }
 }
