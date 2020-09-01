@@ -51,128 +51,128 @@
                         <option ng-repeat="option in hostedAtOptions" value="{{option.id}}" ng-bind-html="option.text" />
                     </select>
                 </div>
-
                 <!-- Data processing agreement -->
-                <div class="form-group">
-                    <div ng-show="filterDataProcessor">
-                        <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
-                        <div class="well">
-                            <ul id="dataProcessingAgreement"
-                                style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
-                                ng-repeat="contract in contracts">
-                                <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
+                <div data-ng-if="user.currentConfig.showDataProcessorAgreement">
+                    <div class="form-group">
+                        <div ng-show="filterDataProcessor">
+                            <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
+                            <div class="well">
+                                <ul id="dataProcessingAgreement"
+                                    style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
+                                    ng-repeat="contract in contracts">
+                                    <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div ng-hide="filterDataProcessor">
+                            <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
+                            <ul ng-disabled="true"
+                                id="dataProcessingAgreementNone"
+                                class="form-control input-sm"
+                                style="list-style-type:none">
+                                Ingen
                             </ul>
                         </div>
+                        <span class="help-block small">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.
+                        </span>
                     </div>
-                    <div ng-hide="filterDataProcessor">
-                        <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
-                        <ul ng-disabled="true"
-                            id="dataProcessingAgreementNone"
-                            class="form-control input-sm"
-                            style="list-style-type:none">
-                            Ingen
-                        </ul>
-                    </div>
-                    <span class="help-block small">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.
-                    </span>
-                </div>
-                <!-- Data processors -->
-                <p class="small boldParagraph">Databehandlere</p>
-                <table class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="GDPRHeaderPadding"><p class="small">Navn</p></th>
-                            <th class="GDPRHeaderPadding noRightBorder"><p class="small">CVR</p></th>
-                            <th class="GDPRHeaderPadding noLeftBorder"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
-                            <td>
-                                {{ dataWorker.dataWorkerName }}
-                            </td>
-                            <td class="noRightBorder">
-                                {{ dataWorker.dataWorkerCvr }}
-                            </td>
-                            <td class="text-right noLeftBorder" style="width: 20px;">
-                                <button type="button"
-                                        class="btn btn-danger btn-xs"
-                                        data-confirmed-click="deleteDataworker({{ dataWorker.id }})"
-                                        data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                        ng-show="hasWriteAccess">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
-                        <tr>
-                            <td colspan="3" style="padding: 0">
-                                <input type="hidden"
-                                       id="dataWorker-selector"
-                                       class="form-control input-sm"
-                                       data-ui-select2="dataWorkerSelectOptions"
-                                       ng-model="selectedDataWorker"
-                                       ng-change="saveDataworker()"
-                                       data-placeholder="Vælg Databehandler" />
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <!-- Data processor control -->
-                <div class="form-group">
-                    <label for="dataProcessorControl" class="control-label small">Tilsyn/kontrol af databehandleren</label>
-                    <select class="form-control input-sm" id="dataProcessorControl"
-                            ui-select2="noSearchNoClearSelect2"
-                            ng-model="usageViewModel.dataProcessorControl"
-                            data-autosave="{{autoSaveUrl}}"
-                            data-field="DataProcessorControl"
-                            ng-disabled="!hasWriteAccess">
-                        <option hidden selected value />
-                        <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                    </select>
-                </div>
-                <div ng-show="usageViewModel.dataProcessorControl == 1">
-                    <!-- Date of last control of the data processor -->
+                    <!-- Data processors -->
+                    <p class="small boldParagraph">Databehandlere</p>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="GDPRHeaderPadding"><p class="small">Navn</p></th>
+                                <th class="GDPRHeaderPadding noRightBorder"><p class="small">CVR</p></th>
+                                <th class="GDPRHeaderPadding noLeftBorder"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dataWorker in usage.associatedDataWorkers" data-element-type="GDPRDataHandling">
+                                <td>
+                                    {{ dataWorker.dataWorkerName }}
+                                </td>
+                                <td class="noRightBorder">
+                                    {{ dataWorker.dataWorkerCvr }}
+                                </td>
+                                <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="deleteDataworker({{ dataWorker.id }})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-show="hasWriteAccess">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot ng-show="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                            <tr>
+                                <td colspan="3" style="padding: 0">
+                                    <input type="hidden"
+                                           id="dataWorker-selector"
+                                           class="form-control input-sm"
+                                           data-ui-select2="dataWorkerSelectOptions"
+                                           ng-model="selectedDataWorker"
+                                           ng-change="saveDataworker()"
+                                           data-placeholder="Vælg Databehandler" />
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <!-- Data processor control -->
                     <div class="form-group">
-                        <label for="lastControl" class="control-label small">Dato for seneste tilsyn/kontrol</label>
-                        <input type="text" id="lastControl" class="form-control"
-                               data-kendo-date-picker
-                               data-k-options="datepickerOptions"
-                               ng-disabled="!hasWriteAccess"
-                               ng-model="usage.lastControl"
-                               ng-blur="patchDate('lastControl', usage.lastControl)"
-                               data-field="lastControl">
-                        <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
+                        <label for="dataProcessorControl" class="control-label small">Tilsyn/kontrol af databehandleren</label>
+                        <select class="form-control input-sm" id="dataProcessorControl"
+                                ui-select2="noSearchNoClearSelect2"
+                                ng-model="usageViewModel.dataProcessorControl"
+                                data-autosave="{{autoSaveUrl}}"
+                                data-field="DataProcessorControl"
+                                ng-disabled="!hasWriteAccess">
+                            <option hidden selected value />
+                            <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                        </select>
                     </div>
+                    <div ng-show="usageViewModel.dataProcessorControl == 1">
+                        <!-- Date of last control of the data processor -->
+                        <div class="form-group">
+                            <label for="lastControl" class="control-label small">Dato for seneste tilsyn/kontrol</label>
+                            <input type="text" id="lastControl" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   ng-disabled="!hasWriteAccess"
+                                   ng-model="usage.lastControl"
+                                   ng-blur="patchDate('lastControl', usage.lastControl)"
+                                   data-field="lastControl">
+                            <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="datahandler-supervision-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
-                            <a id="datahandler-supervision-link" target="_blank" data-element-type="dataProcessLinkField"
-                               href="{{usage.datahandlerSupervisionDocumentationUrl}}"
-                               ng-hide="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
-                                {{usage.datahandlerSupervisionDocumentationUrlName ? usage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
-                            </a>
-                            <label for="datahandler-supervision-link"
-                                   class="control-label small"
-                                   ng-show="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
-                                Intet link til dokumentation
-                            </label>
-                            <button type="button"
-                                    style="float: right; cursor: pointer;"
-                                    ng-disabled="!hasWriteAccess"
-                                    class="btn-link btn-editLink"
-                                    title="Redigér link"
-                                    data-element-type="dataProcessLinkButton"
-                                    ng-click="editLink('datahandlerSupervisionDocumentationUrl')">
-                                <i class="fa fa-pencil" aria-hidden="true"></i>
-                            </button>
+                        <div class="form-group">
+                            <label for="datahandler-supervision-link" class="control-label small">Link til dokumentation</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-supervision-link" target="_blank" data-element-type="dataProcessLinkField"
+                                   href="{{usage.datahandlerSupervisionDocumentationUrl}}"
+                                   ng-hide="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
+                                    {{usage.datahandlerSupervisionDocumentationUrlName ? usage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
+                                </a>
+                                <label for="datahandler-supervision-link"
+                                       class="control-label small"
+                                       ng-show="usage.datahandlerSupervisionDocumentationUrl == '' || usage.datahandlerSupervisionDocumentationUrl == null">
+                                    Intet link til dokumentation
+                                </label>
+                                <button type="button"
+                                        style="float: right; cursor: pointer;"
+                                        ng-disabled="!hasWriteAccess"
+                                        class="btn-link btn-editLink"
+                                        title="Redigér link"
+                                        data-element-type="dataProcessLinkButton"
+                                        ng-click="editLink('datahandlerSupervisionDocumentationUrl')">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-
                 </div>
                 <!-- Notes -->
                 <div class="form-group">
@@ -310,28 +310,28 @@
                             <div class="form-group">
                                 <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
                                 <div id="precautionsOptions">
-                                    <input type="checkbox" 
-                                           data-element-type="precautionsEncryptionCheckbox" 
-                                           ng-model="usage.precautionsOptionsEncryption" 
+                                    <input type="checkbox"
+                                           data-element-type="precautionsEncryptionCheckbox"
+                                           ng-model="usage.precautionsOptionsEncryption"
                                            ng-click="patch('PrecautionsOptionsEncryption', usage.precautionsOptionsEncryption)" />
                                     <span style="font-size: small;">Kryptering</span><br />
 
-                                    <input type="checkbox" 
-                                           data-element-type="precautionsPseudonomiseringCheckbox" 
-                                           ng-model="usage.precautionsOptionsPseudonomisering" 
-                                           ng-click="patch('PrecautionsOptionsPseudonomisering', usage.precautionsOptionsPseudonomisering)" /> 
+                                    <input type="checkbox"
+                                           data-element-type="precautionsPseudonomiseringCheckbox"
+                                           ng-model="usage.precautionsOptionsPseudonomisering"
+                                           ng-click="patch('PrecautionsOptionsPseudonomisering', usage.precautionsOptionsPseudonomisering)" />
                                     <span style="font-size: small;">Pseudonomisering</span><br />
 
-                                    <input type="checkbox" 
-                                           data-element-type="precautionsAccessControlCheckbox" 
-                                           ng-model="usage.precautionsOptionsAccessControl" 
-                                           ng-click="patch('PrecautionsOptionsAccessControl', usage.precautionsOptionsAccessControl)" /> 
+                                    <input type="checkbox"
+                                           data-element-type="precautionsAccessControlCheckbox"
+                                           ng-model="usage.precautionsOptionsAccessControl"
+                                           ng-click="patch('PrecautionsOptionsAccessControl', usage.precautionsOptionsAccessControl)" />
                                     <span style="font-size: small;">Adgangsstyring</span><br />
 
-                                    <input type="checkbox" 
-                                           data-element-type="precautionsLogningCheckbox" 
-                                           ng-model="usage.precautionsOptionsLogning" 
-                                           ng-click="patch('PrecautionsOptionsLogning', usage.precautionsOptionsLogning)" /> 
+                                    <input type="checkbox"
+                                           data-element-type="precautionsLogningCheckbox"
+                                           ng-model="usage.precautionsOptionsLogning"
+                                           ng-click="patch('PrecautionsOptionsLogning', usage.precautionsOptionsLogning)" />
                                     <span style="font-size: small;">Logning</span><br />
                                 </div>
                             </div>
