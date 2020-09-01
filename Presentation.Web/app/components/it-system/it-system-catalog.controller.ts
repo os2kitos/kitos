@@ -175,8 +175,8 @@
 
         updateToggleActiveSystemsMasterFilterBtnText(): void {
             this.toggleActiveSystemsMasterFilterBtnText = this.showInactiveSystems
-                ? "Skjul deaktiverede systemer"
-                : "Vis også deaktiverede systemer";
+                ? "Vis aktive systemer"
+                : "Vis deaktiverede systemer";
         }
 
         toggleActiveSystemsMasterFilter(): void {
@@ -223,14 +223,13 @@
                                     "contains(CAST(Uuid, 'Edm.String'),");
                             }
 
-                            if (this.showInactiveSystems === false) {
-                                const existing = parameterMap.$filter;
-                                const hadExisting = _.isEmpty(existing) === false;
-                                parameterMap.$filter = `Disabled eq false${hadExisting ? " and (" + existing + ")" : ""}`;
-                                if (hadExisting) {
-                                    parameterMap.$filter = `(${parameterMap.$filter})`;
-                                }
+                            const existing = parameterMap.$filter;
+                            const hadExisting = _.isEmpty(existing) === false;
+                            parameterMap.$filter = `Disabled eq ${this.showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;
+                            if (hadExisting) {
+                                parameterMap.$filter = `(${parameterMap.$filter})`;
                             }
+                            
 
                             return parameterMap;
                         }
@@ -312,7 +311,7 @@
                         name: "toggleActiveSystemsMasterFilter",
                         text: "-",
                         template: 
-                            "<button type='button' class='k-button k-button-icontext' title='Skift mellem alle eller kun aktive systemer' data-ng-click='systemCatalogVm.toggleActiveSystemsMasterFilter()'>{{systemCatalogVm.toggleActiveSystemsMasterFilterBtnText}}</button>"
+                            "<button type='button' class='k-button k-button-icontext' title='Skift mellem aktive eller deaktiverede systemer' data-ng-click='systemCatalogVm.toggleActiveSystemsMasterFilter()'>{{systemCatalogVm.toggleActiveSystemsMasterFilterBtnText}}</button>"
                     }
 
                 ],
