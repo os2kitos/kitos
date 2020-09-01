@@ -348,6 +348,7 @@
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="app\components\local-config\local-config-dataProcessorAgreement.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -416,6 +417,7 @@
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\settings\catalog-state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-dataProcessorAgreement.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
