@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.SSO;
+﻿using System.Linq;
+using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Model;
 using dk.nita.saml20.identity;
 using Moq;
@@ -22,8 +23,8 @@ namespace Tests.Unit.Core.DomainServices.SSO
         {
             var mockIdentity = new Mock<ISaml20Identity>();
             var sut = new Saml20IdentityNavigator(mockIdentity.Object);
-            var privilegeNode = sut.GetPrivilegeNode();
-            Assert.False(privilegeNode.HasValue);
+            var privilegeNode = sut.GetPrivilegeNodes();
+            Assert.False(privilegeNode.Any());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using dk.nita.saml20.identity;
 using Infrastructure.Services.Types;
 
@@ -6,12 +7,12 @@ namespace Core.ApplicationServices.SSO.Model
 {
     public class Saml20IdentityParser
     {
-        private readonly Saml20IdentityNavigator _navigator;
-
         private Saml20IdentityParser(Saml20IdentityNavigator navigator)
         {
-            _navigator = navigator;
+            Navigator = navigator;
         }
+
+        public Saml20IdentityNavigator Navigator { get; }
 
         public static Saml20IdentityParser CreateFrom(ISaml20Identity sourceIdentity)
         {
@@ -20,7 +21,7 @@ namespace Core.ApplicationServices.SSO.Model
 
         public Maybe<string> MatchCvrNumber()
         {
-            var cvrNumberAttributes = _navigator
+            var cvrNumberAttributes = Navigator
                 .GetAttribute(StsAdgangsStyringConstants.Attributes.CvrNumber)
                 .Select(x => x.AttributeValue)
                 .GetValueOrFallback(new string[0]);
@@ -38,17 +39,17 @@ namespace Core.ApplicationServices.SSO.Model
         public Maybe<KitosSamlPrivilege> MatchPrivilege(string privilegeId)
         {
             return
-                _navigator
-                    .GetPrivilegeNode()
-                    .Match(xml => xml.InnerText.EndsWith(privilegeId, StringComparison.OrdinalIgnoreCase)
-                            ? new KitosSamlPrivilege(xml.InnerText)
-                            : Maybe<KitosSamlPrivilege>.None, onNone: () => Maybe<KitosSamlPrivilege>.None);
+                Navigator
+                    .GetPrivilegeNodes()
+                    .FirstOrDefault(xml => xml.InnerText.EndsWith(privilegeId, StringComparison.OrdinalIgnoreCase))
+                    .FromNullable()
+                    .Match(xml => new KitosSamlPrivilege(xml.InnerText), onNone: () => Maybe<KitosSamlPrivilege>.None);
         }
 
         public Maybe<SamlUserUuid> MatchUuid()
         {
             return
-                _navigator
+                Navigator
                     .GetSerials()
                     .Match(serials =>
                     {

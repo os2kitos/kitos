@@ -100,7 +100,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateErrorState()
         {
-            return new ErrorState();
+            return new ErrorState(_logger);
         }
     }
 }
