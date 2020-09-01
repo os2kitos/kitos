@@ -343,7 +343,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
+    <Compile Include="Controllers\OData\DataProcessingAgreementsController.cs" />
     <Compile Include="Controllers\API\GDPRExportReportController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
