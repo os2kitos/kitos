@@ -24,6 +24,7 @@ using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Services;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
@@ -166,6 +167,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementService>().To<DataProcessingAgreementService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementReadService>().To<DataProcessingAgreementReadService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -209,6 +211,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
+            RegisterDomainEvent<DataProcessingAgreementChanged, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -257,7 +260,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingAgreementsRepository>().To<DataProcessingAgreementsRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementRepository>().To<DataProcessingAgreementRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementReadModelRepository>().To<DataProcessingAgreementReadModelRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

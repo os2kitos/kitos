@@ -1,17 +1,21 @@
 ﻿using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR
 {
-    public class DataProcessingAgreementsRepository : IDataProcessingAgreementsRepository
+    public class DataProcessingAgreementRepository : IDataProcessingAgreementRepository
     {
         private readonly IGenericRepository<DataProcessingAgreement> _repository;
+        private readonly IDomainEvents _domainEvents;
 
-        public DataProcessingAgreementsRepository(IGenericRepository<DataProcessingAgreement> repository)
+        public DataProcessingAgreementRepository(IGenericRepository<DataProcessingAgreement> repository, IDomainEvents domainEvents)
         {
             _repository = repository;
+            _domainEvents = domainEvents;
         }
 
 
@@ -19,20 +23,24 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             var dataProcessingAgreement = _repository.Insert(newAgreement);
             _repository.Save();
-            //TODO: Publish changes
+            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Created));
             return dataProcessingAgreement;
         }
 
         public void DeleteById(int id)
         {
-            //TODO: Publish changes
-            _repository.DeleteByKeyWithReferencePreload(id);
-            _repository.Save();
+            var dataProcessingAgreement = _repository.GetByKey(id);
+            if (dataProcessingAgreement != null)
+            {
+                _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Deleted));
+                _repository.DeleteByKeyWithReferencePreload(id);
+                _repository.Save();
+            }
         }
 
         public void Update(DataProcessingAgreement dataProcessingAgreement)
         {
-            //TODO: Publish changes!
+            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Updated));
             _repository.Save();
         }
 

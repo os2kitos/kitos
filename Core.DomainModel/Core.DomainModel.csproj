@@ -60,6 +60,8 @@
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementReadModel.cs" />
+    <Compile Include="GDPR\Events\DataProcessingAgreementChanged.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="GlobalConfigKeys.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
+    <Compile Include="IReadModel.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItContract\IDataProcessingAgreementModule.cs" />
     <Compile Include="ItContract\ItContractConstraints.cs" />

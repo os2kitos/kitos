@@ -94,6 +94,8 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<DataProcessingAgreement> DataProcessingAgreements { get; set; }
 
+        public virtual ICollection<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
+
         public virtual int? ContactPersonId { get; set; }
         
         public virtual ContactPerson ContactPerson { get; set; }

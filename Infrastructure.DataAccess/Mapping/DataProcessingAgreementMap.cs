@@ -10,7 +10,7 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.Name)
                 .HasMaxLength(DataProcessingAgreementConstraints.MaxNameLength)
                 .IsRequired()
-                .HasIndexAnnotation("Contract_Index_Name", 0);
+                .HasIndexAnnotation("DataProcessingAgreement_Index_Name", 0);
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.DataProcessingAgreements)

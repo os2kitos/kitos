@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.ItContract;
+﻿using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 
 namespace Core.DomainModel.GDPR
 {
@@ -10,5 +11,7 @@ namespace Core.DomainModel.GDPR
         public int OrganizationId { get; set; }
 
         public virtual Organization.Organization Organization { get; set; }
+
+        public virtual ICollection<DataProcessingAgreementReadModel> ReadModels { get; set; }
     }
 }

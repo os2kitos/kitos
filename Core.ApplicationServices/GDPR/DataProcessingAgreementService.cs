@@ -9,9 +9,9 @@ namespace Core.ApplicationServices.GDPR
     public class DataProcessingAgreementService : IDataProcessingAgreementService
     {
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IDataProcessingAgreementsRepository _repository;
+        private readonly IDataProcessingAgreementRepository _repository;
 
-        public DataProcessingAgreementService(IAuthorizationContext authorizationContext, IDataProcessingAgreementsRepository repository)
+        public DataProcessingAgreementService(IAuthorizationContext authorizationContext, IDataProcessingAgreementRepository repository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;

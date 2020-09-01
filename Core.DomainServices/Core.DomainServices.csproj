@@ -65,6 +65,7 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\BuildDataProcessingAgreementReadModelOnChangesHandler.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
@@ -88,11 +89,13 @@
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
-    <Compile Include="Repositories\GDPR\DataProcessingAgreementsRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingAgreementReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingAgreementRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
-    <Compile Include="Repositories\GDPR\IDataProcessingAgreementsRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingAgreementReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingAgreementRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationUnitRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />

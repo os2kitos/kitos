@@ -4,7 +4,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR
 {
-    public interface IDataProcessingAgreementsRepository
+    public interface IDataProcessingAgreementRepository
     {
         DataProcessingAgreement Add(DataProcessingAgreement newAgreement);
         void DeleteById(int id);
