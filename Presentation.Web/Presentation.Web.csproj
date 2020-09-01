@@ -345,6 +345,7 @@
   <ItemGroup>
     <Compile Include="BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
+    <Compile Include="Controllers\API\DataProcessingAgreementController.cs" />
     <Compile Include="Controllers\OData\DataProcessingAgreementsController.cs" />
     <Compile Include="Controllers\API\GDPRExportReportController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
@@ -370,6 +371,8 @@
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
+    <Compile Include="Models\GDPR\CreateDataProcessingAgreementDTO.cs" />
+    <Compile Include="Models\GDPR\DataProcessingAgreementDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />

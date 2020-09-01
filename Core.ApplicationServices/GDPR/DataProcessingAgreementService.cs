@@ -3,6 +3,7 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.GDPR;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -19,14 +20,10 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
         {
-            if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
-                return new OperationError(OperationFailure.Forbidden);
+            var error = ValidateSuggestedNewAgreement(organizationId,name);
 
-            if (string.IsNullOrWhiteSpace(name) || name.Length > DataProcessingAgreementConstraints.MaxNameLength)
-                return new OperationError("Name does breaks invariant: 0 < nameLength <= 100", OperationFailure.BadInput);
-
-            if (_repository.Search(organizationId, name).Any())
-                return new OperationError("Existing DataProcessingAgreement", OperationFailure.Conflict);
+            if (error.HasValue)
+                return error.Value;
 
             var dataProcessingAgreement = new DataProcessingAgreement()
             {
@@ -37,6 +34,20 @@ namespace Core.ApplicationServices.GDPR
             dataProcessingAgreement = _repository.Add(dataProcessingAgreement);
 
             return dataProcessingAgreement;
+        }
+
+        public Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name)
+        {
+            if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
+
+            if (string.IsNullOrWhiteSpace(name) || name.Length > DataProcessingAgreementConstraints.MaxNameLength)
+                return new OperationError("Name does breaks invariant: 0 < nameLength <= 100", OperationFailure.BadInput);
+
+            if (_repository.Search(organizationId, name).Any())
+                return new OperationError("Existing DataProcessingAgreement", OperationFailure.Conflict);
+
+            return Maybe<OperationError>.None;
         }
 
         public Result<DataProcessingAgreement, OperationError> Delete(int id)
