@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -73,6 +74,8 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsSystemModuleAdmin;
             if (target is IReportModule _)
                 yield return IsReportModuleAdmin;
+            if (target is IDataProcessingAgreementModule _)
+                yield return IsSystemModuleAdmin; //TODO: Discuss with PO what the rules are
             if (target is Config _)
                 yield return IsLocalAdmin;
             if (target.GetType().IsImplementationOfGenericType(typeof(LocalOptionEntity<>)))
@@ -140,6 +143,11 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (MatchType<Report>(target))
             {
                 return IsReportModuleAdmin(organizationId);
+            }
+
+            if (MatchType<DataProcessingAgreement>(target))
+            {
+                return IsSystemModuleAdmin(organizationId); //TODO: Discuss with PO what the authorization rules are here
             }
 
             //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system

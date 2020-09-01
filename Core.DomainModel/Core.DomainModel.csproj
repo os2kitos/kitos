@@ -71,6 +71,7 @@
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
+    <Compile Include="ItContract\IDataProcessingAgreementModule.cs" />
     <Compile Include="ItContract\ItContractConstraints.cs" />
     <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
