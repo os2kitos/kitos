@@ -36,6 +36,7 @@ namespace Presentation.Web
             });
 
             app.UseNinject();
+            app.Use<CorrelationIdMiddleware>();
             app.Use<ApiRequestsLoggingMiddleware>();
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
             app.Use<DenyModificationsThroughApiMiddleware>();

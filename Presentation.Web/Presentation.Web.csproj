@@ -359,6 +359,7 @@
     <Compile Include="Infrastructure\Attributes\RequireTopOnOdataThroughKitosTokenAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
+    <Compile Include="Infrastructure\Middleware\CorrelationIdMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\DenyTooLargeQueriesMiddleware.cs" />
     <Compile Include="Models\CreateItSystemDTO.cs" />
     <Compile Include="Models\CreateItsystemUsageDTO.cs" />
