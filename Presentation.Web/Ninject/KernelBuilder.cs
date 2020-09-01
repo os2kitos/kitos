@@ -7,6 +7,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
@@ -164,6 +165,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementService>().To<DataProcessingAgreementService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -255,6 +257,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementsRepository>().To<DataProcessingAgreementsRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
