@@ -59,8 +59,8 @@
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />
-    <Compile Include="GDPR\DataProcessingAgreementDomainService.cs" />
-    <Compile Include="GDPR\IDataProcessingAgreementDomainService.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementNamingService.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementNamingService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />

@@ -35,7 +35,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _sut.Handle(new EntityLifeCycleEvent<DataProcessingAgreement>(LifeCycleEventType.Created, dataProcessingAgreement));
 
             //Assert
-            _repository.Verify(x => x.Add(MatchSourceData(dataProcessingAgreement)));
+            _repository.Verify(x => x.Add(MatchSourceData(dataProcessingAgreement)),Times.Once);
         }
 
         [Fact]

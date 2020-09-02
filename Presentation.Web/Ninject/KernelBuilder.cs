@@ -168,7 +168,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingAgreementDomainService>().To<DataProcessingAgreementDomainService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadService>().To<DataProcessingAgreementReadService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs

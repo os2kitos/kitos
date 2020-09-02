@@ -7,11 +7,11 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
-    public class DataProcessingAgreementDomainService : IDataProcessingAgreementDomainService
+    public class DataProcessingAgreementNamingService : IDataProcessingAgreementNamingService
     {
         private readonly IDataProcessingAgreementRepository _repository;
 
-        public DataProcessingAgreementDomainService(IDataProcessingAgreementRepository repository)
+        public DataProcessingAgreementNamingService(IDataProcessingAgreementRepository repository)
         {
             _repository = repository;
         }
@@ -19,24 +19,6 @@ namespace Core.DomainServices.GDPR
         public Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name)
         {
             return ValidateNewName(organizationId, name, Maybe<int>.None);
-        }
-
-        public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
-        {
-            var error = ValidateSuggestedNewAgreement(organizationId, name);
-
-            if (error.HasValue)
-                return error.Value;
-
-            var dataProcessingAgreement = new DataProcessingAgreement
-            {
-                OrganizationId = organizationId,
-                Name = name
-            };
-
-            dataProcessingAgreement = _repository.Add(dataProcessingAgreement);
-
-            return dataProcessingAgreement;
         }
 
         public Maybe<OperationError> ChangeName(DataProcessingAgreement dataProcessingAgreement, string newName)
@@ -52,7 +34,6 @@ namespace Core.DomainServices.GDPR
             if (result.HasValue)
                 return result.Value;
             
-            _repository.Update(dataProcessingAgreement);
             return Maybe<OperationError>.None;
         }
 

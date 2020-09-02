@@ -17,16 +17,16 @@ namespace Core.ApplicationServices.GDPR
     {
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingAgreementRepository _repository;
-        private readonly IDataProcessingAgreementDomainService _domainService;
+        private readonly IDataProcessingAgreementNamingService _namingService;
 
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
-            IDataProcessingAgreementDomainService domainService)
+            IDataProcessingAgreementNamingService namingService)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
-            _domainService = domainService;
+            _namingService = namingService;
         }
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
@@ -34,7 +34,18 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            return _domainService.Create(organizationId, name);
+            var error = _namingService.ValidateSuggestedNewAgreement(organizationId, name);
+
+            if (error.HasValue)
+                return error.Value;
+
+            var dataProcessingAgreement = new DataProcessingAgreement
+            {
+                OrganizationId = organizationId,
+                Name = name
+            };
+
+            return _repository.Add(dataProcessingAgreement);
         }
 
         public Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name)
@@ -42,7 +53,7 @@ namespace Core.ApplicationServices.GDPR
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
-            return _domainService.ValidateSuggestedNewAgreement(organizationId, name);
+            return _namingService.ValidateSuggestedNewAgreement(organizationId, name);
         }
 
         public Result<DataProcessingAgreement, OperationError> Delete(int id)
@@ -119,6 +130,8 @@ namespace Core.ApplicationServices.GDPR
             if (updateNameError.HasValue)
                 return updateNameError.Value;
 
+            _repository.Update(dataProcessingAgreement);
+
             return dataProcessingAgreement;
         }
 
@@ -129,7 +142,7 @@ namespace Core.ApplicationServices.GDPR
 
             var newName = nameChange.Value.Value;
 
-            return _domainService.ChangeName(dataProcessingAgreement, newName);
+            return _namingService.ChangeName(dataProcessingAgreement, newName);
         }
     }
 }

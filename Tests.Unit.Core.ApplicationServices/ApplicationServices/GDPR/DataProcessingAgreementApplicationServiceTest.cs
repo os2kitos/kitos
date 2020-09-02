@@ -19,13 +19,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly DataProcessingAgreementApplicationService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
-        private readonly Mock<IDataProcessingAgreementDomainService> _domainServiceMock;
+        private readonly Mock<IDataProcessingAgreementNamingService> _domainServiceMock;
 
         public DataProcessingAgreementApplicationServiceTest()
         {
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
-            _domainServiceMock = new Mock<IDataProcessingAgreementDomainService>();
+            _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object, _repositoryMock.Object, _domainServiceMock.Object);
         }
 
@@ -35,17 +35,19 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Arrange
             var organizationId = A<int>();
             var name = A<string>();
-            var dataProcessingAgreement = new DataProcessingAgreement();
 
             ExpectAllowCreateReturns(organizationId, true);
-            _domainServiceMock.Setup(x => x.Create(organizationId, name)).Returns(dataProcessingAgreement);
+            _domainServiceMock.Setup(x=>x.ValidateSuggestedNewAgreement(organizationId,name)).Returns(Maybe<OperationError>.None);
+            _repositoryMock
+                .Setup(x => x.Add(It.Is<DataProcessingAgreement>(dpa =>
+                    dpa.OrganizationId == organizationId && name == dpa.Name)))
+                .Returns<DataProcessingAgreement>(x => x);
 
             //Act
             var result = _sut.Create(organizationId, name);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(dataProcessingAgreement, result.Value);
         }
 
         [Fact]
@@ -56,7 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
             var operationError = new OperationError(A<OperationFailure>());
 
-            _domainServiceMock.Setup(x => x.Create(organizationId, name)).Returns(operationError);
+            _domainServiceMock.Setup(x=>x.ValidateSuggestedNewAgreement(organizationId,name)).Returns(operationError);
             ExpectAllowCreateReturns(organizationId, true);
 
             //Act
@@ -193,6 +195,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(dataProcessingAgreement), Times.Once);
         }
 
         [Fact]
@@ -213,6 +216,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
+            _repositoryMock.Verify(x => x.Update(dataProcessingAgreement), Times.Never);
         }
 
         [Fact]
