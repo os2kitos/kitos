@@ -343,7 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseOdataController.cs" />
+    <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingAgreementController.cs" />
     <Compile Include="Controllers\OData\DataProcessingAgreementReadModelsController.cs" />
