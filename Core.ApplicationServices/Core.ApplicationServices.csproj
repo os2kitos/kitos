@@ -10,6 +10,7 @@
     <RootNamespace>Core.ApplicationServices</RootNamespace>
     <AssemblyName>Core.ApplicationServices</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+	<LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
