@@ -6,6 +6,7 @@ type navigations = {
     project: protractor.ElementFinder,
     system: protractor.ElementFinder,
     contract: protractor.ElementFinder,
+    dataProcessingAgreementButton: protractor.ElementFinder,
     reports: protractor.ElementFinder
 }
 type userDropdown = {
@@ -26,6 +27,7 @@ class navigationBarWrapper {
         project: element(byDataElementType(consts.navigationProjectButton)),
         system: element(byDataElementType(consts.navigationSystemButton)),
         contract: element(byDataElementType(consts.navigationContractButton)),
+        dataProcessingAgreementButton: element(byDataElementType(consts.navigationDataProcessingAgreementButton)),
         reports: element(byDataElementType(consts.navigationReportsButton))
         };
 
