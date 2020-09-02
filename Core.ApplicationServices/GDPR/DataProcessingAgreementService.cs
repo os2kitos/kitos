@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.GDPR;
@@ -20,12 +21,12 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
         {
-            var error = ValidateSuggestedNewAgreement(organizationId,name);
+            var error = ValidateSuggestedNewAgreement(organizationId, name);
 
             if (error.HasValue)
                 return error.Value;
 
-            var dataProcessingAgreement = new DataProcessingAgreement()
+            var dataProcessingAgreement = new DataProcessingAgreement
             {
                 OrganizationId = organizationId,
                 Name = name
@@ -41,13 +42,18 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            if (string.IsNullOrWhiteSpace(name) || name.Length > DataProcessingAgreementConstraints.MaxNameLength)
-                return new OperationError("Name does breaks invariant: 0 < nameLength <= 100", OperationFailure.BadInput);
+            if (DataProcessingAgreement.IsNameValid(name))
+                return new OperationError("Name is invalid", OperationFailure.BadInput);
 
-            if (_repository.Search(organizationId, name).Any())
+            if (ExistingDataProcessingAgreementWithSameNameInOrganization(organizationId, name))
                 return new OperationError("Existing DataProcessingAgreement", OperationFailure.Conflict);
 
             return Maybe<OperationError>.None;
+        }
+
+        private bool ExistingDataProcessingAgreementWithSameNameInOrganization(int organizationId, string name)
+        {
+            return _repository.Search(organizationId, name).Any();
         }
 
         public Result<DataProcessingAgreement, OperationError> Delete(int id)
@@ -80,6 +86,41 @@ namespace Core.ApplicationServices.GDPR
                 return new OperationError(OperationFailure.Forbidden);
 
             return agreement;
+        }
+
+        public Result<DataProcessingAgreement, OperationError> Update(int id, Maybe<ChangedValue<string>> nameChange)
+        {
+            var result = _repository.GetById(id);
+
+            if (result.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var dataProcessingAgreement = result.Value;
+
+            if (!_authorizationContext.AllowModify(dataProcessingAgreement))
+                return new OperationError(OperationFailure.Forbidden);
+
+            var updateNameError = UpdateName(dataProcessingAgreement, nameChange);
+
+            if (updateNameError.HasValue)
+                return updateNameError.Value;
+
+            _repository.Update(dataProcessingAgreement);
+
+            return dataProcessingAgreement;
+        }
+
+        private Maybe<OperationError> UpdateName(DataProcessingAgreement dataProcessingAgreement, Maybe<ChangedValue<string>> nameChange)
+        {
+            if (nameChange.IsNone)
+                return Maybe<OperationError>.None;
+
+            var newName = nameChange.Value.Value;
+            
+            if (ExistingDataProcessingAgreementWithSameNameInOrganization(dataProcessingAgreement.OrganizationId, newName))
+                return new OperationError(OperationFailure.Conflict);
+
+            return dataProcessingAgreement.SetName(newName);
         }
     }
 }

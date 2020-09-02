@@ -115,6 +115,7 @@
     <Compile Include="GDPR\IDataProcessingAgreementService.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\OptionsService.cs" />

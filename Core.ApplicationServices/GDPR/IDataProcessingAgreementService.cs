@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.GDPR;
+﻿using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
@@ -10,5 +11,6 @@ namespace Core.ApplicationServices.GDPR
         Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name);
         Result<DataProcessingAgreement, OperationError> Delete(int id);
         Result<DataProcessingAgreement, OperationError> Get(int id);
+        Result<DataProcessingAgreement, OperationError> Update(int id, Maybe<ChangedValue<string>> nameChange);
     }
 }

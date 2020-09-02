@@ -23,7 +23,7 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             var dataProcessingAgreement = _repository.Insert(newAgreement);
             _repository.Save();
-            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Created));
+            Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Created);
             return dataProcessingAgreement;
         }
 
@@ -32,7 +32,7 @@ namespace Core.DomainServices.Repositories.GDPR
             var dataProcessingAgreement = _repository.GetByKey(id);
             if (dataProcessingAgreement != null)
             {
-                _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Deleted));
+                Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Deleted);
                 _repository.DeleteByKeyWithReferencePreload(id);
                 _repository.Save();
             }
@@ -40,7 +40,7 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public void Update(DataProcessingAgreement dataProcessingAgreement)
         {
-            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Updated));
+            Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Updated);
             _repository.Save();
         }
 
@@ -55,5 +55,12 @@ namespace Core.DomainServices.Repositories.GDPR
                 _repository.AsQueryable().ByOrganizationId(organizationId)
                     .Transform(previousQuery => exactName.Select(previousQuery.ByNameExact).GetValueOrFallback(previousQuery));
         }
+
+        private void Notify(DataProcessingAgreement dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType changeType)
+        {
+            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement,
+                changeType));
+        }
+
     }
 }

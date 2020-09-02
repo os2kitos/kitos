@@ -409,6 +409,7 @@
     <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SingleValueDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />

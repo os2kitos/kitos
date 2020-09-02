@@ -2,8 +2,11 @@
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
 
 namespace Presentation.Web.Controllers.API
@@ -45,7 +48,17 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingAgreementService
                 .Delete(id)
-                .Match(value => Ok(ToDTO(value)), FromOperationError);
+                .Match(value => NoContent(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/name")]
+        public HttpResponseMessage ChangeName(int id, [FromBody] SingleValueDTO<string> value)
+        {
+            ChangedValue<string> changedValue = value.Value;
+            return _dataProcessingAgreementService
+                .Update(id, changedValue)
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         /// <summary>
