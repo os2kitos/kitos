@@ -19,11 +19,11 @@ namespace Presentation.Web.Controllers.API
     [RoutePrefix("api/v1/data-processing-agreement")]
     public class DataProcessingAgreementController : BaseApiController
     {
-        private readonly IDataProcessingAgreementService _dataProcessingAgreementService;
+        private readonly IDataProcessingAgreementApplicationService _dataProcessingAgreementApplicationService;
 
-        public DataProcessingAgreementController(IDataProcessingAgreementService dataProcessingAgreementService)
+        public DataProcessingAgreementController(IDataProcessingAgreementApplicationService dataProcessingAgreementApplicationService)
         {
-            _dataProcessingAgreementService = dataProcessingAgreementService;
+            _dataProcessingAgreementApplicationService = dataProcessingAgreementApplicationService;
         }
 
         [HttpPost]
@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .Create(dto.OrganizationId, dto.Name)
                 .Match(value => Created(ToDTO(value), new Uri(Request.RequestUri + "/" + value.Id)), FromOperationError);
         }
@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage Get(int id)
         {
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .Get(id)
                 .Match(value => Ok(ToDTO(value)), FromOperationError);
         }
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         public HttpResponseMessage GetOrganizationData(int organizationId, int skip, int take)
         {
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .GetOrganizationData(organizationId, skip, take)
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage Delete(int id)
         {
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .Delete(id)
                 .Match(value => Ok(), FromOperationError);
         }
@@ -92,7 +92,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage ChangeName(int id, [FromBody] SingleValueDTO<string> value)
         {
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .UpdateName(id, value.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
@@ -113,7 +113,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage CanCreate(int organizationId, [FromBody] SingleValueDTO<string> value)
         {
-            return _dataProcessingAgreementService
+            return _dataProcessingAgreementApplicationService
                 .ValidateSuggestedNewAgreement(organizationId, value.Value)
                 .Select(FromOperationError)
                 .GetValueOrFallback(Ok());

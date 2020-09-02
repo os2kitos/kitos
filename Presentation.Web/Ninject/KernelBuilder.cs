@@ -35,6 +35,7 @@ using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.References.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
+using Core.DomainServices.GDPR;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -166,7 +167,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingAgreementService>().To<DataProcessingAgreementService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementDomainService>().To<DataProcessingAgreementDomainService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadService>().To<DataProcessingAgreementReadService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs

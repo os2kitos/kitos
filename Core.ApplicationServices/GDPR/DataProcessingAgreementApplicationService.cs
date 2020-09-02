@@ -7,52 +7,42 @@ using Core.ApplicationServices.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
 {
-    public class DataProcessingAgreementService : IDataProcessingAgreementService
+    public class DataProcessingAgreementApplicationService : IDataProcessingAgreementApplicationService
     {
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingAgreementRepository _repository;
+        private readonly IDataProcessingAgreementDomainService _domainService;
 
-        public DataProcessingAgreementService(IAuthorizationContext authorizationContext, IDataProcessingAgreementRepository repository)
+        public DataProcessingAgreementApplicationService(
+            IAuthorizationContext authorizationContext,
+            IDataProcessingAgreementRepository repository,
+            IDataProcessingAgreementDomainService domainService)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
+            _domainService = domainService;
         }
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
         {
-            var error = ValidateSuggestedNewAgreement(organizationId, name);
+            if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
 
-            if (error.HasValue)
-                return error.Value;
-
-            var dataProcessingAgreement = new DataProcessingAgreement
-            {
-                OrganizationId = organizationId,
-                Name = name
-            };
-
-            dataProcessingAgreement = _repository.Add(dataProcessingAgreement);
-
-            return dataProcessingAgreement;
+            return _domainService.Create(organizationId, name);
         }
 
         public Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name)
         {
-            if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
-            if (!DataProcessingAgreement.IsNameValid(name))
-                return new OperationError("Name is invalid", OperationFailure.BadInput);
-
-            if (ExistingDataProcessingAgreementWithSameNameInOrganization(organizationId, name))
-                return new OperationError("Existing DataProcessingAgreement", OperationFailure.Conflict);
-
-            return Maybe<OperationError>.None;
+            return _domainService.ValidateSuggestedNewAgreement(organizationId, name);
         }
 
         public Result<DataProcessingAgreement, OperationError> Delete(int id)
@@ -109,7 +99,6 @@ namespace Core.ApplicationServices.GDPR
             return UpdateWith(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
-
         private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, DataProcessingAgreementPropertyChanges changeSet)
         {
             if (changeSet == null)
@@ -135,22 +124,39 @@ namespace Core.ApplicationServices.GDPR
             return dataProcessingAgreement;
         }
 
+        private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, Func<DataProcessingAgreement, Result<DataProcessingAgreement, OperationError>> changes)
+        {
+            if (changes == null)
+                throw new ArgumentNullException(nameof(changes));
+
+            var result = _repository.GetById(id);
+
+            if (result.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var dataProcessingAgreement = result.Value;
+
+            if (!_authorizationContext.AllowModify(dataProcessingAgreement))
+                return new OperationError(OperationFailure.Forbidden);
+
+            var changeResult = changes.Invoke(dataProcessingAgreement);
+            
+            if (changeResult.Failed)
+                return changeResult.Error;
+
+            _repository.Update(dataProcessingAgreement);
+
+            return dataProcessingAgreement;
+        }
+
         private Maybe<OperationError> UpdateName(DataProcessingAgreement dataProcessingAgreement, Maybe<ChangedValue<string>> nameChange)
         {
-            if (nameChange.IsNone || nameChange.Value.Value == dataProcessingAgreement.Name)
+            if (nameChange.IsNone)
                 return Maybe<OperationError>.None;
 
             var newName = nameChange.Value.Value;
 
-            if (ExistingDataProcessingAgreementWithSameNameInOrganization(dataProcessingAgreement.OrganizationId, newName))
-                return new OperationError(OperationFailure.Conflict);
-
-            return dataProcessingAgreement.SetName(newName);
-        }
-
-        private bool ExistingDataProcessingAgreementWithSameNameInOrganization(int organizationId, string name)
-        {
-            return _repository.Search(organizationId, name).Any();
+            return _domainService.ChangeName(dataProcessingAgreement, newName);
         }
     }
 }

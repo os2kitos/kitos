@@ -5,7 +5,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
 {
-    public interface IDataProcessingAgreementService
+    public interface IDataProcessingAgreementApplicationService
     {
         Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name);
         Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name);

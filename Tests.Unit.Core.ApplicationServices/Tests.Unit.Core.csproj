@@ -154,7 +154,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
-    <Compile Include="ApplicationServices\GDPR\DataProcessingAgreementServiceTest.cs" />
+    <Compile Include="ApplicationServices\GDPR\DataProcessingAgreementApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />

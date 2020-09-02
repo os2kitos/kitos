@@ -5,6 +5,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.Types;
 using Moq;
@@ -13,17 +14,17 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.GDPR
 {
-    public class DataProcessingAgreementServiceTest : WithAutoFixture
+    public class DataProcessingAgreementApplicationServiceTest : WithAutoFixture
     {
-        private readonly DataProcessingAgreementService _sut;
+        private readonly DataProcessingAgreementApplicationService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
 
-        public DataProcessingAgreementServiceTest()
+        public DataProcessingAgreementApplicationServiceTest()
         {
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
-            _sut = new DataProcessingAgreementService(_authorizationContextMock.Object, _repositoryMock.Object);
+            _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object, _repositoryMock.Object,new DataProcessingAgreementDomainService(_repositoryMock.Object));
         }
 
         [Fact]
@@ -245,10 +246,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Arrange
             var id = A<int>();
             var name = A<string>();
-            var dataProcessingAgreement = new DataProcessingAgreement() { OrganizationId = A<int>() };
+            var dataProcessingAgreement = new DataProcessingAgreement() { OrganizationId = A<int>(), Id =  A<int>()};
             ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
             ExpectAllowModifyReturns(dataProcessingAgreement, true);
-            ExpectSearchReturns(dataProcessingAgreement.OrganizationId, name, new List<DataProcessingAgreement>() { new DataProcessingAgreement() });
+            ExpectSearchReturns(dataProcessingAgreement.OrganizationId, name, new List<DataProcessingAgreement> { new DataProcessingAgreement(){Id =  dataProcessingAgreement.Id+1} });
 
             //Act
             var result = _sut.UpdateName(id, name);
