@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
 using Xunit;
 
@@ -56,6 +57,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}"), cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeNameRequestAsync(int id, string name, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = name };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/name"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendCanCreateRequestAsync(int organizationId, string name, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = name };
+
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/validate/{organizationId}/can-create"), cookie, body);
         }
     }
 }

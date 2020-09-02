@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
@@ -88,8 +90,11 @@ namespace Core.ApplicationServices.GDPR
             return agreement;
         }
 
-        public Result<DataProcessingAgreement, OperationError> Update(int id, Maybe<ChangedValue<string>> nameChange)
+        public Result<DataProcessingAgreement, OperationError> UpdateProperty(int id, DataProcessingAgreementPropertyChanges changeSet)
         {
+            if (changeSet == null)
+                throw new ArgumentNullException(nameof(changeSet));
+
             var result = _repository.GetById(id);
 
             if (result.IsNone)
@@ -100,7 +105,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowModify(dataProcessingAgreement))
                 return new OperationError(OperationFailure.Forbidden);
 
-            var updateNameError = UpdateName(dataProcessingAgreement, nameChange);
+            var updateNameError = UpdateName(dataProcessingAgreement, changeSet.NameChange);
 
             if (updateNameError.HasValue)
                 return updateNameError.Value;
@@ -116,7 +121,7 @@ namespace Core.ApplicationServices.GDPR
                 return Maybe<OperationError>.None;
 
             var newName = nameChange.Value.Value;
-            
+
             if (ExistingDataProcessingAgreementWithSameNameInOrganization(dataProcessingAgreement.OrganizationId, newName))
                 return new OperationError(OperationFailure.Conflict);
 

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
@@ -47,7 +48,7 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingAgreementService
                 .Delete(id)
-                .Match(value => NoContent(), FromOperationError);
+                .Match(value => Ok(), FromOperationError);
         }
 
         [HttpPatch]
@@ -56,8 +57,8 @@ namespace Presentation.Web.Controllers.API
         {
             ChangedValue<string> changedValue = value.Value;
             return _dataProcessingAgreementService
-                .Update(id, changedValue)
-                .Match(_ => NoContent(), FromOperationError);
+                .UpdateProperty(id, new DataProcessingAgreementPropertyChanges { NameChange = changedValue })
+                .Match(_ => Ok(), FromOperationError);
         }
 
         /// <summary>
@@ -66,15 +67,15 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [InternalApi]
-        [Route("validate/can-create")]
-        public HttpResponseMessage CanCreate(int organizationId, string name)
+        [Route("validate/{organizationId}/can-create")]
+        public HttpResponseMessage CanCreate(int organizationId, [FromBody] SingleValueDTO<string> value)
         {
             return _dataProcessingAgreementService
-                .ValidateSuggestedNewAgreement(organizationId, name)
+                .ValidateSuggestedNewAgreement(organizationId, value.Value)
                 .Select(FromOperationError)
-                .GetValueOrFallback(NoContent());
+                .GetValueOrFallback(Ok());
         }
 
         private static DataProcessingAgreementDTO ToDTO(DataProcessingAgreement value)

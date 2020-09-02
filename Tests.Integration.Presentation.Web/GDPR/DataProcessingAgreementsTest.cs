@@ -51,7 +51,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using (var secondResponse = await DataProcessingAgreementHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.Conflict,secondResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
             }
         }
 
@@ -82,10 +82,86 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using (var deleteResponse = await DataProcessingAgreementHelper.SendDeleteRequestAsync(dto.Id))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.NoContent,deleteResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
             }
         }
 
-        //TODO: Add "change name" test
+        [Fact]
+        public async Task Can_Change_Name()
+        {
+            //Arrange
+            var name1 = A<string>();
+            var name2 = A<string>();
+            var agreementDto = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
+
+            //Act
+            using (var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name2))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Cannot_Change_Name_To_NonUniqueName_In_Same_Org()
+        {
+            //Arrange
+            var name1 = A<string>();
+            var name2 = A<string>();
+            await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
+            var agreementDto = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name2).ConfigureAwait(false);
+
+            //Act
+            using (var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name1))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Create_Endpoint_Returns_Ok()
+        {
+            //Arrange
+            var name = A<string>();
+
+            //Act
+            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Create_Endpoint_Returns_Error_If_Non_Unique()
+        {
+            //Arrange
+            var name = A<string>();
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            await DataProcessingAgreementHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
+
+            //Act
+            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(organizationId, name))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData("")] //too short
+        [InlineData("    ")] //only whitespace
+        [InlineData("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")] //101 chars
+        public async Task Can_Create_Returns_Error_If_InvalidName(string name)
+        {
+            //Act
+            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
+        }
     }
 }
