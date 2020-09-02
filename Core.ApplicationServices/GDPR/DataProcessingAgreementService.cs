@@ -95,7 +95,7 @@ namespace Core.ApplicationServices.GDPR
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
-            
+
             if (take < 1 || skip < 0)
                 return new OperationError("Invalid paging arguments", OperationFailure.BadInput);
 
@@ -135,7 +135,7 @@ namespace Core.ApplicationServices.GDPR
 
         private Maybe<OperationError> UpdateName(DataProcessingAgreement dataProcessingAgreement, Maybe<ChangedValue<string>> nameChange)
         {
-            if (nameChange.IsNone)
+            if (nameChange.IsNone || nameChange.Value.Value == dataProcessingAgreement.Name)
                 return Maybe<OperationError>.None;
 
             var newName = nameChange.Value.Value;
