@@ -1,8 +1,8 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import DPA = require("../PageObjects/Local-admin/LocalDataProcessorAgreement.po");
+import DPA = require("../PageObjects/Local-admin/LocalDataProcessingAgreement.po");
 
 
-describe("Local admin is able to toggle DataProcessorAgreement", () => {
+describe("Local admin is able to toggle DataProcessingAgreement", () => {
 
     var loginHelper = new Login();
     var DPAPageHelper = new DPA();
@@ -11,7 +11,7 @@ describe("Local admin is able to toggle DataProcessorAgreement", () => {
         loginHelper.loginAsGlobalAdmin();
     });
 
-    it("Option to toggle DataProcessorAgreement is visible", () => {
+    it("Option to toggle DataProcessingAgreement is visible", () => {
         DPAPageHelper.getPage();
     });
 

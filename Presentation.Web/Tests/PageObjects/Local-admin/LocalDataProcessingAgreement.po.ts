@@ -6,7 +6,7 @@ class LocalProject implements PageObject {
     private navigationHelper = new NavigationHelper();
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/local-config/DataProcessorAgreement");
+        return this.navigationHelper.getPage("/#/local-config/DataProcessingAgreement");
     }
 }
 

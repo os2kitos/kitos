@@ -1,6 +1,6 @@
 ﻿BEGIN
 UPDATE Config
-SET ShowDataProcessorAgreement = 1
+SET ShowDataProcessingAgreement = 1
 END
 
 
