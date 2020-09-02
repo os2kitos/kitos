@@ -261,7 +261,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var organizationId = A<int>();
             var skip = 1;
             var take = 1;
-            var expectedMatch = new DataProcessingAgreement() { Id = 2 };
 
             ExpectOrganizationalReadAccess(organizationId, accessLevel);
 
