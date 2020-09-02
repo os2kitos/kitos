@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
@@ -75,6 +77,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new SingleValueDTO<string> { Value = name };
 
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/validate/{organizationId}/can-create"), cookie, body);
+        }
+
+        public static async Task<IEnumerable<DataProcessingAgreementReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using (var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/DataProcessingAgreementReadModels?$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+                return await response.ReadOdataListResponseBodyAsAsync<DataProcessingAgreementReadModel>();
+            }
         }
     }
 }
