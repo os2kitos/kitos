@@ -19,7 +19,7 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             var existing = GetBySourceId(newModel.SourceEntityId);
 
-            if (existing != null)
+            if (existing.HasValue)
                 throw new InvalidOperationException("Only one read model per entity is allowed");
 
             var inserted = _repository.Insert(newModel);

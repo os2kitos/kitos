@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingAgreement>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            if (DataProcessingAgreement.IsNameValid(name))
+            if (!DataProcessingAgreement.IsNameValid(name))
                 return new OperationError("Name is invalid", OperationFailure.BadInput);
 
             if (ExistingDataProcessingAgreementWithSameNameInOrganization(organizationId, name))

@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
     <Compile Include="ItSystem\SystemRelationsTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
+    <Compile Include="Tools\DataProcessingAgreementHelper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
@@ -190,6 +192,7 @@
       <Name>Tests.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
