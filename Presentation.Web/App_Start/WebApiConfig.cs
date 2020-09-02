@@ -437,7 +437,7 @@ namespace Presentation.Web
             var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
             itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
 
-            var dpaMap = BindEntitySet<DataProcessingAgreementReadModel, DataProcessingAgreementsController>(builder);
+            var dpaMap = BindEntitySet<DataProcessingAgreementReadModel, DataProcessingAgreementReadModelsController>(builder);
 
             return builder.GetEdmModel();
         }

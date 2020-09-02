@@ -163,5 +163,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
         }
+
+        //TODO: Paging query
+        //TODO: Read model test! + query
     }
 }

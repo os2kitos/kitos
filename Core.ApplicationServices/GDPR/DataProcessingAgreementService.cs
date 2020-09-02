@@ -5,6 +5,7 @@ using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.Types;
 
@@ -88,6 +89,23 @@ namespace Core.ApplicationServices.GDPR
                 return new OperationError(OperationFailure.Forbidden);
 
             return agreement;
+        }
+
+        public Result<IQueryable<DataProcessingAgreement>, OperationError> GetOrganizationData(int organizationId, int skip, int take)
+        {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+            
+            if (take < 1 || skip < 0)
+                return new OperationError("Invalid paging arguments", OperationFailure.BadInput);
+
+            var dataProcessingAgreements = _repository
+                .Search(organizationId, Maybe<string>.None)
+                .OrderBy(x => x.Id)
+                .Skip(skip)
+                .Take(take);
+
+            return Result<IQueryable<DataProcessingAgreement>, OperationError>.Success(dataProcessingAgreements);
         }
 
         public Result<DataProcessingAgreement, OperationError> UpdateProperty(int id, DataProcessingAgreementPropertyChanges changeSet)

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.GDPR;
@@ -8,9 +11,11 @@ using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     [RoutePrefix("api/v1/data-processing-agreement")]
     public class DataProcessingAgreementController : BaseApiController
     {
@@ -23,6 +28,10 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<DataProcessingAgreementDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage Post([FromBody] CreateDataProcessingAgreementDTO dto)
         {
             if (dto == null)
@@ -35,6 +44,9 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("{id}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<DataProcessingAgreementDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage Get(int id)
         {
             return _dataProcessingAgreementService
@@ -42,8 +54,28 @@ namespace Presentation.Web.Controllers.API
                 .Match(value => Ok(ToDTO(value)), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("defined-in/{organizationId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<DataProcessingAgreementDTO[]>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        public HttpResponseMessage GetOrganizationData(int organizationId, int skip, int take)
+        {
+            return _dataProcessingAgreementService
+                .GetOrganizationData(organizationId, skip, take)
+                .Match(value => Ok(ToDTOs(value)), FromOperationError);
+        }
+
+        private static List<DataProcessingAgreementDTO> ToDTOs(IQueryable<DataProcessingAgreement> value)
+        {
+            return value.AsEnumerable().Select(ToDTO).ToList();
+        }
+
         [HttpDelete]
         [Route("{id}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage Delete(int id)
         {
             return _dataProcessingAgreementService
@@ -53,6 +85,11 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPatch]
         [Route("{id}/name")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage ChangeName(int id, [FromBody] SingleValueDTO<string> value)
         {
             ChangedValue<string> changedValue = value.Value;
@@ -70,6 +107,11 @@ namespace Presentation.Web.Controllers.API
         [HttpPost]
         [InternalApi]
         [Route("validate/{organizationId}/can-create")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage CanCreate(int organizationId, [FromBody] SingleValueDTO<string> value)
         {
             return _dataProcessingAgreementService

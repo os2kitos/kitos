@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using Core.ApplicationServices.GDPR;
 using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -8,19 +9,21 @@ namespace Presentation.Web.Controllers.OData
     /// <summary>
     /// Search API used for DataProcessingAgreements
     /// </summary>
-    [PublicApi]
-    public class DataProcessingAgreementsController : BaseOdataController
+    [InternalApi]
+    [ODataRoutePrefix("Organizations({organizationId})/DataProcessingAgreementReadModels")]
+    public class DataProcessingAgreementReadModelsController : BaseOdataController
     {
         private readonly IDataProcessingAgreementReadService _dataProcessingAgreementReadService;
 
-        public DataProcessingAgreementsController(IDataProcessingAgreementReadService dataProcessingAgreementReadService)
+        public DataProcessingAgreementReadModelsController(IDataProcessingAgreementReadService dataProcessingAgreementReadService)
         {
             _dataProcessingAgreementReadService = dataProcessingAgreementReadService;
         }
 
         [EnableQuery]
         [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetByOrganizationId(int organizationId)
+        [ODataRoute]
+        public IHttpActionResult Get([FromODataUri]int organizationId)
         {
             return
                 _dataProcessingAgreementReadService
