@@ -2,7 +2,7 @@
 {
     public interface IReadModel<TSourceEntity> : IHasId
     {
-        public int SourceEntityId { get; set; }
-        public TSourceEntity SourceEntity { get; set; }
+        int SourceEntityId { get; set; }
+        TSourceEntity SourceEntity { get; set; }
     }
 }
