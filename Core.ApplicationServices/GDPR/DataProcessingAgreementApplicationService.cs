@@ -119,33 +119,6 @@ namespace Core.ApplicationServices.GDPR
             if (updateNameError.HasValue)
                 return updateNameError.Value;
 
-            _repository.Update(dataProcessingAgreement);
-
-            return dataProcessingAgreement;
-        }
-
-        private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, Func<DataProcessingAgreement, Result<DataProcessingAgreement, OperationError>> changes)
-        {
-            if (changes == null)
-                throw new ArgumentNullException(nameof(changes));
-
-            var result = _repository.GetById(id);
-
-            if (result.IsNone)
-                return new OperationError(OperationFailure.NotFound);
-
-            var dataProcessingAgreement = result.Value;
-
-            if (!_authorizationContext.AllowModify(dataProcessingAgreement))
-                return new OperationError(OperationFailure.Forbidden);
-
-            var changeResult = changes.Invoke(dataProcessingAgreement);
-            
-            if (changeResult.Failed)
-                return changeResult.Error;
-
-            _repository.Update(dataProcessingAgreement);
-
             return dataProcessingAgreement;
         }
 

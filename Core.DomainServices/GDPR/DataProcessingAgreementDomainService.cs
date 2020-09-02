@@ -48,7 +48,12 @@ namespace Core.DomainServices.GDPR
             if (validation.Select(x => x.FailureType == OperationFailure.Conflict).GetValueOrDefault())
                 return new OperationError(OperationFailure.Conflict);
 
-            return dataProcessingAgreement.SetName(newName);
+            var result = dataProcessingAgreement.SetName(newName);
+            if (result.HasValue)
+                return result.Value;
+            
+            _repository.Update(dataProcessingAgreement);
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> ValidateNewName(int organizationId, string name, Maybe<int> exceptId)
