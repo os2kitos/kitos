@@ -92,9 +92,8 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage ChangeName(int id, [FromBody] SingleValueDTO<string> value)
         {
-            ChangedValue<string> changedValue = value.Value;
             return _dataProcessingAgreementService
-                .UpdateProperty(id, new DataProcessingAgreementPropertyChanges { NameChange = changedValue })
+                .UpdateName(id, value.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

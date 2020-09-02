@@ -3,6 +3,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
@@ -54,11 +55,6 @@ namespace Core.ApplicationServices.GDPR
             return Maybe<OperationError>.None;
         }
 
-        private bool ExistingDataProcessingAgreementWithSameNameInOrganization(int organizationId, string name)
-        {
-            return _repository.Search(organizationId, name).Any();
-        }
-
         public Result<DataProcessingAgreement, OperationError> Delete(int id)
         {
             var result = _repository.GetById(id);
@@ -96,7 +92,7 @@ namespace Core.ApplicationServices.GDPR
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
-            if (take < 1 || skip < 0)
+            if (take < 1 || skip < 0 || take > PagingContraints.MaxPageSize)
                 return new OperationError("Invalid paging arguments", OperationFailure.BadInput);
 
             var dataProcessingAgreements = _repository
@@ -108,7 +104,13 @@ namespace Core.ApplicationServices.GDPR
             return Result<IQueryable<DataProcessingAgreement>, OperationError>.Success(dataProcessingAgreements);
         }
 
-        public Result<DataProcessingAgreement, OperationError> UpdateProperty(int id, DataProcessingAgreementPropertyChanges changeSet)
+        public Result<DataProcessingAgreement, OperationError> UpdateName(int id, string name)
+        {
+            return UpdateWith(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
+        }
+
+
+        private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, DataProcessingAgreementPropertyChanges changeSet)
         {
             if (changeSet == null)
                 throw new ArgumentNullException(nameof(changeSet));
@@ -144,6 +146,11 @@ namespace Core.ApplicationServices.GDPR
                 return new OperationError(OperationFailure.Conflict);
 
             return dataProcessingAgreement.SetName(newName);
+        }
+
+        private bool ExistingDataProcessingAgreementWithSameNameInOrganization(int organizationId, string name)
+        {
+            return _repository.Search(organizationId, name).Any();
         }
     }
 }

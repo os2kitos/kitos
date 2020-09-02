@@ -10,7 +10,7 @@
     <RootNamespace>Core.ApplicationServices</RootNamespace>
     <AssemblyName>Core.ApplicationServices</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -131,6 +131,7 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />
     <Compile Include="SSO\ISsoFlowApplicationService.cs" />
