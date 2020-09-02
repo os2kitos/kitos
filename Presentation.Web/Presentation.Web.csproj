@@ -803,7 +803,6 @@
     <TypeScriptCompile Include="Tests\Object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
     <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
