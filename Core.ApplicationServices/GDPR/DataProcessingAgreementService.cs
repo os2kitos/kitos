@@ -49,6 +49,7 @@ namespace Core.ApplicationServices.GDPR
             if (!DataProcessingAgreement.IsNameValid(name))
                 return new OperationError("Name is invalid", OperationFailure.BadInput);
 
+            //TODO: Perhaps much of this belongs in a domain service in stead - the in-org domain rules.... -> consider
             if (ExistingDataProcessingAgreementWithSameNameInOrganization(organizationId, name))
                 return new OperationError("Existing DataProcessingAgreement", OperationFailure.Conflict);
 

@@ -10,7 +10,7 @@
     <RootNamespace>Infrastructure.Services</RootNamespace>
     <AssemblyName>Infrastructure.Services</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -66,6 +66,7 @@
     <Compile Include="DataAccess\ITransactionManager.cs" />
     <Compile Include="Delegates\Factory.cs" />
     <Compile Include="DomainEvents\DomainEvents.cs" />
+    <Compile Include="DomainEvents\EntityLifeCycleEvent.cs" />
     <Compile Include="DomainEvents\IDomainEvent.cs" />
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />

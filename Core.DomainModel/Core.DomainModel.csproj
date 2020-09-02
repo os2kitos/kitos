@@ -10,7 +10,7 @@
     <RootNamespace>Core.DomainModel</RootNamespace>
     <AssemblyName>Core.DomainModel</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -61,7 +61,6 @@
     <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
     <Compile Include="GDPR\DataProcessingAgreementReadModel.cs" />
-    <Compile Include="GDPR\Events\DataProcessingAgreementChanged.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="GlobalConfigKeys.cs" />

@@ -1,12 +1,11 @@
 ﻿using System;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.GDPR.Events;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.Model.EventHandlers
 {
-    public class BuildDataProcessingAgreementReadModelOnChangesHandler : IDomainEventHandler<DataProcessingAgreementChanged>
+    public class BuildDataProcessingAgreementReadModelOnChangesHandler : IDomainEventHandler<EntityLifeCycleEvent<DataProcessingAgreement>>
     {
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
 
@@ -15,16 +14,16 @@ namespace Core.DomainServices.Model.EventHandlers
             _readModelRepository = readModelRepository;
         }
 
-        public void Handle(DataProcessingAgreementChanged domain)
+        public void Handle(EntityLifeCycleEvent<DataProcessingAgreement> domain)
         {
-            var dataProcessingAgreement = domain.DataProcessingAgreement;
+            var dataProcessingAgreement = domain.Entity;
 
-            switch (domain.Change)
+            switch (domain.ChangeType)
             {
-                case DataProcessingAgreementChanged.ChangeType.Created:
+                case LifeCycleEventType.Created:
                     CreateNewModel(dataProcessingAgreement);
                     break;
-                case DataProcessingAgreementChanged.ChangeType.Updated:
+                case LifeCycleEventType.Updated:
                     var readModel = _readModelRepository.GetBySourceId(dataProcessingAgreement.Id);
                     if (readModel.HasValue)
                     {
@@ -39,7 +38,7 @@ namespace Core.DomainServices.Model.EventHandlers
                         CreateNewModel(dataProcessingAgreement);
                     }
                     break;
-                case DataProcessingAgreementChanged.ChangeType.Deleted:
+                case LifeCycleEventType.Deleted:
                     _readModelRepository.DeleteBySourceId(dataProcessingAgreement.Id);
                     break;
                 default:

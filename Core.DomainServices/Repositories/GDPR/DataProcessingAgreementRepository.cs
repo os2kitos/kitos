@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.GDPR.Events;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -23,24 +22,27 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             var dataProcessingAgreement = _repository.Insert(newAgreement);
             _repository.Save();
-            Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Created);
+            Notify(dataProcessingAgreement, LifeCycleEventType.Created);
             return dataProcessingAgreement;
         }
 
-        public void DeleteById(int id)
+        public bool DeleteById(int id)
         {
             var dataProcessingAgreement = _repository.GetByKey(id);
             if (dataProcessingAgreement != null)
             {
-                Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Deleted);
-                _repository.DeleteByKeyWithReferencePreload(id);
+                Notify(dataProcessingAgreement, LifeCycleEventType.Deleted);
+                _repository.DeleteWithReferencePreload(dataProcessingAgreement);
                 _repository.Save();
+                return true;
             }
+
+            return false;
         }
 
         public void Update(DataProcessingAgreement dataProcessingAgreement)
         {
-            Notify(dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType.Updated);
+            Notify(dataProcessingAgreement, LifeCycleEventType.Updated);
             _repository.Save();
         }
 
@@ -56,11 +58,9 @@ namespace Core.DomainServices.Repositories.GDPR
                     .Transform(previousQuery => exactName.Select(previousQuery.ByNameExact).GetValueOrFallback(previousQuery));
         }
 
-        private void Notify(DataProcessingAgreement dataProcessingAgreement, DataProcessingAgreementChanged.ChangeType changeType)
+        private void Notify(DataProcessingAgreement dataProcessingAgreement, LifeCycleEventType changeType)
         {
-            _domainEvents.Raise(new DataProcessingAgreementChanged(dataProcessingAgreement,
-                changeType));
+            _domainEvents.Raise(new EntityLifeCycleEvent<DataProcessingAgreement>(changeType, dataProcessingAgreement));
         }
-
     }
 }
