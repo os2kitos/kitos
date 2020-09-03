@@ -44,6 +44,7 @@ namespace Core.DomainServices.Repositories.BackgroundJobs
                 throw new ArgumentNullException(nameof(pendingUpdate));
 
             _repository.Delete(pendingUpdate);
+            _repository.Save();
         }
 
         public IQueryable<PendingReadModelUpdate> GetMany(PendingReadModelUpdateSourceCategory category, int maxItems)
