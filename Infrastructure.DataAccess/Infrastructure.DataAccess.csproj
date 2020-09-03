@@ -605,6 +605,10 @@
     <Compile Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.designer.cs">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.cs" />
+    <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.designer.cs">
+      <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -983,16 +987,11 @@
     <EmbeddedResource Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.resx">
       <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </EmbeddedResource>
-<<<<<<< HEAD
-    <EmbeddedResource Include="Migrations\202009011252210_Introduce_DataprocessingAgreement.resx">
-      <DependentUpon>202009011252210_Introduce_DataprocessingAgreement.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009030716015_Add_PendingReadModelUpdates.resx">
-      <DependentUpon>202009030716015_Add_PendingReadModelUpdates.cs</DependentUpon>
-=======
     <EmbeddedResource Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.resx">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
->>>>>>> feature-1082-Local-Admin-Toggle-DataProcessorAgreement
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.resx">
+      <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

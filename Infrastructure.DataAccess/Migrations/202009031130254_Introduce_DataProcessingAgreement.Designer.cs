@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_PendingReadModelUpdates : IMigrationMetadata
+    public sealed partial class Introduce_DataProcessingAgreement : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_PendingReadModelUpdates));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Introduce_DataProcessingAgreement));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009030716015_Add_PendingReadModelUpdates"; }
+            get { return "202009031130254_Introduce_DataProcessingAgreement"; }
         }
         
         string IMigrationMetadata.Source

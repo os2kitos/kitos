@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Introduce_DataprocessingAgreement : DbMigration
+    public partial class Introduce_DataProcessingAgreement : DbMigration
     {
         public override void Up()
         {
@@ -43,6 +43,17 @@
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
+            CreateTable(
+                "dbo.PendingReadModelUpdates",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        SourceId = c.Int(nullable: false),
+                        CreatedAt = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        Category = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id);
+            
         }
         
         public override void Down()
@@ -59,6 +70,7 @@
             DropIndex("dbo.DataProcessingAgreementReadModels", new[] { "SourceEntityId" });
             DropIndex("dbo.DataProcessingAgreementReadModels", new[] { "OrganizationId" });
             DropIndex("dbo.DataProcessingAgreementReadModels", "DataProcessingAgreementReadModel_Index_Name");
+            DropTable("dbo.PendingReadModelUpdates");
             DropTable("dbo.DataProcessingAgreements");
             DropTable("dbo.DataProcessingAgreementReadModels");
         }
