@@ -44,7 +44,6 @@ describe("Local admin is able to toggle DataProcessing", () => {
             .then(() => expectSystemGdprDataProcessingViewToBe(isDataProcessingEnabled))
             .then(() => dpPageHelper.getToggleDataProcessingCheckbox().click())
             .then(() => browser.waitForAngular())
-            .then(() => browser.refresh())
             .then(() => expectCheckboxValueToBe(!isDataProcessingEnabled))
             .then(() => expectSystemGdprDataProcessingViewToBe(!isDataProcessingEnabled) )
             .then(() => checkSystemGdprPageDataProcessingVisibility(!isDataProcessingEnabled, systemName));
