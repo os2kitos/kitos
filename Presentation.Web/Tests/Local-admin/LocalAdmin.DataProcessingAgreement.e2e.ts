@@ -2,8 +2,10 @@
 import DPA = require("../PageObjects/Local-admin/LocalDataProcessingAgreement.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import NavigationBarHelper = require("../object-wrappers/navigationBarWrapper");
-
-var checkboxBool;
+import SystemCatalogHelper = require("../Helpers/SystemCatalogHelper");
+import SystemUsageHelper = require("../Helpers/SystemUsageHelper");
+import LocalItSystemNavigation = require("../Helpers/SideNavigation/LocalItSystemNavigation");
+import SystemTabGDPR = require("../PageObjects/it-system/Usage/Tabs/ItSystemUsageGDPR.po");
 
 describe("Local admin is able to toggle DataProcessingAgreement", () => {
 
@@ -11,10 +13,15 @@ describe("Local admin is able to toggle DataProcessingAgreement", () => {
     var dpaPageHelper = new DPA();
     var testFixture = new TestFixtureWrapper();
     var naviHelper = new NavigationBarHelper();
+    var systemName = createItSystemName(1);
 
     beforeAll(() => {
-        loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
+        loginHelper.loginAsGlobalAdmin();
+        SystemCatalogHelper.createSystem(systemName);
+        SystemCatalogHelper.createLocalSystem(systemName);
+        loginHelper.logout();
+        loginHelper.loginAsLocalAdmin();
     });
 
     afterAll(() => {
@@ -25,27 +32,38 @@ describe("Local admin is able to toggle DataProcessingAgreement", () => {
     it("Option to toggle DataProcessingAgreement is visible", () => {
         dpaPageHelper.getPage();
         browser.waitForAngular();
-        expect((dpaPageHelper.dpaCheckbox).isPresent()).toBe(true);
+        expect((dpaPageHelper.getToggleDataProcessingAgreementCheckbox()).isPresent()).toBe(true);
     });
 
     it("Is able to toggle DataProcessingAgreement checkbox", () => {
-        dpaPageHelper.getPage().then(() => {
-            browser.waitForAngular();
-        }).then(() => {
-            checkboxBool = dpaPageHelper.dpaCheckbox.isSelected();
-            expect((dpaPageHelper.dpaCheckbox).isSelected()).toBe(checkboxBool);
-        }).then(() => {
-            return expect((naviHelper.headerNavigations.dataProcessingAgreementButton).isPresent()).toBe(checkboxBool);
-        }).then(() => {
-            dpaPageHelper.dpaCheckbox.click();
-        }).then(() => {
-            expect((dpaPageHelper.dpaCheckbox).isSelected()).toBe(!checkboxBool);
-        }).then(() => {
-            return expect((naviHelper.headerNavigations.dataProcessingAgreementButton).isPresent()).toBe(!checkboxBool);
-        });
+        var boolCheckBox;
+        dpaPageHelper.getPage()
+            .then(() => browser.waitForAngular())
+            .then(async () => boolCheckBox = await dpaPageHelper.getToggleDataProcessingAgreementCheckbox().isSelected())
+            .then(() => checkSystemGdprPageDataProcessingAgreementVisibility(boolCheckBox, systemName)).then(() => dpaPageHelper.getPage())
+            .then(() => browser.waitForAngular())
+            .then(() => expect((dpaPageHelper.getToggleDataProcessingAgreementCheckbox()).isSelected()).toBe(boolCheckBox))
+            .then(() => expect((naviHelper.headerNavigations.dataProcessingAgreementButton).isPresent()).toBe(boolCheckBox))
+            .then(() => dpaPageHelper.getToggleDataProcessingAgreementCheckbox().click())
+            .then(() => browser.waitForAngular())
+            .then(() => browser.refresh())
+            .then(() => browser.waitForAngular())
+            .then(() => expect((dpaPageHelper.getToggleDataProcessingAgreementCheckbox()).isSelected()).toBe(!boolCheckBox))
+            .then(() => expect((naviHelper.headerNavigations.dataProcessingAgreementButton).isPresent()).toBe(!boolCheckBox))
+            .then(() => expect(checkSystemGdprPageDataProcessingAgreementVisibility(!boolCheckBox, systemName)));
 
     });
 
+    function checkSystemGdprPageDataProcessingAgreementVisibility(visibility: boolean, sysName: string) {
+        SystemUsageHelper.openLocalSystem(sysName)
+            .then(() => LocalItSystemNavigation.openGDPRPage())
+            .then(() => browser.waitForAngular())
+            .then(() => expect((SystemTabGDPR.getDataProcessingAgreementView()).isPresent()).toBe(visibility));
+    }
+
+    function createItSystemName(index: number) {
+        return `ItSystem${new Date().getTime()}_${index}`;
+    }
 });
 
 

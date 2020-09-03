@@ -13,14 +13,12 @@ class LocalProject implements PageObject {
         return this.navigationHelper.getPage("/#/local-config/DataProcessingAgreement");
     }
 
-    dpaCheckbox = element(this.byDataElementType(this.consts.dataProcessingAgreementChecbox));
-
     getToggleDataProcessingAgreementCheckbox() {
-        return this.dpaCheckbox; 
+        return element(this.byDataElementType(this.consts.dataProcessingAgreementChecbox)); 
     }
 
     waitForDataProcessingAgreementCheckboxVisibility(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.dpaCheckbox);
+        return this.ec.visibilityOf(element(this.byDataElementType(this.consts.dataProcessingAgreementChecbox)));
     }
 }
 
