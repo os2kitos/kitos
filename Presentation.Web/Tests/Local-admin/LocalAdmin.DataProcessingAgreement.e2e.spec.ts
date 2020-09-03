@@ -30,9 +30,9 @@ describe("Local admin is able to toggle DataProcessingAgreement", () => {
     });
 
     it("Option to toggle DataProcessingAgreement is visible", () => {
-        dpaPageHelper.getPage();
-        browser.waitForAngular();
-        expect((dpaPageHelper.getToggleDataProcessingAgreementCheckbox()).isPresent()).toBe(true);
+        dpaPageHelper.getPage()
+            .then(() => browser.waitForAngular())
+            .then(() => expect((dpaPageHelper.getToggleDataProcessingAgreementCheckbox()).isPresent()).toBe(true));
     });
 
     it("Is able to toggle DataProcessingAgreement checkbox", () => {
