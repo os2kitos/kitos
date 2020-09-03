@@ -31,18 +31,15 @@ describe("Local admin is able to toggle DataProcessing", () => {
 
     it("Option to toggle DataProcessing is visible", () => {
         dpPageHelper.getPage()
-            .then(() => browser.waitForAngular())
             .then(() => expect((dpPageHelper.getToggleDataProcessingCheckbox()).isPresent()).toBe(true));
     });
 
     it("Is able to toggle DataProcessing checkbox", () => {
         var isDataProcessingEnabled;
         dpPageHelper.getPage()
-            .then(() => browser.waitForAngular())
             .then(async () => isDataProcessingEnabled = await dpPageHelper.getToggleDataProcessingCheckbox().isSelected())
             .then(() => checkSystemGdprPageDataProcessingVisibility(isDataProcessingEnabled, systemName))
             .then(() => dpPageHelper.getPage())
-            .then(() => browser.waitForAngular())
             .then(() => expectCheckboxValueToBe(isDataProcessingEnabled))
             .then(() => expectSystemGdprDataProcessingViewToBe(isDataProcessingEnabled))
             .then(() => dpPageHelper.getToggleDataProcessingCheckbox().click())
@@ -57,7 +54,6 @@ describe("Local admin is able to toggle DataProcessing", () => {
     function checkSystemGdprPageDataProcessingVisibility(visibility: boolean, sysName: string) {
         SystemUsageHelper.openLocalSystem(sysName)
             .then(() => LocalItSystemNavigation.openGDPRPage())
-            .then(() => browser.waitForAngular())
             .then(() => expect((SystemTabGDPR.getDataProcessingAgreementView()).isPresent()).toBe(visibility));
     }
 
