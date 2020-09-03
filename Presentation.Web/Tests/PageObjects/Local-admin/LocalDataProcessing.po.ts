@@ -10,15 +10,11 @@ class LocalProject implements PageObject {
     private byDataElementType = new CssLocatorHelper().byDataElementType;
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/local-config/DataProcessingAgreement");
+        return this.navigationHelper.getPage("/#/local-config/DataProcessing");
     }
 
-    getToggleDataProcessingAgreementCheckbox() {
-        return element(this.byDataElementType(this.consts.dataProcessingAgreementChecbox)); 
-    }
-
-    waitForDataProcessingAgreementCheckboxVisibility(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(element(this.byDataElementType(this.consts.dataProcessingAgreementChecbox)));
+    getToggleDataProcessingCheckbox() {
+        return element(this.byDataElementType(this.consts.dataProcessingCheckbox)); 
     }
 }
 

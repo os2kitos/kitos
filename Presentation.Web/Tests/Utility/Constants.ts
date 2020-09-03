@@ -84,7 +84,7 @@
     readonly navigationSystemButton = "systemButton";
     readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
-    readonly navigationDataProcessingAgreementButton = "dataProcessingAgreementButton";
+    readonly navigationDataProcessingButton = "dataProcessingButton";
     readonly navigationReportsButton = "reportButton";
 
     readonly navigationDropdown = "dropdown-button";
@@ -202,7 +202,7 @@
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
-    readonly dataProcessingAgreementChecbox = "DataProcessingAgreementCheckbox";
+    readonly dataProcessingCheckbox = "DataProcessingCheckbox";
 
 }
 export = Constants;

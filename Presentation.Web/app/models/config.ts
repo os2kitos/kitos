@@ -4,7 +4,7 @@
         ShowItProjectModule: boolean;
         ShowItSystemModule: boolean;
         ShowItContractModule: boolean;
-        ShowDataProcessingAgreement: boolean;
+        ShowDataProcessing: boolean;
         ItSupportModuleNameId: number;
         ItSupportGuide: string;
         ShowTabOverview: boolean;

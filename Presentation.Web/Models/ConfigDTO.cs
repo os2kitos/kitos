@@ -7,7 +7,7 @@ namespace Presentation.Web.Models
         public bool ShowItProjectModule { get; set; }
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }
-        public bool ShowDataProcessingAgreement { get; set; }
+        public bool ShowDataProcessing { get; set; }
 
         /* SHOW/HIDE 'IT' PREFIX */
         public bool ShowItProjectPrefix { get; set; }

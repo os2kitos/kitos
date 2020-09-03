@@ -8,7 +8,7 @@ Content:
 
 BEGIN
 UPDATE [Config]
-SET ShowDataProcessingAgreement = 1
+SET ShowDataProcessing = 1
 END
 
 
