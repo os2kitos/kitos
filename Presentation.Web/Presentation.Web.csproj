@@ -358,6 +358,7 @@
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Extensions\AutoMapperExtensions.cs" />
+    <Compile Include="Hangfire\KeepReadModelsInSyncProcess.cs" />
     <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireTopOnOdataThroughKitosTokenAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />

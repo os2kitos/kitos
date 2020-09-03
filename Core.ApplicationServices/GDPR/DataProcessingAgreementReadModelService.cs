@@ -7,12 +7,12 @@ using Core.DomainServices.Repositories.GDPR;
 
 namespace Core.ApplicationServices.GDPR
 {
-    public class DataProcessingAgreementReadService : IDataProcessingAgreementReadService
+    public class DataProcessingAgreementReadModelService : IDataProcessingAgreementReadModelService
     {
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingAgreementReadModelRepository _repository;
 
-        public DataProcessingAgreementReadService(IAuthorizationContext authorizationContext, IDataProcessingAgreementReadModelRepository repository)
+        public DataProcessingAgreementReadModelService(IAuthorizationContext authorizationContext, IDataProcessingAgreementReadModelRepository repository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;

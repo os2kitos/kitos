@@ -3,6 +3,7 @@
     public enum KernelMode
     {
         Web,
-        HangFireJob
+        HangFireJob,
+        Thread
     }
 }

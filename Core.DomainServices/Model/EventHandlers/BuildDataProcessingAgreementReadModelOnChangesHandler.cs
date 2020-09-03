@@ -1,5 +1,7 @@
 ﻿using System;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
 
@@ -8,10 +10,17 @@ namespace Core.DomainServices.Model.EventHandlers
     public class BuildDataProcessingAgreementReadModelOnChangesHandler : IDomainEventHandler<EntityLifeCycleEvent<DataProcessingAgreement>>
     {
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
+        private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _mapper;
+        private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
 
-        public BuildDataProcessingAgreementReadModelOnChangesHandler(IDataProcessingAgreementReadModelRepository readModelRepository)
+        public BuildDataProcessingAgreementReadModelOnChangesHandler(
+            IDataProcessingAgreementReadModelRepository readModelRepository,
+            IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> mapper,
+            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository)
         {
             _readModelRepository = readModelRepository;
+            _mapper = mapper;
+            _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
         }
 
         public void Handle(EntityLifeCycleEvent<DataProcessingAgreement> domain)
@@ -24,19 +33,7 @@ namespace Core.DomainServices.Model.EventHandlers
                     CreateNewModel(dataProcessingAgreement);
                     break;
                 case LifeCycleEventType.Updated:
-                    var readModel = _readModelRepository.GetBySourceId(dataProcessingAgreement.Id);
-                    if (readModel.HasValue)
-                    {
-                        //Update the existing model
-                        var readModelValue = readModel.Value;
-                        BuildFromSource(readModelValue, dataProcessingAgreement);
-                        _readModelRepository.Update(readModelValue);
-                    }
-                    else
-                    {
-                        //Not created yet - build it
-                        CreateNewModel(dataProcessingAgreement);
-                    }
+                    _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.From(dataProcessingAgreement));
                     break;
                 case LifeCycleEventType.Deleted:
                     _readModelRepository.DeleteBySourceId(dataProcessingAgreement.Id);
@@ -55,12 +52,10 @@ namespace Core.DomainServices.Model.EventHandlers
             _readModelRepository.Add(model);
         }
 
-        private static void BuildFromSource(DataProcessingAgreementReadModel model,
+        private void BuildFromSource(DataProcessingAgreementReadModel model,
             DataProcessingAgreement dataProcessingAgreement)
         {
-            model.OrganizationId = dataProcessingAgreement.OrganizationId;
-            model.SourceEntityId = dataProcessingAgreement.Id;
-            model.Name = dataProcessingAgreement.Name;
+            _mapper.Apply(dataProcessingAgreement, model);
         }
     }
 }

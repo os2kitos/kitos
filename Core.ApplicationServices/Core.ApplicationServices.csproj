@@ -109,9 +109,9 @@
     <Compile Include="Authorization\UserContextFactory.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
-    <Compile Include="GDPR\DataProcessingAgreementReadService.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingAgreementApplicationService.cs" />
-    <Compile Include="GDPR\IDataProcessingAgreementReadService.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementApplicationService.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />

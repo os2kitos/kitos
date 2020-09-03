@@ -11,7 +11,7 @@
     <RootNamespace>Infrastructure.DataAccess</RootNamespace>
     <AssemblyName>Infrastructure.DataAccess</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -605,6 +605,10 @@
     <Compile Include="Migrations\202009011252210_Introduce_DataprocessingAgreement.designer.cs">
       <DependentUpon>202009011252210_Introduce_DataprocessingAgreement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009030716015_Add_PendingReadModelUpdates.cs" />
+    <Compile Include="Migrations\202009030716015_Add_PendingReadModelUpdates.designer.cs">
+      <DependentUpon>202009030716015_Add_PendingReadModelUpdates.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -985,6 +989,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009011252210_Introduce_DataprocessingAgreement.resx">
       <DependentUpon>202009011252210_Introduce_DataprocessingAgreement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009030716015_Add_PendingReadModelUpdates.resx">
+      <DependentUpon>202009030716015_Add_PendingReadModelUpdates.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

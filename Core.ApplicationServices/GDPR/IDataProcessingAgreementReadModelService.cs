@@ -4,7 +4,7 @@ using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.GDPR
 {
-    public interface IDataProcessingAgreementReadService
+    public interface IDataProcessingAgreementReadModelService
     {
         Result<IQueryable<DataProcessingAgreementReadModel>, OperationError> GetByOrganizationId(int organizationId);
     }

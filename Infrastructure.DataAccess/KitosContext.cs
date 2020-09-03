@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
@@ -143,6 +144,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
         public DbSet<DataProcessingAgreement> DataProcessingAgreements { get; set; }
         public DbSet<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
+        public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

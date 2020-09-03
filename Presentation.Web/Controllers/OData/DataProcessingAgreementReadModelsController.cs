@@ -13,11 +13,11 @@ namespace Presentation.Web.Controllers.OData
     [ODataRoutePrefix("Organizations({organizationId})/DataProcessingAgreementReadModels")]
     public class DataProcessingAgreementReadModelsController : BaseOdataController
     {
-        private readonly IDataProcessingAgreementReadService _dataProcessingAgreementReadService;
+        private readonly IDataProcessingAgreementReadModelService _dataProcessingAgreementReadModelService;
 
-        public DataProcessingAgreementReadModelsController(IDataProcessingAgreementReadService dataProcessingAgreementReadService)
+        public DataProcessingAgreementReadModelsController(IDataProcessingAgreementReadModelService dataProcessingAgreementReadModelService)
         {
-            _dataProcessingAgreementReadService = dataProcessingAgreementReadService;
+            _dataProcessingAgreementReadModelService = dataProcessingAgreementReadModelService;
         }
 
         [EnableQuery]
@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult Get([FromODataUri]int organizationId)
         {
             return
-                _dataProcessingAgreementReadService
+                _dataProcessingAgreementReadModelService
                     .GetByOrganizationId(organizationId)
                     .Match(onSuccess: Ok, onFailure: FromOperationError);
         }

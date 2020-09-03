@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.ExternalLinks;
+using Core.BackgroundJobs.Model.ReadModels;
 using Core.DomainModel.Result;
 using Infrastructure.Services.BackgroundJobs;
 using Serilog;
@@ -12,18 +13,26 @@ namespace Core.BackgroundJobs.Services
     {
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
+        private readonly RebuildDataProcessingAgreementReadModelsBatchJob _rebuildDataProcessingAgreementReadModels;
 
         public BackgroundJobLauncher(
             ILogger logger,
-            CheckExternalLinksBackgroundJob checkExternalLinksJob)
+            CheckExternalLinksBackgroundJob checkExternalLinksJob,
+            RebuildDataProcessingAgreementReadModelsBatchJob rebuildDataProcessingAgreementReadModels)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
+            _rebuildDataProcessingAgreementReadModels = rebuildDataProcessingAgreementReadModels;
         }
 
         public async Task LaunchLinkCheckAsync()
         {
             await Launch(_checkExternalLinksJob);
+        }
+
+        public async Task LaunchUpdateDataProcessingAgreementReadModels()
+        {
+            await Launch(_rebuildDataProcessingAgreementReadModels);
         }
 
         private async Task Launch(IAsyncBackgroundJob job)
