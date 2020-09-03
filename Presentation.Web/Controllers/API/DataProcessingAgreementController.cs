@@ -5,8 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.GDPR;
-using Core.ApplicationServices.Model.GDPR;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;

@@ -466,6 +466,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-archiveduty-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
+    <TypeScriptCompile Include="app\services\dataProcessingAgreementService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
@@ -1363,6 +1364,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="app\models\data-processing\" />
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Tests\Models\" />
