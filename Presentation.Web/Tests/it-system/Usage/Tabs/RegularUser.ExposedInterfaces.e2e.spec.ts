@@ -59,7 +59,6 @@ describe("Regular user can",
             () => {
                 ItSystemHelper.openSystem(itSystemName)
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
-                    .then(() => browser.waitForAngular())
                     .then(() => console.log("Checking for correct url"))
                     .then(() => expect(browser.getCurrentUrl()).toMatch(urlRegex()));
             });

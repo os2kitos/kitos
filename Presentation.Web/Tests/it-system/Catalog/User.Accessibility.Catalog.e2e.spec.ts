@@ -8,6 +8,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     var pageObject = new ItSystemEditPo();
     var testFixture = new TestFixtureWrapper();
     var findCatalogColumnsFor = SystemCatalogHelper.findCatalogColumnsFor;
+    var until = protractor.ExpectedConditions;
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -24,85 +25,50 @@ describe("ITSystem Catalog accessibility tests", () => {
     it("Local Admin can still delete IT-system Catalogs that have been created locally", () => {
         const systemName = createSystemName();
         loginHelper.loginAsGlobalAdmin()
+            .then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => expectCreateButtonVisibility(true))
+            .then(() => expectNoSystemWithName(systemName))
+            .then(() => SystemCatalogHelper.createSystem(systemName))
             .then(() => {
-                return loadPage();
-            }).then(() => {
-                return waitForKendoGrid();
-            }).then(() => {
-                return expectCreateButtonVisibility(true);
-            }).then(() => {
-                return expectNoSystemWithName(systemName);
-            }).then(() => {
-                console.log("Creating system");
-                return SystemCatalogHelper.createSystem(systemName);
-            }).then(() => {
                 console.log("Deleting cookies");
-                return testFixture.cleanupState();
+                testFixture.cleanupState();
             }).then(() => {
                 console.log("Logging in as Local Admin");
-                return loginHelper.loginAsLocalAdmin();
-            }).then(() => {
-                return loadPage();
-            }).then(() => {
-                return waitForKendoGrid();
-            }).then(() => {
-                return expectSystemWithName(systemName);
-            }).then(() => {
-                console.log("Deleting system");
-                return SystemCatalogHelper.deleteSystem(systemName);
-            }).then(() => {
-                return loadPage();
-            }).then(() => {
-                return waitForKendoGrid();
-            }).then(() => {
+                loginHelper.loginAsLocalAdmin();
+            }).then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => expectSystemWithName(systemName))
+            .then(() => SystemCatalogHelper.deleteSystem(systemName))
+            .then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => {
                 console.log("Checking that the catalog have been deleted");
-                return expectNoSystemWithName(systemName);
+                expectNoSystemWithName(systemName);
             });
     });
 
         it("Global Admin can create and delete It-system catalog", () => {
             const systemName = createSystemName();
              loginHelper.loginAsGlobalAdmin()
-            .then(() => {
-                return loadPage();
-            })
-            .then(() => {
-                return waitForKendoGrid();
-            })
-            .then(() => {
-                return expectCreateButtonVisibility(true);
-            })
-            .then(() => {
-                return expectNoSystemWithName(systemName);
-            })
-            .then(() => {
-                console.log("Creating system");
-                return SystemCatalogHelper.createSystem(systemName);
-            })
+            .then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => expectCreateButtonVisibility(true))
+            .then(() => expectNoSystemWithName(systemName))
+            .then(() => SystemCatalogHelper.createSystem(systemName))
             .then(() => {
                 console.log("Loading page after catalog creation");
-                return loadPage();
+                loadPage();
             })
-            .then(() => {
-                return waitForKendoGrid();
-            })
-            .then(() => {
-                return expectSystemWithName(systemName);
-            })
-            .then(() => {
-                console.log("Deleting catalog");
-                return SystemCatalogHelper.deleteSystem(systemName);
-            })
+            .then(() => waitForKendoGrid())
+            .then(() => expectSystemWithName(systemName))
+            .then(() => SystemCatalogHelper.deleteSystem(systemName))
             .then(() => {
                 console.log("Verify that catalog is deleted");
-                return loadPage();
+                loadPage();
             })
-            .then(() => {
-                return waitForKendoGrid();
-            })
-            .then(() => {
-                return expectNoSystemWithName(systemName);
-            });
+            .then(() => waitForKendoGrid())
+            .then(() => expectNoSystemWithName(systemName));
     });
 
     function expectCreateButtonVisibility(expectedEnabledState: boolean){
@@ -125,6 +91,7 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     function expectSystemWithName(name: string) {
         console.log("Making sure " + name + " does exist");
+        browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name));
         return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
     }
 

@@ -20,7 +20,6 @@ describe("Regular user has access to features in the contract overview", () => {
 
     beforeEach(() => {
         pageObject.getPage()
-            .then(() => browser.waitForAngular())
             .then(() => browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds));
     });
 
