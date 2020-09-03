@@ -351,6 +351,7 @@
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
@@ -420,6 +421,8 @@
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
+    <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
