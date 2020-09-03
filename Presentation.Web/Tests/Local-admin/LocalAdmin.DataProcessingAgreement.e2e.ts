@@ -48,7 +48,6 @@ describe("Local admin is able to toggle DataProcessingAgreement", () => {
             .then(() => dpaPageHelper.getToggleDataProcessingAgreementCheckbox().click())
             .then(() => browser.waitForAngular())
             .then(() => browser.refresh())
-            .then(() => browser.waitForAngular())
             .then(() => expectCheckboxValueTobe(!boolCheckBox))
             .then(() => expectSystemGdprDataProcessingAgreementViewToBe(!boolCheckBox) )
             .then(() => checkSystemGdprPageDataProcessingAgreementVisibility(!boolCheckBox, systemName));
