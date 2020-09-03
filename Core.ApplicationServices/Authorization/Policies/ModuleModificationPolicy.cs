@@ -74,7 +74,7 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsSystemModuleAdmin;
             if (target is IReportModule _)
                 yield return IsReportModuleAdmin;
-            if (target is IDataProcessingAgreementModule _)
+            if (target is IDataProcessingModule _)
             {
                 yield return IsSystemModuleAdmin;
                 yield return IsContractModuleAdmin;
