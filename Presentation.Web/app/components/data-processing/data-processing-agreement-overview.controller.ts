@@ -167,7 +167,7 @@
                 //TODO: Calls for generalization
                 toolbar: [
                     {
-                        //TODO: UI hertil
+                        //TODO: call a function which transitions to the create dialog
                         name: "createDataProcessing",
                         text: "Opret Databehandleraftale",
                         template:
