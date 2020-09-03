@@ -15,6 +15,6 @@
 
         public int SourceEntityId { get; set; }
         
-        public virtual DataProcessingAgreement SourceEntity { get; set; } //TODO: Prevent expand on sourceentity!!
+        public virtual DataProcessingAgreement SourceEntity { get; set; }
     }
 }
