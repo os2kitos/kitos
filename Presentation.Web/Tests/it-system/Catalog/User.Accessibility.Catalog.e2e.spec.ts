@@ -74,7 +74,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     });
 
     function expectCreateButtonVisibility(expectedEnabledState: boolean){
-        console.log("Expecting createCatalog visibility to be:" + expectedEnabledState);
+        console.log(`Expecting createCatalog visibility to be:${expectedEnabledState}`);
         return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
     }
 
@@ -88,17 +88,17 @@ describe("ITSystem Catalog accessibility tests", () => {
     }
 
     function createSystemName() {
-        return "System" + new Date().getTime();
+        return `System${new Date().getTime()}`;
     }
 
     function expectSystemWithName(name: string) {
-        console.log("Making sure " + name + " does exist");
-        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name), waitUpTo.twentySeconds ,'Kendogrid did not load data or the data ' + name + ' was not found')
+        console.log(`Making sure ${name} does exist`);
+        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name), waitUpTo.twentySeconds ,`Kendo grid did not load data or the data ${name} was not found`)
             .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
     }
 
     function expectNoSystemWithName(name: string) {
-        console.log("Making sure " + name + " does not exist");
+        console.log(`Making sure ${name} does not exist`);
         return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
     }
 });
