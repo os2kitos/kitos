@@ -2,6 +2,7 @@
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po")
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
+import WaitTimers = require("../../Utility/WaitTimers");
 
 describe("ITSystem Catalog accessibility tests", () => {
     var loginHelper = new Login();
@@ -9,6 +10,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     var testFixture = new TestFixtureWrapper();
     var findCatalogColumnsFor = SystemCatalogHelper.findCatalogColumnsFor;
     var until = protractor.ExpectedConditions;
+    var waitUpTo = new WaitTimers();
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -91,7 +93,7 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     function expectSystemWithName(name: string) {
         console.log("Making sure " + name + " does exist");
-        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name))
+        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name), waitUpTo.twentySeconds ,'Kendogrid did not load data or the data ' + name + ' was not found')
             .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
     }
 
