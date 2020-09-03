@@ -91,8 +91,8 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     function expectSystemWithName(name: string) {
         console.log("Making sure " + name + " does exist");
-        browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name));
-        return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
+        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name))
+            .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
     }
 
     function expectNoSystemWithName(name: string) {
