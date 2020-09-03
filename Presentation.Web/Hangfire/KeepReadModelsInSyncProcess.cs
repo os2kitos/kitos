@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Hangfire.Server;
 using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,10 @@ namespace Presentation.Web.Hangfire
                 IsBackground = true
             };
             thread.Start();
+
+            //Intentional context switch
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+
             thread.Join();
         }
     }
