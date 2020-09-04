@@ -745,6 +745,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
