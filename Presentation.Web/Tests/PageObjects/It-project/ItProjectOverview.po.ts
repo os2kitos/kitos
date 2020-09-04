@@ -2,10 +2,11 @@
 import KendoToolbarHelper = require("../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper")
 import NavigationHelper = require("../../Utility/NavigationHelper")
+import KendoLoaderHelper = require("../../Helpers/KendoLoaderHelper")
 
 class ItProjectOverview implements IPageObject {
     private navigationHelper = new NavigationHelper();
-    private ec = protractor.ExpectedConditions;
+    private kendoLoaderHelper = new KendoLoaderHelper();
 
     public getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/project/overview");
@@ -14,9 +15,9 @@ class ItProjectOverview implements IPageObject {
     public kendoToolbarHelper = new KendoToolbarHelper();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 
-    public waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().projectName.first());
-    }
+     waitForKendoGrid() {
+        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().projectName.first());
+     }
 
     getCreateProjectButton() {
         return this.kendoToolbarWrapper.headerButtons().createProject;

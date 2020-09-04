@@ -85,7 +85,8 @@ class SystemCatalogHelper {
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
+        return SystemCatalogHelper.pageObject.waitForKendoGrid();
+
     }
 }
 export = SystemCatalogHelper;

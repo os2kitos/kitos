@@ -1,9 +1,7 @@
 ﻿import ItSystemOverview = require("../PageObjects/it-system/Usage/ItSystemUsageOverview.po");
-import WaitTimers = require("../Utility/WaitTimers");
 
 class SystemUsageHelper {
     private static pageObject = new ItSystemOverview();
-    private static waitUpTo = new WaitTimers();
 
     public static openLocalSystem(name: string) {
         console.log(`open details for local system: ${name}`);
@@ -18,7 +16,7 @@ class SystemUsageHelper {
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(SystemUsageHelper.pageObject.waitForKendoGrid(), SystemUsageHelper.waitUpTo.twentySeconds);
+        return this.pageObject.waitForKendoGrid();
     }
 }
 export = SystemUsageHelper;

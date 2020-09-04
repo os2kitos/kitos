@@ -93,8 +93,7 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     function expectSystemWithName(name: string) {
         console.log(`Making sure ${name} does exist`);
-        return browser.wait(until.textToBePresentInElement(findCatalogColumnsFor(name).first(), name), waitUpTo.twentySeconds ,`Kendo grid did not load data or the data ${name} was not found`)
-            .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
+        expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
     }
 
     function expectNoSystemWithName(name: string) {
