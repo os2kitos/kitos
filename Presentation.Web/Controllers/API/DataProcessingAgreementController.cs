@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.GDPR;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -23,6 +24,25 @@ namespace Presentation.Web.Controllers.API
         {
             _dataProcessingAgreementApplicationService = dataProcessingAgreementApplicationService;
         }
+
+        protected override IEntity GetEntity(int id) => _dataProcessingAgreementApplicationService.Get(id).Match(agreement => agreement, _ => null);
+
+        protected override bool AllowCreateNewEntity(int organizationId) => AllowCreate<DataProcessingAgreement>(organizationId);
+
+        [HttpGet]
+        [Route]
+        [InternalApi]
+        public override HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId) => base.GetAccessRights(getEntitiesAccessRights, organizationId);
+
+        [HttpGet]
+        [Route]
+        [InternalApi]
+        public override HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights) => base.GetAccessRightsForEntity(id, getEntityAccessRights);
+
+        [HttpPost]
+        [Route]
+        [InternalApi]
+        public override HttpResponseMessage PostSearchAccessRightsForEntityList(int[] ids, bool? getEntityListAccessRights) => base.PostSearchAccessRightsForEntityList(ids, getEntityListAccessRights);
 
         [HttpPost]
         [Route]

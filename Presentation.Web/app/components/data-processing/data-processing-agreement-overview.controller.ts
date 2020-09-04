@@ -1,5 +1,7 @@
 ﻿module Kitos.DataProcessing.Agreement.Overview {
     "use strict";
+    import IDataProcessingAgreement = Models.DataProcessing.IDataProcessingAgreement;
+    
 
     export interface IOverviewController {
         mainGrid: any;
@@ -131,7 +133,7 @@
 
         private activate() {
             this.canCreate = this.userAccessRights.canCreate;
-            const mainGridOptions: IKendoGridOptions<any> = { //TODO: Add the read-model and use it here
+            const mainGridOptions: IKendoGridOptions<IDataProcessingAgreement> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -239,7 +241,7 @@
                         },
                         width: 340,
                         persistId: "dpaName",
-                        template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`, //TODO: Add the correct state here!
+                        template: dataItem => `<a data-ui-sref="data-processing.edit.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
@@ -262,7 +264,7 @@
             this.mainGridOptions = mainGridOptions;
         }
 
-        private exportToExcel = (e: IKendoGridExcelExportEvent<any>) => { //TODO: Update to use the model!
+        private exportToExcel = (e: IKendoGridExcelExportEvent<IDataProcessingAgreement>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
     }
@@ -276,15 +278,14 @@
                     templateUrl: "app/components/data-processing/data-processing-agreement-overview.view.html",
                     controller: OverviewController,
                     controllerAs: "vm",
-                    resolve: {
+                    resolve: { 
                         user: [
                             "userService", userService => userService.getUser()
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
-                            authorizationServiceFactory
-                                .createProjectAuthorization() //TODO: Create endpoint in backend and an entry here!
-                                .getOverviewAuthorization()
-                        ],
+                            authorizationServiceFactory 
+                                .createDataProcessingAgreementAuthorization()
+                                .getOverviewAuthorization()]
                     }
                 });
             }

@@ -131,71 +131,9 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// GET api/T/GetAccessRights
-        /// Checks what access rights the user has for the given entities
-        /// </summary>
-        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
-        {
-            if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
-            {
-                return Forbidden();
-            }
-            return Ok(new EntitiesAccessRightsDTO
-            {
-                CanCreate = AllowCreate<TModel>(organizationId),
-                CanView = true
-            });
-        }
+        protected override IEntity GetEntity(int id) => Repository.GetByKey(id);
 
-        /// <summary>
-        /// GET api/T/id?GetAccessRightsForEntity
-        /// Checks what access rights the user has for the given entity
-        /// </summary>
-        /// <param name="id">The id of the object</param>
-        public HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
-        {
-            var item = Repository.GetByKey(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return Ok(GetAccessRightsForEntity(item));
-        }
-
-        private EntityAccessRightsDTO GetAccessRightsForEntity(TModel item)
-        {
-            return new EntityAccessRightsDTO
-            {
-                Id = item.Id,
-                CanDelete = AllowDelete(item),
-                CanEdit = AllowModify(item),
-                CanView = AllowRead(item)
-            };
-        }
-
-        /// <summary>
-        /// POST api/T/idListAsCsv?getEntityListAccessRights
-        /// Uses POST verb to allow use of body for potentially long list of ids
-        /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
-        /// </summary>
-        /// <param name="ids">The ids of the objects</param>
-        public HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
-        {
-            if (ids == null || ids.Length == 0)
-            {
-                return BadRequest();
-            }
-
-            return Ok(
-                ids
-                    .Distinct()
-                    .Select(id => Repository.GetByKey(id))
-                    .Where(entity => entity != null)
-                    .Select(GetAccessRightsForEntity)
-                    .ToList()
-            );
-        }
+        protected override bool AllowCreateNewEntity(int organizationId) => AllowCreate<TModel>(organizationId);
 
         protected virtual TModel PostQuery(TModel item)
         {
