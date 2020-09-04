@@ -4,18 +4,19 @@ import SubNavigationBarWrapper = require("../../object-wrappers/SubNavigationBar
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import PageObject = require("../IPageObject.po");
+import KendoLoaderHelper = require("../../Helpers/KendoLoaderHelper");
 
 class ItContractOverview implements PageObject {
-    private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
+    private KendoLoaderHelper = new KendoLoaderHelper();
     public cssHelper = new CssHelper();
 
     getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/contract/plan");
     }
 
-    waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().contractName.first());
+    waitForKendoGrid() {
+        return this.KendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().contractName.first());
     }
 
     kendoToolbarWrapper = new KendoToolbarWrapper();

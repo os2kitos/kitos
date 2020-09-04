@@ -755,6 +755,7 @@
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\OrgHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\RelationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
