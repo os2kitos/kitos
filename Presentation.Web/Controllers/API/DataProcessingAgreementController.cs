@@ -41,11 +41,6 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route]
-        [InternalApi]
-        public override HttpResponseMessage PostSearchAccessRightsForEntityList(int[] ids, bool? getEntityListAccessRights) => base.PostSearchAccessRightsForEntityList(ids, getEntityListAccessRights);
-
-        [HttpPost]
-        [Route]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<DataProcessingAgreementDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -121,18 +116,18 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [InternalApi]
-        [Route("validate/{organizationId}/can-create")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage CanCreate(int organizationId, [FromBody] SingleValueDTO<string> value)
+        public HttpResponseMessage CanCreate(int orgId, string checkname)
         {
             return _dataProcessingAgreementApplicationService
-                .ValidateSuggestedNewAgreement(organizationId, value.Value)
+                .ValidateSuggestedNewAgreement(orgId, checkname)
                 .Select(FromOperationError)
                 .GetValueOrFallback(Ok());
         }

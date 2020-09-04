@@ -11,6 +11,7 @@
         clearGridProfile(): void;
         doesGridProfileExist(): boolean;
         clearOptions(): void;
+        createDataProcessingAgreement() :void;
     }
 
     export class OverviewController implements IOverviewController {
@@ -127,6 +128,10 @@
             this.reload();
         }
 
+        public createDataProcessingAgreement() {
+            this.$state.go("data-processing.overview.create-agreement");
+        }
+
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
@@ -241,7 +246,7 @@
                         },
                         width: 340,
                         persistId: "dpaName",
-                        template: dataItem => `<a data-ui-sref="data-processing.edit.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {

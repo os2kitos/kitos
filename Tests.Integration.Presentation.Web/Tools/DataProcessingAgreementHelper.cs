@@ -74,9 +74,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var body = new SingleValueDTO<string> { Value = name };
-
-            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/validate/{organizationId}/can-create"), cookie, body);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement?orgId={organizationId}&checkname={name}"), cookie);
         }
 
         public static async Task<IEnumerable<DataProcessingAgreementReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
