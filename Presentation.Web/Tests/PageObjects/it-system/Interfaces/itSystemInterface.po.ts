@@ -3,13 +3,14 @@ import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapp
 import CssHelper = require("../../../Object-wrappers/CSSLocatorHelper");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import Constants = require("../../../Utility/Constants");
+import KendoLoaderHelper = require("../../../Helpers/KendoLoaderHelper");
 
 var ec = protractor.ExpectedConditions;
 
 class ItSystemInterfaceCatalog implements IPageObject {
-    private ec = protractor.ExpectedConditions;
     private navigationHelper = new NavigationHelper();
     private constants = new Constants();
+    private kendoLoaderHelper = new KendoLoaderHelper()
     public kendoToolbarWrapper = new KendoToolbarWrapper();
     public cssHelper = new CssHelper();
 
@@ -37,8 +38,8 @@ class ItSystemInterfaceCatalog implements IPageObject {
         return element(this.cssHelper.byDataElementType(this.constants.interfaceBelongsToReadonly));
     }
 
-    public waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+    public waitForKendoGrid() {
+        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
 }
 export = ItSystemInterfaceCatalog;

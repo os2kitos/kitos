@@ -84,6 +84,7 @@
     readonly navigationSystemButton = "systemButton";
     readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
+    readonly navigationDataProcessingButton = "dataProcessingButton";
     readonly navigationReportsButton = "reportButton";
 
     readonly navigationDropdown = "dropdown-button";
@@ -196,10 +197,12 @@
     readonly gdprDPIADateForId = "DPIADateFor";
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
+    readonly gdprDataProcessingAgreementView = "gdprDataProcessingAgreementView";
 
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
+    readonly dataProcessingCheckbox = "DataProcessingCheckbox";
 
 }
 export = Constants;

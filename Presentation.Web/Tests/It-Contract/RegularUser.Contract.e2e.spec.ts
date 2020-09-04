@@ -1,7 +1,6 @@
 ﻿import Login = require("../Helpers/LoginHelper");
 import ItContractOverview = require("../PageObjects/it-contract/ItContractOverview.po");
 import Constants = require("../Utility/Constants");
-import WaitTimers = require("../Utility/WaitTimers");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
 describe("Regular user has access to features in the contract overview", () => {
@@ -11,7 +10,6 @@ describe("Regular user has access to features in the contract overview", () => {
     var pageObject = new ItContractOverview();
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var columnObject = pageObject.kendoToolbarWrapper.columnObjects();
-    var waitUpTo = new WaitTimers();
     var testFixture = new TestFixtureWrapper();
 
     beforeAll(() => {
@@ -20,8 +18,7 @@ describe("Regular user has access to features in the contract overview", () => {
 
     beforeEach(() => {
         pageObject.getPage()
-            .then(() => browser.waitForAngular())
-            .then(() => browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds));
+            .then(() => pageObject.waitForKendoGrid());
     });
 
     afterAll(() => {
