@@ -246,7 +246,7 @@
                         },
                         width: 340,
                         persistId: "dpaName",
-                        template: dataItem => `<a data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref="data-processing.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
