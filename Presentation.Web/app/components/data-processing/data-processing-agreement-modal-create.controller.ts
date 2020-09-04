@@ -12,7 +12,7 @@
         ];
 
         constructor(
-            private dataProcessingAgreementService: Kitos.Services.DataProcessing.IDataProcessingAgreementService,
+            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
             private user: Services.IUser,
             private $scope,
             private notify,
@@ -82,13 +82,9 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                            // OK
-                            // GOTO parent state and reload
                             $state.go("^", null, { reload: true });
                         },
                             () => {
-                                // Cancel
-                                // GOTO parent state
                                 $state.go("^");
                             });
                     }
