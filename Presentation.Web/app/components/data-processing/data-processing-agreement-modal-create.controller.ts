@@ -36,12 +36,21 @@
                 .then
                 (
                     createdResponse => {
-                        if (createdResponse.created) {
-                            msg.toSuccessMessage("En ny databehandleraftale er oprettet!");
-                        } else {
-                            msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
-                        }
+                        msg.toSuccessMessage("En ny databehandleraftale er oprettet!");
                         return createdResponse;
+                    },
+                    (errorResponse: Models.Api.ApiResponseErrorCategory) => {
+                        switch (errorResponse) {
+                            case Models.Api.ApiResponseErrorCategory.BadInput:
+                                msg.toErrorMessage("Fejl! Navnet var ugyldigt!");
+                                break;
+                            case Models.Api.ApiResponseErrorCategory.Conflict:
+                                msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
+                                break;
+                            default:
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
+                                break;
+                        }
                     }
                 );
         }
@@ -49,7 +58,7 @@
         save(): void {
             this.createNew()
                 .then(response => {
-                    if (response.created) {
+                    if (response) {
                         this.$uibModalInstance.close();
                     }
                 });
@@ -58,7 +67,7 @@
         saveAndProceed(): void {
             this.createNew()
                 .then(response => {
-                    if (response.created) {
+                    if (response) {
                         this.$uibModalInstance.close();
                         this.$state.go("data-processing.overview.edit-agreement.main", { id: response.createdObjectId });
                     }

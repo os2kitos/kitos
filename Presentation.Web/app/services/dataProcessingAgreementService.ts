@@ -1,5 +1,6 @@
 ﻿module Kitos.Services.DataProcessing {
     import IApiWrapper = API.Models.IApiWrapper;
+    import ApiResponseErrorCategory = Models.Api.ApiResponseErrorCategory;
 
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
@@ -7,9 +8,7 @@
     }
 
     export interface IDataProcessingAgreementCreatedResult {
-        created: boolean;
         createdObjectId : number;
-        error: string;
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
@@ -24,16 +23,25 @@
                 .then(
                     response => {
                         return <IDataProcessingAgreementCreatedResult>{
-                            created: true,
-                            createdObjectId: response.data.response.id,
-                            error: "TODO"
+                            createdObjectId: response.data.response.id
                         };
                     },
                     error => {
-                        return <IDataProcessingAgreementCreatedResult>{
-                            created: false,
-                            error: "TODO"
-                        };
+                        var errorCategory : ApiResponseErrorCategory;
+                        switch (error.status) {
+                            case 400:
+                                errorCategory = ApiResponseErrorCategory.BadInput;
+                                break;
+                            case 409:
+                                errorCategory = ApiResponseErrorCategory.Conflict;
+                                break;
+                            case 500:
+                                errorCategory = ApiResponseErrorCategory.ServerError;
+                                break;
+                            default:
+                                errorCategory = ApiResponseErrorCategory.UnknownError;
+                        }
+                        throw errorCategory;
                     }
                 );
         }
