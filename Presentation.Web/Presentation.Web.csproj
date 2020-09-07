@@ -1337,6 +1337,10 @@
     </None>
     <Content Include="Robots.Prod.txt" />
     <Content Include="Robots.Test.txt" />
+    <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
+    <Content Include="Scripts\appReport-bundle.min.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <EmbeddedResource Include="Scripts\SwaggerUICustom.js" />
