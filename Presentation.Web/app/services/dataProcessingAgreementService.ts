@@ -1,7 +1,4 @@
 ﻿module Kitos.Services.DataProcessing {
-    import IApiWrapper = API.Models.IApiWrapper;
-    import ApiResponseErrorCategory = Models.Api.ApiResponseErrorCategory;
-
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         //TODO: Extend with type safe methods for getting and changing data
@@ -19,7 +16,7 @@
             };
             return this
                 .$http
-                .post<IApiWrapper<any>>(this.getUri(""), payload)
+                .post<API.Models.IApiWrapper<any>>(this.getUri(""), payload)
                 .then(
                     response => {
                         return <IDataProcessingAgreementCreatedResult>{
@@ -27,28 +24,28 @@
                         };
                     },
                     error => {
-                        var errorCategory : ApiResponseErrorCategory;
+                        var errorCategory: Models.Api.ApiResponseErrorCategory;
                         switch (error.status) {
                             case 400:
-                                errorCategory = ApiResponseErrorCategory.BadInput;
+                                errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
                                 break;
                             case 409:
-                                errorCategory = ApiResponseErrorCategory.Conflict;
+                                errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
                                 break;
                             case 500:
-                                errorCategory = ApiResponseErrorCategory.ServerError;
+                                errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
                                 break;
                             default:
-                                errorCategory = ApiResponseErrorCategory.UnknownError;
+                                errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
                         }
                         throw errorCategory;
                     }
                 );
         }
 
-        static $inject = ["$http", "notify"];
+        static $inject = ["$http"];
 
-        constructor(private readonly $http: ng.IHttpService, private notify) {
+        constructor(private readonly $http: ng.IHttpService) {
         }
 
         private getUri(suffix: string) : string {
@@ -56,5 +53,5 @@
         }
     }
 
-    app.service("dataProcessingAgreementService", Kitos.Services.DataProcessing.DataProcessingAgreementService);
+    app.service("dataProcessingAgreementService", DataProcessingAgreementService);
 }
