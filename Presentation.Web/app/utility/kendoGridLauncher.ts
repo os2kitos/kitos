@@ -1,10 +1,148 @@
-﻿module Kitos.Utility.KendoGrid {
+﻿/**
+     * The purpose of this "builder/launcher" module is to encapsulate the logic behind construction of standard KITOS kendo grid
+     * in stead of the previous method where "copy-paste" was used as "reuse" strategy.
+     *
+     * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
+     */
+module Kitos.Utility.KendoGrid {
     "use strict";
-    import IDataProcessingAgreement = Models.DataProcessing.IDataProcessingAgreement;
+
+    export enum KendoGridColumnFiltering {
+        Contains
+    }
 
     export interface IGridViewAccess<TDataSource> {
         mainGrid: IKendoGrid<TDataSource>;
         mainGridOptions: IKendoGridOptions<TDataSource>;
+    }
+
+    export interface IKendoGridColumnBuilder<TDataSource> {
+        withId(id: string): IKendoGridColumnBuilder<TDataSource>;
+        withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
+        withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
+        withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
+        withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
+        withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
+        withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
+        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
+        withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
+        build(): IKendoGridColumn<TDataSource>;
+    }
+
+    class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
+        private standardWidth: number = 200;
+        private dataSourceName: string = null;
+        private title: string = null;
+        private filtering: KendoGridColumnFiltering = null;
+        private id: string = null;
+        private rendering: (source: TDataSource) => string = null;
+        private excelOutput: (source: TDataSource) => string = null;
+
+        withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource> {
+            if (renderUi == null) throw "renderUi must be defined";
+            this.rendering = renderUi;
+            return this;
+        }
+
+        private echoSourceValue(dataSource: TDataSource): string {
+            const dynamicSource = dataSource as any;
+            if (dynamicSource && dynamicSource[this.dataSourceName]) {
+                return dynamicSource[this.dataSourceName];
+            }
+            return "";
+        }
+
+        withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource> {
+            return this.withRendering(dataSource => this.echoSourceValue(dataSource));
+        }
+
+        withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource> {
+            return this.withExcelOutput(dataSource => this.echoSourceValue(dataSource));
+        }
+
+        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>{
+            if (excelOutput == null) throw "excelOutput must be defined";
+            this.excelOutput = excelOutput;
+            return this;
+        }
+
+        withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource> {
+            if (operation == null) throw "operation must be defined";
+            this.filtering = operation;
+            return this;
+        }
+
+        withId(id: string): IKendoGridColumnBuilder<TDataSource> {
+            if (id == null) throw "id must be defined";
+            this.id = id;
+            return this;
+        }
+
+        withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource> {
+            if (name == null) throw "name must be defined";
+            this.dataSourceName = name;
+            return this;
+        }
+
+        withTitle(title: string): IKendoGridColumnBuilder<TDataSource> {
+            if (title == null) throw "title must be defined";
+            this.title = title;
+            return this;
+        }
+
+        withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource> {
+            if (width == null) throw "width must be defined";
+            this.standardWidth = width;
+            return this;
+        }
+
+        private checkRequiredField(name: string, value: any) {
+            if (value == null) {
+                throw `${name} is a required field and must be provided`;
+            }
+        }
+
+        private getFiltering(): boolean | kendo.ui.GridColumnFilterable {
+            if (this.filtering != null) {
+                switch (this.filtering) {
+                    case KendoGridColumnFiltering.Contains:
+                        return {
+                            cell: {
+                                template: (args) =>
+                                    args.element.kendoAutoComplete({
+                                        noDataTemplate: ""
+                                    }),
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
+                    default:
+                        throw `Unknown filtering strategy ${this.filtering}`;
+                }
+            }
+            return false;
+        }
+
+        build(): IKendoGridColumn<TDataSource> {
+            this.checkRequiredField("dataSourceName", this.dataSourceName);
+            this.checkRequiredField("title", this.title);
+            this.checkRequiredField("id", this.id);
+            this.checkRequiredField("rendering", this.rendering);
+
+            return {
+                field: this.dataSourceName,
+                title: this.title,
+                attributes: {
+                    "data-element-type": `${this.id}KendoObject`
+                },
+                width: this.standardWidth,
+                persistId: this.id,
+                template: dataItem => this.rendering(dataItem),
+                excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
+                filterable: this.getFiltering()
+            } as IKendoGridColumn<TDataSource>;
+        }
     }
 
     export enum KendoToolbarButtonColor {
@@ -27,11 +165,13 @@
     }
 
     type UrlFactory = (options: any) => string;
+    type ColumnConstruction<TDataSource> = (builder: IKendoGridColumnBuilder<TDataSource>) => void;
 
     export interface IKendoGridLauncher<TDataSource> {
         launch(): void;
         withUser(user: Services.IUser): IKendoGridLauncher<TDataSource>;
         withGridBinding(gridBinding: IGridViewAccess<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withStandardSorting(sourceField: string): IKendoGridLauncher<TDataSource>;
         withEntityTypeName(name: string): IKendoGridLauncher<TDataSource>;
         withExcelOutputName(name: string): IKendoGridLauncher<TDataSource>;
         withStorageKey(newKey: string): IKendoGridLauncher<TDataSource>;
@@ -39,16 +179,12 @@
         withFixedSourceUrl(url: string): IKendoGridLauncher<TDataSource>;
         withUrlFactory(factory: UrlFactory): IKendoGridLauncher<TDataSource>;
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource>;
+        withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
     }
 
-    /**
-     * The purpose of this "builder/launcher" is to encapsulate the logic behind construction of standard KITOS kendo grid
-     * in stead of the previous method where "copy-paste" was used as "reuse" strategy.
-     *
-     * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
-     */
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
         private $scope: ng.IScope = null;
+        private standardSortingSourceField : string = null;
         private storageKey: string = null;
         private gridState: Services.IGridStateService = null;
         private entityTypeName: string = null;
@@ -57,6 +193,7 @@
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
+        private columns: ColumnConstruction<TDataSource>[] = [];
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -69,6 +206,18 @@
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withStandardSorting(sourceField: string): IKendoGridLauncher<TDataSource> {
+            if (!sourceField) throw "sourceField must be defined";
+            this.standardSortingSourceField = sourceField;
+            return this;
+        }
+
+        withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource> {
+            if (!build) throw "build must be defined";
+            this.columns.push(build);
+            return this;
         }
 
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource> {
@@ -126,7 +275,7 @@
             this.gridState = this.gridStateService.getService(this.storageKey, this.user.id);
             return this;
         }
-      
+
         // saves grid state to localStorage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.gridBinding.mainGrid);
@@ -183,9 +332,18 @@
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
         }
 
+        private checkRequiredField(name: string, value: any) {
+            if (value == null) {
+                throw `${name} is a required field and must be provided`;
+            }
+        }
+
         private build() {
-            //TODO: Check required fields
-            //TODO: Refactor content of this to use TDataSource in stead and column creation as well + url
+            this.checkRequiredField("$scope", this.$scope);
+            this.checkRequiredField("storageKey", this.storageKey);
+            this.checkRequiredField("entityTypeName", this.entityTypeName);
+            this.checkRequiredField("urlFactory", this.urlFactory);
+            this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
 
             //Build toolbar buttons
             var getColorClass = (color: KendoToolbarButtonColor): string => {
@@ -260,8 +418,17 @@
                 };
             });
 
+            //Build the columns
+            var columns = [];
+            _.forEach(this.columns,
+                build => {
+                    const builder = new KendoGridColumnBuilder<TDataSource>();
+                    build(builder);
+                    columns.push(builder.build());
+                });
+
             //Build the grid
-            const mainGridOptions: IKendoGridOptions<IDataProcessingAgreement> = {
+            const mainGridOptions: IKendoGridOptions<TDataSource> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -272,7 +439,7 @@
                         }
                     },
                     sort: {
-                        field: "Name",
+                        field: this.standardSortingSourceField,
                         dir: "asc"
                     },
                     pageSize: 100,
@@ -294,7 +461,9 @@
                 },
                 toolbar: toolbar,
                 excel: {
-                    fileName: this.excelOutputName ? `${this.excelOutputName}.xlsx` : `${this.entityTypeName}  Overblik.xlsx`,
+                    fileName: this.excelOutputName
+                        ? `${this.excelOutputName}.xlsx`
+                        : `${this.entityTypeName}  Overblik.xlsx`,
                     filterable: true,
                     allPages: true
                 },
@@ -325,37 +494,11 @@
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
                 page: this.onPaging,
-                columns: [
-                    { //TODO: To column builder
-                        field: "Name",
-                        title: "Databehandleraftale",
-                        attributes: {
-                            "data-element-type": "dataProcessingAgreementNameKendoObject"
-                        },
-                        width: 340,
-                        persistId: "dpaName",
-                        template: dataItem => `<a data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    }
-                ]
+                columns: columns,
             };
-            function customFilter(args) {
-                args.element.kendoAutoComplete({
-                    noDataTemplate: ''
-                });
-            }
 
             // assign the generated grid options to the scope value, kendo will do the rest
-            //TODO: Remove this casting hack once refactor is completed
-            this.gridBinding.mainGridOptions = <IKendoGridOptions<TDataSource>>(mainGridOptions as any);
+            this.gridBinding.mainGridOptions = mainGridOptions;
         }
 
         launch() {
@@ -422,5 +565,4 @@
     }
 
     app.service("kendoGridLauncherFactory", KendoGridLauncherFactory);
-
 }

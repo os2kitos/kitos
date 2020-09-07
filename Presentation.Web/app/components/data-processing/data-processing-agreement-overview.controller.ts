@@ -5,12 +5,12 @@
     }
 
     export class OverviewController implements IOverviewController {
-        public mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingAgreement>;
-        public mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingAgreement>;
-        public canCreate: boolean;
-        public projectIdToAccessLookup = {};
+        mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingAgreement>;
+        mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingAgreement>;
+        canCreate: boolean;
+        projectIdToAccessLookup = {};
 
-        public static $inject: Array<string> = [
+        static $inject: Array<string> = [
             "$rootScope",
             "$scope",
             "$state",
@@ -45,6 +45,16 @@
                     enabled: () => userAccessRights.canCreate,
                     onClick: () => $state.go("data-processing.overview.create-agreement")
                 } as Utility.KendoGrid.IKendoToolbarEntry)
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Name")
+                        .withTitle("Databehandleraftale")
+                        .withId("dpaName")
+                        .withStandardWidth(340)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => `<a data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`)
+                        .withSourceValueEchoExcelOutput())
+                .withStandardSorting("Name")
                 .launch();
         }
     }
