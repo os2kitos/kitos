@@ -55,7 +55,6 @@ describe("Data processing agreement tests", () => {
             .then(() => {
                 console.log(`expecting to find new dpa with name ${name}`);
                 expect(pageObject.findSpecificDpaInNameColumn(name).isPresent()).toBeTruthy();
-                console.log("Found it");
             })
             //Verify that dialog acts correctly on attempt to create duplicate dpa name
             .then(() => {
