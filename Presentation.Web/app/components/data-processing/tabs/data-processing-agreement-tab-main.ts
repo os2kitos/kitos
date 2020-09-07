@@ -15,6 +15,6 @@
         ($scope, $http, _, $stateParams, $uibModal, notify, dataProcessingAgreement, hasWriteAccess) => {
             $scope.dataProcessing = dataProcessingAgreement;
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.autosaveUrl = `api/v1/data-processing-agreement/${dataProcessingAgreement.id}`;
+            $scope.autosaveUrl = `api/v1/data-processing-agreement/${dataProcessingAgreement.id}/name`;
         }]);
 })(angular, app);
