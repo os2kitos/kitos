@@ -407,7 +407,7 @@ module Kitos.Utility.KendoGrid {
                 }
             ];
 
-            _.forEach(this.customToolbarEntries, entry => {
+            this._.forEach(this.customToolbarEntries, entry => {
                 toolbar.push({
                     name: entry.id,
                     text: entry.title,
@@ -421,7 +421,7 @@ module Kitos.Utility.KendoGrid {
 
             //Build the columns
             var columns = [];
-            _.forEach(this.columns,
+            this._.forEach(this.columns,
                 build => {
                     const builder = new KendoGridColumnBuilder<TDataSource>();
                     build(builder);

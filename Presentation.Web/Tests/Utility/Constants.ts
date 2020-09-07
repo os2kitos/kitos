@@ -6,6 +6,7 @@
     readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
     readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
+    readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractNameObject";
     readonly kendoButtonResetFilter = "resetFilterButton";
@@ -16,7 +17,8 @@
     readonly kendoProjectButtonCreateProject = "createProjectButton";
     readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
-    readonly kendoCatalogNameObjects = "catalogNameObject";
+    readonly kendoCatalogNameObjects = "dpaNameKendoObject";
+    readonly kendoDpaNameObjects = "dpaNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
@@ -49,6 +51,7 @@
     readonly startMigrationButton = "startMigration";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
+    readonly createDpaForm = "createDpaForm";
     readonly createReferenceForm = "referenceCreatorForm";
     readonly validUrl = "https://strongminds.dk/";
     readonly invalidUrl = "invalidUrl";
