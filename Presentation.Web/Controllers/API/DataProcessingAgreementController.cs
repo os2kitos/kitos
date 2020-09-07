@@ -47,13 +47,12 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage Post([FromBody] CreateDataProcessingAgreementDTO dto)
         {
-            return BadRequest("TODO");
-            //if (dto == null)
-            //    return BadRequest("No input parameters provided");
+            if (dto == null)
+                return BadRequest("No input parameters provided");
 
-            //return _dataProcessingAgreementApplicationService
-            //    .Create(dto.OrganizationId, dto.Name)
-            //    .Match(value => Created(ToDTO(value), new Uri(Request.RequestUri + "/" + value.Id)), FromOperationError);
+            return _dataProcessingAgreementApplicationService
+                .Create(dto.OrganizationId, dto.Name)
+                .Match(value => Created(ToDTO(value), new Uri(Request.RequestUri + "/" + value.Id)), FromOperationError);
         }
 
         [HttpGet]
