@@ -31,11 +31,11 @@
             kendoGridLauncherFactory
                 .create<Models.DataProcessing.IDataProcessingAgreement>()
                 .withScope($scope)
+                .withGridBinding(this)
                 .withUser(user)
                 .withEntityTypeName("Databehandleraftale")
                 .withExcelOutputName("Databehandleraftaler - Overblik")
                 .withStorageKey("data-processing-agreement-overview-options")
-                .withGridBinding(this)
                 .withFixedSourceUrl(`/odata/Organizations(${user.currentOrganizationId})/DataProcessingAgreementReadModels`)
                 .withToolbarEntry({
                     id: "createDpa",

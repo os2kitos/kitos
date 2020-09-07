@@ -344,6 +344,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("entityTypeName", this.entityTypeName);
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
+            this.checkRequiredField("gridBinding", this.gridBinding);
 
             //Build toolbar buttons
             var getColorClass = (color: KendoToolbarButtonColor): string => {
