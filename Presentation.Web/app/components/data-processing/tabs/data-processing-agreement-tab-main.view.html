@@ -1,11 +1,18 @@
 ﻿<div class="object-section-container">
-    <h4>DATABEHANDLER DETAILS</h4>
+    <h4>{{dataProcessing.name}}</h4>
     <div class="panel panel-default">
         <div class="row">
             <div class="col-xs-6">
                 <!-- Name -->
                 <div class="form-group">
-                    <h1>DATABEHANDLER SIDE</h1>
+                    <label for="dataProccessAgreement-name" class="control-label small">Databehandling</label>
+                    <input type="text" id="dataProccessAgreement-name" class="form-control input-sm" required
+                           data-ng-model="dataProcessing.name"
+                           data-field="name"
+                           data-autosave="{{autosaveUrl}}"
+                           data-ng-disabled="!hasWriteAccess"
+                           autofocus
+                           maxlength="150">
                 </div>
             </div>
         </div>

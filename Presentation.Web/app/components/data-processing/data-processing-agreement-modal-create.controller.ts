@@ -59,7 +59,7 @@
                 .then(response => {
                     if (response.created) {
                         this.$uibModalInstance.close();
-                        this.$state.go("data-processing.overview.edit-agreement.main", { id: response.createdObjectId });
+                        this.$state.go("data-processing.edit-agreement.main", { id: response.createdObjectId });
                     }
                 });
         }
