@@ -19,7 +19,6 @@ describe("Data processing agreement tests", () => {
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
-        //TODO: Make sure dpa is enabled  for the organization
     });
 
     afterAll(() => {
