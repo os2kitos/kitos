@@ -1,7 +1,7 @@
 ﻿module Kitos.DataProcessing.Agreement.Edit.Main {
     "use strict";
 
-    export class EditDataProcessingAgreementController {
+    export class EditMainDataProcessingAgreementController {
         static $inject: Array<string> = [
             "dataProcessingAgreementService",
             "user",

@@ -36,7 +36,7 @@
 
             return this
                 .$http
-                .patch<IApiWrapper<any>>(this.getUri(`${dataProcessingAgreementId}/name`), payload).then(
+                .patch<IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload).then(
                     response => {
                     return <IDataProcessingAgreementPatchResult>{
                         modified: true,
@@ -58,7 +58,7 @@
 
             return this
                 .$http
-                .delete<IApiWrapper<any>>(this.getUri(`${dataProcessingAgreementId}`))
+                .delete<IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
                 .then(
                     response => {
                         return <IDataProcessingAgreementDeletedResult>{
@@ -108,11 +108,15 @@
         }
 
         private getUri(suffix: string) : string {
-            return `api/v1/data-processing-agreement/${suffix}`;
+            return this.getBaseUri() + `${suffix}`;
         }
 
-        private getUriWithId(id: string, suffix: string) {
-            return `api/v1/data-processing-agreement/${id}/${suffix}`;
+        private getUriWithIdAndSuffix(id: string, suffix: string) {
+            return this.getBaseUri() + `${id}/${suffix}`;
+        }
+
+        private getBaseUri() {
+            return "api/v1/data-processing-agreement/";
         }
     }
 
