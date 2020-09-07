@@ -26,6 +26,7 @@
                     }
                     var dataProcessingAgreementId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter Databehandleraftale...", false);
+
                     $http.delete("api/v1/data-processing-agreement/" + dataProcessingAgreementId)
                         .success(function (result) {
                             msg.toSuccessMessage("Databehandleraftale er slettet!");
