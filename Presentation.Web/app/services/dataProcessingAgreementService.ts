@@ -9,7 +9,7 @@
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
-        public create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
+        create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
             const payload = {
                 name: name,
                 organizationId: organizationId

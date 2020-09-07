@@ -528,7 +528,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     export class KendoGridLauncherFactory implements IKendoGridLauncherFactory {
-        public static $inject: Array<string> = [
+        static $inject: Array<string> = [
             "gridStateService",
             "exportGridToExcelService",
             "notify",
