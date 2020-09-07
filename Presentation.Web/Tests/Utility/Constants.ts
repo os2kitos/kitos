@@ -17,8 +17,8 @@
     readonly kendoProjectButtonCreateProject = "createProjectButton";
     readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
-    readonly kendoCatalogNameObjects = "dpaNameKendoObject";
-    readonly kendoDpaNameObjects = "dpaNameObject";
+    readonly kendoCatalogNameObjects = "catalogNameObject";
+    readonly kendoDpaNameObjects = "dpaNameKendoObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";

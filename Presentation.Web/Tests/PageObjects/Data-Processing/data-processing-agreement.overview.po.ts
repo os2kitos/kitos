@@ -47,7 +47,7 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
 
     findSpecificDpaInNameColumn(name: string) {
         console.log(`Finding dpa with name : ${name}`);
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '" and @data-element-type="kendo-dpa-name-rendering"]'));
+        return element(by.xpath(`//*/tbody/*/td/a[text()="${name}" and @data-element-type="kendo-dpa-name-rendering"]`));
     }
 }
 export = DataProcessingAgreementOverviewPageObject;
