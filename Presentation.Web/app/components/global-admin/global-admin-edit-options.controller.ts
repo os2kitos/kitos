@@ -2,24 +2,23 @@
     "use strict";
 
     export class OptionsController {
-        public pageTitle: string;
+        pageTitle: string;
+        name: string;
+        isObligatory: boolean;
+        hasWriteAccess: boolean;
+        description: string;
+        buttonDisabled: boolean;
 
-        public name: string;
-        public isObligatory: boolean;
-        public hasWriteAccess: boolean;
-        public description: string;
-        public buttonDisabled: boolean;
-
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "user"];
+        static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "user"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $stateParams: ng.ui.IStateParamsService,
-            private $http: ng.IHttpService,
-            private notify,
-            private user: Services.IUser,
-            private optionsUrl: string,
-            private optionId: number,
-            private optionType: string) {
+            private readonly $stateParams: ng.ui.IStateParamsService,
+            private readonly $http: ng.IHttpService,
+            private readonly notify,
+            private readonly user: Services.IUser,
+            private readonly optionsUrl: string,
+            private readonly optionId: number,
+            private readonly optionType: string) {
 
             this.optionsUrl = this.$stateParams["optionsUrl"];
             this.optionId = this.$stateParams["id"];
@@ -49,7 +48,7 @@
 
         };
 
-        private createPayload(type: string): Object | Object {
+        private createPayload(type: string): object {
             if (type === "role") {
                 return {
                     Name: this.name,
@@ -66,7 +65,7 @@
 
         }
 
-        public ok() {
+        ok() {
             this.buttonDisabled = true;
             if (this.optionId === 0) {
                 const payload = this.createPayload(this.optionType);
@@ -89,7 +88,7 @@
             }
         };
 
-        public cancel() {
+        cancel() {
             this.$uibModalInstance.close();
         };
     }
@@ -137,6 +136,11 @@
                 id: "global-admin.report.edit-report-types",
                 urlSuffix: "edit-report-types",
                 isRole: false
+            },
+            {
+                id: "global-admin.data-processing.edit-data-processing-agreement-roles",
+                urlSuffix: "edit-data-processing-agreement-roles",
+                isRole: true
             }
         ];
 
