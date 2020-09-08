@@ -43,10 +43,7 @@
             throw errorCategory;
         }
 
-        create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
-
-
-        public rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> { ;
+        public rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> { 
 
             const payload  = {
                 Value: name
@@ -54,7 +51,7 @@
 
             return this
                 .$http
-                .patch<IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload).then(
+                .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload).then(
                     response => {
                     return <IDataProcessingAgreementPatchResult>{
                         modified: true,
@@ -76,7 +73,7 @@
 
             return this
                 .$http
-                .delete<IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
+                .delete<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
                 .then(
                     response => {
                         return <IDataProcessingAgreementDeletedResult>{
