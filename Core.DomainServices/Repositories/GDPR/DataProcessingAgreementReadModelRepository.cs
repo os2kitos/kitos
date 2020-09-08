@@ -42,14 +42,21 @@ namespace Core.DomainServices.Repositories.GDPR
             var readModel = GetBySourceId(sourceId);
             if (readModel.HasValue)
             {
-                _repository.DeleteByKeyWithReferencePreload(readModel.Value.Id);
-                _repository.Save();
+                Delete(readModel.Value);
             }
         }
 
         public IQueryable<DataProcessingAgreementReadModel> GetByOrganizationId(int organizationId)
         {
             return _repository.AsQueryable().ByOrganizationId(organizationId);
+        }
+
+        public void Delete(DataProcessingAgreementReadModel readModel)
+        {
+            if (readModel == null) throw new ArgumentNullException(nameof(readModel));
+
+            _repository.DeleteWithReferencePreload(readModel);
+            _repository.Save();
         }
     }
 }

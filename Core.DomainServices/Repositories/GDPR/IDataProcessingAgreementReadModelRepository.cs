@@ -11,5 +11,6 @@ namespace Core.DomainServices.Repositories.GDPR
         void Update(DataProcessingAgreementReadModel updatedModel);
         void DeleteBySourceId(int sourceId);
         IQueryable<DataProcessingAgreementReadModel> GetByOrganizationId(int organizationId);
+        void Delete(DataProcessingAgreementReadModel readModel);
     }
 }
