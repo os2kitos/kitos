@@ -11,6 +11,8 @@ namespace Presentation.Web.Ninject
         {
             switch (mode)
             {
+                case KernelMode.Thread:
+                    return src.InThreadScope();
                 case KernelMode.HangFireJob:
                     return src.InBackgroundJobScope();
                 case KernelMode.Web:

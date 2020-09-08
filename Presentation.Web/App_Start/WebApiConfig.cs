@@ -24,6 +24,7 @@ using Presentation.Web.Controllers.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
+using Core.DomainModel.GDPR;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
@@ -436,11 +437,12 @@ namespace Presentation.Web
             var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
             itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
 
+            var dpaMap = BindEntitySet<DataProcessingAgreementReadModel, DataProcessingAgreementReadModelsController>(builder);
 
             return builder.GetEdmModel();
         }
 
-        private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : Entity
+        private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class, IHasId
         {
             var entitySetConfiguration = BindTypeSet<TEntitySet, TController>(builder);
             entitySetConfiguration.EntityType.HasKey(x => x.Id);

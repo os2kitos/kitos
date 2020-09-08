@@ -7,6 +7,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
@@ -22,7 +23,9 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Model.ExternalLinks;
+using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
@@ -33,7 +36,10 @@ using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainModel.References.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
+using Core.DomainServices.GDPR;
+using Core.DomainServices.Model;
 using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Interface;
@@ -114,6 +120,17 @@ namespace Presentation.Web.Ninject
             return this;
         }
 
+        public KernelBuilder ForThread()
+        {
+            if (_mode.HasValue)
+            {
+                throw new InvalidOperationException("Mode already set");
+            }
+            _mode = KernelMode.Thread;
+
+            return this;
+        }
+
         public StandardKernel Build()
         {
             if (!_mode.HasValue)
@@ -164,6 +181,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBrokenExternalReferencesReportService>().To<BrokenExternalReferencesReportService>().InCommandScope(Mode);
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
+            kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -207,6 +228,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
+            RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -255,6 +277,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementRepository>().To<DataProcessingAgreementRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementReadModelRepository>().To<DataProcessingAgreementReadModelRepository>().InCommandScope(Mode);
+            kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
@@ -317,6 +342,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<RebuildDataProcessingAgreementReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
         }
     }
 }

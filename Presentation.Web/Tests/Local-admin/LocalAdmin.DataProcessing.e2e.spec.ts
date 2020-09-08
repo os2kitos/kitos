@@ -1,5 +1,5 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import DataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
+import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import NavigationBarHelper = require("../object-wrappers/navigationBarWrapper");
 import SystemCatalogHelper = require("../Helpers/SystemCatalogHelper");
@@ -10,7 +10,7 @@ import SystemTabGDPR = require("../PageObjects/it-system/Usage/Tabs/ItSystemUsag
 describe("Local admin is able to toggle DataProcessing", () => {
 
     var loginHelper = new Login();
-    var dpPageHelper = new DataProcessing();
+    var dpPageHelper = new LocalDataProcessing();
     var testFixture = new TestFixtureWrapper();
     var naviHelper = new NavigationBarHelper();
     var systemName = createItSystemName(1);

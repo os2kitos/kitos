@@ -8,13 +8,13 @@ class KendoLoaderHelper {
     readonly kendoLoadingMask = this.ec.not(
         this.ec.presenceOf(element(by.className("k-loading-mask"))));
 
-    public waitForKendoGridData(columnName: protractor.ElementFinder) {
+    waitForKendoGridData(columnName: protractor.ElementFinder) {
 
         return this.waitForKendoGrid(columnName)
             .then(() => browser.wait(this.kendoLoadingMask, this.waitUpTo.twentySeconds));
     }
 
-    public waitForKendoGrid(columnName: protractor.ElementFinder) {
+    waitForKendoGrid(columnName: protractor.ElementFinder) {
         return browser
             .wait(this.ec.visibilityOf(columnName), this.waitUpTo.twentySeconds);
     }

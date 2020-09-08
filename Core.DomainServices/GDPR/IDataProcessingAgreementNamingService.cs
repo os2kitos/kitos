@@ -1,0 +1,12 @@
+﻿using Core.DomainModel.GDPR;
+using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
+
+namespace Core.DomainServices.GDPR
+{
+    public interface IDataProcessingAgreementNamingService
+    {
+        Maybe<OperationError> ValidateSuggestedNewAgreement(int organizationId, string name);
+        Maybe<OperationError> ChangeName(DataProcessingAgreement dataProcessingAgreement, string newName);
+    }
+}

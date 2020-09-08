@@ -10,6 +10,7 @@
     <RootNamespace>Core.DomainModel</RootNamespace>
     <AssemblyName>Core.DomainModel</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,9 +55,13 @@
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
+    <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
+    <Compile Include="GDPR\DataProcessingAgreement.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementReadModel.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="GlobalConfigKeys.cs" />
@@ -65,10 +69,13 @@
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />
+    <Compile Include="IHasId.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
+    <Compile Include="IReadModel.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
+    <Compile Include="ItContract\IDataProcessingModule.cs" />
     <Compile Include="ItContract\ItContractConstraints.cs" />
     <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />

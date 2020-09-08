@@ -10,6 +10,7 @@
     <RootNamespace>Core.DomainServices</RootNamespace>
     <AssemblyName>Core.DomainServices</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,16 +59,21 @@
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementNamingService.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementReadModelUpdate.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementNamingService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\BuildDataProcessingAgreementReadModelOnChangesHandler.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
+    <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,10 +92,16 @@
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
+    <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingAgreementReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingAgreementRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingAgreementReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingAgreementRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationUnitRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
@@ -156,6 +167,7 @@
       <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>

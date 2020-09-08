@@ -49,6 +49,7 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => pageObject.getPage())
             .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
             .then(() => SystemCatalogHelper.createSystem(systemNameTo))
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => toggleSystemActivation(systemNameFrom))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
             .then(() => waitForElement(constants.moveSystemButton))

@@ -14,6 +14,7 @@
     <RootNamespace>Tests.Unit.Core</RootNamespace>
     <AssemblyName>Tests.Unit.Core</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
@@ -29,7 +30,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -154,6 +154,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\GDPR\DataProcessingAgreementApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
@@ -167,6 +168,9 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="DomainServices\GDPR\BuildDataProcessingAgreementReadModelOnChangesHandlerTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingAgreementNamingServiceTest.cs" />
+    <Compile Include="DomainServices\Repositories\DataProcessingAgreementRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
@@ -249,6 +253,7 @@
   <ItemGroup>
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
