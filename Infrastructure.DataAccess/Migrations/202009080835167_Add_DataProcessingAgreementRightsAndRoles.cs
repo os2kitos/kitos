@@ -55,10 +55,34 @@
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
+            CreateTable(
+                "dbo.LocalDataProcessingAgreementRoles",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        Description = c.String(),
+                        OrganizationId = c.Int(nullable: false),
+                        OptionId = c.Int(nullable: false),
+                        IsActive = c.Boolean(nullable: false),
+                        ObjectOwnerId = c.Int(),
+                        LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        LastChangedByUserId = c.Int(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.User", t => t.LastChangedByUserId)
+                .ForeignKey("dbo.User", t => t.ObjectOwnerId)
+                .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
+                .Index(t => t.OrganizationId)
+                .Index(t => t.ObjectOwnerId)
+                .Index(t => t.LastChangedByUserId);
+            
         }
         
         public override void Down()
         {
+            DropForeignKey("dbo.LocalDataProcessingAgreementRoles", "OrganizationId", "dbo.Organization");
+            DropForeignKey("dbo.LocalDataProcessingAgreementRoles", "ObjectOwnerId", "dbo.User");
+            DropForeignKey("dbo.LocalDataProcessingAgreementRoles", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.DataProcessingAgreementRights", "UserId", "dbo.User");
             DropForeignKey("dbo.DataProcessingAgreementRights", "RoleId", "dbo.DataProcessingAgreementRoles");
             DropForeignKey("dbo.DataProcessingAgreementRoles", "ObjectOwnerId", "dbo.User");
@@ -66,6 +90,9 @@
             DropForeignKey("dbo.DataProcessingAgreementRights", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.DataProcessingAgreementRights", "ObjectId", "dbo.DataProcessingAgreements");
             DropForeignKey("dbo.DataProcessingAgreementRights", "LastChangedByUserId", "dbo.User");
+            DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "LastChangedByUserId" });
+            DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "OrganizationId" });
             DropIndex("dbo.DataProcessingAgreementRoles", new[] { "LastChangedByUserId" });
             DropIndex("dbo.DataProcessingAgreementRoles", new[] { "ObjectOwnerId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "LastChangedByUserId" });
@@ -73,6 +100,7 @@
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "ObjectId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "RoleId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "UserId" });
+            DropTable("dbo.LocalDataProcessingAgreementRoles");
             DropTable("dbo.DataProcessingAgreementRoles");
             DropTable("dbo.DataProcessingAgreementRights");
         }

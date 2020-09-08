@@ -1,6 +1,5 @@
 ﻿using System.Web.Http;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Microsoft.AspNet.OData;
@@ -9,13 +8,14 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
-    [InternalApi]
-    [ODataRoutePrefix("LocalFrequencyTypes")]
-    public class LocalFrequencyTypesController : LocalOptionBaseController<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>
+    [PublicApi]
+    [ODataRoutePrefix("LocalDataProcessingAgreementRoles")]
+    public class LocalDataProcessingAgreementRolesController : LocalOptionBaseController<LocalDataProcessingAgreementRole, DataProcessingAgreementRight, DataProcessingAgreementRole>
     {
-        public LocalFrequencyTypesController(IGenericRepository<LocalRelationFrequencyType> repository, IGenericRepository<RelationFrequencyType> optionsRepository)
+        public LocalDataProcessingAgreementRolesController(IGenericRepository<LocalDataProcessingAgreementRole> repository, IGenericRepository<DataProcessingAgreementRole> optionsRepository) 
             : base(repository, optionsRepository)
         {
+
         }
 
         [EnableQuery]
@@ -28,10 +28,10 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
         public override IHttpActionResult Get(int organizationId, int key) => base.Get(organizationId, key);
 
         [ODataRoute]
-        public override IHttpActionResult Post(int organizationId, LocalRelationFrequencyType entity) => base.Post(organizationId, entity);
+        public override IHttpActionResult Post(int organizationId, LocalDataProcessingAgreementRole entity) => base.Post(organizationId, entity);
 
         [ODataRoute]
-        public override IHttpActionResult Patch(int organizationId, int key, Delta<LocalRelationFrequencyType> delta) => base.Patch(organizationId, key, delta);
+        public override IHttpActionResult Patch(int organizationId, int key, Delta<LocalDataProcessingAgreementRole> delta) => base.Patch(organizationId, key, delta);
 
         [ODataRoute]
         public override IHttpActionResult Delete(int organizationId, int key) => base.Delete(organizationId, key);

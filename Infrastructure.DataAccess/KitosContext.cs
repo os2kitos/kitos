@@ -144,6 +144,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
         public DbSet<DataProcessingAgreement> DataProcessingAgreements { get; set; }
         public DbSet<DataProcessingAgreementRole> DataProcessingAgreementsRoles { get; set; }
+        public DbSet<LocalDataProcessingAgreementRole> LocalDataProcessingAgreementsRoles { get; set; }
         public DbSet<DataProcessingAgreementRight> DataProcessingAgreementsRights { get; set; }
         public DbSet<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
         public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }

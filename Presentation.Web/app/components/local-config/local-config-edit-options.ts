@@ -2,19 +2,19 @@
     "use strict";
 
     export class LocalOptionsController {
-        public pageTitle: string;
+        pageTitle: string;
 
-        public optionName: string;
-        public description: string;
+        optionName: string;
+        description: string;
 
-        private optionId: number;
-        private localOptionService: Kitos.Services.LocalOptions.ILocalOptionService;
+        private readonly optionId: number;
+        private readonly localOptionService: Kitos.Services.LocalOptions.ILocalOptionService;
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "notify", "localOptionServiceFactory"];
+        static $inject: string[] = ["$uibModalInstance", "$stateParams", "notify", "localOptionServiceFactory"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $stateParams: ng.ui.IStateParamsService,
-            private notify,
+            private readonly $stateParams: ng.ui.IStateParamsService,
+            private readonly notify,
             localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory,
         ) {
             this.localOptionService = localOptionServiceFactory.create(this.$stateParams["optionType"]);
@@ -34,7 +34,7 @@
             });
         };
 
-        public ok() {
+        ok() {
             const payload: Models.IEditedLocalOptionEntity = {
                 Description: this.description
             };
@@ -51,11 +51,11 @@
             );
         };
 
-        public cancel() {
+        cancel() {
             this.$uibModalInstance.close();
         };
 
-        public resetDescription() {
+        resetDescription() {
             const payload: Models.IEditedLocalOptionEntity = {
                 Description: null
             };
@@ -102,6 +102,10 @@
             },
             {
                 id: "local-config.contract.edit-contract-types",
+                urlSuffix: "edit-contract-types"
+            },
+            {
+                id: "local-config.data-processing.edit-data-processing-agreement-roles",
                 urlSuffix: "edit-contract-types"
             }
         ];

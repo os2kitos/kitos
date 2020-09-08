@@ -354,12 +354,13 @@
     <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-modal-create.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
-    <Content Include="app\components\local-config\local-config-dataProcessing.html" />
+    <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingAgreementRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingAgreementRolesController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Extensions\AutoMapperExtensions.cs" />

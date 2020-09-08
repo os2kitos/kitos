@@ -98,6 +98,7 @@
     <Compile Include="KLE\KLEMostRecent.cs" />
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingAgreementRole.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />

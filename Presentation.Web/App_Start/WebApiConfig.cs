@@ -440,6 +440,8 @@ namespace Presentation.Web
             BindEntitySet<DataProcessingAgreementReadModel, DataProcessingAgreementReadModelsController>(builder);
 
             BindEntitySet<DataProcessingAgreementRole, DataProcessingAgreementRolesController>(builder);
+            
+            BindEntitySet<LocalDataProcessingAgreementRole, LocalDataProcessingAgreementRolesController>(builder);
 
             return builder.GetEdmModel();
         }
