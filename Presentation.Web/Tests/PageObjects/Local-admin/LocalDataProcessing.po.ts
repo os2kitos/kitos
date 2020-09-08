@@ -3,9 +3,8 @@ import NavigationHelper = require("../../Utility/NavigationHelper");
 import constants = require("../../Utility/Constants");
 import CssLocatorHelper = require("../../object-wrappers/CSSLocatorHelper");
 
-class LocalProject implements PageObject {
+class LocalDataProcessing implements PageObject {
     private navigationHelper = new NavigationHelper();
-    private ec = protractor.ExpectedConditions;
     private consts = new constants();
     private byDataElementType = new CssLocatorHelper().byDataElementType;
 
@@ -18,6 +17,6 @@ class LocalProject implements PageObject {
     }
 }
 
-export = LocalProject;
+export = LocalDataProcessing;
 
 

@@ -3,6 +3,7 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject =
 require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
+import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 
 describe("Data processing agreement tests", () => {
 
@@ -19,6 +20,15 @@ describe("Data processing agreement tests", () => {
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
+        var localDpPo = new LocalDataProcessing();
+        localDpPo
+            .getPage()
+            .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
+            .then((selected) => {
+                if (!selected) {
+                    localDpPo.getToggleDataProcessingCheckbox().click();
+                }
+            });
     });
 
     afterAll(() => {
