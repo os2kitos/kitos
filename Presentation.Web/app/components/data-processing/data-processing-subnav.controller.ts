@@ -22,7 +22,7 @@
             this.$scope.page.title = "Databehandleraftaler";
  
             $rootScope.page.subnav = [
-                { state: "data-processing.overview", text: "Databehandleraftaler" }
+                { state: "data-processing.overview", text: "Databehandleraftaler"}
             ];
             $rootScope.page.subnav.buttons = [
                 { func: remove, text: "Slet Databehandleraftale", style: "btn-danger", showWhen: "data-processing.edit-agreement" }
