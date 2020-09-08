@@ -444,6 +444,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
@@ -749,16 +750,19 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\view-data-state.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\data-processing-agreements.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\OrgHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\RelationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
@@ -787,6 +791,7 @@
     <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-agreement.overview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
@@ -1336,6 +1341,10 @@
     </None>
     <Content Include="Robots.Prod.txt" />
     <Content Include="Robots.Test.txt" />
+    <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
+    <Content Include="Scripts\appReport-bundle.min.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <EmbeddedResource Include="Scripts\SwaggerUICustom.js" />

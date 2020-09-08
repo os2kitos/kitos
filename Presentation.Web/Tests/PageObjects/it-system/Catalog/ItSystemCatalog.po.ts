@@ -4,13 +4,15 @@ import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapp
 import CssLocatorHelper = require("../../../object-wrappers/CSSLocatorHelper");
 import Constants = require("../../../Utility/Constants");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
+import KendoLoaderHelper = require("../../../Helpers/KendoLoaderHelper");
 
 class ItSystemCatalog implements IPageObject {
+    
     private consts = new Constants();
     private ec = protractor.ExpectedConditions;
     private byDataElementType = new CssLocatorHelper().byDataElementType;
     private navigationHelper = new NavigationHelper();
-
+    private kendoLoaderHelper = new KendoLoaderHelper();
 
     getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/system/catalog");
@@ -24,8 +26,8 @@ class ItSystemCatalog implements IPageObject {
         return this.ec.visibilityOf(this.createCatalogForm);
     }
 
-    waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+    waitForKendoGrid(){
+        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
 
     getCreateSystemButton() {

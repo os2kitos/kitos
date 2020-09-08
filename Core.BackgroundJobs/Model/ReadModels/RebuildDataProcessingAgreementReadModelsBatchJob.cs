@@ -50,13 +50,12 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId);
+                    var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
                     if (source.HasValue)
                     {
-                        var bySourceId = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
-
-                        var readModel = bySourceId.GetValueOrFallback(new DataProcessingAgreementReadModel());
+                        var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
                         _updater.Apply(source.Value, readModel);
-                        if (bySourceId.HasValue)
+                        if (readModelResult.HasValue)
                         {
                             _readModelRepository.Update(readModel);
                         }
@@ -67,7 +66,13 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     }
                     else
                     {
-                        _logger.Information("Source object {category}:{sourceId} has been deleted since the update was scheduled. The update is ignored.", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
+                        _logger.Information("Source object {category}:{sourceId} has been deleted since the update was scheduled. The update is ignored and readmodel is deleted if present.", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
+                        if (readModelResult.HasValue)
+                        {
+                            _logger.Information("Deleting orphaned read model with id {id}.", readModelResult.Value.Id);
+                            _readModelRepository.Delete(readModelResult.Value);
+                        }
+
                     }
                     completedUpdates++;
                     _pendingReadModelUpdateRepository.Delete(pendingReadModelUpdate);

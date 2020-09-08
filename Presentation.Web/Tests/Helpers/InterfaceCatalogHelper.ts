@@ -1,15 +1,12 @@
 ﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
-import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
 
 class InterfaceCatalogHelper {
-    private static waitUpTo = new WaitTimers();
     private static interfacePage = new InterfaceCatalogPage();
 
     public static createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
         return this.interfacePage.getPage()
-            .then(() => this.interfacePage.waitForKendoGrid())
             .then(() => this.interfacePage.getCreateInterfaceButton().click())
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
@@ -27,7 +24,7 @@ class InterfaceCatalogHelper {
     
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(this.interfacePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
+        return this.interfacePage.waitForKendoGrid();
     }
 
     public static gotoSpecificInterface(name : string) {

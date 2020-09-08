@@ -2,7 +2,6 @@
 
 class KendoToolbarHelper {
     public headerButtons = new HeaderButtons();
-   
 }
 
 class HeaderButtons {

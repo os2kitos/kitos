@@ -12,20 +12,21 @@
         ];
 
         constructor(
-            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
-            private user: Services.IUser,
-            private $scope,
-            private notify,
-            private $state: angular.ui.IStateService,
-            private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+            private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
+            private readonly user: Services.IUser,
+            private readonly $scope,
+            private readonly notify,
+            private readonly $state: angular.ui.IStateService,
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
         }
 
-        public type: string = "Databehandleraftale";
-        public checkAvailableUrl: string = "api/v1/data-processing-agreement";
+        readonly type: string = "Databehandleraftale";
+
+        readonly checkAvailableUrl: string = "api/v1/data-processing-agreement";
 
         private createNew() {
-            let name = this.$scope.formData.name;
-            let organizationId = this.user.currentOrganizationId;
+            const name = this.$scope.formData.name;
+            const organizationId = this.user.currentOrganizationId;
 
             var msg = this.notify.addInfoMessage('Opretter databehandleraftale...', false);
 
@@ -35,12 +36,21 @@
                 .then
                 (
                     createdResponse => {
-                        if (createdResponse.created) {
-                            msg.toSuccessMessage("En ny databehandleraftale er oprettet!");
-                        } else {
-                            msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
-                        }
+                        msg.toSuccessMessage("En ny databehandleraftale er oprettet!");
                         return createdResponse;
+                    },
+                    (errorResponse: Models.Api.ApiResponseErrorCategory) => {
+                        switch (errorResponse) {
+                            case Models.Api.ApiResponseErrorCategory.BadInput:
+                                msg.toErrorMessage("Fejl! Navnet var ugyldigt!");
+                                break;
+                            case Models.Api.ApiResponseErrorCategory.Conflict:
+                                msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
+                                break;
+                            default:
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
+                                break;
+                        }
                     }
                 );
         }
@@ -48,7 +58,7 @@
         save(): void {
             this.createNew()
                 .then(response => {
-                    if (response.created) {
+                    if (response) {
                         this.$uibModalInstance.close();
                     }
                 });
@@ -57,7 +67,7 @@
         saveAndProceed(): void {
             this.createNew()
                 .then(response => {
-                    if (response.created) {
+                    if (response) {
                         this.$uibModalInstance.close();
                         this.$state.go("data-processing.edit-agreement.main", { id: response.createdObjectId });
                     }
