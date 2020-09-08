@@ -11,13 +11,13 @@ namespace Presentation.Web.Extensions
     public static class DTOMappingExtensions
     {
         public static IEnumerable<NamedEntityDTO> MapToNamedEntityDTOs<T>(this IEnumerable<T> source)
-            where T : Entity, IHasName
+            where T : IHasId, IHasName
         {
             return source.Select(MapToNamedEntityDTO);
         }
 
         public static NamedEntityDTO MapToNamedEntityDTO<T>(this T source)
-            where T : Entity, IHasName
+            where T : IHasId, IHasName
         {
             return new NamedEntityDTO(source.Id, source.Name);
         }

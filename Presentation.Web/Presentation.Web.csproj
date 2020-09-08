@@ -371,6 +371,8 @@
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\Middleware\CorrelationIdMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\DenyTooLargeQueriesMiddleware.cs" />
+    <Compile Include="Models\AssignedRoleDTO.cs" />
+    <Compile Include="Models\BusinessRoleDTO.cs" />
     <Compile Include="Models\CreateItSystemDTO.cs" />
     <Compile Include="Models\CreateItsystemUsageDTO.cs" />
     <Compile Include="Models\CreateTaskUsageDTO.cs" />
@@ -378,6 +380,7 @@
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
+    <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingAgreementDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingAgreementDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />

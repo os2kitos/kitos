@@ -6,5 +6,7 @@
             : base(id, name)
         {
         }
+
+        public AssignedRoleDTO[] AssignedRoles { get; set; }
     }
 }

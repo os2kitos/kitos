@@ -54,7 +54,9 @@ namespace Core.DomainServices.Repositories.GDPR
         public IQueryable<DataProcessingAgreement> Search(int organizationId, Maybe<string> exactName)
         {
             return
-                _repository.AsQueryable().ByOrganizationId(organizationId)
+                _repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
                     .Transform(previousQuery => exactName.Select(previousQuery.ByNameExact).GetValueOrFallback(previousQuery));
         }
 

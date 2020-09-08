@@ -183,6 +183,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementRoleAssignmentService>().To<DataProcessingAgreementRoleAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 
@@ -242,6 +243,9 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
                 .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole>>()
+                .To<OptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole, LocalDataProcessingAgreementRole>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

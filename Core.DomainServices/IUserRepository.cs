@@ -1,4 +1,6 @@
-﻿using Core.DomainModel;
+﻿using System.Linq;
+using Core.DomainModel;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices
 {
@@ -6,5 +8,6 @@ namespace Core.DomainServices
     {
         User GetByEmail(string email);
         User GetById(int id);
+        IQueryable<User> Search(int id, Maybe<string> query);
     }
 }

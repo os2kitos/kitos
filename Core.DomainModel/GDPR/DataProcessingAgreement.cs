@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
@@ -28,5 +29,10 @@ namespace Core.DomainModel.GDPR
         public virtual Organization.Organization Organization { get; set; }
 
         public virtual ICollection<DataProcessingAgreementReadModel> ReadModels { get; set; }
+
+        public IEnumerable<DataProcessingAgreementRight> GetRights(int roleId)
+        {
+            return Rights.Where(x => x.RoleId == roleId);
+        }
     }
 }

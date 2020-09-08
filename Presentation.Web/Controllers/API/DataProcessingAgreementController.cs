@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,6 +8,11 @@ using System.Web.Http;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.LocalOptions;
+using Core.DomainServices;
+using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
@@ -19,10 +25,14 @@ namespace Presentation.Web.Controllers.API
     public class DataProcessingAgreementController : BaseApiController
     {
         private readonly IDataProcessingAgreementApplicationService _dataProcessingAgreementApplicationService;
+        private readonly IGenericRepository<LocalDataProcessingAgreementRole> _localRoleRepository;
 
-        public DataProcessingAgreementController(IDataProcessingAgreementApplicationService dataProcessingAgreementApplicationService)
+        public DataProcessingAgreementController(
+            IDataProcessingAgreementApplicationService dataProcessingAgreementApplicationService,
+            IGenericRepository<LocalDataProcessingAgreementRole> localRoleRepository)
         {
             _dataProcessingAgreementApplicationService = dataProcessingAgreementApplicationService;
+            _localRoleRepository = localRoleRepository;
         }
 
         protected override IEntity GetEntity(int id) => _dataProcessingAgreementApplicationService.Get(id).Match(agreement => agreement, _ => null);
@@ -76,12 +86,31 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingAgreementApplicationService
                 .GetOrganizationData(organizationId, skip, take)
-                .Match(value => Ok(ToDTOs(value)), FromOperationError);
+                .Match(value => Ok(ToDTOs(value, organizationId)), FromOperationError);
         }
 
-        private static List<DataProcessingAgreementDTO> ToDTOs(IQueryable<DataProcessingAgreement> value)
+        private List<DataProcessingAgreementDTO> ToDTOs(IQueryable<DataProcessingAgreement> value, int organizationId)
         {
-            return value.AsEnumerable().Select(ToDTO).ToList();
+            var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
+
+            return value
+                .Include(x => x.Rights)
+                .Include(x => x.Rights.Select(_ => _.Role))
+                .Include(x => x.Rights.Select(_ => _.User))
+                .AsNoTracking()
+                .AsEnumerable()
+                .Select(x => ToDTO(x, localDescriptionOverrides))
+                .ToList();
+        }
+
+        private Dictionary<int, Maybe<string>> GetLocalDescriptionOverrides(int organizationId)
+        {
+            var localDescriptionOverrides = _localRoleRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .ToDictionary(x => x.OptionId,
+                    x => string.IsNullOrWhiteSpace(x.Description) ? Maybe<string>.None : x.Description);
+            return localDescriptionOverrides;
         }
 
         [HttpDelete]
@@ -132,9 +161,78 @@ namespace Presentation.Web.Controllers.API
                 .GetValueOrFallback(Ok());
         }
 
-        private static DataProcessingAgreementDTO ToDTO(DataProcessingAgreement value)
+        [HttpGet]
+        [Route("{id}/available-roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<NamedEntityDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [InternalApi]
+        public HttpResponseMessage GetAvailableRoles(int id, string nameContent)
         {
-            return new DataProcessingAgreementDTO(value.Id, value.Name);
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        [Route("{id}/available-roles/{roleId}/applicable-users")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<NamedEntityDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [InternalApi]
+        public HttpResponseMessage GetApplicableUsers(int id, int roleId, string nameOrEmailContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPatch]
+        [Route("{id}/roles/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignNewRole([FromBody] AssignRoleDTO dto)
+        {
+            if (dto == null)
+                return BadRequest("No input parameters provided");
+
+            throw new NotImplementedException();
+
+        }
+
+        [HttpPatch]
+        [Route("{id}/roles/remove/{roleId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage RemoveRole(int id, int roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private DataProcessingAgreementDTO ToDTO(DataProcessingAgreement value)
+        {
+            return ToDTO(value, GetLocalDescriptionOverrides(value.OrganizationId));
+        }
+
+        private static DataProcessingAgreementDTO ToDTO(DataProcessingAgreement value, Dictionary<int, Maybe<string>> localDescriptionOverrides)
+        {
+            return new DataProcessingAgreementDTO(value.Id, value.Name)
+            {
+                AssignedRoles = value.Rights.Select(x => new AssignedRoleDTO
+                {
+                    Role = new BusinessRoleDTO(x.RoleId, x.Role.Name)
+                    {
+                        HasWriteAccess = x.Role.HasWriteAccess,
+                        Note = localDescriptionOverrides.ContainsKey(x.RoleId)
+                            ? localDescriptionOverrides[x.RoleId].GetValueOrFallback(x.Role.Description)
+                            : x.Role.Description
+                    },
+                    User = x.User.MapToNamedEntityDTO()
+
+                }).ToArray()
+            };
         }
     }
 }
