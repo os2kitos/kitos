@@ -143,6 +143,8 @@ namespace Infrastructure.DataAccess
         public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
         public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
         public DbSet<DataProcessingAgreement> DataProcessingAgreements { get; set; }
+        public DbSet<DataProcessingAgreementRole> DataProcessingAgreementsRoles { get; set; }
+        public DbSet<DataProcessingAgreementRight> DataProcessingAgreementsRights { get; set; }
         public DbSet<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
         public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }
 
@@ -231,6 +233,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
             modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementMap());
+            modelBuilder.Configurations.Add(new DataProcessingAgreementRightMap());
+            modelBuilder.Configurations.Add(new DataProcessingAgreementRoleMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementReadModelMap());
         }
     }

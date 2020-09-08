@@ -5,7 +5,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
 {
-    public class DataProcessingAgreement : Entity, IHasName, IOwnedByOrganization, IDataProcessingModule
+    public class DataProcessingAgreement : HasRightsEntity<DataProcessingAgreement, DataProcessingAgreementRight, DataProcessingAgreementRole>, IHasName, IOwnedByOrganization, IDataProcessingModule
 
     {
         public static  bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&

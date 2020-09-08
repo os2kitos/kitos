@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -100,6 +101,11 @@ namespace Core.DomainModel
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
 
         public virtual ICollection<SsoUserIdentity> SsoIdentities { get; set; }
+
+        /// <summary>
+        /// Rights withing dpa
+        /// </summary>
+        public virtual ICollection<DataProcessingAgreementRight> DataProcessingAgreementRights { get; set; }
 
         public DateTime? LockedOutDate { get; set; }
 
