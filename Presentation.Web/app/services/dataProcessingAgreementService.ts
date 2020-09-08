@@ -9,6 +9,26 @@
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
+
+        private handleServerError(error) {
+            console.log("Request failed with:", error);
+            let errorCategory: Models.Api.ApiResponseErrorCategory;
+            switch (error.status) {
+            case 400:
+                errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
+                break;
+            case 409:
+                errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
+                break;
+            case 500:
+                errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
+                break;
+            default:
+                errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
+            }
+            throw errorCategory;
+        }
+
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
             const payload = {
                 name: name,
@@ -23,23 +43,7 @@
                             createdObjectId: response.data.response.id
                         };
                     },
-                    error => {
-                        var errorCategory: Models.Api.ApiResponseErrorCategory;
-                        switch (error.status) {
-                            case 400:
-                                errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
-                                break;
-                            case 409:
-                                errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
-                                break;
-                            case 500:
-                                errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
-                                break;
-                            default:
-                                errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
-                        }
-                        throw errorCategory;
-                    }
+                    error => this.handleServerError(error)
                 );
         }
 
