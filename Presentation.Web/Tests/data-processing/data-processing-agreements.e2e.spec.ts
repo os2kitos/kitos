@@ -1,4 +1,5 @@
-﻿import Login = require("../Helpers/LoginHelper");
+﻿"use strict";
+import Login = require("../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject =
 require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
@@ -42,21 +43,10 @@ describe("Data processing agreement tests", () => {
             //Verify correct creation of dpa and following update of kendo
             .getPage()
             .then(() => waitForKendo())
+            .then(() => openNewDpaDialog())
+            .then(() => enterDpaName(name))
             .then(() => {
-                console.log("clicking createDpaButton");
-                return pageObject.getCreateDpaButton().click();
-            })
-            .then(() => {
-                console.log("waiting for dialog to be visible");
-                return browser.wait(pageObject.isCreateDpaAvailable(), waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                console.log(`entering name: '${name}'`);
-                return pageObject.getNewDpaNameInput().sendKeys(name);
-            })
-            .then(() => {
-                console.log(`Expecting 'save' to be clickable`);
-                expect(pageObject.getNewDpaSubmitButton().isEnabled()).toBeTruthy();
+                validateSaveDpaClickable(true);
                 console.log(`clicking 'save'`);
                 return pageObject.getNewDpaSubmitButton().click();
             })
@@ -66,24 +56,37 @@ describe("Data processing agreement tests", () => {
                 expect(pageObject.findSpecificDpaInNameColumn(name).isPresent()).toBeTruthy();
             })
             //Verify that dialog acts correctly on attempt to create duplicate dpa name
+            .then(() => openNewDpaDialog())
             .then(() => {
-                console.log("clicking createDpaButton");
-                return pageObject.getCreateDpaButton().click();
+                console.log(`Validating UI error when entering the same name again.`);
+                return enterDpaName(name);
             })
             .then(() => {
-                console.log("waiting for dialog to be visible");
-                return browser.wait(pageObject.isCreateDpaAvailable(), waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                console.log(`entering SAME name again: '${name}'`);
-                return pageObject.getNewDpaNameInput().sendKeys(name);
-            })
-            .then(() => {
-                console.log(`Expecting 'save' to be disabled`);
+                console.log("Waiting for UI error to appear");
                 browser.wait(ec.not(ec.elementToBeClickable(pageObject.getNewDpaSubmitButton())), waitUpTo.twentySeconds);
-                expect(pageObject.getNewDpaSubmitButton().isEnabled()).toBeFalsy();
+                validateSaveDpaClickable(false);
             });
     });
+
+    function openNewDpaDialog() {
+        console.log("clicking createDpaButton");
+        return pageObject.getCreateDpaButton().click()
+            .then(() => {
+            console.log("waiting for dialog to be visible");
+            return browser.wait(pageObject.isCreateDpaAvailable(), waitUpTo.twentySeconds);
+        });
+    }
+
+    function validateSaveDpaClickable(isClickable: boolean) {
+        console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
+        const expectation = expect(pageObject.getNewDpaSubmitButton().isEnabled());
+        return isClickable ? expectation.toBeTruthy() : expectation.toBeFalsy();
+    }
+
+    function enterDpaName(name : string) {
+        console.log(`entering name: '${name}'`);
+        return pageObject.getNewDpaNameInput().sendKeys(name);
+    }
 
     function waitForKendo() {
         console.log("waiting for kendo grid to load");
