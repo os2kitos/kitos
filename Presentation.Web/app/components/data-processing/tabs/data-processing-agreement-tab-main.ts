@@ -51,7 +51,7 @@
             $stateProvider.state("data-processing.edit-agreement.main", {
                 url: "/main",
                 templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-main.view.html",
-                controller: EditDataProcessingAgreementController,
+                controller: EditMainDataProcessingAgreementController,
                 controllerAs: "vm"
             });
         }]);

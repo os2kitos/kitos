@@ -3,8 +3,8 @@
 
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
+        delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        //TODO: Extend with type safe methods for getting and changing data
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -12,6 +12,7 @@
         createdObjectId : number;
         error: string;
     }
+
 
     export interface IDataProcessingAgreementDeletedResult {
         deleted: boolean;
