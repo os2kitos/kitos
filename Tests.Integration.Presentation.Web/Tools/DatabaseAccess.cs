@@ -18,10 +18,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <returns></returns>
         public static TOutput MapFromEntitySet<TModel, TOutput>(Func<IGenericRepository<TModel>, TOutput> map) where TModel : class
         {
-            using (var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase()))
-            {
-                return map(repository);
-            }
+            using var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase());
+            
+            return map(repository);
         }
 
         /// <summary>
@@ -31,10 +30,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <param name="mutate"></param>
         public static void MutateEntitySet<TModel>(Action<IGenericRepository<TModel>> mutate) where TModel : class
         {
-            using (var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase()))
-            {
-                mutate(repository);
-            }
+            using var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase());
+
+            mutate(repository);
         }
 
         /// <summary>
@@ -43,10 +41,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <param name="mutate"></param>
         public static void MutateDatabase(Action<KitosContext> mutate)
         {
-            using (var db = TestEnvironment.GetDatabase())
-            {
-                mutate(db);
-            }
+            using var db = TestEnvironment.GetDatabase();
+
+            mutate(db);
         }
     }
 }

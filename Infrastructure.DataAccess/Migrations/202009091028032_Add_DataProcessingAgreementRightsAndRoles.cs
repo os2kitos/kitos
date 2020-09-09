@@ -32,6 +32,24 @@
                 .Index(t => t.LastChangedByUserId);
             
             CreateTable(
+                "dbo.DataProcessingAgreementRoleAssignmentReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        RoleId = c.Int(nullable: false),
+                        RoleName = c.String(),
+                        UserId = c.Int(nullable: false),
+                        UserFullName = c.String(nullable: false, maxLength: 100),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.DataProcessingAgreementReadModels", t => t.ParentId)
+                .Index(t => t.RoleId)
+                .Index(t => t.UserId)
+                .Index(t => t.UserFullName)
+                .Index(t => t.ParentId);
+            
+            CreateTable(
                 "dbo.DataProcessingAgreementRoles",
                 c => new
                     {
@@ -89,12 +107,17 @@
             DropForeignKey("dbo.DataProcessingAgreementRoles", "LastChangedByUserId", "dbo.User");
             DropForeignKey("dbo.DataProcessingAgreementRights", "ObjectOwnerId", "dbo.User");
             DropForeignKey("dbo.DataProcessingAgreementRights", "ObjectId", "dbo.DataProcessingAgreements");
+            DropForeignKey("dbo.DataProcessingAgreementRoleAssignmentReadModels", "ParentId", "dbo.DataProcessingAgreementReadModels");
             DropForeignKey("dbo.DataProcessingAgreementRights", "LastChangedByUserId", "dbo.User");
             DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "LastChangedByUserId" });
             DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "ObjectOwnerId" });
             DropIndex("dbo.LocalDataProcessingAgreementRoles", new[] { "OrganizationId" });
             DropIndex("dbo.DataProcessingAgreementRoles", new[] { "LastChangedByUserId" });
             DropIndex("dbo.DataProcessingAgreementRoles", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.DataProcessingAgreementRoleAssignmentReadModels", new[] { "ParentId" });
+            DropIndex("dbo.DataProcessingAgreementRoleAssignmentReadModels", new[] { "UserFullName" });
+            DropIndex("dbo.DataProcessingAgreementRoleAssignmentReadModels", new[] { "UserId" });
+            DropIndex("dbo.DataProcessingAgreementRoleAssignmentReadModels", new[] { "RoleId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "LastChangedByUserId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "ObjectOwnerId" });
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "ObjectId" });
@@ -102,6 +125,7 @@
             DropIndex("dbo.DataProcessingAgreementRights", new[] { "UserId" });
             DropTable("dbo.LocalDataProcessingAgreementRoles");
             DropTable("dbo.DataProcessingAgreementRoles");
+            DropTable("dbo.DataProcessingAgreementRoleAssignmentReadModels");
             DropTable("dbo.DataProcessingAgreementRights");
         }
     }

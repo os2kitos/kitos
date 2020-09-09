@@ -64,6 +64,7 @@
     <Compile Include="GDPR\Read\DataProcessingAgreementReadModel.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRight.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRole.cs" />
+    <Compile Include="GDPR\Read\DataProcessingAgreementRoleAssignmentReadModel.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="GlobalConfigKeys.cs" />

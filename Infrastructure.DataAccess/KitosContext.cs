@@ -148,6 +148,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataProcessingAgreementRole> LocalDataProcessingAgreementsRoles { get; set; }
         public DbSet<DataProcessingAgreementRight> DataProcessingAgreementsRights { get; set; }
         public DbSet<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
+        public DbSet<DataProcessingAgreementRoleAssignmentReadModel> DataProcessingAgreementRoleAssignmentReadModels { get; set; }
         public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -238,6 +239,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingAgreementRightMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementRoleMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementReadModelMap());
+            modelBuilder.Configurations.Add(new DataProcessingAgreementRoleAssignmentReadModelMap());
         }
     }
 }

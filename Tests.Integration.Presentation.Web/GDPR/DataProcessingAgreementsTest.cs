@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.GDPR.Read;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -157,33 +160,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task Can_Query_ReadModels()
-        {
-            //Arrange
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var suffix = A<Guid>().ToString("N");
-            var name1 = $"1_{suffix}";
-            var name2 = $"2_{suffix}";
-            var name3 = $"3_{suffix}";
-
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name1);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name2);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name3);
-
-            //Act
-            var page1 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
-            var page2 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
-
-            //Assert
-            Assert.Equal(2, page1.Count);
-            Assert.Equal(name1, page1.First().Name);
-            Assert.Equal(name2, page1.Last().Name);
-
-            Assert.Equal(1, page2.Count);
-            Assert.Equal(name3, page2.Single().Name);
         }
 
         [Fact]

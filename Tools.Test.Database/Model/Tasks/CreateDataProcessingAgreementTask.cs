@@ -30,10 +30,10 @@ namespace Tools.Test.Database.Model.Tasks
 
             agreement = dbContext.DataProcessingAgreements.Add(agreement);
             dbContext.SaveChanges();
-            
+
             var readModel = new DataProcessingAgreementReadModel();
-            new DataProcessingAgreementReadModelUpdate().Apply(agreement,readModel);
-            
+            new DataProcessingAgreementReadModelUpdate(new GenericRepository<DataProcessingAgreementRoleAssignmentReadModel>(dbContext)).Apply(agreement, readModel);
+
             dbContext.DataProcessingAgreementReadModels.Add(readModel);
             dbContext.SaveChanges();
 

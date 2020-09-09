@@ -1,12 +1,12 @@
 ﻿using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainServices;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -23,14 +23,17 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         {
             _repository = new Mock<IDataProcessingAgreementReadModelRepository>();
             _pendingUpdatesRepository = new Mock<IPendingReadModelUpdateRepository>();
-            _sut = new BuildDataProcessingAgreementReadModelOnChangesHandler(_repository.Object, new DataProcessingAgreementReadModelUpdate(), _pendingUpdatesRepository.Object);
+            _sut = new BuildDataProcessingAgreementReadModelOnChangesHandler(_repository.Object,
+                new DataProcessingAgreementReadModelUpdate(
+                    Mock.Of<IGenericRepository<DataProcessingAgreementRoleAssignmentReadModel>>()),
+                _pendingUpdatesRepository.Object);
         }
 
         [Fact]
         public void Handle_Created_Adds_New_ReadModel()
         {
             //Arrange
-            var dataProcessingAgreement = new DataProcessingAgreement()
+            var dataProcessingAgreement = new DataProcessingAgreement
             {
                 Id = A<int>(),
                 Name = A<string>(),
