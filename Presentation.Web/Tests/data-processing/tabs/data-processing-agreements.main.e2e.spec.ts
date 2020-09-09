@@ -37,31 +37,37 @@ describe("Data processing agreement main detail tests", () => {
         const name = createName(1);
         const name2 = createName(2);
         const renameValue = createName(3);
-
+        console.log("Creating Data Processing Agreements");
         DataProcessingAgreementHelper.createDataProcessingAgreement(name)
             .then(() => DataProcessingAgreementHelper.createDataProcessingAgreement(name2))
             .then(() => DataProcessingAgreementHelper.goToSpecificDataProcessingAgreement(name))
             .then(() => expect(getValueAttribute(pageObject.getDpaMainNameInput())).toEqual(name))
-            .then(() => pageObject.getDpaMainNameInput().click())
+            .then(() => {
+                console.log("Renaming agreement and checking if value is saved");
+                pageObject.getDpaMainNameInput().click();
+            })
             .then(() => pageObject.getDpaMainNameInput().clear())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-            .then(() => expect(pageObject.getDpaMainNameHeader().getText()).toEqual(renameValue))
+            .then(() => waitForHeaderTitleToChange(pageObject.getDpaMainNameHeader(), renameValue))
             .then(() => pageObjectOverview.getPage())
             .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeTruthy())
             .then(() => DataProcessingAgreementHelper.goToSpecificDataProcessingAgreement(name2))
             .then(() => expect(pageObject.getDpaMainNameHeader().getText()).toEqual(name2))
-            .then(() => pageObject.getDpaMainNameInput().click())
+            .then(() => {
+                console.log("Renaming agreement to already existing agreement");
+                pageObject.getDpaMainNameInput().click();
+            })
             .then(() => pageObject.getDpaMainNameInput().clear())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-            .then(() => expect(pageObject.getDpaMainNameHeader().getText()).toEqual(name2));
+            .then(() => waitForHeaderTitleToChange(pageObject.getDpaMainNameHeader(), name2));
     });
 
     it("It is possible to delete a data processing agreement", () => {
 
         const name = createName(1);
-
+        console.log("Creating agreement and deleting it");
         DataProcessingAgreementHelper.createDataProcessingAgreement(name)
             .then(() => pageObjectOverview.getPage())
             .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(name).isPresent()).toBeTruthy())
@@ -78,7 +84,13 @@ describe("Data processing agreement main detail tests", () => {
     }
 
     function getDeleteButton() {
+        console.log("Retrieving deletebutton");
         return pageObject.getDpaDeleteButton();
+    }
+
+    function waitForHeaderTitleToChange(element: protractor.ElementFinder, text: string) {
+        console.log("Waiting for header title to change to " + text);
+        return browser.wait(ec.textToBePresentInElement(element, text),waitUpTo.twentySeconds);
     }
 
 });

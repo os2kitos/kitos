@@ -8,6 +8,7 @@ class DataProcessingAgreementHelper {
     private static waitUpTo = new WaitTimers();
 
     public static createDataProcessingAgreement(name: string) {
+        console.log("Creating agreement with name " + name);
         return DataProcessingAgreementHelper.pageObject.getPage()
             .then(() => DataProcessingAgreementHelper.pageObject.waitForKendoGrid())
             .then(() => DataProcessingAgreementHelper.openNewDpaDialog())
