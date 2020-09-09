@@ -89,30 +89,6 @@ namespace Presentation.Web.Controllers.API
                 .Match(value => Ok(ToDTOs(value, organizationId)), FromOperationError);
         }
 
-        private List<DataProcessingAgreementDTO> ToDTOs(IQueryable<DataProcessingAgreement> value, int organizationId)
-        {
-            var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
-
-            return value
-                .Include(x => x.Rights)
-                .Include(x => x.Rights.Select(_ => _.Role))
-                .Include(x => x.Rights.Select(_ => _.User))
-                .AsNoTracking()
-                .AsEnumerable()
-                .Select(x => ToDTO(x, localDescriptionOverrides))
-                .ToList();
-        }
-
-        private Dictionary<int, Maybe<string>> GetLocalDescriptionOverrides(int organizationId)
-        {
-            var localDescriptionOverrides = _localRoleRepository
-                .AsQueryable()
-                .ByOrganizationId(organizationId)
-                .ToDictionary(x => x.OptionId,
-                    x => string.IsNullOrWhiteSpace(x.Description) ? Maybe<string>.None : x.Description);
-            return localDescriptionOverrides;
-        }
-
         [HttpDelete]
         [Route("{id}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -163,24 +139,31 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("{id}/available-roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<NamedEntityDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetAvailableRoles(int id, string nameContent)
+        public HttpResponseMessage GetAvailableRoles(int id)
         {
-            throw new NotImplementedException();
+            return _dataProcessingAgreementApplicationService
+                .GetAvailableRoles(id)
+                .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.agreement.OrganizationId).ToList())
+                .Match(Ok, FromOperationError);
+
         }
 
         [HttpGet]
         [Route("{id}/available-roles/{roleId}/applicable-users")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<NamedEntityDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserWithEmailDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetApplicableUsers(int id, int roleId, string nameOrEmailContent)
+        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri]string nameOrEmailContent = null, [FromUri] int pageSize = 25)
         {
-            throw new NotImplementedException();
+            return _dataProcessingAgreementApplicationService
+                .GetUsersWhichCanBeAssignedToRole(id, roleId, nameOrEmailContent, pageSize)
+                .Select<IEnumerable<UserWithEmailDTO>>(users => ToDTOs(users).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
@@ -190,25 +173,72 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignNewRole([FromBody] AssignRoleDTO dto)
+        public HttpResponseMessage AssignNewRole(int id, [FromBody] AssignRoleDTO dto)
         {
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
-            throw new NotImplementedException();
+            return
+                _dataProcessingAgreementApplicationService
+                    .AssignRole(id, dto.RoleId, dto.UserId)
+                    .Match(_ => Ok(), FromOperationError);
 
         }
 
         [HttpPatch]
-        [Route("{id}/roles/remove/{roleId}")]
+        [Route("{id}/roles/remove/{roleId}/from/{userId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage RemoveRole(int id, int roleId)
+        public HttpResponseMessage RemoveRole(int id, int roleId, int userId)
         {
-            throw new NotImplementedException();
+            return
+                _dataProcessingAgreementApplicationService
+                    .RemoveRole(id, roleId, userId)
+                    .Match(_ => Ok(), FromOperationError);
+        }
+
+        private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
+        {
+            return users.Select(ToDTO);
+        }
+
+        private static UserWithEmailDTO ToDTO(User arg)
+        {
+            return new UserWithEmailDTO(arg.Id, $"{arg.Name} {arg.LastName}", arg.Email);
+        }
+
+        private IEnumerable<BusinessRoleDTO> ToDTOs(IEnumerable<DataProcessingAgreementRole> roles, int organizationId)
+        {
+            var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
+
+            return roles.Select(role => ToDTO(role, localDescriptionOverrides));
+        }
+
+        private List<DataProcessingAgreementDTO> ToDTOs(IQueryable<DataProcessingAgreement> value, int organizationId)
+        {
+            var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
+
+            return value
+                .Include(agreement => agreement.Rights)
+                .Include(agreement => agreement.Rights.Select(_ => _.Role))
+                .Include(agreement => agreement.Rights.Select(_ => _.User))
+                .AsNoTracking()
+                .AsEnumerable()
+                .Select(agreement => ToDTO(agreement, localDescriptionOverrides))
+                .ToList();
+        }
+
+        private Dictionary<int, Maybe<string>> GetLocalDescriptionOverrides(int organizationId)
+        {
+            var localDescriptionOverrides = _localRoleRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .ToDictionary(agreementRole => agreementRole.OptionId,
+                    agreementRole => string.IsNullOrWhiteSpace(agreementRole.Description) ? Maybe<string>.None : agreementRole.Description);
+            return localDescriptionOverrides;
         }
 
         private DataProcessingAgreementDTO ToDTO(DataProcessingAgreement value)
@@ -220,18 +250,23 @@ namespace Presentation.Web.Controllers.API
         {
             return new DataProcessingAgreementDTO(value.Id, value.Name)
             {
-                AssignedRoles = value.Rights.Select(x => new AssignedRoleDTO
+                AssignedRoles = value.Rights.Select(agreementRight => new AssignedRoleDTO
                 {
-                    Role = new BusinessRoleDTO(x.RoleId, x.Role.Name)
-                    {
-                        HasWriteAccess = x.Role.HasWriteAccess,
-                        Note = localDescriptionOverrides.ContainsKey(x.RoleId)
-                            ? localDescriptionOverrides[x.RoleId].GetValueOrFallback(x.Role.Description)
-                            : x.Role.Description
-                    },
-                    User = x.User.MapToNamedEntityDTO()
+                    Role = ToDTO(agreementRight.Role, localDescriptionOverrides),
+                    User = ToDTO(agreementRight.User)
 
                 }).ToArray()
+            };
+        }
+
+        private static BusinessRoleDTO ToDTO(DataProcessingAgreementRole role, IReadOnlyDictionary<int, Maybe<string>> localDescriptionOverrides)
+        {
+            return new BusinessRoleDTO(role.Id, role.Name)
+            {
+                HasWriteAccess = role.HasWriteAccess,
+                Note = localDescriptionOverrides.ContainsKey(role.Id)
+                    ? localDescriptionOverrides[role.Id].GetValueOrFallback(role.Description)
+                    : role.Description
             };
         }
     }

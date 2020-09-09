@@ -2,7 +2,7 @@
 {
     public class AssignedRoleDTO
     {
-        public NamedEntityDTO User { get; set; }
+        public UserWithEmailDTO User { get; set; }
         public BusinessRoleDTO Role { get; set; }
     }
 }

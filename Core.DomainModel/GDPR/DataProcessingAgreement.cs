@@ -51,7 +51,6 @@ namespace Core.DomainModel.GDPR
                 Object = this
             };
 
-            //TODO: Check if this even works
             Rights.Add(agreementRight);
 
             return agreementRight;
@@ -66,8 +65,6 @@ namespace Core.DomainModel.GDPR
             if (agreementRight == null)
                 return new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}", OperationFailure.BadInput);
 
-            //TODO: Check if this even works
-            agreementRight.Object = null;
             Rights.Remove(agreementRight);
 
             return agreementRight;

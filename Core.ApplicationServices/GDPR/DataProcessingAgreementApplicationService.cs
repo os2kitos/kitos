@@ -9,6 +9,7 @@ using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
@@ -24,19 +25,22 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementNamingService _namingService;
         private readonly IDataProcessingAgreementRoleAssignmentsService _roleAssignmentsService;
         private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
 
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
             IDataProcessingAgreementNamingService namingService,
             IDataProcessingAgreementRoleAssignmentsService roleAssignmentsService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IGenericRepository<DataProcessingAgreementRight> rightRepository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
             _transactionManager = transactionManager;
+            _rightRepository = rightRepository;
         }
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
@@ -110,15 +114,11 @@ namespace Core.ApplicationServices.GDPR
             return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
-        public Result<IEnumerable<DataProcessingAgreementRole>, OperationError> GetAvailableRoles(int id)
+        public Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id)
         {
-            return WithReadAccess(id,
-                agreement =>
-                    Result<IEnumerable<DataProcessingAgreementRole>, OperationError>
-                        .Success(
-                            _roleAssignmentsService
-                                .GetRolesWhichCanBeAssignedToAgreement(agreement).ToList())
-            );
+            return WithReadAccess<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles)>(
+                id,
+                agreement => (agreement, _roleAssignmentsService.GetRolesWhichCanBeAssignedToAgreement(agreement).ToList()));
         }
 
         public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize)
@@ -160,6 +160,7 @@ namespace Core.ApplicationServices.GDPR
 
                 if (removeResult.Ok)
                 {
+                    _rightRepository.Delete(removeResult.Value);
                     _repository.Update(agreement);
                     transaction.Commit();
                 }

@@ -26,8 +26,11 @@ namespace Tools.Test.Database.Model.Tasks
                 connection.Open();
                 using var sqlCommand = connection.CreateCommand();
                 var sqlToDropDb =
-                    $"alter database [{dbName}] set single_user with rollback immediate; " +
-                    $"drop database [{dbName}]; ";
+                    $"if DB_ID('{dbName}') IS NOT NULL " +
+                    "BEGIN " +
+                        $"alter database [{dbName}] set single_user with rollback immediate " +
+                        $"drop database [{dbName}] " +
+                    "END ";
 
                 sqlCommand.CommandText = sqlToDropDb;
                 sqlCommand.ExecuteNonQuery();

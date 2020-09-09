@@ -70,7 +70,14 @@ namespace Core.DomainServices.GDPR
 
             var user = availableUsers.Value.FirstOrDefault(x => x.Id == userId).FromNullable();
             if (user.IsNone)
-                return new OperationError($"User Id {userId} is invalid in the context of assign role {roleId} to dpa with id {agreement.Id} in organization with id '{agreement.OrganizationId}'", OperationFailure.BadInput);
+            {
+                var failure = OperationFailure.BadInput;
+                
+                if (agreement.GetRights(roleId).Any(x => x.UserId == userId))
+                    failure = OperationFailure.Conflict;
+
+                return new OperationError($"User Id {userId} is invalid in the context of assign role {roleId} to dpa with id {agreement.Id} in organization with id '{agreement.OrganizationId}'", failure);
+            }
 
             var role = _localRoleOptionsService.GetOption(agreement.OrganizationId, roleId).Value.option;
 
