@@ -45,7 +45,7 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
         return this.ec.visibilityOf(this.getCreateDpaDialog());
     }
 
-    findSpecificDpaInNameColumn(name: string) {
+    findSpecificDpaInNameColumn(name: string) { 
         console.log(`Finding dpa with name : ${name}`);
         return element(by.xpath(`//*/tbody/*/td/a[text()="${name}" and @data-element-type="kendo-dpa-name-rendering"]`));
     }

@@ -77,7 +77,7 @@ describe("Data processing agreement main detail tests", () => {
             .then(() => pageObjectOverview.getPage())
             .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(name).isPresent()).toBeFalsy());
     });
-    
+
 
     function getValueAttribute(element: protractor.ElementFinder) {
         return element.getAttribute("value");
@@ -90,7 +90,7 @@ describe("Data processing agreement main detail tests", () => {
 
     function waitForHeaderTitleToChange(element: protractor.ElementFinder, text: string) {
         console.log("Waiting for header title to change to " + text);
-        return browser.wait(ec.textToBePresentInElement(element, text),waitUpTo.twentySeconds);
+        return browser.wait(ec.textToBePresentInElement(element, text), waitUpTo.twentySeconds);
     }
 
 });

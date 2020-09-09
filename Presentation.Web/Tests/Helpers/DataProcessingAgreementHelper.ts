@@ -24,7 +24,7 @@ class DataProcessingAgreementHelper {
         return this.pageObject.getPage()
             .then(() => this.pageObject.waitForKendoGrid())
             .then(() => this.findDataProcessingAgreementColumnFor(name).first().click());
-    } 
+    }
 
     private static openNewDpaDialog() {
         console.log("clicking createDpaButton");
