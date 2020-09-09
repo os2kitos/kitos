@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.BackgroundJobs;
+﻿using System;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices;
@@ -29,6 +30,9 @@ namespace Tests.Unit.Core.DomainServices.GDPR
                     Mock.Of<IGenericRepository<DataProcessingAgreementRoleAssignmentReadModel>>()),
                 _pendingUpdatesRepository.Object, Mock.Of<ITransactionManager>());
         }
+
+        [Fact]
+        void TODO_USER_STUFF() => throw new NotImplementedException("TODO");
 
         [Fact]
         public void Handle_Created_Adds_New_ReadModel()

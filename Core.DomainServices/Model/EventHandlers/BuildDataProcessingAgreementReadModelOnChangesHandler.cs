@@ -70,7 +70,10 @@ namespace Core.DomainServices.Model.EventHandlers
         public void Handle(EntityLifeCycleEvent<User> domainEvent)
         {
             //Schedule update of affected read models
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_User));
+            if (domainEvent.ChangeType == LifeCycleEventType.Updated)
+            {
+                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_User));
+            }
         }
     }
 }
