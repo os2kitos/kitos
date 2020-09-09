@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 
 namespace Infrastructure.DataAccess.Mapping
 {

@@ -25,6 +25,7 @@ using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;

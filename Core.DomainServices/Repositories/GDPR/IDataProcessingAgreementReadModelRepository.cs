@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR

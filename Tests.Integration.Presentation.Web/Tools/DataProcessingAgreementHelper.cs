@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;

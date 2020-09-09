@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.BackgroundJobs;

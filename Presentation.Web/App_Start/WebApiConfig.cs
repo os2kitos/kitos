@@ -25,6 +25,7 @@ using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;

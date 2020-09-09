@@ -13,6 +13,7 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;

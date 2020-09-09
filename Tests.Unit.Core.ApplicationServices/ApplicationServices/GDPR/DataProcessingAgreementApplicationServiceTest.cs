@@ -4,6 +4,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
@@ -28,7 +29,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             //TODO:_ Update tests
-            _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object, _repositoryMock.Object, _domainServiceMock.Object,new Mock<IDataProcessingAgreementRoleAssignmentsService>().Object, new Mock<ITransactionManager>().Object);
+            _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
+                _repositoryMock.Object, _domainServiceMock.Object,
+                new Mock<IDataProcessingAgreementRoleAssignmentsService>().Object,
+                new Mock<ITransactionManager>().Object,
+                new Mock<IGenericRepository<DataProcessingAgreementRight>>().Object);
         }
 
         [Fact]

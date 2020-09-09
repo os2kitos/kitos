@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.GDPR;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;

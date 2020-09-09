@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.GDPR

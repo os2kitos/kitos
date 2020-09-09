@@ -1,4 +1,4 @@
-﻿namespace Core.DomainModel.GDPR
+﻿namespace Core.DomainModel.GDPR.Read
 {
     /// <summary>
     /// A READ optimized perspective of the data processing agreement model

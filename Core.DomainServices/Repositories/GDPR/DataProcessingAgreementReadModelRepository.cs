@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 

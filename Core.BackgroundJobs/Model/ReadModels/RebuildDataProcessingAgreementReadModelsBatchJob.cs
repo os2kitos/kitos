@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Result;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
