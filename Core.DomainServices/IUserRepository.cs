@@ -8,6 +8,6 @@ namespace Core.DomainServices
     {
         User GetByEmail(string email);
         User GetById(int id);
-        IQueryable<User> Search(int id, Maybe<string> query);
+        IQueryable<User> SearchOrganizationUsers(int organizationId, Maybe<string> query);
     }
 }

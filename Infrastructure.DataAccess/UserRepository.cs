@@ -27,12 +27,12 @@ namespace Infrastructure.DataAccess
             return _context.Users.SingleOrDefault(u => u.Id == id);
         }
 
-        public IQueryable<User> Search(int id, Maybe<string> query)
+        public IQueryable<User> SearchOrganizationUsers(int organizationId, Maybe<string> query)
         {
             return
                 _context
-                    .OrganizationRights
-                    .ByOrganizationId(id)
+                    .OrganizationRights //The organization rights are what determines relationship to an organization
+                    .ByOrganizationId(organizationId)
                     .Select(x => x.User)
                     .Transform(userQuery =>
                         query.Select(queryString => new QueryUserByNameOrEmail(queryString).Apply(userQuery))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
@@ -11,9 +12,9 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
@@ -26,6 +27,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IOptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole> _localRoleOptionsService;
         private readonly IDataProcessingAgreementRoleAssignmentService _roleAssignmentService;
         private readonly IUserRepository _userRepository;
+        private readonly ITransactionManager _transactionManager;
 
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
@@ -33,7 +35,8 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingAgreementNamingService namingService,
             IOptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole> localRoleOptionsService,
             IDataProcessingAgreementRoleAssignmentService roleAssignmentService,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ITransactionManager transactionManager)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -41,6 +44,7 @@ namespace Core.ApplicationServices.GDPR
             _localRoleOptionsService = localRoleOptionsService;
             _roleAssignmentService = roleAssignmentService;
             _userRepository = userRepository;
+            _transactionManager = transactionManager;
         }
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
@@ -111,7 +115,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreement, OperationError> UpdateName(int id, string name)
         {
-            return UpdateWith(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
+            return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
         public Result<IEnumerable<DataProcessingAgreementRole>, OperationError> GetAvailableRoles(int id)
@@ -128,6 +132,7 @@ namespace Core.ApplicationServices.GDPR
             return WithReadAccess(id, agreement =>
             {
                 var availableRoles = GetAvailableRoles(id);
+
                 if (availableRoles.Failed)
                     return availableRoles.Error;
 
@@ -136,7 +141,7 @@ namespace Core.ApplicationServices.GDPR
                 if (targetRole.IsNone)
                     return new OperationError("Invalid role id", OperationFailure.BadInput);
 
-                var candidates = _userRepository.Search(agreement.OrganizationId, nameEmailQuery.FromNullable());
+                var candidates = _userRepository.SearchOrganizationUsers(agreement.OrganizationId, nameEmailQuery.FromNullable());
 
                 candidates = _roleAssignmentService.GetUsersWhichCanBeAssignedToRole(agreement, targetRole.Value, candidates);
 
@@ -151,8 +156,31 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreementRight, OperationError> AssignRole(int id, int roleId, int userId)
         {
-            //TODO: Check if insert is automatically applied - perhaps it is not and then we need to use the repo
-            throw new NotImplementedException();
+            return WithWriteAccess(id, agreement =>
+            {
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var availableOption = _localRoleOptionsService.GetAvailableOption(agreement.OrganizationId, roleId);
+
+                if (availableOption.IsNone)
+                    return new OperationError("Selected role is not available in the organization", OperationFailure.BadInput);
+
+                Maybe<User> userResult = _userRepository
+                    .SearchOrganizationUsers(agreement.OrganizationId, Maybe<string>.None)
+                    .FirstOrDefault(user => user.Id == userId);
+
+                if (userResult.IsNone)
+                    return new OperationError($"User Id {userId} is invalid in the context of organization with id '{agreement.OrganizationId}'", OperationFailure.BadInput);
+
+                var assignmentResult = agreement.AssignRoleToUser(availableOption.Value, userResult.Value);
+
+                if (assignmentResult.Ok)
+                {
+                    _repository.Update(agreement);
+                    transaction.Commit();
+                }
+
+                return assignmentResult;
+            });
         }
 
         public Result<DataProcessingAgreementRight, OperationError> RemoveRole(int id, int roleId, int userId)
@@ -161,7 +189,7 @@ namespace Core.ApplicationServices.GDPR
             throw new NotImplementedException();
         }
 
-        private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, DataProcessingAgreementPropertyChanges changeSet)
+        private Result<DataProcessingAgreement, OperationError> UpdateProperties(int id, DataProcessingAgreementPropertyChanges changeSet)
         {
             if (changeSet == null)
                 throw new ArgumentNullException(nameof(changeSet));
