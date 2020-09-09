@@ -10,7 +10,6 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
-    //TODO: Unit test for this one
     public class DataProcessingAgreementRoleAssignmentsService : IDataProcessingAgreementRoleAssignmentsService
     {
         private readonly IOptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole> _localRoleOptionsService;

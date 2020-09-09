@@ -12,7 +12,6 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;

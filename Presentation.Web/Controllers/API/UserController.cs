@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -25,7 +25,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IDomainEvents domainEvents)
             : base(repository)
         {
             _userService = userService;

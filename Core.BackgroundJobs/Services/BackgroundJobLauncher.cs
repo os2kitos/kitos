@@ -15,15 +15,18 @@ namespace Core.BackgroundJobs.Services
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
         private readonly RebuildDataProcessingAgreementReadModelsBatchJob _rebuildDataProcessingAgreementReadModels;
+        private readonly ScheduleDataProcessingAgreementReadModelUpdates _scheduleDataProcessingAgreementReadModelUpdates;
 
         public BackgroundJobLauncher(
             ILogger logger,
             CheckExternalLinksBackgroundJob checkExternalLinksJob,
-            RebuildDataProcessingAgreementReadModelsBatchJob rebuildDataProcessingAgreementReadModels)
+            RebuildDataProcessingAgreementReadModelsBatchJob rebuildDataProcessingAgreementReadModels,
+            ScheduleDataProcessingAgreementReadModelUpdates scheduleDataProcessingAgreementReadModelUpdates)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
             _rebuildDataProcessingAgreementReadModels = rebuildDataProcessingAgreementReadModels;
+            _scheduleDataProcessingAgreementReadModelUpdates = scheduleDataProcessingAgreementReadModelUpdates;
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
@@ -36,6 +39,11 @@ namespace Core.BackgroundJobs.Services
             await Launch(_rebuildDataProcessingAgreementReadModels, token);
         }
 
+        public async Task LaunchScheduleDataProcessingAgreementReadUpdates(CancellationToken token = default)
+        {
+            await Launch(_scheduleDataProcessingAgreementReadModelUpdates, token);
+        }
+
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
         {
             var jobId = job.Id;
@@ -43,7 +51,7 @@ namespace Core.BackgroundJobs.Services
             LogJobStarted(jobId);
             try
             {
-                var result = await job.ExecuteAsync();
+                var result = await job.ExecuteAsync(token);
                 LogJobResult(jobId, result);
             }
             catch (Exception e)

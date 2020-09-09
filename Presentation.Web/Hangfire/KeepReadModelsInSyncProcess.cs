@@ -24,6 +24,7 @@ namespace Presentation.Web.Hangfire
                 //Using a NEW thread to isolate ninject resolutions for the thread scope. This is the best option we have for continous batch jobs which should use ninject and clean up after each execution
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
                 using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken,context.StoppingToken);
+                backgroundJobLauncher.LaunchScheduleDataProcessingAgreementReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
                 backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             })
             {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
@@ -28,13 +29,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
-            //TODO:_ Update tests
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
                 _repositoryMock.Object, _domainServiceMock.Object,
                 new Mock<IDataProcessingAgreementRoleAssignmentsService>().Object,
                 new Mock<ITransactionManager>().Object,
                 new Mock<IGenericRepository<DataProcessingAgreementRight>>().Object);
         }
+
+        [Fact] public void TODO() => throw new NotImplementedException("TODO: Add coverage of role stuff");
 
         [Fact]
         public void Can_Create()
@@ -44,7 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
 
             ExpectAllowCreateReturns(organizationId, true);
-            _domainServiceMock.Setup(x=>x.ValidateSuggestedNewAgreement(organizationId,name)).Returns(Maybe<OperationError>.None);
+            _domainServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(Maybe<OperationError>.None);
             _repositoryMock
                 .Setup(x => x.Add(It.Is<DataProcessingAgreement>(dpa =>
                     dpa.OrganizationId == organizationId && name == dpa.Name)))
@@ -65,7 +67,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
             var operationError = new OperationError(A<OperationFailure>());
 
-            _domainServiceMock.Setup(x=>x.ValidateSuggestedNewAgreement(organizationId,name)).Returns(operationError);
+            _domainServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(operationError);
             ExpectAllowCreateReturns(organizationId, true);
 
             //Act

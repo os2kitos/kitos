@@ -7,5 +7,6 @@ namespace Infrastructure.Services.BackgroundJobs
     {
         Task LaunchLinkCheckAsync(CancellationToken token = default);
         Task LaunchUpdateDataProcessingAgreementReadModels(CancellationToken token = default);
+        Task LaunchScheduleDataProcessingAgreementReadUpdates(CancellationToken token = default);
     }
 }

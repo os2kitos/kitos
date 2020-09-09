@@ -4,6 +4,7 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Web.Http;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 
@@ -73,7 +74,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
 
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
-
+            
             return Created(createdUser);
         }
         [HttpGet]

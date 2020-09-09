@@ -11,7 +11,9 @@ using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
+using Ninject;
 using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
@@ -19,6 +21,9 @@ namespace Presentation.Web.Controllers.API
     public abstract class GenericApiController<TModel, TDto> : BaseApiController
         where TModel : class, IEntity
     {
+        [Inject]
+        public IDomainEvents DomainEvents { get; set; }
+
         protected readonly IGenericRepository<TModel> Repository;
         private const int MaxEntities = 100;
 
@@ -162,7 +167,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var savedItem = PostQuery(item);
-
+                DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Created, savedItem));
                 return NewObjectCreated(savedItem);
             }
             catch (ConflictException e)
@@ -214,6 +219,7 @@ namespace Presentation.Web.Controllers.API
         protected virtual void DeleteQuery(TModel entity)
         {
             Repository.DeleteByKey(entity.Id);
+            DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Deleted, entity));
             Repository.Save();
         }
 
@@ -347,6 +353,7 @@ namespace Presentation.Web.Controllers.API
                 }
             }
             Repository.Update(item);
+            DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Updated,item));
             Repository.Save();
 
             return item;

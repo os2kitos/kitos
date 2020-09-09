@@ -58,5 +58,14 @@ namespace Core.DomainServices.Repositories.GDPR
             _repository.DeleteWithReferencePreload(readModel);
             _repository.Save();
         }
+
+        public IQueryable<DataProcessingAgreementReadModel> GetByUserId(int userId)
+        {
+            //Gets all read models that have dependencies on the user
+            return _repository
+                .AsQueryable()
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
+                .Distinct();
+        }
     }
 }

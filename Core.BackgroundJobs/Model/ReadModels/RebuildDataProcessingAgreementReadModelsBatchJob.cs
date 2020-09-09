@@ -11,6 +11,7 @@ using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels
@@ -58,16 +59,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
                     if (source.HasValue)
                     {
-                        var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
-                        _updater.Apply(source.Value, readModel);
-                        if (readModelResult.HasValue)
-                        {
-                            _readModelRepository.Update(readModel);
-                        }
-                        else
-                        {
-                            _readModelRepository.Add(readModel);
-                        }
+                        var sourceValue = source.Value;
+
+                        ApplyUpdate(readModelResult, sourceValue);
                     }
                     else
                     {
@@ -91,6 +85,20 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 return Task.FromResult(Result<string, OperationError>.Failure(new OperationError("Error during rebuild", OperationFailure.UnknownError)));
             }
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {completedUpdates} updates"));
+        }
+
+        private void ApplyUpdate(Maybe<DataProcessingAgreementReadModel> readModelResult, DataProcessingAgreement sourceValue)
+        {
+            var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
+            _updater.Apply(sourceValue, readModel);
+            if (readModelResult.HasValue)
+            {
+                _readModelRepository.Update(readModel);
+            }
+            else
+            {
+                _readModelRepository.Add(readModel);
+            }
         }
     }
 }

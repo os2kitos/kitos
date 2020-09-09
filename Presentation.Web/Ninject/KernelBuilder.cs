@@ -24,6 +24,7 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.DomainEvents;
@@ -231,6 +232,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
             RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityLifeCycleEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -348,6 +350,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<RebuildDataProcessingAgreementReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleDataProcessingAgreementReadModelUpdates>().ToSelf().InCommandScope(Mode);
         }
     }
 }

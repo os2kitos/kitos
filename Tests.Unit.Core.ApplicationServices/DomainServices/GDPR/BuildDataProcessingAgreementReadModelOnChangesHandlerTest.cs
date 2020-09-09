@@ -6,6 +6,7 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -17,7 +18,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
     {
         private readonly Mock<IDataProcessingAgreementReadModelRepository> _repository;
         private readonly BuildDataProcessingAgreementReadModelOnChangesHandler _sut;
-        private Mock<IPendingReadModelUpdateRepository> _pendingUpdatesRepository;
+        private readonly Mock<IPendingReadModelUpdateRepository> _pendingUpdatesRepository;
 
         public BuildDataProcessingAgreementReadModelOnChangesHandlerTest()
         {
@@ -26,7 +27,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _sut = new BuildDataProcessingAgreementReadModelOnChangesHandler(_repository.Object,
                 new DataProcessingAgreementReadModelUpdate(
                     Mock.Of<IGenericRepository<DataProcessingAgreementRoleAssignmentReadModel>>()),
-                _pendingUpdatesRepository.Object);
+                _pendingUpdatesRepository.Object, Mock.Of<ITransactionManager>());
         }
 
         [Fact]
