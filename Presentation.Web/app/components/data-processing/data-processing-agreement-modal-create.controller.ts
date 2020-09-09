@@ -60,6 +60,8 @@
                 .then(response => {
                     if (response) {
                         this.$uibModalInstance.close();
+                        this.$state.go("^", null, { reload: true });
+
                     }
                 });
         }
@@ -92,8 +94,8 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                            $state.go("^", null, { reload: true });
-                        },
+                                // This is handled in Save and saveAndProcess
+                            },
                             () => {
                                 $state.go("^");
                             });

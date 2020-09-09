@@ -8,7 +8,7 @@ import Constants = require("../../Utility/Constants");
 class DataProcessingAgreementOverviewPageObject implements PageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
     private navigationHelper = new NavigationHelper();
-    private kendoToolbarWrapper = new KendoToolbarWrapper();
+    public kendoToolbarWrapper = new KendoToolbarWrapper();
     private ec = protractor.ExpectedConditions;
     private cssHelper = new CssLocatorHelper();
     private consts = new Constants();

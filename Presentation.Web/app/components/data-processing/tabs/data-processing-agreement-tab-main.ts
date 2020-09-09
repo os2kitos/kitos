@@ -39,7 +39,6 @@
                 },
                 onError => {
                     msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
-
                 }
             );
         }

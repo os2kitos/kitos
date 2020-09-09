@@ -25,7 +25,7 @@
                 { state: "data-processing.overview", text: "Databehandleraftaler"}
             ];
             $rootScope.page.subnav.buttons = [
-                { func: remove, text: "Slet Databehandleraftale", style: "btn-danger", showWhen: "data-processing.edit-agreement" }
+                { func: remove, text: "Slet Databehandleraftale", style: "btn-danger", showWhen: "data-processing.edit-agreement", dataElementType: 'removeDataProcessingAgreementButton' }
             ];
 
             $rootScope.subnavPositionCenter = false;
