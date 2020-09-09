@@ -51,7 +51,24 @@ namespace Core.DomainModel.GDPR
                 Object = this
             };
 
+            //TODO: Check if this even works
             Rights.Add(agreementRight);
+
+            return agreementRight;
+        }
+
+        public Result<DataProcessingAgreementRight, OperationError> RemoveRole(DataProcessingAgreementRole role, User user)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var agreementRight = GetRights(role.Id).FirstOrDefault(x => x.UserId == user.Id && x.RoleId == role.Id);
+            if (agreementRight == null)
+                return new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}", OperationFailure.BadInput);
+
+            //TODO: Check if this even works
+            agreementRight.Object = null;
+            Rights.Remove(agreementRight);
 
             return agreementRight;
         }

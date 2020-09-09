@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
@@ -40,13 +41,16 @@ namespace Core.BackgroundJobs.Model.ReadModels
             _transactionManager = transactionManager;
         }
 
-        public Task<Result<string, OperationError>> ExecuteAsync()
+        public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var completedUpdates = 0;
             try
             {
                 foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingAgreement, BatchSize).ToList())
                 {
+                    if (token.IsCancellationRequested)
+                        break;
+
                     using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId);

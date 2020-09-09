@@ -11,7 +11,6 @@ using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
-using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
@@ -39,6 +38,7 @@ using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model;
 using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -183,7 +183,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingAgreementRoleAssignmentService>().To<DataProcessingAgreementRoleAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementRoleAssignmentsService>().To<DataProcessingAgreementRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 

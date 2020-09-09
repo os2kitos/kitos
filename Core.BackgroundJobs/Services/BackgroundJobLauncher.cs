@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.ExternalLinks;
@@ -25,17 +26,17 @@ namespace Core.BackgroundJobs.Services
             _rebuildDataProcessingAgreementReadModels = rebuildDataProcessingAgreementReadModels;
         }
 
-        public async Task LaunchLinkCheckAsync()
+        public async Task LaunchLinkCheckAsync(CancellationToken token = default)
         {
-            await Launch(_checkExternalLinksJob);
+            await Launch(_checkExternalLinksJob, token);
         }
 
-        public async Task LaunchUpdateDataProcessingAgreementReadModels()
+        public async Task LaunchUpdateDataProcessingAgreementReadModels(CancellationToken token = default)
         {
-            await Launch(_rebuildDataProcessingAgreementReadModels);
+            await Launch(_rebuildDataProcessingAgreementReadModels, token);
         }
 
-        private async Task Launch(IAsyncBackgroundJob job)
+        private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
         {
             var jobId = job.Id;
 
