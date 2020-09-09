@@ -6,6 +6,7 @@ class DataProcessingAgreementHelper {
 
     private static pageObject = new DataProcessingAgreementOverviewPageObject();
     private static waitUpTo = new WaitTimers();
+    private static ec = protractor.ExpectedConditions;
 
     public static createDataProcessingAgreement(name: string) {
         console.log("Creating agreement with name " + name);
@@ -27,9 +28,10 @@ class DataProcessingAgreementHelper {
 
     private static openNewDpaDialog() {
         console.log("clicking createDpaButton");
-        return DataProcessingAgreementHelper.pageObject.getCreateDpaButton().click()
-            .then(() => {
-                console.log("waiting for dialog to be visible");
+        return browser.wait(DataProcessingAgreementHelper.ec.elementToBeClickable(DataProcessingAgreementHelper.pageObject.getCreateDpaButton()), DataProcessingAgreementHelper.waitUpTo.twentySeconds)
+            .then(() => DataProcessingAgreementHelper.pageObject.getCreateDpaButton()
+                .click()).then(() => {
+                    console.log("waiting for dialog to be visible");
                 return browser.wait(DataProcessingAgreementHelper.pageObject.isCreateDpaAvailable(), DataProcessingAgreementHelper.waitUpTo.twentySeconds);
             });
     }
