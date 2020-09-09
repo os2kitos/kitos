@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
