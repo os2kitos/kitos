@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
@@ -25,6 +26,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
         private readonly Mock<IDataProcessingAgreementNamingService> _domainServiceMock;
         private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<ITransactionManager> _transactionManagerMock;
+        private readonly Mock<IGenericRepository<DataProcessingAgreementRight>> _rightsRepositoryMock;
 
         public DataProcessingAgreementApplicationServiceTest()
         {
@@ -32,11 +35,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
+            _transactionManagerMock = new Mock<ITransactionManager>();
+            _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingAgreementRight>>();
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
                 _repositoryMock.Object, _domainServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
-                new Mock<ITransactionManager>().Object,
-                new Mock<IGenericRepository<DataProcessingAgreementRight>>().Object);
+                _transactionManagerMock.Object,
+                _rightsRepositoryMock.Object);
         }
 
         [Fact]
@@ -416,6 +421,137 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_AssignRole_If_WriteAccess_Is_Permitted(bool serviceSucceeds)
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var roleId = A<int>();
+            var userId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var transaction = new Mock<IDatabaseTransaction>();
+            var serviceResult = serviceSucceeds
+                ? Result<DataProcessingAgreementRight, OperationError>.Success(new DataProcessingAgreementRight())
+                : Result<DataProcessingAgreementRight, OperationError>.Failure(A<OperationError>());
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _roleAssignmentServiceMock.Setup(x => x.AssignRole(dataProcessingAgreement, roleId, userId)).Returns(serviceResult);
+
+            //Act
+
+            var result = _sut.AssignRole(agreementId, roleId, userId);
+
+            //Assert
+            Assert.Equal(serviceSucceeds, result.Ok);
+            Assert.Same(serviceResult, result);
+            VerifyExpectedDbSideEffect(serviceSucceeds, dataProcessingAgreement, transaction);
+        }
+
+        [Fact]
+        public void Cannot_AssignRole_If_WriteAccess_Is_Denied()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.AssignRole(agreementId, A<int>(), A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignRole_If_Dpa_Is_Not_found()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.AssignRole(agreementId, A<int>(), A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_RemoveRole_If_WriteAccess_Is_Permitted(bool serviceSucceeds)
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var roleId = A<int>();
+            var userId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var transaction = new Mock<IDatabaseTransaction>();
+            var agreementRight = new DataProcessingAgreementRight();
+            var serviceResult = serviceSucceeds
+                ? Result<DataProcessingAgreementRight, OperationError>.Success(agreementRight)
+                : Result<DataProcessingAgreementRight, OperationError>.Failure(A<OperationError>());
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _roleAssignmentServiceMock.Setup(x => x.RemoveRole(dataProcessingAgreement, roleId, userId)).Returns(serviceResult);
+
+            //Act
+            var result = _sut.RemoveRole(agreementId, roleId, userId);
+
+            //Assert
+            Assert.Equal(serviceSucceeds, result.Ok);
+            Assert.Same(serviceResult, result);
+            VerifyExpectedDbSideEffect(serviceSucceeds, dataProcessingAgreement, transaction);
+            _rightsRepositoryMock.Verify(x => x.Delete(agreementRight), serviceSucceeds ? Times.Once() : Times.Never());
+        }
+
+        [Fact]
+        public void Cannot_RemoveRole_If_WriteAccess_Is_Denied()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.RemoveRole(agreementId, A<int>(), A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_RemoveRole_If_Dpa_Is_Not_found()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.RemoveRole(agreementId, A<int>(), A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingAgreement dataProcessingAgreement, Mock<IDatabaseTransaction> transaction)
+        {
+            _repositoryMock.Verify(x => x.Update(dataProcessingAgreement), expectSideEffect ? Times.Once() : Times.Never());
+            transaction.Verify(x => x.Commit(), expectSideEffect ? Times.Once() : Times.Never());
         }
 
         private void ExpectOrganizationalReadAccess(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
