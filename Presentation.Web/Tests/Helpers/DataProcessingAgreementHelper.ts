@@ -10,47 +10,51 @@ class DataProcessingAgreementHelper {
 
     public static createDataProcessingAgreement(name: string) {
         console.log("Creating agreement with name " + name);
-        return DataProcessingAgreementHelper.pageObject.getPage()
-            .then(() => DataProcessingAgreementHelper.pageObject.waitForKendoGrid())
-            .then(() => DataProcessingAgreementHelper.openNewDpaDialog())
-            .then(() => DataProcessingAgreementHelper.enterDpaName(name))
-            .then(() => DataProcessingAgreementHelper.validateSaveDpaClickable(true))
-            .then(() => DataProcessingAgreementHelper.pageObject.getNewDpaSubmitButton().click())
-            .then(() => DataProcessingAgreementHelper.pageObject.waitForKendoGrid());
+        return this.pageObject.getPage()
+            .then(() => this.waitForKendo())
+            .then(() => this.openNewDpaDialog())
+            .then(() => this.enterDpaName(name))
+            .then(() => this.validateSaveDpaClickable(true))
+            .then(() => this.pageObject.getNewDpaSubmitButton().click())
+            .then(() => this.pageObject.waitForKendoGrid());
     }
 
     public static goToSpecificDataProcessingAgreement(name: string) {
         console.log("Finding DataProcessingAgreement: " + name);
-        return DataProcessingAgreementHelper.pageObject.getPage()
-            .then(() => DataProcessingAgreementHelper.pageObject.waitForKendoGrid())
-            .then(() => DataProcessingAgreementHelper.findDataProcessingAgreementColumnFor(name).first().click());
+        return this.pageObject.getPage()
+            .then(() => this.pageObject.waitForKendoGrid())
+            .then(() => this.findDataProcessingAgreementColumnFor(name).first().click());
     } 
 
     private static openNewDpaDialog() {
         console.log("clicking createDpaButton");
-        return browser.wait(DataProcessingAgreementHelper.ec.elementToBeClickable(DataProcessingAgreementHelper.pageObject.getCreateDpaButton()), DataProcessingAgreementHelper.waitUpTo.twentySeconds)
-            .then(() => DataProcessingAgreementHelper.pageObject.getCreateDpaButton()
-                .click()).then(() => {
-                    console.log("waiting for dialog to be visible");
-                return browser.wait(DataProcessingAgreementHelper.pageObject.isCreateDpaAvailable(), DataProcessingAgreementHelper.waitUpTo.twentySeconds);
+        return this.pageObject.getCreateDpaButton().click()
+            .then(() => {
+                console.log("waiting for dialog to be visible");
+                return browser.wait(this.pageObject.isCreateDpaAvailable(), this.waitUpTo.twentySeconds);
             });
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
-        const expectation = expect(DataProcessingAgreementHelper.pageObject.getNewDpaSubmitButton().isEnabled());
+        const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());
         return isClickable ? expectation.toBeTruthy() : expectation.toBeFalsy();
     }
 
     private static enterDpaName(name: string) {
         console.log(`entering name: '${name}'`);
-        return DataProcessingAgreementHelper.pageObject.getNewDpaNameInput().sendKeys(name);
+        return this.pageObject.getNewDpaNameInput().sendKeys(name);
     }
 
     private static findDataProcessingAgreementColumnFor(name: string) {
-        return DataProcessingAgreementHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(
-            DataProcessingAgreementHelper.pageObject.kendoToolbarWrapper.columnObjects().dpaName,
+        return this.pageObject.kendoToolbarWrapper.getFilteredColumnElement(
+            this.pageObject.kendoToolbarWrapper.columnObjects().dpaName,
             name);
+    }
+
+    private static waitForKendo() {
+        console.log("waiting for kendo grid to load");
+        return this.pageObject.waitForKendoGrid();
     }
 }
 
