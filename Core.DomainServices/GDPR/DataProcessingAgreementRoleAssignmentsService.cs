@@ -38,7 +38,7 @@ namespace Core.DomainServices.GDPR
             return agreement.GetRights(role.Id).Select(x => x.UserId).Distinct();
         }
 
-        public IEnumerable<DataProcessingAgreementRole> GetRolesWhichCanBeAssignedToAgreement(DataProcessingAgreement agreement)
+        public IEnumerable<DataProcessingAgreementRole> GetApplicableRoles(DataProcessingAgreement agreement)
         {
             if (agreement == null) throw new ArgumentNullException(nameof(agreement));
             return _localRoleOptionsService.GetAvailableOptions(agreement.OrganizationId);

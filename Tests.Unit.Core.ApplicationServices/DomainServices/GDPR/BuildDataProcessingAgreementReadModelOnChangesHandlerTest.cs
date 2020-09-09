@@ -32,9 +32,6 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         }
 
         [Fact]
-        void TODO_USER_STUFF() => throw new NotImplementedException("TODO");
-
-        [Fact]
         public void Handle_Created_Adds_New_ReadModel()
         {
             //Arrange

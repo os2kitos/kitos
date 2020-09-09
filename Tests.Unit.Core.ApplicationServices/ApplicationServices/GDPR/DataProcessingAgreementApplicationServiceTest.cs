@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
@@ -23,20 +24,20 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
         private readonly Mock<IDataProcessingAgreementNamingService> _domainServiceMock;
+        private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
 
         public DataProcessingAgreementApplicationServiceTest()
         {
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
+            _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
                 _repositoryMock.Object, _domainServiceMock.Object,
-                new Mock<IDataProcessingAgreementRoleAssignmentsService>().Object,
+                _roleAssignmentServiceMock.Object,
                 new Mock<ITransactionManager>().Object,
                 new Mock<IGenericRepository<DataProcessingAgreementRight>>().Object);
         }
-
-        [Fact] public void TODO() => throw new NotImplementedException("TODO: Add coverage of role stuff");
 
         [Fact]
         public void Can_Create()
@@ -302,6 +303,119 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(organizationData.Failed);
             Assert.Equal(OperationFailure.BadInput, organizationData.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetAvailableRoles_If_ReadAccess_Is_Permitted()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var agreementRoles = new[] { new DataProcessingAgreementRole(), new DataProcessingAgreementRole() };
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, true);
+            _roleAssignmentServiceMock.Setup(x => x.GetApplicableRoles(dataProcessingAgreement)).Returns(agreementRoles);
+
+            //Act
+            var result = _sut.GetAvailableRoles(agreementId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(agreementRoles, result.Value.roles);
+        }
+
+        [Fact]
+        public void Cannot_GetAvailableRoles_If_ReadAccess_Is_Denied()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.GetAvailableRoles(agreementId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_GetAvailableRoles_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var agreementId = A<int>();
+
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.GetAvailableRoles(agreementId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetUsersWhichCanBeAssignedToRole_If_ReadAccess_Is_Permitted()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var roleId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var nameEmailQuery = A<string>();
+            var pageSize = new Random().Next(1, 10);
+            var usersFromService = Enumerable.Range(0, pageSize + 1).Select((index) => new User { Id = index }).ToList(); //one more than pagesize to verify
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, true);
+            _roleAssignmentServiceMock
+                .Setup(x => x.GetUsersWhichCanBeAssignedToRole(dataProcessingAgreement, roleId,
+                    It.Is<Maybe<string>>(m => m.Select(q => q == nameEmailQuery).GetValueOrDefault())))
+                .Returns(Result<IQueryable<User>, OperationError>.Success(usersFromService.AsQueryable()));
+
+            //Act
+            var result = _sut.GetUsersWhichCanBeAssignedToRole(agreementId, roleId, nameEmailQuery, pageSize);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(usersFromService.Take(pageSize), result.Value);
+        }
+
+        [Fact]
+        public void Cannot_GetUsersWhichCanBeAssignedToRole_If_ReadAccess_Is_Denied()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.GetUsersWhichCanBeAssignedToRole(agreementId, A<int>(), A<string>(), 13);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_GetUsersWhichCanBeAssignedToRole_If_Dpa_Is_Not_found()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.GetUsersWhichCanBeAssignedToRole(agreementId, A<int>(), A<string>(), 13);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         private void ExpectOrganizationalReadAccess(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)

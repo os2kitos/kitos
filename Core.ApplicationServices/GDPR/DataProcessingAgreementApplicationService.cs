@@ -118,11 +118,14 @@ namespace Core.ApplicationServices.GDPR
         {
             return WithReadAccess<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles)>(
                 id,
-                agreement => (agreement, _roleAssignmentsService.GetRolesWhichCanBeAssignedToAgreement(agreement).ToList()));
+                agreement => (agreement, _roleAssignmentsService.GetApplicableRoles(agreement).ToList()));
         }
 
         public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize)
         {
+            if (pageSize < 1)
+                throw new ArgumentException($"{nameof(pageSize)} must be above 0");
+
             return WithReadAccess(id, agreement =>
             {
                 return _roleAssignmentsService
