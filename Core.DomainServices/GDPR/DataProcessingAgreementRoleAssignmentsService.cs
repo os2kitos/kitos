@@ -23,16 +23,6 @@ namespace Core.DomainServices.GDPR
             _userRepository = userRepository;
         }
 
-        public IQueryable<User> GetUsersWhichCanBeAssignedToRole(DataProcessingAgreement agreement, DataProcessingAgreementRole role, IQueryable<User> candidates)
-        {
-            if (agreement == null) throw new ArgumentNullException(nameof(agreement));
-            if (role == null) throw new ArgumentNullException(nameof(role));
-            if (candidates == null) throw new ArgumentNullException(nameof(candidates));
-
-            var usersWithSameRole = GetIdsOfUsersAssignedToRole(agreement, role);
-            return candidates.ExceptEntitiesWithIds(usersWithSameRole.ToList());
-        }
-
         private static IEnumerable<int> GetIdsOfUsersAssignedToRole(DataProcessingAgreement agreement, DataProcessingAgreementRole role)
         {
             return agreement.GetRights(role.Id).Select(x => x.UserId).Distinct();
@@ -47,9 +37,7 @@ namespace Core.DomainServices.GDPR
         public Result<IQueryable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(DataProcessingAgreement agreement, int roleId, Maybe<string> nameEmailQuery)
         {
             if (agreement == null) throw new ArgumentNullException(nameof(agreement));
-            var availableRoles = _localRoleOptionsService.GetAvailableOptions(agreement.OrganizationId);
-
-            var targetRole = availableRoles.FirstOrDefault(x => x.Id == roleId).FromNullable();
+            var targetRole = _localRoleOptionsService.GetAvailableOption(agreement.OrganizationId, roleId);
 
             if (targetRole.IsNone)
                 return new OperationError("Invalid role id", OperationFailure.BadInput);
@@ -71,14 +59,14 @@ namespace Core.DomainServices.GDPR
             if (user.IsNone)
             {
                 var failure = OperationFailure.BadInput;
-                
+
                 if (agreement.GetRights(roleId).Any(x => x.UserId == userId))
                     failure = OperationFailure.Conflict;
 
                 return new OperationError($"User Id {userId} is invalid in the context of assign role {roleId} to dpa with id {agreement.Id} in organization with id '{agreement.OrganizationId}'", failure);
             }
 
-            var role = _localRoleOptionsService.GetOption(agreement.OrganizationId, roleId).Value.option;
+            var role = _localRoleOptionsService.GetAvailableOption(agreement.OrganizationId, roleId).Value;
 
             return agreement.AssignRoleToUser(role, user.Value);
         }
