@@ -45,7 +45,7 @@ describe("Data processing agreement main detail tests", () => {
     it("Creating and renaming data processing agreement",
         () => {
             var name1 = createName(10);
-
+            var renameValue = createName(30);
 
             pageObjectOverview.getPage()
                 .then(() => pageObjectOverview.waitForKendoGrid())
@@ -54,9 +54,15 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
                 .then(() => pageObjectOverview.getPage())
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name1))
-                .then(() => pageObjectOverview.waitForKendoGrid());
-
-
+                .then(() => goToSpecificDataProcessingAgreement(name1))
+                .then(() => {
+                    console.log("Renaming agreement and checking if value is saved");
+                    pageObject.getDpaMainNameInput().click();
+                })
+                .then(() => pageObject.getDpaMainNameInput().clear())
+                .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
+                .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
+                .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), renameValue), waitUpTo.twentySeconds));
         });
 
     function openNewDpaDialog() {
@@ -71,6 +77,19 @@ describe("Data processing agreement main detail tests", () => {
     function enterDpaName(name: string) {
         console.log(`entering name: '${name}'`);
         return pageObjectOverview.getNewDpaNameInput().sendKeys(name);
+    }
+
+    function goToSpecificDataProcessingAgreement(name: string) {
+        console.log("Finding DataProcessingAgreement: " + name);
+        return pageObjectOverview.getPage()
+            .then(() => pageObjectOverview.waitForKendoGrid())
+            .then(() => findDataProcessingAgreementColumnFor(name).first().click());
+    }
+
+    function findDataProcessingAgreementColumnFor(name: string) {
+        return pageObjectOverview.kendoToolbarWrapper.getFilteredColumnElement(
+            pageObjectOverview.kendoToolbarWrapper.columnObjects().dpaName,
+            name);
     }
 
     //it("It is possible to rename a data processing agreement",
