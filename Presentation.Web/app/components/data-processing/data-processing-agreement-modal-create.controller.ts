@@ -62,12 +62,20 @@
             this.$uibModalInstance.close();
         }
 
+        private popState(reload = false) {
+            const popped = this.$state.go("^");
+            if (reload) {
+                popped.then(() => this.$state.reload());
+            }
+
+        }
+
         save(): void {
             this.createNew()
                 .then(response => {
                     if (response) {
                         this.close();
-                        this.$state.go("^", null, { reload: true });
+                        this.popState(true);
                     }
                 });
         }
@@ -77,6 +85,7 @@
                 .then(response => {
                     if (response) {
                         this.close();
+                        this.popState();
                         this.$state.go("data-processing.overview.edit-agreement.main", { id: response.createdObjectId });
                     }
                 });
@@ -84,7 +93,7 @@
 
         cancel(): void {
             this.close();
-            this.$state.go("^");
+            this.popState();
         }
     }
 
