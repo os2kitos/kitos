@@ -17,6 +17,8 @@
         enableUsage(dataItem): void;
         removeUsage(dataItem): void;
         allowToggleUsage: boolean;
+        toggleActiveSystemsMasterFilter(): void;
+        toggleActiveSystemsMasterFilterBtnText : string;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -36,6 +38,8 @@
         public canMigrate = this.userMigrationRights.canExecuteMigration;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
         public allowToggleUsage = false;
+        private showInactiveSystems: boolean;
+        public toggleActiveSystemsMasterFilterBtnText : string;
 
         public static $inject:
             Array<string> = [
@@ -55,7 +59,8 @@
                 "gridStateService",
                 "$uibModal",
                 "exportGridToExcelService",
-                "systemUsageUserAccessRights"
+                "systemUsageUserAccessRights",
+                "$window",
             ];
 
         constructor(
@@ -76,6 +81,7 @@
             private $uibModal,
             private exportGridToExcelService,
             private systemUsageUserAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private $window,
             private oldItSystemName,
             private oldItSystemId,
             private oldItSystemUsageId,
@@ -85,6 +91,10 @@
             public migrationConsequenceText) {
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
             $rootScope.page.title = "IT System - Katalog";
+            $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
+            this.showInactiveSystems = ItSystem.Settings.CatalogState.getShowInactiveSystems($window, user.id);
+            this.updateToggleActiveSystemsMasterFilterBtnText();
+
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
                     // the event is emitted for every widget; if we have multiple
@@ -142,11 +152,11 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, (system: { id; name; }) => {
+                        _.each(data.data.response, (system: { id; name;}) => {
                             results.push({
                                 //the id of the system is the id, that is selected
                                 id: system.id,
-                                //but the name of the system is the label for the select2
+                                //the name of the system is the label for the select2
                                 text: system.name,
                                 //saving the system for later use
                                 system: system
@@ -162,6 +172,20 @@
             //Defer until page change is complete
             setTimeout(() => this.activate(), 1);
         }
+
+        updateToggleActiveSystemsMasterFilterBtnText(): void {
+            this.toggleActiveSystemsMasterFilterBtnText = this.showInactiveSystems
+                ? "Vis aktive systemer"
+                : "Vis deaktiverede systemer";
+        }
+
+        toggleActiveSystemsMasterFilter(): void {
+            this.showInactiveSystems = !this.showInactiveSystems;
+            ItSystem.Settings.CatalogState.setShowInactiveSystems(this.$window, this.user.id, this.showInactiveSystems);
+            this.updateToggleActiveSystemsMasterFilterBtnText();
+            this.mainGrid.dataSource.read();
+        }
+
         private activate() {
             var itSystemBaseUrl: string;
             if (this.user.isGlobalAdmin) {
@@ -184,7 +208,6 @@
                         },
                         parameterMap: (options, type) => {
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
                             if (parameterMap.$filter) {
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/,
@@ -198,11 +221,15 @@
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/,
                                     "contains(CAST(Uuid, 'Edm.String'),");
-
-                                //if (user.isGlobalAdmin) {
-                                //    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
-                                //}
                             }
+
+                            const existing = parameterMap.$filter;
+                            const hadExisting = _.isEmpty(existing) === false;
+                            parameterMap.$filter = `Disabled eq ${this.showInactiveSystems ? "true" : "false"} ${hadExisting ? " and (" + existing + ")" : ""}`;
+                            if (hadExisting) {
+                                parameterMap.$filter = `(${parameterMap.$filter})`;
+                            }
+                            
 
                             return parameterMap;
                         }
@@ -279,7 +306,14 @@
                         text: "Slet filter",
                         template:
                             "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemCatalogVm.clearGridProfile()' data-ng-disabled='!systemCatalogVm.doesGridProfileExist()'>#: text #</button>"
+                    },
+                    {
+                        name: "toggleActiveSystemsMasterFilter",
+                        text: "-",
+                        template: 
+                            "<button type='button' class='k-button k-button-icontext' title='Skift mellem aktive eller deaktiverede systemer' data-ng-click='systemCatalogVm.toggleActiveSystemsMasterFilter()'>{{systemCatalogVm.toggleActiveSystemsMasterFilterBtnText}}</button>"
                     }
+
                 ],
                 excel: {
                     fileName: "IT System Katalog.xlsx",
@@ -352,7 +386,7 @@
                         title: "Overordnet IT System",
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
+                        template: dataItem => dataItem.Parent ? Helpers.SystemNameFormat.apply(dataItem.Parent.Name, dataItem.Parent.Disabled) : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -384,12 +418,7 @@
                         width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
-                                    } (Slettes) </a>`;
-                            else
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name
-                                    }</a>`;
+                            return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
                         },
                         attributes: {
                             "data-element-type": "catalogNameObject"
@@ -399,10 +428,7 @@
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
-                                if (dataItem.Disabled)
-                                    return dataItem.Name + " (Slettes)";
-                                else
-                                    return dataItem.Name;
+                                return Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.Disabled);
                             } else {
                                 return "";
                             }
@@ -413,27 +439,6 @@
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "Disabled",
-                        title: "Slettes",
-                        width: 120,
-                        persistId: "Disabled", // DON'T YOU DARE RENAME!
-                        template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: function (args) {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
                             }
                         }
                     },

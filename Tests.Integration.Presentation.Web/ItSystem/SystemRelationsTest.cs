@@ -442,7 +442,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return input;
         }
 
-        private SystemRelationDTO PrepareEditedRelation(SystemRelationDTO created, NamedEntityDTO usage, NamedEntityDTO contract, NamedEntityDTO frequency, NamedEntityDTO interfaceType)
+        private SystemRelationDTO PrepareEditedRelation(SystemRelationDTO created, NamedEntityWithEnabledStatusDTO usage, NamedEntityDTO contract, NamedEntityDTO frequency, NamedEntityDTO interfaceType)
         {
             return new SystemRelationDTO(
                 created.Id,

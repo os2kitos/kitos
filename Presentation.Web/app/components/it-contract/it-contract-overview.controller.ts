@@ -513,10 +513,8 @@
                         template: dataItem => {
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
-                                if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Slettes)";
-                                else
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
+                                const system = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem;
+                                value = Helpers.SystemNameFormat.apply(system.Name, system.Disabled); 
                             }
 
                             if (dataItem.AssociatedSystemUsages.length > 1) {

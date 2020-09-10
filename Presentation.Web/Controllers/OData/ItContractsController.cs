@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -10,6 +9,7 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -20,13 +20,16 @@ namespace Presentation.Web.Controllers.OData
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
         public ItContractsController(
             IGenericRepository<ItContract> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository)
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
+            IOrganizationUnitRepository organizationUnitRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
+            _organizationUnitRepository = organizationUnitRepository;
         }
 
         /// <summary>
@@ -61,7 +64,6 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            //tolist requried to handle filtering on computed fields
             var result = Repository.AsQueryable().ByOrganizationId(key);
 
             return Ok(result);
@@ -80,32 +82,14 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var contracts = new List<ItContract>();
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
 
-            // using iteration instead of recursion else we're running into
-            // an "multiple DataReaders open" issue and MySQL doesn't support MARS
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey)
+                .Where(usage => usage.ResponsibleOrganizationUnitId != null && orgUnitTreeIds.Contains(usage.ResponsibleOrganizationUnitId.Value));
 
-            var queue = new Queue<int>();
-            queue.Enqueue(unitKey);
-            while (queue.Count > 0)
-            {
-                var orgUnitKey = queue.Dequeue();
-                var orgUnit = _orgUnitRepository.AsQueryable()
-                    .Include(x => x.Children)
-                    .Include(x => x.ResponsibleForItContracts)
-                    .FirstOrDefault(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
-
-                if (orgUnit != null)
-                {
-                    contracts.AddRange(orgUnit.ResponsibleForItContracts);
-
-                    var childIds = orgUnit.Children.Select(x => x.Id);
-                    foreach (var childId in childIds)
-                        queue.Enqueue(childId);
-                }
-
-            }
-            return Ok(contracts.Where(AllowRead));
+            return Ok(result);
         }
     }
 }

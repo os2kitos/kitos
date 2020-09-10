@@ -1,7 +1,7 @@
 ﻿module Kitos.Services {
 
     export interface ISelect2LoadingService {
-        loadSelect2(url: string, allowClear: boolean, paramArray: any, checkResultsForDisabled: boolean, nameContentQueryParamName?: string);
+        loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
         select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
         select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear? :boolean);
@@ -32,12 +32,12 @@
             url: string,
             allowClear: boolean,
             paramArray,
-            checkResultsForDisabled,
+            removeDisabledItems,
             nameContentQueryParamName = "q") {
             var self = this;
             return this.loadSelect2WithDataHandler(url, allowClear, paramArray, (item, items) => {
-                if (checkResultsForDisabled) {
-                    self.handleResultsWithDisabled(items, item);
+                if (removeDisabledItems) {
+                    self.filterDisabledResults(items, item);
                 } else {
                     self.handleResults(items, item);
                 }
@@ -83,17 +83,17 @@
             return config;
         }
 
-        private handleResultsWithDisabled(list: any, obj: { id; name; disabled; }) {
-            if (!obj.disabled) {
+        private filterDisabledResults(list: any, obj: { id; name; disabled; itSystemDisabled; }) {
+            if (!obj.disabled && !obj.itSystemDisabled) {
                 this.handleResults(list, obj);
             }
         }
 
-        private handleResults(list: any, obj: { id; name; }) {
+        private handleResults(list: any, obj: { id; name; disabled; itSystemDisabled}) {
             list.push({
                 id: obj.id,
-                text: obj.name
-            });
+                text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled || obj.itSystemDisabled)
+        });
         }
 
     }

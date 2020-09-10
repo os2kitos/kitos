@@ -57,11 +57,11 @@
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
-                    this.mainGrid.dataSource.read();
                 }
             });
 
-            this.activate();
+            //Defer loading grid unitil navigtion completed
+            setTimeout(() => this.activate(), 1);
         }
 
         private saveGridOptions = () => {

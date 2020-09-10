@@ -28,13 +28,16 @@ namespace Presentation.Web.Controllers.SSO
         {
             try
             {
+                _logger.Debug("Starting SSO flow");
                 var finalState = _ssoFlowApplicationService.StartSsoLoginFlow();
                 switch (finalState)
                 {
                     case ErrorState errorState:
+                        _logger.Information("SSO Login failed with error: {errorCode}", errorState.ErrorCode);
                         return SsoError(errorState.ErrorCode);
 
-                    case UserLoggedInState _:
+                    case UserLoggedInState loggedInState:
+                        _logger.Information("SSO Login completed with success for user with id: {userId}", loggedInState.User.Id);
                         return LoggedIn();
                 }
             }
@@ -51,7 +54,7 @@ namespace Presentation.Web.Controllers.SSO
             //Redirect to front page
             var uriBuilder = new UriBuilder(Request.RequestUri)
             {
-                Path = string.Empty,
+                Path = "Home/SsoAuthenticated"
             };
             return Redirect(uriBuilder.Uri);
         }

@@ -140,6 +140,8 @@
                                 if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
                                 if (!ItInterface.ExhibitedBy) {
                                     ItInterface.ExhibitedBy = { ItSystem: { Name: "" } };
+                                }
+                                if (!ItInterface.ExhibitedBy.ItSystem.BelongsTo) {
                                     ItInterface.ExhibitedBy.ItSystem.BelongsTo = { Name: "" };
                                 }
                                 if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
@@ -226,20 +228,12 @@
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.Disabled) {
-                                return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes)</a>`;
-                            } else {
-                                return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
-                            }
-                        },
+                            return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
+                            },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
-                                if (dataItem.Disabled) {
-                                    return dataItem.Name + " (Slettes)";
+                                return Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled);
                                 } else {
-                                    return dataItem.Name;
-                                }
-                            } else {
                                 return "";
                             }
                         },
@@ -282,7 +276,7 @@
                         field: "ExhibitedBy.ItSystem.BelongsTo.Name", title: "Rettighedshaver", width: 150,
                         persistId: "belongs", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
-                        excelTemplate: dataItem => dataItem.ExhibitedBy.ItSystem.BelongsTo ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
+                        excelTemplate: dataItem => (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.BelongsTo) ? dataItem.ExhibitedBy.ItSystem.BelongsTo.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -317,8 +311,8 @@
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
-                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Slettes)" : dataItem.ExhibitedBy.ItSystem.Name;
+                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
+                                return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name,dataItem.ExhibitedBy.ItSystem.Disabled);
                             else
                                 return "";
                         },

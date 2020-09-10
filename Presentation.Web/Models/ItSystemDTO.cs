@@ -16,6 +16,7 @@ namespace Presentation.Web.Models
         public Guid Uuid { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
+        public bool ParentDisabled { get; set; }
 
         /// <summary>
         /// Gets or sets the exposed interface ids.

@@ -5,7 +5,6 @@ using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
 using Serilog;
-using Serilog.Context;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
@@ -23,24 +22,20 @@ namespace Presentation.Web.Infrastructure.Middleware
             var authenticationContext = kernel.Get<IAuthenticationContext>();
             if (authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
-                var guid = Guid.NewGuid();
                 var requestStart = DateTime.UtcNow;
                 var route = context.Request.Path;
                 var method = context.Request.Method;
                 var queryParameters = GetQueryParameters(context.Request.Query);
                 var userId = authenticationContext.UserId.GetValueOrDefault(INVALID_ID);
-                using (LogContext.PushProperty("CorrelationId", guid.ToString()))
+                logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, requestStart);
+                try
                 {
-                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, requestStart);
-                    try
-                    {
-                        await Next.Invoke(context);
-                    }
-                    finally
-                    {
-                        var requestEnd = DateTime.UtcNow;
-                        logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, requestEnd);
-                    }
+                    await Next.Invoke(context);
+                }
+                finally
+                {
+                    var requestEnd = DateTime.UtcNow;
+                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, requestEnd);
                 }
             }
             else

@@ -63,7 +63,6 @@
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 this.loadGridOptions();
-                this.mainGrid.dataSource.read();
 
                 // find the access modifier filter row section
                 var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
@@ -81,7 +80,9 @@
                     kendo.ui.progress(this.mainGrid.element, true);
                 });
             });
-            this.setupGrid();
+
+            //Defer setting up grid until after navigation completed
+            setTimeout(() => this.setupGrid(), 1);
         }
 
         public onEdit = (e: JQueryEventObject) => {

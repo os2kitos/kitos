@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
@@ -12,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -23,15 +22,18 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
+        private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
         public ItSystemUsagesController(
             IGenericRepository<ItSystemUsage> repository,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
-            IGenericRepository<AccessType> accessTypeRepository)
+            IGenericRepository<AccessType> accessTypeRepository,
+            IOrganizationUnitRepository organizationUnitRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
+            _organizationUnitRepository = organizationUnitRepository;
         }
 
         /// <summary>
@@ -79,27 +81,14 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var systemUsages = new List<ItSystemUsage>();
-            var queue = new Queue<int>();
-            queue.Enqueue(unitKey);
-            while (queue.Count > 0)
-            {
-                var orgUnitKey = queue.Dequeue();
-                var orgUnit = _orgUnitRepository.AsQueryable()
-                    .Include(x => x.Children)
-                    .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
-                    .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
-                var responsible =
-                    orgUnit.Using.Select(x => x.ResponsibleItSystemUsage).Where(x => x != null).ToList();
-                systemUsages.AddRange(responsible);
-                var childIds = orgUnit.Children.Select(x => x.Id);
-                foreach (var childId in childIds)
-                {
-                    queue.Enqueue(childId);
-                }
-            }
+            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
 
-            return Ok(systemUsages);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey)
+                .Where(usage => usage.ResponsibleUsage != null && orgUnitTreeIds.Contains(usage.ResponsibleUsage.OrganizationUnitId));
+
+            return Ok(result);
         }
 
         [AcceptVerbs("POST", "PUT")]

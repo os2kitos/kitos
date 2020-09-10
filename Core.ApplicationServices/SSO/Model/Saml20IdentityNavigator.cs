@@ -19,12 +19,13 @@ namespace Core.ApplicationServices.SSO.Model
             _sourceIdentity = sourceIdentity;
         }
 
-        public Maybe<XmlNode> GetPrivilegeNode()
+        public IEnumerable<XmlNode> GetPrivilegeNodes()
         {
             return
                 GetAttribute(StsAdgangsStyringConstants.Attributes.PrivilegeKey)
                     .Select(ToXml)
-                    .Match(xml => xml.SelectSingleNode("//Privilege"), onNone: () => Maybe<XmlNode>.None);
+                    .Select(xml => xml.SelectNodes("//Privilege")?.OfType<XmlNode>())
+                    .GetValueOrFallback(Enumerable.Empty<XmlNode>());
         }
 
         public Maybe<SamlAttribute> GetAttribute(string attributeName)

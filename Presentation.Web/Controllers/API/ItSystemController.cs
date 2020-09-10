@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -73,7 +72,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="paging"></param>
         /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityWithEnabledStatusDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
@@ -82,7 +81,7 @@ namespace Presentation.Web.Controllers.API
 
                 var query = Page(systemQuery, paging)
                     .AsEnumerable()
-                    .MapToNamedEntityDTOs()
+                    .Select(system=>system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToList();
 
                 return Ok(query);
@@ -93,7 +92,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityWithEnabledStatusDTO>>))]
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId, int take = 25)
         {
             try
@@ -103,7 +102,8 @@ namespace Presentation.Web.Controllers.API
                     .ExceptEntitiesWithIds(excludeId)
                     .OrderBy(_ => _.Name)
                     .Take(take)
-                    .MapToNamedEntityDTOs()
+                    .AsEnumerable()
+                    .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToList();
 
                 

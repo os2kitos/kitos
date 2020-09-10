@@ -18,6 +18,18 @@
 
     app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location", "$",
         ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location, $) => {
+
+            const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
+            let ssoStateViewModel = factory.createFromViewState();
+
+            if (ssoStateViewModel.startPreference && ssoStateViewModel.startPreference !== "index") {
+                if (navigationService.checkState(ssoStateViewModel.startPreference)) {
+
+                    $state.go(ssoStateViewModel.startPreference, null, { reload: true });
+                    return;
+                }
+            }
+
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -41,8 +53,7 @@
                 convert_urls: false
             };
 
-            const factory = new Kitos.Models.ViewModel.Sso.SsoStateViewModelFactory($);
-            $scope.ssoVm = factory.createFromViewState();
+            $scope.ssoVm = ssoStateViewModel;
 
             const resetSsoError = () => {
                 $scope.ssoVm.error = null;

@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("UnusedItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemSimpleDTO>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityWithEnabledStatusDTO>>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
             [FromUri]int organizationId,
             [FromUri]string nameContent,
@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API
 
             if (result.Ok)
             {
-                var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
+                var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityWithEnabledStatusDTO).ToList();
                 return Ok(unusedItSystems);
             }
 
@@ -105,9 +105,9 @@ namespace Presentation.Web.Controllers.API
         {
             return new ItSystemUsageMigrationDTO
             {
-                TargetUsage = new NamedEntityDTO(input.SystemUsage.Id, input.FromItSystem.Name),
-                FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
-                ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
+                TargetUsage = input.SystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
+                FromSystem = input.FromItSystem.MapToNamedEntityWithEnabledStatusDTO(),
+                ToSystem = input.ToItSystem.MapToNamedEntityWithEnabledStatusDTO(),
                 AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
                 AffectedContracts = input.AffectedContracts.MapToNamedEntityDTOs().ToList(),
                 AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList()
@@ -118,8 +118,8 @@ namespace Presentation.Web.Controllers.API
         {
             return new RelationMigrationDTO
             {
-                ToSystemUsage = input.FromSystemUsage.MapToNamedEntityDTO(),
-                FromSystemUsage = input.ToSystemUsage.MapToNamedEntityDTO(),
+                ToSystemUsage = input.ToSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
+                FromSystemUsage = input.FromSystemUsage.MapToNamedEntityWithEnabledStatusDTO(),
                 Description = input.Description,
                 Contract = input.AssociatedContract?.MapToNamedEntityDTO(),
                 FrequencyType = input.UsageFrequency?.MapToNamedEntityDTO(),

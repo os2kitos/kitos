@@ -16,7 +16,7 @@
                 <tr ng-repeat="exposure in interfaceExposures">
                     <!-- name of the interface -->
                     <td>
-                        <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ exposure.name }} <span ng-if="exposure.disabled">(Slettes)</span></a>
+                        <a data-ui-sref="it-system.interface-edit.main({ id: exposure.id })">{{ formatInterfaceName(exposure.name, exposure.disabled) }}</a>
                     </td>
 
                     <!-- interface (grænseflade) -->

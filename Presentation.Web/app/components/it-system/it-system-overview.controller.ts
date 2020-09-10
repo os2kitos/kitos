@@ -389,7 +389,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentsysname",
-                        template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
+                        template: dataItem => dataItem.ItSystem.Parent ? Helpers.SystemNameFormat.apply(dataItem.ItSystem.Parent.Name, dataItem.ItSystem.Parent.Disabled) : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -404,10 +404,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         field: "SystemName", title: "IT System", width: 320,
                         persistId: "sysname",
                         template: dataItem => {
-                            if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
-                            else
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
+                            return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.ItSystem.Name, dataItem.ItSystem.Disabled)}</a>`;
                         },
                         attributes: {
                             "data-element-type": "systemNameKendoObject"
@@ -417,10 +414,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
-                                if (dataItem.ItSystem.Disabled)
-                                    return dataItem.ItSystem.Name + " (Slettes)";
-                                else
-                                    return dataItem.ItSystem.Name;
+                                return Helpers.SystemNameFormat.apply(dataItem.ItSystem.Name, dataItem.ItSystem.Disabled);
                             } else {
                                 return "";
                             }
@@ -606,8 +600,14 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>`;
                             }
                         },
-                        excelTemplate: dataItem =>
-                            dataItem && dataItem.MainContract && dataItem.MainContract.ItContract ? this.isContractActive(dataItem.MainContract.ItContract).toString() : "",
+                        excelTemplate: dataItem => {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
+                                return "";
+                            }
+                            else {
+                                return this.isContractActive(dataItem.MainContract.ItContract) ? "True" : "";
+                            }
+                        },
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: {
@@ -1126,7 +1126,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                     resolve: {
                         systemRoles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()
+                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()

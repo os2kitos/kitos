@@ -10,7 +10,7 @@ namespace Tests.Unit.Presentation.Web
 
         public WebHomeController()
         {
-            _homeController = new HomeController();
+            _homeController = new HomeController(null,null);
         }
         [Fact]
         public void Index_Call_ReturnsView()

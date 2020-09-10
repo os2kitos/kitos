@@ -73,6 +73,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             //Refine, order and take the amount requested
             var result = unusedSystems
                 .ByPartOfName(nameContent)
+                .Where(x=>x.Disabled == false)
                 .OrderBy(x => x.Name)
                 .Take(numberOfItSystems)
                 .ToList()
@@ -108,6 +109,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             if (!_authorizationContext.AllowReads(toItSystem))
             {
                 return OperationFailure.Forbidden;
+            }
+
+            if (toItSystem.Disabled)
+            {
+                return OperationFailure.BadInput;
             }
 
             // Get contracts

@@ -30,7 +30,7 @@
                     exhibit));
 
             $scope.interfaceExposures = exhibitViewModels;
-
+            $scope.formatName = Kitos.Helpers.InterfaceNameFormat.apply;
             $scope.expandParagraph = (e) => {
                 Kitos.Utility.TableManipulation.expandRetractParagraphCell(e, Kitos.Configs.ExposedInterfaceTableCellParagraphSizeConfig.shortTextLineCount);
             };
