@@ -51,6 +51,9 @@
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
                                 break;
                         }
+
+                        //Fail the continuation
+                        throw errorResponse;
                     }
                 );
         }
