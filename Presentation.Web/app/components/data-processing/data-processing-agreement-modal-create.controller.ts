@@ -42,7 +42,7 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
                             case Models.Api.ApiResponseErrorCategory.BadInput:
-                                msg.toErrorMessage("Fejl! Navnet var ugyldigt!");
+                                msg.toErrorMessage("Fejl! Navnet er ugyldigt!");
                                 break;
                             case Models.Api.ApiResponseErrorCategory.Conflict:
                                 msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
