@@ -22,6 +22,8 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
+        withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
+        withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -37,6 +39,18 @@ module Kitos.Utility.KendoGrid {
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
+        private sortingEnabled = true;
+        private visible = true;
+
+        withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource> {
+            this.visible = visible;
+            return this;
+        }
+
+        withoutSorting() : IKendoGridColumnBuilder<TDataSource> {
+            this.sortingEnabled = false;
+            return this;
+        }
 
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource> {
             if (renderUi == null) throw "renderUi must be defined";
@@ -137,10 +151,12 @@ module Kitos.Utility.KendoGrid {
                     "data-element-type": `${this.id}KendoObject`
                 },
                 width: this.standardWidth,
+                hidden: !this.visible,
                 persistId: this.id,
                 template: dataItem => this.rendering(dataItem),
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
-                filterable: this.getFiltering()
+                filterable: this.getFiltering(),
+                sortable : this.sortingEnabled
             } as IKendoGridColumn<TDataSource>;
         }
     }

@@ -57,6 +57,7 @@
                         if (parameterMap.$filter) {
                             roles.forEach(role => {
                                 parameterMap.$filter =
+                                    //TODO: Add a createRoleFieldKey
                                     replaceRoleQuery(parameterMap.$filter, `role${role.Id}`, role.Id);
                             });
                         }
@@ -109,6 +110,8 @@
                         .withId(`dpaRole${role.Id}`)
                         .withStandardWidth(135)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                        .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-role-${role.Id}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaToRoleMap[dataItem.Id][role.Id]))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaToRoleMap[dataItem.Id][role.Id])))
             );
