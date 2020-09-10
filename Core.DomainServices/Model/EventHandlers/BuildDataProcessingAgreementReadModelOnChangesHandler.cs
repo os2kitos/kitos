@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Data;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.Model.EventHandlers
@@ -18,18 +16,15 @@ namespace Core.DomainServices.Model.EventHandlers
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _mapper;
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
-        private readonly ITransactionManager _transactionManager;
 
         public BuildDataProcessingAgreementReadModelOnChangesHandler(
             IDataProcessingAgreementReadModelRepository readModelRepository,
             IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> mapper,
-            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository,
-            ITransactionManager transactionManager)
+            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository)
         {
             _readModelRepository = readModelRepository;
             _mapper = mapper;
             _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
-            _transactionManager = transactionManager;
         }
 
         public void Handle(EntityLifeCycleEvent<DataProcessingAgreement> domain)

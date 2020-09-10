@@ -40,7 +40,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var updates = _readModelRepository.GetByUserId(userUpdate.Id).ToList().Select(dpa =>
+                var updates = _readModelRepository.GetByUserId(userUpdate.SourceId).ToList().Select(dpa =>
                         PendingReadModelUpdate.Create(dpa,
                             PendingReadModelUpdateSourceCategory.DataProcessingAgreement))
                     .ToList();

@@ -60,7 +60,7 @@ module Kitos.Utility.KendoGrid {
             return this.withExcelOutput(dataSource => this.echoSourceValue(dataSource));
         }
 
-        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>{
+        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource> {
             if (excelOutput == null) throw "excelOutput must be defined";
             this.excelOutput = excelOutput;
             return this;
@@ -165,6 +165,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     type UrlFactory = (options: any) => string;
+    type ResponseParser<TDataSource> = (response: TDataSource[]) => TDataSource[];
     type ColumnConstruction<TDataSource> = (builder: IKendoGridColumnBuilder<TDataSource>) => void;
 
     export interface IKendoGridLauncher<TDataSource> {
@@ -180,11 +181,12 @@ module Kitos.Utility.KendoGrid {
         withUrlFactory(factory: UrlFactory): IKendoGridLauncher<TDataSource>;
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource>;
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
         private $scope: ng.IScope = null;
-        private standardSortingSourceField : string = null;
+        private standardSortingSourceField: string = null;
         private storageKey: string = null;
         private gridState: Services.IGridStateService = null;
         private entityTypeName: string = null;
@@ -194,6 +196,7 @@ module Kitos.Utility.KendoGrid {
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
         private columns: ColumnConstruction<TDataSource>[] = [];
+        private responseParser: ResponseParser<TDataSource> = response => response;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -206,6 +209,12 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource> {
+            if (!parser) throw "parser must be defined";
+            this.responseParser = parser;
+            return this;
         }
 
         withStandardSorting(sourceField: string): IKendoGridLauncher<TDataSource> {
@@ -457,7 +466,10 @@ module Kitos.Utility.KendoGrid {
                                 IsArchived: { type: "boolean" }
                             },
                         },
-                        parse: response => response
+                        parse: response => {
+                            response.value = this.responseParser(response.value);
+                            return response;
+                        }
                     }
                 },
                 toolbar: toolbar,
