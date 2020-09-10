@@ -30,6 +30,12 @@
             roles: Models.IOptionEntity[]) {
             $rootScope.page.title = "Databehandleraftaler - Overblik";
 
+            var replaceRoleQuery = (filterUrl, roleName, roleId) => {
+                var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
+                var newurl = filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+                return newurl;
+            }
+
             var dpaToRoleMap = {};
 
             //Build and launch kendo grid
@@ -42,8 +48,21 @@
                     .withEntityTypeName("Databehandleraftale")
                     .withExcelOutputName("Databehandleraftaler - Overblik")
                     .withStorageKey("data-processing-agreement-overview-options")
-                    //TODO: consider only expanding role assignments if needed (how to determine that)
                     .withFixedSourceUrl(`/odata/Organizations(${user.currentOrganizationId})/DataProcessingAgreementReadModels?$expand=RoleAssignments`)
+                    .withParameterMapping((options, type) => {
+                        // get kendo to map parameters to an odata url
+                        var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+
+                        //TODO: Allow sorting on roles - replace with "any" for that
+                        if (parameterMap.$filter) {
+                            roles.forEach(role => {
+                                parameterMap.$filter =
+                                    replaceRoleQuery(parameterMap.$filter, `role${role.Id}`, role.Id);
+                            });
+                        }
+
+                        return parameterMap;
+                    })
                     .withResponseParser(response => {
                         //Reset all response state
                         dpaToRoleMap = {}; 
@@ -76,7 +95,7 @@
                             .withDataSourceName("Name")
                             .withTitle("Databehandleraftale")
                             .withId("dpaName")
-                            .withStandardWidth(340)
+                            .withStandardWidth(350)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.overview.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
@@ -94,8 +113,7 @@
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaToRoleMap[dataItem.Id][role.Id])))
             );
 
-            //TODO: Add FilterParser
-
+            //Launch kendo grid
             launcher.launch();
         }
     }

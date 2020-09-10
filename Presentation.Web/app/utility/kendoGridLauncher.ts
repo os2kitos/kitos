@@ -167,6 +167,7 @@ module Kitos.Utility.KendoGrid {
     type UrlFactory = (options: any) => string;
     type ResponseParser<TDataSource> = (response: TDataSource[]) => TDataSource[];
     type ColumnConstruction<TDataSource> = (builder: IKendoGridColumnBuilder<TDataSource>) => void;
+    type ParameterMapper = (data: kendo.data.DataSourceTransportParameterMapData, type: string) => any;
 
     export interface IKendoGridLauncher<TDataSource> {
         launch(): void;
@@ -182,6 +183,7 @@ module Kitos.Utility.KendoGrid {
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource>;
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -197,6 +199,7 @@ module Kitos.Utility.KendoGrid {
         private customToolbarEntries: IKendoToolbarEntry[] = [];
         private columns: ColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
+        private parameterMapper: ParameterMapper = (data,type) => null;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -209,6 +212,12 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource> {
+            if (!mapping) throw "mapping must be defined";
+            this.parameterMapper = mapping;
+            return this;
         }
 
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource> {
@@ -446,7 +455,8 @@ module Kitos.Utility.KendoGrid {
                         read: {
                             url: options => this.urlFactory(options),
                             dataType: "json"
-                        }
+                        },
+                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data,type)
                     },
                     sort: {
                         field: this.standardSortingSourceField,
