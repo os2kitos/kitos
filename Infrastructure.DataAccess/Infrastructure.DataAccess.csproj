@@ -612,9 +612,9 @@
     <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.designer.cs">
       <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009091028032_Add_DataProcessingAgreementRightsAndRoles.cs" />
-    <Compile Include="Migrations\202009091028032_Add_DataProcessingAgreementRightsAndRoles.designer.cs">
-      <DependentUpon>202009091028032_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs" />
+    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.designer.cs">
+      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1000,8 +1000,8 @@
     <EmbeddedResource Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.resx">
       <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009091028032_Add_DataProcessingAgreementRightsAndRoles.resx">
-      <DependentUpon>202009091028032_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.resx">
+      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

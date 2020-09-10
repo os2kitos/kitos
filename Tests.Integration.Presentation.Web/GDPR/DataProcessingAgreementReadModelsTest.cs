@@ -70,7 +70,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(agreement.Id, readModel.SourceEntityId);
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
             Assert.Equal(role.Id, roleAssignment.RoleId);
-            Assert.Equal(role.Name, roleAssignment.RoleName);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
         }

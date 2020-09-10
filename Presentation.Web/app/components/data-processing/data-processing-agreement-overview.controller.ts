@@ -78,7 +78,7 @@
                             .withId("dpaName")
                             .withStandardWidth(340)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(dataItem => `<a data-element-type="kendo-dpa-name-rendering" data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.overview.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
                     .withStandardSorting("Name");
 
@@ -90,9 +90,8 @@
                         .withId(`dpaRole${role.Id}`)
                         .withStandardWidth(135)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        //TODO: Sref rendering here
-                        .withRendering(dataItem => `<a data-element-type="kendo-dpa-role-${role.Id}-rendering" data-ui-sref="data-processing.edit-agreement.roles({id: ${dataItem.SourceEntityId}})">${dpaToRoleMap[dataItem.Id][role.Id] || ""}</a>`)
-                        .withExcelOutput(dataItem => dpaToRoleMap[dataItem.Id][role.Id] || ""))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-role-${role.Id}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaToRoleMap[dataItem.Id][role.Id]))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaToRoleMap[dataItem.Id][role.Id])))
             );
 
             //TODO: Add FilterParser

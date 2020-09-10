@@ -54,7 +54,6 @@ namespace Core.DomainServices.GDPR
                     destination.RoleAssignments.Add(assignment);
                 }
                 assignment.UserFullName = $"{incomingRight.User.Name} {incomingRight.User.LastName}".TrimEnd();
-                assignment.RoleName = incomingRight.Role.Name;
             }
 
             _roleAssignmentRepository.Save();

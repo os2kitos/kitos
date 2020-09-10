@@ -37,7 +37,6 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         RoleId = c.Int(nullable: false),
-                        RoleName = c.String(),
                         UserId = c.Int(nullable: false),
                         UserFullName = c.String(nullable: false, maxLength: 100),
                         ParentId = c.Int(nullable: false),
