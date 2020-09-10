@@ -25,15 +25,15 @@ describe("Data processing agreement main detail tests", () => {
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
-        //var localDpPo = new LocalDataProcessing();
-        //localDpPo
-        //    .getPage()
-        //    .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
-        //    .then((selected) => {
-        //        if (!selected) {
-        //            localDpPo.getToggleDataProcessingCheckbox().click();
-        //        }
-        //    });
+        var localDpPo = new LocalDataProcessing();
+        localDpPo
+            .getPage()
+            .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
+            .then((selected) => {
+                if (!selected) {
+                    localDpPo.getToggleDataProcessingCheckbox().click();
+                }
+            });
     });
 
     afterAll(() => {
@@ -42,17 +42,20 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Craeting and renaming data processing agreement",
+    it("Creating and renaming data processing agreement",
         () => {
-            var name = createName(10);
+            var name1 = createName(10);
+
 
             pageObjectOverview.getPage()
                 .then(() => pageObjectOverview.waitForKendoGrid())
                 .then(() => pageObjectOverview.getCreateDpaButton().click())
-                .then(() => enterDpaName(name))
+                .then(() => enterDpaName(name1))
                 .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
-                .then(() => pageObjectOverview.waitForKendoGrid())
-                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name));
+                .then(() => pageObjectOverview.getPage())
+                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name1))
+                .then(() => pageObjectOverview.waitForKendoGrid());
+
 
         });
 
