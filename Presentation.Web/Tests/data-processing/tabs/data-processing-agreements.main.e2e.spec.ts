@@ -62,17 +62,29 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => pageObject.getDpaMainNameInput().clear())
                 .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
                 .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-                .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), renameValue), waitUpTo.twentySeconds));
+                .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), renameValue),
+                    waitUpTo.twentySeconds,
+                    "Could not find text specified"));
         });
 
-    function openNewDpaDialog() {
-        console.log("clicking createDpaButton");
-        return pageObjectOverview.getCreateDpaButton().click()
-            .then(() => {
-                console.log("waiting for dialog to be visible");
-                browser.wait(pageObjectOverview.isCreateDpaAvailable(), waitUpTo.twentySeconds);
-            });
-    }
+
+    it("It is possible to delete a data processing agreement",
+        () => {
+
+            const nameDeleted = createName(1);
+            console.log("Creating agreement and deleting it");
+            pageObjectOverview.getPage()
+                .then(() => pageObjectOverview.waitForKendoGrid())
+                .then(() => pageObjectOverview.getCreateDpaButton().click())
+                .then(() => enterDpaName(nameDeleted))
+                .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
+                .then(() => pageObjectOverview.getPage())
+                .then(() => goToSpecificDataProcessingAgreement(nameDeleted))
+                .then(() => getDeleteButton().click())
+                .then(() => browser.switchTo().alert().accept())
+                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameDeleted).isPresent())
+                    .toBeFalsy());
+        });
 
     function enterDpaName(name: string) {
         console.log(`entering name: '${name}'`);
@@ -86,68 +98,15 @@ describe("Data processing agreement main detail tests", () => {
             .then(() => findDataProcessingAgreementColumnFor(name).first().click());
     }
 
+    function getDeleteButton() {
+        console.log("Retrieving deletebutton");
+        return pageObject.getDpaDeleteButton();
+    }
+
     function findDataProcessingAgreementColumnFor(name: string) {
         return pageObjectOverview.kendoToolbarWrapper.getFilteredColumnElement(
             pageObjectOverview.kendoToolbarWrapper.columnObjects().dpaName,
             name);
     }
 
-    //it("It is possible to rename a data processing agreement",
-    //    () => {
-
-    //        const name = createName(1);
-    //        const name2 = createName(2);
-    //        const renameValue = createName(3);
-    //        console.log("Creating Data Processing Agreements");
-
-    //        DataProcessingAgreementHelper.createDataProcessingAgreement(name)
-    //            //.then(() => DataProcessingAgreementHelper.createDataProcessingAgreement(name2))
-    //            .then(() => DataProcessingAgreementHelper.goToSpecificDataProcessingAgreement(name))
-    //            .then(() => expect(getValueAttribute(pageObject.getDpaMainNameInput())).toEqual(name))
-    //            .then(() => {
-    //                console.log("Renaming agreement and checking if value is saved");
-    //                pageObject.getDpaMainNameInput().click();
-    //            })
-    //            .then(() => pageObject.getDpaMainNameInput().clear())
-    //            .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
-    //            .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-    //            .then(() => waitForHeaderTitleToChange(pageObject.getDpaMainNameHeader(), renameValue))
-    //            .then(() => pageObjectOverview.getPage())
-    //            .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent())
-    //                .toBeTruthy())
-
-
-    //        it("It is possible to delete a data processing agreement",
-    //            () => {
-
-    //                const name = createName(1);
-    //                console.log("Creating agreement and deleting it");
-    //                DataProcessingAgreementHelper.createDataProcessingAgreement(name)
-    //                    .then(() => pageObjectOverview.getPage())
-    //                    .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(name).isPresent())
-    //                        .toBeTruthy())
-    //                    .then(() => DataProcessingAgreementHelper.goToSpecificDataProcessingAgreement(name))
-    //                    .then(() => getDeleteButton().click())
-    //                    .then(() => browser.switchTo().alert().accept())
-    //                    .then(() => pageObjectOverview.getPage())
-    //                    .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(name).isPresent())
-    //                        .toBeFalsy());
-    //            });
-
-
-    //        function getValueAttribute(element: protractor.ElementFinder) {
-    //            return element.getAttribute("value");
-    //        }
-
-    //        function getDeleteButton() {
-    //            console.log("Retrieving deletebutton");
-    //            return pageObject.getDpaDeleteButton();
-    //        }
-
-    //        function waitForHeaderTitleToChange(element: protractor.ElementFinder, text: string) {
-    //            console.log("Waiting for header title to change to " + text);
-    //            return browser.wait(ec.textToBePresentInElement(element, text), waitUpTo.twentySeconds);
-    //        }
-
-    //    });
 });
