@@ -28,15 +28,20 @@
             userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             roles: Models.IOptionEntity[]) {
+
+            //Prepare the page
             $rootScope.page.title = "Databehandleraftaler - Overblik";
 
-            var replaceRoleQuery = (filterUrl, roleName, roleId) => {
-                var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
-                var newurl = filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
-                return newurl;
-            }
+            //Helper functions
+            const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
 
-            var dpaToRoleMap = {};
+            const replaceRoleQuery = (filterUrl, roleName, roleId) => {
+                var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
+                return  filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+            };
+
+            //Lookup maps
+            var dpaToRoleMap = { };
 
             //Build and launch kendo grid
             var launcher =
@@ -53,12 +58,10 @@
                         // get kendo to map parameters to an odata url
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
-                        //TODO: Allow sorting on roles - replace with "any" for that
                         if (parameterMap.$filter) {
                             roles.forEach(role => {
                                 parameterMap.$filter =
-                                    //TODO: Add a createRoleFieldKey
-                                    replaceRoleQuery(parameterMap.$filter, `role${role.Id}`, role.Id);
+                                    replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
                             });
                         }
 
@@ -96,7 +99,7 @@
                             .withDataSourceName("Name")
                             .withTitle("Databehandleraftale")
                             .withId("dpaName")
-                            .withStandardWidth(350)
+                            .withStandardWidth(200)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.overview.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
@@ -105,14 +108,14 @@
             roles.forEach(role =>
                 launcher = launcher.withColumn(builder =>
                     builder
-                        .withDataSourceName(`role${role.Id}`)
+                        .withDataSourceName(getRoleKey(role))
                         .withTitle(role.Name)
-                        .withId(`dpaRole${role.Id}`)
-                        .withStandardWidth(135)
+                        .withId(`dpa${getRoleKey(role)}`)
+                        .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-role-${role.Id}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaToRoleMap[dataItem.Id][role.Id]))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaToRoleMap[dataItem.Id][role.Id]))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaToRoleMap[dataItem.Id][role.Id])))
             );
 
