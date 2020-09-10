@@ -60,7 +60,7 @@ div#page-body {
 }
 
 .navbar-nav {
-    width: 110%;
+    width: 100%;
 }
 
 .navbar-nav > li {
@@ -86,7 +86,7 @@ div#page-body {
 #navbar-top .navbar-nav li a {
     height: 80px;
     padding: 0 10px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 80px;
     text-align: center;
 }
@@ -151,6 +151,8 @@ div#page-body {
 }
 
 #navbar-top .navbar-right {
+    padding-left:0px;
+
     .dropdown-menu-group {
         height: 80px;
         line-height: 80px;
@@ -176,12 +178,18 @@ div#page-body {
     }
 }
 
+#navbar-top .navbar-center {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 #navbar-top a.active,
 #navbar-top a:hover {
     color: rgb(55, 96, 146);
     text-decoration: none;
     background-color: rgb(219, 229, 241);
 }
+
 /*********************************************/
 
 /* SUBNAV */

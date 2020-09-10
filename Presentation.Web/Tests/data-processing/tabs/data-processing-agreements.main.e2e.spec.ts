@@ -4,9 +4,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../../Utility/WaitTimers");
 import LocalDataProcessing = require("../../PageObjects/Local-admin/LocalDataProcessing.po");
-import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper");
 import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main");
-import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -16,7 +14,6 @@ describe("Data processing agreement main detail tests", () => {
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
-    const cssHelper = new CssHelper();
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
@@ -70,9 +67,9 @@ describe("Data processing agreement main detail tests", () => {
 
     it("It is possible to delete a data processing agreement",
         () => {
-
             const nameDeleted = createName(1);
             console.log("Creating agreement and deleting it");
+
             pageObjectOverview.getPage()
                 .then(() => pageObjectOverview.waitForKendoGrid())
                 .then(() => pageObjectOverview.getCreateDpaButton().click())
