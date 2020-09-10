@@ -58,11 +58,16 @@
                 );
         }
 
+        private close() {
+            this.$uibModalInstance.close();
+        }
+
         save(): void {
             this.createNew()
                 .then(response => {
                     if (response) {
-                        this.$uibModalInstance.close();
+                        this.close();
+                        this.$state.go("^", null, { reload: true });
                     }
                 });
         }
@@ -71,10 +76,15 @@
             this.createNew()
                 .then(response => {
                     if (response) {
-                        this.$uibModalInstance.close();
+                        this.close();
                         this.$state.go("data-processing.overview.edit-agreement.main", { id: response.createdObjectId });
                     }
                 });
+        }
+
+        cancel(): void {
+            this.close();
+            this.$state.go("^");
         }
     }
 
@@ -95,7 +105,7 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                            $state.go("^", null, { reload: true });
+                            
                         },
                             () => {
                                 $state.go("^");
