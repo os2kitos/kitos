@@ -51,20 +51,16 @@
 
             return this
                 .$http
-                .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload).then(
+                .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload)
+                .then(
                     response => {
                     return <IDataProcessingAgreementPatchResult>{
                         modified: true,
-                        valueModified: name
+                        valueModified: name,
+
                     };
                 },
-                error => {
-                    return <IDataProcessingAgreementPatchResult>{
-                        modified: false,
-                        valueModified: name,
-                        error: error.data.msg
-                };
-                }
+                error => this.handleServerError(error)
             );
         }
 
@@ -81,12 +77,7 @@
                             error: "TODO"
                         };
                     },
-                    error => {
-                        return <IDataProcessingAgreementDeletedResult>{
-                            deleted: false,
-                            error: "TODO"
-                        };
-                    }
+                    error => this.handleServerError(error)
                 );
 
         }

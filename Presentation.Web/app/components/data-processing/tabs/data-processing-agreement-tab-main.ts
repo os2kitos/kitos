@@ -30,15 +30,22 @@
 
             return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
                 nameChangeResponse => {
-                    if (nameChangeResponse.modified) {
-                        msg.toSuccessMessage("Databehandleraftale navn ændret!");
+                    msg.toSuccessMessage("Databehandleraftale navn ændret!");
                         this.headerName = nameChangeResponse.valueModified;
-                    } else {
-                        msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
-                    }
+                  
                 },
-                onError => {
-                    msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+                (errorResponse: Models.Api.ApiResponseErrorCategory) => {
+                    switch (errorResponse) {
+                    case Models.Api.ApiResponseErrorCategory.BadInput:
+                        msg.toErrorMessage("Fejl! Navnet var ugyldigt!");
+                        break;
+                    case Models.Api.ApiResponseErrorCategory.Conflict:
+                        msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
+                        break;
+                    default:
+                        msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+                        break;
+                    }
                 }
             );
         }

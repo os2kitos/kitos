@@ -43,15 +43,19 @@
 
                 dataProcessingAgreementService.delete(dataProcessingAgreementId).then(
                     deleteResponse => {
-                        if (deleteResponse.deleted) {
-                            msg.toSuccessMessage("Databehandleraftale slettet!");
+                        msg.toSuccessMessage("Databehandleraftale slettet!");
                             $state.go("data-processing.overview");
-                        } else {
+                        },
+                    (errorResponse: Models.Api.ApiResponseErrorCategory) => {
+                        switch (errorResponse) {
+                        case Models.Api.ApiResponseErrorCategory.BadInput:
+                        case Models.Api.ApiResponseErrorCategory.Conflict:
+                                msg.toErrorMessage("Fejl! Kunne ikke slatte databehandleraftale, kan allerede være slettet!");
+                            break;
+                        default:
                             msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale!");
+                            break;
                         }
-                    },
-                    onError => {
-                        msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale!");
                     }
                 );
             }
