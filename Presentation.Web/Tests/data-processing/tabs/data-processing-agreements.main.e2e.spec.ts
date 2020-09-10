@@ -41,17 +41,17 @@ describe("Data processing agreement main detail tests", () => {
 
     it("Creating and renaming data processing agreement",
         () => {
-            var name1 = createName(10);
+            var name = createName(10);
             var renameValue = createName(30);
 
             pageObjectOverview.getPage()
                 .then(() => pageObjectOverview.waitForKendoGrid())
                 .then(() => pageObjectOverview.getCreateDpaButton().click())
-                .then(() => enterDpaName(name1))
+                .then(() => enterDpaName(name))
                 .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
                 .then(() => pageObjectOverview.getPage())
-                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name1))
-                .then(() => goToSpecificDataProcessingAgreement(name1))
+                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
+                .then(() => goToSpecificDataProcessingAgreement(name))
                 .then(() => {
                     console.log("Renaming agreement and checking if value is saved");
                     pageObject.getDpaMainNameInput().click();

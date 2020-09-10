@@ -55,8 +55,7 @@
                     response => {
                     return <IDataProcessingAgreementPatchResult>{
                         modified: true,
-                        valueModified: name,
-                        error: ""
+                        valueModified: name
                     };
                 },
                 error => {

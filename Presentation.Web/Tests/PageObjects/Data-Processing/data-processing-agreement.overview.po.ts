@@ -8,10 +8,10 @@ import Constants = require("../../Utility/Constants");
 class DataProcessingAgreementOverviewPageObject implements PageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
     private navigationHelper = new NavigationHelper();
-    public kendoToolbarWrapper = new KendoToolbarWrapper();
     private ec = protractor.ExpectedConditions;
     private cssHelper = new CssLocatorHelper();
     private consts = new Constants();
+    public kendoToolbarWrapper = new KendoToolbarWrapper();
 
     getPage(): webdriver.promise.Promise<void> {
         return this.navigationHelper.getPage("/#/data-processing/overview");

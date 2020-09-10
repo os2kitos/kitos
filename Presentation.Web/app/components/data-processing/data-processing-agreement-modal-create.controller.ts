@@ -60,8 +60,6 @@
                 .then(response => {
                     if (response) {
                         this.$uibModalInstance.close();
-                        this.$state.go("^", null, { reload: true });
-
                     }
                 });
         }
