@@ -92,7 +92,7 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                                // This is handled in Save and saveAndProcess
+                                $state.go("^", null, { reload: true });
                             },
                             () => {
                                 $state.go("^");
