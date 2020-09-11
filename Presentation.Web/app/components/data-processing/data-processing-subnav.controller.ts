@@ -45,9 +45,8 @@
                         },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
-                        case Models.Api.ApiResponseErrorCategory.BadInput:
-                        case Models.Api.ApiResponseErrorCategory.Conflict:
-                                msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale, kan allerede være slettet!");
+                        case Models.Api.ApiResponseErrorCategory.NotFound:
+                                msg.toErrorMessage("Fejl! Kunne ikke finde og slette den valgte databehandleraftale!");
                             break;
                         default:
                             msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale!");

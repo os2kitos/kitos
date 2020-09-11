@@ -4,20 +4,14 @@
     export class EditMainDataProcessingAgreementController {
         static $inject: Array<string> = [
             "dataProcessingAgreementService",
-            "user",
-            "$scope",
             "notify",
-            "$state",
             "hasWriteAccess",
             "dataProcessingAgreement"
         ];
 
         constructor(
             private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
-            private user: Services.IUser,
-            private $scope,
             private notify,
-            private $state: angular.ui.IStateService,
             public hasWriteAccess,
             private dataProcessingAgreement) {
         }

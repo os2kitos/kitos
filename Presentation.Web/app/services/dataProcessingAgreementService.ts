@@ -33,6 +33,9 @@
                 case 400:
                     errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
                     break;
+                case 404:
+                    errorCategory = Models.Api.ApiResponseErrorCategory.NotFound;
+                    break;
                 case 409:
                     errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
                     break;
