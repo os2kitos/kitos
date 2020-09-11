@@ -7,8 +7,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
-using Core.DomainModel.References.DomainEvents;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Reference
@@ -36,7 +34,6 @@ namespace Core.DomainServices.Repositories.Reference
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IGenericRepository<DataProcessingAgreement> _dataProcessingAgreementRepository;
-        private readonly IDomainEvents _domainEvents;
 
         public ReferenceRepository(
             IGenericRepository<ExternalReference> referenceRepository,
@@ -44,8 +41,7 @@ namespace Core.DomainServices.Repositories.Reference
             IGenericRepository<ItSystem> systemRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<ItProject> projectRepository,
-            IGenericRepository<DataProcessingAgreement> dataProcessingAgreementRepository,
-            IDomainEvents domainEvents)
+            IGenericRepository<DataProcessingAgreement> dataProcessingAgreementRepository)
         {
             _referenceRepository = referenceRepository;
             _contractRepository = contractRepository;
@@ -53,7 +49,6 @@ namespace Core.DomainServices.Repositories.Reference
             _systemUsageRepository = systemUsageRepository;
             _projectRepository = projectRepository;
             _dataProcessingAgreementRepository = dataProcessingAgreementRepository;
-            _domainEvents = domainEvents;
         }
 
         public Maybe<ExternalReference> Get(int referenceId)
@@ -94,15 +89,15 @@ namespace Core.DomainServices.Repositories.Reference
         {
             return rootType switch
             {
-                ReferenceRootType.System => 
+                ReferenceRootType.System =>
                     new ReferenceRootRepositoryOperations(innerId => _systemRepository.GetByKey(innerId), _systemRepository.Save),
-                ReferenceRootType.SystemUsage => 
+                ReferenceRootType.SystemUsage =>
                     new ReferenceRootRepositoryOperations(innerId => _systemUsageRepository.GetByKey(innerId), _systemUsageRepository.Save),
-                ReferenceRootType.Contract => 
+                ReferenceRootType.Contract =>
                     new ReferenceRootRepositoryOperations(innerId => _contractRepository.GetByKey(innerId), _contractRepository.Save),
-                ReferenceRootType.Project => 
+                ReferenceRootType.Project =>
                     new ReferenceRootRepositoryOperations(innerId => _projectRepository.GetByKey(innerId), _projectRepository.Save),
-                ReferenceRootType.DataProcessingAgreement => 
+                ReferenceRootType.DataProcessingAgreement =>
                     new ReferenceRootRepositoryOperations(innerId => _dataProcessingAgreementRepository.GetByKey(innerId), _dataProcessingAgreementRepository.Save),
                 _ => throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type")
             };
@@ -114,7 +109,6 @@ namespace Core.DomainServices.Repositories.Reference
             {
                 throw new ArgumentNullException(nameof(reference));
             }
-            _domainEvents.Raise(new ExternalReferenceDeleted(reference));
             _referenceRepository.Delete(reference);
             _referenceRepository.Save();
         }

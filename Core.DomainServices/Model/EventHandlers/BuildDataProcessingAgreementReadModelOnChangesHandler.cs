@@ -11,7 +11,8 @@ namespace Core.DomainServices.Model.EventHandlers
 {
     public class BuildDataProcessingAgreementReadModelOnChangesHandler :
         IDomainEventHandler<EntityLifeCycleEvent<DataProcessingAgreement>>,
-        IDomainEventHandler<EntityLifeCycleEvent<User>>
+        IDomainEventHandler<EntityLifeCycleEvent<User>>,
+        IDomainEventHandler<EntityLifeCycleEvent<ExternalReference>>
     {
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _mapper;
@@ -68,6 +69,16 @@ namespace Core.DomainServices.Model.EventHandlers
             if (domainEvent.ChangeType == LifeCycleEventType.Updated)
             {
                 _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_User));
+            }
+        }
+
+        public void Handle(EntityLifeCycleEvent<ExternalReference> domainEvent)
+        {
+            //Schedule read model update for affected dpa if dpa was the target of the reference
+            var dpa = domainEvent.Entity.DataProcessingAgreement;
+            if (dpa != null)
+            {
+                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingAgreement));
             }
         }
     }

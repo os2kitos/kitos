@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202009111128569_Add_Dpa_References"; }
+            get { return "202009111240471_Add_Dpa_References"; }
         }
         
         string IMigrationMetadata.Source

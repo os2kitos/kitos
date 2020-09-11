@@ -34,7 +34,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization.DomainEvents;
-using Core.DomainModel.References.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
@@ -229,10 +228,11 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
             RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityLifeCycleEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
             RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityLifeCycleEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityLifeCycleEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)

@@ -17,10 +17,16 @@ namespace Core.DomainModel.BackgroundJobs
 
         public static PendingReadModelUpdate Create(IHasId source, PendingReadModelUpdateSourceCategory category)
         {
-            return new PendingReadModelUpdate()
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return Create(source.Id, category);
+        }
+
+        public static PendingReadModelUpdate Create(int sourceId, PendingReadModelUpdateSourceCategory category)
+        {
+            return new PendingReadModelUpdate
             {
                 CreatedAt = DateTime.UtcNow,
-                SourceId = source.Id,
+                SourceId = sourceId,
                 Category = category
             };
         }

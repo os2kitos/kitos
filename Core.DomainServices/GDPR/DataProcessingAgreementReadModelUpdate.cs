@@ -20,29 +20,29 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
+            destination.MainReferenceTitle = source.Reference?.Title.Substring(0, 100);
+            destination.MainReferenceUrl = source.Reference?.URL;
+            destination.MainReferenceUserAssignedId = source.Reference?.ExternalReferenceId;
             PatchRoleAssignments(source, destination);
         }
 
         private void PatchRoleAssignments(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)
         {
-            static string createRoleKey(int roleId, int userId)
-            {
-                return $"R:{roleId}U:{userId}";
-            }
+            static string CreateRoleKey(int roleId, int userId) => $"R:{roleId}U:{userId}";
 
-            var incomingRights = source.Rights.ToDictionary(x => createRoleKey(x.RoleId, x.UserId));
+            var incomingRights = source.Rights.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
 
             //Remove rights which were removed
             var assignmentsToBeRemoved =
                 destination.RoleAssignments
-                    .Where(x => incomingRights.ContainsKey(createRoleKey(x.RoleId, x.UserId)) == false).ToList();
+                    .Where(x => incomingRights.ContainsKey(CreateRoleKey(x.RoleId, x.UserId)) == false).ToList();
 
             RemoveAssignments(destination, assignmentsToBeRemoved);
 
-            var existingAssignments = destination.RoleAssignments.ToDictionary(x => createRoleKey(x.RoleId, x.UserId));
+            var existingAssignments = destination.RoleAssignments.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
             foreach (var incomingRight in source.Rights.ToList())
             {
-                if (!existingAssignments.TryGetValue(createRoleKey(incomingRight.RoleId, incomingRight.UserId), out var assignment))
+                if (!existingAssignments.TryGetValue(CreateRoleKey(incomingRight.RoleId, incomingRight.UserId), out var assignment))
                 {
                     //Append the assignment if it is not already present
                     assignment = new DataProcessingAgreementRoleAssignmentReadModel
@@ -53,7 +53,7 @@ namespace Core.DomainServices.GDPR
                     };
                     destination.RoleAssignments.Add(assignment);
                 }
-                assignment.UserFullName = $"{incomingRight.User.Name} {incomingRight.User.LastName}".TrimEnd();
+                assignment.UserFullName = $"{incomingRight.User.Name} {incomingRight.User.LastName}".TrimEnd().Substring(0, 100);
             }
 
             _roleAssignmentRepository.Save();

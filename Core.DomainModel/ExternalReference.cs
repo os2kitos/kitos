@@ -19,6 +19,10 @@ namespace Core.DomainModel
     }
     public class ExternalReference : Entity, IProjectModule, ISystemModule, IContractModule, IDataProcessingModule
     {
+        public ExternalReference()
+        {
+            BrokenLinkReports = new List<BrokenLinkInExternalReference>();
+        }
 
         public int? ItProject_Id { get; set; }
         public virtual ItProject.ItProject ItProject { get; set; }

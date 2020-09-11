@@ -12,6 +12,7 @@ using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.References
 {
@@ -25,6 +26,7 @@ namespace Core.ApplicationServices.References
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IOperationClock _operationClock;
+        private readonly IDomainEvents _domainEvents;
 
 
         public ReferenceService(
@@ -35,7 +37,8 @@ namespace Core.ApplicationServices.References
             IItProjectRepository projectRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            IOperationClock operationClock)
+            IOperationClock operationClock,
+            IDomainEvents domainEvents)
         {
             _referenceRepository = referenceRepository;
             _itSystemRepository = itSystemRepository;
@@ -45,6 +48,7 @@ namespace Core.ApplicationServices.References
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _operationClock = operationClock;
+            _domainEvents = domainEvents;
         }
 
 
@@ -81,6 +85,7 @@ namespace Core.ApplicationServices.References
                                 onSuccess: createdReference =>
                                 {
                                     _referenceRepository.SaveRootEntity(root);
+                                    _domainEvents.Raise(new EntityLifeCycleEvent<ExternalReference>(LifeCycleEventType.Created, createdReference));
                                     return createdReference;
                                 },
                                 onFailure: error => error
@@ -102,10 +107,11 @@ namespace Core.ApplicationServices.References
                             return OperationFailure.Forbidden;
                         }
 
+                        _domainEvents.Raise(new EntityLifeCycleEvent<ExternalReference>(LifeCycleEventType.Deleted, referenceAndOwner.externalReference));
                         _referenceRepository.Delete(referenceAndOwner.externalReference);
                         return referenceAndOwner.externalReference;
                     })
-                    .Match<Result<ExternalReference, OperationFailure>>
+                    .Match
                     (
                         onValue: result => result,
                         onNone: () => OperationFailure.NotFound

@@ -7,7 +7,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Reference;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -22,7 +21,6 @@ namespace Tests.Unit.Core.DomainServices
         private readonly Mock<IGenericRepository<ItSystem>> _systemRepository;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
-        private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IGenericRepository<DataProcessingAgreement>> _dpaRepository;
 
         public ReferenceRepositoryTest()
@@ -32,7 +30,6 @@ namespace Tests.Unit.Core.DomainServices
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _projectRepository = new Mock<IGenericRepository<ItProject>>();
             _dpaRepository = new Mock<IGenericRepository<DataProcessingAgreement>>();
-            _domainEvents = new Mock<IDomainEvents>();
             _sut = new ReferenceRepository
             (
                 new Mock<IGenericRepository<ExternalReference>>().Object,
@@ -40,8 +37,7 @@ namespace Tests.Unit.Core.DomainServices
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _projectRepository.Object,
-                _dpaRepository.Object,
-                _domainEvents.Object
+                _dpaRepository.Object
             );
         }
 

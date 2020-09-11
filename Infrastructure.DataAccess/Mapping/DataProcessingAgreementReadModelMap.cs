@@ -13,6 +13,15 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("DataProcessingAgreementReadModel_Index_Name", 0);
 
+            Property(x => x.MainReferenceTitle)
+                .HasMaxLength(DataProcessingAgreementConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("DataProcessingAgreementReadModel_Index_MainReferenceTitle", 0);
+
+            Property(x => x.MainReferenceUserAssignedId).IsOptional();
+
+            Property(x => x.MainReferenceUrl).IsOptional();
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.DataProcessingAgreementReadModels)
                 .HasForeignKey(d => d.OrganizationId)
