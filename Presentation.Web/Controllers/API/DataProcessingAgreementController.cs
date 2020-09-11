@@ -15,6 +15,7 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
+using Presentation.Web.Models.References;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -157,7 +158,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri]string nameOrEmailContent = null, [FromUri] int pageSize = 25)
+        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri] string nameOrEmailContent = null, [FromUri] int pageSize = 25)
         {
             return _dataProcessingAgreementApplicationService
                 .GetUsersWhichCanBeAssignedToRole(id, roleId, nameOrEmailContent, pageSize)
@@ -222,6 +223,8 @@ namespace Presentation.Web.Controllers.API
 
             return value
                 .Include(agreement => agreement.Rights)
+                .Include(agreement => agreement.ExternalReferences)
+                .Include(agreement => agreement.Reference)
                 .Include(agreement => agreement.Rights.Select(_ => _.Role))
                 .Include(agreement => agreement.Rights.Select(_ => _.User))
                 .AsNoTracking()
@@ -254,7 +257,19 @@ namespace Presentation.Web.Controllers.API
                     Role = ToDTO(agreementRight.Role, localDescriptionOverrides),
                     User = ToDTO(agreementRight.User)
 
-                }).ToArray()
+                }).ToArray(),
+                References = value.ExternalReferences.Select(externalReference => ToDTO(value.ReferenceId, externalReference)).ToArray()
+
+            };
+        }
+
+        private static ReferenceDTO ToDTO(int? masterReferenceId, ExternalReference reference)
+        {
+            return new ReferenceDTO(reference.Id, reference.Title)
+            {
+                MasterReference = masterReferenceId.HasValue && masterReferenceId == reference.Id,
+                ReferenceId = reference.ExternalReferenceId,
+                Url = reference.URL
             };
         }
 

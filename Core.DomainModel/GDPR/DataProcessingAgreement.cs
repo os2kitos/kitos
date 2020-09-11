@@ -3,16 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
 {
-    public class DataProcessingAgreement : HasRightsEntity<DataProcessingAgreement, DataProcessingAgreementRight, DataProcessingAgreementRole>, IHasName, IOwnedByOrganization, IDataProcessingModule
+    public class DataProcessingAgreement : 
+        HasRightsEntity<DataProcessingAgreement, DataProcessingAgreementRight, DataProcessingAgreementRole>, 
+        IHasName, 
+        IOwnedByOrganization, 
+        IDataProcessingModule,
+        IEntityWithExternalReferences
 
     {
+        public DataProcessingAgreement()
+        {
+            ExternalReferences = new List<ExternalReference>();
+        }
+
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
-                                                name.Length <= DataProcessingAgreementConstraints.MaxNameLength;
+                                                       name.Length <= DataProcessingAgreementConstraints.MaxNameLength;
 
         public Maybe<OperationError> SetName(string newName)
         {
@@ -85,5 +96,24 @@ namespace Core.DomainModel.GDPR
                 );
 
         }
+
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
+        public ReferenceRootType GetRootType() => ReferenceRootType.DataProcessingAgreement;
+
+        public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
+        {
+            return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
+        {
+            Reference = newReference;
+            return newReference;
+        }
+
+        public int? ReferenceId { get; set; }
+
+        public virtual ExternalReference Reference { get; set; }
     }
 }

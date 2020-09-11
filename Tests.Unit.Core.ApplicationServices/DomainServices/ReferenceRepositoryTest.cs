@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -22,6 +23,7 @@ namespace Tests.Unit.Core.DomainServices
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<IGenericRepository<DataProcessingAgreement>> _dpaRepository;
 
         public ReferenceRepositoryTest()
         {
@@ -29,6 +31,7 @@ namespace Tests.Unit.Core.DomainServices
             _systemRepository = new Mock<IGenericRepository<ItSystem>>();
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _projectRepository = new Mock<IGenericRepository<ItProject>>();
+            _dpaRepository = new Mock<IGenericRepository<DataProcessingAgreement>>();
             _domainEvents = new Mock<IDomainEvents>();
             _sut = new ReferenceRepository
             (
@@ -37,6 +40,7 @@ namespace Tests.Unit.Core.DomainServices
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _projectRepository.Object,
+                _dpaRepository.Object,
                 _domainEvents.Object
             );
         }
@@ -109,6 +113,23 @@ namespace Tests.Unit.Core.DomainServices
             Assert.Equal(expected.FromNullable<IEntityWithExternalReferences>(), actual);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void GetRootEntity_Returns_DataProcessingAgreement(bool returnsSome)
+        {
+            //Arrange
+            var id = A<int>();
+            var expected = returnsSome ? new DataProcessingAgreement() : null;
+            _dpaRepository.Setup(x => x.GetByKey(id)).Returns(expected);
+
+            //Act
+            var actual = _sut.GetRootEntity(id, ReferenceRootType.DataProcessingAgreement);
+
+            //Assert
+            Assert.Equal(expected.FromNullable<IEntityWithExternalReferences>(), actual);
+        }
+
         [Fact]
         public void SaveRootEntity_With_System()
         {
@@ -147,6 +168,16 @@ namespace Tests.Unit.Core.DomainServices
 
             //Assert
             _projectRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void SaveRootEntity_With_DataProcessingAgreement()
+        {
+            //Act
+            _sut.SaveRootEntity(new DataProcessingAgreement());
+
+            //Assert
+            _dpaRepository.Verify(x => x.Save(), Times.Once);
         }
     }
 }
