@@ -192,7 +192,6 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage RemoveRole(int id, int roleId, int userId)
         {
             return
