@@ -226,6 +226,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(agreement => agreement.Rights)
                 .Include(agreement => agreement.ExternalReferences)
                 .Include(agreement => agreement.Reference)
+                .Include(agreement => agreement.Reference.ObjectOwner)
                 .Include(agreement => agreement.Rights.Select(_ => _.Role))
                 .Include(agreement => agreement.Rights.Select(_ => _.User))
                 .AsNoTracking()
