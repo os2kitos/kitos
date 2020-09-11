@@ -12,6 +12,7 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
@@ -259,7 +260,6 @@ namespace Presentation.Web.Controllers.API
 
                 }).ToArray(),
                 References = value.ExternalReferences.Select(externalReference => ToDTO(value.ReferenceId, externalReference)).ToArray()
-
             };
         }
 
@@ -269,7 +269,9 @@ namespace Presentation.Web.Controllers.API
             {
                 MasterReference = masterReferenceId.HasValue && masterReferenceId == reference.Id,
                 ReferenceId = reference.ExternalReferenceId,
-                Url = reference.URL
+                Url = reference.URL,
+                CreatedAt = reference.Created,
+                CreatedByUser = reference.ObjectOwner.MapToNamedEntityDTO()
             };
         }
 

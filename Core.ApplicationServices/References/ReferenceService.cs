@@ -149,23 +149,21 @@ namespace Core.ApplicationServices.References
                 return OperationFailure.Forbidden;
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            var systemExternalReferences = root.ExternalReferences.ToList();
+
+            if (systemExternalReferences.Count == 0)
             {
-                var systemExternalReferences = root.ExternalReferences.ToList();
-
-                if (systemExternalReferences.Count == 0)
-                {
-                    return systemExternalReferences;
-                }
-
-                foreach (var reference in systemExternalReferences)
-                {
-                    _referenceRepository.Delete(reference);
-                }
-
-                transaction.Commit();
                 return systemExternalReferences;
             }
+
+            foreach (var reference in systemExternalReferences)
+            {
+                _referenceRepository.Delete(reference);
+            }
+
+            transaction.Commit();
+            return systemExternalReferences;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Presentation.Web.Models.References
+﻿using System;
+
+namespace Presentation.Web.Models.References
 {
     public class ReferenceDTO : NamedEntityDTO
     {
@@ -13,5 +15,9 @@
         public string Url { get; set; }
 
         public bool MasterReference { get; set; }
+
+        public NamedEntityDTO CreatedByUser { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }

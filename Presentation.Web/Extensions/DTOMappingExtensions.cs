@@ -27,6 +27,11 @@ namespace Presentation.Web.Extensions
             return new NamedEntityDTO(source.Id, source.Name);
         }
 
+        public static NamedEntityDTO MapToNamedEntityDTO(this User source)
+        {
+            return new NamedEntityDTO(source.Id, $"{source.Name} {source.LastName}".TrimEnd());
+        }
+
         public static NamedEntityWithEnabledStatusDTO MapToNamedEntityWithEnabledStatusDTO(this ItSystem source)
         {
             return new NamedEntityWithEnabledStatusDTO(source.Id, source.Name, source.Disabled);
