@@ -1,6 +1,6 @@
 ﻿<ul data-ng-hide="subnavNotPositioned">
     <li data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
-        <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state) || $state.includes(link.substate) || $state.includes('data-processing.edit-agreement')}">{{link.text}}</a>
+        <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state) || $state.includes(link.substate) || $state.includes('parentState')}">{{link.text}}</a>
     </li>
 </ul>
 <ul class="icons" data-ng-if="user.isAuth"> 
