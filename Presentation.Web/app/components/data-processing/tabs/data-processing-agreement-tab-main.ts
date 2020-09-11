@@ -26,11 +26,12 @@
 
         changeName(name) {
 
-            var msg = this.notify.addInfoMessage('Ændrer navn på databehandleraftale');
+            var msg = this.notify.addInfoMessage('Ændre navn på databehandleraftale');
 
             return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
                 nameChangeResponse => {
                     msg.toSuccessMessage("Databehandleraftale navn ændret!");
+                    this.headerName = nameChangeResponse.valueModifiedTo;
                 },
                 (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                     switch (errorResponse) {
