@@ -41,7 +41,7 @@
             };
 
             //Lookup maps
-            var dpaToRoleMap = { };
+            var dpaRoleIdToUserNamesMap = { };
 
             //Build and launch kendo grid
             var launcher =
@@ -69,18 +69,18 @@
                     })
                     .withResponseParser(response => {
                         //Reset all response state
-                        dpaToRoleMap = {}; 
+                        dpaRoleIdToUserNamesMap = {}; 
 
                         //Build lookups/mutations
                         response.forEach(dpa => {
-                            dpaToRoleMap[dpa.Id] = {};
+                            dpaRoleIdToUserNamesMap[dpa.Id] = {};
 
                             //Update the role assignment map
                             dpa.RoleAssignments.forEach(assignment => {
-                                if (!dpaToRoleMap[dpa.Id][assignment.RoleId])
-                                    dpaToRoleMap[dpa.Id][assignment.RoleId] = assignment.UserFullName;
+                                if (!dpaRoleIdToUserNamesMap[dpa.Id][assignment.RoleId])
+                                    dpaRoleIdToUserNamesMap[dpa.Id][assignment.RoleId] = assignment.UserFullName;
                                 else {
-                                    dpaToRoleMap[dpa.Id][assignment.RoleId] += `, ${assignment.UserFullName}`;
+                                    dpaRoleIdToUserNamesMap[dpa.Id][assignment.RoleId] += `, ${assignment.UserFullName}`;
                                 }
                             });
                         });
@@ -115,8 +115,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaToRoleMap[dataItem.Id][role.Id]))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaToRoleMap[dataItem.Id][role.Id])))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.Id]))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.Id])))
             );
 
             //Launch kendo grid
