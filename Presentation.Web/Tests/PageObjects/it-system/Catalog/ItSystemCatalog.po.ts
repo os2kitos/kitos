@@ -27,7 +27,7 @@ class ItSystemCatalog implements IPageObject {
     }
 
     waitForKendoGrid(){
-        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnHeaders().catalogName);
     }
 
     getCreateSystemButton() {
