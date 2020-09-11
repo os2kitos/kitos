@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject =
 require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
-import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
+import dpaHelper = require("../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement tests", () => {
 
@@ -21,15 +21,7 @@ describe("Data processing agreement tests", () => {
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
-        var localDpPo = new LocalDataProcessing();
-        localDpPo
-            .getPage()
-            .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
-            .then((selected) => {
-                if (!selected) {
-                    localDpPo.getToggleDataProcessingCheckbox().click();
-                }
-            });
+        dpaHelper.checkAndEnableDpaModule();
     });
 
     afterAll(() => {
@@ -39,27 +31,17 @@ describe("Data processing agreement tests", () => {
 
     it("It is possible to create new data processing agreements", () => {
         const name = createName(1);
-        pageObject
             //Verify correct creation of dpa and following update of kendo
-            .getPage()
-            .then(() => waitForKendo())
-            .then(() => openNewDpaDialog())
-            .then(() => enterDpaName(name))
-            .then(() => {
-                validateSaveDpaClickable(true);
-                console.log(`clicking 'save'`);
-                return pageObject.getNewDpaSubmitButton().click();
-            })
-            .then(() => waitForKendo())
+        dpaHelper.createDataProcessingAgreement(name)
             .then(() => {
                 console.log(`expecting to find new dpa with name ${name}`);
                 expect(pageObject.findSpecificDpaInNameColumn(name).isPresent()).toBeTruthy();
             })
             //Verify that dialog acts correctly on attempt to create duplicate dpa name
-            .then(() => openNewDpaDialog())
+            .then(() => dpaHelper.openNewDpaDialog())
             .then(() => {
                 console.log(`Validating UI error when entering the same name again.`);
-                return enterDpaName(name);
+                return dpaHelper.enterDpaName(name);
             })
             .then(() => {
                 console.log("Waiting for UI error to appear");
@@ -68,28 +50,9 @@ describe("Data processing agreement tests", () => {
             });
     });
 
-    function openNewDpaDialog() {
-        console.log("clicking createDpaButton");
-        return pageObject.getCreateDpaButton().click()
-            .then(() => {
-            console.log("waiting for dialog to be visible");
-            return browser.wait(pageObject.isCreateDpaAvailable(), waitUpTo.twentySeconds);
-        });
-    }
-
     function validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(pageObject.getNewDpaSubmitButton().isEnabled());
         return isClickable ? expectation.toBeTruthy() : expectation.toBeFalsy();
-    }
-
-    function enterDpaName(name : string) {
-        console.log(`entering name: '${name}'`);
-        return pageObject.getNewDpaNameInput().sendKeys(name);
-    }
-
-    function waitForKendo() {
-        console.log("waiting for kendo grid to load");
-        return pageObject.waitForKendoGrid();
     }
 });

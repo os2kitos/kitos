@@ -5,6 +5,7 @@ import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Da
 import WaitTimers = require("../../Utility/WaitTimers");
 import LocalDataProcessing = require("../../PageObjects/Local-admin/LocalDataProcessing.po");
 import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main");
+import dpaHelper = require("../../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -22,15 +23,7 @@ describe("Data processing agreement main detail tests", () => {
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
-        var localDpPo = new LocalDataProcessing();
-        localDpPo
-            .getPage()
-            .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
-            .then((selected) => {
-                if (!selected) {
-                    localDpPo.getToggleDataProcessingCheckbox().click();
-                }
-            });
+        dpaHelper.checkAndEnableDpaModule();
     });
 
     afterAll(() => {
@@ -44,66 +37,41 @@ describe("Data processing agreement main detail tests", () => {
             var name = createName(10);
             var renameValue = createName(30);
 
-            pageObjectOverview.getPage()
-                .then(() => pageObjectOverview.waitForKendoGrid())
-                .then(() => pageObjectOverview.getCreateDpaButton().click())
-                .then(() => enterDpaName(name))
-                .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
+            dpaHelper.createDataProcessingAgreement(name)
                 .then(() => pageObjectOverview.getPage())
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
-                .then(() => goToSpecificDataProcessingAgreement(name))
-                .then(() => {
-                    console.log("Renaming agreement and checking if value is saved");
-                    pageObject.getDpaMainNameInput().click();
-                })
-                .then(() => pageObject.getDpaMainNameInput().clear())
-                .then(() => pageObject.getDpaMainNameInput().sendKeys(renameValue))
-                .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-                .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), renameValue),
-                    waitUpTo.twentySeconds,
-                    "Could not find text specified"));
+                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
+                .then(() => renameNameAndVerify(renameValue));
         });
 
 
     it("It is possible to delete a data processing agreement",
         () => {
-            const nameDeleted = createName(1);
+            const nameToDelete = createName(1);
             console.log("Creating agreement and deleting it");
 
-            pageObjectOverview.getPage()
-                .then(() => pageObjectOverview.waitForKendoGrid())
-                .then(() => pageObjectOverview.getCreateDpaButton().click())
-                .then(() => enterDpaName(nameDeleted))
-                .then(() => pageObjectOverview.getNewDpaSubmitButton().click())
-                .then(() => pageObjectOverview.getPage())
-                .then(() => goToSpecificDataProcessingAgreement(nameDeleted))
-                .then(() => getDeleteButton().click())
-                .then(() => browser.switchTo().alert().accept())
-                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameDeleted).isPresent())
+            dpaHelper.createDataProcessingAgreement(nameToDelete)
+                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(nameToDelete))
+                .then(() => getDeleteButtonAndDelete())
+                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameToDelete).isPresent())
                     .toBeFalsy());
         });
 
-    function enterDpaName(name: string) {
-        console.log(`entering name: '${name}'`);
-        return pageObjectOverview.getNewDpaNameInput().sendKeys(name);
+    function renameNameAndVerify(name: string) {
+        console.log("Renaming agreement to " + name);
+        pageObject.getDpaMainNameInput().click()
+            .then(() => pageObject.getDpaMainNameInput().clear())
+            .then(() => pageObject.getDpaMainNameInput().sendKeys(name))
+            .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
+            .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), name),
+                waitUpTo.twentySeconds,
+                "Could not find text specified"));
     }
 
-    function goToSpecificDataProcessingAgreement(name: string) {
-        console.log("Finding DataProcessingAgreement: " + name);
-        return pageObjectOverview.getPage()
-            .then(() => pageObjectOverview.waitForKendoGrid())
-            .then(() => findDataProcessingAgreementColumnFor(name).first().click());
-    }
-
-    function getDeleteButton() {
+    function getDeleteButtonAndDelete() {
         console.log("Retrieving deletebutton");
-        return pageObject.getDpaDeleteButton();
-    }
-
-    function findDataProcessingAgreementColumnFor(name: string) {
-        return pageObjectOverview.kendoToolbarWrapper.getFilteredColumnElement(
-            pageObjectOverview.kendoToolbarWrapper.columnObjects().dpaName,
-            name);
+        return pageObject.getDpaDeleteButton().click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
 });
