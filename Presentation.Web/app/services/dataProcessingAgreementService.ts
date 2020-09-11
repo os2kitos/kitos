@@ -3,23 +3,25 @@
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        get(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementGetResult>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
-        createdObjectId : number;
+        createdObjectId: number;
     }
 
 
     export interface IDataProcessingAgreementDeletedResult {
-        deleted: boolean;
         deletedObjectId: number;
-        error: string;
     }
 
     export interface IDataProcessingAgreementPatchResult {
-        modified: boolean;
-        valueModified: string;
-        error: string;
+        valueModifiedTo: string;
+    }
+
+    export interface IDataProcessingAgreementGetResult {
+        name: string;
+        id: number;
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
@@ -28,24 +30,24 @@
             console.log("Request failed with:", error);
             let errorCategory: Models.Api.ApiResponseErrorCategory;
             switch (error.status) {
-            case 400:
-                errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
-                break;
-            case 409:
-                errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
-                break;
-            case 500:
-                errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
-                break;
-            default:
-                errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
+                case 400:
+                    errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
+                    break;
+                case 409:
+                    errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
+                    break;
+                case 500:
+                    errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
+                    break;
+                default:
+                    errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
             }
             throw errorCategory;
         }
 
-        public rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> { 
+        public rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
 
-            const payload  = {
+            const payload = {
                 Value: name
             };
 
@@ -54,14 +56,12 @@
                 .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload)
                 .then(
                     response => {
-                    return <IDataProcessingAgreementPatchResult>{
-                        modified: true,
-                        valueModified: name,
-
-                    };
-                },
-                error => this.handleServerError(error)
-            );
+                        return <IDataProcessingAgreementPatchResult>{
+                            valueModifiedTo: name,
+                        };
+                    },
+                    error => this.handleServerError(error)
+                );
         }
 
         public delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
@@ -72,9 +72,7 @@
                 .then(
                     response => {
                         return <IDataProcessingAgreementDeletedResult>{
-                            deleted: true,
                             deletedObjectId: response.data.response.id,
-                            error: "TODO"
                         };
                     },
                     error => this.handleServerError(error)
@@ -100,12 +98,25 @@
                 );
         }
 
+        public get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO}
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         static $inject = ["$http"];
 
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        private getUri(suffix: string) : string {
+        private getUri(suffix: string): string {
             return this.getBaseUri() + `${suffix}`;
         }
 

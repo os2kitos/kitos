@@ -3,25 +3,19 @@
 
     export class EditDataProcessingAgreementController {
         static $inject: Array<string> = [
-            "dataProcessingAgreementService",
             "user",
-            "$scope",
+            "$http",
             "$rootScope",
-            "notify",
-            "$state",
             "hasWriteAccess",
             "userAccessRights",
             "dataProcessingAgreement"
         ];
 
         constructor(
-            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
             private user: Services.IUser,
-            private $scope,
+            private $http,
             private $rootScope,
-            private notify,
             private $state: angular.ui.IStateService,
-            private hasWriteAccess,
             private userAccessRights,
             private dataProcessingAgreement) {
 
@@ -49,8 +43,7 @@
                     hasWriteAccess: [
                         "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                     ],
-                    dataProcessingAgreement: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/v1/data-processing-agreement/" + $stateParams.id)
-                        .then(result => result.data.response)],
+                    dataProcessingAgreement: ['$http', '$stateParams', ($http, $stateParams, dataProcessingAgreement = new Services.DataProcessing.DataProcessingAgreementService($http)) => dataProcessingAgreement.get($stateParams.id)],
                 }
             });
         }]);
