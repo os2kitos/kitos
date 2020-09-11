@@ -5,7 +5,7 @@ import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Da
 import WaitTimers = require("../../Utility/WaitTimers");
 import LocalDataProcessing = require("../../PageObjects/Local-admin/LocalDataProcessing.po");
 import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main");
-import dpaHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -15,6 +15,7 @@ describe("Data processing agreement main detail tests", () => {
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
+    const dpaHelper = DataProcessingAgreementHelper;
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
@@ -38,7 +39,6 @@ describe("Data processing agreement main detail tests", () => {
             var renameValue = createName(30);
 
             dpaHelper.createDataProcessingAgreement(name)
-                .then(() => pageObjectOverview.getPage())
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
                 .then(() => renameNameAndVerify(renameValue));
@@ -58,14 +58,17 @@ describe("Data processing agreement main detail tests", () => {
         });
 
     function renameNameAndVerify(name: string) {
-        console.log("Renaming agreement to " + name);
+        console.log(`Renaming agreement to ${name}`);
         pageObject.getDpaMainNameInput().click()
             .then(() => pageObject.getDpaMainNameInput().clear())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(name))
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
-            .then(() => browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), name),
-                waitUpTo.twentySeconds,
-                "Could not find text specified"));
+            .then(() => {
+                console.log(`Expecting agreement to be called ${name}`);
+                browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), name),
+                    waitUpTo.twentySeconds,
+                    `Could not verify that ${name} was changed`);
+            });
     }
 
     function getDeleteButtonAndDelete() {

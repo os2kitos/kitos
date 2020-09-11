@@ -18,21 +18,19 @@
             private $scope,
             private notify,
             private $state: angular.ui.IStateService,
-            private hasWriteAccess,
+            public hasWriteAccess,
             private dataProcessingAgreement) {
         }
 
-        public headerName: string = this.dataProcessingAgreement.name;
+        headerName: string = this.dataProcessingAgreement.name;
 
         changeName(name) {
 
-            var msg = this.notify.addInfoMessage('Ændre navn på databehandleraftale');
+            var msg = this.notify.addInfoMessage('Ændrer navn på databehandleraftale');
 
             return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
                 nameChangeResponse => {
                     msg.toSuccessMessage("Databehandleraftale navn ændret!");
-                        this.headerName = nameChangeResponse.valueModified;
-                  
                 },
                 (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                     switch (errorResponse) {

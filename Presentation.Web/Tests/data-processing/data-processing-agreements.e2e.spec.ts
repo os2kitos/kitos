@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject =
 require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
-import dpaHelper = require("../Helpers/DataProcessingAgreementHelper")
+import DataProcessingAgreementHelper = require("../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement tests", () => {
 
@@ -13,8 +13,9 @@ describe("Data processing agreement tests", () => {
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
+    const dpaHelper = DataProcessingAgreementHelper;
 
-    const createName = (index: number) => {
+    const createName = (index: number) => { 
         return `Dpa${new Date().getTime()}_${index}`;
     }
 

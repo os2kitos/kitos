@@ -1,12 +1,11 @@
-﻿import DataProcessingAgreementOverviewPageObject1 =
-require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
-import WaitTimers1 = require("../Utility/WaitTimers");
+﻿import DataProcessingAgreementOverviewPageObject = require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
+import WaitTimers = require("../Utility/WaitTimers");
 import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 
 class DataProcessingAgreementHelper {
 
-    private static pageObject = new DataProcessingAgreementOverviewPageObject1();
-    private static waitUpTo = new WaitTimers1();
+    private static pageObject = new DataProcessingAgreementOverviewPageObject();
+    private static waitUpTo = new WaitTimers();
 
     public static createDataProcessingAgreement(name: string) {
         console.log("Creating agreement with name " + name);

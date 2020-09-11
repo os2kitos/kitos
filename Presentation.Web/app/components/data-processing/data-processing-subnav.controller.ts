@@ -6,16 +6,13 @@
             "$scope",
             "$rootScope",
             "$state",
-            "$http",
-            "notify",
-            "dataProcessingAgreementService"
+            "notify"
         ];
 
         constructor(
             private $scope,
             private $rootScope,
             private $state: angular.ui.IStateService,
-            private $http,
             private notify,
             private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
 
@@ -50,7 +47,7 @@
                         switch (errorResponse) {
                         case Models.Api.ApiResponseErrorCategory.BadInput:
                         case Models.Api.ApiResponseErrorCategory.Conflict:
-                                msg.toErrorMessage("Fejl! Kunne ikke slatte databehandleraftale, kan allerede være slettet!");
+                                msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale, kan allerede være slettet!");
                             break;
                         default:
                             msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale!");

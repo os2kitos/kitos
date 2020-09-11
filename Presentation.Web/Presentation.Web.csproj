@@ -439,7 +439,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\DataProcessingAgreementHelper.ts" />
     <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
     <TypeScriptCompile Include="app\helpers\SystemNameFormatter.ts" />
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
@@ -451,6 +450,7 @@
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
@@ -762,6 +762,7 @@
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\DataProcessingAgreementHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
