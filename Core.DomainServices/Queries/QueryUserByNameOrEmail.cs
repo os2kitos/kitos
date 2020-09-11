@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<User> Apply(IQueryable<User> source)
         {
-            return source.Where(x => x.Name.Contains(_query) || x.Email.Contains(_query));
+            return source.Where(x => x.Name.Contains(_query) || x.LastName.Contains(_query) || x.Email.Contains(_query));
         }
     }
 }

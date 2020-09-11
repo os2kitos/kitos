@@ -42,7 +42,7 @@ namespace Core.DomainModel.GDPR
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            if (GetRights(role.Id).Any(x => x.UserId == user.Id))
+            if (HasRight(role, user))
                 return new OperationError("Existing right for same role found for the same user", OperationFailure.Conflict);
 
             var agreementRight = new DataProcessingAgreementRight
@@ -57,18 +57,33 @@ namespace Core.DomainModel.GDPR
             return agreementRight;
         }
 
+        private bool HasRight(DataProcessingAgreementRole role, User user)
+        {
+            return GetRight(role, user).HasValue;
+        }
+
+        private Maybe<DataProcessingAgreementRight> GetRight(DataProcessingAgreementRole role, User user)
+        {
+            return GetRights(role.Id).FirstOrDefault(x => x.UserId == user.Id);
+        }
+
         public Result<DataProcessingAgreementRight, OperationError> RemoveRole(DataProcessingAgreementRole role, User user)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var agreementRight = GetRights(role.Id).FirstOrDefault(x => x.UserId == user.Id && x.RoleId == role.Id);
-            if (agreementRight == null)
-                return new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}", OperationFailure.BadInput);
+            return GetRight(role, user)
+                .Match<Result<DataProcessingAgreementRight, OperationError>>
+                (
+                    right =>
+                    {
+                        Rights.Remove(right);
+                        return right;
+                    },
+                    () => new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}",
+                        OperationFailure.BadInput)
+                );
 
-            Rights.Remove(agreementRight);
-
-            return agreementRight;
         }
     }
 }

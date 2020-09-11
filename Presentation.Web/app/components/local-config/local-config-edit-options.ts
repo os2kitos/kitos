@@ -106,7 +106,7 @@
             },
             {
                 id: "local-config.data-processing.edit-data-processing-agreement-roles",
-                urlSuffix: "edit-contract-types"
+                urlSuffix: "edit-data-processing-roles"
             }
         ];
 
