@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Model;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
@@ -20,10 +23,20 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
-            destination.MainReferenceTitle = source.Reference?.Title.Substring(0, 100);
+            PatchReference(source, destination);
+            PatchRoleAssignments(source, destination);
+        }
+
+        private static void PatchReference(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)
+        {
+            destination.MainReferenceTitle = source
+                .Reference
+                .FromNullable()
+                .Select(x => x.Title)
+                .Select(title => title.Substring(0, Math.Min(title.Length, 100)))
+                .GetValueOrDefault();
             destination.MainReferenceUrl = source.Reference?.URL;
             destination.MainReferenceUserAssignedId = source.Reference?.ExternalReferenceId;
-            PatchRoleAssignments(source, destination);
         }
 
         private void PatchRoleAssignments(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)
@@ -53,7 +66,9 @@ namespace Core.DomainServices.GDPR
                     };
                     destination.RoleAssignments.Add(assignment);
                 }
-                assignment.UserFullName = $"{incomingRight.User.Name} {incomingRight.User.LastName}".TrimEnd().Substring(0, 100);
+
+                var fullName = $"{incomingRight.User.Name ?? ""} {incomingRight.User.LastName ?? ""}";
+                assignment.UserFullName = fullName.TrimEnd().Substring(0, Math.Min(fullName.Length, 100));
             }
 
             _roleAssignmentRepository.Save();

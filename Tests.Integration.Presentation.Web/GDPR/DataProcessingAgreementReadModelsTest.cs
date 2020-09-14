@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -44,6 +45,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
+            var refName = $"REF:{name}";
+            var refUserAssignedId = $"REF:{name}EXT_ID";
+            var refUrl = $"https://www.test-rm{A<uint>()}.dk";
+            var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
             var agreement = await DataProcessingAgreementHelper.CreateAsync(organizationId, name);
@@ -52,14 +57,20 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
             using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingAgreement_Id = agreement.Id);
 
             //Wait for read model to rebuild
-            await WaitForAsync(() =>
+            await Task.WhenAll(WaitForAsync(() =>
             {
                 return Task.FromResult(
                     DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
                         x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
-            }, TimeSpan.FromSeconds(10));
+            }, TimeSpan.FromSeconds(10)), WaitForAsync(() =>
+            {
+                return Task.FromResult(
+                    DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
+                        x.AsQueryable().Any(rm => rm.MainReferenceUrl == refUrl)));
+            }, TimeSpan.FromSeconds(10)));
 
             //Act
             var result = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
@@ -72,6 +83,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
+            Assert.Equal(refName, readModel.MainReferenceTitle);
+            Assert.Equal(refUrl, readModel.MainReferenceUrl);
+            Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
         }
 
         [Fact]
@@ -129,7 +143,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 
-            Assert.True(conditionMet,$"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
+            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
         }
     }
 }
