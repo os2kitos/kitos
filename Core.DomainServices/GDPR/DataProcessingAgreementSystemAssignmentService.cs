@@ -17,7 +17,7 @@ namespace Core.DomainServices.GDPR
         {
             _repository = repository;
         }
-        //TODO: Unit test of this
+
         public IQueryable<ItSystem> GetApplicableSystems(DataProcessingAgreement agreement)
         {
             if (agreement == null) throw new ArgumentNullException(nameof(agreement));

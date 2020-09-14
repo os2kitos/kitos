@@ -20,6 +20,7 @@ namespace Core.DomainModel.GDPR
         public DataProcessingAgreement()
         {
             ExternalReferences = new List<ExternalReference>();
+            SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
