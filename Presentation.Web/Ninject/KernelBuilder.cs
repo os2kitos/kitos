@@ -184,9 +184,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementSystemAssignmentService>().To<DataProcessingAgreementSystemAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementRoleAssignmentsService>().To<DataProcessingAgreementRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
-            kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
+            kernel.Bind<IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

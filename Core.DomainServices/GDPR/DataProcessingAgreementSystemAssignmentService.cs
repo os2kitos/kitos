@@ -23,18 +23,38 @@ namespace Core.DomainServices.GDPR
             if (agreement == null) throw new ArgumentNullException(nameof(agreement));
 
             return
-                agreement.SystemUsages.Select(x => x.ItSystem.Id).ToList()
+                agreement
+                    .SystemUsages
+                    .Select(x => x.ItSystem.Id)
+                    .ToList()
                     .Transform(idsInUse => _repository.GetSystemsInUse(agreement.OrganizationId).ExceptEntitiesWithIds(idsInUse));
         }
 
         public Result<ItSystem, OperationError> AssignSystem(DataProcessingAgreement agreement, int systemId)
         {
-            throw new System.NotImplementedException();
+            if (agreement == null) throw new ArgumentNullException(nameof(agreement));
+
+            return _repository
+                .GetSystem(systemId)
+                .FromNullable()
+                .Match
+                (
+                    agreement.AssignSystem,
+                    () => new OperationError("System ID is not valid", OperationFailure.BadInput)
+                );
         }
 
         public Result<ItSystem, OperationError> RemoveSystem(DataProcessingAgreement agreement, int systemId)
         {
-            throw new System.NotImplementedException();
+            if (agreement == null) throw new ArgumentNullException(nameof(agreement));
+            return _repository
+                .GetSystem(systemId)
+                .FromNullable()
+                .Match
+                (
+                    agreement.RemoveSystem,
+                    () => new OperationError("System ID is not valid", OperationFailure.BadInput)
+                );
         }
     }
 }
