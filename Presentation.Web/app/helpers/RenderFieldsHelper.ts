@@ -12,27 +12,40 @@
             }
         }
 
-        static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
-            if (reference === null || _.isUndefined(reference)) {
-                return RenderFieldsHelper.noValueFallback;
+        static renderReference(referenceTitle: string, referenceUrl: string) {
+            if (referenceTitle === null || _.isUndefined(referenceTitle)) {
+                if (Utility.Validation.isValidExternalReference(referenceUrl)) {
+                    return `<a target="_blank" style="float:left;" href="${referenceUrl}">${referenceUrl}</a>`;
+                } else {
+                    return RenderFieldsHelper.noValueFallback;
+                }
             }
-            if (Utility.Validation.isValidExternalReference(reference.URL)) {
-                return `<a target="_blank" style="float:left;" href="${reference.URL}">${reference.Title}</a>`;
+            if (Utility.Validation.isValidExternalReference(referenceUrl)) {
+                return `<a target="_blank" style="float:left;" href="${referenceUrl}">${referenceTitle}</a>`;
             }
-            if (reference.Title === null || _.isUndefined(reference.Title)) {
-                return RenderFieldsHelper.noValueFallback;
-            }
-            return reference.Title;
+            return referenceTitle;
         }
 
-        static renderReferenceId(reference: Models.Reference.IOdataReference) {
+        static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
+            
             if (reference === null || _.isUndefined(reference)) {
                 return RenderFieldsHelper.noValueFallback;
             }
-            if (reference.ExternalReferenceId === null || _.isUndefined(reference.ExternalReferenceId)) {
+            return RenderFieldsHelper.renderReference(reference.Title, reference.URL);
+        }
+
+        static renderReferenceId(externalReferenceId: string) {
+            if (externalReferenceId != null) {
+                return externalReferenceId;
+            }
+            return RenderFieldsHelper.noValueFallback;
+        }
+
+        static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
+            if (reference === null || _.isUndefined(reference)) {
                 return RenderFieldsHelper.noValueFallback;
             }
-            return reference.ExternalReferenceId;
+            return RenderFieldsHelper.renderReferenceId(reference.ExternalReferenceId);
         }
     }
 }
