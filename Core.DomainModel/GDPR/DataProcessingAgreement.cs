@@ -50,6 +50,9 @@ namespace Core.DomainModel.GDPR
             return Rights.Where(x => x.RoleId == roleId);
         }
 
+        public IEnumerable<ItSystem.ItSystem> GetAssignedSystems() => SystemUsages.Select(x => x.ItSystem);
+
+
         public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
         {
             if (system == null) throw new ArgumentNullException(nameof(system));

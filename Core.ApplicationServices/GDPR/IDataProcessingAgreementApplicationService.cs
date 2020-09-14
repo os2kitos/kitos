@@ -20,7 +20,7 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize);
         Result<DataProcessingAgreementRight, OperationError> AssignRole(int id, int roleId, int userId);
         Result<DataProcessingAgreementRight, OperationError> RemoveRole(int id, int roleId, int userId);
-        Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, int systemId, string nameQuery, int pageSize);
+        Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<ItSystem, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystem, OperationError> RemoveSystem(int id, int systemId);
     }

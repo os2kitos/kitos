@@ -200,6 +200,52 @@ namespace Presentation.Web.Controllers.API
                     .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("{id}/it-systems")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableSystems(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _dataProcessingAgreementApplicationService
+                .GetSystemsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(systems => Ok(systems.MapToNamedEntityDTOs().ToList()), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/it-systems/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        {
+            if (systemId == null)
+                return BadRequest("systemId must be provided");
+
+            return _dataProcessingAgreementApplicationService
+                .AssignSystem(id, systemId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/it-systems/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        {
+            if (systemId == null)
+                return BadRequest("systemId must be provided");
+
+            return _dataProcessingAgreementApplicationService
+                .RemoveSystem(id, systemId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -228,6 +274,8 @@ namespace Presentation.Web.Controllers.API
                 .Include(agreement => agreement.Reference.ObjectOwner)
                 .Include(agreement => agreement.Rights.Select(_ => _.Role))
                 .Include(agreement => agreement.Rights.Select(_ => _.User))
+                .Include(agreement => agreement.SystemUsages)
+                .Include(agreement => agreement.SystemUsages.Select(x => x.ItSystem))
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(agreement => ToDTO(agreement, localDescriptionOverrides))
@@ -259,7 +307,14 @@ namespace Presentation.Web.Controllers.API
                     User = ToDTO(agreementRight.User)
 
                 }).ToArray(),
-                References = value.ExternalReferences.Select(externalReference => ToDTO(value.ReferenceId, externalReference)).ToArray()
+                References = value
+                    .ExternalReferences
+                    .Select(externalReference => ToDTO(value.ReferenceId, externalReference))
+                    .ToArray(),
+                ItSystems = value
+                    .GetAssignedSystems()
+                    .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
+                    .ToArray()
             };
         }
 
