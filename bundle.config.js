@@ -46,7 +46,6 @@ module.exports = {
         bower("/angular-route/angular-route.js"),
         bower("/ngstorage/ngstorage.js"),
         bower("/angular-base64/angular-base64.js"),
-        bower("/oidc-angular/oidc-angular.js"),
         npm("/angular-cookies/angular-cookies.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
