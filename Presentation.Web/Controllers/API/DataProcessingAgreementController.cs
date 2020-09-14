@@ -201,7 +201,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("{id}/it-systems")]
+        [Route("{id}/it-systems/available")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
