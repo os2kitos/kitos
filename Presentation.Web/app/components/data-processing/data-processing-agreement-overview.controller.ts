@@ -101,7 +101,7 @@
                             .withId("dpaName")
                             .withStandardWidth(200)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.overview.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
                     .withStandardSorting("Name");
 
