@@ -28,6 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingAgreementRight>> _rightsRepositoryMock;
+        private readonly Mock<IDataProcessingAgreementSystemAssignmentService> _systemAssignmentServiceMock;
 
         public DataProcessingAgreementApplicationServiceTest()
         {
@@ -37,9 +38,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingAgreementRight>>();
+            _systemAssignmentServiceMock = new Mock<IDataProcessingAgreementSystemAssignmentService>();
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
                 _repositoryMock.Object, _domainServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
+                _systemAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }

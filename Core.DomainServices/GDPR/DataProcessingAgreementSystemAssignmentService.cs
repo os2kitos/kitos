@@ -17,7 +17,7 @@ namespace Core.DomainServices.GDPR
         {
             _repository = repository;
         }
-
+        //TODO: Unit test of this
         public IQueryable<ItSystem> GetApplicableSystems(DataProcessingAgreement agreement)
         {
             if (agreement == null) throw new ArgumentNullException(nameof(agreement));
@@ -27,7 +27,12 @@ namespace Core.DomainServices.GDPR
                     .SystemUsages
                     .Select(x => x.ItSystem.Id)
                     .ToList()
-                    .Transform(idsInUse => _repository.GetSystemsInUse(agreement.OrganizationId).ExceptEntitiesWithIds(idsInUse));
+                    .Transform
+                    (
+                        idsInUse => _repository
+                            .GetSystemsInUse(agreement.OrganizationId)
+                            .ExceptEntitiesWithIds(idsInUse)
+                    );
         }
 
         public Result<ItSystem, OperationError> AssignSystem(DataProcessingAgreement agreement, int systemId)

@@ -8,13 +8,16 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
+using Ninject;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -24,14 +27,16 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementRepository _repository;
         private readonly IDataProcessingAgreementNamingService _namingService;
         private readonly IDataProcessingAgreementRoleAssignmentsService _roleAssignmentsService;
+        private readonly IDataProcessingAgreementSystemAssignmentService _systemAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
-
+        //TODO: Update unit test for this
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
             IDataProcessingAgreementNamingService namingService,
             IDataProcessingAgreementRoleAssignmentsService roleAssignmentsService,
+            IDataProcessingAgreementSystemAssignmentService systemAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingAgreementRight> rightRepository)
         {
@@ -39,6 +44,7 @@ namespace Core.ApplicationServices.GDPR
             _repository = repository;
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
+            _systemAssignmentService = systemAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -130,7 +136,13 @@ namespace Core.ApplicationServices.GDPR
             {
                 return _roleAssignmentsService
                     .GetUsersWhichCanBeAssignedToRole(agreement, roleId, nameEmailQuery.FromNullable())
-                    .Select<IEnumerable<User>>(users => users.OrderBy(x => x.Id).Take(pageSize).ToList());
+                    .Select<IEnumerable<User>>(users =>
+                        users
+                            .OrderBy(x => x.Id)
+                            .Take(pageSize)
+                            .OrderBy(x => x.Name)
+                            .ToList()
+                    );
             });
         }
 
@@ -169,6 +181,48 @@ namespace Core.ApplicationServices.GDPR
                 }
 
                 return removeResult;
+            });
+        }
+
+        public Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, int systemId, string nameQuery, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
+            if (pageSize < 1) throw new ActivationException($"{nameof(pageSize)} must be above 0");
+
+            return WithReadAccess<IEnumerable<ItSystem>>(id, dataProcessingAgreement =>
+                _systemAssignmentService
+                    .GetApplicableSystems(dataProcessingAgreement)
+                    .Transform(systems => systems.ByPartOfName(nameQuery))
+                    .OrderBy(x => x.Id)
+                    .Take(pageSize)
+                    .OrderBy(x => x.Name)
+                    .ToList()
+            );
+        }
+
+        public Result<ItSystem, OperationError> AssignSystem(int id, int systemId)
+        {
+            return WithWriteAccess(id, dataProcessingAgreement =>
+            {
+                var result = _systemAssignmentService.AssignSystem(dataProcessingAgreement, systemId);
+
+                if (result.Ok)
+                    _repository.Update(dataProcessingAgreement);
+
+                return result;
+            });
+        }
+
+        public Result<ItSystem, OperationError> RemoveSystem(int id, int systemId)
+        {
+            return WithWriteAccess(id, dataProcessingAgreement =>
+            {
+                var result = _systemAssignmentService.RemoveSystem(dataProcessingAgreement, systemId);
+
+                if (result.Ok)
+                    _repository.Update(dataProcessingAgreement);
+
+                return result;
             });
         }
 
