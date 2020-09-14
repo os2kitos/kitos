@@ -3,7 +3,7 @@
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        get(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementGetResult>;
+        get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -17,11 +17,6 @@
 
     export interface IDataProcessingAgreementPatchResult {
         valueModifiedTo: string;
-    }
-
-    export interface IDataProcessingAgreementGetResult {
-        name: string;
-        id: number;
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
@@ -48,7 +43,7 @@
             throw errorCategory;
         }
 
-        public rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
+        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
 
             const payload = {
                 Value: name
@@ -67,7 +62,7 @@
                 );
         }
 
-        public delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
+        delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
 
             return this
                 .$http
@@ -83,7 +78,7 @@
 
         }
 
-        public create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
+        create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
             const payload = {
                 name: name,
                 organizationId: organizationId
@@ -101,7 +96,7 @@
                 );
         }
 
-        public get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
+        get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))

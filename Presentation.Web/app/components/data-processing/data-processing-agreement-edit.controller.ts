@@ -8,8 +8,8 @@
         ];
 
         constructor(
-            private $rootScope,
-            private userAccessRights) {
+            private readonly $rootScope,
+            private readonly userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) {
 
             if (!this.userAccessRights.canDelete) {
                 _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.dataElementType === "removeDataProcessingAgreementButton");
@@ -36,7 +36,7 @@
                         "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                     ],
                     dataProcessingAgreement: [
-                        "dataProcessingAgreementService", "$stateParams", (dataProcessingAgreementService, $stateParams) => dataProcessingAgreementService.get($stateParams.id)
+                        "dataProcessingAgreementService", "$stateParams", (dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService, $stateParams) => dataProcessingAgreementService.get($stateParams.id)
                     ],
                 }
             });

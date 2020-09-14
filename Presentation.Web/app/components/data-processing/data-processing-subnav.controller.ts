@@ -10,11 +10,11 @@
         ];
 
         constructor(
-            private $scope,
-            private $rootScope,
-            private $state: angular.ui.IStateService,
-            private notify,
-            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
+            private readonly $scope,
+            $rootScope,
+            $state: angular.ui.IStateService,
+            notify,
+            dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
 
             this.$scope.page.title = "Databehandleraftaler";
  
@@ -35,7 +35,7 @@
                 if (!confirm("Er du sikker på du vil slette Databehandleraftale?")) {
                     return;
                 }
-                var dataProcessingAgreementId = $state.params["id"];
+                const dataProcessingAgreementId = $state.params["id"];
                 var msg = notify.addInfoMessage("Sletter Databehandleraftale...", false);
 
                 dataProcessingAgreementService.delete(dataProcessingAgreementId).then(
