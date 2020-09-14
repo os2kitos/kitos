@@ -351,8 +351,10 @@
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Controllers\API\ReportController.cs" />
+    <Content Include="app\components\data-processing\data-processing-agreement-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
@@ -422,6 +424,8 @@
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
+    <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
@@ -446,6 +450,7 @@
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
@@ -754,8 +759,10 @@
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\data-processing-agreements.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\DataProcessingAgreementHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />
@@ -788,6 +795,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-agreement.overview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-agreement.edit.main.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
