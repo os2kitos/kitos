@@ -52,7 +52,7 @@
                         .withId("dpaName")
                         .withStandardWidth(340)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => `<a data-element-type="kendo-dpa-name-rendering" data-ui-sref="data-processing.overview.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`)
+                        .withRendering(dataItem => `<a data-element-type="kendo-dpa-name-rendering" data-ui-sref="data-processing.edit-agreement.main({id: ${dataItem.SourceEntityId}})">${dataItem.Name}</a>`)
                         .withSourceValueEchoExcelOutput())
                 .withStandardSorting("Name")
                 .launch();
