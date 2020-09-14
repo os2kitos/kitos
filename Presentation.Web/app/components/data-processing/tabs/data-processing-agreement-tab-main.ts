@@ -20,7 +20,7 @@
 
         changeName(name) {
 
-            var msg = this.notify.addInfoMessage('Ændre navn på databehandleraftale');
+            var msg = this.notify.addInfoMessage("Ændrer navn på databehandleraftale");
 
             return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
                 nameChangeResponse => {
