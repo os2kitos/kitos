@@ -86,7 +86,7 @@
                     if (response) {
                         this.close();
                         this.popState();
-                        this.$state.go("data-processing.overview.edit-agreement.main", { id: response.createdObjectId });
+                        this.$state.go("data-processing.edit-agreement.main", { id: response.createdObjectId });
                     }
                 });
         }
@@ -114,7 +114,7 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                            
+
                         },
                             () => {
                                 $state.go("^");

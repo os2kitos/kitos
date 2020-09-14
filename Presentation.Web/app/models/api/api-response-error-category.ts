@@ -2,7 +2,10 @@
     export enum ApiResponseErrorCategory {
         BadInput,
         Conflict,
+        NotFound,
         ServerError,
-        UnknownError
+        UnknownError,
+
+
     }
 }
