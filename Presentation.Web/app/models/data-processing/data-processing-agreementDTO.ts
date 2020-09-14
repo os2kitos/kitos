@@ -2,5 +2,6 @@
     export interface IDataProcessingAgreementDTO {
         id: number,
         name: string,
+        reference: Array<BaseReference>;
     }
 }
