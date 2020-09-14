@@ -62,8 +62,10 @@
     <Compile Include="GDPR\DataProcessingAgreementNamingService.cs" />
     <Compile Include="GDPR\DataProcessingAgreementReadModelUpdate.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementSystemAssignmentService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />

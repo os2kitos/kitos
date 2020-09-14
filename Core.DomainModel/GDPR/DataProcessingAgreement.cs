@@ -9,10 +9,10 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
 {
-    public class DataProcessingAgreement : 
-        HasRightsEntity<DataProcessingAgreement, DataProcessingAgreementRight, DataProcessingAgreementRole>, 
-        IHasName, 
-        IOwnedByOrganization, 
+    public class DataProcessingAgreement :
+        HasRightsEntity<DataProcessingAgreement, DataProcessingAgreementRight, DataProcessingAgreementRole>,
+        IHasName,
+        IOwnedByOrganization,
         IDataProcessingModule,
         IEntityWithExternalReferences
 
@@ -43,9 +43,52 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<DataProcessingAgreementReadModel> ReadModels { get; set; }
 
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
+
         public IEnumerable<DataProcessingAgreementRight> GetRights(int roleId)
         {
             return Rights.Where(x => x.RoleId == roleId);
+        }
+
+        public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
+        {
+            if (system == null) throw new ArgumentNullException(nameof(system));
+
+            var usageResult = system.GetUsageForOrganization(OrganizationId);
+            if (usageResult.IsNone)
+                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
+
+            var usage = usageResult.Value;
+
+            if (GetAssignedSystemUsage(usage.Id).HasValue)
+                return new OperationError("System usage is already assigned", OperationFailure.Conflict);
+
+            SystemUsages.Add(usage);
+
+            return system;
+        }
+
+        public Result<ItSystem.ItSystem, OperationError> RemoveSystem(ItSystem.ItSystem system)
+        {
+            if (system == null) throw new ArgumentNullException(nameof(system));
+
+            var usageResult = system.GetUsageForOrganization(OrganizationId);
+            if (usageResult.IsNone)
+                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
+
+            var usage = usageResult.Value;
+
+            if (GetAssignedSystemUsage(usage.Id).IsNone)
+                return new OperationError("Usage not assigned", OperationFailure.BadInput);
+
+            SystemUsages.Remove(usage);
+
+            return system;
+        }
+
+        private Maybe<ItSystemUsage.ItSystemUsage> GetAssignedSystemUsage(int usageId)
+        {
+            return SystemUsages.FirstOrDefault(x => x.Id == usageId).FromNullable();
         }
 
         public Result<DataProcessingAgreementRight, OperationError> AssignRoleToUser(DataProcessingAgreementRole role, User user)
