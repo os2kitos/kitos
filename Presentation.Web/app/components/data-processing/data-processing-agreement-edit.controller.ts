@@ -3,23 +3,15 @@
 
     export class EditDataProcessingAgreementController {
         static $inject: Array<string> = [
-            "user",
-            "$http",
             "$rootScope",
-            "hasWriteAccess",
-            "userAccessRights",
-            "dataProcessingAgreement"
+            "userAccessRights"
         ];
 
         constructor(
-            private user: Services.IUser,
-            private $http,
             private $rootScope,
-            private $state: angular.ui.IStateService,
-            private userAccessRights,
-            private dataProcessingAgreement) {
+            private userAccessRights) {
 
-            if (!userAccessRights.canDelete) {
+            if (!this.userAccessRights.canDelete) {
                 _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.dataElementType === "removeDataProcessingAgreementButton");
             }
         }
@@ -43,7 +35,9 @@
                     hasWriteAccess: [
                         "userAccessRights", (userAccessRights: Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                     ],
-                    dataProcessingAgreement: ['$http', '$stateParams', ($http, $stateParams, dataProcessingAgreement = new Services.DataProcessing.DataProcessingAgreementService($http)) => dataProcessingAgreement.get($stateParams.id)],
+                    dataProcessingAgreement: [
+                        "dataProcessingAgreementService", "$stateParams", (dataProcessingAgreementService, $stateParams) => dataProcessingAgreementService.get($stateParams.id)
+                    ],
                 }
             });
         }]);
