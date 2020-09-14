@@ -20,7 +20,7 @@
             private dataProcessingAgreement) {
 
             if (!userAccessRights.canDelete) {
-                _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.text === "Slet Databehandlingsaftale");
+                _.remove(this.$rootScope.page.subnav.buttons, (o: any) => o.dataElementType === "removeDataProcessingAgreementButton");
             }
         }
     }
