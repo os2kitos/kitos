@@ -42,7 +42,7 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
                             case Models.Api.ApiResponseErrorCategory.BadInput:
-                                msg.toErrorMessage("Fejl! Navnet var ugyldigt!");
+                                msg.toErrorMessage("Fejl! Navnet er ugyldigt!");
                                 break;
                             case Models.Api.ApiResponseErrorCategory.Conflict:
                                 msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
@@ -51,15 +51,31 @@
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
                                 break;
                         }
+
+                        //Fail the continuation
+                        throw errorResponse;
                     }
                 );
+        }
+
+        private close() {
+            this.$uibModalInstance.close();
+        }
+
+        private popState(reload = false) {
+            const popped = this.$state.go("^");
+            if (reload) {
+                popped.then(() => this.$state.reload());
+            }
+
         }
 
         save(): void {
             this.createNew()
                 .then(response => {
                     if (response) {
-                        this.$uibModalInstance.close();
+                        this.close();
+                        this.popState(true);
                     }
                 });
         }
@@ -68,10 +84,16 @@
             this.createNew()
                 .then(response => {
                     if (response) {
-                        this.$uibModalInstance.close();
+                        this.close();
+                        this.popState();
                         this.$state.go("data-processing.edit-agreement.main", { id: response.createdObjectId });
                     }
                 });
+        }
+
+        cancel(): void {
+            this.close();
+            this.popState();
         }
     }
 
@@ -92,8 +114,8 @@
                             controller: CreateDateProcessingAgreementController,
                             controllerAs: "vm",
                         }).result.then(() => {
-                                $state.go("^", null, { reload: true });
-                            },
+
+                        },
                             () => {
                                 $state.go("^");
                             });
