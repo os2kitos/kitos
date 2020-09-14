@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementSystemAssignmentService _systemAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
-        //TODO: Update unit test for this
+        
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
