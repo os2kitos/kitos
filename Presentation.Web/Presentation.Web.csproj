@@ -439,6 +439,7 @@
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />

@@ -90,6 +90,10 @@
                         error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
             };
 
+            $scope.edit = id => {
+                $state.go(".edit", { refId: id, orgId: this.user.currentOrganizationId });
+            };
+
             function reload() {
                 $state.go(".", null, { reload: true });
             };
