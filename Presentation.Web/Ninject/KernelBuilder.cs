@@ -234,6 +234,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
 
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, CleanupDataProcessingAgreementsOnSystemUsageDeletedEvent>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityCreatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);

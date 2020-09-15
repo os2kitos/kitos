@@ -73,6 +73,7 @@
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\EventHandlers\BuildDataProcessingAgreementReadModelOnChangesHandler.cs" />
+    <Compile Include="Model\EventHandlers\CleanupDataProcessingAgreementsOnSystemUsageDeletedEvent.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
