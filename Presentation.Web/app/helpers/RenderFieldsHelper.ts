@@ -47,5 +47,12 @@
             }
             return RenderFieldsHelper.renderReferenceId(reference.ExternalReferenceId);
         }
+
+        static renderString(value: string) {
+            if (!!value) {
+                return value;
+            }
+            return RenderFieldsHelper.noValueFallback;
+        }
     }
 }

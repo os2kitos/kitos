@@ -37,11 +37,11 @@
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
-                return  filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+                return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
             };
 
             //Lookup maps
-            var dpaRoleIdToUserNamesMap = { };
+            var dpaRoleIdToUserNamesMap = {};
 
             //Build and launch kendo grid
             var launcher =
@@ -69,7 +69,7 @@
                     })
                     .withResponseParser(response => {
                         //Reset all response state
-                        dpaRoleIdToUserNamesMap = {}; 
+                        dpaRoleIdToUserNamesMap = {};
 
                         //Build lookups/mutations
                         response.forEach(dpa => {
@@ -103,11 +103,11 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
-                    .withColumn(builder => 
+                    .withColumn(builder =>
                         builder
                             .withDataSourceName("MainReferenceTitle")
                             .withTitle("Lokal Reference")
-                            .withId("ReferenceId")
+                            .withId("dpReferenceId")
                             .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.MainReferenceTitle, dataItem.MainReferenceUrl))
@@ -116,12 +116,21 @@
                         builder
                             .withDataSourceName("MainReferenceUserAssignedId")
                             .withTitle("Dokument ID / Sagsnr.")
-                            .withId("ReferenceUserAssignedId")
+                            .withId("dpReferenceUserAssignedId")
                             .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
                             .withInitialVisibility(false))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("SystemNamesAsCsv")
+                            .withTitle("IT-Systemer")
+                            .withId("dpSystemNamesAsCsv")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SystemNamesAsCsv))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SystemNamesAsCsv)))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>
