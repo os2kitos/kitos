@@ -357,6 +357,7 @@
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />
+    <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -1117,7 +1118,6 @@
     <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.view.html" />

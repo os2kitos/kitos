@@ -125,7 +125,7 @@
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("SystemNamesAsCsv")
-                            .withTitle("IT-Systemer")
+                            .withTitle("IT Systemer")
                             .withId("dpSystemNamesAsCsv")
                             .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)

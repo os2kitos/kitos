@@ -1,7 +1,7 @@
 ﻿<div class="object-section-container">
-    <h4>{{projectEditVm.project.name}}</h4>
+    <h4>{{::itSysAssignmentVm.ownerName}}</h4>
     <div class="panel panel-default">
-        <div class="panel-heading">Projektet vedrører følgende IT Systemer</div>
+        <div class="panel-heading">{{::itSysAssignmentVm.overviewHeader}}</div>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -10,28 +10,28 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="usage in systemUsages">
-                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{ formatSystemName(usage.itSystem.name, usage.itSystem.disabled) }}</a></td>
+                <tr data-ng-repeat="usage in itSysAssignmentVm.systemUsages">
+                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{ itSysAssignmentVm.formatSystemName(usage.itSystem.name, usage.itSystem.disabled) }}</a></td>
                     <td class="text-right">
                         <button type="button"
                                 class="btn btn-danger btn-xs delete-usage"
-                                data-confirmed-click="delete({{ usage.id }})"
+                                data-confirmed-click="itSysAssignmentVm.delete({{ usage.id }})"
                                 data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                data-ng-show="projectEditVm.hasWriteAccess">
+                                data-ng-show="itSysAssignmentVm.hasWriteAccess">
                             <i class="glyphicon glyphicon-trash"></i>
                         </button>
                     </td>
                 </tr>
             </tbody>
-            <tfoot data-ng-show="projectEditVm.hasWriteAccess">
+            <tfoot data-ng-if="itSysAssignmentVm.hasWriteAccess">
                 <tr>
                     <td colspan="3">
                         <input id="select-usage"
                                type="hidden"
                                class="form-control input-sm"
-                               data-ui-select2="itSystemUsagesSelectOptions"
-                               data-ng-model="selectedSystemUsage"
-                               data-ng-change="save()"
+                               data-ui-select2="itSysAssignmentVm.itSystemUsagesSelectOptions"
+                               data-ng-model="itSysAssignmentVm.selectedSystemUsage"
+                               data-ng-change="itSysAssignmentVm.save()"
                                data-placeholder="Vælg IT system" />
                     </td>
                 </tr>
