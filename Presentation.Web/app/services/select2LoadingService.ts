@@ -1,6 +1,7 @@
 ﻿module Kitos.Services {
 
     export interface ISelect2LoadingService {
+        //TODO: Add one more that takes a "transport" lambda so that we are free to call a service in stead
         loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
         select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
