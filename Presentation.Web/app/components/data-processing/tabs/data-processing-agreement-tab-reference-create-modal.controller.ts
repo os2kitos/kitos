@@ -4,7 +4,6 @@
     export class CreateReferenceDataProcessingAgreementController {
         static $inject: Array<string> = [
             "dataProcessingAgreementService",
-            "user",
             "$scope",
             "notify",
             "$state",
@@ -16,7 +15,6 @@
 
         constructor(
             private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
-            private readonly user: Services.IUser,
             private readonly $scope,
             private readonly notify,
             private readonly $state: angular.ui.IStateService,
@@ -70,7 +68,6 @@
                             templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-reference-create-modal.view.html",
                             windowClass: "modal fade in",
                             resolve: {
-                                user: ["userService", (userService: Services.IUserService) => userService.getUser()],
                                 referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],
                             },
                             controller: CreateReferenceDataProcessingAgreementController,

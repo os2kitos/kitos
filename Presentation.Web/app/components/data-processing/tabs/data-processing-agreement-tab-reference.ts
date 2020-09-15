@@ -5,6 +5,7 @@
         static $inject: Array<string> = [
             "$scope",
             "$state",
+            "user",
             "notify",
             "hasWriteAccess",
             "referenceService",
@@ -14,6 +15,7 @@
         constructor(
             private readonly $scope,
             private $state,
+            private readonly user: Services.IUser,
             private notify,
             public hasWriteAccess,
             private referenceService,
@@ -80,7 +82,7 @@
             this.$scope.deleteReference = referenceId => {
                 var msg = notify.addInfoMessage("Sletter...");
 
-                referenceService.deleteReference(referenceId, dataProcessingAgreement.organizationId)
+                referenceService.deleteReference(referenceId, user.currentOrganizationId)
                     .then(success => {
                             msg.toSuccessMessage("Slettet!");
                             reload();
