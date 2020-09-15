@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
@@ -62,7 +63,20 @@ namespace Core.DomainServices.Repositories.GDPR
 
         private void Notify(DataProcessingAgreement dataProcessingAgreement, LifeCycleEventType changeType)
         {
-            _domainEvents.Raise(new EntityLifeCycleEvent<DataProcessingAgreement>(changeType, dataProcessingAgreement));
+            switch (changeType)
+            {
+                case LifeCycleEventType.Created:
+                    _domainEvents.Raise(new EntityCreatedEvent<DataProcessingAgreement>(dataProcessingAgreement));
+                    break;
+                case LifeCycleEventType.Updated:
+                    _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingAgreement>(dataProcessingAgreement));
+                    break;
+                case LifeCycleEventType.Deleted:
+                    _domainEvents.Raise(new EntityDeletedEvent<DataProcessingAgreement>(dataProcessingAgreement));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
+            }
         }
     }
 }

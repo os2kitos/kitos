@@ -83,7 +83,7 @@ namespace Core.ApplicationServices
             
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            _domainEvents.Raise(new EntityLifeCycleEvent<User>(LifeCycleEventType.Created, savedUser));
+            _domainEvents.Raise(new EntityDeletedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
                 IssueAdvisMail(savedUser, false, orgId);

@@ -75,7 +75,7 @@
     <Compile Include="Model\EventHandlers\BuildDataProcessingAgreementReadModelOnChangesHandler.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
-    <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
     <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />

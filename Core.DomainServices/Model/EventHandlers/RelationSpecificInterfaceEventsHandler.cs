@@ -13,7 +13,7 @@ namespace Core.DomainServices.Model.EventHandlers
 {
     public class RelationSpecificInterfaceEventsHandler :
         IDomainEventHandler<ExposingSystemChanged>,
-        IDomainEventHandler<InterfaceDeleted>
+        IDomainEventHandler<EntityDeletedEvent<ItInterface>>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly ITransactionManager _transactionManager;
@@ -48,23 +48,6 @@ namespace Core.DomainServices.Model.EventHandlers
             }
         }
 
-        public void Handle(InterfaceDeleted domainEvent)
-        {
-            if (domainEvent == null)
-                throw new ArgumentNullException(nameof(domainEvent));
-
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
-            {
-                var affectedInterface = domainEvent.DeletedInterface;
-
-                _logger.Debug(
-                    "Interface with id {interfaceId} deleted. Resetting 'interface' field on all associated system relations",
-                    affectedInterface.Id);
-
-                ResetInterfaceOnRelations(affectedInterface, transaction);
-            }
-        }
-
         private void ResetInterfaceOnRelations(ItInterface affectedInterface, IDatabaseTransaction transaction)
         {
             var systemRelations = affectedInterface.AssociatedSystemRelations.ToList();
@@ -90,6 +73,21 @@ namespace Core.DomainServices.Model.EventHandlers
                 _systemUsageRepository.Save();
                 transaction.Commit();
             }
+        }
+
+        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        {
+            if (domainEvent == null)
+                throw new ArgumentNullException(nameof(domainEvent));
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            var affectedInterface = domainEvent.Entity;
+
+            _logger.Debug(
+                "Interface with id {interfaceId} deleted. Resetting 'interface' field on all associated system relations",
+                affectedInterface.Id);
+
+            ResetInterfaceOnRelations(affectedInterface, transaction);
         }
     }
 }

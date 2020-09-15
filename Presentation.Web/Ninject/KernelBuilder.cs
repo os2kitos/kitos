@@ -31,7 +31,6 @@ using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
@@ -225,15 +224,23 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<InterfaceDeleted, RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
-            RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
-            RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
