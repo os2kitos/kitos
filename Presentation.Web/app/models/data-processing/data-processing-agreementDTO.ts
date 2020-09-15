@@ -3,6 +3,8 @@
         id: number,
         name: string,
         organizationId: number,
-        reference: Array<BaseReference>;
+        objectOwnerId: number,
+        referenceId: number,
+        references: Array<BaseReference>;
     }
 }

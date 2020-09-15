@@ -9,7 +9,8 @@
             "notify",
             "hasWriteAccess",
             "referenceService",
-            "dataProcessingAgreement"
+            "dataProcessingAgreement",
+            "dataProcessingAgreementService"
         ];
 
         constructor(
@@ -19,7 +20,8 @@
             private notify,
             public hasWriteAccess,
             private referenceService,
-            private dataProcessingAgreement) {
+            private dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
+            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
 
             this.$scope.mainGridOptions = {
                 dataSource: {
@@ -90,6 +92,30 @@
                         error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
             };
 
+            //TODO Mangler metode til at sætte refrence ID på agreement.
+            //this.$scope.setChosenReference = id => {
+            //    //  var referenceId = (id === dataProcessingAgreement.referenceId) ? null : id;
+
+            //    var msg = notify.addInfoMessage("Opdaterer felt...", false);
+
+            //    var dpa = this.dataProcessingAgreement;
+            //    dpa.referenceId = id;
+
+            //    this.dataProcessingAgreementService.update(dpa).then(
+            //        nameChangeResponse => {
+            //            msg.toSuccessMessage("Feltet er opdateret!");
+            //            this.dataProcessingAgreement.referenceId = id;
+            //        },
+            //        (errorResponse: Models.Api.ApiResponseErrorCategory) => {
+            //            switch (errorResponse) {
+            //            default:
+            //                msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+            //                break;
+            //            }
+
+            //        });
+            //}
+
             $scope.edit = id => {
                 $state.go(".edit", { refId: id, orgId: this.user.currentOrganizationId });
             };
@@ -109,6 +135,8 @@
                 controller: EditRefDataProcessingAgreementController,
                 controllerAs: "vm",
                 resolve: {
+                    // Har måske ikke brug for dette her
+                    // TODO Import i controller istedet og tilgå direkte da vi ikke bruger reference service til at opdatere agreement objekt.
                     referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],
                 },
             });

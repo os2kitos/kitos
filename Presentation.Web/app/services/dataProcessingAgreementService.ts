@@ -1,9 +1,11 @@
 ﻿module Kitos.Services.DataProcessing {
+
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
+        update(agreement: Models.DataProcessing.IDataProcessingAgreementDTO): angular.IPromise<IDataProcessingAgreementPatchResult>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -62,6 +64,20 @@
                 );
         }
 
+        update(agreement: Models.DataProcessing.IDataProcessingAgreementDTO): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this
+                .$http
+                .patch<API.Models.IApiWrapper<any>>(this.getUri(""), agreement)
+                .then(
+                    response => {
+                        return <IDataProcessingAgreementPatchResult>{
+                            valueModifiedTo: response.data.response.id,
+                        };
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
 
             return this
@@ -95,6 +111,7 @@
                     error => this.handleServerError(error)
                 );
         }
+
 
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
             return this
