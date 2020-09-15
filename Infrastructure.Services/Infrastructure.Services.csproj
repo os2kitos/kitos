@@ -73,6 +73,7 @@
     <Compile Include="DomainEvents\IDomainEvent.cs" />
     <Compile Include="DomainEvents\IDomainEventHandler.cs" />
     <Compile Include="DomainEvents\IDomainEvents.cs" />
+    <Compile Include="DomainEvents\NamedEntityChangedNameEvent.cs" />
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Http\EndpointValidation.cs" />

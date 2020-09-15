@@ -52,6 +52,11 @@ namespace Core.DomainServices.Repositories.GDPR
             return _repository.GetByKey(id);
         }
 
+        public IQueryable<DataProcessingAgreement> GetBySystemId(int systemId)
+        {
+            return _repository.AsQueryable().Where(x => x.SystemUsages.Any(usage => usage.ItSystemId == systemId));
+        }
+
         public IQueryable<DataProcessingAgreement> Search(int organizationId, Maybe<string> exactName)
         {
             return

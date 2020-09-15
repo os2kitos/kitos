@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Model;
@@ -25,6 +24,12 @@ namespace Core.DomainServices.GDPR
             destination.Name = source.Name;
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
+            PatchSystems(source, destination);
+        }
+
+        private void PatchSystems(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)
+        {
+            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => x.ItSystem.Name));
         }
 
         private static void PatchReference(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)

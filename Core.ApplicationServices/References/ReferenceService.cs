@@ -165,6 +165,7 @@ namespace Core.ApplicationServices.References
 
             foreach (var reference in systemExternalReferences)
             {
+                _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(reference));
                 _referenceRepository.Delete(reference);
             }
 
