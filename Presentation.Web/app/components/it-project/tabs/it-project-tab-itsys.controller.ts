@@ -4,10 +4,9 @@
             url: "/itsys",
             templateUrl: "app/shared/select-it-systems/generic-tab-it-systems.view.html",
             controller: "project.EditItsysCtrl",
-            controllerAs: "vm",
             resolve: {
                 user: ["userService", userService => userService.getUser()],
-                usages: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/itproject/" + $stateParams.id + "?usages=true")
+                usages: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itproject/${$stateParams.id}?usages=true`)
                     .then(result => result.data.response)]
             }
         });
@@ -18,7 +17,7 @@
             ($scope, $http, $state, $stateParams, user, notify, usages, hasWriteAccess, project) => {
                 var projectId = $stateParams.id;
                 var save = () => {
-                    $http.post("api/itproject/" + projectId + "?usageId=" + $scope.itSysAssignmentVm.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
+                    $http.post(`api/itproject/${projectId}?usageId=${$scope.itSysAssignmentVm.selectedSystemUsage.id}&organizationId=${user.currentOrganizationId}`)
                         .success(() => {
                             notify.addSuccessMessage("Systemet er tilknyttet.");
                             reload();
@@ -29,12 +28,12 @@
                 };
 
                 var deleteFunc = usageId => {
-                    $http.delete("api/itproject/" + projectId + "?usageId=" + usageId + "&organizationId=" + user.currentOrganizationId)
+                    $http.delete(`api/itproject/${projectId}?usageId=${usageId}&organizationId=${user.currentOrganizationId}`)
                         .success(() => {
                             notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
                             reload();
                         })
-                        .error(() => {
+                        .error(() => { 
                             notify.addErrorMessage("Fejl! Kunne ikke fjerne systemets tilknyttning!");
                         });
                 };

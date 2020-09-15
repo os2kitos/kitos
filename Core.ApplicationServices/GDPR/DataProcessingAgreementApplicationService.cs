@@ -186,7 +186,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrWhiteSpace(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
+            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ActivationException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<ItSystem>>(id, dataProcessingAgreement =>

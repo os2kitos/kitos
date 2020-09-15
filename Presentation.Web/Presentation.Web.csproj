@@ -434,6 +434,7 @@
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-it-systems.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />

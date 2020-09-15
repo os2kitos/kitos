@@ -4,6 +4,9 @@
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
+        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        getAvailableSystemsUrl(dataProcessingAgreementId: number) : string;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -16,7 +19,7 @@
     }
 
     export interface IDataProcessingAgreementPatchResult {
-        valueModifiedTo: string;
+        valueModifiedTo: any;
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
@@ -43,15 +46,16 @@
             throw errorCategory;
         }
 
-        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
+        //Use for contracts that take an input defined as SingleValueDTO
+        private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingAgreementPatchResult> {
 
             const payload = {
-                Value: name
+                Value: value
             };
 
             return this
                 .$http
-                .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload)
+                .patch<API.Models.IApiWrapper<any>>(url, payload)
                 .then(
                     response => {
                         return <IDataProcessingAgreementPatchResult>{
@@ -60,6 +64,11 @@
                     },
                     error => this.handleServerError(error)
                 );
+        }
+
+
+        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "name"), name);
         }
 
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
@@ -109,6 +118,17 @@
                 );
         }
 
+        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/assign"), systemId);
+        }
+        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/remove"), systemId);
+        }
+
+        getAvailableSystemsUrl(dataProcessingAgreementId: number): string {
+            return this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/available");
+        }
+
         static $inject = ["$http"];
 
         constructor(private readonly $http: ng.IHttpService) {
@@ -118,7 +138,7 @@
             return this.getBaseUri() + `${suffix}`;
         }
 
-        private getUriWithIdAndSuffix(id: string, suffix: string) {
+        private getUriWithIdAndSuffix(id: number, suffix: string) {
             return this.getBaseUri() + `${id}/${suffix}`;
         }
 

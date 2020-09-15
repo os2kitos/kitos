@@ -11,11 +11,11 @@
             </thead>
             <tbody>
                 <tr data-ng-repeat="usage in itSysAssignmentVm.systemUsages">
-                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{ itSysAssignmentVm.formatSystemName(usage.itSystem.name, usage.itSystem.disabled) }}</a></td>
+                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{::itSysAssignmentVm.formatSystemName(usage.itSystem.name, usage.itSystem.disabled)}}</a></td>
                     <td class="text-right">
                         <button type="button"
                                 class="btn btn-danger btn-xs delete-usage"
-                                data-confirmed-click="itSysAssignmentVm.delete({{ usage.id }})"
+                                data-confirmed-click="itSysAssignmentVm.delete({{::usage.id}})"
                                 data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
                                 data-ng-show="itSysAssignmentVm.hasWriteAccess">
                             <i class="glyphicon glyphicon-trash"></i>
