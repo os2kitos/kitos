@@ -22,6 +22,8 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
+        withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
+        withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -37,6 +39,18 @@ module Kitos.Utility.KendoGrid {
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
+        private sortingEnabled = true;
+        private visible = true;
+
+        withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource> {
+            this.visible = visible;
+            return this;
+        }
+
+        withoutSorting() : IKendoGridColumnBuilder<TDataSource> {
+            this.sortingEnabled = false;
+            return this;
+        }
 
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource> {
             if (renderUi == null) throw "renderUi must be defined";
@@ -60,7 +74,7 @@ module Kitos.Utility.KendoGrid {
             return this.withExcelOutput(dataSource => this.echoSourceValue(dataSource));
         }
 
-        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>{
+        withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource> {
             if (excelOutput == null) throw "excelOutput must be defined";
             this.excelOutput = excelOutput;
             return this;
@@ -137,10 +151,12 @@ module Kitos.Utility.KendoGrid {
                     "data-element-type": `${this.id}KendoObject`
                 },
                 width: this.standardWidth,
+                hidden: !this.visible,
                 persistId: this.id,
                 template: dataItem => this.rendering(dataItem),
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
-                filterable: this.getFiltering()
+                filterable: this.getFiltering(),
+                sortable : this.sortingEnabled
             } as IKendoGridColumn<TDataSource>;
         }
     }
@@ -165,7 +181,9 @@ module Kitos.Utility.KendoGrid {
     }
 
     type UrlFactory = (options: any) => string;
+    type ResponseParser<TDataSource> = (response: TDataSource[]) => TDataSource[];
     type ColumnConstruction<TDataSource> = (builder: IKendoGridColumnBuilder<TDataSource>) => void;
+    type ParameterMapper = (data: kendo.data.DataSourceTransportParameterMapData, type: string) => any;
 
     export interface IKendoGridLauncher<TDataSource> {
         launch(): void;
@@ -180,11 +198,13 @@ module Kitos.Utility.KendoGrid {
         withUrlFactory(factory: UrlFactory): IKendoGridLauncher<TDataSource>;
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource>;
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
+        withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
         private $scope: ng.IScope = null;
-        private standardSortingSourceField : string = null;
+        private standardSortingSourceField: string = null;
         private storageKey: string = null;
         private gridState: Services.IGridStateService = null;
         private entityTypeName: string = null;
@@ -194,6 +214,8 @@ module Kitos.Utility.KendoGrid {
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
         private columns: ColumnConstruction<TDataSource>[] = [];
+        private responseParser: ResponseParser<TDataSource> = response => response;
+        private parameterMapper: ParameterMapper = (data,type) => null;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -206,6 +228,18 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource> {
+            if (!mapping) throw "mapping must be defined";
+            this.parameterMapper = mapping;
+            return this;
+        }
+
+        withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource> {
+            if (!parser) throw "parser must be defined";
+            this.responseParser = parser;
+            return this;
         }
 
         withStandardSorting(sourceField: string): IKendoGridLauncher<TDataSource> {
@@ -437,7 +471,8 @@ module Kitos.Utility.KendoGrid {
                         read: {
                             url: options => this.urlFactory(options),
                             dataType: "json"
-                        }
+                        },
+                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data,type)
                     },
                     sort: {
                         field: this.standardSortingSourceField,
@@ -457,7 +492,10 @@ module Kitos.Utility.KendoGrid {
                                 IsArchived: { type: "boolean" }
                             },
                         },
-                        parse: response => response
+                        parse: response => {
+                            response.value = this.responseParser(response.value);
+                            return response;
+                        }
                     }
                 },
                 toolbar: toolbar,

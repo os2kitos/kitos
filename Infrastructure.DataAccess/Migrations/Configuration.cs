@@ -1,6 +1,7 @@
 using System;
 using System.Data.Entity;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -591,6 +592,30 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     role.Priority = itContractRolesCount;
                     itContractRolesCount--;
+                }
+
+                context.SaveChanges();
+
+                #endregion
+
+                #region DPA ROLES
+                Console.Out.WriteLine("Initializing dpa roles");
+                context.DataProcessingAgreementsRoles.AddOrUpdate(x => x.Name, new DataProcessingAgreementRole
+                {
+                    HasWriteAccess = true,
+                    Name = "Aftaleejer",
+                    IsObligatory = true,
+                    IsLocallyAvailable = true,
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 1
+                });
+
+                var dpaRolesCount = context.DataProcessingAgreementsRoles.Count();
+                foreach (var role in context.ItContractRoles)
+                {
+                    role.Priority = dpaRolesCount;
+                    dpaRolesCount--;
                 }
 
                 context.SaveChanges();

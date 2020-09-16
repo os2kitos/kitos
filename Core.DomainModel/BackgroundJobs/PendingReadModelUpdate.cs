@@ -1,12 +1,13 @@
 ﻿using System;
-using Core.DomainModel.GDPR;
 
 namespace Core.DomainModel.BackgroundJobs
 {
     public enum PendingReadModelUpdateSourceCategory
     {
-        DataProcessingAgreement = 0
+        DataProcessingAgreement = 0,
+        DataProcessingAgreement_User = 1
     }
+
     public class PendingReadModelUpdate
     {
         protected PendingReadModelUpdate()
@@ -14,13 +15,13 @@ namespace Core.DomainModel.BackgroundJobs
 
         }
 
-        public static PendingReadModelUpdate From(DataProcessingAgreement source)
+        public static PendingReadModelUpdate Create(IHasId source, PendingReadModelUpdateSourceCategory category)
         {
-            return new PendingReadModelUpdate
+            return new PendingReadModelUpdate()
             {
                 CreatedAt = DateTime.UtcNow,
                 SourceId = source.Id,
-                Category = PendingReadModelUpdateSourceCategory.DataProcessingAgreement
+                Category = category
             };
         }
 

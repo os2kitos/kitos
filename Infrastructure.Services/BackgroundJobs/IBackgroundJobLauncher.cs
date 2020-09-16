@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Services.BackgroundJobs
 {
     public interface IBackgroundJobLauncher
     {
-        Task LaunchLinkCheckAsync();
-        Task LaunchUpdateDataProcessingAgreementReadModels();
+        Task LaunchLinkCheckAsync(CancellationToken token = default);
+        Task LaunchUpdateDataProcessingAgreementReadModels(CancellationToken token = default);
+        Task LaunchScheduleDataProcessingAgreementReadUpdates(CancellationToken token = default);
     }
 }

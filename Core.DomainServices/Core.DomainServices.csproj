@@ -61,7 +61,9 @@
     <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="GDPR\DataProcessingAgreementNamingService.cs" />
     <Compile Include="GDPR\DataProcessingAgreementReadModelUpdate.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementRoleAssignmentsService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementNamingService.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementRoleAssignmentsService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
@@ -76,12 +78,15 @@
     <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
+    <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\OptionsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
     <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\QueryByOrganizationIds.cs" />
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationIds.cs" />
+    <Compile Include="Queries\QueryUserByNameOrEmail.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />

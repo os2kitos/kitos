@@ -133,5 +133,9 @@
                 });
             return result;
         }
+
+        static renderString(value: string) {
+            return value || ExcelExportHelper.noValueFallback;
+        } 
     }
 }

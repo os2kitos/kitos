@@ -11,7 +11,6 @@ using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
-using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
@@ -25,7 +24,9 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
@@ -39,6 +40,7 @@ using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model;
 using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -183,6 +185,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementRoleAssignmentsService>().To<DataProcessingAgreementRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 
@@ -229,6 +232,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
             RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityLifeCycleEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -242,6 +246,9 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
                 .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole>>()
+                .To<OptionsService<DataProcessingAgreementRight, DataProcessingAgreementRole, LocalDataProcessingAgreementRole>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
@@ -343,6 +350,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<RebuildDataProcessingAgreementReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleDataProcessingAgreementReadModelUpdates>().ToSelf().InCommandScope(Mode);
         }
     }
 }

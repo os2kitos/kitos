@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Result;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels
@@ -40,29 +43,25 @@ namespace Core.BackgroundJobs.Model.ReadModels
             _transactionManager = transactionManager;
         }
 
-        public Task<Result<string, OperationError>> ExecuteAsync()
+        public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var completedUpdates = 0;
             try
             {
                 foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingAgreement, BatchSize).ToList())
                 {
+                    if (token.IsCancellationRequested)
+                        break;
+
                     using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId);
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
                     if (source.HasValue)
                     {
-                        var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
-                        _updater.Apply(source.Value, readModel);
-                        if (readModelResult.HasValue)
-                        {
-                            _readModelRepository.Update(readModel);
-                        }
-                        else
-                        {
-                            _readModelRepository.Add(readModel);
-                        }
+                        var sourceValue = source.Value;
+
+                        ApplyUpdate(readModelResult, sourceValue);
                     }
                     else
                     {
@@ -86,6 +85,20 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 return Task.FromResult(Result<string, OperationError>.Failure(new OperationError("Error during rebuild", OperationFailure.UnknownError)));
             }
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {completedUpdates} updates"));
+        }
+
+        private void ApplyUpdate(Maybe<DataProcessingAgreementReadModel> readModelResult, DataProcessingAgreement sourceValue)
+        {
+            var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
+            _updater.Apply(sourceValue, readModel);
+            if (readModelResult.HasValue)
+            {
+                _readModelRepository.Update(readModel);
+            }
+            else
+            {
+                _readModelRepository.Add(readModel);
+            }
         }
     }
 }

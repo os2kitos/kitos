@@ -17,12 +17,12 @@ var tsProject = ts.createProject("tsconfig.json");
 //Synchronously delete the output script file(s)
 const cleanJsAndMaps = function (callBack) {
     return del
-        (
-            [
-                paths.typescriptOutput,
-                paths.appMaps
-            ].concat(paths.allJavaScriptNoTests)
-        );
+    (
+        [
+            paths.typescriptOutput,
+            paths.appMaps
+        ].concat(paths.allJavaScriptNoTests)
+    );
 };
 
 // create css bundled file

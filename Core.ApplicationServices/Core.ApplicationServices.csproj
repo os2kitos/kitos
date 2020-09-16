@@ -118,8 +118,6 @@
     <Compile Include="Model\GDPR\DataProcessingAgreementPropertyChanges.cs" />
     <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
-    <Compile Include="Options\IOptionsService.cs" />
-    <Compile Include="Options\OptionsService.cs" />
     <Compile Include="KLE\IKLEApplicationService.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
     <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />

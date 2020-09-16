@@ -28,22 +28,22 @@
     }
 
     class LocalOptionRoleListDirective implements IDirectiveScope {
-        public title: string;
-        public editState: string;
-        public optionId: number;
-        public dirId: string;
-        public optionType: LocalOptionType;
+        title: string;
+        editState: string;
+        optionId: number;
+        dirId: string;
+        optionType: LocalOptionType;
 
-        public mainGrid: IKendoGrid<Models.IRoleEntity>;
-        public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
+        mainGrid: IKendoGrid<Models.IRoleEntity>;
+        mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver"];
+        static $inject: string[] = ["$", "$state", "$scope", "localOptionUrlResolver"];
 
         constructor(
-            private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
+            private readonly $: JQueryStatic,
+            $state: ng.ui.IStateService,
             private $scope,
-            private localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver) {
+            localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -154,7 +154,7 @@
             }
         }
 
-        private editOption = (e: JQueryEventObject) => {
+        editOption = (e: JQueryEventObject) => {
             e.preventDefault();
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));

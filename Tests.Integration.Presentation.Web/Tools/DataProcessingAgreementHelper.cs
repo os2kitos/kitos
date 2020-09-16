@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
@@ -14,15 +15,13 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         public static async Task<DataProcessingAgreementDTO> CreateAsync(int organizationId, string name, Cookie optionalLogin = null)
         {
-            using (var createdResponse = await SendCreateRequestAsync(organizationId, name, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingAgreementDTO>();
+            using var createdResponse = await SendCreateRequestAsync(organizationId, name, optionalLogin);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingAgreementDTO>();
 
-                Assert.Equal(name, response.Name);
+            Assert.Equal(name, response.Name);
 
-                return response;
-            }
+            return response;
         }
 
         public static async Task<HttpResponseMessage> SendCreateRequestAsync(int organizationId, string name, Cookie optionalLogin = null)
@@ -47,11 +46,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<DataProcessingAgreementDTO> GetAsync(int id, Cookie optionalLogin = null)
         {
-            using (var response = await SendGetRequestAsync(id, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingAgreementDTO>();
-            }
+            using var response = await SendGetRequestAsync(id, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingAgreementDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetRequestAsync(int id, Cookie optionalLogin = null)
@@ -80,11 +77,49 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<DataProcessingAgreementReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using (var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/DataProcessingAgreementReadModels?$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie))
-            {
-                Assert.Equal(HttpStatusCode.OK,response.StatusCode);
-                return await response.ReadOdataListResponseBodyAsAsync<DataProcessingAgreementReadModel>();
-            }
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/DataProcessingAgreementReadModels?$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<DataProcessingAgreementReadModel>();
+        }
+
+        public static async Task<IEnumerable<BusinessRoleDTO>> GetAvailableRolesAsync(int id, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/available-roles"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<BusinessRoleDTO>>();
+        }
+
+        public static async Task<IEnumerable<UserWithEmailDTO>> GetAvailableUsersAsync(int id, int roleId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/available-roles/{roleId}/applicable-users"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<UserWithEmailDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignRoleRequestAsync(int id, int roleId, int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PatchWithCookieAsync(
+                TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/roles/assign"), cookie,
+                new AssignRoleDTO
+                {
+                    RoleId = roleId,
+                    UserId = userId
+                });
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveRoleRequestAsync(int id, int roleId, int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PatchWithCookieAsync(
+                TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/roles/remove/{roleId}/from/{userId}"), cookie,
+                new{});
         }
     }
 }
