@@ -15,7 +15,7 @@
                     <td class="text-right">
                         <button type="button"
                                 data-element-type="remove-system-assignment-button"
-                                class="btn btn-danger btn-xs delete-usage"
+                                class="btn btn-danger btn-xs"
                                 data-confirmed-click="itSysAssignmentVm.delete({{::viewModel.id}})"
                                 data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
                                 data-ng-show="itSysAssignmentVm.hasWriteAccess">
@@ -27,7 +27,7 @@
             <tfoot data-ng-if="itSysAssignmentVm.hasWriteAccess">
                 <tr>
                     <td colspan="3">
-                        <input id="select-usage"
+                        <input id="select-new-system"
                                type="hidden"
                                class="form-control input-sm"
                                data-ui-select2="itSysAssignmentVm.searchConfiguration"

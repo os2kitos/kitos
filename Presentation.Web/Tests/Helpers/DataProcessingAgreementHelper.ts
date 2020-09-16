@@ -3,6 +3,7 @@ import WaitTimers = require("../Utility/WaitTimers");
 import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
+import Select2Helper = require("./Select2Helper");
 
 class DataProcessingAgreementHelper {
 
@@ -48,6 +49,19 @@ class DataProcessingAgreementHelper {
         return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.it-systems");
     }
 
+    public static assignSystem(name: string) {
+        console.log("Assigning system with name: " + name);
+        return Select2Helper.searchFor(name, "s2id_select-new-system")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static removeSystem(name: string) {
+        console.log("Removing system with name: " + name);
+        return this.pageObject.getRemoveSystemButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
+    }
+
     public static openNewDpaDialog() {
         console.log("clicking createDpaButton");
         return this.pageObject.getCreateDpaButton().click()
@@ -67,7 +81,6 @@ class DataProcessingAgreementHelper {
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());
         return isClickable ? expectation.toBeTruthy() : expectation.toBeFalsy();
     }
-
 
     private static findDataProcessingAgreementColumnFor(name: string) {
         return this.kendoToolbarWrapper.getFilteredColumnElement(
