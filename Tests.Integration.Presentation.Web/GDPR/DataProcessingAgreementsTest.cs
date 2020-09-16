@@ -320,7 +320,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
-        public async Task Cannot_Set_Master_Reference_with_Invalid_Reference()
+        public async Task Cannot_Set_Master_Reference_With_Invalid_Reference()
         {
             //Arrange
             var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
