@@ -102,7 +102,7 @@
                 this.dataProcessingAgreementService.setMasterReference(this.dataProcessingAgreement.id ,id).then(
                     nameChangeResponse => {
                         msg.toSuccessMessage("Feltet er opdateret!");
-                        this.dataProcessingAgreement.referenceId = id;
+                        reload();
                     },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {

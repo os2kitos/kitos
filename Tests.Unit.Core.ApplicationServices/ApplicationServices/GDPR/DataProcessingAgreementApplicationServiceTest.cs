@@ -553,21 +553,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
-        [Fact]
-        public void Can_Set_Master_Reference_On_Dpa()
-        {
-            //Arrange
-            var agreementId = A<int>();
-            var dataProcessingAgreement = new DataProcessingAgreement();
-            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
-            ExpectAllowModifyReturns(dataProcessingAgreement, true);
-
-            //Act
-            var result = _sut.SetMasterReference(agreementId, A<int>());
-
-            //Assert
-            Assert.True(result.Ok);
-        }
 
         [Fact]
         public void Cannot_Set_Master_Reference_On_Dpa_With_Invalid_Dpa()
