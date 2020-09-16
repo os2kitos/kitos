@@ -553,6 +553,36 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Can_Set_Master_Reference_On_Dpa()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, A<int>());
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public void Cannot_Set_Master_Reference_On_Dpa_With_Invalid_Dpa()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingAgreement dataProcessingAgreement, Mock<IDatabaseTransaction> transaction)
         {
             _repositoryMock.Verify(x => x.Update(dataProcessingAgreement), expectSideEffect ? Times.Once() : Times.Never());
