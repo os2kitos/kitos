@@ -117,15 +117,15 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/reference")]
+        [Route("{id}/master-reference")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage SetMasterReference(int id, [FromBody] ExternalReference reference)
+        public HttpResponseMessage SetMasterReference(int id, [FromBody] SingleValueDTO<int> value)
         {
-            return _dataProcessingAgreementApplicationService.SetMasterReference(id, reference)
+            return _dataProcessingAgreementApplicationService
+                .SetMasterReference(id, value.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

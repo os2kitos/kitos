@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Core.ApplicationServices.Authorization;
+﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Shared;
@@ -13,8 +9,13 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -24,6 +25,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementRepository _repository;
         private readonly IDataProcessingAgreementNamingService _namingService;
         private readonly IDataProcessingAgreementRoleAssignmentsService _roleAssignmentsService;
+        private readonly IReferenceRepository _referenceRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
 
@@ -32,6 +34,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingAgreementRepository repository,
             IDataProcessingAgreementNamingService namingService,
             IDataProcessingAgreementRoleAssignmentsService roleAssignmentsService,
+            IReferenceRepository referenceRepository,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingAgreementRight> rightRepository)
         {
@@ -39,6 +42,7 @@ namespace Core.ApplicationServices.GDPR
             _repository = repository;
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
+            _referenceRepository = referenceRepository;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -114,18 +118,25 @@ namespace Core.ApplicationServices.GDPR
             return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
-        public Result<ExternalReference, OperationError> SetMasterReference(int agreementId, ExternalReference reference)
+        public Result<ExternalReference, OperationError> SetMasterReference(int agreementId, int referenceId)
         {
             return WithWriteAccess(agreementId, agreement =>
             {
-                var referenceResult = agreement.SetMasterReference(reference);
+                var referenceResult = _referenceRepository.Get(referenceId);
 
-                if (referenceResult.Ok)
+                if (referenceResult.IsNone)
+                {
+                    return new OperationError("Invalid reference Id",OperationFailure.BadInput);
+                }
+
+                var setReferenceResult = agreement.SetMasterReference(referenceResult.Value);
+
+                if (setReferenceResult.Ok)
                 {
                     _repository.Update(agreement);
                 }
 
-                return referenceResult;
+                return setReferenceResult;
             });
 
 
