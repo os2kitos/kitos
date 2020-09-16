@@ -25,6 +25,7 @@ using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.DomainEvents;
@@ -242,6 +243,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)

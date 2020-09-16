@@ -58,6 +58,7 @@
     <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="Events\EnabledStatusChanged.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithEnabledStatus.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasId.cs" />

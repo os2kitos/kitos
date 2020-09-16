@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystem;
@@ -19,7 +18,8 @@ namespace Core.DomainServices.Model.EventHandlers
         IDomainEventHandler<EntityDeletedEvent<ExternalReference>>,
         IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
         IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
-        IDomainEventHandler<NamedEntityChangedNameEvent<ItSystem>>
+        IDomainEventHandler<NamedEntityChangedNameEvent<ItSystem>>,
+        IDomainEventHandler<EnabledStatusChanged<ItSystem>>
     {
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _mapper;
@@ -82,6 +82,11 @@ namespace Core.DomainServices.Model.EventHandlers
         }
 
         public void Handle(NamedEntityChangedNameEvent<ItSystem> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_ItSystem));
+        }
+
+        public void Handle(EnabledStatusChanged<ItSystem> domainEvent)
         {
             _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_ItSystem));
         }

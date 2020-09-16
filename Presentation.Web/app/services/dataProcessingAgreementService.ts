@@ -61,7 +61,7 @@
                 .then(
                     response => {
                         return <IDataProcessingAgreementPatchResult>{
-                            valueModifiedTo: name,
+                            valueModifiedTo: value,
                         };
                     },
                     error => this.handleServerError(error)

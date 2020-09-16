@@ -29,7 +29,7 @@ namespace Core.DomainServices.GDPR
 
         private void PatchSystems(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)
         {
-            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => x.ItSystem.Name));
+            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
         }
 
         private static void PatchReference(DataProcessingAgreement source, DataProcessingAgreementReadModel destination)

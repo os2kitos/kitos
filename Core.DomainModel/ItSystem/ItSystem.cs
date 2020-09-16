@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus
     {
         public ItSystem()
         {
