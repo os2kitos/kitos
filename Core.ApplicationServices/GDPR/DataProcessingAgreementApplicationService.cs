@@ -138,27 +138,6 @@ namespace Core.ApplicationServices.GDPR
 
                 return setReferenceResult;
             });
-
-
-            // throw new NotImplementedException();
-
-            //return WithWriteAccess(agreementId, agreement =>
-            //{
-            //    using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
-            //    var referenceResult =  agreement.SetMasterReference(reference);
-
-            //    if (referenceResult.Ok)
-            //    {
-            //        _repository.Update(agreement);
-            //        transaction.Commit();
-            //    }
-
-            //    return referenceResult;
-
-            //});
-
-
         }
 
         public Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id)

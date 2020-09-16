@@ -128,22 +128,23 @@
 
         setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
 
-            const referenceService = new ReferenceServiceFactory(this.$http).createDpaReference();
+            const payload = {
+                Value: referenceId
+            };
 
-            return referenceService.getReference(referenceId).then(ref => {
-                return this
+            return this
                     .$http
                     .patch<API.Models.IApiWrapper<any>>(
-                        this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "reference"), ref)
+                        this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "master-reference"), payload)
                     .then(
                         response => {
                             return <IDataProcessingAgreementPatchResult>{
-                                valueModifiedTo: ref.Title,
+                                valueModifiedTo: referenceId.toString(),
                             };
                         },
                         error => this.handleServerError(error)
                     );
-            });
+
         }
 
         static $inject = ["$http"];
