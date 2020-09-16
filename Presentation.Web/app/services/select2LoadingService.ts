@@ -1,14 +1,18 @@
 ﻿module Kitos.Services {
 
+    export type Select2AsyncDataSource = (query: string) => ng.IPromise<Models.ViewModel.Generic.Select2OptionViewModel[]>
+
     export interface ISelect2LoadingService {
-        //TODO: Add one more that takes a "transport" lambda so that we are free to call a service in stead
         loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
+        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
         select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
-        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear? :boolean);
+        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear?: boolean);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
+
+        private static readonly defaultQuietMillis = 500;
 
         static $inject = ["$http"];
         constructor(private readonly $http: ng.IHttpService) {
@@ -27,6 +31,32 @@
                 data: () => ({ "results": dataFn() }),
                 allowClear: allowClear
             };
+        }
+
+        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean) {
+            const config = <any>{
+                minimumInputLength: 1,
+                allowClear: allowClear,
+                ajax: {
+                    data(term, _) {
+                        return { query: term };
+                    },
+                    quietMillis: Select2LoadingService.defaultQuietMillis,
+                    transport(queryParams) {
+                        return source(queryParams.data.query)
+                            .then
+                            (
+                                queryParams.success,
+                                () => null
+                            );
+                    },
+                    results(data, _) {
+                        //TODO: Needed?
+                        return { results: data };
+                    }
+                }
+            };
+            return config;
         }
 
         loadSelect2(
@@ -62,7 +92,7 @@
                     data(term, page) {
                         return { query: term };
                     },
-                    quietMillis: 500,
+                    quietMillis: Select2LoadingService.defaultQuietMillis,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
                         const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
@@ -90,11 +120,11 @@
             }
         }
 
-        private handleResults(list: any, obj: { id; name; disabled; itSystemDisabled}) {
+        private handleResults(list: any, obj: { id; name; disabled; itSystemDisabled }) {
             list.push({
                 id: obj.id,
                 text: Helpers.SystemNameFormat.apply(obj.name, obj.disabled || obj.itSystemDisabled)
-        });
+            });
         }
 
     }

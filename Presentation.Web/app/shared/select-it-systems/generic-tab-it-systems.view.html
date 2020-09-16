@@ -11,7 +11,7 @@
             </thead>
             <tbody>
                 <tr data-ng-repeat="usage in itSysAssignmentVm.systemUsages">
-                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{::itSysAssignmentVm.formatSystemName(usage.itSystem.name, usage.itSystem.disabled)}}</a></td>
+                    <td><a data-ui-sref="it-system.usage.main({ id: usage.id })">{{::itSysAssignmentVm.formatSystemName(usage.name, usage.disabled)}}</a></td>
                     <td class="text-right">
                         <button type="button"
                                 class="btn btn-danger btn-xs delete-usage"

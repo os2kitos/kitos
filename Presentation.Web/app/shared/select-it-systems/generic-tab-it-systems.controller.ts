@@ -1,13 +1,17 @@
 ﻿module Kitos.Shared.GenericTabs.SelectItSystems {
     "use strict";
 
+    export interface ISystemViewModel {
+        id: number;
+        name: string;
+        disabled: boolean;
+    }
+
     export interface IGenericItSystemsSelectionConfiguration {
         ownerName: string;
         overviewHeader: string;
-        searchUrl: string;
-        searchUrlQueryComponent: string;
-        searchUrlPageSizeComponent:string;
-        assignedSystems: any[]; //TODO: Define a new presentation model and use that here
+        searchFunction: Services.Select2AsyncDataSource;
+        assignedSystems: ISystemViewModel[];
         hasWriteAccess: boolean;
         assign(id: number): angular.IPromise<any>;
         remove(id: number): angular.IPromise<any>;
@@ -62,8 +66,7 @@
                     }
                 }
                 ,
-                //TODO: Missing data handler - fix by injecting a search method in stead which must deliver a select2 compliant output! -> this config hell is not go
-                itSystemUsagesSelectOptions: select2LoadingService.loadSelect2(systemSelectionOptions.searchUrl, false, [systemSelectionOptions.searchUrlPageSizeComponent], false, systemSelectionOptions.searchUrlQueryComponent),
+                itSystemUsagesSelectOptions: select2LoadingService.loadSelect2WithDataSource(systemSelectionOptions.searchFunction, false),
                 selectedSystemUsage: null
             }
         }

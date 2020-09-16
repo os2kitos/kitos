@@ -14,20 +14,31 @@
                         "hasWriteAccess", "dataProcessingAgreement", "dataProcessingAgreementService",
                         (hasWriteAccess: boolean, dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO, dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) =>
                             <Shared.GenericTabs.SelectItSystems.IGenericItSystemsSelectionConfiguration>
-                            { 
+                            {
                                 ownerName: dataProcessingAgreement.name,
-                                overviewHeader: "Databehandleraftalen vedrører følgende IT Systemer", 
-
-                                //TODO: replace these 3 with a lambda which returns a promise of the id,Name dto type
-                                searchUrl: dataProcessingAgreementService.getAvailableSystemsUrl(dataProcessingAgreement.id),
-                                searchUrlQueryComponent: "nameQuery",
-                                searchUrlPageSizeComponent: "pageSize=50",
+                                overviewHeader: "Databehandleraftalen vedrører følgende IT Systemer",
+                                searchFunction:
+                                    (query: string) =>
+                                        dataProcessingAgreementService
+                                            .getAvailableSystems(dataProcessingAgreement.id, query)
+                                            .then
+                                            (
+                                                results =>
+                                                    results
+                                                        .map(result =>
+                                                            <Models.ViewModel.Generic.Select2OptionViewModel>
+                                                            {
+                                                                id: result.id,
+                                                                text: Helpers.SystemNameFormat.apply(result.name,result.disabled)
+                                                            }),
+                                                _ => []
+                                            ),
 
                                 assignedSystems: dataProcessingAgreement.itSystems ? dataProcessingAgreement.itSystems.map(system => {
-                                    //Transform into expected view model
-                                    return {
+                                    return <Shared.GenericTabs.SelectItSystems.ISystemViewModel>{
                                         id: system.id,
-                                        itSystem: system 
+                                        name: system.name,
+                                        disabled: system.disabled
                                     }
                                 }) : [],
                                 hasWriteAccess: hasWriteAccess,

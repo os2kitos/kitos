@@ -1,4 +1,6 @@
 ﻿module Kitos.Services.DataProcessing {
+    import Api = Models.Api;
+
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
@@ -6,7 +8,7 @@
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
         assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        getAvailableSystemsUrl(dataProcessingAgreementId: number) : string;
+        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -125,8 +127,17 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/remove"), systemId);
         }
 
-        getAvailableSystemsUrl(dataProcessingAgreementId: number): string {
-            return this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/available");
+        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>{
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId, `it-systems/available?nameQuery=${query}`))
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
         }
 
         static $inject = ["$http"];

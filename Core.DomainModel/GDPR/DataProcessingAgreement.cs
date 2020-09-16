@@ -155,8 +155,12 @@ namespace Core.DomainModel.GDPR
 
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
-            Reference = newReference;
-            return newReference;
+            if (ExternalReferences.Any(x => x.Id == newReference.Id))
+            {
+                Reference = newReference;
+                return newReference;
+            }
+            return new OperationError("Reference is not known to this object", OperationFailure.BadInput);
         }
 
         public int? ReferenceId { get; set; }
