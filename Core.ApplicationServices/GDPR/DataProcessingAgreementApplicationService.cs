@@ -114,6 +114,42 @@ namespace Core.ApplicationServices.GDPR
             return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
+        public Result<ExternalReference, OperationError> SetMasterReference(int agreementId, ExternalReference reference)
+        {
+            return WithWriteAccess(agreementId, agreement =>
+            {
+                var referenceResult = agreement.SetMasterReference(reference);
+
+                if (referenceResult.Ok)
+                {
+                    _repository.Update(agreement);
+                }
+
+                return referenceResult;
+            });
+
+
+            // throw new NotImplementedException();
+
+            //return WithWriteAccess(agreementId, agreement =>
+            //{
+            //    using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+            //    var referenceResult =  agreement.SetMasterReference(reference);
+
+            //    if (referenceResult.Ok)
+            //    {
+            //        _repository.Update(agreement);
+            //        transaction.Commit();
+            //    }
+
+            //    return referenceResult;
+
+            //});
+
+
+        }
+
         public Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id)
         {
             return WithReadAccess<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles)>(

@@ -116,6 +116,19 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/reference")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage SetMasterReference(int id, [FromBody] ExternalReference reference)
+        {
+            return _dataProcessingAgreementApplicationService.SetMasterReference(id, reference)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         /// <summary>
         /// Use internally to query whether a new agreement can be created with the suggested parameters
         /// </summary>

@@ -5,7 +5,7 @@
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
-        update(agreement: Models.DataProcessing.IDataProcessingAgreementDTO): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -119,11 +119,31 @@
                 .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
                 .then(
                     result => {
-                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO}
+                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO }
                         return response.response;
                     },
                     error => this.handleServerError(error)
                 );
+        }
+
+        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+
+            const referenceService = new ReferenceServiceFactory(this.$http).createDpaReference();
+
+            return referenceService.getReference(referenceId).then(ref => {
+                return this
+                    .$http
+                    .patch<API.Models.IApiWrapper<any>>(
+                        this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "reference"), ref)
+                    .then(
+                        response => {
+                            return <IDataProcessingAgreementPatchResult>{
+                                valueModifiedTo: ref.Title,
+                            };
+                        },
+                        error => this.handleServerError(error)
+                    );
+            });
         }
 
         static $inject = ["$http"];

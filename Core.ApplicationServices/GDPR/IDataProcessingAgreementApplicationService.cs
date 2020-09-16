@@ -15,6 +15,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingAgreement, OperationError> Get(int id);
         Result<IQueryable<DataProcessingAgreement>, OperationError> GetOrganizationData(int organizationId, int skip, int take);
         Result<DataProcessingAgreement, OperationError> UpdateName(int id, string name);
+        Result<ExternalReference, OperationError> SetMasterReference(int agreementId, ExternalReference reference);
         Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id);
         Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize);
         Result<DataProcessingAgreementRight, OperationError> AssignRole(int id, int roleId, int userId);
