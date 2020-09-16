@@ -5,6 +5,7 @@
         System,
         SystemUsage,
         Contract,
-        Project
+        Project,
+        DataProcessingAgreement
     }
 }

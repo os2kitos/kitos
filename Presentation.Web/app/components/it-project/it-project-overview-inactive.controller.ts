@@ -364,7 +364,7 @@
                         field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
+                            return Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);

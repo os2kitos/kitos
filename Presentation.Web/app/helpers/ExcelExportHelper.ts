@@ -17,24 +17,35 @@
             white: <IStatusColor>{ danish: "Hvid", english: "White" }
         }
 
+        static renderReference(referenceTitle: string, referenceUrl: string) {
+            if (Utility.Validation.isValidExternalReference(referenceUrl)) {
+                return referenceUrl;
+            }
+            if (referenceTitle === null || _.isUndefined(referenceTitle)) {
+                return ExcelExportHelper.noValueFallback;
+            }
+            return referenceTitle;
+        }
+
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
             if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
-            if (Utility.Validation.isValidExternalReference(reference.URL)) {
-                return reference.URL;
+            return ExcelExportHelper.renderReference(reference.Title, reference.URL);
+        }
+
+        static renderReferenceId(externalReferenceId: string) {
+            if (externalReferenceId != null) {
+                return externalReferenceId;
             }
-            return reference.Title;
+            return ExcelExportHelper.noValueFallback;
         }
 
         static renderExternalReferenceId(reference: Models.Reference.IOdataReference) {
             if (reference === null || _.isUndefined(reference)) {
                 return ExcelExportHelper.noValueFallback;
             }
-            if (reference.ExternalReferenceId != null) {
-                return reference.ExternalReferenceId;
-            }
-            return this.noValueFallback;
+            return ExcelExportHelper.renderReferenceId(reference.ExternalReferenceId);
         }
 
         static renderUrlOrFallback(url, fallback) {

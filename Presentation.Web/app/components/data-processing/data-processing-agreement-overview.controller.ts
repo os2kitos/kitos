@@ -103,6 +103,25 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
+                    .withColumn(builder => 
+                        builder
+                            .withDataSourceName("MainReferenceTitle")
+                            .withTitle("Lokal Reference")
+                            .withId("ReferenceId")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.MainReferenceTitle, dataItem.MainReferenceUrl))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.MainReferenceTitle, dataItem.MainReferenceUrl)))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("MainReferenceUserAssignedId")
+                            .withTitle("Dokument ID / Sagsnr.")
+                            .withId("ReferenceUserAssignedId")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReferenceId(dataItem.MainReferenceUserAssignedId))
+                            .withInitialVisibility(false))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>
