@@ -56,13 +56,13 @@
                         var HTML = "<button type='button' data-ng-disabled='" + !this.hasWriteAccess + "' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         HTML += " <button type='button' data-ng-disabled='" + !this.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
 
-
                         if (Utility.Validation.isValidExternalReference(dataItem.url)) {
-                            if (dataItem.id === dataProcessingAgreement.referenceId) {
+                            if (dataItem.masterReference) {
                                 HTML = HTML + "<button data-ng-disabled='" + !this.hasWriteAccess + "' data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
-                            } else {
+                            }
+                            else
+                            {
                                 HTML = HTML + "<button data-ng-disabled='" + !this.hasWriteAccess + "' data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
-
                             }
                         }
 

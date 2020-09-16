@@ -5,6 +5,14 @@
         organizationId: number,
         objectOwnerId: number,
         referenceId: number,
-        references: Array<BaseReference>;
+        references: Array<DpaReference>;
+    }
+
+    export interface DpaReference extends BaseReference {
+        Title: string;
+        ExternalReferenceId: string;
+        URL: string;
+        MasterReference: boolean;
+        Created: Date;
     }
 }
