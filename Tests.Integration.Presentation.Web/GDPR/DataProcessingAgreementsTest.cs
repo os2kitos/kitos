@@ -325,7 +325,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
            
-            //Act - check its possible to set a reference as master in a data processing agreement
+            //Act - check its not possible to set a reference as master in a data processing agreement with a invalid reference id
             using var setMasterResponse =
                 await DataProcessingAgreementHelper.SendSetMasterReferenceRequestAsync(agreement.Id, A<int>());
 
