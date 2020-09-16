@@ -4,6 +4,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 
 describe("Data processing agreement it-systems test", () => {
 
@@ -30,8 +31,33 @@ describe("Data processing agreement it-systems test", () => {
     });
 
 
-    it("Creating and renaming data processing agreement",
+    it("Assigning and removing systems",
         () => {
+            const dpaName = createName(0);
+            const system1 = createName(1);
+            const system2 = createName(2);
 
+            SystemCatalogHelper.createSystemAndActivateLocally(system1)
+                .then(() => SystemCatalogHelper.createSystemAndActivateLocally(system2))
+                .then(() => dpaHelper.createDataProcessingAgreement(dpaName))
+                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(dpaName))
+                .then(() => dpaHelper.goToItSystems())
+                .then(() => assignSystem(system1))
+                .then(() => assignSystem(system2))
+                .then(() => verifySystemContent([system1, system2]))
+                .then(() => removeSystem(system1))
+                .then(() => verifySystemContent([system2]));
         });
+
+    function assignSystem(name: string) {
+
+    }
+
+    function verifySystemContent(names: string[]) {
+
+    }
+
+    function removeSystem(name: string) {
+
+    }
 });

@@ -39,7 +39,7 @@
                 ownerName: systemSelectionOptions.ownerName,
                 hasWriteAccess: systemSelectionOptions.hasWriteAccess,
                 overviewHeader: systemSelectionOptions.overviewHeader,
-                systemUsages: viewModels,
+                viewModels: viewModels,
                 formatSystemName: Helpers.SystemNameFormat.apply,
                 delete:
                     systemId =>
@@ -52,10 +52,10 @@
                                 _ => notify.addErrorMessage("Fejl! Kunne ikke fjerne systemets tilknyttning!")
                             ),
                 save: () => {
-                    const selectedItem = $scope.itSysAssignmentVm.selectedSystemUsage;
+                    const selectedItem = $scope.itSysAssignmentVm.selectedViewModel;
                     if (selectedItem) {
                         systemSelectionOptions
-                            .assign($scope.itSysAssignmentVm.selectedSystemUsage.id)
+                            .assign(selectedItem.id)
                             .then(
                                 _ => {
                                     notify.addSuccessMessage("Systemet er tilknyttet.");
@@ -66,8 +66,8 @@
                     }
                 }
                 ,
-                itSystemUsagesSelectOptions: select2LoadingService.loadSelect2WithDataSource(systemSelectionOptions.searchFunction, false),
-                selectedSystemUsage: null
+                searchConfiguration: select2LoadingService.loadSelect2WithDataSource(systemSelectionOptions.searchFunction, false),
+                selectedViewModel: null
             }
         }
     }

@@ -2,12 +2,14 @@
 import WaitTimers = require("../Utility/WaitTimers");
 import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
+import NavigationHelper = require("../Utility/NavigationHelper");
 
 class DataProcessingAgreementHelper {
 
     private static pageObject = new DataProcessingAgreementOverviewPageObject();
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
+    private static navigation = new NavigationHelper();
 
     public static createDataProcessingAgreement(name: string) {
         console.log(`Creating agreement with name ${name}`);
@@ -40,6 +42,10 @@ class DataProcessingAgreementHelper {
         return this.pageObject.getPage()
             .then(() => this.pageObject.waitForKendoGrid())
             .then(() => this.findDataProcessingAgreementColumnFor(name).first().click());
+    }
+
+    public static goToItSystems() {
+        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.it-systems");
     }
 
     public static openNewDpaDialog() {
