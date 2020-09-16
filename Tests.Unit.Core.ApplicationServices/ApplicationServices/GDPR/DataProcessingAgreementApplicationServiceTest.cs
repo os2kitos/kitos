@@ -558,7 +558,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var agreementId = A<int>();
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
 
             //Act
             var result = _sut.SetMasterReference(agreementId, A<int>());
