@@ -51,7 +51,6 @@
                             );
                     },
                     results(data, _) {
-                        //TODO: Needed?
                         return { results: data };
                     }
                 }
