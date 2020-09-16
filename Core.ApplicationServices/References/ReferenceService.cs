@@ -85,7 +85,7 @@ namespace Core.ApplicationServices.References
                                 onSuccess: createdReference =>
                                 {
                                     _referenceRepository.SaveRootEntity(root);
-                                    _domainEvents.Raise(new EntityLifeCycleEvent<ExternalReference>(LifeCycleEventType.Created, createdReference));
+                                    _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
                                     return createdReference;
                                 },
                                 onFailure: error => error
@@ -107,7 +107,7 @@ namespace Core.ApplicationServices.References
                             return OperationFailure.Forbidden;
                         }
 
-                        _domainEvents.Raise(new EntityLifeCycleEvent<ExternalReference>(LifeCycleEventType.Deleted, referenceAndOwner.externalReference));
+                        _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(referenceAndOwner.externalReference));
                         _referenceRepository.Delete(referenceAndOwner.externalReference);
                         return referenceAndOwner.externalReference;
                     })
@@ -165,6 +165,7 @@ namespace Core.ApplicationServices.References
 
             foreach (var reference in systemExternalReferences)
             {
+                _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(reference));
                 _referenceRepository.Delete(reference);
             }
 

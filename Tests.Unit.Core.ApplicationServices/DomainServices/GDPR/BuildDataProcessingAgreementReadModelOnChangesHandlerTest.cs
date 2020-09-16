@@ -41,7 +41,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             };
 
             //Act
-            _sut.Handle(new EntityLifeCycleEvent<DataProcessingAgreement>(LifeCycleEventType.Created, dataProcessingAgreement));
+            _sut.Handle(new EntityCreatedEvent<DataProcessingAgreement>(dataProcessingAgreement));
 
             //Assert
             _repository.Verify(x => x.Add(MatchSourceData(dataProcessingAgreement)), Times.Once);
@@ -61,7 +61,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _repository.Setup(x => x.GetBySourceId(dataProcessingAgreement.Id)).Returns(new DataProcessingAgreementReadModel());
 
             //Act
-            _sut.Handle(new EntityLifeCycleEvent<DataProcessingAgreement>(LifeCycleEventType.Updated, dataProcessingAgreement));
+            _sut.Handle(new EntityUpdatedEvent<DataProcessingAgreement>(dataProcessingAgreement));
 
             //Assert
             _pendingUpdatesRepository.Verify(x => x.AddIfNotPresent(It.Is<PendingReadModelUpdate>(pru =>
@@ -79,7 +79,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             };
 
             //Act
-            _sut.Handle(new EntityLifeCycleEvent<DataProcessingAgreement>(LifeCycleEventType.Deleted, dataProcessingAgreement));
+            _sut.Handle(new EntityDeletedEvent<DataProcessingAgreement>(dataProcessingAgreement));
 
             //Assert
             _repository.Verify(x => x.DeleteBySourceId(dataProcessingAgreement.Id), Times.Once);

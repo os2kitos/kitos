@@ -1,94 +1,50 @@
-﻿(function (ng, app) {
-    app.config(["$stateProvider", function ($stateProvider) {
-        $stateProvider.state("it-project.edit.itsys", {
-            url: "/itsys",
-            templateUrl: "app/components/it-project/tabs/it-project-tab-itsys.view.html",
-            controller: "project.EditItsysCtrl",
-            resolve: {
-                user: ["userService", function (userService) {
-                    return userService.getUser();
-                }],
-                usages: ["$http", "$stateParams", function ($http, $stateParams) {
-                    return $http.get("api/itproject/" + $stateParams.id + "?usages=true")
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }]
-            }
-        });
-    }]);
+﻿module Kitos.ItProject.Edit.ItSystems {
+    "use strict";
 
-    app.controller("project.EditItsysCtrl",
-    ["$scope", "$http", "$timeout", "$state", "$stateParams", "user", "notify", "usages",
-        function ($scope, $http, $timeout, $state, $stateParams, user, notify, usages) {
-            var projectId = $stateParams.id;
-            $scope.systemUsages = usages;
-            $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
-            $scope.save = function () {
-                $http.post("api/itproject/" + projectId + "?usageId=" + $scope.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
-                    .success(function () {
-                        notify.addSuccessMessage("Systemet er tilknyttet.");
-                        reload();
-                    })
-                    .error(function () {
-                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte systemet!");
-                    });
-            };
-
-            $scope.delete = function(usageId) {
-                $http.delete("api/itproject/" + projectId + "?usageId=" + usageId + "&organizationId=" + user.currentOrganizationId)
-                    .success(function() {
-                        notify.addSuccessMessage("Systemets tilknyttning er fjernet.");
-                        reload();
-                    })
-                    .error(function() {
-                        notify.addErrorMessage("Fejl! Kunne ikke fjerne systemets tilknyttning!");
-                    });
-            };
-
-            function reload() {
-                $state.go(".", null, { reload: true });
-            };
-
-            //select2 options for looking up it system usages
-            $scope.itSystemUsagesSelectOptions = {
-                minimumInputLength: 1,
-                initSelection: function (elem, callback) {
-                },
-                ajax: {
-                    data: function (term, page) {
-                        return { query: term };
-                    },
-                    quietMillis: 500,
-                    transport: function (queryParams) {
-                        var res = $http.get("api/itSystemUsage?organizationId=" + user.currentOrganizationId + "&q=" + queryParams.data.query + "&take=25").then(queryParams.success);
-                        res.abort = function () {
-                            return null;
-                        };
-
-                        return res;
-                    },
-
-                    results: function (data, page) {
-                        var results = [];
-
-                        //for each system usages
-                        _.each(data.data.response, function (usage: { id; itSystemName; itSystemDisabled;}) {
-                            if (!usage.itSystemDisabled) {
-                                results.push({
-                                    //the id of the system usage is the id, that is selected
-                                    id: usage.id,
-                                    //but the name of the system is the label for the select2
-                                    text: usage.itSystemName,
-                                    //saving the usage for later use
-                                    usage: usage
-                                });
+    angular
+        .module("app")
+        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+            $stateProvider.state("it-project.edit.itsys", {
+                url: "/itsys",
+                templateUrl: "app/shared/select-it-systems/generic-tab-it-systems.view.html",
+                controller: Shared.GenericTabs.SelectItSystems.SelectItSystemsController,
+                controllerAs: "vm",
+                resolve: {
+                    usages: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itproject/${$stateParams.id}?usages=true`)
+                        .then(result => result.data.response)],
+                    systemSelectionOptions: [
+                        "hasWriteAccess", "project", "$http", "usages", "user",
+                        (hasWriteAccess: boolean, project, $http, usages, user: Services.IUser) =>
+                            <Shared.GenericTabs.SelectItSystems.IGenericItSystemsSelectionConfiguration>
+                            {
+                                ownerName: project.name,
+                                overviewHeader: "Projektet vedrører følgende IT Systemer",
+                                searchFunction: (query: string) => {
+                                    return $http
+                                        .get(`api/itSystemUsage?organizationId=${user.currentOrganizationId}&q=${query}&take=25`)
+                                        .then(
+                                            result => result.data.response.map((usage: { id; itSystemName; itSystemDisabled; }) =>
+                                                <Models.ViewModel.Generic.Select2OptionViewModel>
+                                                {
+                                                    id: usage.id,
+                                                    text: Helpers.SystemNameFormat.apply(usage.itSystemName, usage.itSystemDisabled)
+                                                }),
+                                            _ => []
+                                        );
+                                },
+                                assignedSystems: (usages || []).map(usage => <Shared.GenericTabs.SelectItSystems.ISystemViewModel>
+                                //Map to view model
+                                    {
+                                        id: usage.id,
+                                        name: usage.itSystem.name,
+                                        disabled: usage.itSystem.disabled
+                                    }),
+                                hasWriteAccess: hasWriteAccess,
+                                assign: (systemId: number) => $http.post(`api/itproject/${project.id}?usageId=${systemId}&organizationId=${project.organizationId}`),
+                                remove: (systemId: number) => $http.delete(`api/itproject/${project.id}?usageId=${systemId}&organizationId=${project.organizationId}`)
                             }
-                        });
-
-                        return { results: results };
-                    }
+                    ]
                 }
-            };
+            });
         }]);
-})(angular, app);
+}

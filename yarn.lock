@@ -120,10 +120,6 @@
   version "0.3.11"
   resolved "https://codeload.github.com/gsklee/ngStorage/tar.gz/253b718a0b35b044fba25c78b1b2020d672c4017"
 
-"@bower_components/oidc-angular@michaelschnyder/oidc-angular#0.0.9":
-  version "0.0.0"
-  resolved "https://codeload.github.com/michaelschnyder/oidc-angular/tar.gz/3eae892a8fce038e8afdaa5fab64e883f4d3d892"
-
 "@bower_components/select2-bootstrap-css@t0m/select2-bootstrap-css#^1.4.6":
   version "1.4.6"
   resolved "https://codeload.github.com/t0m/select2-bootstrap-css/tar.gz/dffa8740723d12cf5b9a56a28cc3dcd5e08ac3e2"

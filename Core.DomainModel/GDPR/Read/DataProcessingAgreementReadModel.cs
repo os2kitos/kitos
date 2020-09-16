@@ -27,6 +27,8 @@ namespace Core.DomainModel.GDPR.Read
         public string MainReferenceUrl { get; set; }
 
         public string MainReferenceTitle { get; set; }
+
+        public string SystemNamesAsCsv { get; set; }
         
         public virtual DataProcessingAgreement SourceEntity { get; set; }
         
