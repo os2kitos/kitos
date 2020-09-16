@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
@@ -302,5 +303,36 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, removeResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task Can_Set_Master_Reference()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), Display.Url, r => r.DataProcessingAgreement_Id = agreement.Id);
+
+            //Act - check its possible to set a reference as master in a data processing agreement
+            using var setMasterResponse =
+                await DataProcessingAgreementHelper.SendSetMasterReferenceRequestAsync(agreement.Id, reference.Id);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.OK, setMasterResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Set_Master_Reference_with_Invalid_Reference()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+           
+            //Act - check its possible to set a reference as master in a data processing agreement
+            using var setMasterResponse =
+                await DataProcessingAgreementHelper.SendSetMasterReferenceRequestAsync(agreement.Id, A<int>());
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.BadRequest, setMasterResponse.StatusCode);
+        }
+
+
     }
 }

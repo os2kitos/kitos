@@ -11,6 +11,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -26,6 +27,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
         private readonly Mock<IDataProcessingAgreementNamingService> _domainServiceMock;
         private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingAgreementRight>> _rightsRepositoryMock;
 
@@ -35,11 +37,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
+            _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingAgreementRight>>();
             _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
-                _repositoryMock.Object, _domainServiceMock.Object,
+                _repositoryMock.Object,
+                _domainServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
+                _referenceRepositoryMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
