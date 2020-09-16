@@ -1,8 +1,17 @@
 ﻿module Kitos.Models.DataProcessing {
-    /** Contains info about Advices on a contract. */
+
+    export interface IAssignedDataProcessingAgreementRole {
+        RoleId : number;
+        UserFullName : string;
+    }
+
     export interface IDataProcessingAgreement {
         Id: number;
         SourceEntityId : number;
         Name: string;
+        RoleAssignments: IAssignedDataProcessingAgreementRole[];
+        MainReferenceTitle: string;
+        MainReferenceUrl: string;
+        MainReferenceUserAssignedId: string;
     }
 }

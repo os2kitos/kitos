@@ -354,13 +354,16 @@
     <Content Include="app\components\data-processing\data-processing-agreement-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-modal-create.view.html" />
+    <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />
-    <Content Include="app\components\local-config\local-config-dataProcessing.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingAgreementRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingAgreementRolesController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Extensions\AutoMapperExtensions.cs" />
     <Compile Include="Hangfire\KeepReadModelsInSyncProcess.cs" />
@@ -370,6 +373,8 @@
     <Compile Include="Infrastructure\Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\Middleware\CorrelationIdMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\DenyTooLargeQueriesMiddleware.cs" />
+    <Compile Include="Models\AssignedRoleDTO.cs" />
+    <Compile Include="Models\BusinessRoleDTO.cs" />
     <Compile Include="Models\CreateItSystemDTO.cs" />
     <Compile Include="Models\CreateItsystemUsageDTO.cs" />
     <Compile Include="Models\CreateTaskUsageDTO.cs" />
@@ -377,6 +382,7 @@
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
+    <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingAgreementDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingAgreementDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
@@ -414,11 +420,13 @@
     <Compile Include="Models\Qa\BrokenExternalReferencesReportColumns.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
+    <Compile Include="Models\References\ReferenceDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SingleValueDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
+    <Compile Include="Models\UserWithEmailDTO.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
@@ -429,6 +437,7 @@
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />

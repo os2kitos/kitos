@@ -27,25 +27,24 @@
     }
 
     class GlobalOptionRoleListDirective implements IDirectiveScope {
-        public optionsUrl: string;
-        public title: string;
-        public editState: string;
-        public optionId: string;
-        public dirId: string;
-        public optionType: string;
-        public mainGrid: IKendoGrid<Models.IRoleEntity>;
-        public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
+        optionsUrl: string;
+        title: string;
+        editState: string;
+        optionId: string;
+        dirId: string;
+        optionType: string;
+        mainGrid: IKendoGrid<Models.IRoleEntity>;
+        mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
+        static $inject: string[] = ["$http", "_", "$", "$state", "notify", "$scope"];
 
         constructor(
-            private $http: ng.IHttpService,
-            private $timeout: ng.ITimeoutService,
-            private _: ILoDashWithMixins,
-            private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
-            private notify,
-            private $scope) {
+            private readonly $http: ng.IHttpService,
+            private readonly _: ILoDashWithMixins,
+            private readonly $: JQueryStatic,
+            $state: ng.ui.IStateService,
+            private readonly notify,
+            private readonly $scope) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;
@@ -198,11 +197,11 @@
             }
         }
 
-        public createOption = () => {
+        createOption = () => {
             this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
-        public editOption = (e: JQueryEventObject) => {
+        editOption = (e: JQueryEventObject) => {
             e.preventDefault();
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
@@ -210,7 +209,7 @@
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
-        public disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
+        disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
             e.preventDefault();
             var superClass = this;
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
@@ -234,41 +233,27 @@
                 });
         };
 
-        private pushUp = (e: JQueryEventObject) => {
+        changePriority(e: JQueryEventObject, change: number) {
             e.preventDefault();
 
-            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
-            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority: number = selectedItem.get("Priority");
+            const entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            const selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            const priority: number = selectedItem.get("Priority");
 
             this.optionId = selectedItem.get("Id");
 
-            let payload = {
-                Priority: priority + 1
-            }
+            const payload = {
+                Priority: priority + change
+            };
 
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
                 this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
+        }
 
-        };
+        pushUp = (e: JQueryEventObject) => this.changePriority(e,1);
 
-        private pushDown = (e: JQueryEventObject) => {
-            e.preventDefault();
-
-            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
-            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority: number = selectedItem.get("Priority");
-
-            this.optionId = selectedItem.get("Id");
-
-            let payload = {
-                Priority: priority - 1
-            }
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
-                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
-            });
-        };
+        pushDown = (e: JQueryEventObject) => this.changePriority(e, -1);
     }
     angular.module("app")
         .directive("globalOptionRoleList", setupDirective);

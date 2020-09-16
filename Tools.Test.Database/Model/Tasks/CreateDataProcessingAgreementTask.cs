@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.GDPR;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
@@ -29,10 +30,10 @@ namespace Tools.Test.Database.Model.Tasks
 
             agreement = dbContext.DataProcessingAgreements.Add(agreement);
             dbContext.SaveChanges();
-            
+
             var readModel = new DataProcessingAgreementReadModel();
-            new DataProcessingAgreementReadModelUpdate().Apply(agreement,readModel);
-            
+            new DataProcessingAgreementReadModelUpdate(new GenericRepository<DataProcessingAgreementRoleAssignmentReadModel>(dbContext)).Apply(agreement, readModel);
+
             dbContext.DataProcessingAgreementReadModels.Add(readModel);
             dbContext.SaveChanges();
 

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
-using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices.Options
+namespace Core.DomainServices.Options
 {
     public class OptionsService<TReference, TOption, TLocalOption> : IOptionsService<TReference, TOption>
         where TOption : OptionEntity<TReference>
@@ -59,6 +58,20 @@ namespace Core.ApplicationServices.Options
         {
             return GetAvailableOptionsFromOrganization(organizationId)
                 .FirstOrDefault(option => option.Id == optionId);
+        }
+
+        public Maybe<(TOption option, bool available)> GetOption(int organizationId, int optionId)
+        {
+            return
+                GetAvailableOption(organizationId, optionId)
+                    .Match
+                    (
+                        onValue: option => (option, true),
+                        onNone: () => _optionRepository
+                            .GetByKey(optionId)
+                            .FromNullable()
+                            .Select(option => (option, false))
+                    );
         }
     }
 }

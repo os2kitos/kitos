@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR
@@ -12,5 +12,6 @@ namespace Core.DomainServices.Repositories.GDPR
         void DeleteBySourceId(int sourceId);
         IQueryable<DataProcessingAgreementReadModel> GetByOrganizationId(int organizationId);
         void Delete(DataProcessingAgreementReadModel readModel);
+        IQueryable<DataProcessingAgreementReadModel> GetByUserId(int userId);
     }
 }

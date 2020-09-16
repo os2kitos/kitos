@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Qa.References;
@@ -42,7 +43,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
             _operationClock = operationClock;
         }
 
-        public async Task<Result<string, OperationError>> ExecuteAsync()
+        public async Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var brokenInterfaceLinks = await CheckInterfaceLinksAsync().ConfigureAwait(false);
             var brokenSystemLinks = await CheckSystemLinksAsync().ConfigureAwait(false);

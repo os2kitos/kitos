@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Owin;
 using Owin;
 using Hangfire;
@@ -61,7 +62,7 @@ namespace Presentation.Web
 
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
-                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync(CancellationToken.None)),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
         }

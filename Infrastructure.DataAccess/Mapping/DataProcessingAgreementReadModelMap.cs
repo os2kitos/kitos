@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -11,6 +12,15 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(DataProcessingAgreementConstraints.MaxNameLength)
                 .IsRequired()
                 .HasIndexAnnotation("DataProcessingAgreementReadModel_Index_Name", 0);
+
+            Property(x => x.MainReferenceTitle)
+                .HasMaxLength(DataProcessingAgreementConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("DataProcessingAgreementReadModel_Index_MainReferenceTitle", 0);
+
+            Property(x => x.MainReferenceUserAssignedId).IsOptional();
+
+            Property(x => x.MainReferenceUrl).IsOptional();
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.DataProcessingAgreementReadModels)

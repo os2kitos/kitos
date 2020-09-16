@@ -66,6 +66,7 @@
     <Compile Include="Mapping\DataProcessingAgreementMap.cs" />
     <Compile Include="Mapping\DataProcessingAgreementReadModelMap.cs" />
     <Compile Include="Mapping\DataProcessingAgreementRightMap.cs" />
+    <Compile Include="Mapping\DataProcessingAgreementRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\DataProcessingAgreementRoleMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
@@ -611,9 +612,13 @@
     <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.designer.cs">
       <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009080752142_Add_DataProcessingAgreementRightsAndRoles.cs" />
-    <Compile Include="Migrations\202009080752142_Add_DataProcessingAgreementRightsAndRoles.designer.cs">
-      <DependentUpon>202009080752142_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs" />
+    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.designer.cs">
+      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009111240471_Add_Dpa_References.cs" />
+    <Compile Include="Migrations\202009111240471_Add_Dpa_References.designer.cs">
+      <DependentUpon>202009111240471_Add_Dpa_References.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -999,8 +1004,11 @@
     <EmbeddedResource Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.resx">
       <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009080752142_Add_DataProcessingAgreementRightsAndRoles.resx">
-      <DependentUpon>202009080752142_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.resx">
+      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009111240471_Add_Dpa_References.resx">
+      <DependentUpon>202009111240471_Add_Dpa_References.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

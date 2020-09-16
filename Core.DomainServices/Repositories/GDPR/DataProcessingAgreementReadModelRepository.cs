@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 
@@ -57,6 +57,15 @@ namespace Core.DomainServices.Repositories.GDPR
 
             _repository.DeleteWithReferencePreload(readModel);
             _repository.Save();
+        }
+
+        public IQueryable<DataProcessingAgreementReadModel> GetByUserId(int userId)
+        {
+            //Gets all read models that have dependencies on the user
+            return _repository
+                .AsQueryable()
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
+                .Distinct();
         }
     }
 }

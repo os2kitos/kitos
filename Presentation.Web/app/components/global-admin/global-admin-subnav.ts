@@ -18,6 +18,7 @@
             { state: "global-admin.project", text: "IT Projekt" },
             { state: "global-admin.system", text: "IT System" },
             { state: "global-admin.contract", text: "IT Kontrakt" },
+            { state: "global-admin.data-processing", text: "Databehandling" },
             { state: "global-admin.report", text: "Rapport" },
             { state: "global-admin.misc", text: "Andet" },
             { state: "global-admin.help-texts", text: "Hjælpetekster" }

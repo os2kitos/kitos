@@ -14,7 +14,7 @@
     <RootNamespace>Tests.Integration.Presentation.Web</RootNamespace>
     <AssemblyName>Tests.Integration.Presentation.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingAgreementsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
     <Compile Include="ItSystem\SystemRelationsTest.cs" />

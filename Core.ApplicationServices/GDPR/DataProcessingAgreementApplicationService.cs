@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Shared;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
@@ -18,15 +23,24 @@ namespace Core.ApplicationServices.GDPR
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingAgreementRepository _repository;
         private readonly IDataProcessingAgreementNamingService _namingService;
+        private readonly IDataProcessingAgreementRoleAssignmentsService _roleAssignmentsService;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
 
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
-            IDataProcessingAgreementNamingService namingService)
+            IDataProcessingAgreementNamingService namingService,
+            IDataProcessingAgreementRoleAssignmentsService roleAssignmentsService,
+            ITransactionManager transactionManager,
+            IGenericRepository<DataProcessingAgreementRight> rightRepository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
             _namingService = namingService;
+            _roleAssignmentsService = roleAssignmentsService;
+            _transactionManager = transactionManager;
+            _rightRepository = rightRepository;
         }
 
         public Result<DataProcessingAgreement, OperationError> Create(int organizationId, string name)
@@ -75,17 +89,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreement, OperationError> Get(int id)
         {
-            var result = _repository.GetById(id);
-
-            if (result.IsNone)
-                return new OperationError(OperationFailure.NotFound);
-
-            var agreement = result.Value;
-
-            if (!_authorizationContext.AllowReads(agreement))
-                return new OperationError(OperationFailure.Forbidden);
-
-            return agreement;
+            return WithReadAccess<DataProcessingAgreement>(id, result => result);
         }
 
         public Result<IQueryable<DataProcessingAgreement>, OperationError> GetOrganizationData(int organizationId, int skip, int take)
@@ -107,14 +111,87 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingAgreement, OperationError> UpdateName(int id, string name)
         {
-            return UpdateWith(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
+            return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
-        private Result<DataProcessingAgreement, OperationError> UpdateWith(int id, DataProcessingAgreementPropertyChanges changeSet)
+        public Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id)
+        {
+            return WithReadAccess<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles)>(
+                id,
+                agreement => (agreement, _roleAssignmentsService.GetApplicableRoles(agreement).ToList()));
+        }
+
+        public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize)
+        {
+            if (pageSize < 1)
+                throw new ArgumentException($"{nameof(pageSize)} must be above 0");
+
+            return WithReadAccess(id, agreement =>
+            {
+                return _roleAssignmentsService
+                    .GetUsersWhichCanBeAssignedToRole(agreement, roleId, nameEmailQuery.FromNullable())
+                    .Select<IEnumerable<User>>(users => users.OrderBy(x => x.Id).Take(pageSize).ToList());
+            });
+        }
+
+        public Result<DataProcessingAgreementRight, OperationError> AssignRole(int id, int roleId, int userId)
+        {
+            return WithWriteAccess(id, agreement =>
+            {
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+                var assignmentResult = _roleAssignmentsService.AssignRole(agreement, roleId, userId);
+
+                if (assignmentResult.Ok)
+                {
+                    _repository.Update(agreement);
+                    transaction.Commit();
+                }
+
+                return assignmentResult;
+            });
+        }
+
+        public Result<DataProcessingAgreementRight, OperationError> RemoveRole(int id, int roleId, int userId)
+        {
+            return WithWriteAccess(id, agreement =>
+            {
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+                var removeResult = _roleAssignmentsService.RemoveRole(agreement, roleId, userId);
+
+                if (removeResult.Ok)
+                {
+                    _rightRepository.Delete(removeResult.Value);
+                    _repository.Update(agreement);
+                    transaction.Commit();
+                }
+
+                return removeResult;
+            });
+        }
+
+        private Result<DataProcessingAgreement, OperationError> UpdateProperties(int id, DataProcessingAgreementPropertyChanges changeSet)
         {
             if (changeSet == null)
                 throw new ArgumentNullException(nameof(changeSet));
 
+            return WithWriteAccess<DataProcessingAgreement>(id, dataProcessingAgreement =>
+            {
+                var updateNameError = UpdateName(dataProcessingAgreement, changeSet.NameChange);
+
+                if (updateNameError.HasValue)
+                    return updateNameError.Value;
+
+                _repository.Update(dataProcessingAgreement);
+
+                return dataProcessingAgreement;
+            });
+        }
+
+        private Result<TSuccess, OperationError> WithWriteAccess<TSuccess>(int id, Func<DataProcessingAgreement, Result<TSuccess, OperationError>> mutation)
+        {
             var result = _repository.GetById(id);
 
             if (result.IsNone)
@@ -125,14 +202,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowModify(dataProcessingAgreement))
                 return new OperationError(OperationFailure.Forbidden);
 
-            var updateNameError = UpdateName(dataProcessingAgreement, changeSet.NameChange);
-
-            if (updateNameError.HasValue)
-                return updateNameError.Value;
-
-            _repository.Update(dataProcessingAgreement);
-
-            return dataProcessingAgreement;
+            return mutation(dataProcessingAgreement);
         }
 
         private Maybe<OperationError> UpdateName(DataProcessingAgreement dataProcessingAgreement, Maybe<ChangedValue<string>> nameChange)
@@ -143,6 +213,21 @@ namespace Core.ApplicationServices.GDPR
             var newName = nameChange.Value.Value;
 
             return _namingService.ChangeName(dataProcessingAgreement, newName);
+        }
+
+        private Result<TSuccess, OperationError> WithReadAccess<TSuccess>(int id, Func<DataProcessingAgreement, Result<TSuccess, OperationError>> authorizedAction)
+        {
+            var result = _repository.GetById(id);
+
+            if (result.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var agreement = result.Value;
+
+            if (!_authorizationContext.AllowReads(agreement))
+                return new OperationError(OperationFailure.Forbidden);
+
+            return authorizedAction(agreement);
         }
     }
 }

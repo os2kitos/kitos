@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_DataProcessingAgreementRightsAndRoles : IMigrationMetadata
+    public sealed partial class Add_Dpa_References : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_DataProcessingAgreementRightsAndRoles));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Dpa_References));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009080752142_Add_DataProcessingAgreementRightsAndRoles"; }
+            get { return "202009111240471_Add_Dpa_References"; }
         }
         
         string IMigrationMetadata.Source

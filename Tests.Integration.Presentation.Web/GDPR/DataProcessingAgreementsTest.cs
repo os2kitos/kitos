@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.GDPR.Read;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -50,11 +53,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Act
             await DataProcessingAgreementHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
-            using (var secondResponse = await DataProcessingAgreementHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
-            }
+            using var secondResponse = await DataProcessingAgreementHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
         }
 
         [Fact]
@@ -81,11 +83,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 .ConfigureAwait(false);
 
             //Act
-            using (var deleteResponse = await DataProcessingAgreementHelper.SendDeleteRequestAsync(dto.Id))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
-            }
+            using var deleteResponse = await DataProcessingAgreementHelper.SendDeleteRequestAsync(dto.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
         }
 
         [Fact]
@@ -97,11 +98,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var agreementDto = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
 
             //Act
-            using (var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name2))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            using var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
@@ -114,11 +114,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var agreementDto = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name2).ConfigureAwait(false);
 
             //Act
-            using (var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name1))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-            }
+            using var response = await DataProcessingAgreementHelper.SendChangeNameRequestAsync(agreementDto.Id, name1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
 
         [Fact]
@@ -128,11 +127,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            using var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
@@ -145,11 +143,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             await DataProcessingAgreementHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
 
             //Act
-            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(organizationId, name))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-            }
+            using var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(organizationId, name);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
 
         [Theory]
@@ -159,38 +156,151 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Create_Returns_Error_If_InvalidName(string name)
         {
             //Act
-            using (var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            }
+            using var response = await DataProcessingAgreementHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
-        public async Task Can_Query_ReadModels()
+        public async Task Can_Get_Available_Roles()
         {
             //Arrange
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var suffix = A<Guid>().ToString("N");
-            var name1 = $"1_{suffix}";
-            var name2 = $"2_{suffix}";
-            var name3 = $"3_{suffix}";
-
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name1);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name2);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name3);
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act
-            var page1 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId,suffix,2,0)).ToList();
-            var page2 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId,suffix,2,2)).ToList();
+            var roles = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
 
             //Assert
-            Assert.Equal(2,page1.Count);
-            Assert.Equal(name1,page1.First().Name);
-            Assert.Equal(name2,page1.Last().Name);
+            Assert.NotEmpty(roles);
+        }
 
-            Assert.Equal(1, page2.Count);
-            Assert.Equal(name3, page2.Single().Name);
+        [Fact]
+        public async Task Can_Get_Available_Users()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+
+            //Act
+            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+
+            //Assert
+            Assert.NotEmpty(availableUsers);
+        }
+
+        [Fact]
+        public async Task Can_Assign_Role()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var user = availableUsers.First();
+
+            //Act
+            using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            agreement = await DataProcessingAgreementHelper.GetAsync(agreement.Id);
+
+            //Assert role is in the DTO
+            var assignedRoleDto = Assert.Single(agreement.AssignedRoles);
+            Assert.Equal(user.Id, assignedRoleDto.User.Id);
+            Assert.Equal(role.Id, assignedRoleDto.Role.Id);
+
+            //Assert query endpoint now excludes possible duplicate
+            availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            Assert.Empty(availableUsers.Where(x => x.Id == user.Id));
+        }
+
+        [Fact]
+        public async Task Cannot_Assign_Duplicate_Role()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var user = availableUsers.First();
+            using var succeededResponse = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Act
+            using var duplicateResponse = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.OK, succeededResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Assign_Role_To_User_Not_In_Organization()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+
+            //Act
+            using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, int.MaxValue);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Assign_UnAvailable_Role()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+
+            //Act
+            using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, int.MaxValue, TestEnvironment.DefaultUserId);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Remove_Role()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var user = availableUsers.First();
+            using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Act
+            using var removeResponse = await DataProcessingAgreementHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+
+            //Assert that the role is no longer in the DTO
+            agreement = await DataProcessingAgreementHelper.GetAsync(agreement.Id);
+            Assert.Empty(agreement.AssignedRoles);
+        }
+
+        [Fact]
+        public async Task Cannot_Remove_Unassigned_Role()
+        {
+            //Arrange
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var role = businessRoleDtos.First();
+            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var user = availableUsers.First();
+
+            //Act - check on an agreement where no role has been added yet
+            using var removeResponse = await DataProcessingAgreementHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
+
+            //Assert response
+            Assert.Equal(HttpStatusCode.BadRequest, removeResponse.StatusCode);
         }
     }
 }

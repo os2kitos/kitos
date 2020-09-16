@@ -1,13 +1,18 @@
 ﻿using System;
+using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.Model.EventHandlers
 {
-    public class BuildDataProcessingAgreementReadModelOnChangesHandler : IDomainEventHandler<EntityLifeCycleEvent<DataProcessingAgreement>>
+    public class BuildDataProcessingAgreementReadModelOnChangesHandler :
+        IDomainEventHandler<EntityLifeCycleEvent<DataProcessingAgreement>>,
+        IDomainEventHandler<EntityLifeCycleEvent<User>>,
+        IDomainEventHandler<EntityLifeCycleEvent<ExternalReference>>
     {
         private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _mapper;
@@ -33,7 +38,7 @@ namespace Core.DomainServices.Model.EventHandlers
                     CreateNewModel(dataProcessingAgreement);
                     break;
                 case LifeCycleEventType.Updated:
-                    _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.From(dataProcessingAgreement));
+                    _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(dataProcessingAgreement, PendingReadModelUpdateSourceCategory.DataProcessingAgreement));
                     break;
                 case LifeCycleEventType.Deleted:
                     _readModelRepository.DeleteBySourceId(dataProcessingAgreement.Id);
@@ -56,6 +61,25 @@ namespace Core.DomainServices.Model.EventHandlers
             DataProcessingAgreement dataProcessingAgreement)
         {
             _mapper.Apply(dataProcessingAgreement, model);
+        }
+
+        public void Handle(EntityLifeCycleEvent<User> domainEvent)
+        {
+            //Schedule update of affected read models
+            if (domainEvent.ChangeType == LifeCycleEventType.Updated)
+            {
+                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingAgreement_User));
+            }
+        }
+
+        public void Handle(EntityLifeCycleEvent<ExternalReference> domainEvent)
+        {
+            //Schedule read model update for affected dpa if dpa was the target of the reference
+            var dpa = domainEvent.Entity.DataProcessingAgreement;
+            if (dpa != null)
+            {
+                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingAgreement));
+            }
         }
     }
 }
