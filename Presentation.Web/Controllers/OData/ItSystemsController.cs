@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using Core.DomainModel.Events;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItSystem;
@@ -46,6 +47,21 @@ namespace Presentation.Web.Controllers.OData
                     .ByOrganizationDataAndPublicDataFromOtherOrganizations(orgKey, readAccessLevel, GetCrossOrganizationReadAccessLevel());
 
             return Ok(result);
+        }
+
+        public override IHttpActionResult Patch(int key, Delta<ItSystem> delta)
+        {
+            var itSystem = Repository.GetByKey(key);
+            if (itSystem == null)
+                return NotFound();
+            var disabledBefore = itSystem.Disabled;
+            var result = base.Patch(key, delta);
+            if (disabledBefore != itSystem.Disabled)
+            {
+                DomainEvents.Raise(new EnabledStatusChanged<ItSystem>(itSystem, disabledBefore, itSystem.Disabled));
+            }
+
+            return result;
         }
 
         [ODataRoute("ItSystems")]

@@ -24,13 +24,13 @@
             <!-- for each right -->
             <tbody ng-repeat="assignedRole in vm.assignedRoles | orderBy : rightSort : rightSortReverse">
                 <!-- show -->
-                <tr ng-hide="editing">
+                <tr ng-hide="assignedRole.isEditing">
                     <td>{{ assignedRole.role.name }}<a uib-tooltip="{{ assignedRole.role.note }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
                     <td>{{ assignedRole.user.name }}</td>
                     <td>
                         {{ assignedRole.user.email }}
                         <div class="pull-right" ng-show="vm.hasWriteAccess">
-                            <a ng-click="editing = true" class="btn btn-info btn-xs edit-right">
+                            <a ng-click="assignedRole.isEditing = true" class="btn btn-info btn-xs edit-right">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a>
                             <a class="btn btn-danger btn-xs delete-right"
@@ -43,7 +43,7 @@
                 </tr>
 
                 <!-- edit -->
-                <tr ng-show="editing">
+                <tr ng-show="assignedRole.isEditing">
                     <td>
                         <select class="form-control input-sm"
                                 ui-select2
@@ -54,15 +54,16 @@
                         </select>
                     </td>
                     <td colspan="2" class="relative-position">
-                        <input class="form-control input-sm"
-                               ui-select2="::vm.userOptions"
-                               ng-model="assignedRole.newUser" />
-                        {{assignedRole.newUser}}
+                        <!-- type="hidden" makes it start with a default value if the model already contains a value -->
+                        <input type="hidden"
+                               class="form-control input-sm"
+                               ui-select2="assignedRole.editUserOptions"
+                               ng-model="assignedRole.newUser"/>
                         <div class="pull-outside-table">
                             <input type="submit"
                                    class="btn btn-success btn-sm"
                                    value="Gem"
-                                   ng-click="vm.editRole(assignedRole)" />
+                                   ng-click="vm.editRole(assignedRole)"/>
                         </div>
                     </td>
                 </tr>

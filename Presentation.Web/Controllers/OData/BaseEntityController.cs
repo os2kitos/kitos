@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 entity = Repository.Insert(entity);
-                DomainEvents.Raise(new EntityLifeCycleEvent<T>(LifeCycleEventType.Created, entity));
+                DomainEvents.Raise(new EntityCreatedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 // patch the entity
                 delta.Patch(entity);
-                DomainEvents.Raise(new EntityLifeCycleEvent<T>(LifeCycleEventType.Updated, entity));
+                DomainEvents.Raise(new EntityUpdatedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 Repository.DeleteByKey(key);
-                DomainEvents.Raise(new EntityLifeCycleEvent<T>(LifeCycleEventType.Deleted, entity));
+                DomainEvents.Raise(new EntityDeletedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)

@@ -58,6 +58,7 @@
     <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="Events\EnabledStatusChanged.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithEnabledStatus.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasId.cs" />
@@ -82,14 +84,12 @@
     <Compile Include="ItContract\ItContractConstraints.cs" />
     <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
-    <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
     <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
     <Compile Include="ItSystemUsage\GDPR\SensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
-    <Compile Include="ItSystem\DomainEvents\InterfaceDeleted.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
@@ -227,7 +227,6 @@
     <Compile Include="Qa\References\IBrokenLink.cs" />
     <Compile Include="Qa\References\IBrokenLinkWithOrigin.cs" />
     <Compile Include="References\AddReferenceCommand.cs" />
-    <Compile Include="References\DomainEvents\ExternalReferenceDeleted.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />

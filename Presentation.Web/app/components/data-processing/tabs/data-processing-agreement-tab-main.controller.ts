@@ -10,13 +10,13 @@
         ];
 
         constructor(
-            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
-            private notify,
+            private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
+            private readonly notify,
             public hasWriteAccess,
-            private dataProcessingAgreement) {
+            private readonly dataProcessingAgreement : Models.DataProcessing.IDataProcessingAgreementDTO) {
         }
 
-        headerName: string = this.dataProcessingAgreement.name;
+        headerName = this.dataProcessingAgreement.name;
 
         changeName(name) {
 
@@ -24,7 +24,7 @@
 
             return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
                 nameChangeResponse => {
-                    msg.toSuccessMessage("Databehandleraftale navn ændret!");
+                    msg.toSuccessMessage("Navnet er ændret!");
                     this.headerName = nameChangeResponse.valueModifiedTo;
                 },
                 (errorResponse: Models.Api.ApiResponseErrorCategory) => {

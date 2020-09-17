@@ -12,9 +12,11 @@ using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
+using Presentation.Web.Models.References;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -157,7 +159,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri]string nameOrEmailContent = null, [FromUri] int pageSize = 25)
+        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri] string nameOrEmailContent = null, [FromUri] int pageSize = 25)
         {
             return _dataProcessingAgreementApplicationService
                 .GetUsersWhichCanBeAssignedToRole(id, roleId, nameOrEmailContent, pageSize)
@@ -190,13 +192,58 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage RemoveRole(int id, int roleId, int userId)
         {
             return
                 _dataProcessingAgreementApplicationService
                     .RemoveRole(id, roleId, userId)
                     .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{id}/it-systems/available")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableSystems(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _dataProcessingAgreementApplicationService
+                .GetSystemsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(systems => Ok(systems.MapToNamedEntityDTOs().ToList()), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/it-systems/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        {
+            if (systemId == null)
+                return BadRequest("systemId must be provided");
+
+            return _dataProcessingAgreementApplicationService
+                .AssignSystem(id, systemId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/it-systems/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        {
+            if (systemId == null)
+                return BadRequest("systemId must be provided");
+
+            return _dataProcessingAgreementApplicationService
+                .RemoveSystem(id, systemId.Value)
+                .Match(_ => Ok(), FromOperationError);
         }
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
@@ -222,8 +269,13 @@ namespace Presentation.Web.Controllers.API
 
             return value
                 .Include(agreement => agreement.Rights)
+                .Include(agreement => agreement.ExternalReferences)
+                .Include(agreement => agreement.Reference)
+                .Include(agreement => agreement.Reference.ObjectOwner)
                 .Include(agreement => agreement.Rights.Select(_ => _.Role))
                 .Include(agreement => agreement.Rights.Select(_ => _.User))
+                .Include(agreement => agreement.SystemUsages)
+                .Include(agreement => agreement.SystemUsages.Select(x => x.ItSystem))
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(agreement => ToDTO(agreement, localDescriptionOverrides))
@@ -254,7 +306,27 @@ namespace Presentation.Web.Controllers.API
                     Role = ToDTO(agreementRight.Role, localDescriptionOverrides),
                     User = ToDTO(agreementRight.User)
 
-                }).ToArray()
+                }).ToArray(),
+                References = value
+                    .ExternalReferences
+                    .Select(externalReference => ToDTO(value.ReferenceId, externalReference))
+                    .ToArray(),
+                ItSystems = value
+                    .GetAssignedSystems()
+                    .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
+                    .ToArray()
+            };
+        }
+
+        private static ReferenceDTO ToDTO(int? masterReferenceId, ExternalReference reference)
+        {
+            return new ReferenceDTO(reference.Id, reference.Title)
+            {
+                MasterReference = masterReferenceId.HasValue && masterReferenceId == reference.Id,
+                ReferenceId = reference.ExternalReferenceId,
+                Url = reference.URL,
+                CreatedAt = reference.Created,
+                CreatedByUser = reference.ObjectOwner.MapToNamedEntityDTO()
             };
         }
 

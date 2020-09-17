@@ -5,7 +5,8 @@ namespace Core.DomainModel.BackgroundJobs
     public enum PendingReadModelUpdateSourceCategory
     {
         DataProcessingAgreement = 0,
-        DataProcessingAgreement_User = 1
+        DataProcessingAgreement_User = 1,
+        DataProcessingAgreement_ItSystem = 2
     }
 
     public class PendingReadModelUpdate
@@ -17,10 +18,16 @@ namespace Core.DomainModel.BackgroundJobs
 
         public static PendingReadModelUpdate Create(IHasId source, PendingReadModelUpdateSourceCategory category)
         {
-            return new PendingReadModelUpdate()
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return Create(source.Id, category);
+        }
+
+        public static PendingReadModelUpdate Create(int sourceId, PendingReadModelUpdateSourceCategory category)
+        {
+            return new PendingReadModelUpdate
             {
                 CreatedAt = DateTime.UtcNow,
-                SourceId = source.Id,
+                SourceId = sourceId,
                 Category = category
             };
         }

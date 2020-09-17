@@ -3,5 +3,6 @@
     export interface Select2OptionViewModel {
         id: number;
         text: string;
+        optionalObjectContext? : any;
     }
 }

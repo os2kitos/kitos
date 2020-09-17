@@ -1,9 +1,14 @@
 ﻿module Kitos.Services.DataProcessing {
+    import Api = Models.Api;
+
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
+        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
+        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
         getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]>;
         getApplicableUsers(dataProcessingAgreementId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
         assignNewRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void>;
@@ -20,7 +25,7 @@
     }
 
     export interface IDataProcessingAgreementPatchResult {
-        valueModifiedTo: string;
+        valueModifiedTo: any;
     }
 
     export class DataProcessingAgreementService implements IDataProcessingAgreementService {
@@ -47,23 +52,29 @@
             throw errorCategory;
         }
 
-        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
+        //Use for contracts that take an input defined as SingleValueDTO
+        private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingAgreementPatchResult> {
 
             const payload = {
-                Value: name
+                Value: value
             };
 
             return this
                 .$http
-                .patch<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "name"), payload)
+                .patch<API.Models.IApiWrapper<any>>(url, payload)
                 .then(
                     response => {
                         return <IDataProcessingAgreementPatchResult>{
-                            valueModifiedTo: name,
+                            valueModifiedTo: value,
                         };
                     },
                     error => this.handleServerError(error)
                 );
+        }
+
+
+        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "name"), name);
         }
 
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
@@ -113,10 +124,30 @@
                 );
         }
 
+        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/assign"), systemId);
+        }
+        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/remove"), systemId);
+        }
+
+        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>{
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId, `it-systems/available?nameQuery=${query}`))
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]> {
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(),
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId,
                     "available-roles"))
                 .then(
                     result => {
@@ -148,7 +179,7 @@
             return this
                 .$http
                 .patch<API.Models.IApiWrapper<any>>(
-                    this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), "roles/assign"),
+                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, "roles/assign"),
                     payload)
                 .then(
                     result => {},
@@ -162,16 +193,12 @@
             return this
                 .$http
                 .patch<API.Models.IApiWrapper<any>>(
-                    this.getUriWithIdAndSuffix(dataProcessingAgreementId.toString(), `roles/remove/${roleId}/from/${userId}`),
+                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, `roles/remove/${roleId}/from/${userId}`),
                     payload)
                 .then(
                     result => { },
                     error => this.handleServerError(error)
                 );
-        }
-
-        private mapToSelect2Option(input: Models.DataProcessing.ISimpleUserDTO): Models.ViewModel.Generic.Select2OptionViewModel {
-            return { id: input.id, text: input.name };
         }
 
         static $inject = ["$http"];
@@ -183,7 +210,7 @@
             return this.getBaseUri() + `${suffix}`;
         }
 
-        private getUriWithIdAndSuffix(id: string, suffix: string) {
+        private getUriWithIdAndSuffix(id: number, suffix: string) {
             return this.getBaseUri() + `${id}/${suffix}`;
         }
 

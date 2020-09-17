@@ -8,6 +8,7 @@
     export interface IDataProcessingAgreementDTO {
         id: number,
         name: string,
+        itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[],
     }
 

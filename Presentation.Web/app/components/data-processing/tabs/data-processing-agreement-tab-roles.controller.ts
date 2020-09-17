@@ -8,7 +8,7 @@
             "hasWriteAccess",
             "dataProcessingAgreement",
             "dataProcessingAgreementRoles",
-            "$http"
+            "select2LoadingService"
         ];
 
         constructor(
@@ -17,90 +17,86 @@
             public hasWriteAccess,
             private dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
             private dataProcessingAgreementRoles: Models.DataProcessing.IDataProcessingRoleDTO[],
-            private $http) {
+            private select2LoadingService: Services.ISelect2LoadingService) {
         }
 
         headerName = this.dataProcessingAgreement.name;
 
         roles = _.map(this.dataProcessingAgreementRoles, this.mapToRoleOptions);
 
-        selectedRoleIdAsString:string = this.roles[0].id.toString();
+        selectedRoleIdAsString: string = this.roles[0].id.toString();
 
-        selectedUser: Models.ViewModel.Generic.Roles.IUserOptionsViewModel;
+        selectedUser: Models.ViewModel.Generic.Select2OptionViewModel;
 
-        mapToRoleOptions(input: Models.DataProcessing.IDataProcessingRoleDTO): Models.ViewModel.Generic.Roles.IRoleOptionsViewModel {
+        mapToRoleOptions(input: Models.DataProcessing.IDataProcessingRoleDTO): Models.ViewModel.Generic.Select2OptionViewModel {
             return {
                 id: input.id,
-                text: `${input.name} ${input.hasWriteAccess ? "skriv" : "læs"}`,
-                role: input
+                text: `${input.name} (${input.hasWriteAccess ? "skriv" : "læs"})`,
+                optionalObjectContext: input
             }
         }
 
-        getUsers(queryParams) {
-            return this.$http.get(`api/v1/data-processing-agreement/${this.dataProcessingAgreement.id}/available-roles/${this.selectedRoleIdAsString}/applicable-users?nameContent=${queryParams.data.query}`)
-                .then(queryParams.success, () => null);
-        }
-
-        formatResult(obj) {
-            var result = "<div>" + obj.text + "</div>";
-
-            //obj.user might contain more info about the user
-            if (obj.user) {
-                result += "<div class='small'>" + obj.user.email + "</div>";
+        formatResult(select2OptionViewModel: Models.ViewModel.Generic.Select2OptionViewModel) {
+            var result = `<div>${select2OptionViewModel.text}</div>`;
+            if (select2OptionViewModel.optionalObjectContext) {
+                result += `<div class='small'>${select2OptionViewModel.optionalObjectContext.email}</div>`;
             }
-
             return result;
         }
 
-        getOptions() {
-            var self = this;
-            return {
-                formatResult: self.formatResult,
-                minimumInputLength: 1,
-                initSelection(elem, callback) {
-                },
-                allowClear: true,
-                ajax: {
-                    data(term, page) {
-                        return { query: term };
-                    },
-                    quietMillis: 500,
-                    transport(queryParams) {
-                        const res = self.getUsers(queryParams);
+        userOptions = this.select2LoadingService.loadSelect2WithDataSource(
+            (query: string) =>
+                this.dataProcessingAgreementService.getApplicableUsers(this.dataProcessingAgreement.id,
+                    parseInt(this.selectedRoleIdAsString),
+                    query)
+                    .then(
+                        results =>
+                            results
+                                .map(result =>
+                                    <Models.ViewModel.Generic.Select2OptionViewModel>
+                                    {
+                                        id: result.id,
+                                        text: result.name,
+                                        optionalObjectContext: result
+                                    }),
+                        _ => [])
+            , false
+            , this.formatResult);
 
-                        return res;
-                    },
-
-                    results(data, page) {
-                        var results = [];
-                        _.each(data.data.response, (obj) => {
-                            var userOption = {
-                                id: obj.id,
-                                text: obj.name,
-                                user: obj
-                            }
-                            results.push(userOption);
-                        });
-                        return { results: results };
-                    }
-                }
-            };
+        getEditUserOptions(roleId: number) {
+            return this.select2LoadingService.loadSelect2WithDataSource(
+                (query: string) =>
+                this.dataProcessingAgreementService.getApplicableUsers(this.dataProcessingAgreement.id,
+                    roleId,
+                    query)
+                .then(
+                    results =>
+                    results
+                    .map(result =>
+                        <Models.ViewModel.Generic.Select2OptionViewModel>
+                        {
+                            id: result.id,
+                            text: result.name,
+                            optionalObjectContext: result
+                        }),
+                    _ => [])
+                , false
+                , this.formatResult);
         }
 
-        userOptions = this.getOptions();
+        assignedRoles = _.map(this.dataProcessingAgreement.assignedRoles, assignedRole => this.mapToEditableAssignedRole(assignedRole, this));
 
-        assignedRoles = _.map(this.dataProcessingAgreement.assignedRoles, this.mapToEditableAssignedRole);
-
-        mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
+        mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO, self: EditRolesDataProcessingAgreementController): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
             return {
                 user: input.user,
                 role: input.role,
                 newUser: {
                     id: input.user.id,
                     text: input.user.name,
-                    user: input.user
-                } as Models.ViewModel.Generic.Roles.IUserOptionsViewModel,
+                    optionalObjectContext: input.user
+                } as Models.ViewModel.Generic.Select2OptionViewModel,
                 newRoleIdAsString: input.role.id.toString(),
+                editUserOptions:  self.getEditUserOptions(input.role.id)
             } as Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel;
         }
 
@@ -125,16 +121,13 @@
                     () => {
                         msg.toSuccessMessage("Rollen er tilføjet");
                         var assignedRole = this.getRoleFromId(selectedRoleId);
-                        var user = { id: this.selectedUser.user.id, name: this.selectedUser.user.name, email: this.selectedUser.user.email}
+                        var user = { id: this.selectedUser.optionalObjectContext.id, name: this.selectedUser.optionalObjectContext.name, email: this.selectedUser.optionalObjectContext.email }
                         var newAssignedRole = {
                             user: user,
-                            role: assignedRole.role,
-                            newUser: {
-                                id: user.id,
-                                text: user.name,
-                                user: user
-                            } as Models.ViewModel.Generic.Roles.IUserOptionsViewModel,
-                            newRoleIdAsString: assignedRole.role.id.toString(),
+                            role: assignedRole.optionalObjectContext,
+                            newUser: this.selectedUser,
+                            newRoleIdAsString: assignedRole.id.toString(),
+                            editUserOptions: this.getEditUserOptions(assignedRole.id),
                         } as Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel;
 
                         this.assignedRoles.push(newAssignedRole);
@@ -145,9 +138,9 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
 
-                        default:
-                            msg.toErrorMessage("Fejl! Kunne ikke tilføje rolle!");
-                            break;
+                            default:
+                                msg.toErrorMessage("Fejl! Kunne ikke tilføje rolle!");
+                                break;
                         }
                     });
         }
@@ -157,9 +150,9 @@
             var userId = assignedRole.user.id;
             var msg = this.notify.addInfoMessage("Fjerner rolle");
             this.dataProcessingAgreementService.removeRole(
-                    this.dataProcessingAgreement.id,
-                    roleId,
-                    userId)
+                this.dataProcessingAgreement.id,
+                roleId,
+                userId)
                 .then(
                     () => {
                         msg.toSuccessMessage("Rollen er fjernet");
@@ -168,9 +161,9 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
 
-                        default:
-                            msg.toErrorMessage("Fejl! Kunne ikke fjerne rolle!");
-                            break;
+                            default:
+                                msg.toErrorMessage("Fejl! Kunne ikke fjerne rolle!");
+                                break;
                         }
                     });
         }
@@ -181,8 +174,9 @@
 
             var newRole = this.getRoleFromId(parseInt(assignedRole.newRoleIdAsString));
 
-            if (assignedRole.newUser.user === assignedRole.user && newRole.role === assignedRole.role) {
-                msg.toErrorMessage("Fejl! Kunne ikke rette rolle!");
+            if (assignedRole.newUser.optionalObjectContext.id === assignedRole.user.id && newRole.optionalObjectContext.id === assignedRole.role.id) {
+                msg.toSuccessMessage("Rolle ikke opdateret da samme rolle og bruger er valgt");
+                assignedRole.isEditing = false;
                 return;
             }
 
@@ -211,10 +205,11 @@
                             });
 
                     var newAssignedRole = {
-                        user: assignedRole.newUser.user,
-                        role: newRole.role,
+                        user: assignedRole.newUser.optionalObjectContext,
+                        role: newRole.optionalObjectContext,
                         newUser: assignedRole.newUser,
-                        newRoleIdAsString: newRole.id.toString()
+                        newRoleIdAsString: newRole.id.toString(),
+                        editUserOptions: this.getEditUserOptions(newRole.id),
                     } as Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel;
 
                     this.assignedRoles.push(newAssignedRole);
@@ -243,7 +238,7 @@
                 resolve: {
                     dataProcessingAgreementRoles: ["dataProcessingAgreementService", "dataProcessingAgreement",
                         (dataProcessingAgreementService, dataProcessingAgreement) => dataProcessingAgreementService.getAvailableRoles(dataProcessingAgreement.id)]
-        }
+                }
             });
         }]);
 }

@@ -9,6 +9,10 @@
         Id: number;
         SourceEntityId : number;
         Name: string;
-        RoleAssignments : IAssignedDataProcessingAgreementRole[];
+        RoleAssignments: IAssignedDataProcessingAgreementRole[];
+        MainReferenceTitle: string;
+        MainReferenceUrl: string;
+        MainReferenceUserAssignedId: string;
+        SystemNamesAsCsv: string;
     }
 }

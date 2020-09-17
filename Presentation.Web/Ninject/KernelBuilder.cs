@@ -25,16 +25,15 @@ using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization.DomainEvents;
-using Core.DomainModel.References.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
@@ -185,9 +184,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementApplicationService>().To<DataProcessingAgreementApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementNamingService>().To<DataProcessingAgreementNamingService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingAgreementSystemAssignmentService>().To<DataProcessingAgreementSystemAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementRoleAssignmentsService>().To<DataProcessingAgreementRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingAgreementReadModelService>().To<DataProcessingAgreementReadModelService>().InCommandScope(Mode);
-            kernel.Bind<IReadModelUpdate<DataProcessingAgreement,DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
+            kernel.Bind<IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel>>().To<DataProcessingAgreementReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -225,14 +225,25 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<InterfaceDeleted, RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
-            RegisterDomainEvent<SystemUsageDeleted, SystemUsageDeletedHandler>(kernel);
-            RegisterDomainEvent<InterfaceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            RegisterDomainEvent<ExternalReferenceDeleted, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityLifeCycleEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, CleanupDataProcessingAgreementsOnSystemUsageDeletedEvent>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingAgreement>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingAgreementReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
