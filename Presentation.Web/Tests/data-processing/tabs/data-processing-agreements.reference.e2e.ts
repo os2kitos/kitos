@@ -1,7 +1,6 @@
 ﻿import login = require("../../Helpers/LoginHelper");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import DataProcessingHelper = require("../../Helpers/DataProcessingAgreementHelper")
 import DataProcessingAgreementEditReferencePageObject =
 require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.reference.po");
@@ -9,8 +8,7 @@ require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.r
 describe("Data Processing agreement reference test ",
     () => {
         var loginHelper = new login();
-        const pageObjectOverview = new DataProcessingAgreementOverviewPageObject();
-        const pageObjectReference = new DataProcessingAgreementEditReferencePageObject();
+        var pageObjectReference = new DataProcessingAgreementEditReferencePageObject();
         var refHelper = new ReferenceHelper();
         var testFixture = new TestFixtureWrapper();
         var dpaHelper = DataProcessingHelper;
@@ -56,7 +54,7 @@ describe("Data Processing agreement reference test ",
             refHelper.getEditButtonFromReference(reference).click()
                 .then(() => refHelper.getReferenceUrlField().clear())
                 .then(() => refHelper.getReferenceUrlField().sendKeys(url))
-                .then(() => refHelper.getReferenceSaveEditbutton().click());
+                .then(() => refHelper.getReferenceSaveEditButton().click());
         }
 
         function deleteReferenceFromDpa(reference: string) {

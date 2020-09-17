@@ -354,7 +354,7 @@
     <Content Include="app\components\data-processing\data-processing-agreement-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-modal-create.view.html" />
-    <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-create-modal.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />

@@ -37,7 +37,7 @@ class ReferenceHelper {
     public getReferenceTitleField() {
         return this.inputFields.referenceDocTitle;
     }
-    public getReferenceSaveEditbutton() {
+    public getReferenceSaveEditButton() {
         return this.headerButtons.editSaveReference;
     }
 
