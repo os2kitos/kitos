@@ -39,6 +39,13 @@
                 columns: [{
                     field: "title",
                     title: "Dokumenttitel",
+                    headerAttributes: {
+                        "data-element-type": "referenceHeader"
+                    },
+                    attributes:
+                    {
+                        "data-element-type": "referenceObject"
+                    },
                     template: data => {
                         if (Utility.Validation.isValidExternalReference(data.url)) {
                             return "<a target=\"_blank\" href=\"" + data.url + "\">" + data.name + "</a>";
@@ -49,12 +56,19 @@
                     width: 240
                 }, {
                     field: "referenceId",
-                    title: "Evt. dokumentID/Sagsnr./anden referenceContact"
+                        title: "Evt. dokumentID/Sagsnr./anden referenceContact",
+                    headerAttributes: {
+                        "data-element-type": "referenceHeaderId"
+                    },
+                    attributes:
+                    {
+                        "data-element-type": "referenceIdObject"
+                    },
                 }, {
                     title: "Rediger",
                     template: dataItem => {
-                        var HTML = "<button type='button' data-ng-disabled='" + !this.hasWriteAccess + "' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
-                        HTML += " <button type='button' data-ng-disabled='" + !this.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+                        var HTML = "<button type='button' data-element-type='editReference' data-ng-disabled='" + !this.hasWriteAccess + "' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+                        HTML += " <button type='button' data-element-type='deleteReference' data-ng-disabled='" + !this.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
 
                         if (Utility.Validation.isValidExternalReference(dataItem.url)) {
                             if (dataItem.masterReference) {
@@ -75,7 +89,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (this.hasWriteAccess) {
-                                return `<a id="addReference" class="btn btn-success btn-sm" href="\\#/data-processing/edit/${dataProcessingAgreement.id}/reference/createReference/${dataProcessingAgreement.id}"'>Tilføj reference</a>`;
+                                return `<a id="addReference" data-element-type="createReferenceButton" class="btn btn-success btn-sm" href="\\#/data-processing/edit/${dataProcessingAgreement.id}/reference/createReference/${dataProcessingAgreement.id}"'>Tilføj reference</a>`;
                             } else {
                                 return "";
                             }

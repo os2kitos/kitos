@@ -27,5 +27,22 @@ class ReferenceHelper {
             .then(() => browser.wait(element(this.cssLocator.byDataElementType("organizationButton")),this.waitUpTo.twentySeconds))
             .then(() => element(this.cssLocator.byDataElementType("ReferenceTabButton")).click());
     }
+
+
+    public getReferenceId(refName: string) {
+        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
+    }
+
+    public getEditButtonFromReference(refName: string) {
+        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
+    }
+
+    public getDeleteButtonFromReference(refName: string) {
+        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
+    }
+
+    public getUrlFromReference(refName: string) {
+        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceObject"]/a'));
+    }
 }
 export = ReferenceHelper;

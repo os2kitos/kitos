@@ -809,7 +809,8 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-agreement.overview.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-agreement.edit.main.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-agreement.edit.main.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-agreement.edit.reference.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />

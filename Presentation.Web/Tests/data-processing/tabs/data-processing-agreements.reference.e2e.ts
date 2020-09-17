@@ -1,43 +1,71 @@
 ﻿import login = require("../../Helpers/LoginHelper");
-import ItSystemReferenceHelper = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
+import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
+import DataProcessingHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import DataProcessingAgreementEditReferencePageObject =
+    require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.reference.po");
 
 describe("Data Processing agreement reference test ",
     () => {
         var loginHelper = new login();
-        var itSystemReference = new ItSystemReferenceHelper();
+        const pageObjectOverview = new DataProcessingAgreementOverviewPageObject();
+        const pageObjectReference = new DataProcessingAgreementEditReferencePageObject();
         var refHelper = new ReferenceHelper();
         var testFixture = new TestFixtureWrapper();
-        var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
-        var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
+        var dpaHelper = DataProcessingHelper;
+        
 
-        //beforeAll(() => {
-        //    loginHelper.loginAsGlobalAdmin()
-        //        .then(() => ItSystemHelper.createSystem(itSystemName));
-        //});
+        beforeAll(() => {
+            loginHelper.loginAsLocalAdmin();
+            testFixture.enableLongRunningTest();
+            dpaHelper.checkAndEnableDpaModule();
+        });
 
-        //beforeEach(() => {
-        //    testFixture.enableLongRunningTest();
-        //});
+        afterAll(() => {
+            testFixture.disableLongRunningTest();
+            testFixture.cleanupState();
+        });
 
-        //afterAll(() => {
-        //    testFixture.disableLongRunningTest();
-        //    testFixture.cleanupState();
-        //});
+        it("Add and delete reference to a agreement",() => {
+                var referenceName = createReferenceName();
+                var referenceId = createReferenceId();
+                var validUrl = generateValidUrl();
+                var agreementName = createAgreementName();
 
-        //it("Add reference to a agreement",
+                dpaHelper.createDataProcessingAgreement(agreementName)
+                    .then(() => pageObjectOverview.findSpecificDpaInNameColumn(agreementName))
+                    .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
+                    .then(() => pageObjectReference.getDpaReferenceTabButton().click())
+                    .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+                    .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
+                    .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
+                    .then(() => refHelper.getDeleteButtonFromReference(referenceName).click())
+                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalse());
+            });
+
+        //it("Delete a reference in a agreement",
         //    () => {
         //        var referenceName = createReferenceName();
         //        var referenceId = createReferenceId();
         //        var validUrl = generateValidUrl();
+        //        var agreementName = createAgreementName();
+
+        //        dpaHelper.createDataProcessingAgreement(agreementName)
+        //            .then(() => pageObjectOverview.findSpecificDpaInNameColumn(agreementName))
+        //            .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
+        //            .then(() => pageObjectReference.getDpaReferenceTabButton().click())
+        //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
 
         //        refHelper.goToSpecificItSystemReferences(itSystemName)
         //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-        //            .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
-        //            .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl));
+        //            .then(() => getDeleteButtonFromReference(referenceName).click())
+        //            .then(() => browser.switchTo().alert().accept())
+        //            .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalse());
         //    });
+
+
 
         //it("Edit a reference in a agreement",
         //    () => {
@@ -56,18 +84,6 @@ describe("Data Processing agreement reference test ",
         //            .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy());
         //    });
 
-        //it("Delete a reference in a agreement",
-        //    () => {
-        //        var referenceName = createReferenceName();
-        //        var referenceId = createReferenceId();
-        //        var validUrl = generateValidUrl();
-
-        //        refHelper.goToSpecificItSystemReferences(itSystemName)
-        //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-        //            .then(() => getDeleteButtonFromReference(referenceName).click())
-        //            .then(() => browser.switchTo().alert().accept())
-        //            .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalse());
-        //    });
     });
 
 function createAgreementName() {
@@ -90,18 +106,4 @@ function generateInvalidUrl() {
     return `${new Date().getTime()}.dk/`;
 }
 
-function getReferenceId(refName: string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
-}
 
-function getEditButtonFromReference(refName: string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
-}
-
-function getDeleteButtonFromReference(refName: string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
-}
-
-function getUrlFromReference(refName: string) {
-    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceObject"]/a'));
-}
