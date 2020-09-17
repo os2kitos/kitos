@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import DataProcessingHelper = require("../../Helpers/DataProcessingAgreementHelper")
 import DataProcessingAgreementEditReferencePageObject =
-    require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.reference.po");
+require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.reference.po");
 
 describe("Data Processing agreement reference test ",
     () => {
@@ -14,7 +14,7 @@ describe("Data Processing agreement reference test ",
         var refHelper = new ReferenceHelper();
         var testFixture = new TestFixtureWrapper();
         var dpaHelper = DataProcessingHelper;
-        
+
 
         beforeAll(() => {
             loginHelper.loginAsLocalAdmin();
@@ -27,83 +27,67 @@ describe("Data Processing agreement reference test ",
             testFixture.cleanupState();
         });
 
-        it("Add and delete reference to a agreement",() => {
-                var referenceName = createReferenceName();
-                var referenceId = createReferenceId();
-                var validUrl = generateValidUrl();
-                var agreementName = createAgreementName();
+        it("Add, edit and delete reference to a agreement", () => {
+            var referenceName = createReferenceName();
+            var referenceId = createReferenceId();
+            var validUrl = generateValidUrl();
+            var agreementName = createAgreementName();
+            var invalidUrl = generateInvalidUrl();
 
-                dpaHelper.createDataProcessingAgreement(agreementName)
-                    .then(() => pageObjectOverview.findSpecificDpaInNameColumn(agreementName))
-                    .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
-                    .then(() => pageObjectReference.getDpaReferenceTabButton().click())
-                    .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-                    .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
-                    .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
-                    .then(() => refHelper.getDeleteButtonFromReference(referenceName).click())
-                    .then(() => browser.switchTo().alert().accept())
-                    .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalse());
-            });
+            //Creating DPA
+            dpaHelper.createDataProcessingAgreement(agreementName)
+                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
+                .then(() => pageObjectReference.getDpaReferenceTabButton().click())
+            // creating reference
+                .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+                .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
+                .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
+            // changing to invalid URL
+                .then(() => editReferenceUrl(referenceName, invalidUrl))
+                .then(() => expect(refHelper.getUrlFromReference(referenceName).isPresent()).toBeFalsy())
+            // deleting reference
+                .then(() => deleteReferenceFromDpa(referenceName))
+                .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalse());
+        });
 
-        //it("Delete a reference in a agreement",
-        //    () => {
-        //        var referenceName = createReferenceName();
-        //        var referenceId = createReferenceId();
-        //        var validUrl = generateValidUrl();
-        //        var agreementName = createAgreementName();
+        function editReferenceUrl(reference: string, url: string) {
 
-        //        dpaHelper.createDataProcessingAgreement(agreementName)
-        //            .then(() => pageObjectOverview.findSpecificDpaInNameColumn(agreementName))
-        //            .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
-        //            .then(() => pageObjectReference.getDpaReferenceTabButton().click())
-        //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+            console.log(`Editing ${reference} url value to ${url}`);
+            refHelper.getEditButtonFromReference(reference).click()
+                .then(() => refHelper.getReferenceUrlField().clear())
+                .then(() => refHelper.getReferenceUrlField().sendKeys(url))
+                .then(() => refHelper.getReferenceSaveEditbutton().click());
+        }
 
-        //        refHelper.goToSpecificItSystemReferences(itSystemName)
-        //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-        //            .then(() => getDeleteButtonFromReference(referenceName).click())
-        //            .then(() => browser.switchTo().alert().accept())
-        //            .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalse());
-        //    });
+        function deleteReferenceFromDpa(reference: string) {
+
+            console.log(`Deleting ${reference}`);
+            refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference).click()
+                .then(() => browser.switchTo().alert().accept());
+        }
 
 
+        function createAgreementName() {
+            return `DpaRefTest${new Date().getTime()}`;
+        }
 
-        //it("Edit a reference in a agreement",
-        //    () => {
-        //        var referenceName = createReferenceName();
-        //        var referenceId = createReferenceId();
-        //        var validUrl = generateValidUrl();
-        //        var invalidUrl = generateInvalidUrl();
+        function createReferenceName() {
+            return `Reference${new Date().getTime()}`;
+        }
 
-        //        refHelper.goToSpecificItSystemReferences(itSystemName)
-        //            .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-        //            .then(() => expect(getEditButtonFromReference(referenceName).isPresent()).toBe(true))
-        //            .then(() => getEditButtonFromReference(referenceName).click())
-        //            .then(() => inputFields.referenceDocUrl.clear())
-        //            .then(() => inputFields.referenceDocUrl.sendKeys(invalidUrl))
-        //            .then(() => headerButtons.editSaveReference.click())
-        //            .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy());
-        //    });
+        function createReferenceId() {
+            return `ID${new Date().getTime()}`;
+        }
 
+        function generateValidUrl() {
+            return `http://www.${new Date().getTime()}.dk/`;
+        }
+
+        function generateInvalidUrl() {
+            return `${new Date().getTime()}.dk/`;
+        }
     });
 
-function createAgreementName() {
-    return `DpaRefTest${new Date().getTime()}`;
-}
 
-function createReferenceName() {
-    return `Reference${new Date().getTime()}`;
-}
-
-function createReferenceId() {
-    return `ID${new Date().getTime()}`;
-}
-
-function generateValidUrl() {
-    return `http://www.${new Date().getTime()}.dk/`;
-}
-
-function generateInvalidUrl() {
-    return `${new Date().getTime()}.dk/`;
-}
 
 

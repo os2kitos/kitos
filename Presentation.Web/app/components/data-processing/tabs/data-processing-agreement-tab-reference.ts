@@ -108,7 +108,6 @@
                         error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
             };
 
-            //TODO Mangler metode til at sætte refrence ID på agreement.
             this.$scope.setChosenReference = id => {
 
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);

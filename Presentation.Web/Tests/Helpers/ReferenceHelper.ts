@@ -28,21 +28,37 @@ class ReferenceHelper {
             .then(() => element(this.cssLocator.byDataElementType("ReferenceTabButton")).click());
     }
 
+    public getReferenceIdField() {
+        return this.inputFields.referenceDocId;
+    }
+    public getReferenceUrlField() {
+        return this.inputFields.referenceDocUrl;
+    }
+    public getReferenceTitleField() {
+        return this.inputFields.referenceDocTitle;
+    }
+    public getReferenceSaveEditbutton() {
+        return this.headerButtons.editSaveReference;
+    }
 
     public getReferenceId(refName: string) {
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
+        return element(by.xpath(`//*/tbody/*/td/a[text()="${refName}"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]`));
     }
 
     public getEditButtonFromReference(refName: string) {
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
+        return element(by.xpath(`//*/tbody/*/td/a[text()="${refName}"]/parent::*/parent::*//*/button[@data-element-type="editReference"]`));
     }
 
     public getDeleteButtonFromReference(refName: string) {
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
+        return element(by.xpath(`//*/tbody/*/td/a[text()="${refName}"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]`));
+    }
+
+    public getDeleteButtonFromReferenceWithInvalidUrl(refName: string) {
+        return element(by.xpath(`//*/tbody/*/td[contains(text(),${refName})]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]`));
     }
 
     public getUrlFromReference(refName: string) {
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceObject"]/a'));
+        return element(by.xpath(`//*/tbody/*/td/a[text()="${refName}"]/parent::*/parent::*//td[@data-element-type="referenceObject"]/a`));
     }
 }
 export = ReferenceHelper;
