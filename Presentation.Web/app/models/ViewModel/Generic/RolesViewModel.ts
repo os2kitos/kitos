@@ -19,7 +19,7 @@
         newUser: Select2OptionViewModel,
         newRoleIdAsString: string,
         isEditing?: boolean,
-        editUserOptions: (roleId: number) => any,
+        editUserOptions: (input: number) => any,
     }
 
 }

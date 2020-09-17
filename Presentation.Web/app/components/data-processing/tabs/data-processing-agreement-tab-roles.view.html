@@ -3,19 +3,19 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <i class="glyphicon glyphicon-user"></i>
-            Databehandlingsroller
+            Roller
         </div>
         <table class="full-width table org-role-table">
             <thead>
                 <tr>
                     <th>
-                        <button class="btn btn-link btn-header" ng-click="rightSortChange('roleName')">Databehandlingsrolle</button>
+                        <button class="btn btn-link btn-header" ng-click="vm.sortAssignedRoles('roleName')">Rolle</button>
                     </th>
                     <th>
-                        <button class="btn btn-link btn-header" ng-click="rightSortChange('userName')">Navn</button>
+                        <button class="btn btn-link btn-header" ng-click="vm.sortAssignedRoles('userName')">Navn</button>
                     </th>
                     <th>
-                        <button class="btn btn-link btn-header" ng-click="rightSortChange('userEmail')">Email</button>
+                        <button class="btn btn-link btn-header" ng-click="vm.sortAssignedRoles('userEmail')">Email</button>
                     </th>
                 </tr>
             </thead>
@@ -25,7 +25,7 @@
             <tbody ng-repeat="assignedRole in vm.assignedRoles | orderBy : rightSort : rightSortReverse">
                 <!-- show -->
                 <tr ng-hide="assignedRole.isEditing">
-                    <td>{{ assignedRole.role.name }}<a uib-tooltip="{{ assignedRole.role.note }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
+                    <td>{{ assignedRole.role.name }} <a uib-tooltip="{{ assignedRole.role.note }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
                     <td>{{ assignedRole.user.name }}</td>
                     <td>
                         {{ assignedRole.user.email }}
@@ -43,7 +43,7 @@
                 </tr>
 
                 <!-- edit -->
-                <tr ng-show="assignedRole.isEditing">
+                <tr ng-if="assignedRole.isEditing">
                     <td>
                         <select class="form-control input-sm"
                                 ui-select2
@@ -58,12 +58,12 @@
                         <input type="hidden"
                                class="form-control input-sm"
                                ui-select2="assignedRole.editUserOptions"
-                               ng-model="assignedRole.newUser"/>
+                               ng-model="assignedRole.newUser" />
                         <div class="pull-outside-table">
                             <input type="submit"
                                    class="btn btn-success btn-sm"
                                    value="Gem"
-                                   ng-click="vm.editRole(assignedRole)"/>
+                                   ng-click="vm.editRole(assignedRole)" />
                         </div>
                     </td>
                 </tr>
