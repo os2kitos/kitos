@@ -97,13 +97,13 @@ namespace Core.DomainServices.Extensions
         }
 
         public static IQueryable<T> ExceptEntitiesWithIds<T>(this IQueryable<T> result, IReadOnlyList<int> exceptIds) where T :
-            Entity
+            class, IHasId
         {
             return new QueryExceptEntitiesWithIds<T>(exceptIds).Apply(result);
         }
 
         public static IQueryable<T> ExceptEntitiesWithIds<T>(this IQueryable<T> result, params int[] ids) where T :
-            Entity
+            class, IHasId
         {
             return new QueryExceptEntitiesWithIds<T>(ids.ToList()).Apply(result);
         }
@@ -123,13 +123,13 @@ namespace Core.DomainServices.Extensions
         }
 
         public static IQueryable<T> ByIds<T>(this IQueryable<T> result, IReadOnlyList<int> ids) where T :
-            IHasId
+            class, IHasId
         {
             return new QueryByIds<T>(ids).Apply(result);
         }
 
         public static T ById<T>(this IQueryable<T> result, int id) where T :
-            Entity
+            class, IHasId
         {
             return new QueryById<T>(id).Apply(result).SingleOrDefault();
         }
