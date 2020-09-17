@@ -22,9 +22,9 @@
 
 
             <!-- for each right -->
-            <tbody ng-repeat="assignedRole in vm.assignedRoles | orderBy : rightSort : rightSortReverse">
+            <tbody ng-repeat="assignedRole in vm.assignedRoles | orderBy : rightSort : rightSortReverse" id="table-of-assigned-roles">
                 <!-- show -->
-                <tr ng-hide="assignedRole.isEditing">
+                <tr ng-if="!assignedRole.isEditing">
                     <td>{{ assignedRole.role.name }} <a uib-tooltip="{{ assignedRole.role.note }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
                     <td>{{ assignedRole.user.name }}</td>
                     <td>
@@ -73,7 +73,7 @@
             <tbody ng-hide="!vm.hasWriteAccess">
                 <tr>
                     <td>
-                        <select id="add-right-role"
+                        <select id="add-role"
                                 class="form-control input-sm"
                                 ui-select2
                                 ng-model="vm.selectedRoleIdAsString">
@@ -83,7 +83,7 @@
                         </select>
                     </td>
                     <td colspan="2" class="form-group">
-                        <input id="add-role-user"
+                        <input id="add-user"
                                class="form-control input-sm"
                                ui-select2="::vm.userOptions"
                                placeholder="Vælg bruger"

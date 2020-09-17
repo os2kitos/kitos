@@ -41,6 +41,18 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
         return element(this.cssHelper.byDataElementType(this.consts.createDpaForm));
     }
 
+    getRoleRow(rowNumber: number) {
+        return element.all(by.id("table-of-assigned-roles")).get(rowNumber).element(by.tagName("tr"));
+    }
+
+    getRoleDeleteButton(rowNumber: number) {
+        return this.getRoleRow(rowNumber).all(by.tagName("td")).get(2).element(by.tagName("div")).all(by.tagName("a")).get(1);
+    }
+
+    getRoleEditButton(rowNumber: number) {
+        return this.getRoleRow(rowNumber).all(by.tagName("td")).get(2).element(by.tagName("div")).all(by.tagName("a")).get(0);
+    }
+
     getSystemRow(systemName: string) {
         return element(by.xpath(`//*/a[text()="${systemName}"]/../..`));
     }

@@ -55,7 +55,27 @@ class DataProcessingAgreementHelper {
 
     public static assignRole(role: string, user: string) {
         console.log("Assigning role: " + role + " to user: " + user);
-        return Select2Helper.searchFor(user, "s2id_add-role-user")
+        return Select2Helper.searchFor(role, "s2id_add-role")
+            .then(() => Select2Helper.waitForDataAndSelect())
+            .then(() => Select2Helper.searchFor(user, "s2id_add-user"))
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static removeRole(rowNumber: number) {
+        console.log("Removing role: ");
+        return this.pageObject.getRoleDeleteButton(rowNumber)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
+    }
+
+    public static editRole(rowNumber: number, role: string, user: string) {
+        console.log("Removing role: ");
+        return this.pageObject.getRoleEditButton(rowNumber)
+            .click()
+            .then(() => browser.switchTo().alert().accept())
+            .then(() => Select2Helper.searchFor(role, "s2id_add-role"))
+            .then(() => Select2Helper.waitForDataAndSelect())
+            .then(() => Select2Helper.searchFor(user, "s2id_add-user"))
             .then(() => Select2Helper.waitForDataAndSelect());
     }
 
