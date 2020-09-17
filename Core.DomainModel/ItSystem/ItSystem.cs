@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -10,7 +11,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus
     {
         public ItSystem()
         {
@@ -140,6 +141,11 @@ namespace Core.DomainModel.ItSystem
             interfaceExhibit = ItInterfaceExhibits.FirstOrDefault(i => i.ItInterface.Id == interfaceId);
 
             return interfaceExhibit != null;
+        }
+
+        public Maybe<ItSystemUsage.ItSystemUsage> GetUsageForOrganization(int organizationId)
+        {
+            return Usages.FirstOrDefault(x => x.OrganizationId == organizationId);
         }
     }
 }

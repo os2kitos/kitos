@@ -119,7 +119,30 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/roles/remove/{roleId}/from/{userId}"), cookie,
-                new{});
+                new { });
+        }
+
+        public static async Task<IEnumerable<NamedEntityWithEnabledStatusDTO>> GetAvailableSystemsAsync(int id, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/it-systems/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<NamedEntityWithEnabledStatusDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignSystemRequestAsync(int agreementId, int systemId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{agreementId}/it-systems/assign"), cookie, new {Value = systemId });
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveSystemRequestAsync(int agreementId, int systemId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{agreementId}/it-systems/remove"), cookie, new { Value = systemId });
         }
     }
 }

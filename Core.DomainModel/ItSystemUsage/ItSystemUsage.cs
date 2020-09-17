@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -402,6 +403,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// Defines how this system is used by other systems
         /// </summary>
         public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
+        /// <summary>
+        /// DPAs using this system
+        /// </summary>
+        public virtual ICollection<DataProcessingAgreement> AssociatedDataProcessingAgreements { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             ItSystemUsage toSystemUsage,

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Data;
-using Core.DomainModel;
+﻿using System.Data;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainServices;
-using Core.DomainServices.Context;
 using Core.DomainServices.Model.EventHandlers;
-using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -17,7 +13,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
 {
     public class SystemUsageDeletedHandlerTest : WithAutoFixture
     {
-        private readonly SystemUsageDeletedHandler _sut;
+        private readonly UpdateRelationsOnSystemUsageDeletedHandler _sut;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<SystemRelation>> _systemRelationRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
@@ -27,7 +23,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _systemRelationRepository = new Mock<IGenericRepository<SystemRelation>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _sut = new SystemUsageDeletedHandler(
+            _sut = new UpdateRelationsOnSystemUsageDeletedHandler(
                 _systemUsageRepository.Object,
                 _systemRelationRepository.Object,
                 _transactionManager.Object,
@@ -47,7 +43,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new SystemUsageDeleted(deletedSystemUsage));
+            _sut.Handle(new EntityDeletedEvent<ItSystemUsage>(deletedSystemUsage));
 
             //Assert that model was updated and that deleted relations were marked in repository
             Assert.False(relation1.FromSystemUsage.UsageRelations.Contains(relation1));

@@ -13,7 +13,6 @@ var app = angular.module("app", [
     "ngMessages",
     "ui.tree",
     "ui.tinymce",
-    "oidc-angular",
     "ngCookies"]);
 
 app.constant("JSONfn", JSONfn)

@@ -167,7 +167,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var savedItem = PostQuery(item);
-                DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Created, savedItem));
+                DomainEvents.Raise(new EntityCreatedEvent<TModel>(savedItem));
                 return NewObjectCreated(savedItem);
             }
             catch (ConflictException e)
@@ -219,7 +219,7 @@ namespace Presentation.Web.Controllers.API
         protected virtual void DeleteQuery(TModel entity)
         {
             Repository.DeleteByKey(entity.Id);
-            DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Deleted, entity));
+            DomainEvents.Raise(new EntityDeletedEvent<TModel>(entity));
             Repository.Save();
         }
 
@@ -353,7 +353,7 @@ namespace Presentation.Web.Controllers.API
                 }
             }
             Repository.Update(item);
-            DomainEvents.Raise(new EntityLifeCycleEvent<TModel>(LifeCycleEventType.Updated,item));
+            DomainEvents.Raise(new EntityUpdatedEvent<TModel>(item));
             Repository.Save();
 
             return item;

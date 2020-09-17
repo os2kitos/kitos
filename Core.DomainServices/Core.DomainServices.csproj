@@ -62,8 +62,10 @@
     <Compile Include="GDPR\DataProcessingAgreementNamingService.cs" />
     <Compile Include="GDPR\DataProcessingAgreementReadModelUpdate.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\DataProcessingAgreementSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingAgreementRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\IDataProcessingAgreementSystemAssignmentService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
@@ -71,9 +73,10 @@
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\EventHandlers\BuildDataProcessingAgreementReadModelOnChangesHandler.cs" />
+    <Compile Include="Model\EventHandlers\CleanupDataProcessingAgreementsOnSystemUsageDeletedEvent.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
-    <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
     <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />

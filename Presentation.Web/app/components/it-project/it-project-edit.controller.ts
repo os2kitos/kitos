@@ -33,8 +33,8 @@
         ];
 
         constructor(
-            private $rootScope,
-            private _: ILoDashWithMixins,
+            $rootScope,
+            _: ILoDashWithMixins,
             public project,
             public projectTypes,
             public hasWriteAccess,
