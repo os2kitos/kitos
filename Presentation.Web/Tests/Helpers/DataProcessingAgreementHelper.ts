@@ -49,6 +49,16 @@ class DataProcessingAgreementHelper {
         return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.it-systems");
     }
 
+    public static goToRoles() {
+        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.roles");
+    }
+
+    public static assignRole(role: string, user: string) {
+        console.log("Assigning role: " + role + " to user: " + user);
+        return Select2Helper.searchFor(user, "s2id_add-role-user")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
     public static assignSystem(name: string) {
         console.log("Assigning system with name: " + name);
         return Select2Helper.searchFor(name, "s2id_select-new-system")
