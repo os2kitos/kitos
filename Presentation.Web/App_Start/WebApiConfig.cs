@@ -190,11 +190,6 @@ namespace Presentation.Web
             removeUserAction.Parameter<int>("userId").Required();
             removeUserAction.Namespace = orgNameSpace;
 
-            var getAdviceByOrgFunction = organizations.EntityType.Collection.Function("GetByOrganization").ReturnsCollectionFromEntitySet<Advice>("Advice");
-            getAdviceByOrgFunction.Parameter<int>("userId").Required();
-            getAdviceByOrgFunction.ReturnsCollectionFromEntitySet<Advice>(nameof(Controllers.OData.AdviceController).Replace(ControllerSuffix, string.Empty));
-            getAdviceByOrgFunction.Namespace = orgNameSpace;
-
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace(ControllerSuffix, string.Empty));
             orgUnits.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             orgUnits.EntityType.HasKey(x => x.Id);
@@ -407,15 +402,13 @@ namespace Presentation.Web
             config.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
 
+            var getAdvicesByOrg = builder.Function("GetAdvicesByOrganizationId");
+            getAdvicesByOrg.Parameter<int>("organizationId").Required();
+            getAdvicesByOrg.ReturnsCollectionFromEntitySet<Advice>("Advice");
+
             BindEntitySet<Advice, AdviceController>(builder);
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
-
-            var getAdvicesByObjectId = builder.Function("GetAdvicesByObjectID");
-            getAdvicesByObjectId.Parameter<int>("id");
-            getAdvicesByObjectId.Parameter<int>("type");
-            getAdvicesByObjectId.ReturnsCollectionFromEntitySet<Advice>("Advice");
-
 
             BindEntitySet<GlobalConfig, GlobalConfigsController>(builder);
 

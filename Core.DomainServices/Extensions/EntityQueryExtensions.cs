@@ -123,7 +123,7 @@ namespace Core.DomainServices.Extensions
         }
 
         public static IQueryable<T> ByIds<T>(this IQueryable<T> result, IReadOnlyList<int> ids) where T :
-            Entity
+            IHasId
         {
             return new QueryByIds<T>(ids).Apply(result);
         }

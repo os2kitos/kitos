@@ -5,8 +5,10 @@ using Hangfire;
 using System;
 using System.Linq;
 using System.Web.Http;
+using Core.DomainServices.Authorization;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
+using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -188,6 +190,15 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return response;
+        }
+
+        [EnableQuery]
+        [ODataRoute("GetAdvicesByOrganizationId(organizationId={organizationId})")]
+        public IHttpActionResult GetAdvicesByOrganizationId([FromODataUri]int organizationId)
+        {
+            return GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All
+                ? Forbidden()
+                : Ok(_adviceService.GetAdvicesForOrg(organizationId));
         }
 
         [EnableQuery]

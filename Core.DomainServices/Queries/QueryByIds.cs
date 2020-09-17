@@ -5,7 +5,7 @@ using Core.DomainModel;
 namespace Core.DomainServices.Queries
 {
     public class QueryByIds<T> : IDomainQuery<T>
-        where T : Entity
+        where T : IHasId
     {
         private readonly IReadOnlyList<int> _ids;
 
