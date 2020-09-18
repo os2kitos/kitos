@@ -56,7 +56,7 @@
                     width: 240
                 }, {
                     field: "referenceId",
-                        title: "Evt. dokumentID/Sagsnr./anden referenceContact",
+                    title: "Evt. dokumentID/Sagsnr./anden referenceContact",
                     headerAttributes: {
                         "data-element-type": "referenceHeaderId"
                     },
@@ -64,6 +64,15 @@
                     {
                         "data-element-type": "referenceIdObject"
                     },
+                }, {
+                    field: "createdAt",
+                    title: "Oprettet",
+                        template: "#= kendo.toString(kendo.parseDate(createdAt, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
+
+                }, {
+                    field: "createdByUser.name",
+                    title: "Oprettet af",
+                    width: 150
                 }, {
                     title: "Rediger",
                     template: dataItem => {
@@ -74,8 +83,7 @@
                             if (dataItem.masterReference) {
                                 HTML = HTML + "<button data-ng-disabled='" + !this.hasWriteAccess + "' data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                             }
-                            else
-                            {
+                            else {
                                 HTML = HTML + "<button data-ng-disabled='" + !this.hasWriteAccess + "' data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
                             }
                         }
@@ -102,9 +110,9 @@
 
                 referenceService.deleteReference(referenceId, user.currentOrganizationId)
                     .then(success => {
-                            msg.toSuccessMessage("Slettet!");
-                            reload();
-                        },
+                        msg.toSuccessMessage("Slettet!");
+                        reload();
+                    },
                         error => msg.toErrorMessage("Fejl! Kunne ikke slette!"));
             };
 
@@ -112,16 +120,16 @@
 
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
-                this.dataProcessingAgreementService.setMasterReference(this.dataProcessingAgreement.id ,id).then(
+                this.dataProcessingAgreementService.setMasterReference(this.dataProcessingAgreement.id, id).then(
                     nameChangeResponse => {
                         msg.toSuccessMessage("Feltet er opdateret!");
                         reload();
                     },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
-                        default:
-                            msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
-                            break;
+                            default:
+                                msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+                                break;
                         }
                     });
             }
@@ -145,8 +153,6 @@
                 controller: EditRefDataProcessingAgreementController,
                 controllerAs: "vm",
                 resolve: {
-                    // Har måske ikke brug for dette her
-                    // TODO Import i controller istedet og tilgå direkte da vi ikke bruger reference service til at opdatere agreement objekt.
                     referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],
                 },
             });

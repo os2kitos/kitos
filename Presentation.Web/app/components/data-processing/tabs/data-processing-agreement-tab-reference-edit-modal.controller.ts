@@ -71,7 +71,7 @@
                     ($state: ng.ui.IStateService, $stateParams, $uibModal: ng.ui.bootstrap.IModalService, referenceServiceFactory) => {
                         var referenceService = referenceServiceFactory.createDpaReference();
                         $uibModal.open({
-                            templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-reference-modal.view.html",
+                            templateUrl: "app/components/it-reference/it-reference-modal.view.html",
                             windowClass: "modal fade in",
                             resolve: {
                                 referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],

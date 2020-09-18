@@ -67,7 +67,7 @@
                     "$state", "$uibModal",
                     ($state: ng.ui.IStateService, $uibModal: ng.ui.bootstrap.IModalService) => {
                         $uibModal.open({
-                            templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-reference-modal.view.html",
+                            templateUrl: "app/components/it-reference/it-reference-modal.view.html",
                             windowClass: "modal fade in",
                             resolve: {
                                 referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],

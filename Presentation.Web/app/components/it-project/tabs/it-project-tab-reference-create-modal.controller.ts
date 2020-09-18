@@ -1,53 +1,86 @@
-﻿((ng, app) => {
-    app.config(["$stateProvider", $stateProvider => {
-        $stateProvider.state("it-project.edit.references.create", {
-            url: "/createReference/:id",
-            onEnter: ["$state", "$uibModal",
-                ($state, $modal) => {
-                    $modal.open({
-                        templateUrl: "app/components/it-reference/it-reference-modal.view.html",
-                        // fade in instead of slide from top, fixes strange cursor placement in IE
-                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                        windowClass: "modal fade in",
-                        controller: "project.referenceCreateModalCtrl",
-                        resolve: {
-                            referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createProjectReference()],
-                        }
+﻿module Kitos.ItProject.Edit.Reference.Create {
+    "use strict";
 
-                    }).result.then(() => {
-                        // OK
-                        // GOTO parent state and reload
-                        $state.go("^", null, { reload: true });
-                    }, () => {
-                        // Cancel
-                        // GOTO parent state
-                        $state.go("^");
-                    });
-                }
-            ]
-        });
-    }]);
+    export class CreateReferenceItProjectEditController {
+        static $inject: Array<string> = [
+            "$scope",
+            "notify",
+            "$state",
+            "$stateParams",
+            "$uibModalInstance",
+            "referenceService"
 
-    app.controller("project.referenceCreateModalCtrl",
-        ["$scope", "notify", "referenceService", "$stateParams",
-            ($scope, notify, referenceService, $stateParams) => {
+        ];
 
-                $scope.dismiss = () => {
-                    $scope.$dismiss();
-                };
+        constructor(
+            private readonly $scope,
+            private readonly notify,
+            private readonly $state: angular.ui.IStateService,
+            private readonly $stateParams,
+            private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+            private referenceService: Services.ReferenceService) {
 
-                $scope.save = () => {
-                    var msg = notify.addInfoMessage("Gemmer række", false);
-                    referenceService.createReference(
-                        $stateParams.id,
-                        $scope.reference.title,
-                        $scope.reference.externalReferenceId,
-                        $scope.reference.url)
-                        .then(success => {
-                            msg.toSuccessMessage("Referencen er gemt");
-                            $scope.$close(true);
+            $scope.modalTitle = "Opret reference";
+        }
+
+        save() {
+
+            var msg = this.notify.addInfoMessage("Gemmer række", false);
+
+            this.referenceService.createReference(
+                this.$stateParams.id,
+                this.$scope.reference.title,
+                this.$scope.reference.externalReferenceId,
+                this.$scope.reference.url).then(success => {
+                    msg.toSuccessMessage("Referencen er gemt");
+                    this.close();
+                    this.popState(true);
+                },
+                    error => msg.toErrorMessage("Fejl! Prøv igen"));
+        }
+
+        private close() {
+            this.$uibModalInstance.close();
+        }
+
+        cancel(): void {
+            this.close();
+            this.popState();
+        }
+
+        private popState(reload = false) {
+            const popped = this.$state.go("^");
+            if (reload) {
+                popped.then(() => this.$state.reload());
+            }
+        }
+    }
+
+    angular
+        .module("app")
+        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+            $stateProvider.state("it-project.edit.references.create", {
+                url: "/createReference/:id",
+                onEnter: [
+                    "$state", "$uibModal",
+                    ($state: ng.ui.IStateService, $uibModal: ng.ui.bootstrap.IModalService) => {
+                        $uibModal.open({
+                            templateUrl: "app/components/it-reference/it-reference-modal.view.html",
+                            windowClass: "modal fade in",
+                            resolve: {
+                                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createProjectReference()],
+                            },
+                            controller: CreateReferenceItProjectEditController,
+                            controllerAs: "vm",
+                        }).result.then(() => {
+
                         },
-                            error => msg.toErrorMessage("Fejl! Prøv igen"));
-                };
-            }]);
-})(angular, app);
+                            () => {
+                                $state.go("^");
+                            });
+                    }
+                ]
+            });
+        }]);
+}
+

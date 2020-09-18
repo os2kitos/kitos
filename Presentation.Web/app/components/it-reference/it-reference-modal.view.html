@@ -1,7 +1,7 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">Opret ny reference</h3>
-        <help-text class="pull-right" data-key="it_reference_create" data-default-title="Opret reference"></help-text>
+        <h3 class="modal-title pull-left" data-element-type="referenceModalHeadTitle">{{modalTitle}}</h3>
+        <help-text class="pull-right" data-key="it_reference_create" data-default-title={{modalTitle}}></help-text>
     </div>
 </div>
 <form name="activityForm" novalidate="novalidate" class="form-horizontal" data-element-type="referenceCreatorForm" data-ng-submit="save()">
@@ -15,11 +15,11 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="DokomentID" class="col-xs-4 control-label small">
+            <label for="dokomentID" class="col-xs-4 control-label small">
                 Evt. DokumentID/sagsnr./Anden Reference
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" data-element-type="referenceDocId" class="form-inline form-control input-sm" />
+                <input type="text" id="documentId" ng-model="reference.externalReferenceId" data-element-type="referenceDocId" class="form-inline form-control input-sm" />
             </div>
         </div>
         <div class="form-group">
@@ -27,25 +27,12 @@
                 URL, hvis dokumenttitel skal virke som link
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentURL" ng-model="reference.url" data-element-type="referenceDocUrl" class="form-control form-inline input-sm" aria-describedby="helpBlock"/>
+                <input type="text" id="documentURL" ng-model="reference.url" data-element-type="referenceDocUrl" class="form-control form-inline input-sm" aria-describedby="helpBlock" />
             </div>
         </div>
         <div class="modal-footer">
-            <button id="cancel"
-                    type="button"
-                    class="btn btn-warning"
-                    data-ng-click="dismiss()"
-                    data-disabled-on-busy="">
-                Annuller
-            </button>
-            <button id="save"
-                    type="submit"
-                    class="btn btn-success"
-                    data-disabled-on-busy=""
-                    data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)"
-                    data-element-type="editSaveReference">
-                Gem
-            </button>
+            <button type="submit" id="save" data-element-type="editSaveReference" class="btn btn-success" ng-click="vm.save()" data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)">Gem</button>
+            <button type="button" id="cancel" class="btn btn-warning" ng-click="vm.cancel()">Annuller</button>
         </div>
     </div>
 </form>
