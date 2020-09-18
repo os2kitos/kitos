@@ -1,5 +1,4 @@
 ﻿module Kitos.DataProcessing.Agreement.Edit.Roles {
-    import IEditableAssignedRoleViewModel = Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel;
     "use strict";
 
     export class EditRolesDataProcessingAgreementController {
@@ -9,7 +8,7 @@
             "hasWriteAccess",
             "dataProcessingAgreement",
             "dataProcessingAgreementRoles",
-            "select2LoadingService",
+            "select2LoadingService"
         ];
 
         constructor(
