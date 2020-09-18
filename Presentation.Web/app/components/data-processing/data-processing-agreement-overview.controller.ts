@@ -106,7 +106,7 @@
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("MainReferenceTitle")
-                            .withTitle("Lokal Reference")
+                            .withTitle("Reference")
                             .withId("dpReferenceId")
                             .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)

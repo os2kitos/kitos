@@ -9,17 +9,12 @@ namespace Presentation.Web.Ninject
     {
         public static IBindingNamedWithOrOnSyntax<T> InCommandScope<T>(this IBindingInSyntax<T> src, KernelMode mode)
         {
-            switch (mode)
+            return mode switch
             {
-                case KernelMode.Thread:
-                    return src.InThreadScope();
-                case KernelMode.HangFireJob:
-                    return src.InBackgroundJobScope();
-                case KernelMode.Web:
-                    return src.InRequestScope();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(mode));
-            }
+                KernelMode.HangFireJob => src.InBackgroundJobScope(),
+                KernelMode.Web => src.InRequestScope(),
+                _ => throw new ArgumentOutOfRangeException(nameof(mode))
+            };
         }
     }
 }

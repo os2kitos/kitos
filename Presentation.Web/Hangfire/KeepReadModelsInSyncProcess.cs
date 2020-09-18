@@ -14,28 +14,30 @@ namespace Presentation.Web.Hangfire
 
         public KeepReadModelsInSyncProcess()
         {
-            _kernel = new KernelBuilder().ForThread().Build();
+            _kernel = new KernelBuilder().ForHangFire().Build();
         }
 
         public void Execute(BackgroundProcessContext context)
         {
-            var thread = new Thread(() =>
+            using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken, context.StoppingToken);
+            using (new HangfireNinjectResolutionScope(_kernel))
             {
-                //Using a NEW thread to isolate ninject resolutions for the thread scope. This is the best option we have for continous batch jobs which should use ninject and clean up after each execution
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken,context.StoppingToken);
                 backgroundJobLauncher.LaunchScheduleDataProcessingAgreementReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
                 backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
-            })
+            }
+
+            CoolDown(combinedTokenSource);
+        }
+
+        private static void CoolDown(CancellationTokenSource combinedTokenSource)
+        {
+            var secondsPassed = 0;
+            do
             {
-                IsBackground = true,
-            };
-            thread.Start();
-
-            //Intentional context switch
-            Thread.Sleep(TimeSpan.FromSeconds(1));
-
-            thread.Join();
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                secondsPassed++;
+            } while (secondsPassed < 5 && combinedTokenSource.IsCancellationRequested == false);
         }
     }
 }

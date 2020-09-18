@@ -12,6 +12,11 @@ class DataProcessingAgreementHelper {
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
     private static navigation = new NavigationHelper();
 
+    public static loadOverview() {
+        return this.pageObject.getPage()
+            .then(() => this.waitForKendo());
+    }
+
     public static createDataProcessingAgreement(name: string) {
         console.log(`Creating agreement with name ${name}`);
         return this.pageObject.getPage()
