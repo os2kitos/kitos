@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -25,26 +26,30 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly DataProcessingAgreementApplicationService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
-        private readonly Mock<IDataProcessingAgreementNamingService> _domainServiceMock;
+        private readonly Mock<IDataProcessingAgreementNamingService> _namingServiceMock;
         private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingAgreementRight>> _rightsRepositoryMock;
+        private readonly Mock<IDataProcessingAgreementSystemAssignmentService> _systemAssignmentServiceMock;
 
         public DataProcessingAgreementApplicationServiceTest()
         {
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
-            _domainServiceMock = new Mock<IDataProcessingAgreementNamingService>();
+            _namingServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingAgreementRight>>();
-            _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
+            _systemAssignmentServiceMock = new Mock<IDataProcessingAgreementSystemAssignmentService>();
+            _sut = new DataProcessingAgreementApplicationService(
+                _authorizationContextMock.Object,
                 _repositoryMock.Object,
-                _domainServiceMock.Object,
+                _namingServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
                 _referenceRepositoryMock.Object,
+                _systemAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -57,7 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
 
             ExpectAllowCreateReturns(organizationId, true);
-            _domainServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(Maybe<OperationError>.None);
+            _namingServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(Maybe<OperationError>.None);
             _repositoryMock
                 .Setup(x => x.Add(It.Is<DataProcessingAgreement>(dpa =>
                     dpa.OrganizationId == organizationId && name == dpa.Name)))
@@ -78,7 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
             var operationError = new OperationError(A<OperationFailure>());
 
-            _domainServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(operationError);
+            _namingServiceMock.Setup(x => x.ValidateSuggestedNewAgreement(organizationId, name)).Returns(operationError);
             ExpectAllowCreateReturns(organizationId, true);
 
             //Act
@@ -208,7 +213,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var dataProcessingAgreement = new DataProcessingAgreement();
             ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
             ExpectAllowModifyReturns(dataProcessingAgreement, true);
-            _domainServiceMock.Setup(x => x.ChangeName(dataProcessingAgreement, name)).Returns(Maybe<OperationError>.None);
+            _namingServiceMock.Setup(x => x.ChangeName(dataProcessingAgreement, name)).Returns(Maybe<OperationError>.None);
 
             //Act
             var result = _sut.UpdateName(id, name);
@@ -228,7 +233,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var operationError = A<OperationError>();
             ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
             ExpectAllowModifyReturns(dataProcessingAgreement, true);
-            _domainServiceMock.Setup(x => x.ChangeName(dataProcessingAgreement, name)).Returns(operationError);
+            _namingServiceMock.Setup(x => x.ChangeName(dataProcessingAgreement, name)).Returns(operationError);
 
             //Act
             var result = _sut.UpdateName(id, name);
@@ -553,7 +558,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
-
         [Fact]
         public void Cannot_Set_Master_Reference_On_Dpa_With_Invalid_Dpa()
         {
@@ -563,12 +567,167 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Act
             var result = _sut.SetMasterReference(agreementId, A<int>());
+		}
+		
+        [Fact]
+        public void Can_GetSystemsWhichCanBeAssigned()
+        {
+            //Arrange
+            var id = A<int>();
+            var system1Id = A<int>();
+            var system2Id = system1Id + 1;
+            var nameQuery = A<string>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, true);
+            var itSystems = new[] { new ItSystem { Id = system1Id, Name = $"{nameQuery}{1}" }, new ItSystem { Id = system2Id, Name = $"{nameQuery}{2}" } };
+            _systemAssignmentServiceMock.Setup(x => x.GetApplicableSystems(dataProcessingAgreement)).Returns(itSystems.AsQueryable());
+
+            //Act
+            var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(itSystems, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_GetSystemsWhichCanBeAssigned_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            var nameQuery = A<string>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
 
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Cannot_GetSystemsWhichCanBeAssigned_If_Read_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var nameQuery = A<string>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowReadReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_AssignSystem()
+        {
+            //Arrange
+            var id = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var systemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _systemAssignmentServiceMock.Setup(x => x.AssignSystem(dataProcessingAgreement, systemId)).Returns(itSystem);
+
+            //Act
+            var result = _sut.AssignSystem(id, systemId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(itSystem, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_AssignSystem_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.AssignSystem(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignSystem_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.AssignSystem(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveSystem()
+        {
+            //Arrange
+            var id = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            var systemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(dataProcessingAgreement, systemId)).Returns(itSystem);
+
+            //Act
+            var result = _sut.RemoveSystem(id, systemId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(itSystem, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_RemoveSystem_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.RemoveSystem(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_RemoveSystem_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(id, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.RemoveSystem(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingAgreement dataProcessingAgreement, Mock<IDatabaseTransaction> transaction)
         {

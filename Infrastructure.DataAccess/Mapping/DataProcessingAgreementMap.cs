@@ -25,6 +25,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptional(d => d.DataProcessingAgreement)
                 .HasForeignKey(d => d.DataProcessingAgreement_Id)
                 .WillCascadeOnDelete(true);
+
+            //It-systems
+            HasMany(x=>x.SystemUsages)
+                .WithMany(x=>x.AssociatedDataProcessingAgreements);
         }
     }
 }

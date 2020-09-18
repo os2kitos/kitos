@@ -8,11 +8,6 @@
             resolve: {
                 Roles: ["localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()], 
-                advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
-                        return result.data.response.advices;
-                    });
-                }],
                 object: ['contract', function (contract) {
                     return contract;
                 }],

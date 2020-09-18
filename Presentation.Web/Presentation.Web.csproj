@@ -358,6 +358,7 @@
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />
+    <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -434,13 +435,15 @@
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-edit.controller.ts" />
-    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-it-systems.state.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-agreement-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -764,6 +767,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
@@ -772,6 +776,7 @@
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Accessibility\CreateDeleteButtonAccessibility.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\data-processing-agreements.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.reference.e2e.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -1123,7 +1128,6 @@
     <Content Include="app\components\it-project\it-project-edit.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
-    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.view.html" />

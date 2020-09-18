@@ -18,6 +18,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("DataProcessingAgreementReadModel_Index_MainReferenceTitle", 0);
 
+            //No index of this, length is unknown since no bounds on system assignment.
+            Property(x => x.SystemNamesAsCsv).IsOptional();
+
             Property(x => x.MainReferenceUserAssignedId).IsOptional();
 
             Property(x => x.MainReferenceUrl).IsOptional();

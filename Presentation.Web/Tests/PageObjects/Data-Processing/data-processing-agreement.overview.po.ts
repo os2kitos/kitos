@@ -41,6 +41,14 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
         return element(this.cssHelper.byDataElementType(this.consts.createDpaForm));
     }
 
+    getSystemRow(systemName: string) {
+        return element(by.xpath(`//*/a[text()="${systemName}"]/../..`));
+    }
+
+    getRemoveSystemButton(systemName: string) {
+        return element(by.xpath(`//*/a[text()="${systemName}"]/../..//button`));
+    }
+
     isCreateDpaAvailable(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.getCreateDpaDialog());
     }

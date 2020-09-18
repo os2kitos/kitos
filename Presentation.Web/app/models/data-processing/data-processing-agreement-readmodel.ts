@@ -13,5 +13,6 @@
         MainReferenceTitle: string;
         MainReferenceUrl: string;
         MainReferenceUserAssignedId: string;
+        SystemNamesAsCsv: string;
     }
 }

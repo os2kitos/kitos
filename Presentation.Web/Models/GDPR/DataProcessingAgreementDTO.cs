@@ -12,5 +12,7 @@ namespace Presentation.Web.Models.GDPR
         public AssignedRoleDTO[] AssignedRoles { get; set; }
 
         public ReferenceDTO[] References { get; set; }
+
+        public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
     }
 }

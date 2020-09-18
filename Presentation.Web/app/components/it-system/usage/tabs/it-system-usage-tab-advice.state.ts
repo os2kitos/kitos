@@ -8,7 +8,6 @@
             resolve: {
                 Roles: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()],
-                advices: ["$http", "$stateParams", ($http, $stateParams) => $http.get(`api/itSystemUsage/${$stateParams.id}`).then(result => result.data.response.advices)],
                 object: ["itSystemUsage", itSystemUsage => itSystemUsage],
                 type: [() => "itSystemUsage"],
                 advicename: ["$http", "$stateParams",

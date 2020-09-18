@@ -10,6 +10,7 @@ namespace Core.DomainServices.Repositories.GDPR
         bool DeleteById(int id);
         void Update(DataProcessingAgreement dataProcessingAgreement);
         Maybe<DataProcessingAgreement> GetById(int id);
+        IQueryable<DataProcessingAgreement> GetBySystemId(int systemId);
         IQueryable<DataProcessingAgreement> Search(int organizationId, Maybe<string> exactName);
     }
 }

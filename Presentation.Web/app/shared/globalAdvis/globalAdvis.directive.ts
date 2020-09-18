@@ -20,7 +20,7 @@
                         $state,
                         $window) => {
                         $scope.$watch("stateName", function (newValue, oldValue) {
-                            if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview" || $scope.stateName === "it-contract.plan" )
+                            if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview" || $scope.stateName === "it-contract.plan" || $scope.stateName === "data-processing.overview" )
                                 $scope.disableAdvisLink = false;
                             else
                                 $scope.disableAdvisLink = true;
@@ -51,12 +51,17 @@
                                         moduleTypeFilter = "Type eq 'itSystemUsage'";
                                         stateUrl = $window.location.href.replace("overview", "usage");
                                     }
+                                    if (parent.stateName === "data-processing.overview") {
+                                        $scope.title = "IT advis - Databehandleraftaler";
+                                        moduleTypeFilter = "Type eq 'dataProcessingAgreement'";
+                                        stateUrl = $window.location.href.replace("overview", "edit");
+                                    }
                                     $scope.mainGridOptions = {
                                         dataSource: {                                            
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/Organizations(${$scope.user.currentOrganizationId})/Advice?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
+                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
                                                     dataType: "json"
                                                 },
                                             },

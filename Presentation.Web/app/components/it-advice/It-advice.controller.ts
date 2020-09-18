@@ -441,6 +441,9 @@
                                 if (type === "itProject") {
                                     return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll();
                                 }
+                                if (type === "dataProcessingAgreement") {
+                                    return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataProcessingAgreementRoles).getAll();
+                                }
                                 if (type === "itInterface") {
                                     return [];
                                 }

@@ -178,6 +178,7 @@
     <Compile Include="DomainServices\GDPR\BuildDataProcessingAgreementReadModelOnChangesHandlerTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingAgreementNamingServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingAgreementRoleAssignmentsServiceTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingAgreementSystemAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingAgreementRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />

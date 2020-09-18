@@ -9,7 +9,6 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
@@ -137,7 +136,7 @@ namespace Core.ApplicationServices.SystemUsage
                     transaction.Rollback();
                     return deleteBySystemUsageId.Error;
                 }
-                _domainEvents.Raise(new SystemUsageDeleted(itSystemUsage));
+                _domainEvents.Raise(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
                 _usageRepository.DeleteByKeyWithReferencePreload(id);
                 _usageRepository.Save();
                 transaction.Commit();

@@ -6,6 +6,7 @@
         objectOwnerId: number,
         referenceId: number,
         references: Array<DpaReference>;
+		itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
     }
 
     export interface DpaReference extends BaseReference {

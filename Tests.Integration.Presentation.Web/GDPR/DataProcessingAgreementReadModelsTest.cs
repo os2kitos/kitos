@@ -45,6 +45,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
+            var systemName = $"SYSTEM:{name}";
             var refName = $"REF:{name}";
             var refUserAssignedId = $"REF:{name}EXT_ID";
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
@@ -58,19 +59,31 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var user = availableUsers.First();
             using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingAgreement_Id = agreement.Id);
+            var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
+            using var assignSystemResponse = await DataProcessingAgreementHelper.SendAssignSystemRequestAsync(agreement.Id, itSystemDto.Id);
 
             //Wait for read model to rebuild
-            await Task.WhenAll(WaitForAsync(() =>
-            {
-                return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
-                        x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
-            }, TimeSpan.FromSeconds(10)), WaitForAsync(() =>
-            {
-                return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
-                        x.AsQueryable().Any(rm => rm.MainReferenceUrl == refUrl)));
-            }, TimeSpan.FromSeconds(10)));
+            await Task.WhenAll(
+                WaitForAsync(() =>
+                {
+                    return Task.FromResult(
+                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
+                            x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
+                }, TimeSpan.FromSeconds(10)),
+                WaitForAsync(() =>
+                {
+                    return Task.FromResult(
+                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
+                            x.AsQueryable().Any(rm => rm.MainReferenceUrl == refUrl)));
+                }, TimeSpan.FromSeconds(10)),
+                WaitForAsync(() =>
+                {
+                    return Task.FromResult(
+                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
+                            x.AsQueryable().Any(rm => rm.SystemNamesAsCsv.Contains(systemName))));
+                }, TimeSpan.FromSeconds(10))
+            );
 
             //Act
             var result = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();

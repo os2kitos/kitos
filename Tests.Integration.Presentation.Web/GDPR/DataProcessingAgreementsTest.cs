@@ -333,6 +333,63 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.BadRequest, setMasterResponse.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Get_Available_Systems()
+        {
+            //Arrange
+            var systemPrefix = A<Guid>().ToString("N");
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system1Name = $"{systemPrefix}{1}";
+            var system2Name = $"{systemPrefix}{2}";
+            var filteredOutSystemName = A<string>();
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(organizationId, A<string>());
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId, AccessModifier.Public);
+            var filteredOutSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(filteredOutSystem.Id, organizationId);
 
+            //Act
+            var dtos = (await DataProcessingAgreementHelper.GetAvailableSystemsAsync(agreement.Id, systemPrefix)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { system1.Id, system1.Name }, new { system2.Id, system2.Name } });
+        }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_System()
+        {
+            //Arrange
+            var systemPrefix = A<Guid>().ToString("N");
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system1Name = $"{systemPrefix}{1}";
+            var agreement = await DataProcessingAgreementHelper.CreateAsync(organizationId, A<string>());
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            //Act - Add
+            using var assignResponse = await DataProcessingAgreementHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
+            using var duplicateResponse = await DataProcessingAgreementHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            var dto = await DataProcessingAgreementHelper.GetAsync(agreement.Id);
+            var systemDTO = Assert.Single(dto.ItSystems);
+            Assert.Equal(system.Id, systemDTO.Id);
+            Assert.Equal(system.Name, systemDTO.Name);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingAgreementHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
+            using var duplicateRemoveResponse = await DataProcessingAgreementHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveResponse.StatusCode);
+            dto = await DataProcessingAgreementHelper.GetAsync(agreement.Id);
+            Assert.Empty(dto.ItSystems);
+        }
     }
 }
