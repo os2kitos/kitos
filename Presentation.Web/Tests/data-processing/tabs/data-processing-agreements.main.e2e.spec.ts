@@ -52,6 +52,7 @@ describe("Data processing agreement main detail tests", () => {
             dpaHelper.createDataProcessingAgreement(nameToDelete)
                 .then(() => dpaHelper.goToSpecificDataProcessingAgreement(nameToDelete))
                 .then(() => getDeleteButtonAndDelete())
+                .then(() => dpaHelper.loadOverview())
                 .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameToDelete).isPresent())
                     .toBeFalsy());
         });
