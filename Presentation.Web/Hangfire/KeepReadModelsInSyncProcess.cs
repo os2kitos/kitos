@@ -27,6 +27,11 @@ namespace Presentation.Web.Hangfire
                 backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             }
 
+            CoolDown(combinedTokenSource);
+        }
+
+        private static void CoolDown(CancellationTokenSource combinedTokenSource)
+        {
             var secondsPassed = 0;
             do
             {
