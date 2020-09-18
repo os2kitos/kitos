@@ -778,7 +778,7 @@
     <TypeScriptCompile Include="Tests\data-processing\data-processing-agreements.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.main.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.reference.e2e.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingAgreementHelper.ts" />
