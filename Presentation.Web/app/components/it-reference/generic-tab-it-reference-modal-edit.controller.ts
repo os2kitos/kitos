@@ -19,8 +19,8 @@
             private readonly $state: angular.ui.IStateService,
             private readonly $stateParams,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private referenceService: Services.ReferenceService,
-            private reference) {
+            private referenceService: Services.IReferenceService,
+            private reference: Models.Reference.IOdataReference) {
 
             $scope.reference = this.reference;
             $scope.modalTitle = "Rediger reference";

@@ -15,11 +15,11 @@
 
         constructor(
             private readonly $scope,
-            private $state,
+            $state: angular.ui.IStateService,
             private readonly user: Services.IUser,
-            private notify,
+            notify,
             public hasWriteAccess,
-            private referenceService: Services.IReferenceService,
+            referenceService: Services.IReferenceService,
             private dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
             private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
 
@@ -40,7 +40,7 @@
                     field: "title",
                     title: "Dokumenttitel",
                     headerAttributes: {
-                        "data-element-type": "referenceHeader"
+                        "data-element-type": "referenceNameHeader"
                     },
                     attributes:
                     {
