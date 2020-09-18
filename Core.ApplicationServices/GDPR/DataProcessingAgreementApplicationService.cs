@@ -31,7 +31,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementSystemAssignmentService _systemAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
-        
+
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
@@ -131,7 +131,7 @@ namespace Core.ApplicationServices.GDPR
 
                 if (referenceResult.IsNone)
                 {
-                    return new OperationError("Invalid reference Id",OperationFailure.BadInput);
+                    return new OperationError("Invalid reference Id", OperationFailure.BadInput);
                 }
 
                 var setReferenceResult = agreement.SetMasterReference(referenceResult.Value);
