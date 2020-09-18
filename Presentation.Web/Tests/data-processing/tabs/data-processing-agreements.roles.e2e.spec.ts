@@ -23,10 +23,9 @@ describe("Data processing agreement main detail tests", () => {
     const localAdminName = "Automatisk oprettet testbruger (LocalAdmin)";
 
     beforeAll(() => {
-        
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsGlobalAdmin();
-        //.then(() => dpaHelper.checkAndEnableDpaModule());
+        loginHelper.loginAsLocalAdmin()
+            .then(() => dpaHelper.checkAndEnableDpaModule());
     });
 
     afterAll(() => {
