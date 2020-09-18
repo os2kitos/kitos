@@ -19,7 +19,7 @@
             private readonly user: Services.IUser,
             private notify,
             public hasWriteAccess,
-            private referenceService: Services.ReferenceService,
+            private referenceService: Services.IReferenceService,
             private dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
             private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
 
