@@ -55,7 +55,7 @@
                     }
                 }
             };
-            if (formatResult != null) {
+            if (!! formatResult) {
                 config.formatResult = formatResult;
             }
             return config;

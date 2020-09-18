@@ -11,73 +11,89 @@
             "select2LoadingService"
         ];
 
+        headerName: string;
+        roles: Models.ViewModel.Generic.Select2OptionViewModel[];
+        assignedRoles: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel[];
+        selectedRoleIdAsString: string;
+        selectedUser: Models.ViewModel.Generic.Select2OptionViewModel;
+        userOptions: any;
+        lastSortedBy: string;
+        shouldSortReversed: boolean;
+
         constructor(
             private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
             private readonly notify,
             public hasWriteAccess,
             private readonly dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
-            private readonly dataProcessingAgreementRoles: Models.DataProcessing.IDataProcessingRoleDTO[],
+            dataProcessingAgreementRoles: Models.DataProcessing.IDataProcessingRoleDTO[],
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
+
+            this.headerName = dataProcessingAgreement.name;
+            this.roles = dataProcessingAgreementRoles.map(role => this.mapToRoleOptions(role));
+
+            this.lastSortedBy = "";
+            this.shouldSortReversed = false;
+
+            this.assignedRoles = this.dataProcessingAgreement.assignedRoles
+                .map(assignedRole => this.mapToEditableAssignedRole(assignedRole));
+            this.sortAssignedRoles("roleName"); // Initial sorting priority
+
+            this.selectedUser = null;
+
+            if (this.roles.length < 1) {
+                this.selectedRoleIdAsString = null;
+                this.userOptions = this.getAvailableUserOptions(() => null);
+            } else {
+                this.selectedRoleIdAsString = this.roles[0].id.toString();
+                this.userOptions = this.getAvailableUserOptions(() => this.getSelectedRoleId());
+            }
         }
 
-        headerName = this.dataProcessingAgreement.name;
-
-        roles = _.map(this.dataProcessingAgreementRoles, role => this.mapToRoleOptions(role));
-
-        selectedRoleIdAsString = this.roles[0].id.toString();
-        selectedUser: Models.ViewModel.Generic.Select2OptionViewModel;
-
-        userOptions = this.getAvailableUserOptions(() => parseInt(this.selectedRoleIdAsString));
-
-        assignedRoles = _.orderBy(
-            _.map(this.dataProcessingAgreement.assignedRoles, assignedRole => this.mapToEditableAssignedRole(assignedRole)),
-            assignedRole => [assignedRole.role.name, assignedRole.user.name, assignedRole.user.email],
-            "asc");
-
-        lastSortedBy = "";
-        shouldSortAsc = true;
         sortAssignedRoles(sortBy: string) {
-            sortBy === this.lastSortedBy ? this.shouldSortAsc = !this.shouldSortAsc : this.shouldSortAsc = true;
-            var sortDirection = this.shouldSortAsc ? "asc" : "desc";
+            sortBy === this.lastSortedBy
+                ? this.shouldSortReversed = !this.shouldSortReversed
+                : this.shouldSortReversed = false;
             switch (sortBy) {
                 case "roleName":
-                    this.assignedRoles = _.orderBy(
-                        this.assignedRoles,
-                        assignedRole => [assignedRole.role.name, assignedRole.user.name, assignedRole.user.email],
-                        sortDirection);
+                    this.assignedRoles = this.assignedRoles
+                        .sort((assignedRole1, assignedRole2) => this.sortAssignedRolesFunction(assignedRole1,
+                            assignedRole2,
+                            ["role.name", "user.name", "user.email"],
+                            this.shouldSortReversed));
                     break;
                 case "userName":
-                    this.assignedRoles = _.orderBy(
-                        this.assignedRoles,
-                        assignedRole => [assignedRole.user.name, assignedRole.user.email, assignedRole.role.name],
-                        sortDirection);
+                    this.assignedRoles = this.assignedRoles
+                        .sort((assignedRole1, assignedRole2) => this.sortAssignedRolesFunction(assignedRole1,
+                            assignedRole2,
+                            ["user.name", "user.email", "role.name"],
+                            this.shouldSortReversed));
                     break;
                 case "userEmail":
-                    this.assignedRoles = _.orderBy(
-                        this.assignedRoles,
-                        assignedRole => [assignedRole.user.email, assignedRole.user.name, assignedRole.role.name],
-                        sortDirection);
+                    this.assignedRoles = this.assignedRoles
+                        .sort((assignedRole1, assignedRole2) => this.sortAssignedRolesFunction(assignedRole1,
+                            assignedRole2,
+                            ["user.email", "user.name", "role.name"],
+                            this.shouldSortReversed));
                     break;
             }
             this.lastSortedBy = sortBy;
         }
 
         submitRole() {
-            if (this.selectedUser === null || angular.isUndefined(this.selectedUser)) {
+            if (this.checkSelectedUserDefined()) {
                 return;
             }
-            if (this.selectedUser.id === null || angular.isUndefined(this.selectedUser.id)) {
+            if (this.checkSelectedUserHasIdDefined()) {
                 return;
             }
 
-            var selectedRoleId = parseInt(this.selectedRoleIdAsString);
             var msg = this.notify.addInfoMessage("Tilføjer rolle");
 
-            this.dataProcessingAgreementService.assignNewRole(this.dataProcessingAgreement.id, selectedRoleId, this.selectedUser.id)
+            this.dataProcessingAgreementService.assignNewRole(this.dataProcessingAgreement.id, this.getSelectedRoleId(), this.selectedUser.id)
                 .then(
                     () => {
                         msg.toSuccessMessage("Rollen er tilføjet");
-                        var assignedRole = this.getRoleFromId(selectedRoleId);
+                        var assignedRole = this.getRoleFromId(this.selectedRoleIdAsString);
                         var user = <Models.ViewModel.Generic.Roles.IUserViewModel>{ id: this.selectedUser.optionalObjectContext.id, name: this.selectedUser.optionalObjectContext.name, email: this.selectedUser.optionalObjectContext.email }
                         var newAssignedRole = this.createEditableAssignedRole(user,
                             assignedRole.optionalObjectContext,
@@ -121,7 +137,7 @@
         }
 
         editRole(assignedRole: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel) {
-            var newRole = this.getRoleFromId(parseInt(assignedRole.newRoleIdAsString));
+            var newRole = this.getRoleFromId(assignedRole.newRoleIdAsString);
 
             if (angular.isUndefined(newRole)) {
                 assignedRole.isEditing = false;
@@ -172,6 +188,18 @@
                     });
         }
 
+        private checkSelectedUserDefined() {
+            return this.selectedUser === null || angular.isUndefined(this.selectedUser);
+        }
+
+        private checkSelectedUserHasIdDefined() {
+            return this.selectedUser.id === null || angular.isUndefined(this.selectedUser.id);
+        }
+
+        private getSelectedRoleId() {
+            return parseInt(this.selectedRoleIdAsString);
+        }
+
         private mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
             const isExpired = !_.some(this.roles, role => role.id === input.role.id);
             input.role.name = this.formatRoleName(input.role, isExpired);
@@ -183,7 +211,8 @@
             return this.createEditableAssignedRole(input.user, input.role, newUser, input.role.id.toString());
         }
 
-        private getRoleFromId(roleId: number) {
+        private getRoleFromId(roleIdAsString: string) {
+            var roleId = parseInt(roleIdAsString);
             return _.find(this.roles, role => role.id === roleId);
         }
 
@@ -203,6 +232,32 @@
                 text: this.formatRoleName(input, false),
                 optionalObjectContext: formattedRole
             }
+        }
+
+        private sortAssignedRolesFunction(
+            assignedRole1: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel,
+            assignedRole2: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel,
+            parameterSortPriorityList: string[],
+            reversed: boolean) {
+            var sortValue = reversed ? -1 : 1;
+            let priorityProperties = parameterSortPriorityList[0].split(".");
+            if (assignedRole1[priorityProperties[0]][priorityProperties[1]] !== assignedRole2[priorityProperties[0]][priorityProperties[1]]) {
+                return assignedRole1[priorityProperties[0]][priorityProperties[1]] > assignedRole2[priorityProperties[0]][priorityProperties[1]]
+                    ? sortValue
+                    : -sortValue;
+            }
+
+            priorityProperties = parameterSortPriorityList[1].split(".");
+            if (assignedRole1[priorityProperties[0]][priorityProperties[1]] !== assignedRole2[priorityProperties[0]][priorityProperties[1]]) {
+                return assignedRole1[priorityProperties[0]][priorityProperties[1]] > assignedRole2[priorityProperties[0]][priorityProperties[1]]
+                    ? sortValue
+                    : -sortValue;
+            }
+
+            priorityProperties = parameterSortPriorityList[2].split(".");
+            return assignedRole1[priorityProperties[0]][priorityProperties[1]] > assignedRole2[priorityProperties[0]][priorityProperties[1]]
+                ? sortValue
+                : -sortValue;
         }
 
         private formatResult(select2OptionViewModel: Models.ViewModel.Generic.Select2OptionViewModel) {
@@ -229,6 +284,12 @@
         }
 
         private getAvailableUserOptions(getRoleId: () => number) {
+            if (getRoleId() === null) {
+                return {
+                    data: () => ({ "results": [] }),
+                    allowClear: true
+                };
+            }
             return this.select2LoadingService.loadSelect2WithDataSource(
                 (query: string) =>
                 this.dataProcessingAgreementService.getApplicableUsers(this.dataProcessingAgreement.id,
