@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Hangfire.Server;
 using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,7 @@ using Presentation.Web.Ninject;
 
 namespace Presentation.Web.Hangfire
 {
-    public class KeepReadModelsInSyncProcess : IBackgroundProcess, IDisposable
+    public class KeepReadModelsInSyncProcess : IBackgroundProcess
     {
         private readonly StandardKernel _kernel;
 
@@ -26,11 +25,6 @@ namespace Presentation.Web.Hangfire
                 backgroundJobLauncher.LaunchScheduleDataProcessingAgreementReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
                 backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             }
-        }
-
-        public void Dispose()
-        {
-            _kernel?.Dispose();
         }
     }
 }
