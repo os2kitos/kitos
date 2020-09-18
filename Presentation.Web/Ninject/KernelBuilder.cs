@@ -121,17 +121,6 @@ namespace Presentation.Web.Ninject
             return this;
         }
 
-        public KernelBuilder ForThread()
-        {
-            if (_mode.HasValue)
-            {
-                throw new InvalidOperationException("Mode already set");
-            }
-            _mode = KernelMode.Thread;
-
-            return this;
-        }
-
         public StandardKernel Build()
         {
             if (!_mode.HasValue)
