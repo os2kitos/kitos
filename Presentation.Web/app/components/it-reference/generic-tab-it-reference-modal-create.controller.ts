@@ -1,7 +1,7 @@
-﻿module Kitos.ItSystem.Catalog.Edit.Reference.Create {
+﻿module Kitos.Shared.GenericTabs.Reference {
     "use strict";
 
-    export class CreateReferenceItSystemEditController {
+    export class CreateModalReferenceController {
         static $inject: Array<string> = [
             "$scope",
             "notify",
@@ -9,7 +9,6 @@
             "$stateParams",
             "$uibModalInstance",
             "referenceService"
-
         ];
 
         constructor(
@@ -36,7 +35,7 @@
                     this.close();
                     this.popState(true);
                 },
-                    error => msg.toErrorMessage("Fejl! Prøv igen"));
+                error => msg.toErrorMessage("Fejl! Prøv igen"));
         }
 
         private close() {
@@ -55,32 +54,4 @@
             }
         }
     }
-
-    angular
-        .module("app")
-        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("it-system.edit.references.create", {
-                url: "/createReference/:id",
-                onEnter: [
-                    "$state", "$uibModal",
-                    ($state: ng.ui.IStateService, $uibModal: ng.ui.bootstrap.IModalService) => {
-                        $uibModal.open({
-                            templateUrl: "app/components/it-reference/it-reference-modal.view.html",
-                            windowClass: "modal fade in",
-                            resolve: {
-                                referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createSystemReference()],
-                            },
-                            controller: CreateReferenceItSystemEditController,
-                            controllerAs: "vm",
-                        }).result.then(() => {
-
-                        },
-                            () => {
-                                $state.go("^");
-                            });
-                    }
-                ]
-            });
-        }]);
 }
-
