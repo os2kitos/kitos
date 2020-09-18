@@ -41,16 +41,45 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
         return element(this.cssHelper.byDataElementType(this.consts.createDpaForm));
     }
 
-    getRoleRow(rowNumber: number) {
-        return element.all(by.id("table-of-assigned-roles")).get(rowNumber).element(by.tagName("tr"));
+    getRoleRow(roleName: string, userName: string): webdriver.promise.Promise<protractor.ElementFinder> {
+        return element
+            .all(by.id("table-of-assigned-roles"))
+            .filter((row, index) => {
+                var rowElements = row.element(by.tagName("tr")).all(by.tagName("td"));
+                var roleNameCorrect = rowElements.get(0).getText().then(text => roleName === text);
+                var userNameCorrect = rowElements.get(1).getText().then(text => userName === text);
+                return roleNameCorrect && userNameCorrect;
+            })
+            .then(rows => {
+                if (rows.length > 1) {
+                    throw new Error(`Found more than 1 item with role: ${roleName} and user: ${userName}`);
+                }
+                if (rows.length < 1) {
+                    throw new Error(`Found no items with role: ${roleName} and user: ${userName}`);
+                }
+                return rows[0];
+            });
+        
     }
 
-    getRoleDeleteButton(rowNumber: number) {
-        return this.getRoleRow(rowNumber).all(by.tagName("td")).get(2).element(by.tagName("div")).all(by.tagName("a")).get(1);
+    getRoleDeleteButton(roleName: string, userName: string) {
+        return this.getRoleButtons(roleName, userName).then(row => row[1]);
     }
 
-    getRoleEditButton(rowNumber: number) {
-        return this.getRoleRow(rowNumber).all(by.tagName("td")).get(2).element(by.tagName("div")).all(by.tagName("a")).get(0);
+    getRoleEditButton(roleName: string, userName: string) {
+        return this.getRoleButtons(roleName, userName).then(row => row[0]);
+    }
+
+    private getRoleButtons(roleName: string, userName: string) {
+        return this.getRoleRow(roleName, userName)
+            .then(row => row.all(by.tagName("td"))
+                .get(2)
+                .element(by.tagName("div"))
+                .all(by.tagName("a")));
+    }
+
+    getRoleSubmitEditButton() {
+        return element(by.id("submit-edit"));
     }
 
     getSystemRow(systemName: string) {

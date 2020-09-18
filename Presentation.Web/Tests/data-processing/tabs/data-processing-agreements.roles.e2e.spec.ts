@@ -2,7 +2,6 @@
 import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
-import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement main detail tests", () => {
@@ -10,8 +9,6 @@ describe("Data processing agreement main detail tests", () => {
     const loginHelper = new Login();
     const pageObject = new DataProcessingAgreementOverviewPageObject();
     const testFixture = new TestFixtureWrapper();
-    const waitUpTo = new WaitTimers();
-    const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingAgreementHelper;
 
     const createName = () => {
@@ -22,6 +19,8 @@ describe("Data processing agreement main detail tests", () => {
     const roleName2 = "Standard Skriverolle (skriv)";
     const globalAdminEmail = "local-global-admin-user@kitos.dk";
     const globalAdminName = "Automatisk oprettet testbruger (GlobalAdmin)";
+    const localAdminEmail = "local-local-admin-user@kitos.dk";
+    const localAdminName = "Automatisk oprettet testbruger (LocalAdmin)";
 
     beforeAll(() => {
         
@@ -45,18 +44,32 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
                 .then(() => dpaHelper.goToRoles())
                 .then(() => dpaHelper.assignRole(roleName1, globalAdminEmail))
-                .then(() => dpaHelper.assignRole(roleName2, globalAdminEmail))
-                .then(() => verifyRoleAssigned(roleName1, globalAdminName, 0))
-                .then(() => verifyRoleAssigned(roleName2, globalAdminName, 1))
-                .then(() => dpaHelper.removeRole(1));
+                .then(() => dpaHelper.assignRole(roleName2, localAdminEmail))
+                .then(() => verifyRoleAssigned(roleName1, globalAdminName, globalAdminEmail))
+                .then(() => verifyRoleAssigned(roleName2, localAdminName, localAdminEmail))
+                .then(() => dpaHelper.removeRole(roleName2, localAdminName))
+                .then(() => verifyRoleAssignmentDoesNotExist(roleName2, localAdminName))
+                .then(() => dpaHelper.editRole(roleName1, globalAdminName, roleName2, localAdminEmail))
+                .then(() => verifyRoleAssigned(roleName2, localAdminName, localAdminEmail))
+                .then(() => verifyRoleAssignmentDoesNotExist(roleName1, globalAdminName));
         });
 
 
-    function verifyRoleAssigned(role: string, user: string, rowNumber: number) {
-        console.log(`Expecting role: ${role} to be assigned to: ${user}`);
-        expect(pageObject.getRoleRow(rowNumber).all(by.tagName("td")).get(0).getText()).toBe(role);
-        expect(pageObject.getRoleRow(rowNumber).all(by.tagName("td")).get(1).getText()).toBe(user);
-        expect(pageObject.getRoleRow(rowNumber).all(by.tagName("td")).get(2).getText()).toBe(globalAdminEmail);
+    function verifyRoleAssigned(role: string, user: string, email: string) {
+        console.log(`Expecting role: ${role} to be assigned to: ${user} with email: ${email}`);
+        expect(getRowObjectText(role, user, 0)).toBe(role);
+        expect(getRowObjectText(role, user, 1)).toBe(user);
+        expect(getRowObjectText(role, user, 2)).toBe(email);
+    }
+
+    function getRowObjectText(role: string, user: string, objectNumber: number) {
+        return pageObject.getRoleRow(role, user).then(row => row.all(by.tagName("td")).get(objectNumber).getText());
+    }
+
+    function verifyRoleAssignmentDoesNotExist(role: string, user: string) {
+        console.log(`Expecting role: ${role} assigned to: ${user} to not exist`);
+        pageObject.getRoleRow(role, user).then(result => {},
+            error => expect(error.toString()).toBe(`Error: Found no items with role: ${role} and user: ${user}`));
     }
 
 });
