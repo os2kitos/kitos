@@ -6,7 +6,8 @@
             "$scope",
             "$rootScope",
             "$state",
-            "notify"
+            "notify",
+            "dataProcessingAgreementService"
         ];
 
         constructor(
