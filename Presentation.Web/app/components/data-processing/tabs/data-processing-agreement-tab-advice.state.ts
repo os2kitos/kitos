@@ -10,8 +10,8 @@
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataProcessingAgreementRoles).getAll()],
                 object: ["dataProcessingAgreement", agreement => agreement],
                 type: [() => "dataProcessingAgreement"],
-                advicename: [
-                    "dataProcessingAgreement", (dataProcessingAgreement: Kitos.Models.DataProcessing.IDataProcessingAgreementDTO) => dataProcessingAgreement.name
+                advicename: ["dataProcessingAgreement",
+                    (dataProcessingAgreement: Kitos.Models.DataProcessing.IDataProcessingAgreementDTO) => <any>{ name: dataProcessingAgreement.name }
                 ]
             }
         });
