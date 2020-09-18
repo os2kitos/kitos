@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Hangfire.Server;
 using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,13 +19,20 @@ namespace Presentation.Web.Hangfire
 
         public void Execute(BackgroundProcessContext context)
         {
+            using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken, context.StoppingToken);
             using (new HangfireNinjectResolutionScope(_kernel))
             {
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                using var combinedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.ShutdownToken, context.StoppingToken);
                 backgroundJobLauncher.LaunchScheduleDataProcessingAgreementReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
                 backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             }
+
+            var secondsPassed = 0;
+            do
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                secondsPassed++;
+            } while (secondsPassed < 5 && combinedTokenSource.IsCancellationRequested == false);
         }
     }
 }
