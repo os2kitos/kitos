@@ -54,6 +54,39 @@ class DataProcessingAgreementHelper {
         return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.it-systems");
     }
 
+    public static goToRoles() {
+        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.roles");
+    }
+
+    public static assignRole(role: string, user: string) {
+        console.log("Assigning role: " + role + " to user: " + user);
+        return Select2Helper.searchFor(role, "s2id_add-role")
+            .then(() => Select2Helper.waitForDataAndSelect())
+            .then(() => Select2Helper.searchFor(user, "s2id_add-user"))
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static removeRole(roleName: string, userName: string) {
+        console.log("Removing role: ${role} with user: ${user}");
+        return this.pageObject.getRoleDeleteButton(roleName, userName)
+            .then(element => element.click())
+            .then(() => browser.switchTo().alert().accept());
+    }
+
+    public static editRole(oldRoleName: string, oldUserName: string, role: string, user: string) {
+        // Can only edit one role at a time. Otherwise the getRoleSubmitButton method fails to find the correct button.
+        console.log(`Editing role: ${role} with user: ${user}`);
+        return this.pageObject.getRoleRow(oldRoleName, oldUserName).then(row => {
+            return this.pageObject.getRoleEditButton(oldRoleName, oldUserName)
+                .then(element => element.click())
+                .then(() => Select2Helper.searchForByParent(role, "s2id_edit-role", row))
+                .then(() => Select2Helper.waitForDataAndSelect())
+                .then(() => Select2Helper.searchForByParent(user, "s2id_edit-user", row))
+                .then(() => Select2Helper.waitForDataAndSelect())
+                .then(() => this.pageObject.getRoleSubmitEditButton().click());
+        });
+    }
+
     public static assignSystem(name: string) {
         console.log("Assigning system with name: " + name);
         return Select2Helper.searchFor(name, "s2id_select-new-system")

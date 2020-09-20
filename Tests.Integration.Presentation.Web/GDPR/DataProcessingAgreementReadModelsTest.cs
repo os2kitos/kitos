@@ -36,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(name1, page1.First().Name);
             Assert.Equal(name2, page1.Last().Name);
 
-            Assert.Equal(1, page2.Count);
+            Assert.Single(page2);
             Assert.Equal(name3, page2.Single().Name);
         }
 

@@ -603,12 +603,22 @@ namespace Infrastructure.DataAccess.Migrations
                 context.DataProcessingAgreementsRoles.AddOrUpdate(x => x.Name, new DataProcessingAgreementRole
                 {
                     HasWriteAccess = true,
-                    Name = "Aftaleejer",
+                    Name = "Standard Skriverolle",
                     IsObligatory = true,
                     IsLocallyAvailable = true,
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id,
                     Priority = 1
+                });
+                context.DataProcessingAgreementsRoles.AddOrUpdate(x => x.Name, new DataProcessingAgreementRole
+                {
+                    HasWriteAccess = false,
+                    Name = "Standard Læserolle",
+                    IsObligatory = true,
+                    IsLocallyAvailable = true,
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 2
                 });
 
                 var dpaRolesCount = context.DataProcessingAgreementsRoles.Count();
