@@ -17,10 +17,10 @@ describe("Data processing agreement main detail tests", () => {
 
     const roleName1 = "Standard Læserolle (læs)";
     const roleName2 = "Standard Skriverolle (skriv)";
-    const globalAdminEmail = "local-global-admin-user@kitos.dk";
-    const globalAdminName = "Automatisk oprettet testbruger (GlobalAdmin)";
-    const localAdminEmail = "local-local-admin-user@kitos.dk";
+    const localAdminSearchPhrase = "LocalAdmin";
     const localAdminName = "Automatisk oprettet testbruger (LocalAdmin)";
+    const apiUserSearchPhrase = "Api User";
+    const apiUserName = "Automatisk oprettet testbruger (Api User)";
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -42,23 +42,22 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => pageObject.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
                 .then(() => dpaHelper.goToRoles())
-                .then(() => dpaHelper.assignRole(roleName1, globalAdminEmail))
-                .then(() => dpaHelper.assignRole(roleName2, localAdminEmail))
-                .then(() => verifyRoleAssigned(roleName1, globalAdminName, globalAdminEmail))
-                .then(() => verifyRoleAssigned(roleName2, localAdminName, localAdminEmail))
+                .then(() => dpaHelper.assignRole(roleName1, apiUserSearchPhrase))
+                .then(() => dpaHelper.assignRole(roleName2, localAdminSearchPhrase))
+                .then(() => verifyRoleAssigned(roleName1, apiUserName))
+                .then(() => verifyRoleAssigned(roleName2, localAdminName))
                 .then(() => dpaHelper.removeRole(roleName2, localAdminName))
                 .then(() => verifyRoleAssignmentDoesNotExist(roleName2, localAdminName))
-                .then(() => dpaHelper.editRole(roleName1, globalAdminName, roleName2, localAdminEmail))
-                .then(() => verifyRoleAssigned(roleName2, localAdminName, localAdminEmail))
-                .then(() => verifyRoleAssignmentDoesNotExist(roleName1, globalAdminName));
+                .then(() => dpaHelper.editRole(roleName1, apiUserName, roleName2, localAdminSearchPhrase))
+                .then(() => verifyRoleAssigned(roleName2, localAdminName))
+                .then(() => verifyRoleAssignmentDoesNotExist(roleName1, apiUserName));
         });
 
 
-    function verifyRoleAssigned(role: string, user: string, email: string) {
-        console.log(`Expecting role: ${role} to be assigned to: ${user} with email: ${email}`);
+    function verifyRoleAssigned(role: string, user: string) {
+        console.log(`Expecting role: ${role} to be assigned to: ${user}`);
         expect(getRowObjectText(role, user, 0)).toBe(role);
         expect(getRowObjectText(role, user, 1)).toBe(user);
-        expect(getRowObjectText(role, user, 2)).toBe(email);
     }
 
     function getRowObjectText(role: string, user: string, objectNumber: number) {
