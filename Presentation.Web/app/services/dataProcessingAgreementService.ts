@@ -8,6 +8,10 @@
         assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
+        getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]>;
+        getApplicableUsers(dataProcessingAgreementId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
+        assignNewRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void>;
+        removeRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void>;
     }
 
     export interface IDataProcessingAgreementCreatedResult {
@@ -139,6 +143,63 @@
                         var response = result.data as { response: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[] }
                         return response.response;
                     },
+                    error => this.handleServerError(error)
+                );
+        }
+
+        getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]> {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId,
+                    "available-roles"))
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.DataProcessing.IDataProcessingRoleDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                    );
+        }
+
+        getApplicableUsers(dataProcessingAgreementId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]> {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUri(`${dataProcessingAgreementId}/available-roles/${roleId}/applicable-users?nameOrEmailContent=${nameOrEmailContent}`))
+                .then(
+                    result => {
+                        var response = result.data as { response: Models.DataProcessing.ISimpleUserDTO[] }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+            );
+        }
+
+        assignNewRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void> {
+            const payload = {
+                RoleId: roleId,
+                UserId: userId
+            };
+            return this
+                .$http
+                .patch<API.Models.IApiWrapper<any>>(
+                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, "roles/assign"),
+                    payload)
+                .then(
+                    result => {},
+                    error => this.handleServerError(error)
+                );
+        }
+
+        removeRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void> {
+            const payload = {
+            };
+            return this
+                .$http
+                .patch<API.Models.IApiWrapper<any>>(
+                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, `roles/remove/${roleId}/from/${userId}`),
+                    payload)
+                .then(
+                    result => { },
                     error => this.handleServerError(error)
                 );
         }

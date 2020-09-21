@@ -4,7 +4,7 @@
 
     export interface ISelect2LoadingService {
         loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
-        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean);
+        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel) => string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
         select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel]);
         select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel], allowClear?: boolean);
@@ -33,7 +33,7 @@
             };
         }
 
-        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean) {
+        loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel) => string) {
             const config = <any>{
                 minimumInputLength: 1,
                 allowClear: allowClear,
@@ -55,6 +55,9 @@
                     }
                 }
             };
+            if (!! formatResult) {
+                config.formatResult = formatResult;
+            }
             return config;
         }
 

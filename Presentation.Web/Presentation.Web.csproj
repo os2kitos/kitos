@@ -354,6 +354,7 @@
     <Content Include="app\components\data-processing\data-processing-agreement-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-agreement-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-agreement-tab-main.view.html" />
@@ -444,6 +445,7 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-reference.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-agreement-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -476,6 +478,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\RolesViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\Select2OptionViewModel.ts" />
     <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
@@ -781,6 +784,7 @@
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.reference.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-agreements.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingAgreementHelper.ts" />
