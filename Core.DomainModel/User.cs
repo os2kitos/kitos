@@ -105,7 +105,7 @@ namespace Core.DomainModel
         /// <summary>
         /// Rights withing dpa
         /// </summary>
-        public virtual ICollection<DataProcessingAgreementRight> DataProcessingAgreementRights { get; set; }
+        public virtual ICollection<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
 
         public DateTime? LockedOutDate { get; set; }
 

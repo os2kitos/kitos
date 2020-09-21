@@ -63,11 +63,11 @@
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
-    <Compile Include="Mapping\DataProcessingAgreementMap.cs" />
-    <Compile Include="Mapping\DataProcessingAgreementReadModelMap.cs" />
-    <Compile Include="Mapping\DataProcessingAgreementRightMap.cs" />
-    <Compile Include="Mapping\DataProcessingAgreementRoleAssignmentReadModelMap.cs" />
-    <Compile Include="Mapping\DataProcessingAgreementRoleMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationReadModelMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRightMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRoleAssignmentReadModelMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRoleMap.cs" />
     <Compile Include="Mapping\DataProcessingCountryOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
@@ -612,29 +612,9 @@
     <Compile Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.designer.cs">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.cs" />
-    <Compile Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.designer.cs">
-      <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs" />
-    <Compile Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.designer.cs">
-      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202009111240471_Add_Dpa_References.cs" />
-    <Compile Include="Migrations\202009111240471_Add_Dpa_References.designer.cs">
-      <DependentUpon>202009111240471_Add_Dpa_References.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202009141042574_Add_Dpa_Systems.cs" />
-    <Compile Include="Migrations\202009141042574_Add_Dpa_Systems.designer.cs">
-      <DependentUpon>202009141042574_Add_Dpa_Systems.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202009150716039_Extend_DpaReadmodel_With_SystemNames.cs" />
-    <Compile Include="Migrations\202009150716039_Extend_DpaReadmodel_With_SystemNames.designer.cs">
-      <DependentUpon>202009150716039_Extend_DpaReadmodel_With_SystemNames.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202009210936522_Add_DPA_Option_Types.cs" />
-    <Compile Include="Migrations\202009210936522_Add_DPA_Option_Types.designer.cs">
-      <DependentUpon>202009210936522_Add_DPA_Option_Types.cs</DependentUpon>
+    <Compile Include="Migrations\202009211324451_DataProcessingRegistration.cs" />
+    <Compile Include="Migrations\202009211324451_DataProcessingRegistration.designer.cs">
+      <DependentUpon>202009211324451_DataProcessingRegistration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1017,23 +997,8 @@
     <EmbeddedResource Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.resx">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009031130254_Introduce_DataProcessingAgreement.resx">
-      <DependentUpon>202009031130254_Introduce_DataProcessingAgreement.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009100941353_Add_DataProcessingAgreementRightsAndRoles.resx">
-      <DependentUpon>202009100941353_Add_DataProcessingAgreementRightsAndRoles.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009111240471_Add_Dpa_References.resx">
-      <DependentUpon>202009111240471_Add_Dpa_References.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009141042574_Add_Dpa_Systems.resx">
-      <DependentUpon>202009141042574_Add_Dpa_Systems.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009150716039_Extend_DpaReadmodel_With_SystemNames.resx">
-      <DependentUpon>202009150716039_Extend_DpaReadmodel_With_SystemNames.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009210936522_Add_DPA_Option_Types.resx">
-      <DependentUpon>202009210936522_Add_DPA_Option_Types.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009211324451_DataProcessingRegistration.resx">
+      <DependentUpon>202009211324451_DataProcessingRegistration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

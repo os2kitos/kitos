@@ -218,7 +218,7 @@
         }
 
         private getBaseUri() {
-            return "api/v1/data-processing-agreement/";
+            return "api/v1/data-processing-registration/";
         }
     }
 

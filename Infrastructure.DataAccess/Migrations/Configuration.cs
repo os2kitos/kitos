@@ -600,7 +600,7 @@ namespace Infrastructure.DataAccess.Migrations
 
                 #region DPA ROLES
                 Console.Out.WriteLine("Initializing dpa roles");
-                context.DataProcessingAgreementsRoles.AddOrUpdate(x => x.Name, new DataProcessingAgreementRole
+                context.DataProcessingRegistrationRoles.AddOrUpdate(x => x.Name, new DataProcessingRegistrationRole
                 {
                     HasWriteAccess = true,
                     Name = "Standard Skriverolle",
@@ -610,7 +610,7 @@ namespace Infrastructure.DataAccess.Migrations
                     LastChangedByUserId = globalAdmin.Id,
                     Priority = 1
                 });
-                context.DataProcessingAgreementsRoles.AddOrUpdate(x => x.Name, new DataProcessingAgreementRole
+                context.DataProcessingRegistrationRoles.AddOrUpdate(x => x.Name, new DataProcessingRegistrationRole
                 {
                     HasWriteAccess = false,
                     Name = "Standard Læserolle",
@@ -621,7 +621,7 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 2
                 });
 
-                var dpaRolesCount = context.DataProcessingAgreementsRoles.Count();
+                var dpaRolesCount = context.DataProcessingRegistrationRoles.Count();
                 foreach (var role in context.ItContractRoles)
                 {
                     role.Priority = dpaRolesCount;

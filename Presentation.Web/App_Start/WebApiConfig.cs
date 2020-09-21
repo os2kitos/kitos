@@ -431,18 +431,18 @@ namespace Presentation.Web
             var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
             itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
 
-            BindDataProcessingAgreementModule(builder);
+            BindDataProcessingRegistrationModule(builder);
 
             return builder.GetEdmModel();
         }
 
-        private static void BindDataProcessingAgreementModule(ODataConventionModelBuilder builder)
+        private static void BindDataProcessingRegistrationModule(ODataConventionModelBuilder builder)
         {
             //Read model to provide slim search options
-            BindEntitySet<DataProcessingAgreementReadModel, DataProcessingAgreementReadModelsController>(builder);
+            BindEntitySet<DataProcessingRegistrationReadModel, DataProcessingRegistrationReadModelsController>(builder);
 
             //Generic global options
-            BindEntitySet<DataProcessingAgreementRole, DataProcessingAgreementRolesController>(builder);
+            BindEntitySet<DataProcessingRegistrationRole, DataProcessingRegistrationRolesController>(builder);
             BindEntitySet<DataProcessingBasisForTransferOption, DataProcessingBasisForTransferOptionsController>(builder);
             BindEntitySet<DataProcessingOversightOption, DataProcessingOversightOptionsController>(builder);
             BindEntitySet<DataProcessingDataResponsibleOption, DataProcessingDataResponsibleOptionsController>(builder);
@@ -453,7 +453,7 @@ namespace Presentation.Web
             BindEntitySet<LocalDataProcessingOversightOption, LocalDataProcessingOversightOptionsController>(builder);
             BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);
-            BindEntitySet<LocalDataProcessingAgreementRole, LocalDataProcessingAgreementRolesController>(builder);
+            BindEntitySet<LocalDataProcessingRegistrationRole, LocalDataProcessingRegistrationRolesController>(builder);
         }
 
         private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class, IHasId

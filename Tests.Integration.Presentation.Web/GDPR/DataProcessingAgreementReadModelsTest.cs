@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
-    public class DataProcessingAgreementReadModelsTest : WithAutoFixture
+    public class DataProcessingRegistrationReadModelsTest : WithAutoFixture
     {
         [Fact]
         public async Task Can_Query_And_Page_ReadModels()
@@ -23,13 +23,13 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name2 = $"2_{suffix}";
             var name3 = $"3_{suffix}";
 
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name1);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name2);
-            await DataProcessingAgreementHelper.CreateAsync(organizationId, name3);
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name1);
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name2);
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name3);
 
             //Act
-            var page1 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
-            var page2 = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
+            var page1 = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
+            var page2 = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
 
             //Assert
             Assert.Equal(2, page1.Count);
@@ -52,41 +52,41 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
-            var agreement = await DataProcessingAgreementHelper.CreateAsync(organizationId, name);
-            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+            var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
-            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
-            using var response = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
-            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingAgreement_Id = agreement.Id);
+            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = agreement.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
-            using var assignSystemResponse = await DataProcessingAgreementHelper.SendAssignSystemRequestAsync(agreement.Id, itSystemDto.Id);
+            using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, itSystemDto.Id);
 
             //Wait for read model to rebuild
             await Task.WhenAll(
                 WaitForAsync(() =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
+                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
                             x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
                 }, TimeSpan.FromSeconds(10)),
                 WaitForAsync(() =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
+                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
                             x.AsQueryable().Any(rm => rm.MainReferenceUrl == refUrl)));
                 }, TimeSpan.FromSeconds(10)),
                 WaitForAsync(() =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingAgreementReadModel, bool>(x =>
+                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
                             x.AsQueryable().Any(rm => rm.SystemNamesAsCsv.Contains(systemName))));
                 }, TimeSpan.FromSeconds(10))
             );
 
             //Act
-            var result = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
 
             //Assert
             var readModel = Assert.Single(result);
@@ -109,34 +109,34 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
-            var agreement = await DataProcessingAgreementHelper.CreateAsync(organizationId, name);
-            var businessRoleDtos = await DataProcessingAgreementHelper.GetAvailableRolesAsync(agreement.Id);
+            var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+            var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
-            var availableUsers = await DataProcessingAgreementHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
+            var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
-            using var response1 = await DataProcessingAgreementHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var response1 = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Wait for read model to rebuild
             await WaitForAsync(() =>
             {
                 return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
+                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
                         x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
             }, TimeSpan.FromSeconds(10));
 
-            using var response2 = await DataProcessingAgreementHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var response2 = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
 
             //Wait for read model to rebuild
             await WaitForAsync(() =>
             {
                 return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingAgreementRoleAssignmentReadModel, bool>(x =>
+                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
                         x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id) == false));
             }, TimeSpan.FromSeconds(10));
 
             //Act
-            var result = (await DataProcessingAgreementHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
 
             //Assert
             var readModel = Assert.Single(result);

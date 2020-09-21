@@ -5,7 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    public class DataProcessingDataResponsibleOptionsController : BaseOptionController<DataProcessingDataResponsibleOption, DataProcessingAgreement>
+    public class DataProcessingDataResponsibleOptionsController : BaseOptionController<DataProcessingDataResponsibleOption, DataProcessingRegistration>
     {
         public DataProcessingDataResponsibleOptionsController(IGenericRepository<DataProcessingDataResponsibleOption> repository)
             : base(repository)

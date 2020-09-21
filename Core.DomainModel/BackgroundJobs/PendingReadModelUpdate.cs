@@ -4,9 +4,9 @@ namespace Core.DomainModel.BackgroundJobs
 {
     public enum PendingReadModelUpdateSourceCategory
     {
-        DataProcessingAgreement = 0,
-        DataProcessingAgreement_User = 1,
-        DataProcessingAgreement_ItSystem = 2
+        DataProcessingRegistration = 0,
+        DataProcessingRegistration_User = 1,
+        DataProcessingRegistration_ItSystem = 2
     }
 
     public class PendingReadModelUpdate

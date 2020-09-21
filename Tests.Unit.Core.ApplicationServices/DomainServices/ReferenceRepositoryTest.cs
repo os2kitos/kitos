@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.DomainServices
         private readonly Mock<IGenericRepository<ItSystem>> _systemRepository;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
-        private readonly Mock<IGenericRepository<DataProcessingAgreement>> _dpaRepository;
+        private readonly Mock<IGenericRepository<DataProcessingRegistration>> _dpaRepository;
 
         public ReferenceRepositoryTest()
         {
@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.DomainServices
             _systemRepository = new Mock<IGenericRepository<ItSystem>>();
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _projectRepository = new Mock<IGenericRepository<ItProject>>();
-            _dpaRepository = new Mock<IGenericRepository<DataProcessingAgreement>>();
+            _dpaRepository = new Mock<IGenericRepository<DataProcessingRegistration>>();
             _sut = new ReferenceRepository
             (
                 new Mock<IGenericRepository<ExternalReference>>().Object,
@@ -112,15 +112,15 @@ namespace Tests.Unit.Core.DomainServices
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void GetRootEntity_Returns_DataProcessingAgreement(bool returnsSome)
+        public void GetRootEntity_Returns_DataProcessingRegistration(bool returnsSome)
         {
             //Arrange
             var id = A<int>();
-            var expected = returnsSome ? new DataProcessingAgreement() : null;
+            var expected = returnsSome ? new DataProcessingRegistration() : null;
             _dpaRepository.Setup(x => x.GetByKey(id)).Returns(expected);
 
             //Act
-            var actual = _sut.GetRootEntity(id, ReferenceRootType.DataProcessingAgreement);
+            var actual = _sut.GetRootEntity(id, ReferenceRootType.DataProcessingRegistration);
 
             //Assert
             Assert.Equal(expected.FromNullable<IEntityWithExternalReferences>(), actual);
@@ -167,10 +167,10 @@ namespace Tests.Unit.Core.DomainServices
         }
 
         [Fact]
-        public void SaveRootEntity_With_DataProcessingAgreement()
+        public void SaveRootEntity_With_DataProcessingRegistration()
         {
             //Act
-            _sut.SaveRootEntity(new DataProcessingAgreement());
+            _sut.SaveRootEntity(new DataProcessingRegistration());
 
             //Assert
             _dpaRepository.Verify(x => x.Save(), Times.Once);

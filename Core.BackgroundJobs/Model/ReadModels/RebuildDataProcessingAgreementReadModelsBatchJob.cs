@@ -16,23 +16,23 @@ using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels
 {
-    public class RebuildDataProcessingAgreementReadModelsBatchJob : IAsyncBackgroundJob
+    public class RebuildDataProcessingRegistrationReadModelsBatchJob : IAsyncBackgroundJob
     {
         private readonly ILogger _logger;
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
-        private readonly IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> _updater;
-        private readonly IDataProcessingAgreementReadModelRepository _readModelRepository;
-        private readonly IDataProcessingAgreementRepository _sourceRepository;
+        private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _updater;
+        private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
+        private readonly IDataProcessingRegistrationRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
         private const int BatchSize = 500;
-        public string Id => StandardJobIds.UpdateDataProcessingAgreementReadModels;
+        public string Id => StandardJobIds.UpdateDataProcessingRegistrationReadModels;
 
-        public RebuildDataProcessingAgreementReadModelsBatchJob(
+        public RebuildDataProcessingRegistrationReadModelsBatchJob(
             ILogger logger,
             IPendingReadModelUpdateRepository pendingReadModelUpdateRepository,
-            IReadModelUpdate<DataProcessingAgreement, DataProcessingAgreementReadModel> updater,
-            IDataProcessingAgreementReadModelRepository readModelRepository,
-            IDataProcessingAgreementRepository sourceRepository,
+            IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> updater,
+            IDataProcessingRegistrationReadModelRepository readModelRepository,
+            IDataProcessingRegistrationRepository sourceRepository,
             ITransactionManager transactionManager)
         {
             _logger = logger;
@@ -48,7 +48,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
-                foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingAgreement, BatchSize).ToList())
+                foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration, BatchSize).ToList())
                 {
                     if (token.IsCancellationRequested)
                         break;
@@ -87,9 +87,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {completedUpdates} updates"));
         }
 
-        private void ApplyUpdate(Maybe<DataProcessingAgreementReadModel> readModelResult, DataProcessingAgreement sourceValue)
+        private void ApplyUpdate(Maybe<DataProcessingRegistrationReadModel> readModelResult, DataProcessingRegistration sourceValue)
         {
-            var readModel = readModelResult.GetValueOrFallback(new DataProcessingAgreementReadModel());
+            var readModel = readModelResult.GetValueOrFallback(new DataProcessingRegistrationReadModel());
             _updater.Apply(sourceValue, readModel);
             if (readModelResult.HasValue)
             {

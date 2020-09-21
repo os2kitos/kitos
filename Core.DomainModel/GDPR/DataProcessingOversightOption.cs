@@ -2,8 +2,8 @@
 
 namespace Core.DomainModel.GDPR
 {
-    public class DataProcessingOversightOption : OptionEntity<DataProcessingAgreement>, IOptionReference<DataProcessingAgreement>
+    public class DataProcessingOversightOption : OptionEntity<DataProcessingRegistration>, IOptionReference<DataProcessingRegistration>
     {
-        public ICollection<DataProcessingAgreement> References { get; set; }
+        public ICollection<DataProcessingRegistration> References { get; set; }
     }
 }

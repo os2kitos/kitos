@@ -22,7 +22,7 @@
 
         readonly type: string = "Databehandleraftale";
 
-        readonly checkAvailableUrl: string = "api/v1/data-processing-agreement";
+        readonly checkAvailableUrl: string = "api/v1/data-processing-registration";
 
         private createNew() {
             const name = this.$scope.formData.name;

@@ -406,7 +406,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <summary>
         /// DPAs using this system
         /// </summary>
-        public virtual ICollection<DataProcessingAgreement> AssociatedDataProcessingAgreements { get; set; }
+        public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             ItSystemUsage toSystemUsage,

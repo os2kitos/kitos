@@ -14,19 +14,19 @@ namespace Core.BackgroundJobs.Services
     {
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
-        private readonly RebuildDataProcessingAgreementReadModelsBatchJob _rebuildDataProcessingAgreementReadModels;
-        private readonly ScheduleDataProcessingAgreementReadModelUpdates _scheduleDataProcessingAgreementReadModelUpdates;
+        private readonly RebuildDataProcessingRegistrationReadModelsBatchJob _rebuildDataProcessingRegistrationReadModels;
+        private readonly ScheduleDataProcessingRegistrationReadModelUpdates _scheduleDataProcessingRegistrationReadModelUpdates;
 
         public BackgroundJobLauncher(
             ILogger logger,
             CheckExternalLinksBackgroundJob checkExternalLinksJob,
-            RebuildDataProcessingAgreementReadModelsBatchJob rebuildDataProcessingAgreementReadModels,
-            ScheduleDataProcessingAgreementReadModelUpdates scheduleDataProcessingAgreementReadModelUpdates)
+            RebuildDataProcessingRegistrationReadModelsBatchJob rebuildDataProcessingRegistrationReadModels,
+            ScheduleDataProcessingRegistrationReadModelUpdates scheduleDataProcessingRegistrationReadModelUpdates)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
-            _rebuildDataProcessingAgreementReadModels = rebuildDataProcessingAgreementReadModels;
-            _scheduleDataProcessingAgreementReadModelUpdates = scheduleDataProcessingAgreementReadModelUpdates;
+            _rebuildDataProcessingRegistrationReadModels = rebuildDataProcessingRegistrationReadModels;
+            _scheduleDataProcessingRegistrationReadModelUpdates = scheduleDataProcessingRegistrationReadModelUpdates;
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
@@ -34,14 +34,14 @@ namespace Core.BackgroundJobs.Services
             await Launch(_checkExternalLinksJob, token);
         }
 
-        public async Task LaunchUpdateDataProcessingAgreementReadModels(CancellationToken token = default)
+        public async Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default)
         {
-            await Launch(_rebuildDataProcessingAgreementReadModels, token);
+            await Launch(_rebuildDataProcessingRegistrationReadModels, token);
         }
 
-        public async Task LaunchScheduleDataProcessingAgreementReadUpdates(CancellationToken token = default)
+        public async Task LaunchScheduleDataProcessingRegistrationReadUpdates(CancellationToken token = default)
         {
-            await Launch(_scheduleDataProcessingAgreementReadModelUpdates, token);
+            await Launch(_scheduleDataProcessingRegistrationReadModelUpdates, token);
         }
 
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)

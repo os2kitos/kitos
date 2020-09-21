@@ -345,8 +345,8 @@
   <ItemGroup>
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
-    <Compile Include="Controllers\API\DataProcessingAgreementController.cs" />
-    <Compile Include="Controllers\OData\DataProcessingAgreementReadModelsController.cs" />
+    <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
+    <Compile Include="Controllers\OData\DataProcessingRegistrationReadModelsController.cs" />
     <Compile Include="Controllers\API\GDPRExportReportController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\KLEController.cs" />
@@ -364,12 +364,12 @@
     <Content Include="Logout.ashx" />
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingAgreementRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingOversightOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingBasisForTransferOptionsController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\DataProcessingAgreementRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingDataResponsibleOptionsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingOversightOptionsController.cs" />
@@ -393,8 +393,8 @@
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
-    <Compile Include="Models\GDPR\CreateDataProcessingAgreementDTO.cs" />
-    <Compile Include="Models\GDPR\DataProcessingAgreementDTO.cs" />
+    <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />

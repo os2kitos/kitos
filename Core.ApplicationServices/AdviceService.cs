@@ -44,7 +44,7 @@ namespace Core.ApplicationServices
         public IGenericRepository<ItSystemRight> ItSystemRights { get; set; }
 
         [Inject]
-        public IGenericRepository<DataProcessingAgreementRight> DataProcessingAgreementRightsRepository { get; set; }
+        public IGenericRepository<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
 
         [Inject]
         public ILogger Logger { get; set; }
@@ -62,7 +62,7 @@ namespace Core.ApplicationServices
         public IGenericRepository<ItSystemUsage> ItSystemUsageRepository { get; set; }
 
         [Inject]
-        public IGenericRepository<DataProcessingAgreement> DataProcessingAgreementRepository { get; set; }
+        public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
         public AdviceService() { }
 
@@ -211,7 +211,7 @@ namespace Core.ApplicationServices
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingAgreements i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
+            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
             return result.AsQueryable();
         }
 
@@ -256,9 +256,9 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.dataProcessingAgreement:
+                case ObjectType.dataProcessingRegistration:
 
-                    var dpaRoles = DataProcessingAgreementRightsRepository.AsQueryable().Where(I =>
+                    var dpaRoles = DataProcessingRegistrationRights.AsQueryable().Where(I =>
                         I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in dpaRoles)

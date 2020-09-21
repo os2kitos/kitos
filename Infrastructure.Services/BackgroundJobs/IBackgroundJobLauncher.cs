@@ -6,7 +6,7 @@ namespace Infrastructure.Services.BackgroundJobs
     public interface IBackgroundJobLauncher
     {
         Task LaunchLinkCheckAsync(CancellationToken token = default);
-        Task LaunchUpdateDataProcessingAgreementReadModels(CancellationToken token = default);
-        Task LaunchScheduleDataProcessingAgreementReadUpdates(CancellationToken token = default);
+        Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default);
+        Task LaunchScheduleDataProcessingRegistrationReadUpdates(CancellationToken token = default);
     }
 }

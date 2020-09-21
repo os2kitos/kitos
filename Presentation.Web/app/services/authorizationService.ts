@@ -112,7 +112,7 @@
         }
 
         createDataProcessingAgreementAuthorization(): IOperationAuthorizationService {
-            return this.createFor("v1/data-processing-agreement");
+            return this.createFor("v1/data-processing-registration");
         }
     }
 

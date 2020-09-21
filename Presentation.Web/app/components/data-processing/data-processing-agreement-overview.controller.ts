@@ -53,7 +53,7 @@
                     .withEntityTypeName("Databehandleraftale")
                     .withExcelOutputName("Databehandleraftaler - Overblik")
                     .withStorageKey("data-processing-agreement-overview-options")
-                    .withFixedSourceUrl(`/odata/Organizations(${user.currentOrganizationId})/DataProcessingAgreementReadModels?$expand=RoleAssignments`)
+                    .withFixedSourceUrl(`/odata/Organizations(${user.currentOrganizationId})/DataProcessingRegistrationReadModels?$expand=RoleAssignments`)
                     .withParameterMapping((options, type) => {
                         // get kendo to map parameters to an odata url
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);

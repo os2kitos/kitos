@@ -179,7 +179,7 @@
                 case LocalOptionType.TerminationDeadlineTypes:
                     return "LocalTerminationDeadlineTypes";
                 case LocalOptionType.DataProcessingAgreementRoles:
-                    return "LocalDataProcessingAgreementRoles";
+                    return "LocalDataProcessingRegistrationRoles";
                 case LocalOptionType.DataProcessingBasisForTransferOptions:
                     return "LocalDataProcessingBasisForTransferOptions";
                 case LocalOptionType.DataProcessingOversightOptions:
