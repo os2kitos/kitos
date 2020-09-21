@@ -449,7 +449,7 @@ namespace Presentation.Web
             BindEntitySet<DataProcessingCountryOption, DataProcessingCountryOptionsController>(builder);
 
             //Generic local options
-            BindEntitySet<LocalDataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOptionsOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOptionsController>(builder);
             BindEntitySet<LocalDataProcessingOversightOption, LocalDataProcessingOversightOptionsController>(builder);
             BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);

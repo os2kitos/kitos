@@ -9,10 +9,10 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [PublicApi]
-    [ODataRoutePrefix("LocalDataProcessingBasisForTransferOptionsOptions")]
-    public class LocalDataProcessingBasisForTransferOptionsOptionsController : LocalOptionBaseController<LocalDataProcessingBasisForTransferOption, DataProcessingAgreement, DataProcessingBasisForTransferOption>
+    [ODataRoutePrefix("LocalDataProcessingBasisForTransferOptions")]
+    public class LocalDataProcessingBasisForTransferOptionsController : LocalOptionBaseController<LocalDataProcessingBasisForTransferOption, DataProcessingAgreement, DataProcessingBasisForTransferOption>
     {
-        public LocalDataProcessingBasisForTransferOptionsOptionsController(IGenericRepository<LocalDataProcessingBasisForTransferOption> repository, IGenericRepository<DataProcessingBasisForTransferOption> optionsRepository)
+        public LocalDataProcessingBasisForTransferOptionsController(IGenericRepository<LocalDataProcessingBasisForTransferOption> repository, IGenericRepository<DataProcessingBasisForTransferOption> optionsRepository)
             : base(repository, optionsRepository)
         {
 

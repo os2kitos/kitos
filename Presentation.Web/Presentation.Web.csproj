@@ -368,7 +368,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingOversightOptionsController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingBasisForTransferOptionsOptionsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingBasisForTransferOptionsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingAgreementRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingDataResponsibleOptionsController.cs" />
