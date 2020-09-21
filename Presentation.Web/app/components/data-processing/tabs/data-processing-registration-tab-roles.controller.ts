@@ -1,13 +1,13 @@
 ﻿module Kitos.DataProcessing.Agreement.Edit.Roles {
     "use strict";
 
-    export class EditRolesDataProcessingAgreementController {
+    export class EditRolesDataProcessingRegistrationController {
         static $inject: Array<string> = [
-            "dataProcessingAgreementService",
+            "dataProcessingRegistrationService",
             "notify",
             "hasWriteAccess",
-            "dataProcessingAgreement",
-            "dataProcessingAgreementRoles",
+            "dataProcessingRegistration",
+            "dataProcessingRegistrationRoles",
             "select2LoadingService"
         ];
 
@@ -21,20 +21,20 @@
         shouldSortReversed: boolean;
 
         constructor(
-            private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
+            private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             private readonly notify,
             public hasWriteAccess,
-            private readonly dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
-            dataProcessingAgreementRoles: Models.DataProcessing.IDataProcessingRoleDTO[],
+            private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
+            dataProcessingRegistrationRoles: Models.DataProcessing.IDataProcessingRoleDTO[],
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
 
-            this.headerName = dataProcessingAgreement.name;
-            this.roles = dataProcessingAgreementRoles.map(role => this.mapToRoleOptions(role));
+            this.headerName = dataProcessingRegistration.name;
+            this.roles = dataProcessingRegistrationRoles.map(role => this.mapToRoleOptions(role));
 
             this.lastSortedBy = "";
             this.shouldSortReversed = false;
 
-            this.assignedRoles = this.dataProcessingAgreement.assignedRoles
+            this.assignedRoles = this.dataProcessingRegistration.assignedRoles
                 .map(assignedRole => this.mapToEditableAssignedRole(assignedRole));
             this.sortAssignedRoles("roleName"); // Initial sorting priority
 
@@ -89,7 +89,7 @@
 
             var msg = this.notify.addInfoMessage("Tilføjer rolle");
 
-            this.dataProcessingAgreementService.assignNewRole(this.dataProcessingAgreement.id, this.getSelectedRoleId(), this.selectedUser.id)
+            this.dataProcessingRegistrationService.assignNewRole(this.dataProcessingRegistration.id, this.getSelectedRoleId(), this.selectedUser.id)
                 .then(
                     () => {
                         msg.toSuccessMessage("Rollen er tilføjet");
@@ -120,8 +120,8 @@
             var roleId = assignedRole.role.id;
             var userId = assignedRole.user.id;
             var msg = this.notify.addInfoMessage("Fjerner rolle");
-            this.dataProcessingAgreementService.removeRole(
-                this.dataProcessingAgreement.id, roleId, userId)
+            this.dataProcessingRegistrationService.removeRole(
+                this.dataProcessingRegistration.id, roleId, userId)
                 .then(
                     () => {
                         msg.toSuccessMessage("Rollen er fjernet");
@@ -151,10 +151,10 @@
 
             var msg = this.notify.addInfoMessage("Retter rolle");
 
-            this.dataProcessingAgreementService.assignNewRole(this.dataProcessingAgreement.id, newRole.id, assignedRole.newUser.id)
+            this.dataProcessingRegistrationService.assignNewRole(this.dataProcessingRegistration.id, newRole.id, assignedRole.newUser.id)
                 .then(() => {
                     msg.toSuccessMessage("Den nye rolle er oprettet");
-                    this.dataProcessingAgreementService.removeRole(this.dataProcessingAgreement.id, assignedRole.role.id, assignedRole.user.id)
+                    this.dataProcessingRegistrationService.removeRole(this.dataProcessingRegistration.id, assignedRole.role.id, assignedRole.user.id)
                         .then(
                             () => {
                                 msg.toSuccessMessage("Rollen er rettet");
@@ -292,7 +292,7 @@
             }
             return this.select2LoadingService.loadSelect2WithDataSource(
                 (query: string) =>
-                this.dataProcessingAgreementService.getApplicableUsers(this.dataProcessingAgreement.id,
+                this.dataProcessingRegistrationService.getApplicableUsers(this.dataProcessingRegistration.id,
                     getRoleId(),
                     query)
                 .then(
@@ -315,16 +315,16 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.edit-agreement.roles", {
+            $stateProvider.state("data-processing.edit-registration.roles", {
                 url: "/roles",
-                templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-roles.view.html",
-                controller: EditRolesDataProcessingAgreementController,
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-roles.view.html",
+                controller: EditRolesDataProcessingRegistrationController,
                 controllerAs: "vm",
                 resolve: {
-                    dataProcessingAgreementRoles: ["dataProcessingAgreementService", "dataProcessingAgreement",
-                        (dataProcessingAgreementService, dataProcessingAgreement) => dataProcessingAgreementService.getAvailableRoles(dataProcessingAgreement.id)],
-                    dataProcessingAgreement: [
-                        "dataProcessingAgreementService", "$stateParams", (dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService, $stateParams) => dataProcessingAgreementService.get($stateParams.id)
+                    dataProcessingRegistrationRoles: ["dataProcessingRegistrationService", "dataProcessingRegistration",
+                        (dataProcessingRegistrationService, dataProcessingRegistration) => dataProcessingRegistrationService.getAvailableRoles(dataProcessingRegistration.id)],
+                    dataProcessingRegistration: [
+                        "dataProcessingRegistrationService", "$stateParams", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, $stateParams) => dataProcessingRegistrationService.get($stateParams.id)
                     ]
                 }
             });

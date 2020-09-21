@@ -51,11 +51,11 @@ class DataProcessingAgreementHelper {
     }
 
     public static goToItSystems() {
-        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.it-systems");
+        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-registration.it-systems");
     }
 
     public static goToRoles() {
-        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-agreement.roles");
+        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles");
     }
 
     public static assignRole(role: string, user: string) {

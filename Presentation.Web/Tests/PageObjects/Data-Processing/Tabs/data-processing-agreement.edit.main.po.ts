@@ -28,7 +28,7 @@ class DataProcessingAgreementEditMainPageObject {
     }
 
     getDpaDeleteButton() {
-        return element(this.cssHelper.byDataElementType("removeDataProcessingAgreementButton"));
+        return element(this.cssHelper.byDataElementType("removeDataProcessingRegistrationButton"));
     }
 
 }

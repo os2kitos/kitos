@@ -1,33 +1,33 @@
 ﻿module Kitos.Services.DataProcessing {
-    export interface IDataProcessingAgreementService {
-        create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
-        delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
-        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
-        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
-        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
-        getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]>;
-        getApplicableUsers(dataProcessingAgreementId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
-        assignNewRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void>;
-        removeRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void>;
+    export interface IDataProcessingRegistrationService {
+        create(organizationId: number, name: string): angular.IPromise<IDataProcessingRegistrationCreatedResult>;
+        delete(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationDeletedResult>;
+        rename(dataProcessingRegistrationId: number, name: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        get(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationDTO>;
+        setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignSystem(dataProcessingRegistrationId: number, systemId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        removeSystem(dataProcessingRegistrationId: number, systemId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
+        getAvailableRoles(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]>;
+        getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
+        assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
+        removeRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
     }
 
-    export interface IDataProcessingAgreementCreatedResult {
+    export interface IDataProcessingRegistrationCreatedResult {
         createdObjectId: number;
     }
 
 
-    export interface IDataProcessingAgreementDeletedResult {
+    export interface IDataProcessingRegistrationDeletedResult {
         deletedObjectId: number;
     }
 
-    export interface IDataProcessingAgreementPatchResult {
+    export interface IDataProcessingRegistrationPatchResult {
         valueModifiedTo: any;
     }
 
-    export class DataProcessingAgreementService implements IDataProcessingAgreementService {
+    export class DataProcessingRegistrationService implements IDataProcessingRegistrationService {
 
         private handleServerError(error) {
             console.log("Request failed with:", error);
@@ -52,7 +52,7 @@
         }
 
         //Use for contracts that take an input defined as SingleValueDTO
-        private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingAgreementPatchResult> {
+        private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingRegistrationPatchResult> {
 
             const payload = {
                 Value: value
@@ -63,7 +63,7 @@
                 .patch<API.Models.IApiWrapper<any>>(url, payload)
                 .then(
                     response => {
-                        return <IDataProcessingAgreementPatchResult>{
+                        return <IDataProcessingRegistrationPatchResult>{
                             valueModifiedTo: value,
                         };
                     },
@@ -71,18 +71,18 @@
                 );
         }
 
-        rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "name"), name);
+        rename(dataProcessingRegistrationId: number, name: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "name"), name);
         }
 
-        delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult> {
+        delete(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationDeletedResult> {
 
             return this
                 .$http
-                .delete<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
+                .delete<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingRegistrationId.toString()))
                 .then(
                     response => {
-                        return <IDataProcessingAgreementDeletedResult>{
+                        return <IDataProcessingRegistrationDeletedResult>{
                             deletedObjectId: response.data.response.id,
                         };
                     },
@@ -91,7 +91,7 @@
 
         }
 
-        create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult> {
+        create(organizationId: number, name: string): angular.IPromise<IDataProcessingRegistrationCreatedResult> {
             const payload = {
                 name: name,
                 organizationId: organizationId
@@ -101,7 +101,7 @@
                 .post<API.Models.IApiWrapper<any>>(this.getUri(""), payload)
                 .then(
                     response => {
-                        return <IDataProcessingAgreementCreatedResult>{
+                        return <IDataProcessingRegistrationCreatedResult>{
                             createdObjectId: response.data.response.id
                         };
                     },
@@ -110,34 +110,34 @@
         }
 
 
-        get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
+        get(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationDTO> {
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
+                .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingRegistrationId.toString()))
                 .then(
                     result => {
-                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO }
+                        var response = result.data as { response: Models.DataProcessing.IDataProcessingRegistrationDTO }
                         return response.response;
                     },
                     error => this.handleServerError(error)
                 );
         }
 
-        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "master-reference"), referenceId);
+        setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "master-reference"), referenceId);
 		}
 
-        assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/assign"), systemId);
+        assignSystem(dataProcessingRegistrationId: number, systemId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "it-systems/assign"), systemId);
         }
-        removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/remove"), systemId);
+        removeSystem(dataProcessingRegistrationId: number, systemId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "it-systems/remove"), systemId);
         }
 
-        getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>{
+        getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>{
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId, `it-systems/available?nameQuery=${query}`))
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `it-systems/available?nameQuery=${query}`))
                 .then(
                     result => {
                         var response = result.data as { response: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[] }
@@ -147,10 +147,10 @@
                 );
         }
 
-        getAvailableRoles(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]> {
+        getAvailableRoles(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRoleDTO[]> {
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingAgreementId,
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId,
                     "available-roles"))
                 .then(
                     result => {
@@ -161,10 +161,10 @@
                     );
         }
 
-        getApplicableUsers(dataProcessingAgreementId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]> {
+        getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]> {
             return this
                 .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUri(`${dataProcessingAgreementId}/available-roles/${roleId}/applicable-users?nameOrEmailContent=${nameOrEmailContent}`))
+                .get<API.Models.IApiWrapper<any>>(this.getUri(`${dataProcessingRegistrationId}/available-roles/${roleId}/applicable-users?nameOrEmailContent=${nameOrEmailContent}`))
                 .then(
                     result => {
                         var response = result.data as { response: Models.DataProcessing.ISimpleUserDTO[] }
@@ -174,7 +174,7 @@
             );
         }
 
-        assignNewRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void> {
+        assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void> {
             const payload = {
                 RoleId: roleId,
                 UserId: userId
@@ -182,7 +182,7 @@
             return this
                 .$http
                 .patch<API.Models.IApiWrapper<any>>(
-                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, "roles/assign"),
+                    this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "roles/assign"),
                     payload)
                 .then(
                     result => {},
@@ -190,13 +190,13 @@
                 );
         }
 
-        removeRole(dataProcessingAgreementId: number, roleId: number, userId: number): angular.IPromise<void> {
+        removeRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void> {
             const payload = {
             };
             return this
                 .$http
                 .patch<API.Models.IApiWrapper<any>>(
-                    this.getUriWithIdAndSuffix(dataProcessingAgreementId, `roles/remove/${roleId}/from/${userId}`),
+                    this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `roles/remove/${roleId}/from/${userId}`),
                     payload)
                 .then(
                     result => { },
@@ -222,5 +222,5 @@
         }
     }
 
-    app.service("dataProcessingAgreementService", DataProcessingAgreementService);
+    app.service("dataProcessingRegistrationService", DataProcessingRegistrationService);
 }

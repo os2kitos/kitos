@@ -105,11 +105,11 @@
                 urlSuffix: "edit-contract-types"
             },
             {
-                id: "local-config.data-processing.edit-data-processing-agreement-roles",
+                id: "local-config.data-processing.edit-data-processing-registration-roles",
                 urlSuffix: "edit-data-processing-roles"
             },
             {
-                id: "local-config.data-processing.edit-data-processing-agreement-types",
+                id: "local-config.data-processing.edit-data-processing-registration-types",
                 urlSuffix: "edit-data-processing-types"
             }
         ];

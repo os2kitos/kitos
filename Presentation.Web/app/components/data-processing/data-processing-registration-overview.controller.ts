@@ -1,12 +1,12 @@
 ﻿module Kitos.DataProcessing.Agreement.Overview {
     "use strict";
 
-    export interface IOverviewController extends Utility.KendoGrid.IGridViewAccess<Models.DataProcessing.IDataProcessingAgreement> {
+    export interface IOverviewController extends Utility.KendoGrid.IGridViewAccess<Models.DataProcessing.IDataProcessingRegistration> {
     }
 
     export class OverviewController implements IOverviewController {
-        mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingAgreement>;
-        mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingAgreement>;
+        mainGrid: IKendoGrid<Models.DataProcessing.IDataProcessingRegistration>;
+        mainGridOptions: IKendoGridOptions<Models.DataProcessing.IDataProcessingRegistration>;
         canCreate: boolean;
         projectIdToAccessLookup = {};
 
@@ -30,7 +30,7 @@
             roles: Models.IOptionEntity[]) {
 
             //Prepare the page
-            $rootScope.page.title = "Databehandleraftaler - Overblik";
+            $rootScope.page.title = "Databehandling - Overblik";
 
             //Helper functions
             const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
@@ -46,13 +46,13 @@
             //Build and launch kendo grid
             var launcher =
                 kendoGridLauncherFactory
-                    .create<Models.DataProcessing.IDataProcessingAgreement>()
+                    .create<Models.DataProcessing.IDataProcessingRegistration>()
                     .withScope($scope)
                     .withGridBinding(this)
                     .withUser(user)
-                    .withEntityTypeName("Databehandleraftale")
-                    .withExcelOutputName("Databehandleraftaler - Overblik")
-                    .withStorageKey("data-processing-agreement-overview-options")
+                    .withEntityTypeName("Databehandling")
+                    .withExcelOutputName("Databehandling - Overblik")
+                    .withStorageKey("data-processing-registration-overview-options")
                     .withFixedSourceUrl(`/odata/Organizations(${user.currentOrganizationId})/DataProcessingRegistrationReadModels?$expand=RoleAssignments`)
                     .withParameterMapping((options, type) => {
                         // get kendo to map parameters to an odata url
@@ -97,11 +97,11 @@
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("Name")
-                            .withTitle("Databehandleraftale")
+                            .withTitle("Databehandling")
                             .withId("dpaName")
                             .withStandardWidth(200)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.edit-agreement.main", dataItem.SourceEntityId, dataItem.Name))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference("kendo-dpa-name-rendering", "data-processing.edit-registration.main", dataItem.SourceEntityId, dataItem.Name))
                             .withSourceValueEchoExcelOutput())
                     .withColumn(builder =>
                         builder
@@ -143,7 +143,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-agreement.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.Id]))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-registration.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.Id]))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.Id])))
             );
 
@@ -158,7 +158,7 @@
             "$stateProvider", $stateProvider => {
                 $stateProvider.state("data-processing.overview", {
                     url: "/overview",
-                    templateUrl: "app/components/data-processing/data-processing-agreement-overview.view.html",
+                    templateUrl: "app/components/data-processing/data-processing-registration-overview.view.html",
                     controller: OverviewController,
                     controllerAs: "vm",
                     resolve: {
@@ -167,11 +167,11 @@
                         ],
                         roles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingAgreementRoles).getAll()
+                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingRegistrationRoles).getAll()
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                                .createDataProcessingAgreementAuthorization()
+                                .createDataProcessingRegistrationAuthorization()
                                 .getOverviewAuthorization()]
                     }
                 });

@@ -1,9 +1,9 @@
 ﻿module Kitos.DataProcessing.Agreement.Create {
     "use strict";
 
-    export class CreateDateProcessingAgreementController {
+    export class CreateDateProcessingRegistrationController {
         static $inject: Array<string> = [
-            "dataProcessingAgreementService",
+            "dataProcessingRegistrationService",
             "user",
             "$scope",
             "notify",
@@ -12,7 +12,7 @@
         ];
 
         constructor(
-            private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
+            private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             private readonly user: Services.IUser,
             private readonly $scope,
             private readonly notify,
@@ -31,7 +31,7 @@
             var msg = this.notify.addInfoMessage('Opretter databehandleraftale...', false);
 
             return this
-                .dataProcessingAgreementService
+                .dataProcessingRegistrationService
                 .create(organizationId, name)
                 .then
                 (
@@ -86,7 +86,7 @@
                     if (response) {
                         this.close();
                         this.popState();
-                        this.$state.go("data-processing.edit-agreement.main", { id: response.createdObjectId });
+                        this.$state.go("data-processing.edit-registration.main", { id: response.createdObjectId });
                     }
                 });
         }
@@ -106,12 +106,12 @@
                     "$state", "$uibModal",
                     ($state: ng.ui.IStateService, $uibModal: ng.ui.bootstrap.IModalService) => {
                         $uibModal.open({
-                            templateUrl: "app/components/data-processing/data-processing-agreement-modal-create.view.html",
+                            templateUrl: "app/components/data-processing/data-processing-registration-modal-create.view.html",
                             windowClass: "modal fade in",
                             resolve: {
                                 user: ["userService", (userService: Services.IUserService) => userService.getUser()]
                             },
-                            controller: CreateDateProcessingAgreementController,
+                            controller: CreateDateProcessingRegistrationController,
                             controllerAs: "vm",
                         }).result.then(() => {
 

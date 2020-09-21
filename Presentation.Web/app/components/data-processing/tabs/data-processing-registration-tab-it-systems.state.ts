@@ -4,23 +4,23 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.edit-agreement.it-systems", {
+            $stateProvider.state("data-processing.edit-registration.it-systems", {
                 url: "/it-systems",
                 templateUrl: "app/shared/select-it-systems/generic-tab-it-systems.view.html",
                 controller: Shared.GenericTabs.SelectItSystems.SelectItSystemsController,
                 controllerAs: "vm",
                 resolve: {
                     systemSelectionOptions: [
-                        "hasWriteAccess", "dataProcessingAgreement", "dataProcessingAgreementService",
-                        (hasWriteAccess: boolean, dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO, dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) =>
+                        "hasWriteAccess", "dataProcessingRegistration", "dataProcessingRegistrationService",
+                        (hasWriteAccess: boolean, dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO, dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) =>
                             <Shared.GenericTabs.SelectItSystems.IGenericItSystemsSelectionConfiguration>
                             {
-                                ownerName: dataProcessingAgreement.name,
+                                ownerName: dataProcessingRegistration.name,
                                 overviewHeader: "Databehandleraftalen vedrører følgende IT Systemer",
                                 searchFunction:
                                     (query: string) =>
-                                        dataProcessingAgreementService
-                                            .getAvailableSystems(dataProcessingAgreement.id, query)
+                                        dataProcessingRegistrationService
+                                            .getAvailableSystems(dataProcessingRegistration.id, query)
                                             .then
                                             (
                                                 results =>
@@ -34,7 +34,7 @@
                                                 _ => []
                                             ),
 
-                                assignedSystems: dataProcessingAgreement.itSystems ? dataProcessingAgreement.itSystems.map(system => {
+                                assignedSystems: dataProcessingRegistration.itSystems ? dataProcessingRegistration.itSystems.map(system => {
                                     return <Shared.GenericTabs.SelectItSystems.ISystemViewModel>{
                                         id: system.id,
                                         name: system.name,
@@ -42,8 +42,8 @@
                                     }
                                 }) : [],
                                 hasWriteAccess: hasWriteAccess,
-                                assign: (systemId: number) => dataProcessingAgreementService.assignSystem(dataProcessingAgreement.id, systemId),
-                                remove: (systemId: number) => dataProcessingAgreementService.removeSystem(dataProcessingAgreement.id, systemId)
+                                assign: (systemId: number) => dataProcessingRegistrationService.assignSystem(dataProcessingRegistration.id, systemId),
+                                remove: (systemId: number) => dataProcessingRegistrationService.removeSystem(dataProcessingRegistration.id, systemId)
                             }
                     ]
                 }

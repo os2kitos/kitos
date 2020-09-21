@@ -1,28 +1,28 @@
 ﻿module Kitos.DataProcessing.Agreement.Edit.Main {
     "use strict";
 
-    export class EditMainDataProcessingAgreementController {
+    export class EditMainDataProcessingRegistrationController {
         static $inject: Array<string> = [
-            "dataProcessingAgreementService",
+            "dataProcessingRegistrationService",
             "notify",
             "hasWriteAccess",
-            "dataProcessingAgreement"
+            "dataProcessingRegistration"
         ];
 
         constructor(
-            private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
+            private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             private readonly notify,
             public hasWriteAccess,
-            private readonly dataProcessingAgreement : Models.DataProcessing.IDataProcessingAgreementDTO) {
+            private readonly dataProcessingRegistration : Models.DataProcessing.IDataProcessingRegistrationDTO) {
         }
 
-        headerName = this.dataProcessingAgreement.name;
+        headerName = this.dataProcessingRegistration.name;
 
         changeName(name) {
 
             var msg = this.notify.addInfoMessage("Ændrer navn på databehandleraftale");
 
-            return this.dataProcessingAgreementService.rename(this.dataProcessingAgreement.id, name).then(
+            return this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name).then(
                 nameChangeResponse => {
                     msg.toSuccessMessage("Navnet er ændret!");
                     this.headerName = nameChangeResponse.valueModifiedTo;
@@ -47,10 +47,10 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.edit-agreement.main", {
+            $stateProvider.state("data-processing.edit-registration.main", {
                 url: "/main",
-                templateUrl: "app/components/data-processing/tabs/data-processing-agreement-tab-main.view.html",
-                controller: EditMainDataProcessingAgreementController,
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-main.view.html",
+                controller: EditMainDataProcessingRegistrationController,
                 controllerAs: "vm"
             });
         }]);

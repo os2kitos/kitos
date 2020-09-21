@@ -16,6 +16,6 @@ class DataProcessingAgreementNavigation {
 export = DataProcessingAgreementNavigation;
 
 class DataProcessingAgreementNavigationSrefs {
-    static mainPageSref = "data-processing.edit-agreement.main";
-    static referencePageSref = "data-processing.edit-agreement.reference";
+    static mainPageSref = "data-processing.edit-registration.main";
+    static referencePageSref = "data-processing.edit-registration.reference";
 }

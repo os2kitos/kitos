@@ -138,13 +138,13 @@
                 isRole: false
             },
             {
-                id: "global-admin.data-processing.edit-data-processing-agreement-roles",
-                urlSuffix: "edit-data-processing-agreement-roles",
+                id: "global-admin.data-processing.edit-data-processing-registration-roles",
+                urlSuffix: "edit-data-processing-registration-roles",
                 isRole: true
             },
             {
-                id: "global-admin.data-processing.edit-data-processing-agreement-types",
-                urlSuffix: "edit-data-processing-agreement-types",
+                id: "global-admin.data-processing.edit-data-processing-registration-types",
+                urlSuffix: "edit-data-processing-registration-types",
                 isRole: false
             }
         ];

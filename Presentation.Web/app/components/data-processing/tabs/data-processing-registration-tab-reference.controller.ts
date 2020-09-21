@@ -1,7 +1,7 @@
 ﻿module Kitos.DataProcessing.Agreement.Edit.Ref {
     "use strict";
 
-    export class EditRefDataProcessingAgreementController {
+    export class EditRefDataProcessingRegistrationController {
         static $inject: Array<string> = [
             "$scope",
             "$state",
@@ -9,8 +9,8 @@
             "notify",
             "hasWriteAccess",
             "referenceService",
-            "dataProcessingAgreement",
-            "dataProcessingAgreementService"
+            "dataProcessingRegistration",
+            "dataProcessingRegistrationService"
         ];
 
         constructor(
@@ -20,14 +20,14 @@
             notify,
             public hasWriteAccess,
             referenceService: Services.IReferenceService,
-            private dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO,
-            private dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
+            private dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
+            private dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) {
 
-            $scope.referenceName = dataProcessingAgreement.name;
+            $scope.referenceName = dataProcessingRegistration.name;
 
             this.$scope.mainGridOptions = {
                 dataSource: {
-                    data: dataProcessingAgreement.references,
+                    data: dataProcessingRegistration.references,
                     pageSize: 10
                 },
                 sortable: true,
@@ -97,7 +97,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (this.hasWriteAccess) {
-                                return `<a id="addReference" data-element-type="createReferenceButton" class="btn btn-success btn-sm" href="\\#/data-processing/edit/${dataProcessingAgreement.id}/reference/createReference/${dataProcessingAgreement.id}"'>Tilføj reference</a>`;
+                                return `<a id="addReference" data-element-type="createReferenceButton" class="btn btn-success btn-sm" href="\\#/data-processing/edit/${dataProcessingRegistration.id}/reference/createReference/${dataProcessingRegistration.id}"'>Tilføj reference</a>`;
                             } else {
                                 return "";
                             }
@@ -120,7 +120,7 @@
 
                 var msg = notify.addInfoMessage("Opdaterer felt...", false);
 
-                this.dataProcessingAgreementService.setMasterReference(this.dataProcessingAgreement.id, id).then(
+                this.dataProcessingRegistrationService.setMasterReference(this.dataProcessingRegistration.id, id).then(
                     nameChangeResponse => {
                         msg.toSuccessMessage("Feltet er opdateret!");
                         reload();
@@ -147,10 +147,10 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.edit-agreement.reference", {
+            $stateProvider.state("data-processing.edit-registration.reference", {
                 url: "/reference",
                 templateUrl: "app/components/it-reference/it-reference.view.html",
-                controller: EditRefDataProcessingAgreementController,
+                controller: EditRefDataProcessingRegistrationController,
                 controllerAs: "vm",
                 resolve: {
                     referenceService: ["referenceServiceFactory", (referenceServiceFactory) => referenceServiceFactory.createDpaReference()],

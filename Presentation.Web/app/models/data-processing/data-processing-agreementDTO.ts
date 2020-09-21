@@ -5,7 +5,7 @@
         role: IDataProcessingRoleDTO,
     }
 
-    export interface IDataProcessingAgreementDTO {
+    export interface IDataProcessingRegistrationDTO {
         id: number,
         name: string,
         references: Array<IDataProcessingReferenceDTO>;
