@@ -3,8 +3,6 @@
         id: number,
         name: string,
         organizationId: number,
-        objectOwnerId: number,
-        referenceId: number,
         references: Array<dpaReference>;
 		itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
     }

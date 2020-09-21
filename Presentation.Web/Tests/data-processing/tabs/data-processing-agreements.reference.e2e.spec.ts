@@ -35,7 +35,7 @@ describe("Data Processing agreement reference test ",
             //Creating DPA
             dpaHelper.createDataProcessingAgreement(agreementName)
                 .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
-                .then(() => pageObjectReference.getDpaReferenceTabButton().click())
+                .then(() => pageObjectReference.goToDpaReferenceTab())
             // creating reference
                 .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                 .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))

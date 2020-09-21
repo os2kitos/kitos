@@ -2,6 +2,7 @@
 import WaitTimers = require("../Utility/WaitTimers");
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import ItSystemCatalogPage = require("../PageObjects/it-system/Catalog/ItSystemCatalog.po");
+import DataProcessingAgreementPage = require("../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main.po");
 
 class ReferenceHelper {
     private homePage = new ReferencePage();
@@ -9,6 +10,7 @@ class ReferenceHelper {
     private waitUpTo = new WaitTimers();
     private headerButtons = new ReferencePage().kendoToolbarWrapper.headerButtons();
     private inputFields = new ReferencePage().kendoToolbarWrapper.inputFields();
+    private dpaPage = new DataProcessingAgreementPage();
     private cssLocator = new CSSLocator();
 
     public createReference(title: string, url: string, id: string) {
