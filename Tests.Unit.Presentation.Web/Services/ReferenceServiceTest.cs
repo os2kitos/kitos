@@ -10,6 +10,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
@@ -53,6 +54,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _systemUsageRepository.Object,
                 _contractRepository.Object, 
                 _projectRepository.Object, 
+                Mock.Of<IDataProcessingRegistrationRepository>(),
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),

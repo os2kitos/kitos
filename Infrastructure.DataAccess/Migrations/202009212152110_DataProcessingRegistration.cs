@@ -100,7 +100,7 @@ namespace Infrastructure.DataAccess.Migrations
                         ParentId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.DataProcessingRegistrationReadModels", t => t.ParentId)
+                .ForeignKey("dbo.DataProcessingRegistrationReadModels", t => t.ParentId, cascadeDelete: true)
                 .Index(t => t.RoleId)
                 .Index(t => t.UserId)
                 .Index(t => t.UserFullName)
@@ -352,7 +352,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddForeignKey("dbo.ExternalReferences", "DataProcessingRegistration_Id", "dbo.DataProcessingRegistrations", "Id", cascadeDelete: true);
             SqlResource(SqlMigrationScriptRepository.GetResourceName("AddDefaultDpaTypesToExistingDb.sql"));
         }
-
+        
         public override void Down()
         {
             DropForeignKey("dbo.LocalDataProcessingRegistrationRoles", "OrganizationId", "dbo.Organization");

@@ -12,7 +12,7 @@ namespace Infrastructure.DataAccess.Mapping
             HasRequired(x => x.Parent)
                 .WithMany(x => x.RoleAssignments)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
             Property(x=>x.UserFullName)
                 .IsRequired()
                 .HasMaxLength(UserConstraints.MaxNameLength)

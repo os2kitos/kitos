@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
@@ -23,6 +24,7 @@ namespace Core.ApplicationServices.References
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository;
         private readonly IItProjectRepository _projectRepository;
+        private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IOperationClock _operationClock;
@@ -35,6 +37,7 @@ namespace Core.ApplicationServices.References
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IItProjectRepository projectRepository,
+            IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IOperationClock operationClock,
@@ -45,6 +48,7 @@ namespace Core.ApplicationServices.References
             _systemUsageRepository = systemUsageRepository;
             _contractRepository = contractRepository;
             _projectRepository = projectRepository;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _operationClock = operationClock;
@@ -141,6 +145,14 @@ namespace Core.ApplicationServices.References
         {
             var project = _projectRepository.GetById(projectId);
             return DeleteExternalReferences(project);
+        }
+
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id)
+        {
+            return _dataProcessingRegistrationRepository
+                .GetById(id)
+                .Select(DeleteExternalReferences)
+                .Match(r => r, () => OperationFailure.NotFound);
         }
 
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)

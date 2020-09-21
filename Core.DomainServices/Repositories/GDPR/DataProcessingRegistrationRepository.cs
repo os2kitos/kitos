@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR
@@ -33,6 +34,9 @@ namespace Core.DomainServices.Repositories.GDPR
             if (registration != null)
             {
                 Notify(registration, LifeCycleEventType.Deleted);
+                registration.Reference.Track();
+                registration.Reference = null;
+                registration.ExternalReferences.Clear();
                 _repository.DeleteWithReferencePreload(registration);
                 _repository.Save();
                 return true;

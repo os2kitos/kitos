@@ -612,9 +612,9 @@
     <Compile Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.designer.cs">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009211324451_DataProcessingRegistration.cs" />
-    <Compile Include="Migrations\202009211324451_DataProcessingRegistration.designer.cs">
-      <DependentUpon>202009211324451_DataProcessingRegistration.cs</DependentUpon>
+    <Compile Include="Migrations\202009212152110_DataProcessingRegistration.cs" />
+    <Compile Include="Migrations\202009212152110_DataProcessingRegistration.designer.cs">
+      <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -997,8 +997,8 @@
     <EmbeddedResource Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.resx">
       <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009211324451_DataProcessingRegistration.resx">
-      <DependentUpon>202009211324451_DataProcessingRegistration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009212152110_DataProcessingRegistration.resx">
+      <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
