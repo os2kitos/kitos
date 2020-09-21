@@ -49,7 +49,7 @@ namespace Tools.Test.Database.Model.Tasks
             return true;
         }
 
-        private static T BuildOption<T>(T option, string name, int optionPriority, int ownerId, string helpText = null) where T : OptionEntity<DataProcessingAgreement>, IOptionReference<DataProcessingAgreement>
+        private static T BuildOption<T>(T option, string name, int optionPriority, int ownerId, string helpText = null) where T : OptionEntity<DataProcessingRegistration>, IOptionReference<DataProcessingRegistration>
         {
             option.Name = name;
             option.Priority = optionPriority;

@@ -53,7 +53,7 @@
                                     }
                                     if (parent.stateName === "data-processing.overview") {
                                         $scope.title = "IT advis - Databehandleraftaler";
-                                        moduleTypeFilter = "Type eq 'dataProcessingAgreement'";
+                                        moduleTypeFilter = "Type eq 'dataProcessingRegistration'";
                                         stateUrl = $window.location.href.replace("overview", "edit");
                                     }
                                     $scope.mainGridOptions = {

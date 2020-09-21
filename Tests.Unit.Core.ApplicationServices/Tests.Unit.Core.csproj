@@ -161,7 +161,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
-    <Compile Include="ApplicationServices\GDPR\DataProcessingAgreementApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
@@ -175,11 +175,11 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
-    <Compile Include="DomainServices\GDPR\BuildDataProcessingAgreementReadModelOnChangesHandlerTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingAgreementNamingServiceTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingAgreementRoleAssignmentsServiceTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingAgreementSystemAssignmentServiceTest.cs" />
-    <Compile Include="DomainServices\Repositories\DataProcessingAgreementRepositoryTest.cs" />
+    <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationNamingServiceTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationRoleAssignmentsServiceTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />

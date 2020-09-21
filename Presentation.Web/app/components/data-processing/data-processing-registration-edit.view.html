@@ -1,0 +1,31 @@
+﻿<!-- it project master sheet -->
+<div class="container-fluid object-wrapper">
+    <!-- Left menu -->
+    <div class="col-xs-3 col-lg-2 left-menu-container">
+        <div class="left-menu">
+            <div class="header">
+                <h3>Databehandling</h3>
+            </div>
+            <ul>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="data-processing.edit-registration.main"><img src="/Content/img/Systemforside.svg"></img> Forside</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="data-processing.edit-registration.it-systems"><img src="/Content/img/ITsystemer.svg"/> IT Systemer</a>
+                </li>
+				<li data-ui-sref-active="active">
+                    <a data-ui-sref="data-processing.edit-registration.reference"><img src="/Content/img/References.svg"></img> Referencer</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="data-processing.edit-registration.advice"><img src="/Content/img/Advis.svg"/> Advis</a>
+                </li>				
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="data-processing.edit-registration.roles"><img src="/Content/img/Systemroller.svg"/> Databehandlingsroller</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-9 col-lg-10 object-content">
+        <ui-view />
+    </div>
+</div>

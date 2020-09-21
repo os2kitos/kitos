@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingOversightOptionMap : OptionEntityMap<DataProcessingOversightOption, DataProcessingAgreement>
+    public class DataProcessingOversightOptionMap : OptionEntityMap<DataProcessingOversightOption, DataProcessingRegistration>
     {
     }
 }

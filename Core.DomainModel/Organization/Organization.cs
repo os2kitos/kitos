@@ -93,9 +93,9 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<SsoOrganizationIdentity> SsoIdentities { get; set; }
 
-        public virtual ICollection<DataProcessingAgreement> DataProcessingAgreements { get; set; }
+        public virtual ICollection<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
-        public virtual ICollection<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
+        public virtual ICollection<DataProcessingRegistrationReadModel> DataProcessingRegistrationReadModels { get; set; }
 
         public virtual int? ContactPersonId { get; set; }
         

@@ -33,7 +33,7 @@ namespace Core.DomainServices.Repositories.Reference
         private readonly IGenericRepository<ItSystem> _systemRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<ItProject> _projectRepository;
-        private readonly IGenericRepository<DataProcessingAgreement> _dataProcessingAgreementRepository;
+        private readonly IGenericRepository<DataProcessingRegistration> _dataProcessingRegistrationRepository;
 
         public ReferenceRepository(
             IGenericRepository<ExternalReference> referenceRepository,
@@ -41,14 +41,14 @@ namespace Core.DomainServices.Repositories.Reference
             IGenericRepository<ItSystem> systemRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<ItProject> projectRepository,
-            IGenericRepository<DataProcessingAgreement> dataProcessingAgreementRepository)
+            IGenericRepository<DataProcessingRegistration> dataProcessingRegistrationRepository)
         {
             _referenceRepository = referenceRepository;
             _contractRepository = contractRepository;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
             _projectRepository = projectRepository;
-            _dataProcessingAgreementRepository = dataProcessingAgreementRepository;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
         }
 
         public Maybe<ExternalReference> Get(int referenceId)
@@ -70,7 +70,7 @@ namespace Core.DomainServices.Repositories.Reference
                 ReferenceRootType.SystemUsage => baseQuery.Where(x => x.ItSystemUsage_Id != null),
                 ReferenceRootType.Contract => baseQuery.Where(x => x.Itcontract_Id != null),
                 ReferenceRootType.Project => baseQuery.Where(x => x.ItProject_Id != null),
-                ReferenceRootType.DataProcessingAgreement => baseQuery.Where(x => x.DataProcessingAgreement_Id != null),
+                ReferenceRootType.DataProcessingRegistration => baseQuery.Where(x => x.DataProcessingRegistration_Id != null),
                 _ => throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type")
             };
         }
@@ -97,8 +97,8 @@ namespace Core.DomainServices.Repositories.Reference
                     new ReferenceRootRepositoryOperations(innerId => _contractRepository.GetByKey(innerId), _contractRepository.Save),
                 ReferenceRootType.Project =>
                     new ReferenceRootRepositoryOperations(innerId => _projectRepository.GetByKey(innerId), _projectRepository.Save),
-                ReferenceRootType.DataProcessingAgreement =>
-                    new ReferenceRootRepositoryOperations(innerId => _dataProcessingAgreementRepository.GetByKey(innerId), _dataProcessingAgreementRepository.Save),
+                ReferenceRootType.DataProcessingRegistration =>
+                    new ReferenceRootRepositoryOperations(innerId => _dataProcessingRegistrationRepository.GetByKey(innerId), _dataProcessingRegistrationRepository.Save),
                 _ => throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type")
             };
         }

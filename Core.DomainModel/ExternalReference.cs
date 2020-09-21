@@ -36,8 +36,8 @@ namespace Core.DomainModel
         public int? ItSystem_Id { get; set; }
         public virtual ItSystem.ItSystem ItSystem { get; set; }
 
-        public int? DataProcessingAgreement_Id { get; set; }
-        public virtual DataProcessingAgreement DataProcessingAgreement { get; set; }
+        public int? DataProcessingRegistration_Id { get; set; }
+        public virtual DataProcessingRegistration DataProcessingRegistration { get; set; }
 
 
         public string Title { get; set; }
@@ -52,7 +52,7 @@ namespace Core.DomainModel
                 ItSystemUsage ??
                 ItContract ??
                 ItProject ??
-                DataProcessingAgreement ??
+                DataProcessingRegistration ??
                 (IEntityWithExternalReferences)ItSystem;
         }
 

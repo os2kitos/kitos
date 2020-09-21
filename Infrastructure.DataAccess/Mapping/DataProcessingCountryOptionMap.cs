@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingCountryOptionMap : OptionEntityMap<DataProcessingCountryOption, DataProcessingAgreement>
+    public class DataProcessingCountryOptionMap : OptionEntityMap<DataProcessingCountryOption, DataProcessingRegistration>
     {
     }
 }

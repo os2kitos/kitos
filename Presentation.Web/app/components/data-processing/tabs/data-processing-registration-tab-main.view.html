@@ -1,0 +1,22 @@
+﻿<div class="object-section-container">
+    <h4 data-element-type="dpaMainDetailHeader">{{vm.headerName}}</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-6">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="dataProcessingRegistration-name" class="control-label small">Navn</label>
+                    <input type="text" id="dataProcessingRegistration-name" class="form-control input-sm" required
+                           data-ng-model="vm.dataProcessingRegistration.name"
+                           data-element-type="dpaMainName"
+                           data-field="name"
+                           ng-blur="vm.changeName(vm.dataProcessingRegistration.name)"
+                           data-ng-disabled="!vm.hasWriteAccess"
+                           autofocus
+                           maxlength="150">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="object-section-container"></div>

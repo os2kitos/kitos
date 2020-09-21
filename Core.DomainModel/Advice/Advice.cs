@@ -12,7 +12,7 @@ namespace Core.DomainModel.Advice
         itSystemUsage = 1,
         itProject = 2,
         itInterface = 3,
-        dataProcessingAgreement = 4
+        dataProcessingRegistration = 4
     }
     public enum Scheduling
     {

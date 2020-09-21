@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.API
                 fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.System, dto.ItSystem_Id,
                     fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.SystemUsage, dto.ItSystemUsage_Id,
                         fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.Project, dto.ItProject_Id,
-                            fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.DataProcessingAgreement, dto.DataProcessingAgreement_Id,
+                            fallback: () => GetOwnerTypeAndIdOrFallback(ReferenceRootType.DataProcessingRegistration, dto.DataProcessingRegistration_Id,
                                 fallback: () => Maybe<KeyValuePair<ReferenceRootType, int>>.None)))));
         }
 
