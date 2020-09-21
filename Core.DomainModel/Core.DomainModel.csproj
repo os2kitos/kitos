@@ -62,6 +62,10 @@
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GDPR\DataProcessingAgreementConstraints.cs" />
     <Compile Include="GDPR\DataProcessingAgreement.cs" />
+    <Compile Include="GDPR\DataProcessingCountryOption.cs" />
+    <Compile Include="GDPR\DataProcessingDataResponsibleOption.cs" />
+    <Compile Include="GDPR\DataProcessingOversightOption.cs" />
+    <Compile Include="GDPR\DataProcessingBasisForTransferOption.cs" />
     <Compile Include="GDPR\Read\DataProcessingAgreementReadModel.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRight.cs" />
     <Compile Include="GDPR\DataProcessingAgreementRole.cs" />
@@ -100,6 +104,10 @@
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
     <Compile Include="LocalOptions\LocalDataProcessingAgreementRole.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingCountryOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingDataResponsibleOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingOversightOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingBasisForTransferOption.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />

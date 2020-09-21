@@ -37,6 +37,7 @@ namespace Tools.Test.Database.Model.Tasks
             {
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData1"),
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData2"),
+                new CreateDpaOptionTypesTask(),
                 new EnableAllOptionsTask(),
                 new CreateOrganizationTask((int)OrganizationTypeKeys.Kommune,SecondOrganizationName),
                 new CreateKitosUserTask(_globalAdmin, OrganizationRole.GlobalAdmin, DefaultOrganizationName),

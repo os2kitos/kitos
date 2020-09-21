@@ -141,6 +141,11 @@
                 id: "global-admin.data-processing.edit-data-processing-agreement-roles",
                 urlSuffix: "edit-data-processing-agreement-roles",
                 isRole: true
+            },
+            {
+                id: "global-admin.data-processing.edit-data-processing-agreement-types",
+                urlSuffix: "edit-data-processing-agreement-types",
+                isRole: false
             }
         ];
 

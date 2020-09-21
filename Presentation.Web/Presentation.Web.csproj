@@ -365,7 +365,15 @@
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingAgreementRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingOversightOptionsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingBasisForTransferOptionsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataProcessingAgreementRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingCountryOptionsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingDataResponsibleOptionsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingOversightOptionsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataProcessingBasisForTransferOptionsController.cs" />
     <Compile Include="Controllers\SSO\SSOController.cs" />
     <Compile Include="Extensions\AutoMapperExtensions.cs" />
     <Compile Include="Hangfire\KeepReadModelsInSyncProcess.cs" />
