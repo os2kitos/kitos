@@ -86,7 +86,7 @@
         SensitiveDataTypes,
         TerminationDeadlineTypes,
         DataProcessingAgreementRoles,
-        DataProcessingTransferReasonOptions,
+        DataProcessingBasisForTransferOptions,
         DataProcessingOversightOptions,
         DataProcessingDataResponsibleOptions,
         DataProcessingCountryOptions,
@@ -180,8 +180,8 @@
                     return "LocalTerminationDeadlineTypes";
                 case LocalOptionType.DataProcessingAgreementRoles:
                     return "LocalDataProcessingAgreementRoles";
-                case LocalOptionType.DataProcessingTransferReasonOptions:
-                    return "LocalDataProcessingTransferReasonOptions";
+                case LocalOptionType.DataProcessingBasisForTransferOptions:
+                    return "LocalDataProcessingBasisForTransferOptions";
                 case LocalOptionType.DataProcessingOversightOptions:
                     return "LocalDataProcessingOversightOptions";
                 case LocalOptionType.DataProcessingDataResponsibleOptions:

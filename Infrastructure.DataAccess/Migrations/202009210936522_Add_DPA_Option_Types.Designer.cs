@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202009210608212_Add_DPA_Option_Types"; }
+            get { return "202009210936522_Add_DPA_Option_Types"; }
         }
         
         string IMigrationMetadata.Source

@@ -443,13 +443,13 @@ namespace Presentation.Web
 
             //Generic global options
             BindEntitySet<DataProcessingAgreementRole, DataProcessingAgreementRolesController>(builder);
-            BindEntitySet<DataProcessingTransferReasonOption, DataProcessingTransferReasonOptionsController>(builder);
+            BindEntitySet<DataProcessingBasisForTransferOption, DataProcessingBasisForTransferOptionsController>(builder);
             BindEntitySet<DataProcessingOversightOption, DataProcessingOversightOptionsController>(builder);
             BindEntitySet<DataProcessingDataResponsibleOption, DataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<DataProcessingCountryOption, DataProcessingCountryOptionsController>(builder);
 
             //Generic local options
-            BindEntitySet<LocalDataProcessingTransferReasonOption, LocalDataProcessingTransferReasonOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOptionsOptionsController>(builder);
             BindEntitySet<LocalDataProcessingOversightOption, LocalDataProcessingOversightOptionsController>(builder);
             BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);

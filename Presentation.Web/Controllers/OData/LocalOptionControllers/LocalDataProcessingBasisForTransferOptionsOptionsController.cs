@@ -9,10 +9,10 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [PublicApi]
-    [ODataRoutePrefix("LocalDataProcessingTransferReasonOptions")]
-    public class LocalDataProcessingTransferReasonOptionsController : LocalOptionBaseController<LocalDataProcessingTransferReasonOption, DataProcessingAgreement, DataProcessingTransferReasonOption>
+    [ODataRoutePrefix("LocalDataProcessingBasisForTransferOptionsOptions")]
+    public class LocalDataProcessingBasisForTransferOptionsOptionsController : LocalOptionBaseController<LocalDataProcessingBasisForTransferOption, DataProcessingAgreement, DataProcessingBasisForTransferOption>
     {
-        public LocalDataProcessingTransferReasonOptionsController(IGenericRepository<LocalDataProcessingTransferReasonOption> repository, IGenericRepository<DataProcessingTransferReasonOption> optionsRepository)
+        public LocalDataProcessingBasisForTransferOptionsOptionsController(IGenericRepository<LocalDataProcessingBasisForTransferOption> repository, IGenericRepository<DataProcessingBasisForTransferOption> optionsRepository)
             : base(repository, optionsRepository)
         {
 
@@ -28,10 +28,10 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
         public override IHttpActionResult Get(int organizationId, int key) => base.Get(organizationId, key);
 
         [ODataRoute]
-        public override IHttpActionResult Post(int organizationId, LocalDataProcessingTransferReasonOption entity) => base.Post(organizationId, entity);
+        public override IHttpActionResult Post(int organizationId, LocalDataProcessingBasisForTransferOption entity) => base.Post(organizationId, entity);
 
         [ODataRoute]
-        public override IHttpActionResult Patch(int organizationId, int key, Delta<LocalDataProcessingTransferReasonOption> delta) => base.Patch(organizationId, key, delta);
+        public override IHttpActionResult Patch(int organizationId, int key, Delta<LocalDataProcessingBasisForTransferOption> delta) => base.Patch(organizationId, key, delta);
 
         [ODataRoute]
         public override IHttpActionResult Delete(int organizationId, int key) => base.Delete(organizationId, key);
