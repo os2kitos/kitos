@@ -109,7 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
-    <Compile Include="GDPR\DataProcessingAgreementReadModelsTest.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
     <Compile Include="ItSystem\SystemRelationsTest.cs" />
