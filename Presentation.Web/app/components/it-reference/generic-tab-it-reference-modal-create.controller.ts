@@ -17,7 +17,7 @@
             private readonly $state: angular.ui.IStateService,
             private readonly $stateParams,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private referenceService: Services.ReferenceService) {
+            private readonly referenceService: Services.IReferenceService) {
 
             $scope.modalTitle = "Opret reference";
         }

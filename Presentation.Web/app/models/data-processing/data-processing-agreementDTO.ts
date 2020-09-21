@@ -5,15 +5,15 @@
         organizationId: number,
         objectOwnerId: number,
         referenceId: number,
-        references: Array<DpaReference>;
+        references: Array<dpaReference>;
 		itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
     }
 
-    export interface DpaReference extends BaseReference {
-        Title: string;
-        ExternalReferenceId: string;
-        URL: string;
-        MasterReference: boolean;
-        Created: Date;
+    export interface dpaReference extends BaseReference {
+        title: string;
+        externalReferenceId: string;
+        url: string;
+        masterReference: boolean;
+        created: Date;
     }
 }
