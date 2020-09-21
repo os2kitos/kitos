@@ -32,7 +32,7 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Creating and renaming data processing agreement",
+    it("Creating and renaming data processing registration",
         () => {
             var name = createName(10);
             var renameValue = createName(30);
@@ -44,7 +44,7 @@ describe("Data processing agreement main detail tests", () => {
         });
 
 
-    it("It is possible to delete a data processing agreement",
+    it("It is possible to delete a data processing registration",
         () => {
             const nameToDelete = createName(1);
             console.log("Creating agreement and deleting it");
@@ -58,13 +58,13 @@ describe("Data processing agreement main detail tests", () => {
         });
 
     function renameNameAndVerify(name: string) {
-        console.log(`Renaming agreement to ${name}`);
+        console.log(`Renaming registration to ${name}`);
         pageObject.getDpaMainNameInput().click()
             .then(() => pageObject.getDpaMainNameInput().clear())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(name))
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
             .then(() => {
-                console.log(`Expecting agreement to be called ${name}`);
+                console.log(`Expecting registration to be called ${name}`);
                 browser.wait(ec.textToBePresentInElement(pageObject.getDpaMainNameHeader(), name),
                     waitUpTo.twentySeconds,
                     `Could not verify that ${name} was changed`);

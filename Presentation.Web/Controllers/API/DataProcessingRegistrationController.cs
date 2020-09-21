@@ -161,7 +161,7 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingRegistrationApplicationService
                 .GetAvailableRoles(id)
-                .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.agreement.OrganizationId).ToList())
+                .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
                 .Match(Ok, FromOperationError);
 
         }

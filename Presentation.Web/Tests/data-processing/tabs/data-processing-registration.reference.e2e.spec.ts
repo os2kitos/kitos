@@ -5,7 +5,7 @@ import DataProcessingHelper = require("../../Helpers/DataProcessingRegistrationH
 import DataProcessingRegistrationEditReferencePageObject =
 require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.reference.po");
 
-describe("Data Processing agreement reference test ",
+describe("Data Processing registration reference test ",
     () => {
         var loginHelper = new login();
         var pageObjectReference = new DataProcessingRegistrationEditReferencePageObject();
@@ -25,7 +25,7 @@ describe("Data Processing agreement reference test ",
             testFixture.cleanupState();
         });
 
-        it("Add, edit and delete reference to a agreement", () => {
+        it("Add, edit and delete reference to a registration", () => {
             var referenceName = createReferenceName();
             var referenceId = createReferenceId();
             var validUrl = generateValidUrl();

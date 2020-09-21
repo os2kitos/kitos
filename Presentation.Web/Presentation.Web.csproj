@@ -806,7 +806,7 @@
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\DataProcessingAgreementNavigation.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\DataProcessingRegistrationNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />

@@ -1,7 +1,7 @@
 ﻿import PageObject = require("../../IPageObject.po");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import CssLocatorHelper = require("../../../Object-wrappers/CSSLocatorHelper");
-import DataProcessingRegistrationNavigation = require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
+import DataProcessingRegistrationNavigation = require("../../../Helpers/SideNavigation/DataProcessingRegistrationNavigation");
 
 class DataProcessingRegistrationEditReferencePageObject {
     private navigationHelper = new NavigationHelper();

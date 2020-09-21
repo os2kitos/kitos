@@ -2,7 +2,7 @@
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import CssLocatorHelper = require("../../../Object-wrappers/CSSLocatorHelper");
 import DataProcessingRegistrationNavigation =
-require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
+require("../../../Helpers/SideNavigation/DataProcessingRegistrationNavigation");
 
 class DataProcessingRegistrationEditMainPageObject {
     private navigationHelper = new NavigationHelper();

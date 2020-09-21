@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject =
 require("../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
-import DataProcessingRegistrationtHelper = require("../Helpers/DataProcessingRegistrationHelper")
+import DataProcessingRegistrationHelper = require("../Helpers/DataProcessingRegistrationHelper")
 
 describe("Data processing registration tests", () => {
 
@@ -13,7 +13,7 @@ describe("Data processing registration tests", () => {
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
-    const dpaHelper = DataProcessingRegistrationtHelper;
+    const dpaHelper = DataProcessingRegistrationHelper;
 
     const createName = (index: number) => { 
         return `Dpa${new Date().getTime()}_${index}`;
