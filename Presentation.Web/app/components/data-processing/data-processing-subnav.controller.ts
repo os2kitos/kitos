@@ -17,7 +17,7 @@
             notify,
             dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) {
 
-            this.$scope.page.title = "Databehandling - Overblok";
+            this.$scope.page.title = "Databehandling - Overblik";
  
             $rootScope.page.subnav = [
                 { state: "data-processing.overview", substate: "data-processing.edit-registration", text: "Overblik" }

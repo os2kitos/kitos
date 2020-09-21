@@ -20,7 +20,7 @@
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance) {
         }
 
-        readonly type: string = "Databehandleraftale";
+        readonly type: string = "Registrering";
 
         readonly checkAvailableUrl: string = "api/v1/data-processing-registration";
 
@@ -28,7 +28,7 @@
             const name = this.$scope.formData.name;
             const organizationId = this.user.currentOrganizationId;
 
-            var msg = this.notify.addInfoMessage('Opretter databehandleraftale...', false);
+            var msg = this.notify.addInfoMessage('Opretter registrering...', false);
 
             return this
                 .dataProcessingRegistrationService
@@ -36,7 +36,7 @@
                 .then
                 (
                     createdResponse => {
-                        msg.toSuccessMessage("En ny databehandleraftale er oprettet!");
+                        msg.toSuccessMessage("En ny registrering er oprettet!");
                         return createdResponse;
                     },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
@@ -48,7 +48,7 @@
                                 msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
                                 break;
                             default:
-                                msg.toErrorMessage("Fejl! Kunne ikke oprette ny databehandleraftale!");
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette ny registrering!");
                                 break;
                         }
 
@@ -100,7 +100,7 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("data-processing.overview.create-agreement", {
+            $stateProvider.state("data-processing.overview.create-registration", {
                 url: "/create-agreement",
                 onEnter: [
                     "$state", "$uibModal",

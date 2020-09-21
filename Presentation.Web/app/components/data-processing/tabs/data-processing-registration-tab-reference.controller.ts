@@ -128,7 +128,7 @@
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
                             default:
-                                msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+                                msg.toErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                                 break;
                         }
                     });

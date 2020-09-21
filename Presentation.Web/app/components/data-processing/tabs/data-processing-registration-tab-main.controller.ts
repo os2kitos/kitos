@@ -20,7 +20,7 @@
 
         changeName(name) {
 
-            var msg = this.notify.addInfoMessage("Ændrer navn på databehandleraftale");
+            var msg = this.notify.addInfoMessage("Ændrer nav");
 
             return this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name).then(
                 nameChangeResponse => {
@@ -36,7 +36,7 @@
                         msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
                         break;
                     default:
-                        msg.toErrorMessage("Fejl! Kunne ikke ændre navn på databehandleraftale!");
+                        msg.toErrorMessage("Fejl! Kunne ikke ændre navnet!");
                         break;
                     }
                 }

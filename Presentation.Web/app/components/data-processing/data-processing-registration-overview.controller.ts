@@ -88,11 +88,11 @@
                     })
                     .withToolbarEntry({
                         id: "createDpa",
-                        title: "Opret Databehandleraftale",
+                        title: "Opret Registrering",
                         color: Utility.KendoGrid.KendoToolbarButtonColor.Green,
                         position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                         enabled: () => userAccessRights.canCreate,
-                        onClick: () => $state.go("data-processing.overview.create-agreement")
+                        onClick: () => $state.go("data-processing.overview.create-registration")
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>
                         builder
