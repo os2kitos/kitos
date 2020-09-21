@@ -67,6 +67,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/name"), cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendSetMasterReferenceRequestAsync(int id, int refId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new { Value = refId };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-agreement/{id}/master-reference"), cookie, body);
+        }
+
         public static async Task<HttpResponseMessage> SendCanCreateRequestAsync(int organizationId, string name, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

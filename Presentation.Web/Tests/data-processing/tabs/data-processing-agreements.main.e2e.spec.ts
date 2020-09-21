@@ -3,7 +3,7 @@ import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
 import WaitTimers = require("../../Utility/WaitTimers");
-import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main");
+import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main.po");
 import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
 
 describe("Data processing agreement main detail tests", () => {
