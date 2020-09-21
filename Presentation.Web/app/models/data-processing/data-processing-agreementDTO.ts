@@ -8,13 +8,12 @@
     export interface IDataProcessingAgreementDTO {
         id: number,
         name: string,
-        organizationId: number,
-        references: Array<dpaReference>;
+        references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
     }
 
-    export interface dpaReference extends BaseReference {
+    export interface IDataProcessingReferenceDTO extends BaseReference {
         title: string;
         externalReferenceId: string;
         url: string;
