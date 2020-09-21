@@ -11,7 +11,7 @@
         organizationId: number,
         references: Array<dpaReference>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
-        assignRoles: IAssignedRoleDTO[];
+        assignedRoles: IAssignedRoleDTO[];
     }
 
     export interface dpaReference extends BaseReference {
