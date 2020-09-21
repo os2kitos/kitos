@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Edit.Roles {
+﻿module Kitos.DataProcessing.Registration.Edit.Roles {
     "use strict";
 
     export class EditRolesDataProcessingRegistrationController {

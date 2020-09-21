@@ -103,16 +103,16 @@ namespace Core.DomainModel.GDPR
             if (HasRight(role, user))
                 return new OperationError("Existing right for same role found for the same user", OperationFailure.Conflict);
 
-            var agreementRight = new DataProcessingRegistrationRight
+            var newRight = new DataProcessingRegistrationRight
             {
                 Role = role,
                 User = user,
                 Object = this
             };
 
-            Rights.Add(agreementRight);
+            Rights.Add(newRight);
 
-            return agreementRight;
+            return newRight;
         }
 
         private bool HasRight(DataProcessingRegistrationRole role, User user)

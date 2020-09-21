@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Edit.Ref {
+﻿module Kitos.DataProcessing.Registration.Edit.Ref {
     "use strict";
 
     export class EditRefDataProcessingRegistrationController {

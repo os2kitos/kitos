@@ -86,14 +86,14 @@ namespace Core.ApplicationServices.GDPR
             if (result.IsNone)
                 return new OperationError(OperationFailure.NotFound);
 
-            var agreementToDelete = result.Value;
+            var registrationToDelete = result.Value;
 
-            if (!_authorizationContext.AllowDelete(agreementToDelete))
+            if (!_authorizationContext.AllowDelete(registrationToDelete))
                 return new OperationError(OperationFailure.Forbidden);
 
             _repository.DeleteById(id);
 
-            return agreementToDelete;
+            return registrationToDelete;
         }
 
         public Result<DataProcessingRegistration, OperationError> Get(int id)
@@ -123,9 +123,9 @@ namespace Core.ApplicationServices.GDPR
             return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
-        public Result<ExternalReference, OperationError> SetMasterReference(int agreementId, int referenceId)
+        public Result<ExternalReference, OperationError> SetMasterReference(int id, int referenceId)
         {
-            return WithWriteAccess(agreementId, agreement =>
+            return WithWriteAccess(id, registration =>
             {
                 var referenceResult = _referenceRepository.Get(referenceId);
 
@@ -134,22 +134,22 @@ namespace Core.ApplicationServices.GDPR
                     return new OperationError("Invalid reference Id", OperationFailure.BadInput);
                 }
 
-                var setReferenceResult = agreement.SetMasterReference(referenceResult.Value);
+                var setReferenceResult = registration.SetMasterReference(referenceResult.Value);
 
                 if (setReferenceResult.Ok)
                 {
-                    _repository.Update(agreement);
+                    _repository.Update(registration);
                 }
 
                 return setReferenceResult;
             });
         }
 
-        public Result<(DataProcessingRegistration agreement, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id)
+        public Result<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id)
         {
-            return WithReadAccess<(DataProcessingRegistration agreement, IEnumerable<DataProcessingRegistrationRole> roles)>(
+            return WithReadAccess<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles)>(
                 id,
-                agreement => (agreement, _roleAssignmentsService.GetApplicableRoles(agreement).ToList()));
+                registration => (registration, _roleAssignmentsService.GetApplicableRoles(registration).ToList()));
         }
 
         public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize)
@@ -157,10 +157,10 @@ namespace Core.ApplicationServices.GDPR
             if (pageSize < 1)
                 throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
-            return WithReadAccess(id, agreement =>
+            return WithReadAccess(id, registration =>
             {
                 return _roleAssignmentsService
-                    .GetUsersWhichCanBeAssignedToRole(agreement, roleId, nameEmailQuery.FromNullable())
+                    .GetUsersWhichCanBeAssignedToRole(registration, roleId, nameEmailQuery.FromNullable())
                     .Select<IEnumerable<User>>(users =>
                         users
                             .OrderBy(x => x.Id)
@@ -173,15 +173,15 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> AssignRole(int id, int roleId, int userId)
         {
-            return WithWriteAccess(id, agreement =>
+            return WithWriteAccess(id, registration =>
             {
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
-                var assignmentResult = _roleAssignmentsService.AssignRole(agreement, roleId, userId);
+                var assignmentResult = _roleAssignmentsService.AssignRole(registration, roleId, userId);
 
                 if (assignmentResult.Ok)
                 {
-                    _repository.Update(agreement);
+                    _repository.Update(registration);
                     transaction.Commit();
                 }
 
@@ -191,17 +191,17 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId)
         {
-            return WithWriteAccess(id, agreement =>
+            return WithWriteAccess(id, registration =>
             {
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
-                var removeResult = _roleAssignmentsService.RemoveRole(agreement, roleId, userId);
+                var removeResult = _roleAssignmentsService.RemoveRole(registration, roleId, userId);
 
                 if (removeResult.Ok)
                 {
                     _rightRepository.Delete(removeResult.Value);
-                    _repository.Update(agreement);
+                    _repository.Update(registration);
                     transaction.Commit();
                 }
 
@@ -301,12 +301,12 @@ namespace Core.ApplicationServices.GDPR
             if (result.IsNone)
                 return new OperationError(OperationFailure.NotFound);
 
-            var agreement = result.Value;
+            var registration = result.Value;
 
-            if (!_authorizationContext.AllowReads(agreement))
+            if (!_authorizationContext.AllowReads(registration))
                 return new OperationError(OperationFailure.Forbidden);
 
-            return authorizedAction(agreement);
+            return authorizedAction(registration);
         }
     }
 }

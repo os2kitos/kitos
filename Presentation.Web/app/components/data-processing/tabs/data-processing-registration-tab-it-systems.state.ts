@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Edit.ItSystems {
+﻿module Kitos.DataProcessing.Registration.Edit.ItSystems {
     "use strict";
 
     angular

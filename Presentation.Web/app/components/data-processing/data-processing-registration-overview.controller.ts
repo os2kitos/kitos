@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Overview {
+﻿module Kitos.DataProcessing.Registration.Overview {
     "use strict";
 
     export interface IOverviewController extends Utility.KendoGrid.IGridViewAccess<Models.DataProcessing.IDataProcessingRegistration> {

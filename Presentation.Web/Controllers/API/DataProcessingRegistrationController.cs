@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
             _localRoleRepository = localRoleRepository;
         }
 
-        protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(agreement => agreement, _ => null);
+        protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
 
         protected override bool AllowCreateNewEntity(int organizationId) => AllowCreate<DataProcessingRegistration>(organizationId);
 
@@ -281,17 +281,17 @@ namespace Presentation.Web.Controllers.API
             var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
 
             return value
-                .Include(agreement => agreement.Rights)
-                .Include(agreement => agreement.ExternalReferences)
-                .Include(agreement => agreement.Reference)
-                .Include(agreement => agreement.Reference.ObjectOwner)
-                .Include(agreement => agreement.Rights.Select(_ => _.Role))
-                .Include(agreement => agreement.Rights.Select(_ => _.User))
-                .Include(agreement => agreement.SystemUsages)
-                .Include(agreement => agreement.SystemUsages.Select(x => x.ItSystem))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Reference)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.ObjectOwner)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Rights.Select(_ => _.Role))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Rights.Select(_ => _.User))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .AsNoTracking()
                 .AsEnumerable()
-                .Select(agreement => ToDTO(agreement, localDescriptionOverrides))
+                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
                 .ToList();
         }
 
@@ -300,8 +300,8 @@ namespace Presentation.Web.Controllers.API
             var localDescriptionOverrides = _localRoleRepository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
-                .ToDictionary(agreementRole => agreementRole.OptionId,
-                    agreementRole => string.IsNullOrWhiteSpace(agreementRole.Description) ? Maybe<string>.None : agreementRole.Description);
+                .ToDictionary(localDataProcessingRegistrationRole => localDataProcessingRegistrationRole.OptionId,
+                    localDataProcessingRegistrationRole => string.IsNullOrWhiteSpace(localDataProcessingRegistrationRole.Description) ? Maybe<string>.None : localDataProcessingRegistrationRole.Description);
             return localDescriptionOverrides;
         }
 
@@ -314,10 +314,10 @@ namespace Presentation.Web.Controllers.API
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
-                AssignedRoles = value.Rights.Select(agreementRight => new AssignedRoleDTO
+                AssignedRoles = value.Rights.Select(dataProcessingRegistrationRight => new AssignedRoleDTO
                 {
-                    Role = ToDTO(agreementRight.Role, localDescriptionOverrides),
-                    User = ToDTO(agreementRight.User)
+                    Role = ToDTO(dataProcessingRegistrationRight.Role, localDescriptionOverrides),
+                    User = ToDTO(dataProcessingRegistrationRight.User)
 
                 }).ToArray(),
                 References = value

@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Create {
+﻿module Kitos.DataProcessing.Registration.Create {
     "use strict";
 
     export class CreateDateProcessingRegistrationController {

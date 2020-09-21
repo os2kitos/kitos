@@ -1,4 +1,4 @@
-﻿module Kitos.DataProcessing.Agreement.Edit.Reference.Create {
+﻿module Kitos.DataProcessing.Registration.Edit.Reference.Create {
     "use strict";
 
     angular
