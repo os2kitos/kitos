@@ -29,8 +29,8 @@ namespace Tools.Test.Database.Model.Tasks
 
             //Oversight options
             dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Leverandøren er databehandler", 0, ownerId, "(Det er vurderet at leverandøren behandler persondata på instruks fra kommunen og der skal indgås en databehandleraftale)"));
-            dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Leverandøren behandler ikke personoplysninger ", 1, ownerId, "(Og derfor skal der ikke indgås en databehandleraftale)"));
-            dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Leverandøren er selvstændig dataansvarlig ", 2, ownerId, "(Deres anvendelse af data er ikke noget vi har indflydelse på)"));
+            dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Leverandøren behandler ikke personoplysninger", 1, ownerId, "(Og derfor skal der ikke indgås en databehandleraftale)"));
+            dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Leverandøren er selvstændig dataansvarlig", 2, ownerId, "(Deres anvendelse af data er ikke noget vi har indflydelse på)"));
             dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Fællesdataansvar ", 3, ownerId, "(der skal typisk indgås en anden type aftale – fortrolighedserklæring eller…)"));
             dbContext.DataProcessingDataResponsibleOptions.Add(BuildOption(new DataProcessingDataResponsibleOption(), "Kommunen er selv dataansvarlig", 4, ownerId));
 

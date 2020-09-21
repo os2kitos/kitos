@@ -1045,6 +1045,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\EnableDataProcessing.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\AddDefaultDpaTypesToExistingDb.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

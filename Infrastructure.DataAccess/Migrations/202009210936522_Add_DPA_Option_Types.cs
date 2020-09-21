@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+
+namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -191,8 +193,9 @@
             AddForeignKey("dbo.DataProcessingAgreements", "DataProcessingCountryOption_Id", "dbo.DataProcessingCountryOptions", "Id");
             AddForeignKey("dbo.DataProcessingAgreements", "DataProcessingDataResponsibleOption_Id", "dbo.DataProcessingDataResponsibleOptions", "Id");
             AddForeignKey("dbo.DataProcessingAgreements", "DataProcessingOversightOption_Id", "dbo.DataProcessingOversightOptions", "Id");
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("AddDefaultDpaTypesToExistingDb.sql"));
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.LocalDataProcessingOversightOptions", "OrganizationId", "dbo.Organization");
