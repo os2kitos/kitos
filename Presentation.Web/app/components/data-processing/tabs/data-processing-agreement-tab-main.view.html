@@ -15,6 +15,19 @@
                            autofocus
                            maxlength="150">
                 </div>
+                <!-- Agreement concluded -->
+                <div class="form-group">
+                    <label for="agreementConcluded" class="control-label small">Databehandleraftale indgået</label>
+                    <select class="form-control input-sm" id="agreementConcluded"
+                            ui-select2="noSearchNoClearSelect2"
+                            ng-model="usageViewModel.isBusinessCritical"
+                            data-autosave="{{autoSaveUrl}}"
+                            data-field="AgreementConcluded"
+                            ng-disabled="!vm.hasWriteAccess">
+                        <option hidden selected value />
+                        <option ng-repeat="option in vm.agreementConcludedOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                    </select>
+                </div>
             </div>
         </div>
     </div>

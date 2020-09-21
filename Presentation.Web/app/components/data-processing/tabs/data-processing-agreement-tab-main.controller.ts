@@ -9,14 +9,17 @@
             "dataProcessingAgreement"
         ];
 
+
         constructor(
             private readonly dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService,
             private readonly notify,
             public hasWriteAccess,
-            private readonly dataProcessingAgreement : Models.DataProcessing.IDataProcessingAgreementDTO) {
+            private readonly dataProcessingAgreement: Models.DataProcessing.IDataProcessingAgreementDTO) {
         }
 
         headerName = this.dataProcessingAgreement.name;
+
+        agreementConcludedOptions = new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options;
 
         changeName(name) {
 
@@ -42,6 +45,8 @@
                 }
             );
         }
+
+
     }
 
     angular
