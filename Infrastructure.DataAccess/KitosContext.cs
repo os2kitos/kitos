@@ -150,6 +150,14 @@ namespace Infrastructure.DataAccess
         public DbSet<DataProcessingAgreementReadModel> DataProcessingAgreementReadModels { get; set; }
         public DbSet<DataProcessingAgreementRoleAssignmentReadModel> DataProcessingAgreementRoleAssignmentReadModels { get; set; }
         public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }
+        public DbSet<DataProcessingTransferReasonOption> DataProcessingTransferReasonOptions { get; set; }
+        public DbSet<DataProcessingOversightOption> DataProcessingOversightOptions { get; set; }
+        public DbSet<DataProcessingDataResponsibleOption> DataProcessingDataResponsibleOptions { get; set; }
+        public DbSet<DataProcessingCountryOption> DataProcessingCountryOptions { get; set; }
+        public DbSet<LocalDataProcessingTransferReasonOption> LocalDataProcessingTransferReasonOptions { get; set; }
+        public DbSet<LocalDataProcessingOversightOption> LocalDataProcessingOversightOptions { get; set; }
+        public DbSet<LocalDataProcessingDataResponsibleOption> LocalDataProcessingDataResponsibleOptions { get; set; }
+        public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -240,6 +248,10 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingAgreementRoleMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementReadModelMap());
             modelBuilder.Configurations.Add(new DataProcessingAgreementRoleAssignmentReadModelMap());
+            modelBuilder.Configurations.Add(new DataProcessingTransferReasonOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingOversightOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingDataResponsibleOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingCountryOptionMap());
         }
     }
 }
