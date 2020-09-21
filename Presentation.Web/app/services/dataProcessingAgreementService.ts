@@ -1,11 +1,10 @@
 ﻿module Kitos.Services.DataProcessing {
-    import Api = Models.Api;
-
     export interface IDataProcessingAgreementService {
         create(organizationId: number, name: string): angular.IPromise<IDataProcessingAgreementCreatedResult>;
         delete(dataProcessingAgreementId: number): angular.IPromise<IDataProcessingAgreementDeletedResult>;
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult>;
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO>;
+        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         removeSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult>;
         getAvailableSystems(dataProcessingAgreementId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>;
@@ -72,7 +71,6 @@
                 );
         }
 
-
         rename(dataProcessingAgreementId: number, name: string): angular.IPromise<IDataProcessingAgreementPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "name"), name);
         }
@@ -111,18 +109,23 @@
                 );
         }
 
+
         get(dataProcessingAgreementId: number): angular.IPromise<Models.DataProcessing.IDataProcessingAgreementDTO> {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingAgreementId.toString()))
                 .then(
                     result => {
-                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO}
+                        var response = result.data as { response: Models.DataProcessing.IDataProcessingAgreementDTO }
                         return response.response;
                     },
                     error => this.handleServerError(error)
                 );
         }
+
+        setMasterReference(dataProcessingAgreementId: number, referenceId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "master-reference"), referenceId);
+		}
 
         assignSystem(dataProcessingAgreementId: number, systemId: number): angular.IPromise<IDataProcessingAgreementPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingAgreementId, "it-systems/assign"), systemId);

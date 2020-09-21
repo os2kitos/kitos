@@ -12,6 +12,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -27,6 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingAgreementRepository> _repositoryMock;
         private readonly Mock<IDataProcessingAgreementNamingService> _namingServiceMock;
         private readonly Mock<IDataProcessingAgreementRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingAgreementRight>> _rightsRepositoryMock;
         private readonly Mock<IDataProcessingAgreementSystemAssignmentService> _systemAssignmentServiceMock;
@@ -37,12 +39,16 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingAgreementRepository>();
             _namingServiceMock = new Mock<IDataProcessingAgreementNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingAgreementRoleAssignmentsService>();
+            _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingAgreementRight>>();
             _systemAssignmentServiceMock = new Mock<IDataProcessingAgreementSystemAssignmentService>();
-            _sut = new DataProcessingAgreementApplicationService(_authorizationContextMock.Object,
-                _repositoryMock.Object, _namingServiceMock.Object,
+            _sut = new DataProcessingAgreementApplicationService(
+                _authorizationContextMock.Object,
+                _repositoryMock.Object,
+                _namingServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
+                _referenceRepositoryMock.Object,
                 _systemAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
@@ -546,6 +552,108 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Act
             var result = _sut.RemoveRole(agreementId, A<int>(), A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Set_Master_Reference_On_Dpa()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var referenceId = A<int>();
+            var expectedNewMasterReference = new ExternalReference() { Id = referenceId };
+
+            var dataProcessingAgreement = new DataProcessingAgreement
+            {
+                ExternalReferences = { expectedNewMasterReference, new ExternalReference() { Id = A<int>() } }
+            };
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _referenceRepositoryMock.Setup(x => x.Get(referenceId)).Returns(expectedNewMasterReference);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, referenceId);
+
+            //Assert
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public void Cannot_Set_Master_Reference_On_Dpa_If_ExternalReferenceId_Is_Invalid()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var referenceId = A<int>();
+
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _referenceRepositoryMock.Setup(x => x.Get(referenceId)).Returns(Maybe<ExternalReference>.None);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, referenceId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Set_Master_Reference_On_Dpa_If_ExternalReference_Does_Not_Belong_To_Dpa()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var referenceId = A<int>();
+            var fetchedMasterReference = new ExternalReference { Id = referenceId };
+
+            var dataProcessingAgreement = new DataProcessingAgreement
+            {
+                ExternalReferences = { new ExternalReference { Id = A<int>() }, new ExternalReference { Id = A<int>() } }
+            };
+
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, true);
+            _referenceRepositoryMock.Setup(x => x.Get(referenceId)).Returns(fetchedMasterReference);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, referenceId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Set_Master_Reference_On_Dpa_If_WriteAccess_Is_Not_Permitted()
+        {
+            //Arrange
+            var agreementId = A<int>();
+
+            var dataProcessingAgreement = new DataProcessingAgreement();
+            ExpectRepositoryGetToReturn(agreementId, dataProcessingAgreement);
+            ExpectAllowModifyReturns(dataProcessingAgreement, false);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Set_Master_Reference_On_Dpa_With_Invalid_Dpa()
+        {
+            //Arrange
+            var agreementId = A<int>();
+            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingAgreement>.None);
+
+            //Act
+            var result = _sut.SetMasterReference(agreementId, A<int>());
 
             //Assert
             Assert.True(result.Failed);

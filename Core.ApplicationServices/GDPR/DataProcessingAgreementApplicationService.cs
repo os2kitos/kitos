@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Core.ApplicationServices.Authorization;
+﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Shared;
@@ -15,9 +11,13 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
-using Ninject;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -27,15 +27,17 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingAgreementRepository _repository;
         private readonly IDataProcessingAgreementNamingService _namingService;
         private readonly IDataProcessingAgreementRoleAssignmentsService _roleAssignmentsService;
+        private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingAgreementSystemAssignmentService _systemAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingAgreementRight> _rightRepository;
-        
+
         public DataProcessingAgreementApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingAgreementRepository repository,
             IDataProcessingAgreementNamingService namingService,
             IDataProcessingAgreementRoleAssignmentsService roleAssignmentsService,
+            IReferenceRepository referenceRepository,
             IDataProcessingAgreementSystemAssignmentService systemAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingAgreementRight> rightRepository)
@@ -44,6 +46,7 @@ namespace Core.ApplicationServices.GDPR
             _repository = repository;
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
+            _referenceRepository = referenceRepository;
             _systemAssignmentService = systemAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
@@ -120,6 +123,28 @@ namespace Core.ApplicationServices.GDPR
             return UpdateProperties(id, new DataProcessingAgreementPropertyChanges { NameChange = new ChangedValue<string>(name) });
         }
 
+        public Result<ExternalReference, OperationError> SetMasterReference(int agreementId, int referenceId)
+        {
+            return WithWriteAccess(agreementId, agreement =>
+            {
+                var referenceResult = _referenceRepository.Get(referenceId);
+
+                if (referenceResult.IsNone)
+                {
+                    return new OperationError("Invalid reference Id", OperationFailure.BadInput);
+                }
+
+                var setReferenceResult = agreement.SetMasterReference(referenceResult.Value);
+
+                if (setReferenceResult.Ok)
+                {
+                    _repository.Update(agreement);
+                }
+
+                return setReferenceResult;
+            });
+        }
+
         public Result<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles), OperationError> GetAvailableRoles(int id)
         {
             return WithReadAccess<(DataProcessingAgreement agreement, IEnumerable<DataProcessingAgreementRole> roles)>(
@@ -187,7 +212,7 @@ namespace Core.ApplicationServices.GDPR
         public Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
             if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
-            if (pageSize < 1) throw new ActivationException($"{nameof(pageSize)} must be above 0");
+            if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<ItSystem>>(id, dataProcessingAgreement =>
                 _systemAssignmentService

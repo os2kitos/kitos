@@ -85,6 +85,7 @@
         createSystemUsageReference(): IReferenceService;
         createContractReference(): IReferenceService;
         createProjectReference(): IReferenceService;
+        createDpaReference(): IReferenceService;
     }
 
     export class ReferenceServiceFactory implements IReferenceServiceFactory {
@@ -123,7 +124,15 @@
             return this.createFor("itProject", (reference, id) => {
                 reference.ItProject_Id = id;
                 return reference;
-            }); }
+            });
+        }
+
+        createDpaReference(): IReferenceService {
+            return this.createFor("v1/data-processing-agreement", (reference, id) => {
+                reference.DataProcessingAgreement_Id = id;
+                return reference;
+            });
+        }
     }
 
     app.service("referenceServiceFactory", ReferenceServiceFactory);
