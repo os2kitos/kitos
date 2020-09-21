@@ -1,9 +1,9 @@
 ﻿import PageObject = require("../../IPageObject.po");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import CssLocatorHelper = require("../../../Object-wrappers/CSSLocatorHelper");
-import DataProcessingAgreementNavigation = require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
+import DataProcessingRegistrationNavigation = require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
 
-class DataProcessingAgreementEditReferencePageObject {
+class DataProcessingRegistrationEditReferencePageObject {
     private navigationHelper = new NavigationHelper();
 
     private cssHelper = new CssLocatorHelper();
@@ -13,7 +13,7 @@ class DataProcessingAgreementEditReferencePageObject {
     }
 
     goToDpaReferenceTab() {
-        return DataProcessingAgreementNavigation.referencePage();
+        return DataProcessingRegistrationNavigation.referencePage();
     }
 
     getDpaReferenceCreateButton() {
@@ -21,4 +21,4 @@ class DataProcessingAgreementEditReferencePageObject {
     }
 
 }
-export = DataProcessingAgreementEditReferencePageObject;
+export = DataProcessingRegistrationEditReferencePageObject;

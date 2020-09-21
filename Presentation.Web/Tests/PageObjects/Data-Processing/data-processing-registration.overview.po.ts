@@ -5,7 +5,7 @@ import KendoLoaderHelper = require("../../Helpers/KendoLoaderHelper");
 import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import Constants = require("../../Utility/Constants");
 
-class DataProcessingAgreementOverviewPageObject implements PageObject {
+class DataProcessingRegistrationOverviewPageObject implements PageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
     private navigationHelper = new NavigationHelper();
     private ec = protractor.ExpectedConditions;
@@ -99,4 +99,4 @@ class DataProcessingAgreementOverviewPageObject implements PageObject {
         return element(by.xpath(`//*/tbody/*/td/a[text()="${name}" and @data-element-type="kendo-dpa-name-rendering"]`));
     }
 }
-export = DataProcessingAgreementOverviewPageObject;
+export = DataProcessingRegistrationOverviewPageObject;

@@ -1,21 +1,21 @@
 ﻿import NavigationHelper = require("../../Utility/NavigationHelper");
 
-class DataProcessingAgreementNavigation {
+class DataProcessingRegistrationNavigation {
 
     private static readonly navigation = new NavigationHelper();
 
     public static mainPage() {
-        return DataProcessingAgreementNavigation.navigation.goToSubMenuElement(DataProcessingAgreementNavigationSrefs.mainPageSref);
+        return DataProcessingRegistrationNavigation.navigation.goToSubMenuElement(DataProcessingRegistrationNavigationSrefs.mainPageSref);
     }
 
     public static referencePage() {
-        return DataProcessingAgreementNavigation.navigation.goToSubMenuElement(DataProcessingAgreementNavigationSrefs.referencePageSref);
+        return DataProcessingRegistrationNavigation.navigation.goToSubMenuElement(DataProcessingRegistrationNavigationSrefs.referencePageSref);
     }
 }
 
-export = DataProcessingAgreementNavigation;
+export = DataProcessingRegistrationNavigation;
 
-class DataProcessingAgreementNavigationSrefs {
+class DataProcessingRegistrationNavigationSrefs {
     static mainPageSref = "data-processing.edit-registration.main";
     static referencePageSref = "data-processing.edit-registration.reference";
 }

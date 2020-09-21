@@ -1,20 +1,20 @@
 ﻿"use strict";
 import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
+import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import WaitTimers = require("../../Utility/WaitTimers");
-import DataProcessingAgreementEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.main.po");
-import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import DataProcessingRegistrationEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 
 describe("Data processing agreement main detail tests", () => {
 
     const loginHelper = new Login();
-    const pageObjectOverview = new DataProcessingAgreementOverviewPageObject();
-    const pageObject = new DataProcessingAgreementEditMainPageObject();
+    const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();
+    const pageObject = new DataProcessingRegistrationEditMainPageObject();
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
-    const dpaHelper = DataProcessingAgreementHelper;
+    const dpaHelper = DataProcessingRegistrationHelper;
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
@@ -37,9 +37,9 @@ describe("Data processing agreement main detail tests", () => {
             var name = createName(10);
             var renameValue = createName(30);
 
-            dpaHelper.createDataProcessingAgreement(name)
+            dpaHelper.createDataProcessingRegistration(name)
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
+                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
                 .then(() => renameNameAndVerify(renameValue));
         });
 
@@ -49,8 +49,8 @@ describe("Data processing agreement main detail tests", () => {
             const nameToDelete = createName(1);
             console.log("Creating agreement and deleting it");
 
-            dpaHelper.createDataProcessingAgreement(nameToDelete)
-                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(nameToDelete))
+            dpaHelper.createDataProcessingRegistration(nameToDelete)
+                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(nameToDelete))
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
                 .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameToDelete).isPresent())

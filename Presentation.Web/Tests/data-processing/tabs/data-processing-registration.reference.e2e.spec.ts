@@ -1,14 +1,14 @@
 ﻿import login = require("../../Helpers/LoginHelper");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import DataProcessingHelper = require("../../Helpers/DataProcessingAgreementHelper")
-import DataProcessingAgreementEditReferencePageObject =
-require("../../PageObjects/Data-Processing/Tabs/data-processing-agreement.edit.reference.po");
+import DataProcessingHelper = require("../../Helpers/DataProcessingRegistrationHelper")
+import DataProcessingRegistrationEditReferencePageObject =
+require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.reference.po");
 
 describe("Data Processing agreement reference test ",
     () => {
         var loginHelper = new login();
-        var pageObjectReference = new DataProcessingAgreementEditReferencePageObject();
+        var pageObjectReference = new DataProcessingRegistrationEditReferencePageObject();
         var refHelper = new ReferenceHelper();
         var testFixture = new TestFixtureWrapper();
         var dpaHelper = DataProcessingHelper;
@@ -33,8 +33,8 @@ describe("Data Processing agreement reference test ",
             var invalidUrl = generateInvalidUrl();
 
             //Creating DPA
-            dpaHelper.createDataProcessingAgreement(agreementName)
-                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(agreementName))
+            dpaHelper.createDataProcessingRegistration(agreementName)
+                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(agreementName))
                 .then(() => pageObjectReference.goToDpaReferenceTab())
             // creating reference
                 .then(() => refHelper.createReference(referenceName, validUrl, referenceId))

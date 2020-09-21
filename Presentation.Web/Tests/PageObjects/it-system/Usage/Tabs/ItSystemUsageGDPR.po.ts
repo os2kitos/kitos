@@ -150,8 +150,8 @@ class ItSystemUsageGDPR {
         return element(by.id(this.consts.gdprLatestRiskAssesmentDateDateId));
     }
 
-    static getDataProcessingAgreementView() {
-        return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessingAgreementView));
+    static getDataProcessingRegistrationView() {
+        return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessingRegistrationView));
     }
 }
 

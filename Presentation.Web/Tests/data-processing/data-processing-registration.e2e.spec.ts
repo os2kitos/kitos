@@ -1,19 +1,19 @@
 ﻿"use strict";
 import Login = require("../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
-import DataProcessingAgreementOverviewPageObject =
-require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
+import DataProcessingRegistrationOverviewPageObject =
+require("../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
-import DataProcessingAgreementHelper = require("../Helpers/DataProcessingAgreementHelper")
+import DataProcessingRegistrationtHelper = require("../Helpers/DataProcessingRegistrationHelper")
 
-describe("Data processing agreement tests", () => {
+describe("Data processing registration tests", () => {
 
     const loginHelper = new Login();
-    const pageObject = new DataProcessingAgreementOverviewPageObject();
+    const pageObject = new DataProcessingRegistrationOverviewPageObject();
     const testFixture = new TestFixtureWrapper();
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
-    const dpaHelper = DataProcessingAgreementHelper;
+    const dpaHelper = DataProcessingRegistrationtHelper;
 
     const createName = (index: number) => { 
         return `Dpa${new Date().getTime()}_${index}`;
@@ -30,10 +30,10 @@ describe("Data processing agreement tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("It is possible to create new data processing agreements", () => {
+    it("It is possible to create new data processing registrations", () => {
         const name = createName(1);
             //Verify correct creation of dpa and following update of kendo
-        dpaHelper.createDataProcessingAgreement(name)
+        dpaHelper.createDataProcessingRegistration(name)
             .then(() => {
                 console.log(`expecting to find new dpa with name ${name}`);
                 expect(pageObject.findSpecificDpaInNameColumn(name).isPresent()).toBeTruthy();

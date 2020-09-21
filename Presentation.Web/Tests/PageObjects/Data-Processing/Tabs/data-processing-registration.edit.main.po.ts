@@ -1,9 +1,10 @@
 ﻿import PageObject = require("../../IPageObject.po");
 import NavigationHelper = require("../../../Utility/NavigationHelper");
 import CssLocatorHelper = require("../../../Object-wrappers/CSSLocatorHelper");
-import DataProcessingAgreementNavigation = require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
+import DataProcessingRegistrationNavigation =
+require("../../../Helpers/SideNavigation/DataProcessingAgreementNavigation");
 
-class DataProcessingAgreementEditMainPageObject {
+class DataProcessingRegistrationEditMainPageObject {
     private navigationHelper = new NavigationHelper();
     private cssHelper = new CssLocatorHelper();
 
@@ -12,11 +13,11 @@ class DataProcessingAgreementEditMainPageObject {
     }
 
     getMainPage() {
-        DataProcessingAgreementNavigation.mainPage();
+        DataProcessingRegistrationNavigation.mainPage();
     }
 
     getReferencePage() {
-        DataProcessingAgreementNavigation.referencePage();
+        DataProcessingRegistrationNavigation.referencePage();
     }
 
     getDpaMainNameInput() {
@@ -32,4 +33,4 @@ class DataProcessingAgreementEditMainPageObject {
     }
 
 }
-export = DataProcessingAgreementEditMainPageObject;
+export = DataProcessingRegistrationEditMainPageObject;

@@ -1,15 +1,15 @@
 ﻿"use strict";
 import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
-import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
+import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper")
 
 describe("Data processing agreement main detail tests", () => {
 
     const loginHelper = new Login();
-    const pageObject = new DataProcessingAgreementOverviewPageObject();
+    const pageObject = new DataProcessingRegistrationOverviewPageObject();
     const testFixture = new TestFixtureWrapper();
-    const dpaHelper = DataProcessingAgreementHelper;
+    const dpaHelper = DataProcessingRegistrationHelper;
 
     const createName = () => {
         return `Dpa${new Date().getTime()}`;
@@ -38,9 +38,9 @@ describe("Data processing agreement main detail tests", () => {
         () => {
             var name = createName();
 
-            dpaHelper.createDataProcessingAgreement(name)
+            dpaHelper.createDataProcessingRegistration(name)
                 .then(() => pageObject.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(name))
+                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
                 .then(() => dpaHelper.goToRoles())
                 .then(() => dpaHelper.assignRole(roleName1, apiUserSearchPhrase))
                 .then(() => dpaHelper.assignRole(roleName2, localAdminSearchPhrase))

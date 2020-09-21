@@ -53,7 +53,7 @@ describe("Local admin is able to toggle DataProcessing", () => {
     function checkSystemGdprPageDataProcessingVisibility(visibility: boolean, sysName: string) {
         SystemUsageHelper.openLocalSystem(sysName)
             .then(() => LocalItSystemNavigation.openGDPRPage())
-            .then(() => expect((SystemTabGDPR.getDataProcessingAgreementView()).isPresent()).toBe(visibility));
+            .then(() => expect((SystemTabGDPR.getDataProcessingRegistrationView()).isPresent()).toBe(visibility));
     }
 
     function expectCheckboxValueToBe(currentValueIs: boolean) {

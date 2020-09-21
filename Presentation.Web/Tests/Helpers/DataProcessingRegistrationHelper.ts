@@ -1,13 +1,13 @@
-﻿import DataProcessingAgreementOverviewPageObject = require("../PageObjects/Data-Processing/data-processing-agreement.overview.po");
+﻿import DataProcessingRegistrationOverviewPageObject = require("../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import WaitTimers = require("../Utility/WaitTimers");
 import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProcessing.po");
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
 
-class DataProcessingAgreementHelper {
+class DataProcessingRegistrationHelper {
 
-    private static pageObject = new DataProcessingAgreementOverviewPageObject();
+    private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
     private static navigation = new NavigationHelper();
@@ -17,8 +17,8 @@ class DataProcessingAgreementHelper {
             .then(() => this.waitForKendo());
     }
 
-    public static createDataProcessingAgreement(name: string) {
-        console.log(`Creating agreement with name ${name}`);
+    public static createDataProcessingRegistration(name: string) {
+        console.log(`Creating registration with name ${name}`);
         return this.pageObject.getPage()
             .then(() => this.waitForKendo())
             .then(() => this.openNewDpaDialog())
@@ -43,19 +43,19 @@ class DataProcessingAgreementHelper {
             });
     }
 
-    public static goToSpecificDataProcessingAgreement(name: string) {
-        console.log(`Finding DataProcessingAgreement: ${name}`);
+    public static goToSpecificDataProcessingRegistration(name: string) {
+        console.log(`Finding registration: ${name}`);
         return this.pageObject.getPage()
             .then(() => this.pageObject.waitForKendoGrid())
-            .then(() => this.findDataProcessingAgreementColumnFor(name).first().click());
+            .then(() => this.findDataProcessingRegistrationColumnFor(name).first().click());
     }
 
     public static goToItSystems() {
-        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-registration.it-systems");
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.it-systems");
     }
 
     public static goToRoles() {
-        return DataProcessingAgreementHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles");
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles");
     }
 
     public static assignRole(role: string, user: string) {
@@ -120,7 +120,7 @@ class DataProcessingAgreementHelper {
         return isClickable ? expectation.toBeTruthy() : expectation.toBeFalsy();
     }
 
-    private static findDataProcessingAgreementColumnFor(name: string) {
+    private static findDataProcessingRegistrationColumnFor(name: string) {
         return this.kendoToolbarWrapper.getFilteredColumnElement(
             this.kendoToolbarWrapper.columnObjects().dpaName,
             name);
@@ -132,4 +132,4 @@ class DataProcessingAgreementHelper {
     }
 }
 
-export = DataProcessingAgreementHelper;
+export = DataProcessingRegistrationHelper;

@@ -1,16 +1,16 @@
 ﻿"use strict";
 import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import DataProcessingAgreementOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-agreement.overview.po");
-import DataProcessingAgreementHelper = require("../../Helpers/DataProcessingAgreementHelper")
+import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
+import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper")
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 
-describe("Data processing agreement it-systems test", () => {
+describe("Data processing registration it-systems test", () => {
 
     const loginHelper = new Login();
     const testFixture = new TestFixtureWrapper();
-    const pageObject = new DataProcessingAgreementOverviewPageObject();
-    const dpaHelper = DataProcessingAgreementHelper;
+    const pageObject = new DataProcessingRegistrationOverviewPageObject();
+    const dpaHelper = DataProcessingRegistrationHelper;
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
@@ -38,8 +38,8 @@ describe("Data processing agreement it-systems test", () => {
         () => {
             const dpaName = createName(3);
 
-            dpaHelper.createDataProcessingAgreement(dpaName)
-                .then(() => dpaHelper.goToSpecificDataProcessingAgreement(dpaName))
+            dpaHelper.createDataProcessingRegistration(dpaName)
+                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(dpaName))
                 .then(() => dpaHelper.goToItSystems())
                 .then(() => dpaHelper.assignSystem(system1))
                 .then(() => dpaHelper.assignSystem(system2))
