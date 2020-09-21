@@ -16,7 +16,7 @@
                             <Shared.GenericTabs.SelectItSystems.IGenericItSystemsSelectionConfiguration>
                             {
                                 ownerName: dataProcessingRegistration.name,
-                                overviewHeader: "Databehandleraftalen vedrører følgende IT Systemer",
+                                overviewHeader: "Registreringen vedrører følgende IT Systemer",
                                 searchFunction:
                                     (query: string) =>
                                         dataProcessingRegistrationService
