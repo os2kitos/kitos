@@ -25,12 +25,13 @@
         save() {
 
             var msg = this.notify.addInfoMessage("Gemmer række", false);
+            var referenceScope = this.$scope.reference;
 
             this.referenceService.createReference(
                 this.$stateParams.id,
-                this.$scope.reference.title,
-                this.$scope.reference.externalReferenceId,
-                this.$scope.reference.url).then(success => {
+                referenceScope.title,
+                referenceScope.externalReferenceId,
+                referenceScope.url).then(success => {
                     msg.toSuccessMessage("Referencen er gemt");
                     this.close();
                     this.popState(true);

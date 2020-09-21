@@ -29,13 +29,14 @@
         save() {
 
             var msg = this.notify.addInfoMessage("Gemmer række", false);
+            var referenceScope = this.$scope.reference;
 
             this.referenceService.updateReference(
                 this.$stateParams.refId,
                 this.$stateParams.orgId,
-                this.$scope.reference.title,
-                this.$scope.reference.externalReferenceId,
-                this.$scope.reference.url)
+                referenceScope.title,
+                referenceScope.externalReferenceId,
+                referenceScope.url)
                 .then(success => {
                     msg.toSuccessMessage("Ændringer er gemt");
                     this.close();
