@@ -616,6 +616,10 @@
     <Compile Include="Migrations\202009212152110_DataProcessingRegistration.designer.cs">
       <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs" />
+    <Compile Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.designer.cs">
+      <DependentUpon>202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -999,6 +1003,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009212152110_DataProcessingRegistration.resx">
       <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.resx">
+      <DependentUpon>202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

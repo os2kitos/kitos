@@ -243,6 +243,7 @@
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
+    <Compile Include="Shared\YearMonthIntervalOption.cs" />
     <Compile Include="SSO\SsoOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
     <Compile Include="Text.cs" />

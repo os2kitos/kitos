@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -250,6 +251,18 @@ namespace Core.ApplicationServices.GDPR
                 return result;
             });
         }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id,
+            YearMonthIntervalOption? yearMonthIntervalOption)
+        {
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalChange = new ChangedValue<YearMonthIntervalOption?>(yearMonthIntervalOption) });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
+        {
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalNoteChange = new ChangedValue<string>(note) });
+        }
+
 
         private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
         {
