@@ -5,7 +5,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Organization;
-using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
