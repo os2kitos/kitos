@@ -37,11 +37,12 @@ namespace Core.DomainServices.GDPR
 
         private string MapYesNoIrrelevantOptionToString(YesNoIrrelevantOption? yesNoIrrelevantOption)
         {
+            //TODO: Review: Pull out of class so that this can be re-used (extension class or mapping or,,,)
             return yesNoIrrelevantOption switch
             {
                 YesNoIrrelevantOption.NO => "Nej",
                 YesNoIrrelevantOption.YES => "Ja",
-                YesNoIrrelevantOption.IRRELEVANT => "Irrelevant",
+                YesNoIrrelevantOption.IRRELEVANT => "Irrelevant", //TODO Review: Ikke den korrekte tekst
                 YesNoIrrelevantOption.UNDECIDED => "",
                 _ => "",
             };

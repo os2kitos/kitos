@@ -836,6 +836,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
+            //TODO: Review: Assert that it was actually changed
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -888,6 +889,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
+            //TODO: Review: Assert that it was actually changed
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -905,6 +907,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
+            //TODO: Review: Assert that it was actually changed to null
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 

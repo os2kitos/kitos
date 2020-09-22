@@ -408,6 +408,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
+        //TODO: Remove this case
         [Fact]
         public async Task Can_Change_IsAgreementConcluded_To_Null()
         {

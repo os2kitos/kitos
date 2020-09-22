@@ -60,35 +60,21 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(agreement.Id, isAgreementConcluded);
+            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(agreement.Id, agreementConcludedAt);
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = agreement.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
             using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, itSystemDto.Id);
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(agreement.Id, isAgreementConcluded);
-            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(agreement.Id, agreementConcludedAt);
 
-            //Wait for read model to rebuild
-            await Task.WhenAll(
-                WaitForAsync(() =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
-                            x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
-                }, TimeSpan.FromSeconds(10)),
-                WaitForAsync(() =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
-                            x.AsQueryable().Any(rm => rm.MainReferenceUrl == refUrl)));
-                }, TimeSpan.FromSeconds(10)),
-                WaitForAsync(() =>
-                {
-                    return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
-                            x.AsQueryable().Any(rm => rm.SystemNamesAsCsv.Contains(systemName))));
-                }, TimeSpan.FromSeconds(10))
-            );
+            //Wait for the LAST side-effect to be part of the updated read-model
+            await WaitForAsync(() =>
+            {
+                return Task.FromResult(
+                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
+                        x.AsQueryable().Any(rm => rm.SystemNamesAsCsv.Contains(systemName))));
+            }, TimeSpan.FromSeconds(10));
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
@@ -104,7 +90,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
-            Assert.Matches("Ja|Nej|Irrelevant", readModel.IsAgreementConcluded);
+            Assert.Matches("Ja|Nej|Irrelevant", readModel.IsAgreementConcluded);//TODO Review: Use mapping of the actually set value
             Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
 
         }

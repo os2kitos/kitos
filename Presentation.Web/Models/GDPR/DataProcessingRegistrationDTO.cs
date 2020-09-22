@@ -14,5 +14,7 @@ namespace Presentation.Web.Models.GDPR
         public ReferenceDTO[] References { get; set; }
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
+
+        //TODO Review comment: Missing new fields
     }
 }
