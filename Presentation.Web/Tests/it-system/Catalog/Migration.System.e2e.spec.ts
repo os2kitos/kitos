@@ -5,6 +5,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import Constants = require("../../Utility/Constants");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import CatalogPage = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po");
+import WaitTimers = require("../../Utility/WaitTimers");
 
 describe("Global Administrator is able to migrate from one system to another", () => {
     var loginHelper = new Login();
@@ -13,6 +14,7 @@ describe("Global Administrator is able to migrate from one system to another", (
     var cssHelper = new CssHelper();
     var pageObject = new CatalogPage();
     var ec = protractor.ExpectedConditions;
+    var waitUpTo = new WaitTimers();
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -126,12 +128,12 @@ describe("Global Administrator is able to migrate from one system to another", (
     function waitForElement(name: string) {
         console.log(`waitForElement: ${name}`);
         return browser.wait(ec.visibilityOf(element(cssHelper.byDataElementType(name))),
-            20000);
+            waitUpTo.twentySeconds);
     }
 
     function waitForSelect2DataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(ec.visibilityOf(element(by.className("select2-result-label"))), 20000)
+        return browser.wait(ec.visibilityOf(element(by.className("select2-result-label"))), waitUpTo.twentySeconds)
             .then(() => element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
@@ -141,4 +143,5 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => element(by.className("select2-input")).click())
             .then(() => element(by.className("select2-input")).sendKeys(name));
     }
+
 });
