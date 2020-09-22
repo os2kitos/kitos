@@ -5,6 +5,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Organization;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
@@ -29,20 +30,22 @@ namespace Core.DomainServices.GDPR
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 
-            return _organizationRepository
-                .GetById(organizationId)
-                .Select(registration.AssignDataProcessor)
-                .Match(result => result, () => new OperationError("Invalid organization id", OperationFailure.BadInput));
+            return
+                _organizationRepository
+                    .GetById(organizationId)
+                    .Select(registration.AssignDataProcessor)
+                    .Match(result => result, () => new OperationError("Invalid organization id", OperationFailure.BadInput));
         }
 
         public Result<Organization, OperationError> RemoveDataProcessor(DataProcessingRegistration registration, int organizationId)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 
-            return _organizationRepository
-                .GetById(organizationId)
-                .Select(registration.RemoveDataProcessor)
-                .Match(result => result, () => new OperationError("Invalid organization id", OperationFailure.BadInput));
+            return
+                _organizationRepository
+                    .GetById(organizationId)
+                    .Select(registration.RemoveDataProcessor)
+                    .Match(result => result, () => new OperationError("Invalid organization id", OperationFailure.BadInput));
         }
     }
 }
