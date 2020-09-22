@@ -32,20 +32,7 @@ namespace Core.DomainServices.GDPR
 
         private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.IsAgreementConcluded = MapYesNoIrrelevantOptionToString(source.IsAgreementConcluded);
-        }
-
-        private string MapYesNoIrrelevantOptionToString(YesNoIrrelevantOption? yesNoIrrelevantOption)
-        {
-            //TODO: Review: Pull out of class so that this can be re-used (extension class or mapping or,,,)
-            return yesNoIrrelevantOption switch
-            {
-                YesNoIrrelevantOption.NO => "Nej",
-                YesNoIrrelevantOption.YES => "Ja",
-                YesNoIrrelevantOption.IRRELEVANT => "Irrelevant", //TODO Review: Ikke den korrekte tekst
-                YesNoIrrelevantOption.UNDECIDED => "",
-                _ => "",
-            };
+            destination.IsAgreementConcluded = source.IsAgreementConcluded.ToDanishString();
         }
 
         private void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

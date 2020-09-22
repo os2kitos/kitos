@@ -1,4 +1,6 @@
-﻿using Presentation.Web.Models.References;
+﻿using System;
+using Core.DomainModel.Shared;
+using Presentation.Web.Models.References;
 
 namespace Presentation.Web.Models.GDPR
 {
@@ -15,6 +17,8 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
-        //TODO Review comment: Missing new fields
+        public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
+
+        public DateTime? AgreementConcludedAt { get; set; }
     }
 }

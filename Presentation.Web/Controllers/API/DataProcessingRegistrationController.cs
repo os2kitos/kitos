@@ -267,9 +267,8 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption?> yesNoIrrelevantOption)
+        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> yesNoIrrelevantOption)
         {
-            //TODO: REVIEW COMMENT: null er ikke gyldig - klienterne bruger YesNotIr,Undecided
             if (yesNoIrrelevantOption == null)
                 return BadRequest("dataOption must be provided");
 
@@ -362,7 +361,9 @@ namespace Presentation.Web.Controllers.API
                 ItSystems = value
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
-                    .ToArray()
+                    .ToArray(),
+                IsAgreementConcluded = value.IsAgreementConcluded,
+                AgreementConcludedAt = value.AgreementConcludedAt,
             };
         }
 

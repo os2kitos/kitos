@@ -408,21 +408,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        //TODO: Remove this case
-        [Fact]
-        public async Task Can_Change_IsAgreementConcluded_To_Null()
-        {
-            //Arrange
-            var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-
-            //Act
-            using var response = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registrationDto.Id, null);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
         [Fact]
         public async Task Can_Change_AgreementConcludedAt()
         {

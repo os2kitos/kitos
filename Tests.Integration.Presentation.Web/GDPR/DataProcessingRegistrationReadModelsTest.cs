@@ -90,7 +90,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
-            Assert.Matches("Ja|Nej|Irrelevant", readModel.IsAgreementConcluded);//TODO Review: Use mapping of the actually set value
+            Assert.Matches(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
             Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
 
         }

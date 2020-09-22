@@ -12,6 +12,8 @@
         getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
         assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
         removeRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevant: Models.ViewModel.Generic.Select2OptionViewModel);
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -202,6 +204,16 @@
                     result => { },
                     error => this.handleServerError(error)
                 );
+        }
+
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevant: Models.ViewModel.Generic.Select2OptionViewModel) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "is-agreement-concluded"), yesNoIrrelevant.id);
+        }
+
+
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any) {
+            var date = moment(dateTime, "YYYY-MM-DD");
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
         }
 
         static $inject = ["$http"];

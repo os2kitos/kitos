@@ -252,9 +252,9 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption? yesNoIrrelevantOption)
+        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption yesNoIrrelevantOption)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption?>(yesNoIrrelevantOption) });
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption>(yesNoIrrelevantOption) });
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? dateTime)
@@ -316,7 +316,7 @@ namespace Core.ApplicationServices.GDPR
             return _namingService.ChangeName(dataProcessingRegistration, newName);
         }
 
-        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption?>> yesNoIrrelevantOptionChange)
+        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption>> yesNoIrrelevantOptionChange)
         {
             if (yesNoIrrelevantOptionChange.IsNone)
                 return Maybe<OperationError>.None;

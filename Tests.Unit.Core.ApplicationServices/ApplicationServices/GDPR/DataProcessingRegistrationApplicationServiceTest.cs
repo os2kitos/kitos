@@ -836,24 +836,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            //TODO: Review: Assert that it was actually changed
-            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
-        }
-
-        [Fact]
-        public void Can_Update_IsAgreementConcluded_To_Null()
-        {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, true);
-
-            //Act
-            var result = _sut.UpdateIsAgreementConcluded(id, null);
-
-            //Assert
-            Assert.True(result.Ok);
+            Assert.Equal(isAgreementConcluded, result.Value.IsAgreementConcluded);
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -889,7 +872,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            //TODO: Review: Assert that it was actually changed
+            Assert.Equal(dateTime, result.Value.AgreementConcludedAt);
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -907,7 +890,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            //TODO: Review: Assert that it was actually changed to null
+            Assert.Null(result.Value.AgreementConcludedAt);
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 

@@ -20,16 +20,28 @@
         headerName = this.dataProcessingRegistration.name;
 
         agreementConcludedOptions = new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options;
-
         
-
         changeName(name) {
-
             this.apiUseCaseFactory
                 .createUpdate(() => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
                 .executeAsync(nameChangeResponse => this.headerName = nameChangeResponse.valueModifiedTo);
         }
 
+        changeIsAgreementConcluded(isAgreementConcluded) {
+            this.apiUseCaseFactory
+                .createUpdate(() => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded))
+                .executeAsync();
+        }
+
+        changeAgreementConcludedAt(agreementConcludedAt) {
+            this.apiUseCaseFactory
+                .createUpdate(() => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
+                .executeAsync();
+        }
+
+        datepickerOptions = {
+            format: "dd-MM-yyyy"
+        };
 
     }
 
