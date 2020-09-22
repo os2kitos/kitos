@@ -620,6 +620,10 @@
     <Compile Include="Migrations\202009220748023_Added_Data_Processors_To_DPR.designer.cs">
       <DependentUpon>202009220748023_Added_Data_Processors_To_DPR.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs" />
+    <Compile Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.designer.cs">
+      <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1006,6 +1010,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009220748023_Added_Data_Processors_To_DPR.resx">
       <DependentUpon>202009220748023_Added_Data_Processors_To_DPR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.resx">
+      <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
