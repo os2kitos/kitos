@@ -252,8 +252,7 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id,
-            YearMonthIntervalOption? yearMonthIntervalOption)
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption? yearMonthIntervalOption)
         {
             return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalChange = new ChangedValue<YearMonthIntervalOption?>(yearMonthIntervalOption) });
         }
@@ -275,6 +274,22 @@ namespace Core.ApplicationServices.GDPR
 
                 if (updateNameError.HasValue)
                     return updateNameError.Value;
+
+                var updateOversightIntervalOptionError =
+                    UpdateOversightInterval(registration, changeSet.OversightIntervalChange);
+
+                if (updateOversightIntervalOptionError.HasValue)
+                {
+                    return updateOversightIntervalOptionError.Value;
+                }
+
+                var updateOversightIntervalNoteError =
+                    UpdateOversightIntervalNote(registration, changeSet.OversightIntervalNoteChange);
+
+                if (updateOversightIntervalNoteError.HasValue)
+                {
+                    return updateOversightIntervalNoteError.Value;
+                }
 
                 _repository.Update(registration);
 
@@ -306,6 +321,19 @@ namespace Core.ApplicationServices.GDPR
 
             return _namingService.ChangeName(dataProcessingRegistration, newName);
         }
+
+        private Maybe<OperationError> UpdateOversightInterval(DataProcessingRegistration dataProcessingRegistration,
+            Maybe<ChangedValue<YearMonthIntervalOption?>> yearMonthIntervalOption)
+        {
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateOversightIntervalNote(DataProcessingRegistration dataProcessingRegistration,
+            Maybe<ChangedValue<string>> yearMonthIntervalOptionNote)
+        {
+            return Maybe<OperationError>.None;
+        }
+
 
         private Result<TSuccess, OperationError> WithReadAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> authorizedAction)
         {

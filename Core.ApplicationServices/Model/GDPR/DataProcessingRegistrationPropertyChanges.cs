@@ -8,8 +8,7 @@ namespace Core.ApplicationServices.Model.GDPR
     {
         public Maybe<ChangedValue<string>> NameChange { get; set; } = Maybe<ChangedValue<string>>.None;
 
-        public Maybe<ChangedValue<YearMonthIntervalOption?>> OversightIntervalChange { get; set; } =
-            Maybe<ChangedValue<YearMonthIntervalOption?>>.None;
+        public Maybe<ChangedValue<YearMonthIntervalOption?>> OversightIntervalChange { get; set; } = Maybe<ChangedValue<YearMonthIntervalOption?>>.None;
 
         public Maybe<ChangedValue<string>> OversightIntervalNoteChange { get; set; } = Maybe<ChangedValue<string>>.None;
 
