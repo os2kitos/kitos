@@ -56,8 +56,52 @@
         }
     }
 
+    class AsyncApiRemoveValueUseCase<T> implements IAsyncApiUseCase<T> {
+        constructor(private readonly notify, private readonly apiCall: ApiCall<T>, private removalCategory : string) {
+            if (!notify) throw new Error("notify must be defined");
+            if (!apiCall) throw new Error("apiCall must be defined");
+            if (!removalCategory) throw new Error("removalCategory must be defined");
+        }
+
+        executeAsync(optionalSuccessCallback?: (successValue: T) => T, optionalErrorCallback?: (errorValue: Models.Api.ApiResponseErrorCategory) => void): angular.IPromise<T> {
+            var msg = this.notify.addInfoMessage(`Fjerner ${this.removalCategory} ...`, false);
+
+            return this
+                .apiCall()
+                .then
+                (
+                    (success: T) => {
+                        msg.toSuccessMessage(`${this.removalCategory} er fjernet`);
+                        if (!!optionalSuccessCallback) {
+                            success = optionalSuccessCallback(success);
+                        }
+                        return success;
+                    },
+                    (error: Models.Api.ApiResponseErrorCategory) => {
+
+                        switch (error) {
+                            case Models.Api.ApiResponseErrorCategory.NotFound:
+                                msg.toErrorMessage(`Fejl! ${this.removalCategory} kunne ikke findes. En af dine kollegaer har muligvis nedlagt den. Tryk F5 og prøv igen!`);
+                                break;
+                            default:
+                                msg.toErrorMessage(`Fejl! ${this.removalCategory} kunne ikke fjernes!`);
+                                break;
+                        }
+
+                        if (!!optionalErrorCallback) {
+                            optionalErrorCallback(error);
+                        }
+
+                        //Fail the continuation
+                        throw error;
+                    }
+                );
+        }
+    }
+
     export interface IApiUseCaseFactory {
         createUpdate<T>(change: ApiCall<T>): AsyncApiChangeFieldUseCase<T>;
+        createAssignmentRemoval<T>(apiCall: ApiCall<T>): AsyncApiRemoveValueUseCase<T>;
     }
 
     export class ApiUseCaseFactory implements IApiUseCaseFactory {
@@ -71,6 +115,13 @@
                 throw new Error("apiCall must be defined");
             }
             return new AsyncApiChangeFieldUseCase<T>(this.notify, apiCall);
+        }
+
+        createAssignmentRemoval<T>(apiCall: ApiCall<T>): AsyncApiRemoveValueUseCase<T> {
+            if (!apiCall) {
+                throw new Error("apiCall must be defined");
+            }
+            return new AsyncApiRemoveValueUseCase<T>(this.notify, apiCall,"Tilknytningen");
         }
     }
 

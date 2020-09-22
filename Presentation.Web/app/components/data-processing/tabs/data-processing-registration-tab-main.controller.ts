@@ -13,16 +13,36 @@
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
-            private readonly apiUseCaseFactory : Services.Generic.IApiUseCaseFactory) {
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
+            this.bindDataProcessors();
         }
 
         headerName = this.dataProcessingRegistration.name;
 
-        changeName(name) {
+        dataProcessors : Models.DataProcessing.IDataProcessorDTO[];
 
+        private bindDataProcessors() {
+            this.dataProcessors = this.dataProcessingRegistration.dataProcessors;
+        }
+
+        changeName(name) {
             this.apiUseCaseFactory
                 .createUpdate(() => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
                 .executeAsync(nameChangeResponse => this.headerName = nameChangeResponse.valueModifiedTo);
+        }
+
+        removeDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistration.id, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.dataProcessors = this.dataProcessingRegistration.dataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindDataProcessors();
+                    return success;
+                });
         }
     }
 
