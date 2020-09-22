@@ -840,6 +840,23 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Can_Update_IsAgreementConcluded_To_Null()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            //Act
+            var result = _sut.UpdateIsAgreementConcluded(id, null);
+
+            //Assert
+            Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
         public void Update_IsAgreementConcluded_Returns_Forbidden()
         {
             //Arrange
@@ -868,6 +885,23 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Act
             var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
+
+            //Assert
+            Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Can_Update_AgreementConcludedAt_To_Null()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            //Act
+            var result = _sut.UpdateAgreementConcludedAt(id, null);
 
             //Assert
             Assert.True(result.Ok);

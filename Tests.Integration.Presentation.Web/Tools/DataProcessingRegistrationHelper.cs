@@ -156,20 +156,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{agreementId}/it-systems/remove"), cookie, new { Value = systemId });
         }
 
-        public static async Task<HttpResponseMessage> SendChangeIsAgreementConcludedRequestAsync(int id, YesNoIrrelevantOption yesNoIrrelevantOption, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendChangeIsAgreementConcludedRequestAsync(int id, YesNoIrrelevantOption? yesNoIrrelevantOption, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var body = new SingleValueDTO<YesNoIrrelevantOption> { Value = yesNoIrrelevantOption };
+            var body = new SingleValueDTO<YesNoIrrelevantOption?> { Value = yesNoIrrelevantOption };
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/is-agreement-concluded"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendChangeAgreementConcludedAtRequestAsync(int id, DateTime dateTime, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendChangeAgreementConcludedAtRequestAsync(int id, DateTime? dateTime, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var body = new SingleValueDTO<DateTime> { Value = dateTime };
+            var body = new SingleValueDTO<DateTime?> { Value = dateTime };
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded-at"), cookie, body);
         }

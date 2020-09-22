@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
 using Infrastructure.Services.Types;
 
@@ -25,6 +26,25 @@ namespace Core.DomainServices.GDPR
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
+            PatchIsAgreementConcluded(source, destination);
+            destination.AgreementConcludedAt = source.AgreementConcludedAt;
+        }
+
+        private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.IsAgreementConcluded = MapYesNoIrrelevantOptionToString(source.IsAgreementConcluded);
+        }
+
+        private string MapYesNoIrrelevantOptionToString(YesNoIrrelevantOption? yesNoIrrelevantOption)
+        {
+            return yesNoIrrelevantOption switch
+            {
+                YesNoIrrelevantOption.NO => "Nej",
+                YesNoIrrelevantOption.YES => "Ja",
+                YesNoIrrelevantOption.IRRELEVANT => "Irrelevant",
+                YesNoIrrelevantOption.UNDECIDED => "",
+                _ => "",
+            };
         }
 
         private void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

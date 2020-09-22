@@ -616,9 +616,9 @@
     <Compile Include="Migrations\202009212152110_DataProcessingRegistration.designer.cs">
       <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration.cs" />
-    <Compile Include="Migrations\202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration.designer.cs">
-      <DependentUpon>202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
+    <Compile Include="Migrations\202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration.cs" />
+    <Compile Include="Migrations\202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration.designer.cs">
+      <DependentUpon>202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1004,8 +1004,8 @@
     <EmbeddedResource Include="Migrations\202009212152110_DataProcessingRegistration.resx">
       <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration.resx">
-      <DependentUpon>202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration.resx">
+      <DependentUpon>202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -252,14 +252,14 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption yesNoIrrelevantOption)
+        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption? yesNoIrrelevantOption)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption>(yesNoIrrelevantOption) });
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption?>(yesNoIrrelevantOption) });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime dateTime)
+        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? dateTime)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { AgreementConcludedAtChange = new ChangedValue<DateTime>(dateTime) });
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { AgreementConcludedAtChange = new ChangedValue<DateTime?>(dateTime) });
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
@@ -316,7 +316,7 @@ namespace Core.ApplicationServices.GDPR
             return _namingService.ChangeName(dataProcessingRegistration, newName);
         }
 
-        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption>> yesNoIrrelevantOptionChange)
+        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption?>> yesNoIrrelevantOptionChange)
         {
             if (yesNoIrrelevantOptionChange.IsNone)
                 return Maybe<OperationError>.None;
@@ -327,7 +327,7 @@ namespace Core.ApplicationServices.GDPR
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> UpdateAgreementConcludedAt(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<DateTime>> dateTimeChange)
+        private Maybe<OperationError> UpdateAgreementConcludedAt(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<DateTime?>> dateTimeChange)
         {
             if (dateTimeChange.IsNone)
                 return Maybe<OperationError>.None;

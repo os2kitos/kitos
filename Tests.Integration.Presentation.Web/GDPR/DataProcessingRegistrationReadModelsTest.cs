@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -51,6 +52,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+            var isAgreementConcluded = A<YesNoIrrelevantOption>();
+            var agreementConcludedAt = A<DateTime>();
 
             var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
@@ -62,6 +65,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
             using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, itSystemDto.Id);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(agreement.Id, isAgreementConcluded);
+            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(agreement.Id, agreementConcludedAt);
 
             //Wait for read model to rebuild
             await Task.WhenAll(
@@ -99,6 +104,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
+            Assert.Matches("Ja|Nej|Irrelevant", readModel.IsAgreementConcluded);
+            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
+
         }
 
         [Fact]

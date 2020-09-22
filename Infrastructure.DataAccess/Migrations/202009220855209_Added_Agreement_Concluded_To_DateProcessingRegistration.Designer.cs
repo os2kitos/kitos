@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202009220731445_Added_Agreement_Concluded_To_DateProcessingRegistration"; }
+            get { return "202009220855209_Added_Agreement_Concluded_To_DateProcessingRegistration"; }
         }
         
         string IMigrationMetadata.Source

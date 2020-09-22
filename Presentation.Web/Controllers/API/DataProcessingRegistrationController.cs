@@ -267,7 +267,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> yesNoIrrelevantOption)
+        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption?> yesNoIrrelevantOption)
         {
             if (yesNoIrrelevantOption == null)
                 return BadRequest("dataOption must be provided");
@@ -283,7 +283,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime> dateTime)
+        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> dateTime)
         {
             if (dateTime == null)
                 return BadRequest("dataOption must be provided");
