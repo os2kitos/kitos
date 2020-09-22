@@ -33,6 +33,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
@@ -233,6 +234,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
         }
 
