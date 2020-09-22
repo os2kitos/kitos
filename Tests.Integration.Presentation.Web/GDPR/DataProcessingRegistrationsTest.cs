@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -390,6 +391,36 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveResponse.StatusCode);
             dto = await DataProcessingRegistrationHelper.GetAsync(agreement.Id);
             Assert.Empty(dto.ItSystems);
+        }
+
+        [Fact]
+        public async Task Can_Change_IsAgreementConcluded()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registrationDto.Id, yesNoIrrelevantOption);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_AgreementConcludedAt()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dateTime = A<DateTime>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registrationDto.Id, dateTime);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
     }
 }

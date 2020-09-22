@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
@@ -166,5 +168,9 @@ namespace Core.DomainModel.GDPR
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
+
+        public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
+
+        public DateTime? AgreementConcludedAt { get; set; }
     }
 }

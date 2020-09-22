@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -251,10 +252,21 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
+        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption yesNoIrrelevantOption)
+        {
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption>(yesNoIrrelevantOption) });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime dateTime)
+        {
+            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { AgreementConcludedAtChange = new ChangedValue<DateTime>(dateTime) });
+        }
+
         private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
         {
             if (changeSet == null)
                 throw new ArgumentNullException(nameof(changeSet));
+
 
             return WithWriteAccess<DataProcessingRegistration>(id, registration =>
             {
@@ -262,6 +274,16 @@ namespace Core.ApplicationServices.GDPR
 
                 if (updateNameError.HasValue)
                     return updateNameError.Value;
+
+                var updateIsAgreementConcludedError = UpdateIsAgreementConcluded(registration, changeSet.IsAgreementConcludedChange);
+
+                if (updateIsAgreementConcludedError.HasValue)
+                    return updateIsAgreementConcludedError.Value;
+
+                var updateAgreementConcludedAtError = UpdateAgreementConcludedAt(registration, changeSet.AgreementConcludedAtChange);
+
+                if (updateAgreementConcludedAtError.HasValue)
+                    return updateAgreementConcludedAtError.Value;
 
                 _repository.Update(registration);
 
@@ -292,6 +314,28 @@ namespace Core.ApplicationServices.GDPR
             var newName = nameChange.Value.Value;
 
             return _namingService.ChangeName(dataProcessingRegistration, newName);
+        }
+
+        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption>> yesNoIrrelevantOptionChange)
+        {
+            if (yesNoIrrelevantOptionChange.IsNone)
+                return Maybe<OperationError>.None;
+
+            var newOptionValue = yesNoIrrelevantOptionChange.Value.Value;
+            dataProcessingRegistration.IsAgreementConcluded = newOptionValue;
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateAgreementConcludedAt(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<DateTime>> dateTimeChange)
+        {
+            if (dateTimeChange.IsNone)
+                return Maybe<OperationError>.None;
+
+            var newdateTime = dateTimeChange.Value.Value;
+            dataProcessingRegistration.AgreementConcludedAt = newdateTime;
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<TSuccess, OperationError> WithReadAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> authorizedAction)

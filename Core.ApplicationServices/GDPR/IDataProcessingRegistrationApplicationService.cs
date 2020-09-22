@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
@@ -24,5 +26,7 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<ItSystem, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystem, OperationError> RemoveSystem(int id, int systemId);
+        Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption yesNoIrrelevantOption);
+        Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime dateTime);
     }
 }

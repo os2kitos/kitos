@@ -8,7 +8,9 @@ using System.Web.Http;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
@@ -256,6 +258,38 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveSystem(id, systemId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/is-agreement-concluded")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> yesNoIrrelevantOption)
+        {
+            if (yesNoIrrelevantOption == null)
+                return BadRequest("dataOption must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsAgreementConcluded(id, yesNoIrrelevantOption.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/agreement-concluded-at")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime> dateTime)
+        {
+            if (dateTime == null)
+                return BadRequest("dataOption must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateAgreementConcludedAt(id, dateTime.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

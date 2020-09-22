@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
@@ -818,6 +819,76 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_IsAgreementConcluded()
+        {
+            //Arrange
+            var id = A<int>();
+            var isAgreementConcluded = A<YesNoIrrelevantOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            //Act
+            var result = _sut.UpdateIsAgreementConcluded(id, isAgreementConcluded);
+
+            //Assert
+            Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_IsAgreementConcluded_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var isAgreementConcluded = A<YesNoIrrelevantOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateIsAgreementConcluded(id, isAgreementConcluded);
+
+            //Assert
+            AssertModificationFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Can_Update_AgreementConcludedAt()
+        {
+            //Arrange
+            var id = A<int>();
+            var dateTime = A<DateTime>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            //Act
+            var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
+
+            //Assert
+            Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_AgreementConcludedAt_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var dateTime = A<DateTime>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
+
+            //Assert
+            AssertModificationFailure(result, OperationFailure.Forbidden);
         }
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)
