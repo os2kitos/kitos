@@ -12,4 +12,22 @@
             ];
         }
     }
+
+    export interface IDataProcessingAgreementViewModel {
+        id: number;
+        organizationId: number;
+        isDataAgreementConcluded: AgreementConcludedOptions;
+    }
+
+    export class DataProcessingAgreementViewModel implements IDataProcessingAgreementViewModel{
+        id: number;
+        organizationId: number;
+        isDataAgreementConcluded: AgreementConcludedOptions;
+
+        constructor(dataProcessingAgreementDTO: Models.DataProcessing.IDataProcessingAgreementDTO) {
+            this.id = dataProcessingAgreementDTO.id;
+            this.isDataAgreementConcluded
+        }
+    }
+
 }

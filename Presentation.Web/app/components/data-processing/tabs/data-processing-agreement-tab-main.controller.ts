@@ -21,6 +21,8 @@
 
         agreementConcludedOptions = new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options;
 
+        viewModel = new 
+
         changeName(name) {
 
             var msg = this.notify.addInfoMessage("Ændrer navn på databehandleraftale");

@@ -485,6 +485,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\data-processing\data-processing-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\RolesViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\Select2OptionViewModel.ts" />
