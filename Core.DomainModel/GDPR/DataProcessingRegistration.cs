@@ -5,6 +5,7 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
@@ -166,5 +167,10 @@ namespace Core.DomainModel.GDPR
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
+
+        public YearMonthIntervalOption? OversightInterval { get; set; }
+
+        public string OversightIntervalNote { get; set; }
+
     }
 }
