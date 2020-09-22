@@ -122,7 +122,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 return Task.FromResult(
                     DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
                         x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id)));
-            }, TimeSpan.FromSeconds(10));
+            }, TimeSpan.FromSeconds(20));
 
             using var response2 = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
@@ -133,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 return Task.FromResult(
                     DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
                         x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == agreement.Id) == false));
-            }, TimeSpan.FromSeconds(10));
+            }, TimeSpan.FromSeconds(20));
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
