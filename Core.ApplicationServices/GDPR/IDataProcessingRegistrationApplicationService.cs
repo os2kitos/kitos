@@ -25,8 +25,8 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<ItSystem, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystem, OperationError> RemoveSystem(int id, int systemId);
-        Result<DataProcessingRegistration, OperationError> OversightIntervalChange(int id, YearMonthIntervalOption? yesNoIrrelevantOption);
-        Result<DataProcessingRegistration, OperationError> OversightIntervalNoteChange(int id, string note);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption? yesNoIrrelevantOption);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note);
 
     }
 }
