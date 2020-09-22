@@ -4,43 +4,25 @@
     export class EditMainDataProcessingRegistrationController {
         static $inject: Array<string> = [
             "dataProcessingRegistrationService",
-            "notify",
             "hasWriteAccess",
-            "dataProcessingRegistration"
+            "dataProcessingRegistration",
+            "apiUseCaseFactory"
         ];
 
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
-            private readonly notify,
             public hasWriteAccess,
-            private readonly dataProcessingRegistration : Models.DataProcessing.IDataProcessingRegistrationDTO) {
+            private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
+            private readonly apiUseCaseFactory : Services.Generic.IApiUseCaseFactory) {
         }
 
         headerName = this.dataProcessingRegistration.name;
 
         changeName(name) {
 
-            var msg = this.notify.addInfoMessage("Ændrer nav");
-
-            return this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name).then(
-                nameChangeResponse => {
-                    msg.toSuccessMessage("Navnet er ændret!");
-                    this.headerName = nameChangeResponse.valueModifiedTo;
-                },
-                (errorResponse: Models.Api.ApiResponseErrorCategory) => {
-                    switch (errorResponse) {
-                    case Models.Api.ApiResponseErrorCategory.BadInput:
-                        msg.toErrorMessage("Fejl! Navnet er ugyldigt!");
-                        break;
-                    case Models.Api.ApiResponseErrorCategory.Conflict:
-                        msg.toErrorMessage("Fejl! Navnet er allerede brugt!");
-                        break;
-                    default:
-                        msg.toErrorMessage("Fejl! Kunne ikke ændre navnet!");
-                        break;
-                    }
-                }
-            );
+            this.apiUseCaseFactory
+                .createUpdate(() => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
+                .executeAsync(nameChangeResponse => this.headerName = nameChangeResponse.valueModifiedTo);
         }
     }
 
