@@ -5,16 +5,17 @@ class KendoLoaderHelper {
     private waitUpTo = new WaitTimers();
     private ec = protractor.ExpectedConditions;
 
-    readonly kendoLoadingMask = this.ec.not(
+    private kendoLoadingMaskOff = this.ec.not(
         this.ec.presenceOf(element(by.className("k-loading-mask"))));
 
     waitForKendoGridData(columnName: protractor.ElementFinder) {
-
-        return this.waitForKendoGrid(columnName)
-            .then(() => browser.wait(this.kendoLoadingMask, this.waitUpTo.twentySeconds));
+        console.log("Waiting for kendo grid to load");
+        return browser.wait(this.kendoLoadingMaskOff, this.waitUpTo.twentySeconds)
+            .then(() => this.waitForKendoGrid(columnName));
     }
 
     waitForKendoGrid(columnName: protractor.ElementFinder) {
+        console.log(`Waiting for kendo grid to show column`);
         return browser
             .wait(this.ec.visibilityOf(columnName), this.waitUpTo.twentySeconds);
     }
