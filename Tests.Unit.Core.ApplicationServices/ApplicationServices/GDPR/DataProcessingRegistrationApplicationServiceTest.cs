@@ -50,6 +50,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _roleAssignmentServiceMock.Object,
                 _referenceRepositoryMock.Object,
                 _systemAssignmentServiceMock.Object,
+                new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>().Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }

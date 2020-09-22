@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
@@ -24,5 +25,8 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<ItSystem, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystem, OperationError> RemoveSystem(int id, int systemId);
+        Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+        Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId);
+        Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
     }
 }
