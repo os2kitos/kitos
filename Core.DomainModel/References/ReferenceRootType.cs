@@ -6,6 +6,6 @@
         SystemUsage,
         Contract,
         Project,
-        DataProcessingAgreement
+        DataProcessingRegistration
     }
 }

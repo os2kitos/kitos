@@ -24,7 +24,7 @@
         organizationId: number;
         isDataAgreementConcluded: AgreementConcludedOptions;
 
-        constructor(dataProcessingAgreementDTO: Models.DataProcessing.IDataProcessingAgreementDTO) {
+        constructor(dataProcessingAgreementDTO: Models.DataProcessing.IDataProcessingRegistrationDTO) {
             this.id = dataProcessingAgreementDTO.id;
             this.isDataAgreementConcluded
         }

@@ -98,18 +98,18 @@ namespace Tests.Integration.Presentation.Web.References
         }
 
         [Fact]
-        public async Task Can_Create_Reference_In_DataProcessingAgreement()
+        public async Task Can_Create_Reference_In_DataProcessingRegistration()
         {
             //Arrange
-            var dpa = await DataProcessingAgreementHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var dpa = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act - create two similar references... we expect the first one to be the master
-            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.DataProcessingAgreement_Id = dpa.Id);
-            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.DataProcessingAgreement_Id = dpa.Id);
+            var expectedMasterReference = await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.DataProcessingRegistration_Id = dpa.Id);
+            await ReferencesHelper.CreateReferenceAsync(_title, _externalReferenceId, _referenceUrl, _display, dto => dto.DataProcessingRegistration_Id = dpa.Id);
 
             //Assert
             AssertCreatedReference(_title, expectedMasterReference, _externalReferenceId, _referenceUrl, _display);
-            dpa = await DataProcessingAgreementHelper.GetAsync(dpa.Id);
+            dpa = await DataProcessingRegistrationHelper.GetAsync(dpa.Id);
 
             Assert.Equal(2, dpa.References.Length);
             Assert.Equal(expectedMasterReference.Id, dpa.References.FirstOrDefault(x => x.MasterReference).FromNullable().Select(x => x.Id).GetValueOrFallback(-1)); //First reference must be marked as "the reference"

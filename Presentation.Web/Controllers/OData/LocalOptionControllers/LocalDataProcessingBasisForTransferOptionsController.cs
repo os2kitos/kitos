@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [PublicApi]
     [ODataRoutePrefix("LocalDataProcessingBasisForTransferOptions")]
-    public class LocalDataProcessingBasisForTransferOptionsController : LocalOptionBaseController<LocalDataProcessingBasisForTransferOption, DataProcessingAgreement, DataProcessingBasisForTransferOption>
+    public class LocalDataProcessingBasisForTransferOptionsController : LocalOptionBaseController<LocalDataProcessingBasisForTransferOption, DataProcessingRegistration, DataProcessingBasisForTransferOption>
     {
         public LocalDataProcessingBasisForTransferOptionsController(IGenericRepository<LocalDataProcessingBasisForTransferOption> repository, IGenericRepository<DataProcessingBasisForTransferOption> optionsRepository)
             : base(repository, optionsRepository)

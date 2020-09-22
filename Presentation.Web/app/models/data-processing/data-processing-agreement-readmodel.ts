@@ -1,15 +1,15 @@
 ﻿module Kitos.Models.DataProcessing {
 
-    export interface IAssignedDataProcessingAgreementRole {
+    export interface IAssignedDataProcessingRegistrationRole {
         RoleId : number;
         UserFullName : string;
     }
 
-    export interface IDataProcessingAgreement {
+    export interface IDataProcessingRegistration {
         Id: number;
         SourceEntityId : number;
         Name: string;
-        RoleAssignments: IAssignedDataProcessingAgreementRole[];
+        RoleAssignments: IAssignedDataProcessingRegistrationRole[];
         MainReferenceTitle: string;
         MainReferenceUrl: string;
         MainReferenceUserAssignedId: string;

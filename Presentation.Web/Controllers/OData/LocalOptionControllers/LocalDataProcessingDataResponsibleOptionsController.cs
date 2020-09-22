@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [PublicApi]
     [ODataRoutePrefix("LocalDataProcessingDataResponsibleOptions")]
-    public class LocalDataProcessingDataResponsibleOptionsController : LocalOptionBaseController<LocalDataProcessingDataResponsibleOption, DataProcessingAgreement, DataProcessingDataResponsibleOption>
+    public class LocalDataProcessingDataResponsibleOptionsController : LocalOptionBaseController<LocalDataProcessingDataResponsibleOption, DataProcessingRegistration, DataProcessingDataResponsibleOption>
     {
         public LocalDataProcessingDataResponsibleOptionsController(IGenericRepository<LocalDataProcessingDataResponsibleOption> repository, IGenericRepository<DataProcessingDataResponsibleOption> optionsRepository)
             : base(repository, optionsRepository)

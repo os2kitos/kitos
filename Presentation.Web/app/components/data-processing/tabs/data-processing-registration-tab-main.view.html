@@ -1,0 +1,35 @@
+﻿<div class="object-section-container">
+    <h4 data-element-type="dpaMainDetailHeader">{{vm.headerName}}</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-6">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="dataProcessingRegistration-name" class="control-label small">Navn</label>
+                    <input type="text" id="dataProcessingRegistration-name" class="form-control input-sm" required
+                           data-ng-model="vm.dataProcessingRegistration.name"
+                           data-element-type="dpaMainName"
+                           data-field="name"
+                           ng-blur="vm.changeName(vm.dataProcessingRegistration.name)"
+                           data-ng-disabled="!vm.hasWriteAccess"
+                           autofocus
+                           maxlength="150">
+                </div>
+                <!-- Agreement concluded -->
+                <div class="form-group">
+                    <label for="agreementConcluded" class="control-label small">Databehandleraftale indgået</label>
+                    <select class="form-control input-sm" id="agreementConcluded"
+                            ui-select2="noSearchNoClearSelect2"
+                            ng-model="usageViewModel.isBusinessCritical"
+                            data-autosave="{{autoSaveUrl}}"
+                            data-field="AgreementConcluded"
+                            ng-disabled="!vm.hasWriteAccess">
+                        <option hidden selected value />
+                        <option ng-repeat="option in vm.agreementConcludedOptions" value="{{option.id}}" ng-bind-html="option.text" />
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="object-section-container"></div>

@@ -109,8 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
-    <Compile Include="GDPR\DataProcessingAgreementReadModelsTest.cs" />
-    <Compile Include="GDPR\DataProcessingAgreementsTest.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
     <Compile Include="ItSystem\SystemRelationsTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
@@ -137,7 +137,7 @@
     <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
-    <Compile Include="Tools\DataProcessingAgreementHelper.cs" />
+    <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />

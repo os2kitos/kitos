@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingBasisForTransferOptionMap : OptionEntityMap<DataProcessingBasisForTransferOption, DataProcessingAgreement>
+    public class DataProcessingBasisForTransferOptionMap : OptionEntityMap<DataProcessingBasisForTransferOption, DataProcessingRegistration>
     {
     }
 }

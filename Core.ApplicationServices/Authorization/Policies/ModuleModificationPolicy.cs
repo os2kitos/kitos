@@ -148,7 +148,7 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return IsReportModuleAdmin(organizationId);
             }
 
-            if (MatchType<DataProcessingAgreement>(target))
+            if (MatchType<DataProcessingRegistration>(target))
             {
                 return IsSystemModuleAdmin(organizationId) || IsContractModuleAdmin(organizationId);
             }

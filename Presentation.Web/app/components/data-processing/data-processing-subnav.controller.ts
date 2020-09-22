@@ -1,13 +1,13 @@
-﻿module Kitos.DataProcessing.Agreement.Edit {
+﻿module Kitos.DataProcessing.Registration.Edit {
     "use strict";
 
-    export class SubNavDataProcessingAgreementController {
+    export class SubNavDataProcessingRegistrationController {
         static $inject: Array<string> = [
             "$scope",
             "$rootScope",
             "$state",
             "notify",
-            "dataProcessingAgreementService"
+            "dataProcessingRegistrationService"
         ];
 
         constructor(
@@ -15,15 +15,15 @@
             $rootScope,
             $state: angular.ui.IStateService,
             notify,
-            dataProcessingAgreementService: Services.DataProcessing.IDataProcessingAgreementService) {
+            dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService) {
 
-            this.$scope.page.title = "Databehandleraftaler";
+            this.$scope.page.title = "Databehandling - Overblik";
  
             $rootScope.page.subnav = [
-                { state: "data-processing.overview", substate: "data-processing.edit-agreement", text: "Databehandleraftaler" }
+                { state: "data-processing.overview", substate: "data-processing.edit-registration", text: "Overblik" }
             ];
             $rootScope.page.subnav.buttons = [
-                { func: remove, text: "Slet Databehandleraftale", style: "btn-danger", showWhen: "data-processing.edit-agreement", dataElementType: 'removeDataProcessingAgreementButton' }
+                { func: remove, text: "Slet Registrering", style: "btn-danger", showWhen: "data-processing.edit-registration", dataElementType: 'removeDataProcessingRegistrationButton' }
             ];
 
             $rootScope.subnavPositionCenter = false;
@@ -33,24 +33,24 @@
             });
 
             function remove() {
-                if (!confirm("Er du sikker på du vil slette Databehandleraftale?")) {
+                if (!confirm("Er du sikker på du vil slette registreringen?")) {
                     return;
                 }
-                const dataProcessingAgreementId = $state.params["id"];
-                var msg = notify.addInfoMessage("Sletter Databehandleraftale...", false);
+                const dataProcessingRegistrationId = $state.params["id"];
+                var msg = notify.addInfoMessage("Sletter registreringen...", false);
 
-                dataProcessingAgreementService.delete(dataProcessingAgreementId).then(
+                dataProcessingRegistrationService.delete(dataProcessingRegistrationId).then(
                     deleteResponse => {
-                        msg.toSuccessMessage("Databehandleraftale slettet!");
+                        msg.toSuccessMessage("Registreringen er slettet!");
                             $state.go("data-processing.overview");
                         },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
                         switch (errorResponse) {
                         case Models.Api.ApiResponseErrorCategory.NotFound:
-                                msg.toErrorMessage("Fejl! Kunne ikke finde og slette den valgte databehandleraftale!");
+                                msg.toErrorMessage("Fejl! Kunne ikke finde og slette registreringen!");
                             break;
                         default:
-                            msg.toErrorMessage("Fejl! Kunne ikke slette databehandleraftale!");
+                                msg.toErrorMessage("Fejl! Kunne ikke slette registreringen!");
                             break;
                         }
                     }
@@ -66,7 +66,7 @@
                 url: "/data-processing",
                 abstract: true,
                 template: "<ui-view autoscroll=\"false\" />",
-                controller: SubNavDataProcessingAgreementController,
+                controller: SubNavDataProcessingRegistrationController,
                 controllerAs: "vm"
             });
         }]);

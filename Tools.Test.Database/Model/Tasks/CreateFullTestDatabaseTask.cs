@@ -50,7 +50,7 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateItContractTask("DefaultTestItContract"),
                 new CreateItProjectTask("DefaultTestItProject"),
                 new CreateItReportTask("DefaultTestReport"),
-                new CreateDataProcessingAgreementTask("DefaultDpa"),
+                new CreateDataProcessingRegistrationTask("DefaultDpa"),
                 new CreateTaskRefTask(DefaultOrganizationName)
             }.AsReadOnly();
         }

@@ -23,8 +23,8 @@ namespace Presentation.Web.Hangfire
             using (new HangfireNinjectResolutionScope(_kernel))
             {
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                backgroundJobLauncher.LaunchScheduleDataProcessingAgreementReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
-                backgroundJobLauncher.LaunchUpdateDataProcessingAgreementReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
+                backgroundJobLauncher.LaunchScheduleDataProcessingRegistrationReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
+                backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             }
 
             CoolDown(combinedTokenSource);

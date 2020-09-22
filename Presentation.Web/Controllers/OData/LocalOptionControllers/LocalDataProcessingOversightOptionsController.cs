@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [PublicApi]
     [ODataRoutePrefix("LocalDataProcessingOversightOptions")]
-    public class LocalDataProcessingOversightOptionsController : LocalOptionBaseController<LocalDataProcessingOversightOption, DataProcessingAgreement, DataProcessingOversightOption>
+    public class LocalDataProcessingOversightOptionsController : LocalOptionBaseController<LocalDataProcessingOversightOption, DataProcessingRegistration, DataProcessingOversightOption>
     {
         public LocalDataProcessingOversightOptionsController(IGenericRepository<LocalDataProcessingOversightOption> repository, IGenericRepository<DataProcessingOversightOption> optionsRepository)
             : base(repository, optionsRepository)

@@ -200,7 +200,7 @@
     readonly gdprDPIADateForId = "DPIADateFor";
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
-    readonly gdprDataProcessingAgreementView = "gdprDataProcessingAgreementView";
+    readonly gdprDataProcessingRegistrationView = "gdprDataProcessingRegistrationView";
 
     //Local admin
 

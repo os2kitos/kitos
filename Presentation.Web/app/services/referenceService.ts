@@ -128,8 +128,8 @@
         }
 
         createDpaReference(): IReferenceService {
-            return this.createFor("v1/data-processing-agreement", (reference, id) => {
-                reference.DataProcessingAgreement_Id = id;
+            return this.createFor("v1/data-processing-registration", (reference, id) => {
+                reference.DataProcessingRegistration_Id = id;
                 return reference;
             });
         }

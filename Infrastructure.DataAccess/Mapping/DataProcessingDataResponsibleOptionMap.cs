@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingDataResponsibleOptionMap : OptionEntityMap<DataProcessingDataResponsibleOption, DataProcessingAgreement>
+    public class DataProcessingDataResponsibleOptionMap : OptionEntityMap<DataProcessingDataResponsibleOption, DataProcessingRegistration>
     {
     }
 }
