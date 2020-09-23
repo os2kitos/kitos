@@ -13,6 +13,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("DataProcessingRegistration_Index_Name", 0);
 
+            Property(x => x.HasSubDataProcessors).IsOptional();
+
             //Organization relationship
             HasRequired(t => t.Organization)
                 .WithMany(t => t.DataProcessingRegistrations)
@@ -33,6 +35,10 @@ namespace Infrastructure.DataAccess.Mapping
             //Data processors
             HasMany(x => x.DataProcessors)
                 .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
+
+            //Sub Data processors
+            HasMany(x => x.SubDataProcessors)
+                .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
         }
     }
 }

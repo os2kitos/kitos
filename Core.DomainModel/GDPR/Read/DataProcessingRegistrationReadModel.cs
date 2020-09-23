@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Core.DomainModel.GDPR.Read
 {
@@ -31,9 +32,11 @@ namespace Core.DomainModel.GDPR.Read
         public string SystemNamesAsCsv { get; set; }
         
         public string DataProcessorNamesAsCsv { get; set; }
+        
+        public string SubDataProcessorNamesAsCsv { get; set; }
 
         public virtual DataProcessingRegistration SourceEntity { get; set; }
-        
+
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
     }
 }

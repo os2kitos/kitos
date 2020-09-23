@@ -5,6 +5,7 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
@@ -22,6 +23,7 @@ namespace Core.DomainModel.GDPR
             ExternalReferences = new List<ExternalReference>();
             SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             DataProcessors = new List<Organization.Organization>();
+            SubDataProcessors = new List<Organization.Organization>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -41,6 +43,8 @@ namespace Core.DomainModel.GDPR
 
         public int OrganizationId { get; set; }
 
+        public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+
         public virtual Organization.Organization Organization { get; set; }
 
         public virtual ICollection<DataProcessingRegistrationReadModel> ReadModels { get; set; }
@@ -48,6 +52,8 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
+
+        public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
 
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {
