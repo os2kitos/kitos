@@ -987,6 +987,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateIsAgreementConcluded(id, isAgreementConcluded);
@@ -994,6 +996,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(isAgreementConcluded, result.Value.IsAgreementConcluded);
+            transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -1023,6 +1026,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
@@ -1030,6 +1035,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(dateTime, result.Value.AgreementConcludedAt);
+            transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -1041,6 +1047,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateAgreementConcludedAt(id, null);
@@ -1048,6 +1056,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Null(result.Value.AgreementConcludedAt);
+            transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 

@@ -268,8 +268,6 @@ namespace Core.ApplicationServices.GDPR
                 if (updateAgreementConcludedAtError.HasValue)
                     return updateAgreementConcludedAtError.Value;
 
-                _repository.Update(registration);
-
                 return registration;
             });
         }
