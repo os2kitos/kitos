@@ -84,6 +84,37 @@ namespace Core.DomainModel.GDPR
             return dataProcessor;
         }
 
+        public Result<Organization.Organization, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+
+            if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
+                return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
+
+            if (HasSubDataProcessor(dataProcessor))
+                return new OperationError("Sub Data processor already assigned", OperationFailure.Conflict);
+
+            SubDataProcessors.Add(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        public Result<Organization.Organization, OperationError> RemoveSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+            if (!HasSubDataProcessor(dataProcessor))
+                return new OperationError("Sub Data processor not assigned", OperationFailure.BadInput);
+
+            SubDataProcessors.Remove(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        private bool HasSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            return SubDataProcessors.Any(x => x.Id == dataProcessor.Id);
+        }
+
         private bool HasDataProcessor(Organization.Organization dataProcessor)
         {
             return DataProcessors.Any(x => x.Id == dataProcessor.Id);

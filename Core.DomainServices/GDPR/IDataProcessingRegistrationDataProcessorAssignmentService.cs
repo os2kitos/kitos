@@ -10,5 +10,8 @@ namespace Core.DomainServices.GDPR
         IQueryable<Organization> GetApplicableDataProcessors(DataProcessingRegistration registration);
         Result<Organization, OperationError> AssignDataProcessor(DataProcessingRegistration registration, int organizationId);
         Result<Organization, OperationError> RemoveDataProcessor(DataProcessingRegistration registration, int organizationId);
+        IQueryable<Organization> GetApplicableSubDataProcessors(DataProcessingRegistration registration);
+        Result<Organization, OperationError> AssignSubDataProcessor(DataProcessingRegistration registration, int organizationId);
+        Result<Organization, OperationError> RemoveSubDataProcessor(DataProcessingRegistration registration, int organizationId);
     }
 }

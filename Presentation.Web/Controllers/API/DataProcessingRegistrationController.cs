@@ -9,6 +9,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
@@ -302,6 +303,68 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{id}/sub-data-processors/available")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/state")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage SetSubDataProcessorsState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        {
+            if (value == null)
+                return BadRequest("value must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .SetSubDataProcessorsState(id, value.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignSubDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveSubDataProcessor(id, organizationId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
