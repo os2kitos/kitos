@@ -619,6 +619,7 @@
     <Compile Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs" />
     <Compile Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.designer.cs">
       <DependentUpon>202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
+	</Compile>
     <Compile Include="Migrations\202009220748023_Added_Data_Processors_To_DPR.cs" />
     <Compile Include="Migrations\202009220748023_Added_Data_Processors_To_DPR.designer.cs">
       <DependentUpon>202009220748023_Added_Data_Processors_To_DPR.cs</DependentUpon>
@@ -1013,6 +1014,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.resx">
       <DependentUpon>202009221212126_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
+	</EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009220748023_Added_Data_Processors_To_DPR.resx">
       <DependentUpon>202009220748023_Added_Data_Processors_To_DPR.cs</DependentUpon>
     </EmbeddedResource>
