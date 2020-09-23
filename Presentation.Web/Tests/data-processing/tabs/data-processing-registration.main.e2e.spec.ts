@@ -6,6 +6,7 @@ import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingRegistrationEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 import GetDateHelper = require("../../Helpers/GetDateHelper");
+import Select2Helper = require("../../Helpers/Select2Helper");
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -98,12 +99,17 @@ describe("Data processing agreement main detail tests", () => {
 
     function verifyIsAgreementConcluded(selectedValue: string) {
         console.log(`Expecting IsAgreementConcluded to be set to: ${selectedValue}`);
-        expect(pageObject.getIsAgreementConcludedField().getText).toBe(selectedValue);
+        expect(Select2Helper.getData("s2id_agreementConcluded").getText()).toEqual(selectedValue);
     }
 
     function verifyAgreementConcludedAt(selectedDate: string) {
+        setFocusOnNameToActivateBlur();
         console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
-        expect(pageObject.getAgreementConcludedAtDateField().getText).toBe(selectedDate);
+        expect(pageObject.getAgreementConcludedAtDateField().getAttribute("value")).toEqual(selectedDate);
+    }
+
+    function setFocusOnNameToActivateBlur() {
+        return pageObject.getDpaMainNameInput().click();
     }
 
 });
