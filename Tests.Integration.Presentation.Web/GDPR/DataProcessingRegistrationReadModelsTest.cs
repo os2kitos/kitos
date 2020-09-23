@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Organization;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
-using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -76,22 +76,31 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
 
             //Assert
             var readModel = Assert.Single(result);
+            Console.Out.WriteLine("Read model found");
             Assert.Equal(name, readModel.Name);
             Assert.Equal(registration.Id, readModel.SourceEntityId);
-            var roleAssignment = Assert.Single(readModel.RoleAssignments);
-            Assert.Equal(role.Id, roleAssignment.RoleId);
-            Assert.Equal(user.Id, roleAssignment.UserId);
-            Assert.Equal(user.Name, roleAssignment.UserFullName);
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
+
+            Console.Out.WriteLine("Flat values asserted");
+            Console.Out.WriteLine("Asserting role assignments");
+
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            Console.Out.WriteLine("Found one role assignment as expected");
+
+            Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(user.Id, roleAssignment.UserId);
+            Assert.Equal(user.Name, roleAssignment.UserFullName);
+            Console.Out.WriteLine("Role data verified");
         }
 
         private static async Task WaitForReadModelQueueDepletion()
