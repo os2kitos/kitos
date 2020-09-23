@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -448,6 +449,67 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.DataProcessors);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationHelper.GetAvailableSubDataProcessors(registration.Id, orgPrefix);
+
+            //Assert
+            Assert.True(processors.Any(x => x.Id == organization.Id));
+        }
+
+        [Fact]
+        public async Task Can_Assign_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, A<string>(), "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, setStateRequest.StatusCode);
+
+            //Act
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id);
+            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            var processor = Assert.Single(dto.SubDataProcessors);
+            Assert.Equal(organization.Id, processor.Id);
+            Assert.Equal(organization.Name, processor.Name);
+            Assert.Equal(organization.Cvr, processor.CvrNumber);
+        }
+
+        [Fact]
+        public async Task Can_Remove_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, A<string>(), "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, setStateRequest.StatusCode);
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, organization.Id);
+
+            //Act
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveSubDataProcessorRequestAsync(registration.Id, organization.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Empty(dto.SubDataProcessors);
         }
     }
 }

@@ -399,6 +399,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
@@ -441,7 +442,12 @@ namespace Presentation.Web.Controllers.API
                 DataProcessors = value
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())
-                    .ToArray()
+                    .ToArray(),
+                SubDataProcessors = value
+                    .SubDataProcessors
+                    .Select(x => x.MapToShallowOrganizationDTO())
+                    .ToArray(),
+                HasSubDataProcessors = value.HasSubDataProcessors
             };
         }
 
