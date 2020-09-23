@@ -11,7 +11,7 @@
         references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
-        isAgreementConcluded;
+        isAgreementConcluded: number;
         agreementConcludedAt;
     }
 

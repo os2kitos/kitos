@@ -14,12 +14,17 @@
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
-            private readonly apiUseCaseFactory : Services.Generic.IApiUseCaseFactory) {
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
+
+            this.bindIsAgreementConcluded();
+            this.bindAgreementConcludedAt();
         }
 
         headerName = this.dataProcessingRegistration.name;
 
-        agreementConcludedOptions = new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options;
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<number>;
+
+        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel
         
         changeName(name) {
             this.apiUseCaseFactory
@@ -39,10 +44,20 @@
                 .executeAsync();
         }
 
-        datepickerOptions = {
-            format: "dd-MM-yyyy"
-        };
 
+        private bindIsAgreementConcluded() {
+            this.isAgreementConcluded = {
+                selectedElement: this.dataProcessingRegistration.isAgreementConcluded,
+                select2Options: new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options,
+                elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
+            };
+        }
+
+        private bindAgreementConcludedAt() {
+            this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.agreementConcludedAt,
+                (newDate) => this.changeAgreementConcludedAt(newDate));
+        }
     }
 
     angular

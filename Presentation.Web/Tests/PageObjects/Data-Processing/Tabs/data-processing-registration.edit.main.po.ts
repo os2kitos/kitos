@@ -32,5 +32,9 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(this.cssHelper.byDataElementType("removeDataProcessingRegistrationButton"));
     }
 
+    getAgreementConcludedAtDateField() {
+        return element(by.id("agreementConcludedAt"));
+    }
+
 }
 export = DataProcessingRegistrationEditMainPageObject;

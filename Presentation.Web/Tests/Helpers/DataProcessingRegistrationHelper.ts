@@ -114,6 +114,12 @@ class DataProcessingRegistrationHelper {
         return this.pageObject.getNewDpaNameInput().sendKeys(name);
     }
 
+    public static changeIsAgreementConcluded(changeToValue: string) {
+        console.log("Changing IsAgreementConcluded to: " + changeToValue);
+        return Select2Helper.searchFor(changeToValue, "s2id_agreementConcluded")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());

@@ -12,7 +12,7 @@
         getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
         assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
         removeRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevant: Models.ViewModel.Generic.Select2OptionViewModel);
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any);
     }
 
@@ -206,8 +206,8 @@
                 );
         }
 
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevant: Models.ViewModel.Generic.Select2OptionViewModel) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "is-agreement-concluded"), yesNoIrrelevant.id);
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "is-agreement-concluded"), yesNoIrrelevantId);
         }
 
 
