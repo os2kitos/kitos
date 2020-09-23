@@ -74,7 +74,7 @@
                 );
         }
 
-        private innerGet<TResponse>(url: string) {
+        private getDataFromUrl<TResponse>(url: string) {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(url)
@@ -127,11 +127,11 @@
 
 
         get(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationDTO> {
-            return this.innerGet<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
         }
 
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query:string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
-            return this.innerGet<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}`));
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}`));
         }
 
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {

@@ -511,7 +511,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-archiveduty-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\it-system\system-view-models.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
-    <TypeScriptCompile Include="app\services\dataProcessingAgreementService.ts" />
+    <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
