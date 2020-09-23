@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4 data-element-type="dpaMainDetailHeader">{{::vm.headerName}}</h4>
+    <h4 data-element-type="dpaMainDetailHeader">{{vm.headerName}}</h4>
     <div class="panel panel-default">
         <div class="row">
             <div class="col-xs-6">
@@ -24,17 +24,17 @@
                         <thead>
                             <tr>
                                 <!--TODO: New classes for this-->
-                                <th class="GDPRHeaderPadding">
+                                <th class="data-processors-table_header--padding">
                                     <p class="small">Navn</p>
                                 </th>
-                                <th class="GDPRHeaderPadding noRightBorder">
+                                <th class="data-processors-table_header--padding noRightBorder">
                                     <p class="small">CVR</p>
                                 </th>
-                                <th class="GDPRHeaderPadding noLeftBorder"></th>
+                                <th class="data-processors-table_header--padding noLeftBorder"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="dataProcessor in vm.dataProcessors" data-element-type="data-processing_data-processors">
+                            <tr ng-repeat="dataProcessor in vm.dataProcessors.selectedElements" data-element-type="data-processing_data-processors">
                                 <td>
                                     {{::dataProcessor.name }}
                                 </td>
@@ -44,28 +44,27 @@
                                 <td class="text-right noLeftBorder" style="width: 20px;">
                                     <button type="button"
                                             class="btn btn-danger btn-xs"
-                                            data-confirmed-click="vm.removeDataProcessor({{::dataProcessor.id }})"
+                                            data-confirmed-click="vm.dataProcessors.removeItemRequested({{::dataProcessor}})"
                                             data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                            ng-if="vm.hasWriteAccess">
+                                            ng-if="vm.dataProcessors.allowRemoval">
                                         <i class="glyphicon glyphicon-trash"></i>
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
-                        <!--TODO-->
-                        <!--<tfoot ng-if="hasWriteAccess" class="noPaddingLeftRightGDPR">
+                        <tfoot ng-if="vm.dataProcessors.allowAddition" class="data-processors-table_footer--padding">
                         <tr>
                             <td colspan="3" style="padding: 0">
                                 <input type="hidden"
                                        id="dataWorker-selector"
                                        class="form-control input-sm"
-                                       data-ui-select2="dataWorkerSelectOptions"
-                                       ng-model="selectedDataWorker"
-                                       ng-change="saveDataworker()"
+                                       data-ui-select2="vm.dataProcessors.select2Config"
+                                       ng-model="vm.dataProcessors.newElementSelection"
+                                       ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
                                        data-placeholder="Vælg Databehandler" />
                             </td>
                         </tr>
-                        </tfoot>-->
+                        </tfoot>
                     </table>
                 </div>
             </div>
