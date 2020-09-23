@@ -55,6 +55,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
+            Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
+
             var dataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, dpName, "22334455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
