@@ -441,6 +441,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
+        [Fact]
         public async Task Can_Get_Available_DataProcessors()
         {
             //Arrange

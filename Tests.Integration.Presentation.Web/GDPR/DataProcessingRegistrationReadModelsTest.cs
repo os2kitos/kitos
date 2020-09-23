@@ -65,12 +65,11 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, role.Id);
             var user = availableUsers.First();
-            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(agreement.Id,
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
                 oversightInterval);
-            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(agreement.Id,
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(registration.Id,
                 oversightNote);
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
-            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = agreement.Id);
+
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

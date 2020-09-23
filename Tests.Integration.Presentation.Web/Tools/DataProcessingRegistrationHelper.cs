@@ -91,7 +91,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var body = new SingleValueDTO<string?> { Value = note };
+            var body = new SingleValueDTO<string> { Value = note };
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-note"), cookie, body);
 

@@ -293,8 +293,6 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
-
-
         [HttpPatch]
         [Route("{id}/oversight-option")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -329,17 +327,6 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightIntervalNote(id, yearMonthIntervalOptionNote.Value).Match(_ => Ok(), FromOperationError);
-        }
-
-
-        public HttpResponseMessage RemoveDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
-        {
-            if (organizationId == null)
-                return BadRequest("organizationId must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .RemoveDataProcessor(id, organizationId.Value)
-                .Match(_ => Ok(), FromOperationError);
         }
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
