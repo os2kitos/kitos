@@ -50,7 +50,9 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => renameNameAndVerify(renameValue))
                 //Changing IsAgreementConcluded and AgreementConcludedAt
                 .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))
+                .then(() => verifyIsAgreementConcluded(dropdownYes))
                 .then(() => dpaHelper.changeAgreementConcludedAt(today))
+                .then(() => verifyAgreementConcludedAt(today))
                 //Changing data processors
                 .then(() => dpaHelper.assignDataProcessor(dataProcessorName))
                 .then(() => verifyDataProcessorContent([dataProcessorName], []))

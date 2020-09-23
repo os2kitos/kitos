@@ -316,7 +316,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> yesNoIrrelevantOption)
         {
             if (yesNoIrrelevantOption == null)
-                return BadRequest("dataOption must be provided");
+                return BadRequest("yesNoIrrelevantOption must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsAgreementConcluded(id, yesNoIrrelevantOption.Value)
@@ -332,7 +332,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> dateTime)
         {
             if (dateTime == null)
-                return BadRequest("dataOption must be provided");
+                return BadRequest("dateTime must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateAgreementConcludedAt(id, dateTime.Value)

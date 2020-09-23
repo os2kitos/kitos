@@ -10,7 +10,6 @@
             "select2LoadingService"
         ];
 
-
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -18,7 +17,6 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
             this.bindDataProcessors();
-
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedAt();
         }
@@ -27,36 +25,11 @@
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
-        private bindDataProcessors() {
-            this.dataProcessors = {
-                selectedElements: this.dataProcessingRegistration.dataProcessors,
-                removeItemRequested: (element) => this.removeDataProcessor(element.id),
-                allowAddition: this.hasWriteAccess,
-                allowRemoval: this.hasWriteAccess,
-                newElementSelection: null,
-                select2Config: this
-                    .select2LoadingService
-                    .loadSelect2WithDataSource(
-                        (query) => this
-                            .dataProcessingRegistrationService
-                            .getApplicableDataProcessors(this.dataProcessingRegistration.id, query)
-                            .then(
-                                dataProcessors => dataProcessors.map(
-                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
-                                        id: dataProcessor.id,
-                                        text: dataProcessor.name,
-                                        optionalObjectContext: dataProcessor
-                                    }
-                                )
-                            ),
-                        false
-                    ),
-                newItemSelected: (newElement) => this.addDataProcessor(newElement)
-            };
-        }
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<number>;
+
+        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
         changeName(name) {
-        
             this.apiUseCaseFactory
                 .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
                 .executeAsync(nameChangeResponse => {
@@ -64,8 +37,6 @@
                     return nameChangeResponse;
                 });
         }
-
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<number>;
 
         private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
             if (!!newElement && !!newElement.optionalObjectContext) {
@@ -82,8 +53,6 @@
                     });
             }
         }
-
-        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel
         
         private removeDataProcessor(id: number) {
             this.apiUseCaseFactory
@@ -111,7 +80,6 @@
                 .executeAsync();
         }
 
-
         private bindIsAgreementConcluded() {
             this.isAgreementConcluded = {
                 selectedElement: this.dataProcessingRegistration.isAgreementConcluded,
@@ -124,6 +92,34 @@
             this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
                 this.dataProcessingRegistration.agreementConcludedAt,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
+        }
+
+        private bindDataProcessors() {
+            this.dataProcessors = {
+                selectedElements: this.dataProcessingRegistration.dataProcessors,
+                removeItemRequested: (element) => this.removeDataProcessor(element.id),
+                allowAddition: this.hasWriteAccess,
+                allowRemoval: this.hasWriteAccess,
+                newElementSelection: null,
+                select2Config: this
+                    .select2LoadingService
+                    .loadSelect2WithDataSource(
+                        (query) => this
+                            .dataProcessingRegistrationService
+                            .getApplicableDataProcessors(this.dataProcessingRegistration.id, query)
+                            .then(
+                                dataProcessors => dataProcessors.map(
+                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
+                                        id: dataProcessor.id,
+                                        text: dataProcessor.name,
+                                        optionalObjectContext: dataProcessor
+                                    }
+                                )
+                            ),
+                        false
+                    ),
+                newItemSelected: (newElement) => this.addDataProcessor(newElement)
+            };
         }
     }
 
