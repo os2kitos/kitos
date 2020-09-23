@@ -17,6 +17,8 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
+        public ShallowOrganizationDTO[] DataProcessors { get; set; }
+
         public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }

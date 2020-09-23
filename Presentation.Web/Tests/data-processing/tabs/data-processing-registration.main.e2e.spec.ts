@@ -5,6 +5,7 @@ import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects
 import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingRegistrationEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
+import GetDateHelper = require("../../Helpers/GetDateHelper");
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -15,10 +16,15 @@ describe("Data processing agreement main detail tests", () => {
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingRegistrationHelper;
+    const dataProcessorName = "Fælles Kommune";
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
     }
+
+    var dropdownYes = "Ja";
+
+    var today = GetDateHelper.getTodayAsString();
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
@@ -32,30 +38,41 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Creating and renaming data processing registration",
+    it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
             var renameValue = createName(30);
 
             dpaHelper.createDataProcessingRegistration(name)
+                //Changing name
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
-                .then(() => renameNameAndVerify(renameValue));
-        });
-
-
-    it("It is possible to delete a data processing registration",
-        () => {
-            const nameToDelete = createName(1);
-            console.log("Creating agreement and deleting it");
-
-            dpaHelper.createDataProcessingRegistration(nameToDelete)
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(nameToDelete))
+                .then(() => renameNameAndVerify(renameValue))
+                //Changing IsAgreementConcluded and AgreementConcludedAt
+                .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))
+                .then(() => dpaHelper.changeAgreementConcludedAt(today))
+                //Changing data processors
+                .then(() => dpaHelper.assignDataProcessor(dataProcessorName))
+                .then(() => verifyDataProcessorContent([dataProcessorName], []))
+                .then(() => dpaHelper.removeDataProcessor(dataProcessorName))
+                .then(() => verifyDataProcessorContent([], [dataProcessorName]))
+                //COMPLETE - Delete the registration and verify
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
-                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameToDelete).isPresent())
-                    .toBeFalsy());
+                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeFalsy());
         });
+
+
+    function verifyDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
+        presentNames.forEach(name => {
+            console.log(`Expecting system to be present:${name}`);
+            expect(pageObject.getDataProcessorRow(name).isPresent()).toBeTruthy();
+        });
+        unpresentNames.forEach(name => {
+            console.log(`Expecting system NOT to be present:${name}`);
+            expect(pageObject.getDataProcessorRow(name).isPresent()).toBeFalsy();
+        });
+    }
 
     function renameNameAndVerify(name: string) {
         console.log(`Renaming registration to ${name}`);
@@ -75,6 +92,16 @@ describe("Data processing agreement main detail tests", () => {
         console.log("Retrieving deletebutton");
         return pageObject.getDpaDeleteButton().click()
             .then(() => browser.switchTo().alert().accept());
+    }
+
+    function verifyIsAgreementConcluded(selectedValue: string) {
+        console.log(`Expecting IsAgreementConcluded to be set to: ${selectedValue}`);
+        expect(pageObject.getIsAgreementConcludedField().getText).toBe(selectedValue);
+    }
+
+    function verifyAgreementConcludedAt(selectedDate: string) {
+        console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
+        expect(pageObject.getAgreementConcludedAtDateField().getText).toBe(selectedDate);
     }
 
 });

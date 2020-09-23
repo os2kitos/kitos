@@ -5,6 +5,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import Constants = require("../../Utility/Constants");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import CatalogPage = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po");
+import WaitTimers = require("../../Utility/WaitTimers");
 
 describe("Global Administrator is able to migrate from one system to another", () => {
     var loginHelper = new Login();
@@ -13,6 +14,7 @@ describe("Global Administrator is able to migrate from one system to another", (
     var cssHelper = new CssHelper();
     var pageObject = new CatalogPage();
     var ec = protractor.ExpectedConditions;
+    var waitUpTo = new WaitTimers();
 
     afterEach(() => {
         testFixture.cleanupState();
@@ -52,15 +54,15 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => toggleSystemActivation(systemNameFrom))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-            .then(() => waitForElement(constants.moveSystemButton))
+            .then(() => waitForButtonToBeClickAble(constants.moveSystemButton))
             .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(true))
             .then(() => element(cssHelper.byDataElementType(constants.moveSystemButton)).click())
-            .then(() => waitForElement(constants.consequenceButton))
+            .then(() => waitForButtonToBeClickAble(constants.consequenceButton))
             .then(() => expect(element(cssHelper.byDataElementType(constants.consequenceButton)).isPresent()).toBe(true))
             .then(() => select2SearchForSystem(systemNameTo))
             .then(() => waitForSelect2DataAndSelect())
             .then(() => element(cssHelper.byDataElementType(constants.consequenceButton)).click())
-            .then(() => waitForElement(constants.startMigrationButton))
+            .then(() => waitForButtonToBeClickAble(constants.startMigrationButton))
             .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(true))
             .then(() => element(cssHelper.byDataElementType(constants.startMigrationButton)).click())
             .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
@@ -84,14 +86,14 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgB))
             .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgC))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-            .then(() => waitForElement(constants.moveSystemButton))
+            .then(() => waitForButtonToBeClickAble(constants.moveSystemButton))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)), 2, orgC))
             .then(() => browser.refresh())
             .then(() => OrgHelper.activateSystemForOrg(systemNameFrom, orgBB))
             .then(() => openMigrationOnSpecificSystem(systemNameFrom))
-            .then(() => waitForElement(constants.moveSystemButton))
+            .then(() => waitForButtonToBeClickAble(constants.moveSystemButton))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),0,orgA))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),1,orgB))
             .then(() => checkIfElementIsInCorrectPosition(element.all(cssHelper.byDataElementType(constants.migrationOrgNameToMove)),2,orgBB))
@@ -123,15 +125,14 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//*/a[@data-element-type="usagesLinkText"]')).click());
     }
 
-    function waitForElement(name: string) {
-        console.log(`waitForElement: ${name}`);
-        return browser.wait(ec.visibilityOf(element(cssHelper.byDataElementType(name))),
-            20000);
+    function waitForButtonToBeClickAble(name: string) {
+        console.log(`Waiting for button to be clickable: ${name}`);
+        return browser.wait(ec.elementToBeClickable(element(cssHelper.byDataElementType(name))), waitUpTo.twentySeconds);
     }
 
     function waitForSelect2DataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(ec.visibilityOf(element(by.className("select2-result-label"))), 20000)
+        return browser.wait(ec.visibilityOf(element(by.className("select2-result-label"))), waitUpTo.twentySeconds)
             .then(() => element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
@@ -141,4 +142,5 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => element(by.className("select2-input")).click())
             .then(() => element(by.className("select2-input")).sendKeys(name));
     }
+
 });

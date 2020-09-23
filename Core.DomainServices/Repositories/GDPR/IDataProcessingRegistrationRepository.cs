@@ -12,5 +12,6 @@ namespace Core.DomainServices.Repositories.GDPR
         Maybe<DataProcessingRegistration> GetById(int id);
         IQueryable<DataProcessingRegistration> GetBySystemId(int systemId);
         IQueryable<DataProcessingRegistration> Search(int organizationId, Maybe<string> exactName);
+        IQueryable<DataProcessingRegistration> GetByDataProcessorId(int organizationId);
     }
 }

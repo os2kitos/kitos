@@ -70,6 +70,11 @@ namespace Core.DomainServices.Repositories.GDPR
                     .Transform(previousQuery => exactName.Select(previousQuery.ByNameExact).GetValueOrFallback(previousQuery));
         }
 
+        public IQueryable<DataProcessingRegistration> GetByDataProcessorId(int organizationId)
+        {
+            return _repository.AsQueryable().Where(x => x.DataProcessors.Any(organization => organization.Id == organizationId));
+        }
+
         private void Notify(DataProcessingRegistration dataProcessingRegistration, LifeCycleEventType changeType)
         {
             switch (changeType)

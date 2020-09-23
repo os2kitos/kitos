@@ -23,6 +23,7 @@ namespace Core.DomainModel.GDPR
         {
             ExternalReferences = new List<ExternalReference>();
             SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
+            DataProcessors = new List<Organization.Organization>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -48,6 +49,8 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
 
+        public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
+
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {
             return Rights.Where(x => x.RoleId == roleId);
@@ -55,6 +58,32 @@ namespace Core.DomainModel.GDPR
 
         public IEnumerable<ItSystem.ItSystem> GetAssignedSystems() => SystemUsages.Select(x => x.ItSystem);
 
+        public Result<Organization.Organization, OperationError> AssignDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+            if (HasDataProcessor(dataProcessor))
+                return new OperationError("Data processor already assigned", OperationFailure.Conflict);
+
+            DataProcessors.Add(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        public Result<Organization.Organization, OperationError> RemoveDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+            if (!HasDataProcessor(dataProcessor))
+                return new OperationError("Data processor not assigned", OperationFailure.BadInput);
+
+            DataProcessors.Remove(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        private bool HasDataProcessor(Organization.Organization dataProcessor)
+        {
+            return DataProcessors.Any(x => x.Id == dataProcessor.Id);
+        }
 
         public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
         {

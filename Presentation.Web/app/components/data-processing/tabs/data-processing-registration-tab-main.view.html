@@ -43,6 +43,54 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <!-- Data processors -->
+                    <label for="dpTable" class="control-label small">Databehandlere</label>
+                    <table id="dpTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <!--TODO: New classes for this-->
+                                <th class="data-processors-table_header--padding">
+                                    <p class="small">Navn</p>
+                                </th>
+                                <th class="data-processors-table_header--padding noRightBorder">
+                                    <p class="small">CVR</p>
+                                </th>
+                                <th class="data-processors-table_header--padding noLeftBorder"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dataProcessor in vm.dataProcessors.selectedElements" data-element-type="data-processing_data-processors">
+                                <td>{{::dataProcessor.name }}</td>
+                                <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
+                                <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="vm.dataProcessors.removeItemRequested({{::dataProcessor}})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-if="vm.dataProcessors.allowRemoval">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot ng-if="vm.dataProcessors.allowAddition" class="data-processors-table_footer--padding">
+                        <tr>
+                            <td colspan="3" style="padding: 0">
+                                <input type="hidden"
+                                       id="data-processor_select-new"
+                                       class="form-control input-sm"
+                                       data-ui-select2="vm.dataProcessors.select2Config"
+                                       ng-model="vm.dataProcessors.newElementSelection"
+                                       ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
+                                       data-placeholder="Vælg Databehandler" />
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -14,5 +14,6 @@
         MainReferenceUrl: string;
         MainReferenceUserAssignedId: string;
         SystemNamesAsCsv: string;
+        DataProcessorNamesAsCsv: string;
     }
 }

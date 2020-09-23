@@ -33,6 +33,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Context;
@@ -176,6 +177,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationSystemAssignmentService>().To<DataProcessingRegistrationSystemAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationRoleAssignmentsService>().To<DataProcessingRegistrationRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelService>().To<DataProcessingRegistrationReadModelService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationDataProcessorAssignmentService>().To<DataProcessingRegistrationDataProcessorAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -232,6 +234,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
         }
 

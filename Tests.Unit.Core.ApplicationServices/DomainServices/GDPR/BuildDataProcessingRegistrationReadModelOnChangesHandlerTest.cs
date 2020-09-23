@@ -64,7 +64,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _sut.Handle(new EntityUpdatedEvent<DataProcessingRegistration>(registration));
 
             //Assert
-            _pendingUpdatesRepository.Verify(x => x.AddIfNotPresent(It.Is<PendingReadModelUpdate>(pru =>
+            _pendingUpdatesRepository.Verify(x => x.Add(It.Is<PendingReadModelUpdate>(pru =>
                 pru.Category == PendingReadModelUpdateSourceCategory.DataProcessingRegistration &&
                 pru.SourceId == registration.Id)));
         }

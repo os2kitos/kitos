@@ -27,8 +27,12 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(true);
 
             //It-systems
-            HasMany(x=>x.SystemUsages)
-                .WithMany(x=>x.AssociatedDataProcessingRegistrations);
+            HasMany(x => x.SystemUsages)
+                .WithMany(x => x.AssociatedDataProcessingRegistrations);
+
+            //Data processors
+            HasMany(x => x.DataProcessors)
+                .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
         }
     }
 }
