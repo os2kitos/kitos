@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Organization;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -59,6 +62,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var oversightInterval = A<YearMonthIntervalOption>();
             var oversightNote = A<string>();
 
+            Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
+
             var dataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, dpName, "22334455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
@@ -85,24 +90,33 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
 
             //Assert
             var readModel = Assert.Single(result);
+            Console.Out.WriteLine("Read model found");
             Assert.Equal(name, readModel.Name);
             Assert.Equal(registration.Id, readModel.SourceEntityId);
-            var roleAssignment = Assert.Single(readModel.RoleAssignments);
-            Assert.Equal(role.Id, roleAssignment.RoleId);
-            Assert.Equal(user.Id, roleAssignment.UserId);
-            Assert.Equal(user.Name, roleAssignment.UserFullName);
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
             Assert.Equal(oversightNote,readModel.OversightIntervalNote);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
+
+            Console.Out.WriteLine("Flat values asserted");
+            Console.Out.WriteLine("Asserting role assignments");
+
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            Console.Out.WriteLine("Found one role assignment as expected");
+
+            Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(user.Id, roleAssignment.UserId);
+            Assert.Equal(user.Name, roleAssignment.UserFullName);
+            Console.Out.WriteLine("Role data verified");
         }
 
         private static async Task WaitForReadModelQueueDepletion()
