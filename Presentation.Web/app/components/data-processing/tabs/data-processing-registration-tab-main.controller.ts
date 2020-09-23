@@ -17,11 +17,13 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
             this.bindDataProcessors();
+            this.bindSubDataProcessors();
         }
 
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
+        subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
         private bindDataProcessors() {
             this.dataProcessors = {
@@ -48,6 +50,34 @@
                         false
                     ),
                 newItemSelected: (newElement) => this.addDataProcessor(newElement)
+            };
+        }
+        //TODO: Find abstraction where differences are injected!
+        private bindSubDataProcessors() {
+            this.subDataProcessors = {
+                selectedElements: this.dataProcessingRegistration.subDataProcessors,
+                removeItemRequested: (element) => this.removeSubDataProcessor(element.id),
+                allowAddition: this.hasWriteAccess,
+                allowRemoval: this.hasWriteAccess,
+                newElementSelection: null,
+                select2Config: this
+                    .select2LoadingService
+                    .loadSelect2WithDataSource(
+                        (query) => this
+                            .dataProcessingRegistrationService
+                            .getApplicableSubDataProcessors(this.dataProcessingRegistration.id, query)
+                            .then(
+                                dataProcessors => dataProcessors.map(
+                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
+                                        id: dataProcessor.id,
+                                        text: dataProcessor.name,
+                                        optionalObjectContext: dataProcessor
+                                    }
+                                )
+                            ),
+                        false
+                    ),
+                newItemSelected: (newElement) => this.addSubDataProcessor(newElement)
             };
         }
 
@@ -89,6 +119,38 @@
                     return success;
                 });
         }
+        //TODO: Abstractions around it and parameterize the differences
+        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
+            if (!!newElement && !!newElement.optionalObjectContext) {
+                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
+                this.apiUseCaseFactory
+                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignSubDataProcessor(this.dataProcessingRegistration.id, newDp.id))
+                    .executeAsync(success => {
+                        //Update the source collection
+                        this.dataProcessingRegistration.subDataProcessors.push(newDp);
+
+                        //Trigger UI update
+                        this.bindSubDataProcessors();
+                        return success;
+                    });
+            }
+        }
+
+        private removeSubDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistration.id, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindSubDataProcessors();
+                    return success;
+                });
+        }
+
+        //TODO: Missing: The flag setting and the "hide/show" logic in the view. Altso refactoring as described in todos above
     }
 
     angular

@@ -15,6 +15,9 @@
         removeDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
+        removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -134,6 +137,10 @@
             return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}`));
         }
 
+        getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `sub-data-processors/available?nameQuery=${query}`));
+        }
+
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "master-reference"), referenceId);
         }
@@ -151,6 +158,14 @@
 
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/assign"), dataProcessorId);
+        }
+
+        removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/remove"), dataProcessorId);
+        }
+
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/assign"), dataProcessorId);
         }
 
         getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]> {
