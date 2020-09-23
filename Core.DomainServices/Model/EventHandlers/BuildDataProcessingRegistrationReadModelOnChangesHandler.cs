@@ -4,6 +4,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
@@ -19,7 +20,8 @@ namespace Core.DomainServices.Model.EventHandlers
         IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
         IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
         IDomainEventHandler<NamedEntityChangedNameEvent<ItSystem>>,
-        IDomainEventHandler<EnabledStatusChanged<ItSystem>>
+        IDomainEventHandler<EnabledStatusChanged<ItSystem>>,
+        IDomainEventHandler<EntityUpdatedEvent<Organization>>
     {
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _mapper;
@@ -57,12 +59,12 @@ namespace Core.DomainServices.Model.EventHandlers
 
         public void Handle(EntityUpdatedEvent<DataProcessingRegistration> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
         }
 
         public void Handle(EntityUpdatedEvent<User> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
         }
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
@@ -77,18 +79,23 @@ namespace Core.DomainServices.Model.EventHandlers
             var dpa = domainEvent.Entity.DataProcessingRegistration;
             if (dpa != null)
             {
-                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
             }
         }
 
         public void Handle(NamedEntityChangedNameEvent<ItSystem> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
         }
 
         public void Handle(EnabledStatusChanged<ItSystem> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
+        }
+
+        public void Handle(EntityUpdatedEvent<Organization> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization));
         }
     }
 }

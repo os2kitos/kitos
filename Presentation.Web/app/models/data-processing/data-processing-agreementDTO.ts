@@ -11,6 +11,7 @@
         references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
+        dataProcessors : IDataProcessorDTO[];
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {
@@ -23,16 +24,16 @@
         assignedRoles: IAssignedRoleDTO[],
     }
 
-    export interface IDataProcessingRoleDTO {
-        id: number,
-        name: string,
+    export interface IDataProcessorDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
+        cvrNumber: string,
+    }
+
+    export interface IDataProcessingRoleDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         note: string,
         hasWriteAccess: boolean,
     }
 
-    export interface ISimpleUserDTO {
-        id: number,
-        name: string,
+    export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         email: string,
     }
 }

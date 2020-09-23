@@ -7,6 +7,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -32,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
         private readonly Mock<IDataProcessingRegistrationSystemAssignmentService> _systemAssignmentServiceMock;
+        private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -43,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
             _systemAssignmentServiceMock = new Mock<IDataProcessingRegistrationSystemAssignmentService>();
+            _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -50,6 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _roleAssignmentServiceMock.Object,
                 _referenceRepositoryMock.Object,
                 _systemAssignmentServiceMock.Object,
+                _dpAssignmentService.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -214,12 +218,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             _namingServiceMock.Setup(x => x.ChangeName(registration, name)).Returns(Maybe<OperationError>.None);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateName(id, name);
 
             //Assert
             Assert.True(result.Ok);
+            transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
@@ -574,12 +581,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(agreementId, registration);
             ExpectAllowModifyReturns(registration, true);
             _referenceRepositoryMock.Setup(x => x.Get(referenceId)).Returns(expectedNewMasterReference);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.SetMasterReference(agreementId, referenceId);
 
             //Assert
             Assert.True(result.Ok);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -727,6 +737,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystem);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.AssignSystem(id, systemId);
@@ -734,6 +746,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Same(itSystem, result.Value);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -779,6 +792,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystem);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.RemoveSystem(id, systemId);
@@ -786,6 +801,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Same(itSystem, result.Value);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -818,6 +834,147 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_AssignDataProcessor()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var organizationId = A<int>();
+            var organization = new Organization();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            _dpAssignmentService.Setup(x => x.AssignDataProcessor(registration, organizationId))
+                .Returns(Result<Organization, OperationError>.Success(organization));
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.AssignDataProcessor(id, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(organization, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_AssignDataProcessorIf_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.AssignDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignDataProcessor_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.AssignDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveDataProcessor()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var organizationId = A<int>();
+            var organization = new Organization();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            _dpAssignmentService.Setup(x => x.RemoveDataProcessor(registration, organizationId))
+                .Returns(Result<Organization, OperationError>.Success(organization));
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.RemoveDataProcessor(id, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(organization, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveDataProcessor_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.RemoveDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_RemoveDataProcessor_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.AssignDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetDataProcessorsWhichCanBeAssigned()
+        {
+            //Arrange
+            var id = A<int>();
+            var org1Id = A<int>();
+            var org2Id = org1Id + 1;
+            var nameQuery = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var organizations = new[] { new Organization { Id = org1Id, Name = $"{nameQuery}{1}" }, new Organization { Id = org2Id, Name = $"{nameQuery}{2}" } };
+            _dpAssignmentService.Setup(x => x.GetApplicableDataProcessors(registration)).Returns(organizations.AsQueryable());
+
+            //Act
+            var result = _sut.GetDataProcessorsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(organizations, result.Value);
+        }
+
+        private Mock<IDatabaseTransaction> ExpectTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            return transaction;
         }
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)

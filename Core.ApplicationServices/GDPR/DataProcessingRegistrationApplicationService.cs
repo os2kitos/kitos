@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -29,6 +30,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationRoleAssignmentsService _roleAssignmentsService;
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
+        private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
@@ -39,6 +41,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationRoleAssignmentsService roleAssignmentsService,
             IReferenceRepository referenceRepository,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
+            IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingRegistrationRight> rightRepository)
         {
@@ -48,6 +51,7 @@ namespace Core.ApplicationServices.GDPR
             _roleAssignmentsService = roleAssignmentsService;
             _referenceRepository = referenceRepository;
             _systemAssignmentService = systemAssignmentService;
+            _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -126,23 +130,10 @@ namespace Core.ApplicationServices.GDPR
         public Result<ExternalReference, OperationError> SetMasterReference(int id, int referenceId)
         {
             return WithWriteAccess(id, registration =>
-            {
-                var referenceResult = _referenceRepository.Get(referenceId);
-
-                if (referenceResult.IsNone)
-                {
-                    return new OperationError("Invalid reference Id", OperationFailure.BadInput);
-                }
-
-                var setReferenceResult = registration.SetMasterReference(referenceResult.Value);
-
-                if (setReferenceResult.Ok)
-                {
-                    _repository.Update(registration);
-                }
-
-                return setReferenceResult;
-            });
+                _referenceRepository
+                    .Get(referenceId)
+                    .Select(registration.SetMasterReference)
+                    .Match(result => result, () => new OperationError("Invalid reference Id", OperationFailure.BadInput)));
         }
 
         public Result<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id)
@@ -173,36 +164,18 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> AssignRole(int id, int roleId, int userId)
         {
-            return WithWriteAccess(id, registration =>
-            {
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
-                var assignmentResult = _roleAssignmentsService.AssignRole(registration, roleId, userId);
-
-                if (assignmentResult.Ok)
-                {
-                    _repository.Update(registration);
-                    transaction.Commit();
-                }
-
-                return assignmentResult;
-            });
+            return WithWriteAccess(id, registration => _roleAssignmentsService.AssignRole(registration, roleId, userId));
         }
 
         public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId)
         {
             return WithWriteAccess(id, registration =>
             {
-
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
                 var removeResult = _roleAssignmentsService.RemoveRole(registration, roleId, userId);
 
                 if (removeResult.Ok)
                 {
                     _rightRepository.Delete(removeResult.Value);
-                    _repository.Update(registration);
-                    transaction.Commit();
                 }
 
                 return removeResult;
@@ -217,7 +190,7 @@ namespace Core.ApplicationServices.GDPR
             return WithReadAccess<IEnumerable<ItSystem>>(id, registration =>
                 _systemAssignmentService
                     .GetApplicableSystems(registration)
-                    .Transform(systems => systems.ByPartOfName(nameQuery))
+                    .ByPartOfName(nameQuery)
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.Name)
@@ -227,28 +200,38 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<ItSystem, OperationError> AssignSystem(int id, int systemId)
         {
-            return WithWriteAccess(id, registration =>
-            {
-                var result = _systemAssignmentService.AssignSystem(registration, systemId);
-
-                if (result.Ok)
-                    _repository.Update(registration);
-
-                return result;
-            });
+            return WithWriteAccess(id, registration => _systemAssignmentService.AssignSystem(registration, systemId));
         }
 
         public Result<ItSystem, OperationError> RemoveSystem(int id, int systemId)
         {
-            return WithWriteAccess(id, registration =>
-            {
-                var result = _systemAssignmentService.RemoveSystem(registration, systemId);
+            return WithWriteAccess(id, registration => _systemAssignmentService.RemoveSystem(registration, systemId));
+        }
 
-                if (result.Ok)
-                    _repository.Update(registration);
+        public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        {
+            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
+            if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
-                return result;
-            });
+            return WithReadAccess<IEnumerable<Organization>>(id,
+                registration =>
+                    _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableDataProcessors(registration)
+                        .ByPartOfName(nameQuery)
+                        .OrderBy(x => x.Id)
+                        .Take(pageSize)
+                        .OrderBy(x => x.Name)
+                        .ToList());
+        }
+
+        public Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId)
+        {
+            return WithWriteAccess(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignDataProcessor(registration, organizationId));
+        }
+
+        public Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId)
+        {
+            return WithWriteAccess(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
@@ -263,14 +246,14 @@ namespace Core.ApplicationServices.GDPR
                 if (updateNameError.HasValue)
                     return updateNameError.Value;
 
-                _repository.Update(registration);
-
                 return registration;
             });
         }
 
         private Result<TSuccess, OperationError> WithWriteAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
             var result = _repository.GetById(id);
 
             if (result.IsNone)
@@ -281,7 +264,15 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowModify(registration))
                 return new OperationError(OperationFailure.Forbidden);
 
-            return mutation(registration);
+            var mutationResult = mutation(registration);
+
+            if (mutationResult.Ok)
+            {
+                _repository.Update(registration);
+                transaction.Commit();
+            }
+
+            return mutationResult;
         }
 
         private Maybe<OperationError> UpdateName(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<string>> nameChange)

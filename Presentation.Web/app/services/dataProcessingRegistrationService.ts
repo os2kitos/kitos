@@ -12,6 +12,9 @@
         getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]>;
         assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
         removeRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void>;
+        removeDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -71,6 +74,19 @@
                 );
         }
 
+        private getDataFromUrl<TResponse>(url: string) {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(url)
+                .then(
+                    result => {
+                        var response = result.data as { response: TResponse }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         rename(dataProcessingRegistrationId: number, name: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "name"), name);
         }
@@ -111,21 +127,16 @@
 
 
         get(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationDTO> {
-            return this
-                .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUri(dataProcessingRegistrationId.toString()))
-                .then(
-                    result => {
-                        var response = result.data as { response: Models.DataProcessing.IDataProcessingRegistrationDTO }
-                        return response.response;
-                    },
-                    error => this.handleServerError(error)
-                );
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
+        }
+
+        getApplicableDataProcessors(dataProcessingRegistrationId: number, query:string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}`));
         }
 
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "master-reference"), referenceId);
-		}
+        }
 
         assignSystem(dataProcessingRegistrationId: number, systemId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "it-systems/assign"), systemId);
@@ -134,7 +145,15 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "it-systems/remove"), systemId);
         }
 
-        getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]>{
+        removeDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/remove"), dataProcessorId);
+        }
+
+        assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/assign"), dataProcessorId);
+        }
+
+        getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]> {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `it-systems/available?nameQuery=${query}`))
@@ -158,7 +177,7 @@
                         return response.response;
                     },
                     error => this.handleServerError(error)
-                    );
+                );
         }
 
         getApplicableUsers(dataProcessingRegistrationId: number, roleId: number, nameOrEmailContent: string): angular.IPromise<Models.DataProcessing.ISimpleUserDTO[]> {
@@ -171,7 +190,7 @@
                         return response.response;
                     },
                     error => this.handleServerError(error)
-            );
+                );
         }
 
         assignNewRole(dataProcessingRegistrationId: number, roleId: number, userId: number): angular.IPromise<void> {
@@ -185,7 +204,7 @@
                     this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "roles/assign"),
                     payload)
                 .then(
-                    result => {},
+                    result => { },
                     error => this.handleServerError(error)
                 );
         }

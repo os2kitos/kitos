@@ -17,7 +17,7 @@ class KendoLoaderHelper {
     waitForKendoGrid(columnName: protractor.ElementFinder) {
         console.log(`Waiting for kendo grid to show column`);
         return browser
-            .wait(this.ec.visibilityOf(columnName), this.waitUpTo.twentySeconds);
+            .wait(this.ec.presenceOf(columnName), this.waitUpTo.twentySeconds);
     }
 }
 export = KendoLoaderHelper

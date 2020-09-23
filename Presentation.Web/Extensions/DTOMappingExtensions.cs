@@ -4,6 +4,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Extensions
@@ -40,6 +41,11 @@ namespace Presentation.Web.Extensions
         public static NamedEntityWithEnabledStatusDTO MapToNamedEntityWithEnabledStatusDTO(this ItSystemUsage source)
         {
             return new NamedEntityWithEnabledStatusDTO(source.Id, source.ItSystem.Name, source.ItSystem.Disabled);
+        }
+
+        public static ShallowOrganizationDTO MapToShallowOrganizationDTO(this Organization source)
+        {
+            return new ShallowOrganizationDTO(source.Id, source.Name) { CvrNumber = source.Cvr };
         }
     }
 }

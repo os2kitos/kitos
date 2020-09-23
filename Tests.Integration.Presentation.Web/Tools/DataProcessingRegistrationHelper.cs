@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -140,18 +141,39 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<NamedEntityWithEnabledStatusDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendAssignSystemRequestAsync(int agreementId, int systemId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendAssignSystemRequestAsync(int registrationId, int systemId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{agreementId}/it-systems/assign"), cookie, new {Value = systemId });
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/it-systems/assign"), cookie, new { Value = systemId });
         }
 
-        public static async Task<HttpResponseMessage> SendRemoveSystemRequestAsync(int agreementId, int systemId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendRemoveSystemRequestAsync(int registrationId, int systemId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{agreementId}/it-systems/remove"), cookie, new { Value = systemId });
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/it-systems/remove"), cookie, new { Value = systemId });
+        }
+
+        public static async Task<IEnumerable<ShallowOrganizationDTO>> GetAvailableDataProcessors(int id, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ShallowOrganizationDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/data-processors/assign"), cookie, new SingleValueDTO<int> { Value = organizationId });
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/data-processors/remove"), cookie, new SingleValueDTO<int> { Value = organizationId });
         }
     }
 }
