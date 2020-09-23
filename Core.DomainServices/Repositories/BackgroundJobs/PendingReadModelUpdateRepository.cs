@@ -1,41 +1,25 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using Core.DomainModel.BackgroundJobs;
-using Infrastructure.Services.DataAccess;
 
 namespace Core.DomainServices.Repositories.BackgroundJobs
 {
     public class PendingReadModelUpdateRepository : IPendingReadModelUpdateRepository
     {
         private readonly IGenericRepository<PendingReadModelUpdate> _repository;
-        private readonly ITransactionManager _transactionManager;
 
-        public PendingReadModelUpdateRepository(IGenericRepository<PendingReadModelUpdate> repository, ITransactionManager transactionManager)
+        public PendingReadModelUpdateRepository(IGenericRepository<PendingReadModelUpdate> repository)
         {
             _repository = repository;
-            _transactionManager = transactionManager;
         }
 
-        public void AddIfNotPresent(PendingReadModelUpdate newItem)
+        public void Add(PendingReadModelUpdate newItem)
         {
             if (newItem == null)
                 throw new ArgumentNullException(nameof(newItem));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
-            //Ignore if existing update for same source object within the same update category
-            var alreadyPresent = _repository
-                .AsQueryable()
-                .Where(x => x.SourceId == newItem.SourceId && x.Category == newItem.Category)
-                .Any();
-
-            if (!alreadyPresent)
-            {
-                _repository.Insert(newItem);
-                _repository.Save();
-                transaction.Commit();
-            }
+            _repository.Insert(newItem);
+            _repository.Save();
         }
 
         public void Delete(PendingReadModelUpdate pendingUpdate)

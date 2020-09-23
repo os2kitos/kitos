@@ -59,12 +59,12 @@ namespace Core.DomainServices.Model.EventHandlers
 
         public void Handle(EntityUpdatedEvent<DataProcessingRegistration> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
         }
 
         public void Handle(EntityUpdatedEvent<User> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
         }
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
@@ -79,23 +79,23 @@ namespace Core.DomainServices.Model.EventHandlers
             var dpa = domainEvent.Entity.DataProcessingRegistration;
             if (dpa != null)
             {
-                _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(dpa, PendingReadModelUpdateSourceCategory.DataProcessingRegistration));
             }
         }
 
         public void Handle(NamedEntityChangedNameEvent<ItSystem> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
         }
 
         public void Handle(EnabledStatusChanged<ItSystem> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem));
         }
 
         public void Handle(EntityUpdatedEvent<Organization> domainEvent)
         {
-            _pendingReadModelUpdateRepository.AddIfNotPresent(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization));
         }
     }
 }

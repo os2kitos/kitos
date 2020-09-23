@@ -114,7 +114,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private int CompleteUpdate(int updatesExecuted, List<PendingReadModelUpdate> updates, PendingReadModelUpdate userUpdate,
             IDatabaseTransaction transaction)
         {
-            updates.ForEach(update => _updateRepository.AddIfNotPresent(update));
+            updates.ForEach(update => _updateRepository.Add(update));
             _updateRepository.Delete(userUpdate);
             transaction.Commit();
             updatesExecuted++;
