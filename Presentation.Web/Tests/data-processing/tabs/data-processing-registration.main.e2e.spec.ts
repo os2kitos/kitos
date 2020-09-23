@@ -32,15 +32,18 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Creating and renaming data processing registration",
+    it("Creating and modifying data processing registration",
         () => {
             var name = createName(10);
             var renameValue = createName(30);
 
             dpaHelper.createDataProcessingRegistration(name)
+                //Changing name
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
-                .then(() => renameNameAndVerify(renameValue));
+                .then(() => renameNameAndVerify(renameValue))
+                //Changing data processors
+                .then(() => { /*TODO: Modify the data processors*/ });
         });
 
 
