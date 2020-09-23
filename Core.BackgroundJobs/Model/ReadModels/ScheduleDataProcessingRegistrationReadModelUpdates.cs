@@ -7,6 +7,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model.ReadModels
@@ -19,6 +20,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IPendingReadModelUpdateRepository _updateRepository;
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
+        private readonly IOrganizationRepository _organizationRepository;
         private readonly ITransactionManager _transactionManager;
         public string Id => StandardJobIds.ScheduleDataProcessingRegistrationReadModelUpdates;
         private const int BatchSize = 250;
@@ -27,11 +29,13 @@ namespace Core.BackgroundJobs.Model.ReadModels
             IPendingReadModelUpdateRepository updateRepository,
             IDataProcessingRegistrationReadModelRepository readModelRepository,
             IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
+            IOrganizationRepository organizationRepository,
             ITransactionManager transactionManager)
         {
             _updateRepository = updateRepository;
             _readModelRepository = readModelRepository;
             _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+            _organizationRepository = organizationRepository;
             _transactionManager = transactionManager;
         }
 
@@ -42,8 +46,29 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleOrganizationUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
+        }
+
+        private int HandleOrganizationUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var updates = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId) //Org id is not stored in read model so search the source model
+                    .Where(x => alreadyScheduledIds.Contains(x.Id) == false)
+                    .ToList()
+                    .Select(dpa => PendingReadModelUpdate.Create(dpa.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
+                    .ToList();
+
+                updatesExecuted = CompleteUpdate(updatesExecuted, updates, update, transaction);
+            }
+
+            return updatesExecuted;
         }
 
         private int HandleSystemUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
@@ -89,7 +114,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private int CompleteUpdate(int updatesExecuted, List<PendingReadModelUpdate> updates, PendingReadModelUpdate userUpdate,
             IDatabaseTransaction transaction)
         {
-            updates.ForEach(update => _updateRepository.AddIfNotPresent(update));
+            updates.ForEach(update => _updateRepository.Add(update));
             _updateRepository.Delete(userUpdate);
             transaction.Commit();
             updatesExecuted++;

@@ -28,10 +28,15 @@ namespace Core.DomainServices.GDPR
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
             PatchOversightInterval(source,destination);
-
+            PatchDataProcessors(source, destination);
         }
 
-        private void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
+        }
+
+        private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
         }

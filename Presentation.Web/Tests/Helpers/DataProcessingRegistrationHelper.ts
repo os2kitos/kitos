@@ -4,6 +4,8 @@ import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProces
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
+import DataProcessingRegistrationEditMainPageObject =
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 
 class DataProcessingRegistrationHelper {
 
@@ -11,6 +13,7 @@ class DataProcessingRegistrationHelper {
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
     private static navigation = new NavigationHelper();
+    private static editMainPo = new DataProcessingRegistrationEditMainPageObject();
 
     public static loadOverview() {
         return this.pageObject.getPage()
@@ -85,6 +88,19 @@ class DataProcessingRegistrationHelper {
                 .then(() => Select2Helper.waitForDataAndSelect())
                 .then(() => this.pageObject.getRoleSubmitEditButton().click());
         });
+    }
+
+    public static assignDataProcessor(name: string) {
+        console.log("Assigning data processor with name: " + name);
+        return Select2Helper.searchFor(name, "s2id_data-processor_select-new")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static removeDataProcessor(name: string) {
+        console.log("Removing data processor with name: " + name);
+        return this.editMainPo.getRemoveDataProcessorButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
     public static assignSystem(name: string) {

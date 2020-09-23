@@ -32,5 +32,13 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(this.cssHelper.byDataElementType("removeDataProcessingRegistrationButton"));
     }
 
+    getDataProcessorRow(dpName: string) {
+        return element(by.xpath(`//*/td[text()="${dpName}"]/..`));
+    }
+
+    getRemoveDataProcessorButton(dpName: string) {
+        return element(by.xpath(`//*/td[text()="${dpName}"]/..//button`));
+    }
+
 }
 export = DataProcessingRegistrationEditMainPageObject;

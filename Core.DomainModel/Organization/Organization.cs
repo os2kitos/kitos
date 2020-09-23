@@ -100,6 +100,8 @@ namespace Core.DomainModel.Organization
         public virtual int? ContactPersonId { get; set; }
         
         public virtual ContactPerson ContactPerson { get; set; }
+        
+        public virtual ICollection<DataProcessingRegistration> DataProcessorForDataProcessingRegistrations { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

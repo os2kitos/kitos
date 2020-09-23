@@ -19,5 +19,7 @@ namespace Presentation.Web.Models.GDPR
         public YearMonthIntervalOption? OversightIntervalOption { get; set; }
 
         public string OversightIntervalOptionNote { get; set; }
+        
+        public ShallowOrganizationDTO[] DataProcessors { get; set; }
     }
 }

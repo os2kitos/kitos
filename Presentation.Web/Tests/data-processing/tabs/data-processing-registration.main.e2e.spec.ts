@@ -15,6 +15,7 @@ describe("Data processing agreement main detail tests", () => {
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingRegistrationHelper;
+    const dataProcessorName = "Fælles Kommune";
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
@@ -32,30 +33,38 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Creating and renaming data processing registration",
+    it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
             var renameValue = createName(30);
 
             dpaHelper.createDataProcessingRegistration(name)
+                //Changing name
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
-                .then(() => renameNameAndVerify(renameValue));
-        });
-
-
-    it("It is possible to delete a data processing registration",
-        () => {
-            const nameToDelete = createName(1);
-            console.log("Creating agreement and deleting it");
-
-            dpaHelper.createDataProcessingRegistration(nameToDelete)
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(nameToDelete))
+                .then(() => renameNameAndVerify(renameValue))
+                //Changing data processors
+                .then(() => dpaHelper.assignDataProcessor(dataProcessorName))
+                .then(() => verifyDataProcessorContent([dataProcessorName], []))
+                .then(() => dpaHelper.removeDataProcessor(dataProcessorName))
+                .then(() => verifyDataProcessorContent([], [dataProcessorName]))
+                //COMPLETE - Delete the registration and verify
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
-                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(nameToDelete).isPresent())
-                    .toBeFalsy());
+                .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeFalsy());
         });
+
+
+    function verifyDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
+        presentNames.forEach(name => {
+            console.log(`Expecting system to be present:${name}`);
+            expect(pageObject.getDataProcessorRow(name).isPresent()).toBeTruthy();
+        });
+        unpresentNames.forEach(name => {
+            console.log(`Expecting system NOT to be present:${name}`);
+            expect(pageObject.getDataProcessorRow(name).isPresent()).toBeFalsy();
+        });
+    }
 
     function renameNameAndVerify(name: string) {
         console.log(`Renaming registration to ${name}`);

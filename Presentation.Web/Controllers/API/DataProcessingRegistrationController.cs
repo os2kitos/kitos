@@ -261,6 +261,41 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
+        [Route("{id}/data-processors/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/data-processors/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+
+
+        [HttpPatch]
         [Route("{id}/oversight-option")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -297,6 +332,16 @@ namespace Presentation.Web.Controllers.API
         }
 
 
+        public HttpResponseMessage RemoveDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -327,6 +372,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights.Select(_ => _.User))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
@@ -367,9 +413,11 @@ namespace Presentation.Web.Controllers.API
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
                 OversightIntervalOption = value.OversightInterval,
-                OversightIntervalOptionNote = value.OversightIntervalNote
-
-
+                OversightIntervalOptionNote = value.OversightIntervalNote,
+                DataProcessors = value
+                    .DataProcessors
+                    .Select(x => x.MapToShallowOrganizationDTO())
+                    .ToArray()
             };
         }
 
