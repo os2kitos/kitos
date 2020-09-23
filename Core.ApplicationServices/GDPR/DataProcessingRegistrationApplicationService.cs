@@ -274,8 +274,6 @@ namespace Core.ApplicationServices.GDPR
                     return updateOversightIntervalNoteError.Value;
                 }
 
-                _repository.Update(registration);
-
                 return registration;
             });
         }
