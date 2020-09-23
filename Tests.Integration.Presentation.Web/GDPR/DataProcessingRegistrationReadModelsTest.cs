@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -75,12 +75,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, assignSystemResponse.StatusCode);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForAsync(() =>
-            {
-                return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationReadModel, bool>(x =>
-                        x.AsQueryable().Any(rm => rm.SystemNamesAsCsv.Contains(systemName))));
-            }, TimeSpan.FromSeconds(15));
+            await WaitForReadModelQueueDepletion();
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
@@ -99,6 +94,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
         }
 
+        private static async Task WaitForReadModelQueueDepletion()
+        {
+            await WaitForAsync(
+                () =>
+                {
+                    return Task.FromResult(
+                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any());
+                }, TimeSpan.FromSeconds(15));
+        }
+
         [Fact]
         [Description("Tests that child entities are removed from the read model when updated from the source model")]
         public async Task ReadModels_Update_When_Child_Entities_Are_Removed()
@@ -115,25 +120,12 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var response1 = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
-            //Wait for read model to rebuild
-            await WaitForAsync(() =>
-            {
-                return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
-                        x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == registration.Id)));
-            }, TimeSpan.FromSeconds(20));
+            await WaitForReadModelQueueDepletion();
 
             using var response2 = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
-
-            //Wait for read model to rebuild
-            await WaitForAsync(() =>
-            {
-                return Task.FromResult(
-                    DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRoleAssignmentReadModel, bool>(x =>
-                        x.AsQueryable().Any(rm => rm.Parent.SourceEntityId == registration.Id) == false));
-            }, TimeSpan.FromSeconds(20));
+            await WaitForReadModelQueueDepletion();
 
             //Act
             var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
