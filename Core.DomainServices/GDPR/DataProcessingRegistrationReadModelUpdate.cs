@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
 using Infrastructure.Services.Types;
 
@@ -22,9 +23,12 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
+            destination.OversightIntervalNote = source.OversightIntervalNote;
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
+            PatchOversightInterval(source,destination);
+
         }
 
         private void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -77,6 +81,12 @@ namespace Core.DomainServices.GDPR
             }
 
             _roleAssignmentRepository.Save();
+        }
+
+        private void PatchOversightInterval(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            destination.OversightInterval = source.OversightInterval?.TranslateToDanishString();
         }
 
         private void RemoveAssignments(DataProcessingRegistrationReadModel destination, List<DataProcessingRegistrationRoleAssignmentReadModel> assignmentsToBeRemoved)

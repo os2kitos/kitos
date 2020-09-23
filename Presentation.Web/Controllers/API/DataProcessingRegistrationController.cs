@@ -9,6 +9,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
@@ -259,6 +260,43 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/oversight-option")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightOption(int id,
+            [FromBody] SingleValueDTO<YearMonthIntervalOption> yearMonthIntervalOption)
+        {
+            if (yearMonthIntervalOption == null)
+            {
+                return BadRequest("Value is not provided");
+            }
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightInterval(id, yearMonthIntervalOption.Value).Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-option-note")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightOptionNote(int id,
+            [FromBody] SingleValueDTO<string> yearMonthIntervalOptionNote)
+        {
+            if (yearMonthIntervalOptionNote == null)
+            {
+                return BadRequest("Value is not provided");
+            }
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightIntervalNote(id, yearMonthIntervalOptionNote.Value).Match(_ => Ok(), FromOperationError);
+        }
+
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -327,7 +365,11 @@ namespace Presentation.Web.Controllers.API
                 ItSystems = value
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
-                    .ToArray()
+                    .ToArray(),
+                OversightIntervalOption = value.OversightInterval,
+                OversightIntervalOptionNote = value.OversightIntervalNote
+
+
             };
         }
 

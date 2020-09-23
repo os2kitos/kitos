@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
 using Xunit;
@@ -74,6 +75,25 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new { Value = refId };
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/master-reference"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionRequestAsync(int id, YearMonthIntervalOption? yearMonthIntervalOption, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<YearMonthIntervalOption?> {Value = yearMonthIntervalOption};
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionNoteRequestAsync(int id, string note, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string?> { Value = note };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-note"), cookie, body);
+
         }
 
         public static async Task<HttpResponseMessage> SendCanCreateRequestAsync(int organizationId, string name, Cookie optionalLogin = null)

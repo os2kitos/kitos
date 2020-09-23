@@ -1,4 +1,5 @@
-﻿using Presentation.Web.Models.References;
+﻿using Core.DomainModel.Shared;
+using Presentation.Web.Models.References;
 
 namespace Presentation.Web.Models.GDPR
 {
@@ -14,5 +15,9 @@ namespace Presentation.Web.Models.GDPR
         public ReferenceDTO[] References { get; set; }
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
+
+        public YearMonthIntervalOption? OversightIntervalOption { get; set; }
+
+        public string OversightIntervalOptionNote { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -22,7 +23,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var response = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var response = await DataProcessingRegistrationHelper
+                .CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(response);
@@ -35,8 +37,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var responseInFirstOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-            var responseInSecondOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.SecondOrganizationId, name).ConfigureAwait(false);
+            var responseInFirstOrg = await DataProcessingRegistrationHelper
+                .CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var responseInSecondOrg = await DataProcessingRegistrationHelper
+                .CreateAsync(TestEnvironment.SecondOrganizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(responseInFirstOrg);
@@ -54,7 +58,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Act
             await DataProcessingRegistrationHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
-            using var secondResponse = await DataProcessingRegistrationHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
+            using var secondResponse = await DataProcessingRegistrationHelper
+                .SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
@@ -65,7 +70,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
+                .ConfigureAwait(false);
 
             //Act
             var gotten = await DataProcessingRegistrationHelper.GetAsync(dto.Id);
@@ -96,10 +102,12 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name1 = A<string>();
             var name2 = A<string>();
-            var agreementDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
+            var agreementDto = await DataProcessingRegistrationHelper
+                .CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(agreementDto.Id, name2);
+            using var response =
+                await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(agreementDto.Id, name2);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -111,11 +119,14 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name1 = A<string>();
             var name2 = A<string>();
-            await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
-            var agreementDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name2).ConfigureAwait(false);
+            await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1)
+                .ConfigureAwait(false);
+            var agreementDto = await DataProcessingRegistrationHelper
+                .CreateAsync(TestEnvironment.DefaultOrganizationId, name2).ConfigureAwait(false);
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(agreementDto.Id, name1);
+            using var response =
+                await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(agreementDto.Id, name1);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -128,7 +139,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
+            using var response =
+                await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId,
+                    name);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -153,11 +166,14 @@ namespace Tests.Integration.Presentation.Web.GDPR
         [Theory]
         [InlineData("")] //too short
         [InlineData("    ")] //only whitespace
-        [InlineData("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")] //101 chars
+        [InlineData(
+            "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")] //101 chars
         public async Task Can_Create_Returns_Error_If_InvalidName(string name)
         {
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
+            using var response =
+                await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId,
+                    name);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -167,7 +183,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Get_Available_Roles()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act
             var roles = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
@@ -180,7 +197,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Get_Available_Users()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
 
@@ -195,14 +213,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Assign_Role()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var response =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -222,15 +242,18 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Cannot_Assign_Duplicate_Role()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
-            using var succeededResponse = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var succeededResponse =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Act
-            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var duplicateResponse =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.OK, succeededResponse.StatusCode);
@@ -241,12 +264,14 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Cannot_Assign_Role_To_User_Not_In_Organization()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, int.MaxValue);
+            using var response =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, int.MaxValue);
 
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -256,10 +281,13 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Cannot_Assign_UnAvailable_Role()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, int.MaxValue, TestEnvironment.DefaultUserId);
+            using var response =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, int.MaxValue,
+                    TestEnvironment.DefaultUserId);
 
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -269,15 +297,18 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Remove_Role()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var response =
+                await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Act
-            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var removeResponse =
+                await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
@@ -291,14 +322,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Cannot_Remove_Unassigned_Role()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
 
             //Act - check on an agreement where no role has been added yet
-            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
+            using var removeResponse =
+                await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(agreement.Id, role.Id, user.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, removeResponse.StatusCode);
@@ -308,8 +341,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Set_Master_Reference()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
-            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), Display.Url, r => r.DataProcessingRegistration_Id = agreement.Id);
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(),
+                Display.Url, r => r.DataProcessingRegistration_Id = agreement.Id);
 
             //Act - check its possible to set a reference as master in a data processing agreement
             using var setMasterResponse =
@@ -323,8 +358,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Cannot_Set_Master_Reference_With_Invalid_Reference()
         {
             //Arrange
-            var agreement = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
-           
+            var agreement =
+                await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+
             //Act - check its not possible to set a reference as master in a data processing agreement with a invalid reference id
             using var setMasterResponse =
                 await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(agreement.Id, A<int>());
@@ -343,19 +379,27 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var system2Name = $"{systemPrefix}{2}";
             var filteredOutSystemName = A<string>();
             var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId, AccessModifier.Public);
-            var filteredOutSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId, AccessModifier.Public);
+            var system1 =
+                await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId,
+                    AccessModifier.Public);
+            var system2 =
+                await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId,
+                    AccessModifier.Public);
+            var filteredOutSystem =
+                await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId,
+                    AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
             await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
             await ItSystemHelper.TakeIntoUseAsync(filteredOutSystem.Id, organizationId);
 
             //Act
-            var dtos = (await DataProcessingRegistrationHelper.GetAvailableSystemsAsync(agreement.Id, systemPrefix)).ToList();
+            var dtos = (await DataProcessingRegistrationHelper.GetAvailableSystemsAsync(agreement.Id, systemPrefix))
+                .ToList();
 
             //Assert
             Assert.Equal(2, dtos.Count);
-            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { system1.Id, system1.Name }, new { system2.Id, system2.Name } });
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[]
+                {new {system1.Id, system1.Name}, new {system2.Id, system2.Name}});
         }
 
         [Fact]
@@ -366,12 +410,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system1Name = $"{systemPrefix}{1}";
             var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
+            var system =
+                await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId,
+                    AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             //Act - Add
-            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
-            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
+            using var assignResponse =
+                await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
+            using var duplicateResponse =
+                await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(agreement.Id, system.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
@@ -382,8 +430,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(system.Name, systemDTO.Name);
 
             //Act - remove
-            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
-            using var duplicateRemoveResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
+            using var removeResponse =
+                await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
+            using var duplicateRemoveResponse =
+                await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(agreement.Id, system.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
@@ -391,5 +441,42 @@ namespace Tests.Integration.Presentation.Web.GDPR
             dto = await DataProcessingRegistrationHelper.GetAsync(agreement.Id);
             Assert.Empty(dto.ItSystems);
         }
+
+        [Fact]
+        public async Task Can_Change_Oversight_Option()
+        {
+            //Arrange
+            var name = A<string>();
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
+                .ConfigureAwait(false);
+            var yearMonthIntervalOption = A<YearMonthIntervalOption>();
+
+            //Act
+            using var response =
+                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(dprDTO.Id,
+                    yearMonthIntervalOption);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_Oversight_Option_Note()
+        {
+            //Arrange
+            var name = A<string>();
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
+                .ConfigureAwait(false);
+            var oversightNote = A<string>();
+
+            //Act
+            using var response =
+                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id,
+                    oversightNote);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
     }
 }

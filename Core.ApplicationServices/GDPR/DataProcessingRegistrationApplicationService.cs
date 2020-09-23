@@ -325,12 +325,29 @@ namespace Core.ApplicationServices.GDPR
         private Maybe<OperationError> UpdateOversightInterval(DataProcessingRegistration dataProcessingRegistration,
             Maybe<ChangedValue<YearMonthIntervalOption?>> yearMonthIntervalOption)
         {
+
+            if (yearMonthIntervalOption.IsNone)
+            {
+                return Maybe<OperationError>.None;
+            }
+
+            var newOptionValue = yearMonthIntervalOption.Value.Value;
+            dataProcessingRegistration.OversightInterval = newOptionValue;
+
             return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateOversightIntervalNote(DataProcessingRegistration dataProcessingRegistration,
             Maybe<ChangedValue<string>> yearMonthIntervalOptionNote)
         {
+            if (yearMonthIntervalOptionNote.IsNone)
+            {
+                return Maybe<OperationError>.None;
+            }
+
+            var newNoteValue = yearMonthIntervalOptionNote.Value.Value;
+            dataProcessingRegistration.OversightIntervalNote = newNoteValue;
+            
             return Maybe<OperationError>.None;
         }
 

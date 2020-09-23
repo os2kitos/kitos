@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -51,12 +52,18 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+            var oversightInterval = A<YearMonthIntervalOption>();
+            var oversightNote = A<string>();
 
             var agreement = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(agreement.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(agreement.Id, role.Id);
             var user = availableUsers.First();
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(agreement.Id,
+                oversightInterval);
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(agreement.Id,
+                oversightNote);
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(agreement.Id, role.Id, user.Id);
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = agreement.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
@@ -99,6 +106,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
+            Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
+            Assert.Equal(oversightNote,readModel.OversightIntervalNote);
         }
 
         [Fact]
