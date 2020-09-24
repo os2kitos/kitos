@@ -115,7 +115,6 @@
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
-    <Compile Include="Model\GDPR\DataProcessingRegistrationPropertyChanges.cs" />
     <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
     <Compile Include="KLE\IKLEApplicationService.cs" />

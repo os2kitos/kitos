@@ -68,16 +68,24 @@
                 });
         }
 
-        changeIsAgreementConcluded(isAgreementConcluded) {
+        private changeIsAgreementConcluded(isAgreementConcluded) {
             this.apiUseCaseFactory
                 .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded))
-                .executeAsync();
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.isAgreementConcluded = isAgreementConcluded;
+                    this.bindIsAgreementConcluded();
+                    return success;
+                });
         }
 
-        changeAgreementConcludedAt(agreementConcludedAt) {
+        private changeAgreementConcludedAt(agreementConcludedAt) {
             this.apiUseCaseFactory
                 .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
-                .executeAsync();
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcludedAt = agreementConcludedAt;
+                    this.bindAgreementConcludedAt();
+                    return success;
+                });
         }
 
         private bindIsAgreementConcluded() {

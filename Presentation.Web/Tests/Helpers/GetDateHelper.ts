@@ -1,20 +1,14 @@
 ﻿class GetDateHelper {
 
-    public static getTodayAsString() {
-        const currentDay = new Date().getDate();
-        const currentMonth = new Date().getMonth() + 1; // getMonth gets counts 0. So January is 0.
+    private static getDataComponentAsString(dayOrMonth: number) {
+        return (`0${dayOrMonth}`).slice(-2);
+    }
 
-        if (currentDay <= 9) {
-            if (currentMonth <= 9) {
-                return `0${currentDay}-0${currentMonth}-${new Date().getFullYear()}`;
-            }
-            return `0${currentDay}-${currentMonth}-${new Date().getFullYear()}`;
-        }
-
-        if (currentMonth <= 9) {
-            return `${currentDay}-0${currentMonth}-${new Date().getFullYear()}`;
-        }
-        return `${currentDay}-${currentMonth}-${new Date().getFullYear()}`;
+    static getTodayAsString() {
+        const now = new Date();
+        const currentDay = now.getDate();
+        const currentMonth = now.getMonth() + 1; // getMonth gets counts 0. So January is 0.
+        return `${this.getDataComponentAsString(currentDay)}-${this.getDataComponentAsString(currentMonth)}-${now.getFullYear()}`;
 
     }
 }
