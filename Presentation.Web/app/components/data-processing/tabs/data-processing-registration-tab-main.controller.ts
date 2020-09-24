@@ -31,10 +31,25 @@
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
+
         subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
+
+        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
+
+        shouldShowAgreementConcludedAt: boolean;
+
+        enableDataProcessorSelection: boolean;
+
+        hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+
         private bindHasSubDataProcessors() {
-            this.hasSubDataProcessors = this.dataProcessingRegistration.hasSubDataProcessors as number;
+            this.hasSubDataProcessors = {
+                selectedElement: this.dataProcessingRegistration.hasSubDataProcessors,
+                select2Options: new Models.ViewModel.Shared.YesNoUndecidedOptions().options,
+                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement)
+            };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
 
@@ -92,13 +107,7 @@
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
                     .then(results => this.mapDataProcessingSearchResults(results))
             );
-		}
-		
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
-
-        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
-
-        shouldShowAgreementConcludedAt: boolean;
+        }
 
         changeName(name) {
             this.apiUseCaseFactory
@@ -124,7 +133,7 @@
                     });
             }
         }
-        
+
         private removeDataProcessor(id: number) {
             this.apiUseCaseFactory
                 .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistrationId, id))
@@ -165,7 +174,7 @@
 
                     //Propagate changes to UI binding
                     this.bindSubDataProcessors();
-		            return success;
+                    return success;
                 });
         }
 
@@ -180,13 +189,7 @@
                 });
         }
 
-        //TODO: Missing: The flag setting and the "hide/show" logic in the view. Altso refactoring as described in todos above
-        //TODO: Use jacobs singleselect model to work to show the select options
-
-        //TODO: Refactor shit below
-        enableDataProcessorSelection: boolean;
-        hasSubDataProcessors: number;
-        changeHasSubDataProcessor(value: string) {
+        private changeHasSubDataProcessor(value: string) {
             const valueAsEnum = parseInt(value) as Models.Api.Shared.YesNoUndecidedOption;
             this
                 .apiUseCaseFactory
@@ -194,7 +197,7 @@
                 .executeAsync(success => {
                     this.dataProcessingRegistration.hasSubDataProcessors = valueAsEnum;
                     this.bindHasSubDataProcessors();
-					                    return success;
+                    return success;
                 });
         }
 

@@ -90,17 +90,14 @@
                 <div class="form-group">
                     <!-- Sub Data processors State -->
                     <label for="subDpTable" class="control-label small">Underdatabehandlere</label>
-                    <!-- TODO: Add selection here and then the table below -->
                     <select id="hasSubDataProcessorsSelection"
                             class="form-control input-sm"
                             ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="vm.hasSubDataProcessors"
+                            data-ng-model="vm.hasSubDataProcessors.selectedElement"
                             data-ng-disabled="!vm.hasWriteAccess"
-                            ng-change="vm.changeHasSubDataProcessor(vm.hasSubDataProcessors)">
-                        <option value=""></option>
-                        <option value="2">&nbsp;</option>
-                        <option value="0">Ja</option>
-                        <option value="1">Nej</option>
+                            ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)">
+                        <option hidden selected value />
+                        <option ng-repeat="option in vm.hasSubDataProcessors.select2Options" value="{{::option.optionalObjectContext}}" ng-bind-html="option.text" />
                     </select>
                 </div>
                 <div class="form-group" ng-if="vm.enableDataProcessorSelection">
