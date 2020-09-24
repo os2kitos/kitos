@@ -8,7 +8,8 @@ module Kitos.Utility.KendoGrid {
     "use strict";
 
     export enum KendoGridColumnFiltering {
-        Contains
+        Contains,
+        Date
     }
 
     export interface IGridViewAccess<TDataSource> {
@@ -20,6 +21,7 @@ module Kitos.Utility.KendoGrid {
         withId(id: string): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
+        withFormat(format: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
@@ -35,6 +37,7 @@ module Kitos.Utility.KendoGrid {
         private standardWidth: number = 200;
         private dataSourceName: string = null;
         private title: string = null;
+        private format: string = null;
         private filtering: KendoGridColumnFiltering = null;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
@@ -104,6 +107,12 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
+        withFormat(format: string): IKendoGridColumnBuilder<TDataSource> {
+            if (format == null) throw "format must be defined";
+            this.format = format;
+            return this;
+        }
+
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource> {
             if (width == null) throw "width must be defined";
             this.standardWidth = width;
@@ -131,6 +140,16 @@ module Kitos.Utility.KendoGrid {
                                 operator: "contains"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.Date:
+                        return {
+                            operators: {
+                                date: {
+                                    eq: "Lig med",
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
+                                }
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
                     default:
                         throw `Unknown filtering strategy ${this.filtering}`;
                 }
@@ -147,6 +166,7 @@ module Kitos.Utility.KendoGrid {
             return {
                 field: this.dataSourceName,
                 title: this.title,
+                format: this.format,
                 attributes: {
                     "data-element-type": `${this.id}KendoObject`
                 },
