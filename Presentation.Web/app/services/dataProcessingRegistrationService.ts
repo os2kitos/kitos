@@ -226,7 +226,7 @@
         }
 
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "is-agreement-concluded"), yesNoIrrelevantId);
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded"), yesNoIrrelevantId);
         }
 
 

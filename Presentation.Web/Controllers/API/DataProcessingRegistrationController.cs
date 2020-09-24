@@ -308,7 +308,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/is-agreement-concluded")]
+        [Route("{id}/agreement-concluded")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -413,8 +413,10 @@ namespace Presentation.Web.Controllers.API
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
-                IsAgreementConcluded = value.IsAgreementConcluded,
-                AgreementConcludedAt = value.AgreementConcludedAt,
+                AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>(){  
+                    Value = value.IsAgreementConcluded,
+                    OptionalDateValue = value.AgreementConcludedAt,
+                }
             };
         }
 

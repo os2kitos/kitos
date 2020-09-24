@@ -433,6 +433,7 @@
     <Compile Include="Models\References\ReferenceDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\ShallowOrganizationDTO.cs" />
+    <Compile Include="Models\Shared\ValueOptionWithDateDTO.cs" />
     <Compile Include="Models\SingleValueDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
