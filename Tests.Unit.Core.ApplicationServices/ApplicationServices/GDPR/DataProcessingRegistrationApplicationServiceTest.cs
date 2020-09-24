@@ -9,6 +9,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
@@ -968,6 +969,105 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(organizations, result.Value);
+        }
+
+        [Fact]
+        public void Can_Update_OversightInterval()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightInterval = A<YearMonthIntervalOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateOversightInterval(id, oversightInterval);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(oversightInterval,result.Value.OversightInterval);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration),Times.Once);
+        }
+
+        [Fact]
+        public void Can_Update_OversightInterval_To_Null()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateOversightInterval(id, null);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Null(result.Value.OversightInterval);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_OversightInterval_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightInterval = A<YearMonthIntervalOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateOversightInterval(id, oversightInterval);
+
+            //Assert
+            AssertModificationFailure(result,OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Can_Update_OversightIntervalNote()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightIntervalNote = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateOversightIntervalNote(id, oversightIntervalNote);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(oversightIntervalNote, result.Value.OversightIntervalNote);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_OversightIntervalNote_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightIntervalNote = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateOversightIntervalNote(id, oversightIntervalNote);
+
+            //Assert
+            AssertModificationFailure(result, OperationFailure.Forbidden);
         }
 
         private Mock<IDatabaseTransaction> ExpectTransaction()
