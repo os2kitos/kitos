@@ -220,6 +220,7 @@ module Kitos.Utility.KendoGrid {
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
+        withSchemaFields(schemaFields: any): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -235,7 +236,8 @@ module Kitos.Utility.KendoGrid {
         private customToolbarEntries: IKendoToolbarEntry[] = [];
         private columns: ColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
-        private parameterMapper: ParameterMapper = (data,type) => null;
+        private parameterMapper: ParameterMapper = (data, type) => null;
+        private schemaFields: any;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -248,6 +250,12 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
+        }
+
+        withSchemaFields(schemaFields: any) {
+            if (!schemaFields) throw "schemaFields must be defined";
+            this.schemaFields = schemaFields;
+            return this;
         }
 
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource> {
@@ -399,6 +407,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
+            this.checkRequiredField("schema", this.schemaFields);
 
             //Build toolbar buttons
             var getColorClass = (color: KendoToolbarButtonColor): string => {
@@ -492,7 +501,7 @@ module Kitos.Utility.KendoGrid {
                             url: options => this.urlFactory(options),
                             dataType: "json"
                         },
-                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data,type)
+                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data, type)
                     },
                     sort: {
                         field: this.standardSortingSourceField,
@@ -504,13 +513,7 @@ module Kitos.Utility.KendoGrid {
                     serverFiltering: true,
                     schema: {
                         model: {
-                            fields: {
-                                StatusDate: { type: "date" },
-                                LastChanged: { type: "date" },
-                                IsTransversal: { type: "boolean" },
-                                IsStrategy: { type: "boolean" },
-                                IsArchived: { type: "boolean" }
-                            },
+                            fields: this.schemaFields,
                         },
                         parse: response => {
                             response.value = this.responseParser(response.value);

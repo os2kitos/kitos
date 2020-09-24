@@ -86,6 +86,9 @@
                         });
                         return response;
                     })
+                    .withSchemaFields({
+                        AgreementConcludedAt: { type: "date" }
+                    })
                     .withToolbarEntry({
                         id: "createDpa",
                         title: "Opret Registrering",
