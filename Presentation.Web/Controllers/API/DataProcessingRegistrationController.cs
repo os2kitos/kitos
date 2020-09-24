@@ -260,6 +260,19 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("{id}/data-processors/available")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .GetDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
+        }
+
         [HttpPatch]
         [Route("{id}/data-processors/assign")]
         [SwaggerResponse(HttpStatusCode.OK)]
