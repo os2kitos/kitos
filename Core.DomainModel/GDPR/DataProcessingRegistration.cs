@@ -51,6 +51,10 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
 
+        public DataProcessingDataResponsibleOption DataResponsible { get; set; }
+
+        public string DataResponsibleRemark { get; set; }
+
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {
             return Rights.Where(x => x.RoleId == roleId);
