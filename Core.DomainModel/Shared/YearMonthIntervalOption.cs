@@ -33,8 +33,5 @@ namespace Core.DomainModel.Shared
         {
             return yearMonthIntervalOption.HasValue ? yearMonthIntervalOption.Value.TranslateToDanishString() : "";
         }
-
     }
-
-
 }

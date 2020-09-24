@@ -13,6 +13,4 @@ namespace Core.ApplicationServices.Model.GDPR
         public Maybe<ChangedValue<string>> OversightIntervalNoteChange { get; set; } = Maybe<ChangedValue<string>>.None;
 
     }
-
-
 }
