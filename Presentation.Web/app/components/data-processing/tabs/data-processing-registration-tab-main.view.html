@@ -26,7 +26,7 @@
                            ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)" 
                            ng-disabled="!vm.hasWriteAccess" />
                 </div>
-                <div ng-if="vm.shouldShowAgreementConcludedAt()">
+                <div ng-if="vm.shouldShowAgreementConcludedAt">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
