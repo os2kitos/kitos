@@ -63,7 +63,10 @@
                     </table>
                 </div>
                 <div class="form-group">
-                    <!-- Data processors -->
+                    <!--Has sub data processors-->
+                </div>
+                <div class="form-group">
+                    <!-- Sub Data processors -->
                     <label for="subDpTable" class="control-label small">Underdatabehandlere</label>
                     <table id="subDpTable" class="table table-striped table-bordered">
                         <thead>
@@ -98,9 +101,9 @@
                                     <input type="hidden"
                                            id="sub-data-processor_select-new"
                                            class="form-control input-sm"
-                                           data-ui-select2="vm.dataProcessors.select2Config"
+                                           data-ui-select2="vm.subDataProcessors.select2Config"
                                            ng-model="vm.subDataProcessors.newElementSelection"
-                                           ng-change="vm.subDataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
+                                           ng-change="vm.subDataProcessors.newItemSelected(vm.subDataProcessors.newElementSelection)"
                                            data-placeholder="Vælg Databehandler" />
                                 </td>
                             </tr>
