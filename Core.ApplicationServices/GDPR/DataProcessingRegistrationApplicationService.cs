@@ -249,7 +249,7 @@ namespace Core.ApplicationServices.GDPR
             if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
-            return Modify<IEnumerable<Organization>>(id,
+            return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>
                     _dataProcessingRegistrationDataProcessorAssignmentService
                         .GetApplicableSubDataProcessors(registration)
