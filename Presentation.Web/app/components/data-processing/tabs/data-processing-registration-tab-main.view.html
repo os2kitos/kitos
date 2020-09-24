@@ -17,7 +17,7 @@
                 </div>
                 <!-- Agreement concluded -->
                 <div class="form-group">
-                    <label for="agreementConcluded" class="control-label small">Databehandleraftale indgået</label>
+                    <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
                     <select class="form-control input-sm" id="agreementConcluded"
                             ui-select2="noSearchNoClearSelect2"
                             ng-model="vm.isAgreementConcluded.selectedElement"
@@ -25,13 +25,13 @@
                             data-field="isAgreementConcluded"
                             ng-disabled="!vm.hasWriteAccess">
                         <option hidden selected value />
-                        <option ng-repeat="option in vm.isAgreementConcluded.select2Options" value="{{option.id}}" ng-bind-html="option.text" />
+                        <option ng-repeat="option in vm.isAgreementConcluded.select2Options" value="{{::option.id}}" ng-bind-html="option.text" />
                     </select>
                 </div>
                 <div ng-if="vm.isAgreementConcluded.selectedElement == 1">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
-                        <label for="agreementConcludedAt" class="control-label small">Dato for databehandleraftale indgået</label>
+                        <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
                         <input type="text" id="agreementConcludedAt" class="form-control"
                                data-kendo-date-picker
                                data-k-options="vm.agreementConcludedAt.dateFormat"
