@@ -29,6 +29,10 @@
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
+        shouldShowAgreementConcludedAt(): boolean{
+            return this.isAgreementConcluded.selectedElement == Models.DataProcessing.YesNoIrrelevantOption.YES;
+        }
+
         changeName(name) {
             this.apiUseCaseFactory
                 .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
@@ -72,17 +76,17 @@
             this.apiUseCaseFactory
                 .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.isAgreementConcluded = isAgreementConcluded;
+                    this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded;
                     this.bindIsAgreementConcluded();
                     return success;
                 });
         }
 
-        private changeAgreementConcludedAt(agreementConcludedAt) {
+        private changeAgreementConcludedAt(agreementConcludedAt: string) {
             this.apiUseCaseFactory
                 .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.agreementConcludedAt = agreementConcludedAt;
+                    this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
                     this.bindAgreementConcludedAt();
                     return success;
                 });
@@ -90,7 +94,7 @@
 
         private bindIsAgreementConcluded() {
             this.isAgreementConcluded = {
-                selectedElement: this.dataProcessingRegistration.isAgreementConcluded,
+                selectedElement: this.dataProcessingRegistration.agreementConcluded.value,
                 select2Options: new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options,
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
@@ -98,7 +102,7 @@
 
         private bindAgreementConcludedAt() {
             this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
-                this.dataProcessingRegistration.agreementConcludedAt,
+                this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
         }
 

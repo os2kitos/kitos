@@ -16,7 +16,7 @@
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number);
-        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any);
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -230,7 +230,7 @@
         }
 
 
-        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any) {
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string) {
             var date = moment(dateTime, "YYYY-MM-DD");
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
         }

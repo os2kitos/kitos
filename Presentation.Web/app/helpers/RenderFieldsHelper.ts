@@ -54,5 +54,12 @@
             }
             return RenderFieldsHelper.noValueFallback;
         }
+
+        static renderDate(date: Date) {
+            if (!!date) {
+                return moment(date).format("DD-MM-YYYY");
+            }
+            return RenderFieldsHelper.noValueFallback;
+        }
     }
 }

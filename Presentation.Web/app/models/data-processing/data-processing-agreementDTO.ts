@@ -11,9 +11,8 @@
         references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
-        dataProcessors : IDataProcessorDTO[];
-        isAgreementConcluded: number;
-        agreementConcludedAt;
+        dataProcessors: IDataProcessorDTO[];
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption>
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {
@@ -38,4 +37,12 @@
     export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         email: string,
     }
+
+    export enum YesNoIrrelevantOption {
+        NO = 0,
+        YES = 1,
+        IRRELEVANT = 2,
+        UNDECIDED = 3
+    }
+    
 }
