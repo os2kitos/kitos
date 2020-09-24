@@ -313,15 +313,16 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage PatchOversightOption(int id,
-            [FromBody] SingleValueDTO<YearMonthIntervalOption> yearMonthIntervalOption)
+            [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
         {
-            if (yearMonthIntervalOption == null)
+            if (oversightInterval == null)
             {
-                return BadRequest("Value is not provided");
+                return BadRequest("Oversight interval value is not provided");
             }
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateOversightInterval(id, yearMonthIntervalOption.Value).Match(_ => Ok(), FromOperationError);
+                .UpdateOversightInterval(id, oversightInterval.Value)
+                .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
@@ -331,15 +332,16 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage PatchOversightOptionNote(int id,
-            [FromBody] SingleValueDTO<string> yearMonthIntervalOptionNote)
+            [FromBody] SingleValueDTO<string> oversightIntervalNote)
         {
-            if (yearMonthIntervalOptionNote == null)
+            if (oversightIntervalNote == null)
             {
-                return BadRequest("Value is not provided");
+                return BadRequest("Oversight note value is not provided");
             }
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateOversightIntervalNote(id, yearMonthIntervalOptionNote.Value).Match(_ => Ok(), FromOperationError);
+                .UpdateOversightIntervalNote(id, oversightIntervalNote.Value)
+                .Match(_ => Ok(), FromOperationError);
         }
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
@@ -412,8 +414,8 @@ namespace Presentation.Web.Controllers.API
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
-                OversightIntervalOption = value.OversightInterval,
-                OversightIntervalOptionNote = value.OversightIntervalNote,
+                OversightInterval = value.OversightInterval,
+                OversightIntervalNote = value.OversightIntervalNote,
                 DataProcessors = value
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())

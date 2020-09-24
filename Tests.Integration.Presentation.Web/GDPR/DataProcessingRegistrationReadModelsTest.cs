@@ -68,8 +68,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var user = availableUsers.First();
             await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
                 oversightInterval);
-            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(registration.Id,
-                oversightNote);
 
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -100,7 +98,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
-            Assert.Equal(oversightNote,readModel.OversightIntervalNote);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
 
             Console.Out.WriteLine("Flat values asserted");

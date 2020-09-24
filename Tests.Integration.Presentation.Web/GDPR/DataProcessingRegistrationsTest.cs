@@ -24,8 +24,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var response = await DataProcessingRegistrationHelper
-                .CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var response = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(response);
@@ -38,10 +37,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var responseInFirstOrg = await DataProcessingRegistrationHelper
-                .CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-            var responseInSecondOrg = await DataProcessingRegistrationHelper
-                .CreateAsync(TestEnvironment.SecondOrganizationId, name).ConfigureAwait(false);
+            var responseInFirstOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var responseInSecondOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.SecondOrganizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(responseInFirstOrg);
@@ -59,8 +56,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Act
             await DataProcessingRegistrationHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
-            using var secondResponse = await DataProcessingRegistrationHelper
-                .SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
+            using var secondResponse = await DataProcessingRegistrationHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
@@ -71,8 +67,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
-                .ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
 
             //Act
             var gotten = await DataProcessingRegistrationHelper.GetAsync(dto.Id);
@@ -87,8 +82,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
-                .ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
 
             //Act
             using var deleteResponse = await DataProcessingRegistrationHelper.SendDeleteRequestAsync(dto.Id);
@@ -135,9 +129,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            using var response =
-                await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId,
-                    name);
+            using var response = await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -167,9 +159,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Create_Returns_Error_If_InvalidName(string name)
         {
             //Act
-            using var response =
-                await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId,
-                    name);
+            using var response = await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -324,8 +314,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), Display.Url, r => r.DataProcessingRegistration_Id = registration.Id);
 
             //Act - check its possible to set a reference as master in a data processing registration
-            using var setMasterResponse =
-                await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, reference.Id);
+            using var setMasterResponse = await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, reference.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.OK, setMasterResponse.StatusCode);
@@ -338,8 +327,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act - check its not possible to set a reference as master in a data processing registration with a invalid reference id
-            using var setMasterResponse =
-                await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, A<int>());
+            using var setMasterResponse = await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, A<int>());
 
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, setMasterResponse.StatusCode);
@@ -367,8 +355,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(2, dtos.Count);
-            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[]
-                {new {system1.Id, system1.Name}, new {system2.Id, system2.Name}});
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] {new {system1.Id, system1.Name}, new {system2.Id, system2.Name}});
         }
 
         [Fact]
@@ -410,14 +397,11 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
-                .ConfigureAwait(false);
-            var yearMonthIntervalOption = A<YearMonthIntervalOption>();
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var oversightInterval = A<YearMonthIntervalOption>();
 
             //Act
-            using var response =
-                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(dprDTO.Id,
-                    yearMonthIntervalOption);
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(dprDTO.Id, oversightInterval);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK,response.StatusCode);
@@ -428,14 +412,12 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
-                .ConfigureAwait(false);
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var oversightNote = A<string>();
 
             //Act
             using var response =
-                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id,
-                    oversightNote);
+                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id, oversightNote);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

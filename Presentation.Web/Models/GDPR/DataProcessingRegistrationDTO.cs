@@ -16,9 +16,9 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
-        public YearMonthIntervalOption? OversightIntervalOption { get; set; }
+        public YearMonthIntervalOption? OversightInterval { get; set; }
 
-        public string OversightIntervalOptionNote { get; set; }
+        public string OversightIntervalNote { get; set; }
         
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
     }

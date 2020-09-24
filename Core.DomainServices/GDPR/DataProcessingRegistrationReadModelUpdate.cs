@@ -23,7 +23,6 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
-            destination.OversightIntervalNote = source.OversightIntervalNote;
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
