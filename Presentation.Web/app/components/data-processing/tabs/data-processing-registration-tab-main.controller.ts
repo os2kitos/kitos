@@ -43,7 +43,7 @@
             getInitialElements: () => TElement[],
             removeFunc: ((element: TElement) => void),
             newFunc: Models.ViewModel.Generic.NewItemSelectedFunc,
-            searchFunc: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel[]>) {
+            searchFunc: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>) {
 
             const configuration = {
                 selectedElements: getInitialElements(),
@@ -61,7 +61,7 @@
 
         private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
             return dataProcessors.map(
-                dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
+                dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                     id: dataProcessor.id,
                     text: dataProcessor.name,
                     optionalObjectContext: dataProcessor
@@ -98,9 +98,7 @@
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
-        shouldShowAgreementConcludedAt(): boolean{
-            return this.isAgreementConcluded.selectedElement == Models.Api.Shared.YesNoIrrelevantOption.YES;
-        }
+        shouldShowAgreementConcludedAt: boolean;
 
         changeName(name) {
             this.apiUseCaseFactory
@@ -141,7 +139,7 @@
                 });
         }
 
-        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
+        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
                 const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
                 this.apiUseCaseFactory
@@ -216,6 +214,7 @@
                 select2Options: new Models.ViewModel.Shared.YesNoIrrelevantOptions().options,
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
+            this.shouldShowAgreementConcludedAt = this.dataProcessingRegistration.agreementConcluded.value === Models.Api.Shared.YesNoIrrelevantOption.YES;
         }
 
         private bindAgreementConcludedAt() {

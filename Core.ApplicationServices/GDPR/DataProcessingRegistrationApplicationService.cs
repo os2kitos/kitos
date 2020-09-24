@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.GDPR
 {

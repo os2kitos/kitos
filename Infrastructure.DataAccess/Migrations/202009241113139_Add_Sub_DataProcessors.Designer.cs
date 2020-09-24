@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class DPR_Sub_DataProcessors : IMigrationMetadata
+    public sealed partial class Add_Sub_DataProcessors : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(DPR_Sub_DataProcessors));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Sub_DataProcessors));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009231154033_DPR_Sub_DataProcessors"; }
+            get { return "202009241113139_Add_Sub_DataProcessors"; }
         }
         
         string IMigrationMetadata.Source

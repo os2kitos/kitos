@@ -624,13 +624,13 @@
     <Compile Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.designer.cs">
       <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009231154033_DPR_Sub_DataProcessors.cs" />
-    <Compile Include="Migrations\202009231154033_DPR_Sub_DataProcessors.designer.cs">
-      <DependentUpon>202009231154033_DPR_Sub_DataProcessors.cs</DependentUpon>
-	</Compile>
     <Compile Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs" />
     <Compile Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.designer.cs">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009241113139_Add_Sub_DataProcessors.cs" />
+    <Compile Include="Migrations\202009241113139_Add_Sub_DataProcessors.designer.cs">
+      <DependentUpon>202009241113139_Add_Sub_DataProcessors.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1022,11 +1022,11 @@
     <EmbeddedResource Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.resx">
       <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009231154033_DPR_Sub_DataProcessors.resx">
-      <DependentUpon>202009231154033_DPR_Sub_DataProcessors.cs</DependentUpon>
-	</EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.resx">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009241113139_Add_Sub_DataProcessors.resx">
+      <DependentUpon>202009241113139_Add_Sub_DataProcessors.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

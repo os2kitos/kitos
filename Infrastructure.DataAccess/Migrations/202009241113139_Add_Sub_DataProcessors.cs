@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class DPR_Sub_DataProcessors : DbMigration
+    public partial class Add_Sub_DataProcessors : DbMigration
     {
         public override void Up()
         {

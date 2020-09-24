@@ -27,7 +27,7 @@
                         <option ng-repeat="option in vm.isAgreementConcluded.select2Options" value="{{::option.optionalObjectContext}}" ng-bind-html="option.text" />
                     </select>
                 </div>
-                <div ng-if="vm.shouldShowAgreementConcludedAt()">
+                <div ng-if="vm.shouldShowAgreementConcludedAt">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
@@ -36,7 +36,7 @@
                                data-k-options="vm.agreementConcludedAt.dateFormat"
                                ng-disabled="!vm.hasWriteAccess"
                                ng-model="vm.agreementConcludedAt.selectedDate"
-                               ng-blur="vm.agreementConcludedAt.dateSelected(vm.agreementConcludedAt.selectedDate)"
+                               ng-blur="vm.agreementConcludedAt.dateSelected(vm.agreementConcludedAt.selectedDate)"/>
                         <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
                     </div>
                 </div>
