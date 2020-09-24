@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Core.DomainModel.GDPR.Read
 {
@@ -35,5 +36,9 @@ namespace Core.DomainModel.GDPR.Read
         public virtual DataProcessingRegistration SourceEntity { get; set; }
         
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
+
+        public string IsAgreementConcluded { get; set; }
+
+        public DateTime? AgreementConcludedAt { get; set; }
     }
 }

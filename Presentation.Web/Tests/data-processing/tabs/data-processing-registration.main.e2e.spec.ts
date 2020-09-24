@@ -5,6 +5,8 @@ import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects
 import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingRegistrationEditMainPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
+import GetDateHelper = require("../../Helpers/GetDateHelper");
+import Select2Helper = require("../../Helpers/Select2Helper");
 
 describe("Data processing agreement main detail tests", () => {
 
@@ -20,6 +22,10 @@ describe("Data processing agreement main detail tests", () => {
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
     }
+
+    var dropdownYes = "Ja";
+
+    var today = GetDateHelper.getTodayAsString();
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
@@ -43,6 +49,11 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
                 .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
                 .then(() => renameNameAndVerify(renameValue))
+                //Changing IsAgreementConcluded and AgreementConcludedAt
+                .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))
+                .then(() => verifyIsAgreementConcluded(dropdownYes))
+                .then(() => dpaHelper.changeAgreementConcludedAt(today))
+                .then(() => verifyAgreementConcludedAt(today))
                 //Changing data processors
                 .then(() => dpaHelper.assignDataProcessor(dataProcessorName))
                 .then(() => verifyDataProcessorContent([dataProcessorName], []))
@@ -84,6 +95,21 @@ describe("Data processing agreement main detail tests", () => {
         console.log("Retrieving deletebutton");
         return pageObject.getDpaDeleteButton().click()
             .then(() => browser.switchTo().alert().accept());
+    }
+
+    function verifyIsAgreementConcluded(selectedValue: string) {
+        console.log(`Expecting IsAgreementConcluded to be set to: ${selectedValue}`);
+        expect(Select2Helper.getData("s2id_agreementConcluded").getText()).toEqual(selectedValue);
+    }
+
+    function verifyAgreementConcludedAt(selectedDate: string) {
+        setFocusOnNameToActivateBlur();
+        console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
+        expect(pageObject.getAgreementConcludedAtDateField().getAttribute("value")).toEqual(selectedDate);
+    }
+
+    function setFocusOnNameToActivateBlur() {
+        return pageObject.getDpaMainNameInput().click();
     }
 
 });

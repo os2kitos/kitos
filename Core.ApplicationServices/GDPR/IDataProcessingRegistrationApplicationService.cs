@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
@@ -28,5 +30,7 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId);
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
+        Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
+        Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
     }
 }

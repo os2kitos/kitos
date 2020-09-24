@@ -101,7 +101,10 @@
         }
 
         static renderDate(date: Date) {
-            return moment(date).format("DD-MM-YYYY");
+            if (!!date) {
+                return moment(date).format("DD-MM-YYYY");
+            }
+            return ExcelExportHelper.noValueFallback;
         }
 
         static renderStatusColorWithStatus(dataItem: IItProjectInactiveOverview, status) {

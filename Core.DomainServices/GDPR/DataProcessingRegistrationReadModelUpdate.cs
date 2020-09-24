@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
 using Infrastructure.Services.Types;
 
@@ -25,12 +26,26 @@ namespace Core.DomainServices.GDPR
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
-            PatchDataProcessors(source, destination);
+            PatchDataProcessors(source, destination); 
+            PatchIsAgreementConcluded(source, destination);
         }
 
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
+        }
+
+        private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.IsAgreementConcluded = source.IsAgreementConcluded.ToDanishString();
+            if(source.IsAgreementConcluded == YesNoIrrelevantOption.YES)
+            {
+                destination.AgreementConcludedAt = source.AgreementConcludedAt;
+            }
+            else
+            {
+                destination.AgreementConcludedAt = null;
+            }
         }
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

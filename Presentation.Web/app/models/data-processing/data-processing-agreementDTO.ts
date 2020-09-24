@@ -11,7 +11,8 @@
         references: Array<IDataProcessingReferenceDTO>;
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
-        dataProcessors : IDataProcessorDTO[];
+        dataProcessors: IDataProcessorDTO[];
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

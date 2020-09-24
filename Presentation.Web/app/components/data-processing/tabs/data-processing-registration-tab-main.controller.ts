@@ -17,11 +17,97 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
             this.bindDataProcessors();
+            this.bindIsAgreementConcluded();
+            this.bindAgreementConcludedAt();
         }
+
+        yesNoIrrelevantMapper = Models.Api.Shared.YesNoIrrelevantOptionMapper;
 
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
+
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
+
+        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
+
+        shouldShowAgreementConcludedAt(): boolean{
+            return this.isAgreementConcluded.selectedElement == Models.Api.Shared.YesNoIrrelevantOption.YES;
+        }
+
+        changeName(name) {
+            this.apiUseCaseFactory
+                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
+                .executeAsync(nameChangeResponse => {
+                    this.headerName = name;
+                    return nameChangeResponse;
+                });
+        }
+
+        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
+            if (!!newElement && !!newElement.optionalObjectContext) {
+                const newDp = newElement.optionalObjectContext;
+                this.apiUseCaseFactory
+                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistration.id, newDp.id))
+                    .executeAsync(success => {
+                        //Update the source collection
+                        this.dataProcessingRegistration.dataProcessors.push(newDp);
+
+                        //Trigger UI update
+                        this.bindDataProcessors();
+                        return success;
+                    });
+            }
+        }
+        
+        private removeDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistration.id, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.dataProcessors = this.dataProcessingRegistration.dataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindDataProcessors();
+                    return success;
+                });
+        }
+
+        private changeIsAgreementConcluded(isAgreementConcluded: string) {
+            var yesNoIrrelevant = this.yesNoIrrelevantMapper.mapFromIdAsString(isAgreementConcluded);
+            this.apiUseCaseFactory
+                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, yesNoIrrelevant))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.value = yesNoIrrelevant;
+                    this.bindIsAgreementConcluded();
+                    return success;
+                });
+        }
+
+        private changeAgreementConcludedAt(agreementConcludedAt: string) {
+            this.apiUseCaseFactory
+                .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
+                    this.bindAgreementConcludedAt();
+                    return success;
+                });
+        }
+
+        private bindIsAgreementConcluded() {
+            this.isAgreementConcluded = {
+                selectedElement: this.dataProcessingRegistration.agreementConcluded.value,
+                select2Options: new Models.ViewModel.Shared.YesNoIrrelevantOptions().options,
+                elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
+            };
+        }
+
+        private bindAgreementConcludedAt() {
+            this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
+                (newDate) => this.changeAgreementConcludedAt(newDate));
+        }
 
         private bindDataProcessors() {
             this.dataProcessors = {
@@ -38,7 +124,7 @@
                             .getApplicableDataProcessors(this.dataProcessingRegistration.id, query)
                             .then(
                                 dataProcessors => dataProcessors.map(
-                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
+                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                                         id: dataProcessor.id,
                                         text: dataProcessor.name,
                                         optionalObjectContext: dataProcessor
@@ -49,45 +135,6 @@
                     ),
                 newItemSelected: (newElement) => this.addDataProcessor(newElement)
             };
-        }
-
-        changeName(name) {
-            this.apiUseCaseFactory
-                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
-                .executeAsync(nameChangeResponse => {
-                    this.headerName = name;
-                    return nameChangeResponse;
-                });
-        }
-
-        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
-            if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
-                this.apiUseCaseFactory
-                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistration.id, newDp.id))
-                    .executeAsync(success => {
-                        //Update the source collection
-                        this.dataProcessingRegistration.dataProcessors.push(newDp);
-
-                        //Trigger UI update
-                        this.bindDataProcessors();
-                        return success;
-                    });
-            }
-        }
-
-        private removeDataProcessor(id: number) {
-            this.apiUseCaseFactory
-                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistration.id, id))
-                .executeAsync(success => {
-
-                    //Update the source collection
-                    this.dataProcessingRegistration.dataProcessors = this.dataProcessingRegistration.dataProcessors.filter(x => x.id !== id);
-
-                    //Propagate changes to UI binding
-                    this.bindDataProcessors();
-                    return success;
-                });
         }
     }
 
