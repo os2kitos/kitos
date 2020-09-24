@@ -979,7 +979,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var oversightInterval = A<YearMonthIntervalOption>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, true);
+            ExpectAllowModifyReturns(registration,true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -1000,7 +1000,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, true);
+            ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -1022,7 +1022,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var oversightInterval = A<YearMonthIntervalOption>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, false);
+            ExpectAllowModifyReturns(registration, false);
 
             //Act
             var result = _sut.UpdateOversightInterval(id, oversightInterval);
@@ -1039,7 +1039,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var oversightIntervalNote = A<string>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, true);
+            ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -1061,7 +1061,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var oversightIntervalNote = A<string>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, false);
+            ExpectAllowModifyReturns(registration, false);
 
             //Act
             var result = _sut.UpdateOversightIntervalNote(id, oversightIntervalNote);
