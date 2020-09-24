@@ -10,7 +10,7 @@
             "select2LoadingService"
         ];
 
-        private readonly dataProcessingRegistrationId : number;
+        private readonly dataProcessingRegistrationId: number;
 
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
@@ -20,6 +20,7 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
+            this.bindHasSubDataProcessors();
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
         }
 
@@ -28,6 +29,11 @@
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
         subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
+
+        private bindHasSubDataProcessors() {
+            this.hasSubDataProcessors = this.dataProcessingRegistration.hasSubDataProcessors as number;
+            this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
+        }
 
         private bindMultiSelectConfiguration<TElement>(
             setField: ((finalVm: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<TElement>) => void),
@@ -154,6 +160,24 @@
         }
 
         //TODO: Missing: The flag setting and the "hide/show" logic in the view. Altso refactoring as described in todos above
+        //TODO: Use jacobs singleselect model to work to show the select options
+
+        //TODO: Refactor shit below
+        enableDataProcessorSelection: boolean;
+        hasSubDataProcessors: number;
+        changeHasSubDataProcessor(value: string) {
+            const valueAsEnum = parseInt(value) as Models.Api.Shared.YesNoUndecidedOption;
+            this
+                .apiUseCaseFactory
+                .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, valueAsEnum))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.hasSubDataProcessors = valueAsEnum;
+                    this.bindHasSubDataProcessors();
+                    return success;
+                });
+        }
+
+
     }
 
     angular
