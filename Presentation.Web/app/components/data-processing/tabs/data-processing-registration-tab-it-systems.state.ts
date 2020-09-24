@@ -26,7 +26,7 @@
                                                 results =>
                                                     results
                                                         .map(result =>
-                                                            <Models.ViewModel.Generic.Select2OptionViewModel>
+                                                            <Models.ViewModel.Generic.Select2OptionViewModel<any>>
                                                             {
                                                                 id: result.id,
                                                                 text: Helpers.SystemNameFormat.apply(result.name,result.disabled)

@@ -77,7 +77,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, sendAssignDataProcessorRequestAsync.StatusCode);
 
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
-            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registration.Id, agreementConcludedAt);
 
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
@@ -101,6 +100,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -111,10 +111,43 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
-            Assert.Matches(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
-            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
 
             Console.Out.WriteLine("Role data verified");
+        }
+
+        [Fact]
+        public async Task ReadModels_Contain_Correct_Dependent_Content()
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var isAgreementConcluded = YesNoIrrelevantOption.YES;
+            var agreementConcludedAt = A<DateTime>();
+
+            Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
+
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
+            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registration.Id, agreementConcludedAt);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(result);
+            Console.Out.WriteLine("Read model found");
+            Assert.Equal(name, readModel.Name);
+            Assert.Equal(registration.Id, readModel.SourceEntityId);
+
+            Console.Out.WriteLine("Asserting Dependent and dependee properties");
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
+            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
+
         }
 
         private static async Task WaitForReadModelQueueDepletion()

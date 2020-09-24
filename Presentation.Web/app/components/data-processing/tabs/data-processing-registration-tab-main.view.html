@@ -24,7 +24,7 @@
                             ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)"
                             ng-disabled="!vm.hasWriteAccess">
                         <option hidden selected value />
-                        <option ng-repeat="option in vm.isAgreementConcluded.select2Options" value="{{::option.id}}" ng-bind-html="option.text" />
+                        <option ng-repeat="option in vm.isAgreementConcluded.select2Options" value="{{::option.optionalObjectContext}}" ng-bind-html="option.text" />
                     </select>
                 </div>
                 <div ng-if="vm.shouldShowAgreementConcludedAt()">

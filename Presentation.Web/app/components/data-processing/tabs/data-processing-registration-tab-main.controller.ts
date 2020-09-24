@@ -21,16 +21,18 @@
             this.bindAgreementConcludedAt();
         }
 
+        yesNoIrrelevantMapper = Models.Api.Shared.YesNoIrrelevantOptionMapper;
+
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<number>;
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
         shouldShowAgreementConcludedAt(): boolean{
-            return this.isAgreementConcluded.selectedElement == Models.DataProcessing.YesNoIrrelevantOption.YES;
+            return this.isAgreementConcluded.selectedElement == Models.Api.Shared.YesNoIrrelevantOption.YES;
         }
 
         changeName(name) {
@@ -42,9 +44,9 @@
                 });
         }
 
-        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
+        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
+                const newDp = newElement.optionalObjectContext;
                 this.apiUseCaseFactory
                     .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistration.id, newDp.id))
                     .executeAsync(success => {
@@ -72,11 +74,12 @@
                 });
         }
 
-        private changeIsAgreementConcluded(isAgreementConcluded) {
+        private changeIsAgreementConcluded(isAgreementConcluded: string) {
+            var yesNoIrrelevant = this.yesNoIrrelevantMapper.mapFromIdAsString(isAgreementConcluded);
             this.apiUseCaseFactory
-                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded))
+                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, yesNoIrrelevant))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded;
+                    this.dataProcessingRegistration.agreementConcluded.value = yesNoIrrelevant;
                     this.bindIsAgreementConcluded();
                     return success;
                 });
@@ -95,7 +98,7 @@
         private bindIsAgreementConcluded() {
             this.isAgreementConcluded = {
                 selectedElement: this.dataProcessingRegistration.agreementConcluded.value,
-                select2Options: new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options,
+                select2Options: new Models.ViewModel.Shared.YesNoIrrelevantOptions().options,
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
         }
@@ -121,7 +124,7 @@
                             .getApplicableDataProcessors(this.dataProcessingRegistration.id, query)
                             .then(
                                 dataProcessors => dataProcessors.map(
-                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
+                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                                         id: dataProcessor.id,
                                         text: dataProcessor.name,
                                         optionalObjectContext: dataProcessor

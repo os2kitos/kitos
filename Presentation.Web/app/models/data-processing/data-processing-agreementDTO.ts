@@ -12,7 +12,7 @@
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
         dataProcessors: IDataProcessorDTO[];
-        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption>
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {
@@ -37,12 +37,4 @@
     export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         email: string,
     }
-
-    export enum YesNoIrrelevantOption {
-        NO = 0,
-        YES = 1,
-        IRRELEVANT = 2,
-        UNDECIDED = 3
-    }
-    
 }

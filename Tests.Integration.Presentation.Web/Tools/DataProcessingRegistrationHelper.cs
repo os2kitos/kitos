@@ -183,7 +183,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new SingleValueDTO<YesNoIrrelevantOption?> { Value = yesNoIrrelevantOption };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/is-agreement-concluded"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded"), cookie, body);
         }
 
         public static async Task<HttpResponseMessage> SendChangeAgreementConcludedAtRequestAsync(int id, DateTime? dateTime, Cookie optionalLogin = null)

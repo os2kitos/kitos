@@ -106,7 +106,7 @@
 
         }
 
-        private setValuesOrNull(value: Select2OptionViewModel) {
+        private setValuesOrNull(value: Select2OptionViewModel<any>) {
             if (value !== null) {
                 return <IItSystemUsageRelationIdName>{ Id: value.id, Name: value.text }
             } else {

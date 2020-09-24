@@ -15,7 +15,7 @@
         removeDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number);
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
     }
 
@@ -225,7 +225,7 @@
                 );
         }
 
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number) {
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded"), yesNoIrrelevantId);
         }
 
