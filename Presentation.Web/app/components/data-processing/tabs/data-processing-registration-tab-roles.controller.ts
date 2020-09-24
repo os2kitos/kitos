@@ -12,10 +12,10 @@
         ];
 
         headerName: string;
-        roles: Models.ViewModel.Generic.Select2OptionViewModel[];
+        roles: Models.ViewModel.Generic.Select2OptionViewModel<any>[];
         assignedRoles: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel[];
         selectedRoleIdAsString: string;
-        selectedUser: Models.ViewModel.Generic.Select2OptionViewModel;
+        selectedUser: Models.ViewModel.Generic.Select2OptionViewModel<any>;
         userOptions: any;
         lastSortedBy: string;
         shouldSortReversed: boolean;
@@ -203,7 +203,7 @@
         private mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
             const isExpired = !_.some(this.roles, role => role.id === input.role.id);
             input.role.name = this.formatRoleName(input.role, isExpired);
-            const newUser = <Models.ViewModel.Generic.Select2OptionViewModel>{
+            const newUser = <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.ISimpleUserDTO>>{
                 id: input.user.id,
                 text: input.user.name,
                 optionalObjectContext: input.user
@@ -220,14 +220,14 @@
             return `${input.name} (${expired ? "udgået" : input.hasWriteAccess ? "skriv" : "læs"})`;
         }
 
-        private mapToRoleOptions(input: Models.DataProcessing.IDataProcessingRoleDTO): Models.ViewModel.Generic.Select2OptionViewModel {
+        private mapToRoleOptions(input: Models.DataProcessing.IDataProcessingRoleDTO): Models.ViewModel.Generic.Select2OptionViewModel<Models.ViewModel.Generic.Roles.IRoleViewModel> {
             const formattedRole = <Models.ViewModel.Generic.Roles.IRoleViewModel>{
                 id: input.id,
                 name: this.formatRoleName(input, false),
                 note: input.note,
                 hasWriteAccess: input.hasWriteAccess,
             };
-            return <Models.ViewModel.Generic.Select2OptionViewModel>{
+            return <Models.ViewModel.Generic.Select2OptionViewModel<Models.ViewModel.Generic.Roles.IRoleViewModel>>{
                 id: input.id,
                 text: this.formatRoleName(input, false),
                 optionalObjectContext: formattedRole
@@ -260,7 +260,7 @@
                 : -sortValue;
         }
 
-        private formatResult(select2OptionViewModel: Models.ViewModel.Generic.Select2OptionViewModel) {
+        private formatResult(select2OptionViewModel: Models.ViewModel.Generic.Select2OptionViewModel<any>) {
             var result = `<div>${select2OptionViewModel.text}</div>`;
             if (select2OptionViewModel.optionalObjectContext) {
                 result += `<div class='small'>${select2OptionViewModel.optionalObjectContext.email}</div>`;
@@ -271,7 +271,7 @@
         private createEditableAssignedRole(
             user: Models.ViewModel.Generic.Roles.IUserViewModel,
             role: Models.ViewModel.Generic.Roles.IRoleViewModel,
-            newUser: Models.ViewModel.Generic.Select2OptionViewModel,
+            newUser: Models.ViewModel.Generic.Select2OptionViewModel<any>,
             newRoleIdAsString: string): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
             var newAssignedRole = <Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel>{
                 user: user,
@@ -298,8 +298,8 @@
                 .then(
                     results =>
                     results
-                    .map(result =>
-                        <Models.ViewModel.Generic.Select2OptionViewModel>
+                        .map(result =>
+                            <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.ISimpleUserDTO>>
                         {
                             id: result.id,
                             text: result.name,

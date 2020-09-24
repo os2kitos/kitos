@@ -130,6 +130,16 @@ class DataProcessingRegistrationHelper {
         return this.pageObject.getNewDpaNameInput().sendKeys(name);
     }
 
+    public static changeIsAgreementConcluded(changeToValue: string) {
+        console.log("Changing IsAgreementConcluded to: " + changeToValue);
+        return Select2Helper.selectWithNoSearch(changeToValue, "s2id_agreementConcluded");
+    }
+
+    public static changeAgreementConcludedAt(changeToDate: string) {
+        console.log("Changing AgreementConcludedAt to date: " + changeToDate);
+        return this.editMainPo.getAgreementConcludedAtDateField().sendKeys(changeToDate);
+    }
+
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());

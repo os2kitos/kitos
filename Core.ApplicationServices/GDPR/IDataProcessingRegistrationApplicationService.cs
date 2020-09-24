@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
@@ -33,5 +34,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state);
         Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId);
         Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId);
+        Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
+        Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
     }
 }

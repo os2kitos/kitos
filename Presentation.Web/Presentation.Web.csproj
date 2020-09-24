@@ -433,6 +433,7 @@
     <Compile Include="Models\References\ReferenceDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\ShallowOrganizationDTO.cs" />
+    <Compile Include="Models\Shared\ValueOptionWithDateDTO.cs" />
     <Compile Include="Models\SingleValueDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
@@ -479,14 +480,18 @@
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
+    <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
+    <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\DateSelectionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\RolesViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\Select2OptionViewModel.ts" />
@@ -502,6 +507,7 @@
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\MultipleSelectionViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\SingleSelectionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\UrlViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-misc-brokenlinks-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\global-admin\global-admin-organization-view-model.ts" />
@@ -800,6 +806,7 @@
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingRegistrationHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\GetDateHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoLoaderHelper.ts" />

@@ -408,7 +408,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var processors = await DataProcessingRegistrationHelper.GetAvailableDataProcessors(registration.Id, orgPrefix);
 
             //Assert
-            Assert.True(processors.Any(x => x.Id == organization.Id));
+            Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
         [Fact]
@@ -510,6 +510,50 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.SubDataProcessors);
+		}
+		
+		[Fact]
+        public async Task Can_Change_IsAgreementConcluded()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registrationDto.Id, yesNoIrrelevantOption);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_AgreementConcludedAt()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dateTime = A<DateTime>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registrationDto.Id, dateTime);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_AgreementConcludedAt_To_Null()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registrationDto.Id, null);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
     }
 }

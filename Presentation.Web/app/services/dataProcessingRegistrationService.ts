@@ -19,6 +19,8 @@
         updateSubDataProcessorsState(dataProcessingRegistrationId: number, state: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -241,6 +243,16 @@
                     result => { },
                     error => this.handleServerError(error)
                 );
+        }
+
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded"), yesNoIrrelevantId);
+        }
+
+
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string) {
+            var date = moment(dateTime, "YYYY-MM-DD");
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
         }
 
         static $inject = ["$http"];

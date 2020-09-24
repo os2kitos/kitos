@@ -38,5 +38,9 @@ namespace Core.DomainModel.GDPR.Read
         public virtual DataProcessingRegistration SourceEntity { get; set; }
 
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
+
+        public string IsAgreementConcluded { get; set; }
+
+        public DateTime? AgreementConcludedAt { get; set; }
     }
 }

@@ -22,13 +22,16 @@
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
+            this.bindIsAgreementConcluded();
+            this.bindAgreementConcludedAt();
         }
+
+        yesNoIrrelevantMapper = Models.Api.Shared.YesNoIrrelevantOptionMapper;
 
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
         subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
-
 
         private bindHasSubDataProcessors() {
             this.hasSubDataProcessors = this.dataProcessingRegistration.hasSubDataProcessors as number;
@@ -89,6 +92,14 @@
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
                     .then(results => this.mapDataProcessingSearchResults(results))
             );
+		}
+		
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
+
+        agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
+
+        shouldShowAgreementConcludedAt(): boolean{
+            return this.isAgreementConcluded.selectedElement == Models.Api.Shared.YesNoIrrelevantOption.YES;
         }
 
         changeName(name) {
@@ -100,9 +111,9 @@
                 });
         }
 
-        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
+        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
+                const newDp = newElement.optionalObjectContext;
                 this.apiUseCaseFactory
                     .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistrationId, newDp.id))
                     .executeAsync(success => {
@@ -115,7 +126,7 @@
                     });
             }
         }
-
+        
         private removeDataProcessor(id: number) {
             this.apiUseCaseFactory
                 .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistrationId, id))
@@ -129,6 +140,7 @@
                     return success;
                 });
         }
+
         private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
             if (!!newElement && !!newElement.optionalObjectContext) {
                 const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
@@ -155,6 +167,17 @@
 
                     //Propagate changes to UI binding
                     this.bindSubDataProcessors();
+		            return success;
+                });
+        }
+
+        private changeIsAgreementConcluded(isAgreementConcluded: string) {
+            var yesNoIrrelevant = this.yesNoIrrelevantMapper.mapFromIdAsString(isAgreementConcluded);
+            this.apiUseCaseFactory
+                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, yesNoIrrelevant))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.value = yesNoIrrelevant;
+                    this.bindIsAgreementConcluded();
                     return success;
                 });
         }
@@ -173,10 +196,33 @@
                 .executeAsync(success => {
                     this.dataProcessingRegistration.hasSubDataProcessors = valueAsEnum;
                     this.bindHasSubDataProcessors();
+					                    return success;
+                });
+        }
+
+        private changeAgreementConcludedAt(agreementConcludedAt: string) {
+            this.apiUseCaseFactory
+                .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
+                    this.bindAgreementConcludedAt();
                     return success;
                 });
         }
 
+        private bindIsAgreementConcluded() {
+            this.isAgreementConcluded = {
+                selectedElement: this.dataProcessingRegistration.agreementConcluded.value,
+                select2Options: new Models.ViewModel.Shared.YesNoIrrelevantOptions().options,
+                elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
+            };
+        }
+
+        private bindAgreementConcludedAt() {
+            this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
+                (newDate) => this.changeAgreementConcludedAt(newDate));
+        }
 
     }
 

@@ -13,6 +13,7 @@
         dataProcessors: IDataProcessorDTO[];
         hasSubDataProcessors?: Models.Api.Shared.YesNoUndecidedOption;
         subDataProcessors: IDataProcessorDTO[];
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

@@ -40,5 +40,13 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.xpath(`//*/td[text()="${dpName}"]/..//button`));
     }
 
+    getIsAgreementConcludedField() {
+        return element(by.id("agreementConcluded"));
+    }
+
+    getAgreementConcludedAtDateField() {
+        return element(by.id("agreementConcludedAt"));
+    }
+
 }
 export = DataProcessingRegistrationEditMainPageObject;
