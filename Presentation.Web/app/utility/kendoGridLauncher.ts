@@ -17,6 +17,10 @@ module Kitos.Utility.KendoGrid {
         mainGridOptions: IKendoGridOptions<TDataSource>;
     }
 
+    export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
+        schemaMutation: (map: any) => void;
+    }
+
     export interface IKendoGridColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
@@ -29,7 +33,7 @@ module Kitos.Utility.KendoGrid {
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
-        build(): IKendoGridColumn<TDataSource>;
+        build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
@@ -48,7 +52,7 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        withoutSorting() : IKendoGridColumnBuilder<TDataSource> {
+        withoutSorting(): IKendoGridColumnBuilder<TDataSource> {
             this.sortingEnabled = false;
             return this;
         }
@@ -117,6 +121,18 @@ module Kitos.Utility.KendoGrid {
             }
         }
 
+        private getSchemaMutation(): (map: any) => void {
+            if (this.filtering != null) {
+                switch (this.filtering) {
+                    case KendoGridColumnFiltering.Date:
+                        return map => map[this.dataSourceName] = { type: "date" };
+                    default:
+                        break;
+                }
+            }
+            return _ => { }; //NOP
+        }
+
         private getFiltering(): boolean | kendo.ui.GridColumnFilterable {
             if (this.filtering != null) {
                 switch (this.filtering) {
@@ -149,7 +165,7 @@ module Kitos.Utility.KendoGrid {
             return false;
         }
 
-        build(): IKendoGridColumn<TDataSource> {
+        build(): IExtendedKendoGridColumn<TDataSource> {
             this.checkRequiredField("dataSourceName", this.dataSourceName);
             this.checkRequiredField("title", this.title);
             this.checkRequiredField("id", this.id);
@@ -167,8 +183,9 @@ module Kitos.Utility.KendoGrid {
                 template: dataItem => this.rendering(dataItem),
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: this.getFiltering(),
-                sortable : this.sortingEnabled
-            } as IKendoGridColumn<TDataSource>;
+                sortable: this.sortingEnabled,
+                schemaMutation: this.getSchemaMutation()
+            } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
 
@@ -211,7 +228,6 @@ module Kitos.Utility.KendoGrid {
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
-        withSchemaFields(schemaFields: any): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -228,7 +244,6 @@ module Kitos.Utility.KendoGrid {
         private columns: ColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
-        private schemaFields: any;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -241,12 +256,6 @@ module Kitos.Utility.KendoGrid {
             private readonly $window: ng.IWindowService
         ) {
 
-        }
-
-        withSchemaFields(schemaFields: any) {
-            if (!schemaFields) throw "schemaFields must be defined";
-            this.schemaFields = schemaFields;
-            return this;
         }
 
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource> {
@@ -398,7 +407,6 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-            this.checkRequiredField("schema", this.schemaFields);
 
             //Build toolbar buttons
             var getColorClass = (color: KendoToolbarButtonColor): string => {
@@ -475,11 +483,14 @@ module Kitos.Utility.KendoGrid {
 
             //Build the columns
             var columns = [];
+            var schemaFields = {};
             this._.forEach(this.columns,
                 build => {
                     const builder = new KendoGridColumnBuilder<TDataSource>();
                     build(builder);
-                    columns.push(builder.build());
+                    const gridColumn = builder.build();
+                    gridColumn.schemaMutation(schemaFields);
+                    columns.push(gridColumn);
                 });
 
             //Build the grid
@@ -504,7 +515,7 @@ module Kitos.Utility.KendoGrid {
                     serverFiltering: true,
                     schema: {
                         model: {
-                            fields: this.schemaFields,
+                            fields: schemaFields,
                         },
                         parse: response => {
                             response.value = this.responseParser(response.value);
