@@ -30,13 +30,9 @@
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
-                        <input type="text" id="agreementConcludedAt" class="form-control"
-                               data-kendo-date-picker
-                               data-k-options="vm.agreementConcludedAt.dateFormat"
-                               ng-disabled="!vm.hasWriteAccess"
-                               ng-model="vm.agreementConcludedAt.selectedDate"
-                               ng-blur="vm.agreementConcludedAt.dateSelected(vm.agreementConcludedAt.selectedDate)" />
-                        <span id="helpBlock" class="help-block small">Eksempelvis "25-04-2017"</span>
+                        <date-picker id="agreementConcludedAt" 
+                                     ng-model="vm.agreementConcludedAt" 
+                                     ng-disabled="!vm.hasWriteAccess"/>
                     </div>
                 </div>
             </div>

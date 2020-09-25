@@ -358,6 +358,7 @@
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
+    <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
@@ -469,6 +470,7 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
+    <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
     <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
     <TypeScriptCompile Include="app\helpers\SystemNameFormatter.ts" />
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
@@ -529,6 +531,7 @@
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
+    <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
