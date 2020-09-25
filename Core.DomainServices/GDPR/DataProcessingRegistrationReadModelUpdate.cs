@@ -33,6 +33,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
+            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.SubDataProcessors.Select(x => x.Name));
         }
 
         private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

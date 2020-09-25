@@ -479,6 +479,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
@@ -489,6 +490,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DateSelectionViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DescriptionViewModel.ts" />
@@ -790,6 +792,8 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
+    <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
+    <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />

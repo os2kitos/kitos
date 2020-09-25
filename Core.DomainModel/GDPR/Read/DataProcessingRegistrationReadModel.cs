@@ -32,9 +32,11 @@ namespace Core.DomainModel.GDPR.Read
         public string SystemNamesAsCsv { get; set; }
         
         public string DataProcessorNamesAsCsv { get; set; }
+        
+        public string SubDataProcessorNamesAsCsv { get; set; }
 
         public virtual DataProcessingRegistration SourceEntity { get; set; }
-        
+
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
 
         public string IsAgreementConcluded { get; set; }

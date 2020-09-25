@@ -103,6 +103,30 @@ class DataProcessingRegistrationHelper {
             .then(() => browser.switchTo().alert().accept());
     }
 
+    public static assignSubDataProcessor(name: string) {
+        console.log("Assigning sub data processor with name: " + name);
+        return Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static enableSubDataProcessors() {
+        console.log("Enabling sub data processors");
+        return Select2Helper.selectWithNoSearch("Ja", "s2id_hasSubDataProcessorsSelection");
+    }
+
+    public static  verifyHasSubDataProcessorsToBeEnabled() {
+        console.log(`Expecting 'has sub data processors' to be set 'Ja'`);
+        expect(Select2Helper.getData("s2id_hasSubDataProcessorsSelection").getText()).toEqual("Ja");
+    }
+
+    public static removeSubDataProcessor(name: string) {
+        console.log("Removing sub data processor with name: " + name);
+        return this.editMainPo.getRemoveSubDataProcessorButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
+    }
+
+
     public static assignSystem(name: string) {
         console.log("Assigning system with name: " + name);
         return Select2Helper.searchFor(name, "s2id_select-new-system")

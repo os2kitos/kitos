@@ -1,5 +1,4 @@
 ﻿module Kitos.Models.DataProcessing {
-
     export interface IAssignedRoleDTO {
         user: ISimpleUserDTO,
         role: IDataProcessingRoleDTO,
@@ -12,7 +11,9 @@
         itSystems: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[];
         assignedRoles: IAssignedRoleDTO[];
         dataProcessors: IDataProcessorDTO[];
-        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
+        hasSubDataProcessors?: Models.Api.Shared.YesNoUndecidedOption;
+        subDataProcessors: IDataProcessorDTO[];
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

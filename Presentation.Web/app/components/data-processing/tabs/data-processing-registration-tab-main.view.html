@@ -18,14 +18,9 @@
                 <!-- Agreement concluded -->
                 <div class="form-group">
                     <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
-                    <input type="hidden" 
-                           id="agreementConcluded" 
-                           class="form-control input-sm" 
-                           data-ui-select2="vm.isAgreementConcluded.select2Config" 
-                           ng-model="vm.isAgreementConcluded.selectedElement" 
-                           ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)" 
-                           ng-disabled="!vm.hasWriteAccess" />
+                    <single-select-select2 id="agreementConcluded" ng-model="vm.isAgreementConcluded" ng-disabled="!vm.hasWriteAccess" />
                 </div>
+
                 <div ng-if="vm.shouldShowAgreementConcludedAt">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
@@ -47,7 +42,6 @@
                     <table id="dpTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <!--TODO: New classes for this-->
                                 <th class="data-processors-table_header--padding">
                                     <p class="small">Navn</p>
                                 </th>
@@ -73,17 +67,67 @@
                             </tr>
                         </tbody>
                         <tfoot ng-if="vm.dataProcessors.allowAddition" class="data-processors-table_footer--padding">
-                        <tr>
-                            <td colspan="3" style="padding: 0">
-                                <input type="hidden"
-                                       id="data-processor_select-new"
-                                       class="form-control input-sm"
-                                       data-ui-select2="vm.dataProcessors.select2Config"
-                                       ng-model="vm.dataProcessors.newElementSelection"
-                                       ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
-                                       data-placeholder="Vælg Databehandler" />
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="3" style="padding: 0">
+                                    <input type="hidden"
+                                           id="data-processor_select-new"
+                                           class="form-control input-sm"
+                                           data-ui-select2="vm.dataProcessors.select2Config"
+                                           ng-model="vm.dataProcessors.newElementSelection"
+                                           ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
+                                           data-placeholder="Vælg Databehandler" />
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="form-group">
+                    <!-- Sub Data processors State -->
+                    <label for="hasSubDataProcessorsSelection" class="control-label small">Underdatabehandlere</label>
+                    <single-select-select2 id="hasSubDataProcessorsSelection" ng-model="vm.hasSubDataProcessors" ng-disabled="!vm.hasWriteAccess"/>
+
+                </div>
+                <div class="form-group" ng-if="vm.enableDataProcessorSelection">
+                    <!-- Sub Data processors -->
+                    <table id="subDpTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="data-processors-table_header--padding">
+                                    <p class="small">Navn</p>
+                                </th>
+                                <th class="data-processors-table_header--padding noRightBorder">
+                                    <p class="small">CVR</p>
+                                </th>
+                                <th class="data-processors-table_header--padding noLeftBorder"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dataProcessor in vm.subDataProcessors.selectedElements" data-element-type="data-processing_sub-data-processors">
+                                <td>{{::dataProcessor.name }}</td>
+                                <td class="noRightBorder">{{::dataProcessor.cvrNumber }}</td>
+                                <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="vm.subDataProcessors.removeItemRequested({{::dataProcessor}})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-if="vm.subDataProcessors.allowRemoval">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot ng-if="vm.subDataProcessors.allowAddition" class="data-processors-table_footer--padding">
+                            <tr>
+                                <td colspan="3" style="padding: 0">
+                                    <input type="hidden"
+                                           id="sub-data-processor_select-new"
+                                           class="form-control input-sm"
+                                           data-ui-select2="vm.subDataProcessors.select2Config"
+                                           ng-model="vm.subDataProcessors.newElementSelection"
+                                           ng-change="vm.subDataProcessors.newItemSelected(vm.subDataProcessors.newElementSelection)"
+                                           data-placeholder="Vælg Underdatabehandler" />
+                                </td>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>

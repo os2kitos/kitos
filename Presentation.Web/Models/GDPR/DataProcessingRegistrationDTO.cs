@@ -18,7 +18,11 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
+        public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
+        
+        public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
 
         public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
     }

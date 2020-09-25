@@ -59,6 +59,13 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => verifyDataProcessorContent([dataProcessorName], []))
                 .then(() => dpaHelper.removeDataProcessor(dataProcessorName))
                 .then(() => verifyDataProcessorContent([], [dataProcessorName]))
+                //Changing sub data processors
+                .then(() => dpaHelper.enableSubDataProcessors())
+                .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
+                .then(() => dpaHelper.assignSubDataProcessor(dataProcessorName))
+                .then(() => verifySubDataProcessorContent([dataProcessorName], []))
+                .then(() => dpaHelper.removeSubDataProcessor(dataProcessorName))
+                .then(() => verifySubDataProcessorContent([], [dataProcessorName]))
                 //COMPLETE - Delete the registration and verify
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
@@ -68,18 +75,29 @@ describe("Data processing agreement main detail tests", () => {
 
     function verifyDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
         presentNames.forEach(name => {
-            console.log(`Expecting system to be present:${name}`);
+            console.log(`Expecting data procesor to be present:${name}`);
             expect(pageObject.getDataProcessorRow(name).isPresent()).toBeTruthy();
         });
         unpresentNames.forEach(name => {
-            console.log(`Expecting system NOT to be present:${name}`);
+            console.log(`Expecting data processor NOT to be present:${name}`);
             expect(pageObject.getDataProcessorRow(name).isPresent()).toBeFalsy();
+        });
+    }
+
+    function verifySubDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
+        presentNames.forEach(name => {
+            console.log(`Expecting sub data processor to be present:${name}`);
+            expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeTruthy();
+        });
+        unpresentNames.forEach(name => {
+            console.log(`Expecting sub data processor NOT to be present:${name}`);
+            expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeFalsy();
         });
     }
 
     function renameNameAndVerify(name: string) {
         console.log(`Renaming registration to ${name}`);
-        pageObject.getDpaMainNameInput().click()
+        return pageObject.getDpaMainNameInput().click()
             .then(() => pageObject.getDpaMainNameInput().clear())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(name))
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))

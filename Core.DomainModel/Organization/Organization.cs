@@ -11,7 +11,7 @@ using Core.DomainModel.SSO;
 
 namespace Core.DomainModel.Organization
 {
-   
+
 
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).
@@ -98,10 +98,12 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<DataProcessingRegistrationReadModel> DataProcessingRegistrationReadModels { get; set; }
 
         public virtual int? ContactPersonId { get; set; }
-        
+
         public virtual ContactPerson ContactPerson { get; set; }
-        
+
         public virtual ICollection<DataProcessingRegistration> DataProcessorForDataProcessingRegistrations { get; set; }
+
+        public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently
@@ -112,6 +114,6 @@ namespace Core.DomainModel.Organization
             return OrgUnits.FirstOrDefault(u => u.Parent == null);
         }
 
-        public IEnumerable<int> GetOrganizationIds() => new []{Id};
+        public IEnumerable<int> GetOrganizationIds() => new[] { Id };
     }
 }
