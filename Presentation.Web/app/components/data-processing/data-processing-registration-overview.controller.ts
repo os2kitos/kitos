@@ -146,7 +146,16 @@
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
                             .withStandardWidth(100)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.YES),
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.NO),
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT)
+                                ]
+                                , false
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded)))
                     .withColumn(builder =>
@@ -154,8 +163,8 @@
                             .withDataSourceName("AgreementConcludedAt")
                             .withTitle("Dato for indgåelse af databehandleraftale")
                             .withId("agreementConcludedAt")
-                            .withStandardWidth(100)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt))
                             .withInitialVisibility(false))
