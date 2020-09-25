@@ -9,7 +9,8 @@ module Kitos.Utility.KendoGrid {
 
     export enum KendoGridColumnFiltering {
         Contains,
-        Date
+        Date,
+        FixedValueRange
     }
 
     export interface IGridViewAccess<TDataSource> {
@@ -27,6 +28,7 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -41,11 +43,20 @@ module Kitos.Utility.KendoGrid {
         private dataSourceName: string = null;
         private title: string = null;
         private filtering: KendoGridColumnFiltering = null;
+        private valueRange: string[] = null;
+        private valueRangeMultiSelect: boolean = false;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
         private visible = true;
+
+        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
+            if (possibleValues == null) throw "possibleValues must be defined";
+            this.valueRange = possibleValues;
+            this.valueRangeMultiSelect = multiSelect;
+            return this;
+        }
 
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource> {
             this.visible = visible;
@@ -156,6 +167,28 @@ module Kitos.Utility.KendoGrid {
                                     gte: "Fra og med",
                                     lte: "Til og med"
                                 }
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.FixedValueRange:
+                        if (this.valueRange === null) {
+                            throw new Error(
+                                "this.valueRange must be defined when using filtering option FixedValueRange");
+                        }
+                        const valueRange = this.valueRange; //capture the reference to use in lambda below
+                        return {
+                            cell: {
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: valueRange.map(value => {
+                                            return { textValue: value, text: value };
+                                        } ),
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false,
+                                operator: this.valueRangeMultiSelect ? "contains" : "eq"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
                     default:
