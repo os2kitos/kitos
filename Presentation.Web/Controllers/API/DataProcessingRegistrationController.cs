@@ -413,9 +413,10 @@ namespace Presentation.Web.Controllers.API
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
-                AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>(){  
+                AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>
+                {
                     Value = value.IsAgreementConcluded,
-                    OptionalDateValue = value.AgreementConcludedAt,
+                    OptionalDateValue = value.AgreementConcludedAt
                 }
             };
         }
