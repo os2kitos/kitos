@@ -6,8 +6,8 @@
         loadSelect2(url: string, allowClear: boolean, paramArray: any, removeDisabledItems: boolean, nameContentQueryParamName?: string);
         loadSelect2WithDataSource(source: Select2AsyncDataSource, allowClear: boolean, formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string);
         loadSelect2WithDataHandler(url: string, allowClear: boolean, paramArray: any, resultBuilder: (candidate: any, allResults: any[]) => void, nameContentQueryParamName?: string, formatResult?: (input: any) => string);
-        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel<any>]);
-        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel<any>], allowClear?: boolean);
+        select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]);
+        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
@@ -18,14 +18,14 @@
         constructor(private readonly $http: ng.IHttpService) {
         }
 
-        select2LocalData(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel<any>]) {
+        select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]) {
             return {
                 data: () => ({ "results": dataFn() }),
                 allowClear: true
             };
         }
 
-        select2LocalDataNoSearch(dataFn: () => [Models.ViewModel.Generic.Select2OptionViewModel<any>], allowClear = true) {
+        select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear = true) {
             return {
                 minimumResultsForSearch: Infinity,
                 data: () => ({ "results": dataFn() }),
