@@ -235,14 +235,15 @@ namespace Core.ApplicationServices.GDPR
             return WithWriteAccess(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption? yearMonthIntervalOption)
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalChange = new ChangedValue<YearMonthIntervalOption?>(yearMonthIntervalOption) });
+            throw new NotImplementedException();
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalNoteChange = new ChangedValue<string>(note) });
+            //return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalNoteChange = new ChangedValue<string>(note) });
+            return null;
         }
 
 
@@ -257,22 +258,6 @@ namespace Core.ApplicationServices.GDPR
 
                 if (updateNameError.HasValue)
                     return updateNameError.Value;
-
-                var updateOversightIntervalOptionError =
-                    UpdateOversightInterval(registration, changeSet.OversightIntervalChange);
-
-                if (updateOversightIntervalOptionError.HasValue)
-                {
-                    return updateOversightIntervalOptionError.Value;
-                }
-
-                var updateOversightIntervalNoteError =
-                    UpdateOversightIntervalNote(registration, changeSet.OversightIntervalNoteChange);
-
-                if (updateOversightIntervalNoteError.HasValue)
-                {
-                    return updateOversightIntervalNoteError.Value;
-                }
 
                 return registration;
             });
@@ -357,5 +342,7 @@ namespace Core.ApplicationServices.GDPR
 
             return authorizedAction(registration);
         }
+
+
     }
 }

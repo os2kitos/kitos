@@ -994,27 +994,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Can_Update_OversightInterval_To_Null()
-        {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, true);
-            var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
-
-            //Act
-            var result = _sut.UpdateOversightInterval(id, null);
-
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Null(result.Value.OversightInterval);
-            transaction.Verify(x => x.Commit());
-            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
-        }
-
-        [Fact]
         public void Update_OversightInterval_Returns_Forbidden()
         {
             //Arrange
