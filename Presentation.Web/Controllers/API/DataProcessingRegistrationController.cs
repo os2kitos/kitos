@@ -414,8 +414,11 @@ namespace Presentation.Web.Controllers.API
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
-                OversightInterval = value.OversightInterval,
-                OversightIntervalNote = value.OversightIntervalNote,
+                OversightInterval = new ValueOptionWithOptionalNoteDTO<YearMonthIntervalOption?>()
+                {
+                    Value = value.OversightInterval,
+                    Note = value.OversightIntervalNote
+                },
                 DataProcessors = value
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())
