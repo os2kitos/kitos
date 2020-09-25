@@ -398,7 +398,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightInterval = A<YearMonthIntervalOption>();
 
             //Act
@@ -406,6 +406,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
+            Assert.Equal(dto.OversightInterval.Value.Value, oversightInterval);
         }
 
         [Fact]
@@ -413,15 +415,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightNote = A<string>();
 
             //Act
-            using var response =
-                await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id, oversightNote);
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id, oversightNote);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
+            Assert.Equal(dto.OversightInterval.Note, oversightNote);
         }
 
         [Fact]
