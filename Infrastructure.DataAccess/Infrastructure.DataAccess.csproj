@@ -624,10 +624,6 @@
     <Compile Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.designer.cs">
       <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009231335434_Added_Agreement_Oversight_Interval_Option_And_Note.cs" />
-    <Compile Include="Migrations\202009231335434_Added_Agreement_Oversight_Interval_Option_And_Note.designer.cs">
-      <DependentUpon>202009231335434_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs" />
     <Compile Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.designer.cs">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
@@ -1025,9 +1021,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009221144455_Update_Dpr_Readmodel_with_dataprocessors.resx">
       <DependentUpon>202009221144455_Update_Dpr_Readmodel_with_dataprocessors.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009231335434_Added_Agreement_Oversight_Interval_Option_And_Note.resx">
-      <DependentUpon>202009231335434_Added_Agreement_Oversight_Interval_Option_And_Note.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.resx">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
