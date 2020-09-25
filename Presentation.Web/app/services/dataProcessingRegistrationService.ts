@@ -231,8 +231,8 @@
 
 
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string) {
-            var date = moment(dateTime, "YYYY-MM-DD");
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
+            var formattedDate = moment(dateTime, "DD-MM-YYYY").format("YYYY-MM-DD");
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), formattedDate);
         }
 
         static $inject = ["$http"];
