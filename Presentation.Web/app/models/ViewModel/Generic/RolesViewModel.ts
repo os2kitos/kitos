@@ -16,7 +16,7 @@
     export interface IEditableAssignedRoleViewModel {
         user: IUserViewModel,
         role: IRoleViewModel,
-        newUser: Select2OptionViewModel,
+        newUser: Select2OptionViewModel<any>,
         newRoleIdAsString: string,
         isEditing?: boolean,
         editUserOptions: (input: number) => any,

@@ -7,6 +7,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Organization;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -55,6 +59,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+            var isAgreementConcluded = A<YesNoIrrelevantOption>();
+            var agreementConcludedAt = A<DateTime>();
             var oversightInterval = A<YearMonthIntervalOption>();
             var oversightNote = A<string>();
 
@@ -75,8 +81,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var sendAssignDataProcessorRequestAsync = await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(registration.Id, dataProcessor.Id);
             Assert.Equal(HttpStatusCode.OK, sendAssignDataProcessorRequestAsync.StatusCode);
 
-            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
 
+            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
             using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, itSystemDto.Id);
@@ -99,6 +106,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -109,7 +117,43 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
+
             Console.Out.WriteLine("Role data verified");
+        }
+
+        [Fact]
+        public async Task ReadModels_Contain_Correct_Dependent_Content()
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var isAgreementConcluded = YesNoIrrelevantOption.YES;
+            var agreementConcludedAt = A<DateTime>();
+
+            Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
+
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
+            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registration.Id, agreementConcludedAt);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(result);
+            Console.Out.WriteLine("Read model found");
+            Assert.Equal(name, readModel.Name);
+            Assert.Equal(registration.Id, readModel.SourceEntityId);
+
+            Console.Out.WriteLine("Asserting Dependent and dependee properties");
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
+            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
+
         }
 
         private static async Task WaitForReadModelQueueDepletion()

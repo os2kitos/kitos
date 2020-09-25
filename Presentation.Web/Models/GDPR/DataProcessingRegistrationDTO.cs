@@ -1,6 +1,8 @@
-﻿using Core.DomainModel.Shared;
+﻿using System;
+using Core.DomainModel.Shared;
 using Presentation.Web.Models.References;
 using Presentation.Web.Models;
+using Presentation.Web.Models.Shared;
 
 namespace Presentation.Web.Models.GDPR
 {
@@ -20,5 +22,7 @@ namespace Presentation.Web.Models.GDPR
         public ValueOptionWithOptionalNoteDTO<YearMonthIntervalOption?> OversightInterval { get; set; }
 
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
+
+        public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
     }
 }

@@ -8,12 +8,18 @@ module Kitos.Utility.KendoGrid {
     "use strict";
 
     export enum KendoGridColumnFiltering {
-        Contains
+        Contains,
+        Date,
+        FixedValueRange
     }
 
     export interface IGridViewAccess<TDataSource> {
         mainGrid: IKendoGrid<TDataSource>;
         mainGridOptions: IKendoGridOptions<TDataSource>;
+    }
+
+    export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
+        schemaMutation: (map: any) => void;
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -22,13 +28,14 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
-        build(): IKendoGridColumn<TDataSource>;
+        build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
@@ -36,18 +43,27 @@ module Kitos.Utility.KendoGrid {
         private dataSourceName: string = null;
         private title: string = null;
         private filtering: KendoGridColumnFiltering = null;
+        private valueRange: string[] = null;
+        private valueRangeMultiSelect: boolean = false;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
         private visible = true;
 
+        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
+            if (possibleValues == null) throw "possibleValues must be defined";
+            this.valueRange = possibleValues;
+            this.valueRangeMultiSelect = multiSelect;
+            return this;
+        }
+
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource> {
             this.visible = visible;
             return this;
         }
 
-        withoutSorting() : IKendoGridColumnBuilder<TDataSource> {
+        withoutSorting(): IKendoGridColumnBuilder<TDataSource> {
             this.sortingEnabled = false;
             return this;
         }
@@ -116,6 +132,18 @@ module Kitos.Utility.KendoGrid {
             }
         }
 
+        private getSchemaMutation(): (map: any) => void {
+            if (this.filtering != null) {
+                switch (this.filtering) {
+                    case KendoGridColumnFiltering.Date:
+                        return map => map[this.dataSourceName] = { type: "date" };
+                    default:
+                        break;
+                }
+            }
+            return _ => { }; //NOP
+        }
+
         private getFiltering(): boolean | kendo.ui.GridColumnFilterable {
             if (this.filtering != null) {
                 switch (this.filtering) {
@@ -131,6 +159,38 @@ module Kitos.Utility.KendoGrid {
                                 operator: "contains"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.Date:
+                        return {
+                            operators: {
+                                date: {
+                                    eq: "Lig med",
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
+                                }
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.FixedValueRange:
+                        if (this.valueRange === null) {
+                            throw new Error(
+                                "this.valueRange must be defined when using filtering option FixedValueRange");
+                        }
+                        const valueRange = this.valueRange; //capture the reference to use in lambda below
+                        return {
+                            cell: {
+                                template: (args) => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: valueRange.map(value => {
+                                            return { textValue: value, text: value };
+                                        } ),
+                                        dataTextField: "text",
+                                        dataValueField: "textValue",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false,
+                                operator: this.valueRangeMultiSelect ? "contains" : "eq"
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
                     default:
                         throw `Unknown filtering strategy ${this.filtering}`;
                 }
@@ -138,7 +198,7 @@ module Kitos.Utility.KendoGrid {
             return false;
         }
 
-        build(): IKendoGridColumn<TDataSource> {
+        build(): IExtendedKendoGridColumn<TDataSource> {
             this.checkRequiredField("dataSourceName", this.dataSourceName);
             this.checkRequiredField("title", this.title);
             this.checkRequiredField("id", this.id);
@@ -156,8 +216,9 @@ module Kitos.Utility.KendoGrid {
                 template: dataItem => this.rendering(dataItem),
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: this.getFiltering(),
-                sortable : this.sortingEnabled
-            } as IKendoGridColumn<TDataSource>;
+                sortable: this.sortingEnabled,
+                schemaMutation: this.getSchemaMutation()
+            } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
 
@@ -215,7 +276,7 @@ module Kitos.Utility.KendoGrid {
         private customToolbarEntries: IKendoToolbarEntry[] = [];
         private columns: ColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
-        private parameterMapper: ParameterMapper = (data,type) => null;
+        private parameterMapper: ParameterMapper = (data, type) => null;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -455,11 +516,14 @@ module Kitos.Utility.KendoGrid {
 
             //Build the columns
             var columns = [];
+            var schemaFields = {};
             this._.forEach(this.columns,
                 build => {
                     const builder = new KendoGridColumnBuilder<TDataSource>();
                     build(builder);
-                    columns.push(builder.build());
+                    const gridColumn = builder.build();
+                    gridColumn.schemaMutation(schemaFields);
+                    columns.push(gridColumn);
                 });
 
             //Build the grid
@@ -472,7 +536,7 @@ module Kitos.Utility.KendoGrid {
                             url: options => this.urlFactory(options),
                             dataType: "json"
                         },
-                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data,type)
+                        parameterMap: (data: kendo.data.DataSourceTransportParameterMapData, type: string) => this.parameterMapper(data, type)
                     },
                     sort: {
                         field: this.standardSortingSourceField,
@@ -484,13 +548,7 @@ module Kitos.Utility.KendoGrid {
                     serverFiltering: true,
                     schema: {
                         model: {
-                            fields: {
-                                StatusDate: { type: "date" },
-                                LastChanged: { type: "date" },
-                                IsTransversal: { type: "boolean" },
-                                IsStrategy: { type: "boolean" },
-                                IsArchived: { type: "boolean" }
-                            },
+                            fields: schemaFields,
                         },
                         parse: response => {
                             response.value = this.responseParser(response.value);

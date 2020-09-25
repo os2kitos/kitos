@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}"
 EndProject
@@ -36,7 +36,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.eslintrc = .eslintrc
 		.gitignore = .gitignore
 		bundle.config.js = bundle.config.js
-		DOCUMENTATION.md = DOCUMENTATION.md
 		gulpfile.js = gulpfile.js
 		InstallSelfSignedCert.ps1 = InstallSelfSignedCert.ps1
 		package.json = package.json
@@ -44,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		protractor.conf.js = protractor.conf.js
 		protractor.headless.conf.js = protractor.headless.conf.js
 		README.md = README.md
-		testReport.mrt = testReport.mrt
+		tsconfig.json = tsconfig.json
 		tslint.json = tslint.json
 	EndProjectSection
 EndProject
