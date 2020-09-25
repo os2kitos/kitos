@@ -242,8 +242,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
         {
-            //return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { OversightIntervalNoteChange = new ChangedValue<string>(note) });
-            return null;
+            throw new NotImplementedException();
         }
 
 
@@ -299,7 +298,7 @@ namespace Core.ApplicationServices.GDPR
         }
 
         private Maybe<OperationError> UpdateOversightInterval(DataProcessingRegistration dataProcessingRegistration,
-            Maybe<ChangedValue<YearMonthIntervalOption?>> yearMonthIntervalOption)
+            Maybe<ChangedValue<YearMonthIntervalOption>> yearMonthIntervalOption)
         {
 
             if (yearMonthIntervalOption.IsNone)
