@@ -32,12 +32,28 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(this.cssHelper.byDataElementType("removeDataProcessingRegistrationButton"));
     }
 
+    private getDpRowExpression(dpName: string) {
+        return `//*/table[@id="dpTable"]//*/td[text()="${dpName}"]/..`;
+    }
+
     getDataProcessorRow(dpName: string) {
-        return element(by.xpath(`//*/td[text()="${dpName}"]/..`));
+        return element(by.xpath(this.getDpRowExpression(dpName)));
     }
 
     getRemoveDataProcessorButton(dpName: string) {
-        return element(by.xpath(`//*/td[text()="${dpName}"]/..//button`));
+        return element(by.xpath(`${this.getDpRowExpression(dpName)}//button`));
+    }
+
+    private getSubDpRowExpression(dpName: string) {
+        return `//*/table[@id="subDpTable"]//*/td[text()="${dpName}"]/..`;
+    }
+
+    getSubDataProcessorRow(dpName: string) {
+        return element(by.xpath(this.getSubDpRowExpression(dpName)));
+    }
+
+    getRemoveSubDataProcessorButton(dpName: string) {
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//button`));
     }
 
     getIsAgreementConcludedField() {
