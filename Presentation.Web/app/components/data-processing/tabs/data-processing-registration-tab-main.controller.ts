@@ -26,15 +26,13 @@
             this.bindAgreementConcludedAt();
         }
 
-        yesNoIrrelevantMapper = Models.Api.Shared.YesNoIrrelevantOptionMapper;
-
         headerName = this.dataProcessingRegistration.name;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
         subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>;        
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
@@ -178,12 +176,11 @@
                 });
         }
 
-        private changeIsAgreementConcluded(isAgreementConcluded: string) {
-            var yesNoIrrelevant = this.yesNoIrrelevantMapper.mapFromIdAsString(isAgreementConcluded);
+        private changeIsAgreementConcluded(isAgreementConcluded: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>) {
             this.apiUseCaseFactory
-                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, yesNoIrrelevant))
+                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded.optionalObjectContext))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.agreementConcluded.value = yesNoIrrelevant;
+                    this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded.optionalObjectContext;
                     this.bindIsAgreementConcluded();
                     return success;
                 });
@@ -213,11 +210,21 @@
 
         private bindIsAgreementConcluded() {
             this.isAgreementConcluded = {
-                selectedElement: this.dataProcessingRegistration.agreementConcluded.value,
-                select2Options: new Models.ViewModel.Shared.YesNoIrrelevantOptions().options,
+                selectedElement: this.getYesNoIrrelevantOptionFromId(this.dataProcessingRegistration.agreementConcluded.value),
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoIrrelevantOptions().options, false),
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
-            this.shouldShowAgreementConcludedAt = this.dataProcessingRegistration.agreementConcluded.value === Models.Api.Shared.YesNoIrrelevantOption.YES;
+
+            this.shouldShowAgreementConcludedAt =
+                this.isAgreementConcluded.selectedElement &&
+                this.isAgreementConcluded.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoIrrelevantOption.YES;
+        }
+
+        private getYesNoIrrelevantOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
+            if (id === null) {
+                return null;
+            }
+            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().options.filter(option => option.id === id)[0];
         }
 
         private bindAgreementConcludedAt() {
