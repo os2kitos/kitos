@@ -345,13 +345,11 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightOption(int id,
-            [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
+        public HttpResponseMessage PatchOversightOption(int id, [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
         {
             if (oversightInterval == null)
-            {
                 return BadRequest("YearMonthIntervalOption must provided");
-            }
+            
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightInterval(id, oversightInterval.Value)
@@ -364,13 +362,10 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightOptionNote(int id,
-            [FromBody] SingleValueDTO<string> oversightIntervalNote)
+        public HttpResponseMessage PatchOversightOptionNote(int id, [FromBody] SingleValueDTO<string> oversightIntervalNote)
         {
             if (oversightIntervalNote == null)
-            {
                 return BadRequest("Note must be provided");
-            }
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightIntervalNote(id, oversightIntervalNote.Value)
