@@ -29,9 +29,8 @@
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
-        shouldShowAgreementConcludedAt(): boolean{
-            return this.isAgreementConcluded.selectedElement.optionalObjectContext == Models.Api.Shared.YesNoIrrelevantOption.YES;
-        }
+        shouldShowAgreementConcludedAt: boolean;
+      
 
         changeName(name) {
             this.apiUseCaseFactory
@@ -98,10 +97,16 @@
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoIrrelevantOptions().options, false),
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
+            this.shouldShowAgreementConcludedAt =
+                this.isAgreementConcluded.selectedElement &&
+                this.isAgreementConcluded.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoIrrelevantOption.YES;
         }
 
-        private getYesNoIrrelevantOptionFromId(id: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
-            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().options.filter(option => option.id == id)[0];
+        private getYesNoIrrelevantOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
+            if (id === null) {
+                return null;
+            }
+            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().options.filter(option => option.id === id)[0];
         }
 
         private bindAgreementConcludedAt() {
