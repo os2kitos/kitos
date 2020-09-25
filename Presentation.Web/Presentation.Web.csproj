@@ -439,6 +439,7 @@
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
     <Compile Include="Models\UserWithEmailDTO.cs" />
+    <Compile Include="Models\ValueOptionWithOptionalNoteDTO.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />
@@ -483,7 +484,6 @@
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />
-    <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalNote.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />

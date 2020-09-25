@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Core.DomainModel.Shared;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.GDPR
@@ -253,21 +252,6 @@ namespace Core.ApplicationServices.GDPR
                 return registration;
             });
         }
-        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
-        {
-            if (changeSet == null)
-                throw new ArgumentNullException(nameof(changeSet));
 
         public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate)
         {
@@ -278,6 +262,16 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
+        {
+            throw new NotImplementedException();
+        }
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
@@ -303,46 +297,6 @@ namespace Core.ApplicationServices.GDPR
             return mutationResult;
         }
 
-        private Maybe<OperationError> UpdateName(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<string>> nameChange)
-        {
-            if (nameChange.IsNone)
-                return Maybe<OperationError>.None;
-
-            var newName = nameChange.Value.Value;
-
-            return _namingService.ChangeName(dataProcessingRegistration, newName);
-        }
-
-        private Maybe<OperationError> UpdateOversightInterval(DataProcessingRegistration dataProcessingRegistration,
-            Maybe<ChangedValue<YearMonthIntervalOption>> yearMonthIntervalOption)
-        {
-
-            if (yearMonthIntervalOption.IsNone)
-            {
-                return Maybe<OperationError>.None;
-            }
-
-            var newOptionValue = yearMonthIntervalOption.Value.Value;
-            dataProcessingRegistration.OversightInterval = newOptionValue;
-
-            return Maybe<OperationError>.None;
-        }
-
-        private Maybe<OperationError> UpdateOversightIntervalNote(DataProcessingRegistration dataProcessingRegistration,
-            Maybe<ChangedValue<string>> yearMonthIntervalOptionNote)
-        {
-            if (yearMonthIntervalOptionNote.IsNone)
-            {
-                return Maybe<OperationError>.None;
-            }
-
-            var newNoteValue = yearMonthIntervalOptionNote.Value.Value;
-            dataProcessingRegistration.OversightIntervalNote = newNoteValue;
-            
-            return Maybe<OperationError>.None;
-        }
-
-
         private Result<TSuccess, OperationError> WithReadAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> authorizedAction)
         {
             var result = _repository.GetById(id);
@@ -357,7 +311,5 @@ namespace Core.ApplicationServices.GDPR
 
             return authorizedAction(registration);
         }
-
-
     }
 }
