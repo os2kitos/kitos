@@ -792,6 +792,8 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
+    <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
+    <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />

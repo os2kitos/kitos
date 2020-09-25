@@ -18,14 +18,9 @@
                 <!-- Agreement concluded -->
                 <div class="form-group">
                     <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
-                    <input type="hidden" 
-                           id="agreementConcluded" 
-                           class="form-control input-sm" 
-                           data-ui-select2="vm.isAgreementConcluded.select2Config" 
-                           ng-model="vm.isAgreementConcluded.selectedElement" 
-                           ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)" 
-                           ng-disabled="!vm.hasWriteAccess" />
+                    <single-select-select2 id="agreementConcluded" ng-model="vm.isAgreementConcluded" ng-disabled="!vm.hasWriteAccess" />
                 </div>
+
                 <div ng-if="vm.shouldShowAgreementConcludedAt">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
@@ -88,14 +83,9 @@
                 </div>
                 <div class="form-group">
                     <!-- Sub Data processors State -->
-                    <label for="subDpTable" class="control-label small">Underdatabehandlere</label>
-                    <input type="hidden"
-                           id="hasSubDataProcessorsSelection"
-                           class="form-control input-sm"
-                           data-ui-select2="vm.hasSubDataProcessors.select2Config"
-                           ng-model="vm.hasSubDataProcessors.selectedElement"
-                           ng-change="vm.hasSubDataProcessors.elementSelected(vm.hasSubDataProcessors.selectedElement)"
-                           ng-disabled="!vm.hasWriteAccess" />
+                    <label for="hasSubDataProcessorsSelection" class="control-label small">Underdatabehandlere</label>
+                    <single-select-select2 id="hasSubDataProcessorsSelection" ng-model="vm.hasSubDataProcessors" ng-disabled="!vm.hasWriteAccess"/>
+
                 </div>
                 <div class="form-group" ng-if="vm.enableDataProcessorSelection">
                     <!-- Sub Data processors -->

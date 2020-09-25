@@ -4,8 +4,8 @@
     export type ElementSelectedFunc<T> = (element: T) => void;
 
     export interface ISingleSelectionWithFixedOptionsViewModel<TElement> {
-        selectedElement: TElement;
+        selectedElement: Generic.Select2OptionViewModel<TElement>;
         select2Config: any;
-        elementSelected: ElementSelectedFunc<TElement>;
+        elementSelected: ElementSelectedFunc<Generic.Select2OptionViewModel<TElement>>;
     }
 }
