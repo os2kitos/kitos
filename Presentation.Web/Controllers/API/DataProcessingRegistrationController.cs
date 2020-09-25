@@ -350,7 +350,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (oversightInterval == null)
             {
-                return BadRequest("Oversight interval value is not provided");
+                return BadRequest("YearMonthIntervalOption must provided");
             }
 
             return _dataProcessingRegistrationApplicationService
@@ -369,7 +369,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (oversightIntervalNote == null)
             {
-                return BadRequest("Oversight note value is not provided");
+                return BadRequest("Note must be provided");
             }
 
             return _dataProcessingRegistrationApplicationService

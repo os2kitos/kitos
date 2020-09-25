@@ -24,10 +24,5 @@
                 _ => "",
             };
         }
-
-        public static string TranslateToDanishString(this YearMonthIntervalOption? yearMonthIntervalOption)
-        {
-            return yearMonthIntervalOption.HasValue ? yearMonthIntervalOption.Value.TranslateToDanishString() : "";
-        }
     }
 }
