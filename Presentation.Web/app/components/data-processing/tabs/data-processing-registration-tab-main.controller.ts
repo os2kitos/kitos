@@ -40,13 +40,13 @@
 
         enableDataProcessorSelection: boolean;
 
-        hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+        hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>;
 
         private bindHasSubDataProcessors() {
             this.hasSubDataProcessors = {
-                selectedElement: this.dataProcessingRegistration.hasSubDataProcessors,
-                select2Options: new Models.ViewModel.Shared.YesNoUndecidedOptions().options,
-                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement)
+                selectedElement: this.dataProcessingRegistration.hasSubDataProcessors !== null && new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x=>x.id === (this.dataProcessingRegistration.hasSubDataProcessors as number))[0],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
+                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement.optionalObjectContext)
             };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
@@ -186,13 +186,12 @@
                 });
         }
 
-        private changeHasSubDataProcessor(value: string) {
-            const valueAsEnum = parseInt(value) as Models.Api.Shared.YesNoUndecidedOption;
+        private changeHasSubDataProcessor(value: Models.Api.Shared.YesNoUndecidedOption) {
             this
                 .apiUseCaseFactory
-                .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, valueAsEnum))
+                .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, value))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.hasSubDataProcessors = valueAsEnum;
+                    this.dataProcessingRegistration.hasSubDataProcessors = value;
                     this.bindHasSubDataProcessors();
                     return success;
                 });
@@ -216,7 +215,7 @@
             };
 
             this.shouldShowAgreementConcludedAt =
-                this.isAgreementConcluded.selectedElement &&
+                this.isAgreementConcluded.selectedElement !== null &&
                 this.isAgreementConcluded.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoIrrelevantOption.YES;
         }
 

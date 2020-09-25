@@ -89,16 +89,13 @@
                 <div class="form-group">
                     <!-- Sub Data processors State -->
                     <label for="subDpTable" class="control-label small">Underdatabehandlere</label>
-                    <!-- TODO: Create singleSelectionDirective since tha makes perfect sense here! -->
-                    <select id="hasSubDataProcessorsSelection"
-                            class="form-control input-sm"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="vm.hasSubDataProcessors.selectedElement"
-                            data-ng-disabled="!vm.hasWriteAccess"
-                            ng-change="vm.isAgreementConcluded.elementSelected(vm.isAgreementConcluded.selectedElement)">
-                        <option hidden selected value />
-                        <option ng-repeat="option in vm.hasSubDataProcessors.select2Options" value="{{::option.optionalObjectContext}}" ng-bind-html="option.text" />
-                    </select>
+                    <input type="hidden"
+                           id="hasSubDataProcessorsSelection"
+                           class="form-control input-sm"
+                           data-ui-select2="vm.hasSubDataProcessors.select2Config"
+                           ng-model="vm.hasSubDataProcessors.selectedElement"
+                           ng-change="vm.hasSubDataProcessors.elementSelected(vm.hasSubDataProcessors.selectedElement)"
+                           ng-disabled="!vm.hasWriteAccess" />
                 </div>
                 <div class="form-group" ng-if="vm.enableDataProcessorSelection">
                     <!-- Sub Data processors -->
