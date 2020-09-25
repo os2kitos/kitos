@@ -244,6 +244,42 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
         }
 
+        public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        {
+            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
+            if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
+
+            return WithReadAccess<IEnumerable<Organization>>(id,
+                registration =>
+                    _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableSubDataProcessors(registration)
+                        .ByPartOfName(nameQuery)
+                        .OrderBy(x => x.Id)
+                        .Take(pageSize)
+                        .OrderBy(x => x.Name)
+                        .ToList());
+        }
+
+        public Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.HasSubDataProcessors = state;
+                return registration;
+            });
+        }
+
+        public Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId)
+        {
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignSubDataProcessor(registration, organizationId));
+        }
+
+        public Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId)
+        {
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveSubDataProcessor(registration, organizationId));
+        }
+
+
         public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded)
         {
             return Modify<DataProcessingRegistration>(id, registration =>

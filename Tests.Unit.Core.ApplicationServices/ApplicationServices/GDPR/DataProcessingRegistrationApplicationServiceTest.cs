@@ -972,6 +972,193 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Can_AssignSubDataProcessor()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var organizationId = A<int>();
+            var organization = new Organization();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            _dpAssignmentService.Setup(x => x.AssignSubDataProcessor(registration, organizationId))
+                .Returns(Result<Organization, OperationError>.Success(organization));
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(id, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(organization, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_AssignSubDataProcessorIf_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveSubDataProcessor()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var organizationId = A<int>();
+            var organization = new Organization();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            _dpAssignmentService.Setup(x => x.RemoveSubDataProcessor(registration, organizationId))
+                .Returns(Result<Organization, OperationError>.Success(organization));
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.RemoveSubDataProcessor(id, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(organization, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveSubDataProcessor_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.RemoveSubDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_RemoveSubDataProcessor_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(id, A<int>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetSubDataProcessorsWhichCanBeAssigned()
+        {
+            //Arrange
+            var id = A<int>();
+            var org1Id = A<int>();
+            var org2Id = org1Id + 1;
+            var nameQuery = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var organizations = new[] { new Organization { Id = org1Id, Name = $"{nameQuery}{1}" }, new Organization { Id = org2Id, Name = $"{nameQuery}{2}" } };
+            _dpAssignmentService.Setup(x => x.GetApplicableSubDataProcessors(registration)).Returns(organizations.AsQueryable());
+
+            //Act
+            var result = _sut.GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(organizations, result.Value);
+        }
+
+        [Fact]
+        public void Can_SetSubDataProcessorsState()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var newValue = A<YesNoUndecidedOption>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.SetSubDataProcessorsState(id, newValue);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(registration.HasSubDataProcessors, newValue);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_SetSubDataProcessorsState_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.SetSubDataProcessorsState(id, A<YesNoUndecidedOption>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_SetSubDataProcessorsState_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.SetSubDataProcessorsState(id, A<YesNoUndecidedOption>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
         public void Can_Update_OversightInterval()
         {
             //Arrange

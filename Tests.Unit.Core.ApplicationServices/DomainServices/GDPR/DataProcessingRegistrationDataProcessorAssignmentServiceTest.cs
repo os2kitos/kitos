@@ -2,6 +2,7 @@
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.Types;
@@ -142,6 +143,150 @@ namespace Tests.Unit.Core.DomainServices.GDPR
 
             //Act
             var result = _sut.RemoveDataProcessor(dataProcessingRegistration, organization.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetApplicableSubDataProcessors_Returns_Organizations_Not_Already_Assigned()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var validCandidate1 = new Organization { Id = A<int>() };
+            var validCandidate2 = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+
+            ExpectGetAllOrganizationsReturn(validCandidate1, validCandidate2, existingProcessor);
+
+            //Act
+            var applicableSubDataProcessors = _sut.GetApplicableSubDataProcessors(dataProcessingRegistration).ToList();
+
+            //Assert
+            Assert.Equal(2, applicableSubDataProcessors.Count);
+            Assert.Equal(new[] { validCandidate1, validCandidate2 }, applicableSubDataProcessors);
+        }
+
+        [Fact]
+        public void Can_AssignSubDataProcessor()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var validCandidate = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
+
+            ExpectGetOrganizationByIdReturns(validCandidate.Id, validCandidate);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, validCandidate.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(validCandidate, result.Value);
+            Assert.True(dataProcessingRegistration.SubDataProcessors.Contains(validCandidate));
+        }
+
+        [Fact]
+        public void Cannot_AssignSubDataProcessor_If_Not_Ussing_Sub_Data_Processors()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var validCandidate = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.No };
+
+            ExpectGetOrganizationByIdReturns(validCandidate.Id, validCandidate);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, validCandidate.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignSubDataProcessor_If_Not_Applicable()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var dpId = A<int>();
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+
+            ExpectGetOrganizationByIdReturns(dpId, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, dpId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignSubDataProcessor_If_Already_Assigned()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.Yes };
+
+            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor);
+
+            //Act
+            var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, existingProcessor.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveSubDataProcessor()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration() { SubDataProcessors = { existingProcessor } };
+
+            ExpectGetOrganizationByIdReturns(existingProcessor.Id, existingProcessor);
+
+            //Act
+            var result = _sut.RemoveSubDataProcessor(dataProcessingRegistration, existingProcessor.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(existingProcessor, result.Value);
+            Assert.False(dataProcessingRegistration.SubDataProcessors.Contains(existingProcessor));
+        }
+
+        [Fact]
+        public void Cannot_RemoveSubDataProcessor_If_Not_Applicable()
+        {
+            //Arrange
+            var existingProcessor = new Organization { Id = A<int>() };
+            var dpId = A<int>();
+            var dataProcessingRegistration = new DataProcessingRegistration { SubDataProcessors = { existingProcessor } };
+
+            ExpectGetOrganizationByIdReturns(dpId, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.RemoveSubDataProcessor(dataProcessingRegistration, dpId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_RemoveSubDataProcessor_If_Not_Present()
+        {
+            //Arrange
+            var organization = new Organization { Id = A<int>() };
+            var dataProcessingRegistration = new DataProcessingRegistration();
+
+            ExpectGetOrganizationByIdReturns(organization.Id, organization);
+
+            //Act
+            var result = _sut.RemoveSubDataProcessor(dataProcessingRegistration, organization.Id);
 
             //Assert
             Assert.True(result.Failed);
