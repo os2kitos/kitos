@@ -265,12 +265,25 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
         {
-            throw new NotImplementedException();
+            return Modify<DataProcessingRegistration>(id, registration =>
+                {
+                    registration.OversightInterval = oversightInterval;
+                    return registration;
+                });
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
         {
-            throw new NotImplementedException();
+            if (note == null)
+            {
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.OversightIntervalNote = note;
+                return registration;
+            });
         }
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
