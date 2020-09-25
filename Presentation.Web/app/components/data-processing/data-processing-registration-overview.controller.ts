@@ -142,6 +142,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
+							.withDataSourceName("SubDataProcessorNamesAsCsv")
+							.withTitle("Underdatabehandlere")
+							.withId("dpSubDataProcessorNamesAsCsv")
+							.withStandardWidth(150)
+							.withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+							.withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv))
+							.withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder							
                             .withDataSourceName("IsAgreementConcluded")
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")

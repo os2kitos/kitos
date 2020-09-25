@@ -307,35 +307,98 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("{id}/sub-data-processors/available")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/state")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage SetSubDataProcessorsState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        {
+            if (value == null)
+                return BadRequest("value must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .SetSubDataProcessorsState(id, value.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+		[SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignSubDataProcessor(id, organizationId.Value)
+				.Match(_ => Ok(), FromOperationError);
+		}
+
+
         [HttpPatch]
         [Route("{id}/agreement-concluded")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> yesNoIrrelevantOption)
+        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> concluded)
         {
-            if (yesNoIrrelevantOption == null)
-                return BadRequest("yesNoIrrelevantOption must be provided");
+            if (concluded == null)
+                return BadRequest("concluded must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateIsAgreementConcluded(id, yesNoIrrelevantOption.Value)
+                .UpdateIsAgreementConcluded(id, concluded.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
+        [Route("{id}/sub-data-processors/remove")]
+		[SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+		public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveSubDataProcessor(id, organizationId.Value)
+				.Match(_ => Ok(), FromOperationError);
+		}
+
+		[HttpPatch]
         [Route("{id}/agreement-concluded-at")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> dateTime)
+        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> concludedAt)
         {
-            if (dateTime == null)
-                return BadRequest("dateTime must be provided");
+            if (concludedAt == null)
+                return BadRequest("concludedAt must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateAgreementConcludedAt(id, dateTime.Value)
+                .UpdateAgreementConcludedAt(id, concludedAt.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -370,6 +433,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
@@ -413,6 +477,11 @@ namespace Presentation.Web.Controllers.API
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
+                SubDataProcessors = value
+                    .SubDataProcessors
+                    .Select(x => x.MapToShallowOrganizationDTO())
+                    .ToArray(),
+                HasSubDataProcessors = value.HasSubDataProcessors,
                 AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>
                 {
                     Value = value.IsAgreementConcluded,

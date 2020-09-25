@@ -177,6 +177,33 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/data-processors/remove"), cookie, new SingleValueDTO<int> { Value = organizationId });
         }
 
+        public static async Task<IEnumerable<ShallowOrganizationDTO>> GetAvailableSubDataProcessors(int id, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/sub-data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ShallowOrganizationDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignSubDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/assign"), cookie, new SingleValueDTO<int> { Value = organizationId });
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveSubDataProcessorRequestAsync(int registrationId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/remove"), cookie, new SingleValueDTO<int> { Value = organizationId });
+        }
+
+        public static async Task<HttpResponseMessage> SendSetUseSubDataProcessorsStateRequestAsync(int registrationId, YesNoUndecidedOption value, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/state"), cookie, new SingleValueDTO<YesNoUndecidedOption> { Value = value });
+		}
+
         public static async Task<HttpResponseMessage> SendChangeIsAgreementConcludedRequestAsync(int id, YesNoIrrelevantOption? yesNoIrrelevantOption, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
