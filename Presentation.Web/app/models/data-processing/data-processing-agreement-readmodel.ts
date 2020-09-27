@@ -15,5 +15,8 @@
         MainReferenceUserAssignedId: string;
         SystemNamesAsCsv: string;
         DataProcessorNamesAsCsv: string;
+        SubDataProcessorNamesAsCsv: string;
+        IsAgreementConcluded: string;
+        AgreementConcludedAt?: Date;
     }
 }

@@ -72,7 +72,13 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public IQueryable<DataProcessingRegistration> GetByDataProcessorId(int organizationId)
         {
-            return _repository.AsQueryable().Where(x => x.DataProcessors.Any(organization => organization.Id == organizationId));
+            return _repository
+                .AsQueryable()
+                .Where(x =>
+                    x.DataProcessors.Any(organization => organization.Id == organizationId) ||
+                    x.SubDataProcessors.Any(organization => organization.Id == organizationId
+                    )
+                );
         }
 
         private void Notify(DataProcessingRegistration dataProcessingRegistration, LifeCycleEventType changeType)

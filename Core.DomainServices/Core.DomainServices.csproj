@@ -60,11 +60,13 @@
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationDataResponsibleAssigmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationDataResponsibleAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />

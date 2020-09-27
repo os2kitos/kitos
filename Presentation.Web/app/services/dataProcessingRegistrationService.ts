@@ -15,8 +15,13 @@
         removeDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number);
-        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any);
+        removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateSubDataProcessorsState(dataProcessingRegistrationId: number, state: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getApplicableDataResponsibleOptions(dataProcessingRegistrationId: number);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -132,8 +137,12 @@
             return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
         }
 
-        getApplicableDataProcessors(dataProcessingRegistrationId: number, query:string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
+        getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
             return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}`));
+        }
+
+        getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `sub-data-processors/available?nameQuery=${query}`));
         }
 
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
@@ -153,6 +162,18 @@
 
         assignDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/assign"), dataProcessorId);
+        }
+
+        updateSubDataProcessorsState(dataProcessingRegistrationId: number, state: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/state"), state as number);
+        }
+
+        removeSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/remove"), dataProcessorId);
+        }
+
+        assignSubDataProcessor(dataProcessingRegistrationId: number, dataProcessorId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/assign"), dataProcessorId);
         }
 
         getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]> {
@@ -225,14 +246,28 @@
                 );
         }
 
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: number) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "is-agreement-concluded"), yesNoIrrelevantId);
+        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded"), yesNoIrrelevantId);
         }
 
 
-        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: any) {
+        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string) {
             var date = moment(dateTime, "YYYY-MM-DD");
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
+        }
+
+        getApplicableDataResponsibleOptions(dataProcessingRegistrationId: number) {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId,
+                    "data-responsible-options"))
+                .then(
+                    result => {
+                        var response = result.data as { response }
+                        return response.response;
+                    },
+                    error => this.handleServerError(error)
+                );
         }
 
         static $inject = ["$http"];

@@ -17,7 +17,6 @@
                 YesNoIrrelevantOption.NO => "Nej",
                 YesNoIrrelevantOption.YES => "Ja",
                 YesNoIrrelevantOption.IRRELEVANT => "Ikke relevant",
-                YesNoIrrelevantOption.UNDECIDED => "",
                 _ => "",
             };
         }

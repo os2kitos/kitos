@@ -24,7 +24,7 @@
                                         .get(`api/itSystemUsage?organizationId=${user.currentOrganizationId}&q=${query}&take=25`)
                                         .then(
                                             result => result.data.response.map((usage: { id; itSystemName; itSystemDisabled; }) =>
-                                                <Models.ViewModel.Generic.Select2OptionViewModel>
+                                                <Models.ViewModel.Generic.Select2OptionViewModel<any>>
                                                 {
                                                     id: usage.id,
                                                     text: Helpers.SystemNameFormat.apply(usage.itSystemName, usage.itSystemDisabled)

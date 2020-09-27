@@ -1,6 +1,4 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.GDPR;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
@@ -29,6 +27,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationRepository _repository;
         private readonly IDataProcessingRegistrationNamingService _namingService;
         private readonly IDataProcessingRegistrationRoleAssignmentsService _roleAssignmentsService;
+        private readonly IDataProcessingRegistrationDataResponsibleAssignmentService _dataResponsibleAssigmentService;
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
         private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
@@ -41,6 +40,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationNamingService namingService,
             IDataProcessingRegistrationRoleAssignmentsService roleAssignmentsService,
             IReferenceRepository referenceRepository,
+            IDataProcessingRegistrationDataResponsibleAssignmentService dataResponsibleAssigmentService,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
             IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
             ITransactionManager transactionManager,
@@ -51,6 +51,7 @@ namespace Core.ApplicationServices.GDPR
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
             _referenceRepository = referenceRepository;
+            _dataResponsibleAssigmentService = dataResponsibleAssigmentService;
             _systemAssignmentService = systemAssignmentService;
             _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
             _transactionManager = transactionManager;
@@ -125,12 +126,23 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateName(int id, string name)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { NameChange = new ChangedValue<string>(name) });
+            return Modify
+            (
+                id,
+                registration =>
+                    _namingService
+                        .ChangeName(registration, name)
+                        .Match
+                        (
+                            error => error,
+                            () => Result<DataProcessingRegistration, OperationError>.Success(registration)
+                        )
+            );
         }
 
         public Result<ExternalReference, OperationError> SetMasterReference(int id, int referenceId)
         {
-            return WithWriteAccess(id, registration =>
+            return Modify(id, registration =>
                 _referenceRepository
                     .Get(referenceId)
                     .Select(registration.SetMasterReference)
@@ -165,12 +177,12 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> AssignRole(int id, int roleId, int userId)
         {
-            return WithWriteAccess(id, registration => _roleAssignmentsService.AssignRole(registration, roleId, userId));
+            return Modify(id, registration => _roleAssignmentsService.AssignRole(registration, roleId, userId));
         }
 
         public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId)
         {
-            return WithWriteAccess(id, registration =>
+            return Modify(id, registration =>
             {
                 var removeResult = _roleAssignmentsService.RemoveRole(registration, roleId, userId);
 
@@ -201,12 +213,12 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<ItSystem, OperationError> AssignSystem(int id, int systemId)
         {
-            return WithWriteAccess(id, registration => _systemAssignmentService.AssignSystem(registration, systemId));
+            return Modify(id, registration => _systemAssignmentService.AssignSystem(registration, systemId));
         }
 
         public Result<ItSystem, OperationError> RemoveSystem(int id, int systemId)
         {
-            return WithWriteAccess(id, registration => _systemAssignmentService.RemoveSystem(registration, systemId));
+            return Modify(id, registration => _systemAssignmentService.RemoveSystem(registration, systemId));
         }
 
         public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
@@ -227,52 +239,76 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId)
         {
-            return WithWriteAccess(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignDataProcessor(registration, organizationId));
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignDataProcessor(registration, organizationId));
         }
 
         public Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId)
         {
-            return WithWriteAccess(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption yesNoIrrelevantOption)
+        public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { IsAgreementConcludedChange = new ChangedValue<YesNoIrrelevantOption>(yesNoIrrelevantOption) });
+            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
+            if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
+
+            return WithReadAccess<IEnumerable<Organization>>(id,
+                registration =>
+                    _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableSubDataProcessors(registration)
+                        .ByPartOfName(nameQuery)
+                        .OrderBy(x => x.Id)
+                        .Take(pageSize)
+                        .OrderBy(x => x.Name)
+                        .ToList());
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? dateTime)
+        public Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state)
         {
-            return UpdateProperties(id, new DataProcessingRegistrationPropertyChanges { AgreementConcludedAtChange = new ChangedValue<DateTime?>(dateTime) });
-        }
-
-        private Result<DataProcessingRegistration, OperationError> UpdateProperties(int id, DataProcessingRegistrationPropertyChanges changeSet)
-        {
-            if (changeSet == null)
-                throw new ArgumentNullException(nameof(changeSet));
-
-
-            return WithWriteAccess<DataProcessingRegistration>(id, registration =>
+            return Modify<DataProcessingRegistration>(id, registration =>
             {
-                var updateNameError = UpdateName(registration, changeSet.NameChange);
-
-                if (updateNameError.HasValue)
-                    return updateNameError.Value;
-
-                var updateIsAgreementConcludedError = UpdateIsAgreementConcluded(registration, changeSet.IsAgreementConcludedChange);
-
-                if (updateIsAgreementConcludedError.HasValue)
-                    return updateIsAgreementConcludedError.Value;
-
-                var updateAgreementConcludedAtError = UpdateAgreementConcludedAt(registration, changeSet.AgreementConcludedAtChange);
-
-                if (updateAgreementConcludedAtError.HasValue)
-                    return updateAgreementConcludedAtError.Value;
-
+                registration.HasSubDataProcessors = state;
                 return registration;
             });
         }
 
-        private Result<TSuccess, OperationError> WithWriteAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
+        public Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId)
+        {
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.AssignSubDataProcessor(registration, organizationId));
+        }
+
+        public Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId)
+        {
+            return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveSubDataProcessor(registration, organizationId));
+        }
+
+
+        public Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.IsAgreementConcluded = concluded;
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.AgreementConcludedAt = concludedAtDate;
+                return registration;
+            });
+        }
+
+        public Result<IEnumerable<DataProcessingDataResponsibleOption>, OperationError> GetDataResponsibleOptionsWhichCanBeAssigned(int id)
+        {
+            return WithReadAccess<IEnumerable<DataProcessingDataResponsibleOption>>(
+                id,
+                registration => _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptions(registration).ToList());
+        }
+
+        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
@@ -295,38 +331,6 @@ namespace Core.ApplicationServices.GDPR
             }
 
             return mutationResult;
-        }
-
-        private Maybe<OperationError> UpdateName(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<string>> nameChange)
-        {
-            if (nameChange.IsNone)
-                return Maybe<OperationError>.None;
-
-            var newName = nameChange.Value.Value;
-
-            return _namingService.ChangeName(dataProcessingRegistration, newName);
-        }
-
-        private Maybe<OperationError> UpdateIsAgreementConcluded(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<YesNoIrrelevantOption>> yesNoIrrelevantOptionChange)
-        {
-            if (yesNoIrrelevantOptionChange.IsNone)
-                return Maybe<OperationError>.None;
-
-            var newOptionValue = yesNoIrrelevantOptionChange.Value.Value;
-            dataProcessingRegistration.IsAgreementConcluded = newOptionValue;
-
-            return Maybe<OperationError>.None;
-        }
-
-        private Maybe<OperationError> UpdateAgreementConcludedAt(DataProcessingRegistration dataProcessingRegistration, Maybe<ChangedValue<DateTime?>> dateTimeChange)
-        {
-            if (dateTimeChange.IsNone)
-                return Maybe<OperationError>.None;
-
-            var newdateTime = dateTimeChange.Value.Value;
-            dataProcessingRegistration.AgreementConcludedAt = newdateTime;
-
-            return Maybe<OperationError>.None;
         }
 
         private Result<TSuccess, OperationError> WithReadAccess<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> authorizedAction)

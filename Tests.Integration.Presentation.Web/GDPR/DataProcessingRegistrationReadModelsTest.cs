@@ -7,10 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
-using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.Organization;
-using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -52,7 +48,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dpName = $"Org:{name}";
+            var dpName = $"Dp:{name}";
+            var subDpName = $"Sub_Dp:{name}";
             var systemName = $"SYSTEM:{name}";
             var refName = $"REF:{name}";
             var refUserAssignedId = $"REF:{name}EXT_ID";
@@ -65,6 +62,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
             var dataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, dpName, "22334455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var subDataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, subDpName, "22314455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
             var role = businessRoleDtos.First();
@@ -73,11 +71,17 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
+            //Enable and set sub processors
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, setStateRequest.StatusCode);
+
             using var sendAssignDataProcessorRequestAsync = await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(registration.Id, dataProcessor.Id);
             Assert.Equal(HttpStatusCode.OK, sendAssignDataProcessorRequestAsync.StatusCode);
+            
+            using var sendAssignSubDataProcessorRequestAsync = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, subDataProcessor.Id);
+            Assert.Equal(HttpStatusCode.OK, sendAssignSubDataProcessorRequestAsync.StatusCode);
 
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
-            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registration.Id, agreementConcludedAt);
 
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
@@ -101,6 +105,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
+            Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -111,10 +117,43 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
-            Assert.Matches(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
-            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
 
             Console.Out.WriteLine("Role data verified");
+        }
+
+        [Fact]
+        public async Task ReadModels_Contain_Correct_Dependent_Content()
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var isAgreementConcluded = YesNoIrrelevantOption.YES;
+            var agreementConcludedAt = A<DateTime>();
+
+            Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
+
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
+            await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registration.Id, agreementConcludedAt);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act
+            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(result);
+            Console.Out.WriteLine("Read model found");
+            Assert.Equal(name, readModel.Name);
+            Assert.Equal(registration.Id, readModel.SourceEntityId);
+
+            Console.Out.WriteLine("Asserting Dependent and dependee properties");
+            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
+            Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
+
         }
 
         private static async Task WaitForReadModelQueueDepletion()

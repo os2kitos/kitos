@@ -24,6 +24,7 @@ namespace Core.DomainModel.GDPR
             ExternalReferences = new List<ExternalReference>();
             SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             DataProcessors = new List<Organization.Organization>();
+            SubDataProcessors = new List<Organization.Organization>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -43,6 +44,8 @@ namespace Core.DomainModel.GDPR
 
         public int OrganizationId { get; set; }
 
+        public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+
         public virtual Organization.Organization Organization { get; set; }
 
         public virtual ICollection<DataProcessingRegistrationReadModel> ReadModels { get; set; }
@@ -50,6 +53,8 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
 
         public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
+
+        public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
 
         public DataProcessingDataResponsibleOption DataResponsible { get; set; }
 
@@ -82,6 +87,37 @@ namespace Core.DomainModel.GDPR
             DataProcessors.Remove(dataProcessor);
 
             return dataProcessor;
+        }
+
+        public Result<Organization.Organization, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+
+            if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
+                return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
+
+            if (HasSubDataProcessor(dataProcessor))
+                return new OperationError("Sub Data processor already assigned", OperationFailure.Conflict);
+
+            SubDataProcessors.Add(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        public Result<Organization.Organization, OperationError> RemoveSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
+            if (!HasSubDataProcessor(dataProcessor))
+                return new OperationError("Sub Data processor not assigned", OperationFailure.BadInput);
+
+            SubDataProcessors.Remove(dataProcessor);
+
+            return dataProcessor;
+        }
+
+        private bool HasSubDataProcessor(Organization.Organization dataProcessor)
+        {
+            return SubDataProcessors.Any(x => x.Id == dataProcessor.Id);
         }
 
         private bool HasDataProcessor(Organization.Organization dataProcessor)

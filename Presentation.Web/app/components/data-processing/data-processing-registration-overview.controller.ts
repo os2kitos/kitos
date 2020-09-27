@@ -140,6 +140,43 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataProcessorNamesAsCsv))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataProcessorNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder
+							.withDataSourceName("SubDataProcessorNamesAsCsv")
+							.withTitle("Underdatabehandlere")
+							.withId("dpSubDataProcessorNamesAsCsv")
+							.withStandardWidth(150)
+							.withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+							.withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv))
+							.withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder							
+                            .withDataSourceName("IsAgreementConcluded")
+                            .withTitle("Databehandleraftale er indgået")
+                            .withId("agreementConcluded")
+                            .withStandardWidth(100)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.YES),
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.NO),
+                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT)
+                                ]
+                                , false
+                            )
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded)))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("AgreementConcludedAt")
+                            .withTitle("Dato for indgåelse af databehandleraftale")
+                            .withId("agreementConcludedAt")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt))
+                            .withInitialVisibility(false))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>

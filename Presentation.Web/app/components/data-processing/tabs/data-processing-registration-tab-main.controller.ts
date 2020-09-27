@@ -10,6 +10,8 @@
             "select2LoadingService"
         ];
 
+        private readonly dataProcessingRegistrationId: number;
+
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -17,6 +19,9 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
             this.bindDataProcessors();
+            this.bindSubDataProcessors();
+            this.bindHasSubDataProcessors();
+            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedAt();
         }
@@ -25,24 +30,97 @@
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<number>;
+        subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
+
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;        
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
+        shouldShowAgreementConcludedAt: boolean;
+
+        enableDataProcessorSelection: boolean;
+
+        hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+
+        private bindHasSubDataProcessors() {
+            this.hasSubDataProcessors = {
+                selectedElement: this.dataProcessingRegistration.hasSubDataProcessors !== null && new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x=>x.id === (this.dataProcessingRegistration.hasSubDataProcessors as number))[0],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
+                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement.optionalObjectContext)
+            };
+            this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
+        }
+
+        private bindMultiSelectConfiguration<TElement>(
+            setField: ((finalVm: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<TElement>) => void),
+            getInitialElements: () => TElement[],
+            removeFunc: ((element: TElement) => void),
+            newFunc: Models.ViewModel.Generic.NewItemSelectedFunc,
+            searchFunc: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>) {
+
+            const configuration = {
+                selectedElements: getInitialElements(),
+                removeItemRequested: removeFunc,
+                allowAddition: this.hasWriteAccess,
+                allowRemoval: this.hasWriteAccess,
+                newElementSelection: null,
+                select2Config: this
+                    .select2LoadingService
+                    .loadSelect2WithDataSource(searchFunc, false),
+                newItemSelected: newFunc
+            };
+            setField(configuration);
+        }
+
+        private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
+            return dataProcessors.map(
+                dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
+                    id: dataProcessor.id,
+                    text: dataProcessor.name,
+                    optionalObjectContext: dataProcessor
+                }
+            );
+        }
+
+        private bindDataProcessors() {
+            this.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
+                config => this.dataProcessors = config,
+                () => this.dataProcessingRegistration.dataProcessors,
+                element => this.removeDataProcessor(element.id),
+                newElement => this.addDataProcessor(newElement),
+                (query) => this
+                    .dataProcessingRegistrationService
+                    .getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
+                    .then(results => this.mapDataProcessingSearchResults(results))
+            );
+        }
+        private bindSubDataProcessors() {
+            this.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
+                config => this.subDataProcessors = config,
+                () => this.dataProcessingRegistration.subDataProcessors,
+                element => this.removeSubDataProcessor(element.id),
+                newElement => this.addSubDataProcessor(newElement),
+                (query) => this
+                    .dataProcessingRegistrationService
+                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
+                    .then(results => this.mapDataProcessingSearchResults(results))
+            );
+        }
+
         changeName(name) {
             this.apiUseCaseFactory
-                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistration.id, name))
+                .createUpdate("Navn", () => this.dataProcessingRegistrationService.rename(this.dataProcessingRegistrationId, name))
                 .executeAsync(nameChangeResponse => {
                     this.headerName = name;
                     return nameChangeResponse;
                 });
         }
 
-        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel) {
+        private addDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
+                const newDp = newElement.optionalObjectContext;
                 this.apiUseCaseFactory
-                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistration.id, newDp.id))
+                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignDataProcessor(this.dataProcessingRegistrationId, newDp.id))
                     .executeAsync(success => {
                         //Update the source collection
                         this.dataProcessingRegistration.dataProcessors.push(newDp);
@@ -53,10 +131,10 @@
                     });
             }
         }
-        
+
         private removeDataProcessor(id: number) {
             this.apiUseCaseFactory
-                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistration.id, id))
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeDataProcessor(this.dataProcessingRegistrationId, id))
                 .executeAsync(success => {
 
                     //Update the source collection
@@ -68,59 +146,92 @@
                 });
         }
 
-        changeIsAgreementConcluded(isAgreementConcluded) {
-            this.apiUseCaseFactory
-                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded))
-                .executeAsync();
+        private addSubDataProcessor(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
+            if (!!newElement && !!newElement.optionalObjectContext) {
+                const newDp = newElement.optionalObjectContext as Models.DataProcessing.IDataProcessorDTO;
+                this.apiUseCaseFactory
+                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignSubDataProcessor(this.dataProcessingRegistrationId, newDp.id))
+                    .executeAsync(success => {
+                        //Update the source collection
+                        this.dataProcessingRegistration.subDataProcessors.push(newDp);
+
+                        //Trigger UI update
+                        this.bindSubDataProcessors();
+                        return success;
+                    });
+            }
         }
 
-        changeAgreementConcludedAt(agreementConcludedAt) {
+        private removeSubDataProcessor(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.subDataProcessors = this.dataProcessingRegistration.subDataProcessors.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindSubDataProcessors();
+                    return success;
+                });
+        }
+
+        private changeIsAgreementConcluded(isAgreementConcluded: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>) {
+            this.apiUseCaseFactory
+                .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded.optionalObjectContext))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded.optionalObjectContext;
+                    this.bindIsAgreementConcluded();
+                    return success;
+                });
+        }
+
+        private changeHasSubDataProcessor(value: Models.Api.Shared.YesNoUndecidedOption) {
+            this
+                .apiUseCaseFactory
+                .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, value))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.hasSubDataProcessors = value;
+                    this.bindHasSubDataProcessors();
+                    return success;
+                });
+        }
+
+        private changeAgreementConcludedAt(agreementConcludedAt: string) {
             this.apiUseCaseFactory
                 .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
-                .executeAsync();
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
+                    this.bindAgreementConcludedAt();
+                    return success;
+                });
         }
 
         private bindIsAgreementConcluded() {
             this.isAgreementConcluded = {
-                selectedElement: this.dataProcessingRegistration.isAgreementConcluded,
-                select2Options: new Models.ViewModel.DataProcessingAgreement.AgreementConcludedOptions().options,
+                selectedElement: this.getYesNoIrrelevantOptionFromId(this.dataProcessingRegistration.agreementConcluded.value),
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoIrrelevantOptions().options, false),
                 elementSelected: (newElement) => this.changeIsAgreementConcluded(newElement)
             };
+
+            this.shouldShowAgreementConcludedAt =
+                this.isAgreementConcluded.selectedElement !== null &&
+                this.isAgreementConcluded.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoIrrelevantOption.YES;
+        }
+
+        private getYesNoIrrelevantOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
+            if (id === null) {
+                return null;
+            }
+            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().options.filter(option => option.id === id)[0];
         }
 
         private bindAgreementConcludedAt() {
             this.agreementConcludedAt = new Models.ViewModel.Generic.DateSelectionViewModel(
-                this.dataProcessingRegistration.agreementConcludedAt,
+                this.dataProcessingRegistration.agreementConcluded.optionalDateValue,
                 (newDate) => this.changeAgreementConcludedAt(newDate));
         }
 
-        private bindDataProcessors() {
-            this.dataProcessors = {
-                selectedElements: this.dataProcessingRegistration.dataProcessors,
-                removeItemRequested: (element) => this.removeDataProcessor(element.id),
-                allowAddition: this.hasWriteAccess,
-                allowRemoval: this.hasWriteAccess,
-                newElementSelection: null,
-                select2Config: this
-                    .select2LoadingService
-                    .loadSelect2WithDataSource(
-                        (query) => this
-                            .dataProcessingRegistrationService
-                            .getApplicableDataProcessors(this.dataProcessingRegistration.id, query)
-                            .then(
-                                dataProcessors => dataProcessors.map(
-                                    dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel>{
-                                        id: dataProcessor.id,
-                                        text: dataProcessor.name,
-                                        optionalObjectContext: dataProcessor
-                                    }
-                                )
-                            ),
-                        false
-                    ),
-                newItemSelected: (newElement) => this.addDataProcessor(newElement)
-            };
-        }
     }
 
     angular

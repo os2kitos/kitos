@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.References;
+using Presentation.Web.Models.Shared;
 
 namespace Presentation.Web.Models.GDPR
 {
@@ -17,10 +18,12 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
+        public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
+        
+        public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
 
-        public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
-
-        public DateTime? AgreementConcludedAt { get; set; }
+        public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
     }
 }

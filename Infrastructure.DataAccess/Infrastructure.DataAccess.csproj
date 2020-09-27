@@ -628,6 +628,14 @@
     <Compile Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.designer.cs">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009241113139_Add_Sub_DataProcessors.cs" />
+    <Compile Include="Migrations\202009241113139_Add_Sub_DataProcessors.designer.cs">
+      <DependentUpon>202009241113139_Add_Sub_DataProcessors.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009251322284_Add_Data_Responsible_Options.cs" />
+    <Compile Include="Migrations\202009251322284_Add_Data_Responsible_Options.designer.cs">
+      <DependentUpon>202009251322284_Add_Data_Responsible_Options.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1020,6 +1028,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.resx">
       <DependentUpon>202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009241113139_Add_Sub_DataProcessors.resx">
+      <DependentUpon>202009241113139_Add_Sub_DataProcessors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009251322284_Add_Data_Responsible_Options.resx">
+      <DependentUpon>202009251322284_Add_Data_Responsible_Options.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
