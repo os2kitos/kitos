@@ -1,5 +1,4 @@
-﻿using System;
-using Core.DomainModel.Shared;
+﻿using Core.DomainModel.Shared;
 using Presentation.Web.Models.References;
 using Presentation.Web.Models.Shared;
 
@@ -20,12 +19,14 @@ namespace Presentation.Web.Models.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
-        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
-
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
         
         public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
 
         public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
+
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public NamedEntityDTO[] InsecureThirdCountries { get; set; }
     }
 }

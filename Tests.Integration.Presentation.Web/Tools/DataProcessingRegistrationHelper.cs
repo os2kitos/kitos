@@ -221,5 +221,32 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded-at"), cookie, body);
         }
+
+
+        public static async Task<HttpResponseMessage> SendAssignInsecureThirdCountryRequestAsync(int registrationId, int countryId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/insecure-third-countries/assign"), cookie, new SingleValueDTO<int> { Value = countryId });
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveInsecureThirdCountryRequestAsync(int registrationId, int countryId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/insecure-third-countries/remove"), cookie, new SingleValueDTO<int> { Value = countryId });
+        }
+
+        public static async Task<HttpResponseMessage> SendSetUseTransferToInsecureThirdCountriesStateRequestAsync(int registrationId, YesNoUndecidedOption value, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/insecure-third-countries/state"), cookie, new SingleValueDTO<YesNoUndecidedOption> { Value = value });
+        }
+
+        public static async Task<IEnumerable<OptionDTO>> GetCountryOptionsAsync(int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalDataProcessingCountryOptions?organizationId={organizationId}"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
+        }
     }
 }

@@ -369,6 +369,38 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
+        [Route("{id}/agreement-concluded")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> concluded)
+        {
+            if (concluded == null)
+                return BadRequest("concluded must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsAgreementConcluded(id, concluded.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/agreement-concluded-at")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> concludedAt)
+        {
+            if (concludedAt == null)
+                return BadRequest("concludedAt must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateAgreementConcludedAt(id, concludedAt.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
         [Route("{id}/insecure-third-countries/state")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -414,39 +446,6 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveInsecureThirdCountry(id, countryId.Value)
-                .Match(_ => Ok(), FromOperationError);
-        }
-
-
-        [HttpPatch]
-        [Route("{id}/agreement-concluded")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> concluded)
-        {
-            if (concluded == null)
-                return BadRequest("concluded must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .UpdateIsAgreementConcluded(id, concluded.Value)
-                .Match(_ => Ok(), FromOperationError);
-        }
-
-        [HttpPatch]
-        [Route("{id}/agreement-concluded-at")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> concludedAt)
-        {
-            if (concludedAt == null)
-                return BadRequest("concludedAt must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .UpdateAgreementConcludedAt(id, concludedAt.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -535,7 +534,8 @@ namespace Presentation.Web.Controllers.API
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt
                 },
-                TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries
+                TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
+                InsecureThirdCountries = value.InsecureCountriesSubjectToDataTransfer.MapToNamedEntityDTOs().ToArray()
             };
         }
 
