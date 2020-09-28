@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
 using Infrastructure.Services.Types;
 
@@ -38,7 +39,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.IsAgreementConcluded = source.IsAgreementConcluded;
-            destination.AgreementConcludedAt = source.AgreementConcludedAt;
+            destination.AgreementConcludedAt = source.IsAgreementConcluded == YesNoIrrelevantOption.YES ? source.AgreementConcludedAt : null;
         }
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
