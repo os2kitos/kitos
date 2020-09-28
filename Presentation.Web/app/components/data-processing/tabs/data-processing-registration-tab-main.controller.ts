@@ -48,7 +48,11 @@
             this.hasSubDataProcessors = {
                 selectedElement: this.dataProcessingRegistration.hasSubDataProcessors !== null && new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x=>x.id === (this.dataProcessingRegistration.hasSubDataProcessors as number))[0],
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
-                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement.optionalObjectContext)
+                elementSelected: (newElement) => {
+                    if (!newElement) {
+                        this.changeHasSubDataProcessor(newElement.optionalObjectContext);
+                    }
+                }
             };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
