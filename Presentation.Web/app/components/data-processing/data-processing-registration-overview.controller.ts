@@ -206,7 +206,7 @@
                                     }
                                 })
                                 , false
-                            )
+                        )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval]))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval])))
                     .withStandardSorting("Name");

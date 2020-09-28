@@ -9,7 +9,7 @@
         {
             AddColumn("dbo.DataProcessingRegistrations", "OversightInterval", c => c.Int());
             AddColumn("dbo.DataProcessingRegistrations", "OversightIntervalNote", c => c.String());
-            AddColumn("dbo.DataProcessingRegistrationReadModels", "OversightInterval", c => c.String());
+            AddColumn("dbo.DataProcessingRegistrationReadModels", "OversightInterval", c => c.Int());
         }
         
         public override void Down()
