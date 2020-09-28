@@ -5,19 +5,20 @@
             <div class="col-xs-6">
                 <!-- Agreement concluded -->
                 <div class="form-group">
-                    <label for="oversightInterval" class="control-label small">Tilsyns interval</label>
+                    <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
                     <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
                 </div>
 
                 <!-- Tilsyn Interval Note -->
                 <div class="form-group">
-                    <label for="oversightIntervalNote" class="control-label small">Tilsyns interval note</label>
+                    <label for="oversightIntervalNote" class="control-label small">Tilsynsinterval note</label>
                     <textarea id="oversightIntervalNote" class="form-control input-sm" rows="2"
                               ng-disabled="!vm.hasWriteAccess"
                               ng-model="vm.oversightIntervalNote"
                               data-element-type="oversightIntervalNote"
-                              ng-blur=""
-                              data-field="oversightIntervalNote"></textarea>
+                              ng-blur="vm.changeOversightIntervalNote(vm.oversightIntervalNote)"
+                              data-field="oversightIntervalNote">
+                    </textarea>
                 </div>
             </div>
         </div>

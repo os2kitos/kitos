@@ -7,25 +7,18 @@
             "hasWriteAccess",
             "dataProcessingRegistration",
             "apiUseCaseFactory",
-            "select2LoadingService",
-            "notify"
+            "select2LoadingService"
         ];
-
-        private readonly dataProcessingRegistrationId: number;
 
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
-            private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly notify) {
+            private readonly select2LoadingService: Services.ISelect2LoadingService) {
 
-            this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
-             
             this.bindOversightInterval();
             this.bindOversightIntervalNote();
-
         }
 
         headerName = this.dataProcessingRegistration.name;
@@ -63,7 +56,7 @@
                 });
         }
 
-        private changeOversightIntervalNote(oversightIntervalNote: string) {
+        changeOversightIntervalNote(oversightIntervalNote: string) {
             this.apiUseCaseFactory
                 .createUpdate("Tilsyn Interval note sat", () => this.dataProcessingRegistrationService.updateOversightIntervalNote(this.dataProcessingRegistration.id, oversightIntervalNote))
                 .executeAsync(success => {
@@ -72,7 +65,6 @@
                     return success;
                 });
         }
-
     }
 
     angular
