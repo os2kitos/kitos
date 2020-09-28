@@ -42,5 +42,9 @@ namespace Core.DomainModel.GDPR.Read
         public string IsAgreementConcluded { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }
+
+        public DataProcessingDataResponsibleOption? DataResponsible { get; set; }
+
+        public string DataResponsibleRemark { get; set; }
     }
 }

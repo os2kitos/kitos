@@ -302,13 +302,6 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<IEnumerable<DataProcessingDataResponsibleOption>, OperationError> GetDataResponsibleOptionsWhichCanBeAssigned(int id)
-        {
-            return WithReadAccess<IEnumerable<DataProcessingDataResponsibleOption>>(
-                id,
-                registration => _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptions(registration).ToList());
-        }
-
         public Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id)
         {
             return WithReadAccess<DataProcessingRegistrationOptions>(
@@ -316,8 +309,13 @@ namespace Core.ApplicationServices.GDPR
                 registration => new DataProcessingRegistrationOptions() {
                     Registration = registration,
                     DataProcessingRegistrationRoles = _roleAssignmentsService.GetApplicableRoles(registration).ToList(),
-                    DataProcessingRegistrationDataResponsibleOptions = _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptions(registration).ToList()
-                }) ;
+                    DataProcessingRegistrationDataResponsibleOptions = _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration).ToList()
+                });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(int id, int? dataResponsibleId)
+        {
+            return Modify(id, registration => _dataResponsibleAssigmentService.UpdateDataResponsible(registration, dataResponsibleId));
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)

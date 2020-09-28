@@ -56,7 +56,7 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
 
-        public DataProcessingDataResponsibleOption DataResponsible { get; set; }
+        public DataProcessingDataResponsibleOption? DataResponsible { get; set; }
 
         public string DataResponsibleRemark { get; set; }
 
