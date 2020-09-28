@@ -353,6 +353,71 @@ namespace Presentation.Web.Controllers.API
 				.Match(_ => Ok(), FromOperationError);
 		}
 
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveSubDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/state")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage SetTransferToInsecureCountriesState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        {
+            if (value == null)
+                return BadRequest("value must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateTransferToInsecureThirdCountries(id, value.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        {
+            if (countryId == null)
+                return BadRequest($"{nameof(countryId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignInsecureThirdCountry(id, countryId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        {
+            if (countryId == null)
+                return BadRequest($"{nameof(countryId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveInsecureThirdCountry(id, countryId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
 
         [HttpPatch]
         [Route("{id}/agreement-concluded")]
@@ -371,22 +436,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/sub-data-processors/remove")]
-		[SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-		public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
-        {
-            if (organizationId == null)
-                return BadRequest("organizationId must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .RemoveSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
-
-		[HttpPatch]
         [Route("{id}/agreement-concluded-at")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

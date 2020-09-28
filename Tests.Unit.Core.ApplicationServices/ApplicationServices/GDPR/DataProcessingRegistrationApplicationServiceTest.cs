@@ -13,6 +13,7 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
@@ -35,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
         private readonly Mock<IDataProcessingRegistrationSystemAssignmentService> _systemAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
+        private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -47,6 +49,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
             _systemAssignmentServiceMock = new Mock<IDataProcessingRegistrationSystemAssignmentService>();
             _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
+            _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -55,6 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _referenceRepositoryMock.Object,
                 _systemAssignmentServiceMock.Object,
                 _dpAssignmentService.Object,
+                _insecureThirdCountryAssignmentMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
