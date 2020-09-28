@@ -109,7 +109,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
-            Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
+            Assert.Equal(oversightInterval, readModel.OversightInterval);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);

@@ -99,7 +99,7 @@ namespace Core.DomainServices.GDPR
         private void PatchOversightInterval(DataProcessingRegistration source,
             DataProcessingRegistrationReadModel destination)
         {
-            destination.OversightInterval = source.OversightInterval?.TranslateToDanishString();
+            destination.OversightInterval = source.OversightInterval;
         }
 
         private void RemoveAssignments(DataProcessingRegistrationReadModel destination, List<DataProcessingRegistrationRoleAssignmentReadModel> assignmentsToBeRemoved)

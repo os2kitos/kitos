@@ -44,6 +44,6 @@ namespace Core.DomainModel.GDPR.Read
 
         public DateTime? AgreementConcludedAt { get; set; }
 
-        public string OversightInterval { get; set; }
+        public YearMonthIntervalOption? OversightInterval { get; set; }
     }
 }

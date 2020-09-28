@@ -18,5 +18,6 @@
         SubDataProcessorNamesAsCsv: string;
         IsAgreementConcluded?: Models.Api.Shared.YesNoIrrelevantOption;
         AgreementConcludedAt?: Date;
+        OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
     }
 }

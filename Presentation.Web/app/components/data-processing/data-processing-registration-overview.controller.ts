@@ -44,6 +44,7 @@
             var dpaRoleIdToUserNamesMap = {};
 
             const yesNoIrrelevantOptionValueToTextMap = Models.Api.Shared.YesNoIrrelevantOptionMapper.getValueToTextMap();
+            const yearMonthUndecidedOptionValueToTextMap = Models.Api.Shared.YearMonthUndecidedOptionMapper.getValueToTextMap();
 
             //Build and launch kendo grid
             var launcher =
@@ -184,6 +185,30 @@
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt))
                             .withInitialVisibility(false))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("OversightInterval")
+                            .withTitle("Tilsynsinterval")
+                            .withId("oversightInterval")
+                            .withStandardWidth(100)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly,
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly,
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year,
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Other
+                                ].map(value => {
+                                    return {
+                                        textValue: yearMonthUndecidedOptionValueToTextMap[value],
+                                        remoteValue: value
+                                    }
+                                })
+                                , false
+                            )
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval]))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval])))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>
