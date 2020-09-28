@@ -13,7 +13,6 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
-using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
@@ -137,31 +136,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Delete_Returns_NotFound()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.Delete(id);
-
-            //Assert
-            AssertFailureToDelete(id, result, OperationFailure.NotFound);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.Delete(id));
         }
 
         [Fact]
         public void Delete_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowDeleteReturns(registration, false);
-
-            //Act
-            var result = _sut.Delete(id);
-
-            //Assert
-            AssertFailureToDelete(id, result, OperationFailure.Forbidden);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.Delete(id));
         }
 
         [Fact]
@@ -184,33 +165,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Get_Returns_NotFound()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.Get(id);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.Get(id));
         }
 
         [Fact]
         public void Get_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, false);
-
-            //Act
-            var result = _sut.Get(id);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_ReadAccess(id => _sut.Get(id));
         }
 
         [Fact]
@@ -259,18 +220,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_Name_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var name = A<string>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.UpdateName(id, name);
-
-            //Assert
-            AssertModificationFailure(result, OperationFailure.Forbidden);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateName(id, A<string>()));
         }
 
         [Fact]
@@ -355,35 +305,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_GetAvailableRoles_If_ReadAccess_Is_Denied()
         {
-            //Arrange
-            var agreementId = A<int>();
-            var registration = new DataProcessingRegistration();
-
-            ExpectRepositoryGetToReturn(agreementId, registration);
-            ExpectAllowReadReturns(registration, false);
-
-            //Act
-            var result = _sut.GetAvailableRoles(agreementId);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_ReadAccess(id => _sut.GetAvailableRoles(id));
         }
 
         [Fact]
-        public void Cannot_GetAvailableRoles_If_Dpa_Is_Not_Found()
+        public void Cannot_GetAvailableRoles_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var agreementId = A<int>();
-
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.GetAvailableRoles(agreementId);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.GetAvailableRoles(id));
         }
 
         [Fact]
@@ -415,34 +343,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_GetUsersWhichCanBeAssignedToRole_If_ReadAccess_Is_Denied()
         {
-            //Arrange
-            var agreementId = A<int>();
-            var registration = new DataProcessingRegistration();
-
-            ExpectRepositoryGetToReturn(agreementId, registration);
-            ExpectAllowReadReturns(registration, false);
-
-            //Act
-            var result = _sut.GetUsersWhichCanBeAssignedToRole(agreementId, A<int>(), A<string>(), 13);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_ReadAccess(id => _sut.GetUsersWhichCanBeAssignedToRole(id, A<int>(), A<string>(), 13));
         }
 
         [Fact]
-        public void Cannot_GetUsersWhichCanBeAssignedToRole_If_Dpa_Is_Not_found()
+        public void Cannot_GetUsersWhichCanBeAssignedToRole_If_Dpr_Is_Not_found()
         {
-            //Arrange
-            var agreementId = A<int>();
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.GetUsersWhichCanBeAssignedToRole(agreementId, A<int>(), A<string>(), 13);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.GetUsersWhichCanBeAssignedToRole(id, A<int>(), A<string>(), 13));
         }
 
         [Theory]
@@ -478,33 +385,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_AssignRole_If_WriteAccess_Is_Denied()
         {
-            //Arrange
-            var agreementId = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(agreementId, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignRole(agreementId, A<int>(), A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignRole(id, A<int>(), A<int>()));
         }
 
         [Fact]
-        public void Cannot_AssignRole_If_Dpa_Is_Not_found()
+        public void Cannot_AssignRole_If_Dpr_Is_Not_found()
         {
-            //Arrange
-            var agreementId = A<int>();
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.AssignRole(agreementId, A<int>(), A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignRole(id, A<int>(), A<int>()));
         }
 
         [Theory]
@@ -541,33 +428,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_RemoveRole_If_WriteAccess_Is_Denied()
         {
-            //Arrange
-            var agreementId = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(agreementId, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.RemoveRole(agreementId, A<int>(), A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveRole(id, A<int>(), A<int>()));
         }
 
         [Fact]
-        public void Cannot_RemoveRole_If_Dpa_Is_Not_found()
+        public void Cannot_RemoveRole_If_Dpr_Is_Not_found()
         {
-            //Arrange
-            var agreementId = A<int>();
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.RemoveRole(agreementId, A<int>(), A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveRole(id, A<int>(), A<int>()));
         }
 
         [Fact]
@@ -645,34 +512,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_Set_Master_Reference_On_Dpa_If_WriteAccess_Is_Not_Permitted()
         {
-            //Arrange
-            var agreementId = A<int>();
-
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(agreementId, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.SetMasterReference(agreementId, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.SetMasterReference(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_Set_Master_Reference_On_Dpa_With_Invalid_Dpa()
         {
-            //Arrange
-            var agreementId = A<int>();
-            ExpectRepositoryGetToReturn(agreementId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.SetMasterReference(agreementId, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.SetMasterReference(id, A<int>()));
         }
 
         [Fact]
@@ -698,37 +544,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_GetSystemsWhichCanBeAssigned_If_Dpa_Is_Not_Found()
+        public void Cannot_GetSystemsWhichCanBeAssigned_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            var nameQuery = A<string>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.GetSystemsWhichCanBeAssigned(id, A<string>(), new Random().Next(2, 100)));
         }
 
         [Fact]
         public void Cannot_GetSystemsWhichCanBeAssigned_If_Read_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var nameQuery = A<string>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowReadReturns(registration, false);
-
-            //Act
-            var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_ReadAccess(id => _sut.GetSystemsWhichCanBeAssigned(id, A<string>(), new Random().Next(2, 100)));
         }
 
         [Fact]
@@ -755,35 +579,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_AssignSystem_If_Dpa_Is_Not_Found()
+        public void Cannot_AssignSystem_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.AssignSystem(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSystem(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_AssignSystem_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignSystem(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSystem(id, A<int>()));
         }
 
         [Fact]
@@ -810,35 +614,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_RemoveSystem_If_Dpa_Is_Not_Found()
+        public void Cannot_RemoveSystem_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.RemoveSystem(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveSystem(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_RemoveSystem_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.RemoveSystem(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveSystem(id, A<int>()));
         }
 
         [Fact]
@@ -866,35 +650,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_AssignDataProcessorIf_Dpa_Is_Not_Found()
+        public void Cannot_AssignDataProcessorIf_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.AssignDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignDataProcessor(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_AssignDataProcessor_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignDataProcessor(id, A<int>()));
         }
 
         [Fact]
@@ -922,35 +686,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_RemoveDataProcessor_If_Dpa_Is_Not_Found()
+        public void Cannot_RemoveDataProcessor_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.RemoveDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveDataProcessor(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_RemoveDataProcessor_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveDataProcessor(id, A<int>()));
         }
 
         [Fact]
@@ -1000,35 +744,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_AssignSubDataProcessorIf_Dpa_Is_Not_Found()
+        public void Cannot_AssignSubDataProcessorIf_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.AssignSubDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignSubDataProcessor(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_AssignSubDataProcessor_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignSubDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignSubDataProcessor(id, A<int>()));
         }
 
         [Fact]
@@ -1056,35 +780,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_RemoveSubDataProcessor_If_Dpa_Is_Not_Found()
+        public void Cannot_RemoveSubDataProcessor_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.RemoveSubDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveSubDataProcessor(id, A<int>()));
         }
 
         [Fact]
         public void Cannot_RemoveSubDataProcessor_If_Write_Access_Is_Denied()
         {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.AssignSubDataProcessor(id, A<int>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveSubDataProcessor(id, A<int>()));
         }
 
         [Fact]
@@ -1131,18 +835,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_SetSubDataProcessorsState_If_Dpa_Is_Not_Found()
+        public void Cannot_SetSubDataProcessorsState_If_Dpr_Is_Not_Found()
         {
-            //Arrange
-            var id = A<int>();
-            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.SetSubDataProcessorsState(id, A<YesNoUndecidedOption>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.SetSubDataProcessorsState(id, A<YesNoUndecidedOption>()));
         }
 
         [Fact]
@@ -1194,18 +889,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_IsAgreementConcluded_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var isAgreementConcluded = A<YesNoIrrelevantOption>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.UpdateIsAgreementConcluded(id, isAgreementConcluded);
-
-            //Assert
-            AssertModificationFailure(result, OperationFailure.Forbidden);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsAgreementConcluded(id, A<YesNoIrrelevantOption>()));
         }
 
         [Fact]
@@ -1254,19 +938,169 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_AgreementConcludedAt_Returns_Forbidden()
         {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateAgreementConcludedAt(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Can_UpdateTransferToInsecureThirdCountries()
+        {
             //Arrange
             var id = A<int>();
-            var dateTime = A<DateTime>();
+            var registration = new DataProcessingRegistration();
+            var newValue = A<YesNoUndecidedOption>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.UpdateTransferToInsecureThirdCountries(id, newValue);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(registration.TransferToInsecureThirdCountries, newValue);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_UpdateTransferToInsecureThirdCountries_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateTransferToInsecureThirdCountries(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Cannot_UpdateTransferToInsecureThirdCountries_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateTransferToInsecureThirdCountries(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Can_AssignInsecureThirdCountry()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var countryId = A<int>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _insecureThirdCountryAssignmentMock.Setup(x => x.Assign(registration, countryId)).Returns(Result<DataProcessingCountryOption, OperationError>.Success(new DataProcessingCountryOption()));
+
+            //Act
+            var result = _sut.AssignInsecureThirdCountry(id, countryId);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_AssignInsecureThirdCountry_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignInsecureThirdCountry(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_AssignInsecureThirdCountry_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignInsecureThirdCountry(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_RemoveInsecureThirdCountry()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var countryId = A<int>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _insecureThirdCountryAssignmentMock.Setup(x => x.Remove(registration, countryId)).Returns(Result<DataProcessingCountryOption, OperationError>.Success(new DataProcessingCountryOption()));
+
+            //Act
+            var result = _sut.RemoveInsecureThirdCountry(id, countryId);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveInsecureThirdCountry_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveInsecureThirdCountry(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_RemoveInsecureThirdCountry_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveInsecureThirdCountry(id, A<int>()));
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing Write access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, false);
 
             //Act
-            var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
+            var result = command(id);
 
             //Assert
-            AssertModificationFailure(result, OperationFailure.Forbidden);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing read access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Dpr_Insufficient_ReadAccess<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, false);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "DRP not found" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Dpr_NotFound<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectRepositoryGetToReturn(id, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)
         {
@@ -1279,13 +1113,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(organizationDataReadAccessLevel);
         }
 
-        private void AssertModificationFailure(Result<DataProcessingRegistration, OperationError> result, OperationFailure operationFailure)
-        {
-            _repositoryMock.Verify(x => x.Update(It.IsAny<DataProcessingRegistration>()), Times.Never);
-            Assert.True(result.Failed);
-            Assert.Equal(operationFailure, result.Error.FailureType);
-        }
-
         private void ExpectAllowModifyReturns(DataProcessingRegistration dataProcessingRegistration, bool value)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(dataProcessingRegistration)).Returns(value);
@@ -1294,13 +1121,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectAllowReadReturns(DataProcessingRegistration dataProcessingRegistration, bool value)
         {
             _authorizationContextMock.Setup(x => x.AllowReads(dataProcessingRegistration)).Returns(value);
-        }
-
-        private void AssertFailureToDelete(int id, Result<DataProcessingRegistration, OperationError> result, OperationFailure operationFailure)
-        {
-            _repositoryMock.Verify(x => x.DeleteById(id), Times.Never);
-            Assert.True(result.Failed);
-            Assert.Equal(operationFailure, result.Error.FailureType);
         }
 
         private void ExpectAllowDeleteReturns(DataProcessingRegistration dataProcessingRegistration, bool value)
