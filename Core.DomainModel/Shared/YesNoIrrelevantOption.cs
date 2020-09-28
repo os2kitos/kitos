@@ -7,23 +7,4 @@
         IRRELEVANT = 2,
         UNDECIDED = 3
     }
-
-    public static class YesNoIrrelevantOptionExtensions
-    {
-        public static string ToDanishString(this YesNoIrrelevantOption yesNoIrrelevantOption)
-        {
-            return yesNoIrrelevantOption switch
-            {
-                YesNoIrrelevantOption.NO => "Nej",
-                YesNoIrrelevantOption.YES => "Ja",
-                YesNoIrrelevantOption.IRRELEVANT => "Ikke relevant",
-                _ => "",
-            };
-        }
-
-        public static string ToDanishString(this YesNoIrrelevantOption? yesNoIrrelevantOption)
-        {
-            return yesNoIrrelevantOption.HasValue ? yesNoIrrelevantOption.Value.ToDanishString() : "";
-        }
-    }
 }

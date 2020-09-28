@@ -16,7 +16,7 @@
         SystemNamesAsCsv: string;
         DataProcessorNamesAsCsv: string;
         SubDataProcessorNamesAsCsv: string;
-        IsAgreementConcluded: string;
+        IsAgreementConcluded?: Models.Api.Shared.YesNoIrrelevantOption;
         AgreementConcludedAt?: Date;
     }
 }
