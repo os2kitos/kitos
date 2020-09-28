@@ -21,6 +21,8 @@
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
+        updateOversightInterval(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YearMonthUndecidedIntervalOption);
+        updateOversightIntervalNote(dataProcessingRegistrationId: number, note: string);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -252,6 +254,14 @@
 
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateString: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
+        }
+
+        updateOversightInterval(dataProcessingRegistrationId: number, yearMonthUndecidedId: Models.Api.Shared.YearMonthUndecidedIntervalOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option"), yearMonthUndecidedId);
+        }
+
+        updateOversightIntervalNote(dataProcessingRegistrationId: number, note: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option-note"), note);
         }
 
         static $inject = ["$http"];
