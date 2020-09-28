@@ -38,15 +38,7 @@ namespace Core.DomainServices.GDPR
 
         private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.IsAgreementConcluded = source.IsAgreementConcluded.ToDanishString();
-            if(source.IsAgreementConcluded == YesNoIrrelevantOption.YES)
-            {
-                destination.AgreementConcludedAt = source.AgreementConcludedAt;
-            }
-            else
-            {
-                destination.AgreementConcludedAt = null;
-            }
+            destination.IsAgreementConcluded = source.IsAgreementConcluded;
         }
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

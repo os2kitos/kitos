@@ -43,6 +43,8 @@
             //Lookup maps
             var dpaRoleIdToUserNamesMap = {};
 
+            const yesNoIrrelevantOptionValueToTextMap = Models.Api.Shared.YesNoIrrelevantOptionMapper.getValueToTextMap();
+
             //Build and launch kendo grid
             var launcher =
                 kendoGridLauncherFactory
@@ -142,15 +144,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
-							.withDataSourceName("SubDataProcessorNamesAsCsv")
-							.withTitle("Underdatabehandlere")
-							.withId("dpSubDataProcessorNamesAsCsv")
-							.withStandardWidth(150)
-							.withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-							.withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv))
-							.withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
+                            .withDataSourceName("SubDataProcessorNamesAsCsv")
+                            .withTitle("Underdatabehandlere")
+                            .withId("dpSubDataProcessorNamesAsCsv")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SubDataProcessorNamesAsCsv))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
                     .withColumn(builder =>
-                        builder							
+                        builder
                             .withDataSourceName("IsAgreementConcluded")
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
@@ -159,14 +161,19 @@
                             .withFixedValueRange
                             (
                                 [
-                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.YES),
-                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.NO),
-                                    Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT)
-                                ]
+                                    Models.Api.Shared.YesNoIrrelevantOption.YES,
+                                    Models.Api.Shared.YesNoIrrelevantOption.NO,
+                                    Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
+                                ].map(value => {
+                                    return {
+                                        textValue: yesNoIrrelevantOptionValueToTextMap[value],
+                                        remoteValue: value
+                                    }
+                                })
                                 , false
                             )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded)))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded && yesNoIrrelevantOptionValueToTextMap[dataItem.IsAgreementConcluded]))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && yesNoIrrelevantOptionValueToTextMap[dataItem.IsAgreementConcluded])))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("AgreementConcludedAt")
