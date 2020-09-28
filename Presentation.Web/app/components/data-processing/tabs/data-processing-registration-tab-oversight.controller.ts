@@ -22,7 +22,7 @@
             private readonly notify) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
-
+             
             this.bindOversightInterval();
             this.bindOversightIntervalNote();
 
@@ -71,8 +71,6 @@
                     this.bindOversightIntervalNote();
                     return success;
                 });
-            
-
         }
 
     }
@@ -81,7 +79,7 @@
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
             $stateProvider.state("data-processing.edit-registration.oversight", {
-                url: "/main",
+                url: "/oversight",
                 templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight.view.html",
                 controller: EditOversightDataProcessingRegistrationController,
                 controllerAs: "vm"
