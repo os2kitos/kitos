@@ -39,5 +39,6 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
         Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(int id, int? dataResponsibleId);
+        Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
     }
 }

@@ -7,7 +7,8 @@
             "hasWriteAccess",
             "dataProcessingRegistration",
             "apiUseCaseFactory",
-            "select2LoadingService"
+            "select2LoadingService",
+            "notify"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -17,7 +18,8 @@
             public hasWriteAccess,
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
-            private readonly select2LoadingService: Services.ISelect2LoadingService) {
+            private readonly select2LoadingService: Services.ISelect2LoadingService,
+            private readonly notify) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -46,7 +48,11 @@
             this.hasSubDataProcessors = {
                 selectedElement: this.dataProcessingRegistration.hasSubDataProcessors !== null && new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x=>x.id === (this.dataProcessingRegistration.hasSubDataProcessors as number))[0],
                 select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
-                elementSelected: (newElement) => this.changeHasSubDataProcessor(newElement.optionalObjectContext)
+                elementSelected: (newElement) => {
+                    if (!!newElement) {
+                        this.changeHasSubDataProcessor(newElement.optionalObjectContext);
+                    }
+                }
             };
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
@@ -198,13 +204,17 @@
         }
 
         private changeAgreementConcludedAt(agreementConcludedAt: string) {
-            this.apiUseCaseFactory
-                .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, agreementConcludedAt))
-                .executeAsync(success => {
-                    this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
-                    this.bindAgreementConcludedAt();
-                    return success;
-                });
+            var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(agreementConcludedAt);
+            if (!!formattedDate.convertedValue) {
+                return this.apiUseCaseFactory
+                    .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, formattedDate.convertedValue))
+                    .executeAsync(success => {
+                        this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
+                        this.bindAgreementConcludedAt();
+                        return success;
+                    });
+            }
+            return this.notify.addErrorMessage(formattedDate.errorMessage);            
         }
 
         private bindIsAgreementConcluded() {

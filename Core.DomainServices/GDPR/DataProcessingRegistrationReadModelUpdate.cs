@@ -28,6 +28,13 @@ namespace Core.DomainServices.GDPR
             PatchSystems(source, destination);
             PatchDataProcessors(source, destination); 
             PatchIsAgreementConcluded(source, destination);
+            PatchDataResponsible(source, destination);
+        }
+
+        private static void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.DataResponsible = source.DataResponsible;
+            destination.DataResponsibleRemark = source.DataResponsibleRemark;
         }
 
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -36,17 +43,10 @@ namespace Core.DomainServices.GDPR
             destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.SubDataProcessors.Select(x => x.Name));
         }
 
-        private void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        private static void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.IsAgreementConcluded = source.IsAgreementConcluded.ToDanishString();
-            if(source.IsAgreementConcluded == YesNoIrrelevantOption.YES)
-            {
-                destination.AgreementConcludedAt = source.AgreementConcludedAt;
-            }
-            else
-            {
-                destination.AgreementConcludedAt = null;
-            }
+            destination.IsAgreementConcluded = source.IsAgreementConcluded;
+            destination.AgreementConcludedAt = source.IsAgreementConcluded == YesNoIrrelevantOption.YES ? source.AgreementConcludedAt : null;
         }
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

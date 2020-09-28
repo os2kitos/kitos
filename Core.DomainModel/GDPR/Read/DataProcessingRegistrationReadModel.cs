@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.GDPR.Read
 {
@@ -39,11 +40,11 @@ namespace Core.DomainModel.GDPR.Read
 
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
 
-        public string IsAgreementConcluded { get; set; }
+        public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }
 
-        public DataProcessingDataResponsibleOption? DataResponsible { get; set; }
+        public DataProcessingDataResponsibleOption DataResponsible { get; set; }
 
         public string DataResponsibleRemark { get; set; }
     }

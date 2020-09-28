@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Agreement_Concluded_To_DateProcessingRegistration : IMigrationMetadata
+    public sealed partial class Added_Data_Responsible : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Agreement_Concluded_To_DateProcessingRegistration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Data_Responsible));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009231046185_Added_Agreement_Concluded_To_DateProcessingRegistration"; }
+            get { return "202009281305258_Added_Data_Responsible"; }
         }
         
         string IMigrationMetadata.Source

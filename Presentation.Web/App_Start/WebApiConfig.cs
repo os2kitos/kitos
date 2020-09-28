@@ -18,7 +18,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
-using Presentation.Web.Infrastructure.Odata;
 using Presentation.Web.Models;
 using Presentation.Web.Controllers.OData.AttachedOptions;
 using Microsoft.OData;
@@ -26,6 +25,7 @@ using Microsoft.OData.UriParser;
 using System.Collections.Generic;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
@@ -55,11 +55,8 @@ namespace Presentation.Web
 
             var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: routePrefix, configureAction: (builder => builder
             .AddService(ServiceLifetime.Singleton, sp => GetModel())
-            .AddService(ServiceLifetime.Singleton, sp => new StringAsEnumResolver())
-            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver())
-            .AddService(ServiceLifetime.Singleton, sp => new UnqualifiedODataUriResolver())
-            .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp =>
-                        ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
+            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true})
+            .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp => ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());

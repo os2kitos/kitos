@@ -1267,6 +1267,171 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertModificationFailure(result, OperationFailure.Forbidden);
         }
 
+        [Fact]
+        public void Can_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_ReadAccess_Is_Permitted()
+        {
+            //Arrange
+            var registrationId = A<int>();
+            var registration = new DataProcessingRegistration();
+            var dataResponsibleOptions = new[] { new DataProcessingDataResponsibleOption() };
+            var agreementRoles = new[] { new DataProcessingRegistrationRole(), new DataProcessingRegistrationRole() };
+
+            ExpectRepositoryGetToReturn(registrationId, registration);
+            ExpectAllowReadReturns(registration, true);
+            _dataResponsibleAssignmentServiceMock.Setup(x => x.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration)).Returns(dataResponsibleOptions);
+            _roleAssignmentServiceMock.Setup(x => x.GetApplicableRoles(registration)).Returns(agreementRoles);
+
+            //Act
+            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(dataResponsibleOptions, result.Value.DataProcessingRegistrationDataResponsibleOptions);
+            Assert.Equal(agreementRoles, result.Value.DataProcessingRegistrationRoles);
+        }
+
+        [Fact]
+        public void Cannot_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_ReadAccess_Is_Denied()
+        {
+            //Arrange
+            var registrationId = A<int>();
+            var registration = new DataProcessingRegistration();
+
+            ExpectRepositoryGetToReturn(registrationId, registration);
+            ExpectAllowReadReturns(registration, false);
+
+            //Act
+            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_Dpa_Is_Not_Found()
+        {
+            //Arrange
+            var registrationId = A<int>();
+
+            ExpectRepositoryGetToReturn(registrationId, Maybe<DataProcessingRegistration>.None);
+
+            //Act
+            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsible()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var dataResponsibleOption = new DataProcessingDataResponsibleOption() { Id = A<int>() };
+
+            var updatedRegistration = registration;
+            updatedRegistration.DataResponsible = dataResponsibleOption;
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _dataResponsibleAssignmentServiceMock.Setup(x => x.UpdateDataResponsible(registration, dataResponsibleOption.Id)).Returns(updatedRegistration);
+
+            //Act
+            var result = _sut.UpdateDataResponsible(id, dataResponsibleOption.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(dataResponsibleOption, result.Value.DataResponsible);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsible_To_Null()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration(); 
+
+            var updatedRegistration = registration;
+            updatedRegistration.DataResponsible = null;
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _dataResponsibleAssignmentServiceMock.Setup(x => x.UpdateDataResponsible(registration, null)).Returns(updatedRegistration);
+
+            //Act
+            var result = _sut.UpdateDataResponsible(id, null);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Null(result.Value.DataResponsible);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var dataResponsibleOption = new DataProcessingDataResponsibleOption() { Id = A<int>()};
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateDataResponsible(id, dataResponsibleOption.Id);
+
+            //Assert
+            AssertModificationFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsibleRemark()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var dataResponsibleRemark = A<string>();
+
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateDataResponsibleRemark(id, dataResponsibleRemark);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(dataResponsibleRemark, result.Value.DataResponsibleRemark);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_Forbidden()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var dataResponsibleRemark = A<string>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, false);
+
+            //Act
+            var result = _sut.UpdateDataResponsibleRemark(id, dataResponsibleRemark);
+
+            //Assert
+            AssertModificationFailure(result, OperationFailure.Forbidden);
+        }
+
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)
         {
             _repositoryMock.Verify(x => x.Update(dataProcessingRegistration), expectSideEffect ? Times.Once() : Times.Never());

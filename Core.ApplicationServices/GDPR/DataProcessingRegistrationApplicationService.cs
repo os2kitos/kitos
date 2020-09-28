@@ -318,7 +318,16 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _dataResponsibleAssigmentService.UpdateDataResponsible(registration, dataResponsibleId));
         }
 
-        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
+        public Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.DataResponsibleRemark = remark;
+                return registration;
+            });
+        }
+
+            private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
