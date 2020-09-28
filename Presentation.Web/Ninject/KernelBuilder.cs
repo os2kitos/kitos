@@ -253,6 +253,9 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>>()
                 .To<OptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>()
+                .To<OptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
