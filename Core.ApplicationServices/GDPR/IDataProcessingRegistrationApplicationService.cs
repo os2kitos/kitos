@@ -37,7 +37,6 @@ namespace Core.ApplicationServices.GDPR
         Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId);
         Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
-        Result<IEnumerable<DataProcessingDataResponsibleOption>, OperationError> GetDataResponsibleOptionsWhichCanBeAssigned(int id);
         Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(int id, int? dataResponsibleId);
     }
