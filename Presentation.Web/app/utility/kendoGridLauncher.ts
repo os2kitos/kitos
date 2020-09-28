@@ -22,13 +22,18 @@ module Kitos.Utility.KendoGrid {
         schemaMutation: (map: any) => void;
     }
 
+    export interface IKendoParameter {
+        textValue: string;
+        remoteValue : any;
+    }
+
     export interface IKendoGridColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
-        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -43,7 +48,7 @@ module Kitos.Utility.KendoGrid {
         private dataSourceName: string = null;
         private title: string = null;
         private filtering: KendoGridColumnFiltering = null;
-        private valueRange: string[] = null;
+        private valueRange: IKendoParameter[] = null;
         private valueRangeMultiSelect: boolean = false;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
@@ -51,7 +56,7 @@ module Kitos.Utility.KendoGrid {
         private sortingEnabled = true;
         private visible = true;
 
-        withFixedValueRange(possibleValues: string[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
             this.valueRange = possibleValues;
             this.valueRangeMultiSelect = multiSelect;
@@ -175,15 +180,19 @@ module Kitos.Utility.KendoGrid {
                                 "this.valueRange must be defined when using filtering option FixedValueRange");
                         }
                         const valueRange = this.valueRange; //capture the reference to use in lambda below
+                        
                         return {
                             cell: {
                                 template: (args) => {
                                     args.element.kendoDropDownList({
                                         dataSource: valueRange.map(value => {
-                                            return { textValue: value, text: value };
+                                            return {
+                                                remoteValue: value.remoteValue,
+                                                text: value.textValue
+                                            };
                                         } ),
                                         dataTextField: "text",
-                                        dataValueField: "textValue",
+                                        dataValueField: "remoteValue",
                                         valuePrimitive: true
                                     });
                                 },

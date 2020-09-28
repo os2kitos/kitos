@@ -112,7 +112,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(oversightInterval.TranslateToDanishString(), readModel.OversightInterval);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
-            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
+            Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");
@@ -157,7 +157,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(registration.Id, readModel.SourceEntityId);
 
             Console.Out.WriteLine("Asserting Dependent and dependee properties");
-            Assert.Equal(isAgreementConcluded.ToDanishString(), readModel.IsAgreementConcluded);
+            Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(agreementConcludedAt, readModel.AgreementConcludedAt);
 
         }
