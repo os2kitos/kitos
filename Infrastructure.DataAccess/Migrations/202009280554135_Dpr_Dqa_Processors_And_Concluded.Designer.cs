@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Update_Dpr_Readmodel_with_dataprocessors : IMigrationMetadata
+    public sealed partial class Dpr_Dqa_Processors_And_Concluded : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Update_Dpr_Readmodel_with_dataprocessors));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Dpr_Dqa_Processors_And_Concluded));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009221144455_Update_Dpr_Readmodel_with_dataprocessors"; }
+            get { return "202009280554135_Dpr_Dqa_Processors_And_Concluded"; }
         }
         
         string IMigrationMetadata.Source

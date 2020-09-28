@@ -38,6 +38,10 @@ namespace Infrastructure.DataAccess.Mapping
             //No index bc we don't know how long it might be
             Property(x => x.DataProcessorNamesAsCsv).IsOptional();
             Property(x => x.SubDataProcessorNamesAsCsv).IsOptional();
+
+            Property(x => x.IsAgreementConcluded)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_Concluded", 0);
         }
     }
 }

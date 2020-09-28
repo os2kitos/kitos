@@ -668,7 +668,6 @@
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
-    <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
     <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Models\ArchivePeriodDTO.cs" />
