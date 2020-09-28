@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -45,6 +44,10 @@ namespace Core.DomainModel.GDPR
         public int OrganizationId { get; set; }
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+        
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; }
 
         public virtual Organization.Organization Organization { get; set; }
 

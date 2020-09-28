@@ -39,6 +39,11 @@ namespace Infrastructure.DataAccess.Mapping
             //Sub Data processors
             HasMany(x => x.SubDataProcessors)
                 .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
+
+            //Transfer to insecure countries
+            HasMany(x => x.InsecureCountriesSubjectToDataTransfer)
+                .WithMany(x => x.InsecureDataTransferSubjectsInDataProcessingRegistrations);
+            Property(x => x.TransferToInsecureThirdCountries).IsOptional();
         }
     }
 }
