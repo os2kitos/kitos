@@ -38,8 +38,8 @@
                     dataProcessingRegistration: [
                         "dataProcessingRegistrationService", "$stateParams", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, $stateParams) => dataProcessingRegistrationService.get($stateParams.id)
                     ],
-                    dataResponsibleOptions: [
-                        "dataProcessingRegistrationService", "dataProcessingRegistration", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, dataProcessingRegistration) => dataProcessingRegistrationService.getApplicableDataResponsibleOptions(dataProcessingRegistration.id)
+                    dataProcessingRegistrationOptions: [
+                        "dataProcessingRegistrationService", "dataProcessingRegistration", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, dataProcessingRegistration) => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(dataProcessingRegistration.id)
                     ]
                 }
             });

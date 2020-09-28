@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
@@ -19,6 +20,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.GDPR;
 using Presentation.Web.Models.References;
+using Presentation.Web.Models.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -403,16 +405,19 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("{id}/data-responsible-options")]
+        [Route("{id}/data-processing-registration-options")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableDataResponsibleOptions(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public HttpResponseMessage GetDataProcessingRegistrationOptions(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
         {
             return _dataProcessingRegistrationApplicationService
-                .GetDataResponsibleOptionsWhichCanBeAssigned(id)
-                .Select<IEnumerable<DataProcessingDataResponsibleOption>>(result => result.ToList())
+                .GetDataProcessingRegistrationOptionsWhichCanBeAssigned(id)
+                .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO() { 
+                    roles = ToDTOs(result.DataProcessingRegistrationRoles, result.Registration.OrganizationId).ToList(),
+                    dataResponsibleOptions = ToDTOs(result.DataProcessingRegistrationDataResponsibleOptions, id).ToList()
+                } )
                 .Match(Ok, FromOperationError);
         }
 
@@ -424,6 +429,13 @@ namespace Presentation.Web.Controllers.API
         private static UserWithEmailDTO ToDTO(User arg)
         {
             return new UserWithEmailDTO(arg.Id, $"{arg.Name} {arg.LastName}", arg.Email);
+        }
+
+        private IEnumerable<SimpleOptionDTO> ToDTOs(IEnumerable<DataProcessingDataResponsibleOption> options, int organizationId)
+        {
+            var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
+
+            return options.Select(option => ToDTO(option, localDescriptionOverrides));
         }
 
         private IEnumerable<BusinessRoleDTO> ToDTOs(IEnumerable<DataProcessingRegistrationRole> roles, int organizationId)
@@ -526,5 +538,16 @@ namespace Presentation.Web.Controllers.API
                     : role.Description
             };
         }
+
+        private static SimpleOptionDTO ToDTO(DataProcessingDataResponsibleOption option, IReadOnlyDictionary<int, Maybe<string>> localDescriptionOverrides)
+        {
+            return new SimpleOptionDTO(option.Id, option.Name)
+            {
+                Note = localDescriptionOverrides.ContainsKey(option.Id)
+                    ? localDescriptionOverrides[option.Id].GetValueOrFallback(option.Description)
+                    : option.Description
+            };
+        }
+
     }
 }

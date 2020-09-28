@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.DomainModel.Organization;
+using Core.ApplicationServices.Model.GDPR;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -306,6 +307,17 @@ namespace Core.ApplicationServices.GDPR
             return WithReadAccess<IEnumerable<DataProcessingDataResponsibleOption>>(
                 id,
                 registration => _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptions(registration).ToList());
+        }
+
+        public Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id)
+        {
+            return WithReadAccess<DataProcessingRegistrationOptions>(
+                id,
+                registration => new DataProcessingRegistrationOptions() {
+                    Registration = registration,
+                    DataProcessingRegistrationRoles = _roleAssignmentsService.GetApplicableRoles(registration).ToList(),
+                    DataProcessingRegistrationDataResponsibleOptions = _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptions(registration).ToList()
+                }) ;
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)

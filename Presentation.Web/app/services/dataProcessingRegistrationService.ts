@@ -21,7 +21,7 @@
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        getApplicableDataResponsibleOptions(dataProcessingRegistrationId: number);
+        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -256,11 +256,11 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), date);
         }
 
-        getApplicableDataResponsibleOptions(dataProcessingRegistrationId: number) {
+        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number) {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId,
-                    "data-responsible-options"))
+                    "data-processing-registration-options"))
                 .then(
                     result => {
                         var response = result.data as { response }
