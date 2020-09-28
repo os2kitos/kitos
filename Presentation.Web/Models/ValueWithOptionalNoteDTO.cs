@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Presentation.Web.Models
 {
-    public class ValueOptionWithOptionalNoteDTO<T>
+    public class ValueWithOptionalNoteDTO<T>
     {
         public T Value { get; set; }
 

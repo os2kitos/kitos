@@ -411,7 +411,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchOversightOption(int id, [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
         {
             if (oversightInterval == null)
-                return BadRequest("YearMonthIntervalOption must provided");
+                return BadRequest(nameof(oversightInterval) + " must provided");
             
 
             return _dataProcessingRegistrationApplicationService
@@ -428,7 +428,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchOversightOptionNote(int id, [FromBody] SingleValueDTO<string> oversightIntervalNote)
         {
             if (oversightIntervalNote == null)
-                return BadRequest("Note must be provided");
+                return BadRequest(nameof(oversightIntervalNote) +" must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightIntervalNote(id, oversightIntervalNote.Value)
