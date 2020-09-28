@@ -440,7 +440,7 @@
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
     <Compile Include="Models\UserWithEmailDTO.cs" />
-    <Compile Include="Models\ValueOptionWithOptionalNoteDTO.cs" />
+    <Compile Include="Models\ValueWithOptionalNoteDTO.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
     <Compile Include="Ninject\KernelBuilder.cs" />
@@ -453,6 +453,7 @@
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference.controller.ts" />

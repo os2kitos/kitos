@@ -506,7 +506,7 @@ namespace Presentation.Web.Controllers.API
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
-                OversightInterval = new ValueOptionWithOptionalNoteDTO<YearMonthIntervalOption?>()
+                OversightInterval = new ValueWithOptionalNoteDTO<YearMonthIntervalOption?>()
                 {
                     Value = value.OversightInterval,
                     Note = value.OversightIntervalNote
