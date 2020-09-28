@@ -620,6 +620,10 @@
     <Compile Include="Migrations\202009280554135_Dpr_Dqa_Processors_And_Concluded.designer.cs">
       <DependentUpon>202009280554135_Dpr_Dqa_Processors_And_Concluded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.cs" />
+    <Compile Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.designer.cs">
+      <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1006,6 +1010,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009280554135_Dpr_Dqa_Processors_And_Concluded.resx">
       <DependentUpon>202009280554135_Dpr_Dqa_Processors_And_Concluded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.resx">
+      <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
