@@ -8,7 +8,6 @@ using System.Web.Http;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
@@ -342,7 +341,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-		[SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
@@ -350,8 +349,8 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
+                .Match(_ => Ok(), FromOperationError);
+        }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
@@ -483,7 +482,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
-                .AsNoTracking()
+                .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .AsEnumerable()
                 .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
                 .ToList();
@@ -535,7 +534,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt
-                }
+                },
+                TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries
             };
         }
 

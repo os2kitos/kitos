@@ -20,6 +20,8 @@ namespace Presentation.Web.Models.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
         public ShallowOrganizationDTO[] DataProcessors { get; set; }
         
         public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
