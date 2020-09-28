@@ -61,7 +61,7 @@ class DataProcessingRegistrationEditMainPageObject {
     }
 
     getAgreementConcludedAtDateField() {
-        return element(by.id("agreementConcludedAt"));
+        return element(by.id("agreementConcludedAt")).element(by.tagName("input"));
     }
 
 }

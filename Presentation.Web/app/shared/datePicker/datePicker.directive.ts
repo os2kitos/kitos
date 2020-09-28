@@ -6,7 +6,6 @@
         () => ({
             templateUrl: "app/shared/datePicker/datePicker.view.html",
             scope: {
-                id: "@",
                 model: "=ngModel",
                 appendurl: "@",
                 disabled: "=ngDisabled",
