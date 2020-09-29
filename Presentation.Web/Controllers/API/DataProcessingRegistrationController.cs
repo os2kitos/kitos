@@ -555,6 +555,10 @@ namespace Presentation.Web.Controllers.API
                 {
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt
+                },
+                DataResponsible = new SimpleOptionDTO(value.DataResponsible.Id, value.DataResponsible.Name)
+                {
+                    Note = value.DataResponsible.Description,
                 }
             };
         }
