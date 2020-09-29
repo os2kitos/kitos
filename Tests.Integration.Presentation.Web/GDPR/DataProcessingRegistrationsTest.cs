@@ -155,8 +155,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         [Theory]
         [InlineData("")] //too short
         [InlineData("    ")] //only whitespace
-        [InlineData(
-            "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")] //101 chars
+        [InlineData("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")] //101 chars
         public async Task Can_Create_Returns_Error_If_InvalidName(string name)
         {
             //Act

@@ -2,10 +2,8 @@
 import Login = require("../../Helpers/LoginHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
-import WaitTimers = require("../../Utility/WaitTimers");
 import DataProcessingRegistrationEditOversightPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
-import GetDateHelper = require("../../Helpers/GetDateHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
 
 describe("Data processing agreement oversight detail tests", () => {
@@ -14,8 +12,6 @@ describe("Data processing agreement oversight detail tests", () => {
     const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();
     const pageObject = new DataProcessingRegistrationEditOversightPageObject();
     const testFixture = new TestFixtureWrapper();
-    const waitUpTo = new WaitTimers();
-    const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingRegistrationHelper;
 
     const createName = (index: number) => {
