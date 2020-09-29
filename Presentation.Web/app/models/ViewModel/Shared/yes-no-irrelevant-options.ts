@@ -51,11 +51,19 @@
             const select2BlankOptionTextValue = "\u200B";
 
             this.options = [
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED as number, text: select2BlankOptionTextValue, optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.YES as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.YES), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.YES },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.NO as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.NO), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.NO },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT }
-            ];
+                Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED,
+                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                Models.Api.Shared.YesNoIrrelevantOption.NO,
+                Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
+            ].map(optionType => {
+                return <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{
+                    id: optionType as number,
+                    text: optionType === Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
+                        ? select2BlankOptionTextValue
+                        : YesNoIrrelevantOptions.getText(optionType),
+                    optionalObjectContext: optionType
+                }
+            });
         }
     }
 }
