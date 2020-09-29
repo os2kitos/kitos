@@ -69,6 +69,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var organizationId = A<int>();
             var name = A<string>();
 
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
             ExpectAllowCreateReturns(organizationId, true);
             _namingServiceMock.Setup(x => x.ValidateSuggestedNewRegistrationName(organizationId, name)).Returns(Maybe<OperationError>.None);
             _repositoryMock
@@ -81,6 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
+            transaction.Verify(x=>x.Commit());
         }
 
         [Fact]
@@ -124,6 +127,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowDeleteReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
 
             //Act
             var result = _sut.Delete(id);
@@ -131,6 +136,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             _repositoryMock.Verify(x => x.DeleteById(id), Times.Once);
             Assert.True(result.Ok);
+            transaction.Verify(x=>x.Commit());
         }
 
         [Fact]

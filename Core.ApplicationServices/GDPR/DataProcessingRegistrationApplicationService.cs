@@ -63,6 +63,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingRegistration>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             var error = _namingService.ValidateSuggestedNewRegistrationName(organizationId, name);
 
             if (error.HasValue)
@@ -74,7 +75,9 @@ namespace Core.ApplicationServices.GDPR
                 Name = name
             };
 
-            return _repository.Add(registration);
+            var dataProcessingRegistration = _repository.Add(registration);
+            transaction.Commit();
+            return dataProcessingRegistration;
         }
 
         public Maybe<OperationError> ValidateSuggestedNewRegistrationName(int organizationId, string name)
@@ -87,6 +90,8 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> Delete(int id)
         {
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+
             var result = _repository.GetById(id);
 
             if (result.IsNone)
@@ -98,7 +103,7 @@ namespace Core.ApplicationServices.GDPR
                 return new OperationError(OperationFailure.Forbidden);
 
             _repository.DeleteById(id);
-
+            transaction.Commit();
             return registrationToDelete;
         }
 
