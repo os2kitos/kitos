@@ -50,7 +50,7 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="country in vm.insecureThirdCountries.selectedElements" data-element-type="data-processing_insecure_third_countries">
-                                <td>{{::country.name }}</td>
+                                <td>{{::country.name }}<span ng-if="country.expired"> (udgået)</span></td>
                                 <td class="text-right noLeftBorder" style="width: 20px;">
                                     <button type="button"
                                             class="btn btn-danger btn-xs"

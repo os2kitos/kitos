@@ -15,7 +15,7 @@
         subDataProcessors: IDataProcessorDTO[];
         agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
         transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
-        insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityDTO[];
+        insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO[];
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

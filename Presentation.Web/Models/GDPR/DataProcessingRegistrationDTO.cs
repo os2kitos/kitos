@@ -27,6 +27,6 @@ namespace Presentation.Web.Models.GDPR
 
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
 
-        public NamedEntityDTO[] InsecureThirdCountries { get; set; }
+        public NamedEntityWithExpirationStatusDTO[] InsecureThirdCountries { get; set; }
     }
 }

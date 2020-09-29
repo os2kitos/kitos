@@ -13,7 +13,6 @@
         ];
 
         private readonly dataProcessingRegistrationId: number;
-
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -33,7 +32,7 @@
 
         headerName = this.dataProcessingRegistration.name;
 
-        insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityDTO>;
+        insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>;
 
         enableSelectionOfInsecureThirdCountries: boolean;
 
@@ -67,9 +66,9 @@
             };
             this.enableSelectionOfInsecureThirdCountries = this.dataProcessingRegistration.transferToInsecureThirdCountries === Models.Api.Shared.YesNoUndecidedOption.Yes;
 
-            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityDTO>(
+            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
-                () => this.dataProcessingRegistration.insecureThirdCountries,//TODO: Handle "udgået" by testing them against the available options
+                () => this.dataProcessingRegistration.insecureThirdCountries,
                 element => this.removeInsecureThirdCountry(element.id),
                 newElement => this.addInsecureThirdCountry(newElement),
                 null,
@@ -88,7 +87,8 @@
                             id: x.Id,
                             optionalObjectContext: {
                                 id: x.Id,
-                                name: x.Name
+                                name: x.Name,
+                                expired: false //We only allow selection of non-expired and this object is based on the available objects
                             }
                         };
                     });
@@ -245,9 +245,9 @@
                 });
         }
 
-        private addInsecureThirdCountry(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityDTO>) {
+        private addInsecureThirdCountry(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const country = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityDTO;
+                const country = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
                 this.apiUseCaseFactory
                     .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignInsecureThirdCountry(this.dataProcessingRegistrationId, country.id))
                     .executeAsync(success => {
