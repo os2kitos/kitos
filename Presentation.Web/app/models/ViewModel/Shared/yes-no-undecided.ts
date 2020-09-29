@@ -8,22 +8,22 @@
                 .keys(Models.Api.Shared.YesNoUndecidedOption)
                 .filter(k => isNaN(parseInt(k)) === false)
                 .reduce((acc, next, _) => {
-                        var text = "";
+                    var text = "";
 
-                        switch (parseInt(next) as Models.Api.Shared.YesNoUndecidedOption) {
+                    switch (parseInt(next) as Models.Api.Shared.YesNoUndecidedOption) {
                         case Models.Api.Shared.YesNoUndecidedOption.Yes:
                             text = "Ja";
                             break;
                         case Models.Api.Shared.YesNoUndecidedOption.No:
                             text = "Nej";
                             break;
-                        }
+                    }
 
-                        //Set by numeric and text value
-                        acc[next] = text;
-                        acc[Models.Api.Shared.YesNoUndecidedOption[next]] = text;
-                        return acc;
-                    },
+                    //Set by numeric and text value
+                    acc[next] = text;
+                    acc[Models.Api.Shared.YesNoUndecidedOption[next]] = text;
+                    return acc;
+                },
                     {}
                 );
         }
@@ -35,7 +35,7 @@
             return YesNoUndecidedOptions.valueToTextMap[option];
         }
 
-        getById(id?: number): Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>{
+        getById(id?: number): Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption> {
             if (id === null) {
                 return null;
             }
@@ -47,10 +47,18 @@
             const select2BlankOptionTextValue = "\u200B";
 
             this.options = [
-                <Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>{ id: Models.Api.Shared.YesNoUndecidedOption.Undecided as number, text: select2BlankOptionTextValue, optionalObjectContext: Models.Api.Shared.YesNoUndecidedOption.Undecided },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>{ id: Models.Api.Shared.YesNoUndecidedOption.Yes as number, text: YesNoUndecidedOptions.getText(Models.Api.Shared.YesNoUndecidedOption.Yes), optionalObjectContext: Models.Api.Shared.YesNoUndecidedOption.Yes },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>{ id: Models.Api.Shared.YesNoUndecidedOption.No as number, text: YesNoUndecidedOptions.getText(Models.Api.Shared.YesNoUndecidedOption.No), optionalObjectContext: Models.Api.Shared.YesNoUndecidedOption.No }
-            ];
+                Models.Api.Shared.YesNoUndecidedOption.Undecided,
+                Models.Api.Shared.YesNoUndecidedOption.Yes,
+                Models.Api.Shared.YesNoUndecidedOption.No
+            ].map(optionType => {
+                return <Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>{
+                    id: optionType as number,
+                    text: optionType === Models.Api.Shared.YesNoUndecidedOption.Undecided
+                        ? select2BlankOptionTextValue
+                        : YesNoUndecidedOptions.getText(optionType),
+                    optionalObjectContext: optionType
+                }
+            });
         }
     }
 }
