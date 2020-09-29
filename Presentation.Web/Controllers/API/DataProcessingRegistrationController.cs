@@ -347,7 +347,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-		[SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
@@ -355,8 +355,8 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
+                .Match(_ => Ok(), FromOperationError);
+        }
 
 
         [HttpPatch]
@@ -377,21 +377,21 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
-		[SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-		public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
                 return BadRequest("organizationId must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
+                .Match(_ => Ok(), FromOperationError);
+        }
 
-		[HttpPatch]
+        [HttpPatch]
         [Route("{id}/agreement-concluded-at")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -417,10 +417,11 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingRegistrationApplicationService
                 .GetDataProcessingRegistrationOptionsWhichCanBeAssigned(id)
-                .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO() { 
+                .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO()
+                {
                     roles = ToDTOs(result.DataProcessingRegistrationRoles, result.Registration.OrganizationId).ToList(),
                     dataResponsibleOptions = ToDTOs(result.DataProcessingRegistrationDataResponsibleOptions).ToList()
-                } )
+                })
                 .Match(Ok, FromOperationError);
         }
 
@@ -556,10 +557,14 @@ namespace Presentation.Web.Controllers.API
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt
                 },
-                DataResponsible = new SimpleOptionDTO(value.DataResponsible.Id, value.DataResponsible.Name)
-                {
-                    Note = value.DataResponsible.Description,
-                }
+                DataResponsible = value
+                    .DataResponsible
+                    .FromNullable()
+                    .Select(responsible => new SimpleOptionDTO(responsible.Id, responsible.Name)
+                    {
+                        Note = responsible.Description,
+                    })
+                    .GetValueOrDefault()
             };
         }
 

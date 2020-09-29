@@ -39,6 +39,11 @@ namespace Infrastructure.DataAccess.Mapping
             //Sub Data processors
             HasMany(x => x.SubDataProcessors)
                 .WithMany(x => x.SubDataProcessorForDataProcessingRegistrations);
+
+            //Data responsible
+            HasOptional(x => x.DataResponsible)
+                .WithMany(x => x.References)
+                .HasForeignKey(x => x.DataResponsible_Id);
         }
     }
 }
