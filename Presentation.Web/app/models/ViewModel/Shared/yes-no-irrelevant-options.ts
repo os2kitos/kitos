@@ -3,17 +3,39 @@
 
     export class YesNoIrrelevantOptions {
 
+        private static getValueToTextMap() {
+            return Object
+                .keys(Models.Api.Shared.YesNoIrrelevantOption)
+                .filter(k => isNaN(parseInt(k)) === false)
+                .reduce((acc, next, _) => {
+                        var text = "";
+
+                        switch (parseInt(next) as Models.Api.Shared.YesNoIrrelevantOption) {
+                        case Models.Api.Shared.YesNoIrrelevantOption.YES:
+                            text = "Ja";
+                            break;
+                        case Models.Api.Shared.YesNoIrrelevantOption.NO:
+                            text = "Nej";
+                            break;
+                        case Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT:
+                            text = "Ikke relevant";
+                            break;
+                        }
+
+                        //Set by numeric and text value
+                        acc[next] = text;
+                        acc[Models.Api.Shared.YesNoIrrelevantOption[next]] = text;
+                        return acc;
+                    },
+                    {}
+                );
+        }
+
+        //Cache the names for quick lookup
+        private static readonly valueToNameMap = YesNoIrrelevantOptions.getValueToTextMap();
+
         static getText(option: Models.Api.Shared.YesNoIrrelevantOption) {
-            switch (option) {
-                case Models.Api.Shared.YesNoIrrelevantOption.YES:
-                    return "Ja";
-                case Models.Api.Shared.YesNoIrrelevantOption.NO:
-                    return "Nej"
-                case Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT:
-                    return "Ikke relevant";
-                default:
-                    return "";
-            }
+            return YesNoIrrelevantOptions.valueToNameMap[option];
         }
 
         options: Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>[];
