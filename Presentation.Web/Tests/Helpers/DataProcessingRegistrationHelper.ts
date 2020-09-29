@@ -8,7 +8,7 @@ import DataProcessingRegistrationEditMainPageObject =
     require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 
 class DataProcessingRegistrationHelper {
-
+    private static readonly transferToThirdCountriesSelectionId : string = "s2id_transferToInsecureThirdCountries_config";
     private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
@@ -92,7 +92,7 @@ class DataProcessingRegistrationHelper {
 
     public static assignDataProcessor(name: string) {
         console.log("Assigning data processor with name: " + name);
-        return Select2Helper.searchFor(name, "s2id_data-processor_select-new")
+        return Select2Helper.searchFor(name, "s2id_data-processor_select-new_config")
             .then(() => Select2Helper.waitForDataAndSelect());
     }
 
@@ -105,18 +105,18 @@ class DataProcessingRegistrationHelper {
 
     public static assignSubDataProcessor(name: string) {
         console.log("Assigning sub data processor with name: " + name);
-        return Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new")
+        return Select2Helper.searchFor(name, "s2id_sub-data-processor_select-new_config")
             .then(() => Select2Helper.waitForDataAndSelect());
     }
 
     public static enableSubDataProcessors() {
         console.log("Enabling sub data processors");
-        return Select2Helper.selectWithNoSearch("Ja", "s2id_hasSubDataProcessorsSelection");
+        return Select2Helper.selectWithNoSearch("Ja", "s2id_hasSubDataProcessorsSelection_config");
     }
 
     public static  verifyHasSubDataProcessorsToBeEnabled() {
         console.log(`Expecting 'has sub data processors' to be set 'Ja'`);
-        expect(Select2Helper.getData("s2id_hasSubDataProcessorsSelection").getText()).toEqual("Ja");
+        expect(Select2Helper.getData("s2id_hasSubDataProcessorsSelection_config").getText()).toEqual("Ja");
     }
 
     public static removeSubDataProcessor(name: string) {
@@ -156,7 +156,7 @@ class DataProcessingRegistrationHelper {
 
     public static changeIsAgreementConcluded(changeToValue: string) {
         console.log("Changing IsAgreementConcluded to: " + changeToValue);
-        return Select2Helper.selectWithNoSearch(changeToValue, "s2id_agreementConcluded");
+        return Select2Helper.selectWithNoSearch(changeToValue, "s2id_agreementConcluded_config");
     }
 
     public static changeAgreementConcludedAt(changeToDate: string) {
@@ -179,6 +179,28 @@ class DataProcessingRegistrationHelper {
     private static waitForKendo() {
         console.log("waiting for kendo grid to load");
         return this.pageObject.waitForKendoGrid();
+    }
+
+    public static enableTransferToInsecureThirdCountries() {
+        console.log("Enabling transfer to unsafe third countries");
+        return Select2Helper.selectWithNoSearch("Ja", DataProcessingRegistrationHelper.transferToThirdCountriesSelectionId);
+    }
+
+    public static verifyHasTransferToInsecureThirdCountriesToBeEnabled() {
+        console.log(`Expecting 'transfer to unsafe third countries' to be set 'Ja'`);
+        expect(Select2Helper.getData(DataProcessingRegistrationHelper.transferToThirdCountriesSelectionId).getText()).toEqual("Ja");
+    }
+
+    public static assignThirdCountry(thirdCountryName) {
+        console.log(`Assigning unsafe third country with name: ${thirdCountryName}`);
+        return Select2Helper.selectWithNoSearch(thirdCountryName, "s2id_insecure-third-country_select-new_config");
+    }
+
+    public static removeThirdCountry(thirdCountryName) {
+        console.log(`Removing unsafe third country with name: ${thirdCountryName}`);
+        return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
     }
 }
 

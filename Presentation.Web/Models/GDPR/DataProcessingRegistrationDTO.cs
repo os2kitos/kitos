@@ -27,6 +27,10 @@ namespace Presentation.Web.Models.GDPR
 
         public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
 
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public NamedEntityWithExpirationStatusDTO[] InsecureThirdCountries { get; set; }
+
         public SimpleOptionDTO DataResponsible { get; set; }
     }
 }

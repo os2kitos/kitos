@@ -510,9 +510,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.SubDataProcessors);
-		}
-		
-		[Fact]
+        }
+
+        [Fact]
         public async Task Can_Change_IsAgreementConcluded()
         {
             //Arrange
@@ -554,6 +554,39 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_InsecureThirdCountry()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var countries = (await DataProcessingRegistrationHelper.GetCountryOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var randomCountry = countries[Math.Abs(A<int>()) % countries.Count];
+            using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseTransferToInsecureThirdCountriesStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, setStateRequest.StatusCode);
+
+            //Act - add country
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignInsecureThirdCountryRequestAsync(registration.Id, randomCountry.Id);
+            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignInsecureThirdCountryRequestAsync(registration.Id, randomCountry.Id);
+
+            //Assert - country added
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Equal(YesNoUndecidedOption.Yes, dto.TransferToInsecureThirdCountries);
+            var country = Assert.Single(dto.InsecureThirdCountries);
+            Assert.Equal(randomCountry.Id, country.Id);
+            Assert.Equal(randomCountry.Name, country.Name);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveInsecureThirdCountryRequestAsync(registration.Id, randomCountry.Id);
+
+            //Assert country removed again
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Empty(dto.InsecureThirdCountries);
+
         }
 
         [Fact]

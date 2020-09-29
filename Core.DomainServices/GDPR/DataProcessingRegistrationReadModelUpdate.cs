@@ -20,21 +20,33 @@ namespace Core.DomainServices.GDPR
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.OrganizationId = source.OrganizationId;
-            destination.SourceEntityId = source.Id;
-            destination.Name = source.Name;
+            PatchBasicInformation(source, destination);
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
-            PatchDataProcessors(source, destination); 
+            PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
+            PatchTransferToInsecureThirdCountries(source, destination); 
             PatchDataResponsible(source, destination);
+        }
+
+        private static void PatchBasicInformation(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            destination.OrganizationId = source.OrganizationId;
+            destination.SourceEntityId = source.Id;
+            destination.Name = source.Name;
         }
 
         private static void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataResponsible = source.DataResponsible == null ? "" : source.DataResponsible.Name;
             destination.DataResponsibleRemark = source.DataResponsibleRemark;
+        }
+
+        private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.TransferToInsecureThirdCountries = source.TransferToInsecureThirdCountries;
         }
 
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

@@ -41,6 +41,8 @@ namespace Core.DomainModel.GDPR.Read
         public virtual ICollection<DataProcessingRegistrationRoleAssignmentReadModel> RoleAssignments { get; set; }
 
         public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
+        
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }
 

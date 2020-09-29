@@ -60,12 +60,14 @@
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataResponsibleAssigmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataResponsibleAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationRoleAssignmentsService.cs" />
@@ -86,7 +88,9 @@
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\IOptionTypeAssignmentService.cs" />
     <Compile Include="Options\OptionsService.cs" />
+    <Compile Include="Options\OptionTypeAssignmentServiceBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />

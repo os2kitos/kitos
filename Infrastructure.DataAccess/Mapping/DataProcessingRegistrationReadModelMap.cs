@@ -42,6 +42,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.IsAgreementConcluded)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_Concluded", 0);
+
+            Property(x => x.TransferToInsecureThirdCountries)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_TransferToInsecureThirdCountries", 0);
         }
     }
 }
