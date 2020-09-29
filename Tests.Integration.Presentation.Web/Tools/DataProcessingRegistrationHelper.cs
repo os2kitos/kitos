@@ -221,5 +221,30 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded-at"), cookie, body);
         }
+
+        public static async Task<HttpResponseMessage> SendGetAvailableDataResponseOptionsRequestAsync(int id, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-processing-registration-options"), cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateDataResponseRequestAsync(int id, int? dataResponsibleOptionId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<int?> { Value = dataResponsibleOptionId };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-responsible"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateDataResponseRequestAsync(int id, string dataResponsibleRemark, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = dataResponsibleRemark };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-responsible-remark"), cookie, body);
+        }
     }
 }
