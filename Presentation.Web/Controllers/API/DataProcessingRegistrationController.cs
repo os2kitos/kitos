@@ -32,18 +32,18 @@ namespace Presentation.Web.Controllers.API
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<LocalDataProcessingRegistrationRole> _localRoleRepository;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
-        private readonly IGenericRepository<LocalDataProcessingDataResponsibleOption> _localDataResponsibleRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _localDataResponsibleOptionsService;
 
         public DataProcessingRegistrationController(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
             IGenericRepository<LocalDataProcessingRegistrationRole> localRoleRepository,
             IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService,
-            IGenericRepository<LocalDataProcessingDataResponsibleOption> localDataResponsibleRepository)
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> localDataResponsibleOptionsService)
         {
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _localRoleRepository = localRoleRepository;
             _countryOptionsService = countryOptionsService;
-            _localDataResponsibleRepository = localDataResponsibleRepository;
+            _localDataResponsibleOptionsService = localDataResponsibleOptionsService;
         }
 
         protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
@@ -518,19 +518,9 @@ namespace Presentation.Web.Controllers.API
             return new UserWithEmailDTO(arg.Id, $"{arg.Name} {arg.LastName}", arg.Email);
         }
 
-        private IEnumerable<SimpleOptionDTO> ToDTOs(IEnumerable<DataProcessingDataResponsibleOption> options)
+        private IEnumerable<OptionWithDescriptionDTO> ToDTOs(IEnumerable<DataProcessingDataResponsibleOption> options)
         {
             return options.Select(ToDTO);
-        }
-
-        private Dictionary<int, Maybe<string>> GetLocalDataResponsibleDescriptionOverrides(int organizationId)
-        {
-            var localDescriptionOverrides = _localDataResponsibleRepository
-                .AsQueryable()
-                .ByOrganizationId(organizationId)
-                .ToDictionary(localDataProcessingRegistrationRole => localDataProcessingRegistrationRole.OptionId,
-                    localDataProcessingRegistrationRole => string.IsNullOrWhiteSpace(localDataProcessingRegistrationRole.Description) ? Maybe<string>.None : localDataProcessingRegistrationRole.Description);
-            return localDescriptionOverrides;
         }
 
         private IEnumerable<BusinessRoleDTO> ToDTOs(IEnumerable<DataProcessingRegistrationRole> roles, int organizationId)
@@ -565,6 +555,11 @@ namespace Presentation.Web.Controllers.API
         private ISet<int> GetIdsOfAvailableCountryOptions(int organizationId)
         {
             return new HashSet<int>(_countryOptionsService.GetAvailableOptions(organizationId).Select(x => x.Id));
+        }
+
+        private ISet<int> GetIdsOfAvailableDataResponsibleOptions(int organizationId)
+        {
+            return new HashSet<int>(_localDataResponsibleOptionsService.GetAvailableOptions(organizationId).Select(x => x.Id));
         }
 
         private Dictionary<int, Maybe<string>> GetLocalDescriptionOverrides(int organizationId)
@@ -622,11 +617,9 @@ namespace Presentation.Web.Controllers.API
                 DataResponsible = value
                     .DataResponsible
                     .FromNullable()
-                    .Select(responsible => new SimpleOptionDTO(responsible.Id, responsible.Name)
-                    {
-                        Note = responsible.Description,
-                    })
-                    .GetValueOrDefault()
+                    .Select(responsible => new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, true, responsible.Description))
+                    .GetValueOrDefault(),
+                DataResponsibleRemark = value.DataResponsibleRemark
             };
         }
 
@@ -653,12 +646,9 @@ namespace Presentation.Web.Controllers.API
             };
         }
 
-        private static SimpleOptionDTO ToDTO(DataProcessingDataResponsibleOption option)
+        private static OptionWithDescriptionDTO ToDTO(DataProcessingDataResponsibleOption option)
         {
-            return new SimpleOptionDTO(option.Id, option.Name)
-            {
-                Note = option.Description
-            };
+            return new OptionWithDescriptionDTO(option.Id, option.Name, option.Description);
         }
 
     }

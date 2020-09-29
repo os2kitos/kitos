@@ -649,6 +649,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(remark, updateRegistrationDto.DataResponsibleRemark);
         }
     }
 }
