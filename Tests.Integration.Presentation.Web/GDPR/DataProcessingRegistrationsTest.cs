@@ -465,7 +465,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var processors = await DataProcessingRegistrationHelper.GetAvailableSubDataProcessors(registration.Id, orgPrefix);
 
             //Assert
-            Assert.True(processors.Any(x => x.Id == organization.Id));
+            Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
         [Fact]
@@ -551,6 +551,64 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registrationDto.Id, null);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_AvailableDataResponsibleOptions()
+        {
+            //Arrange
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
+
+            //Act
+            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+
+            //Assert
+            Assert.NotEmpty(dataProcessingOptions.dataResponsibleOptions);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsible()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsible_ToNull()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRequestAsync(registrationDto.Id, null);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsibleRemark()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRemarkRequestAsync(registrationDto.Id, remark);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

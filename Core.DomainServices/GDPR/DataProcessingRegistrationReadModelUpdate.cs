@@ -33,7 +33,7 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.DataResponsible = source.DataResponsible;
+            destination.DataResponsible = source.DataResponsible == null ? "" : source.DataResponsible.Name;
             destination.DataResponsibleRemark = source.DataResponsibleRemark;
         }
 

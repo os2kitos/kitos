@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Data_Responsible : IMigrationMetadata
+    public sealed partial class AddedDataResponsible : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Data_Responsible));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedDataResponsible));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009281305258_Added_Data_Responsible"; }
+            get { return "202009290744494_Added-Data-Responsible"; }
         }
         
         string IMigrationMetadata.Source

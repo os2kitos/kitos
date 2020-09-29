@@ -222,14 +222,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded-at"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendGetAvailableDataResponseOptionsRequestAsync(int id, Cookie optionalLogin = null)
+        public static async Task<DataProcessingOptionsDTO> GetAvailableDataResponsibleOptionsRequestAsync(int id, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-processing-registration-options"), cookie);
+            var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-processing-registration-options"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingOptionsDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendUpdateDataResponseRequestAsync(int id, int? dataResponsibleOptionId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendUpdateDataResponsibleRequestAsync(int id, int? dataResponsibleOptionId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -238,7 +241,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-responsible"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendUpdateDataResponseRequestAsync(int id, string dataResponsibleRemark, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendUpdateDataResponsibleRemarkRequestAsync(int id, string dataResponsibleRemark, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
