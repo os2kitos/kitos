@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -25,6 +24,7 @@ namespace Core.DomainModel.GDPR
             SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
             DataProcessors = new List<Organization.Organization>();
             SubDataProcessors = new List<Organization.Organization>();
+            InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -45,6 +45,10 @@ namespace Core.DomainModel.GDPR
         public int OrganizationId { get; set; }
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
+
+        public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; }
 
         public virtual Organization.Organization Organization { get; set; }
 
@@ -109,6 +113,38 @@ namespace Core.DomainModel.GDPR
             SubDataProcessors.Remove(dataProcessor);
 
             return dataProcessor;
+        }
+
+        public Result<DataProcessingCountryOption, OperationError> AssignInsecureCountrySubjectToDataTransfer(DataProcessingCountryOption country)
+        {
+            if (country == null) throw new ArgumentNullException(nameof(country));
+
+            if (TransferToInsecureThirdCountries != YesNoUndecidedOption.Yes)
+                return new OperationError("To Add new insecure data transfer country, but transfer to insecure countries is not enabled", OperationFailure.BadInput);
+
+            if (HasInsecureCountry(country))
+                return new OperationError("Country already assigned", OperationFailure.Conflict);
+
+            InsecureCountriesSubjectToDataTransfer.Add(country);
+
+            return country;
+        }
+
+        public Result<DataProcessingCountryOption, OperationError> RemoveInsecureCountrySubjectToDataTransfer(DataProcessingCountryOption country)
+        {
+            if (country == null) throw new ArgumentNullException(nameof(country));
+
+            if (!HasInsecureCountry(country))
+                return new OperationError("Country not assigned", OperationFailure.Conflict);
+
+            InsecureCountriesSubjectToDataTransfer.Remove(country);
+
+            return country;
+        }
+
+        private bool HasInsecureCountry(DataProcessingCountryOption country)
+        {
+            return InsecureCountriesSubjectToDataTransfer.Any(c => c.Id == country.Id);
         }
 
         private bool HasSubDataProcessor(Organization.Organization dataProcessor)

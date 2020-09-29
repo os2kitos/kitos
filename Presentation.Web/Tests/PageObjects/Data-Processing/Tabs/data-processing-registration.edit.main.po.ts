@@ -56,6 +56,18 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//button`));
     }
 
+    private getThirdCountryRowExpression(dpName: string) {
+        return `//*/table[@id="insecureThirdCountriesTable"]//*/td[text()="${dpName}"]/..`;
+    }
+
+    getThirdCountryProcessorRow(dpName: string) {
+        return element(by.xpath(this.getThirdCountryRowExpression(dpName)));
+    }
+
+    getRemoveThirdCountryButton(dpName: string) {
+        return element(by.xpath(`${this.getThirdCountryRowExpression(dpName)}//button`));
+    }
+
     getIsAgreementConcludedField() {
         return element(by.id("agreementConcluded"));
     }

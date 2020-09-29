@@ -8,11 +8,11 @@ using System.Web.Http;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Options;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -29,13 +29,16 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<LocalDataProcessingRegistrationRole> _localRoleRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
 
         public DataProcessingRegistrationController(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IGenericRepository<LocalDataProcessingRegistrationRole> localRoleRepository)
+            IGenericRepository<LocalDataProcessingRegistrationRole> localRoleRepository,
+            IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService)
         {
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _localRoleRepository = localRoleRepository;
+            _countryOptionsService = countryOptionsService;
         }
 
         protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
@@ -342,7 +345,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-		[SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
@@ -350,9 +353,24 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
+                .Match(_ => Ok(), FromOperationError);
+        }
 
+        [HttpPatch]
+        [Route("{id}/sub-data-processors/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        {
+            if (organizationId == null)
+                return BadRequest("organizationId must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveSubDataProcessor(id, organizationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
 
         [HttpPatch]
         [Route("{id}/agreement-concluded")]
@@ -371,22 +389,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/sub-data-processors/remove")]
-		[SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-		public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
-        {
-            if (organizationId == null)
-                return BadRequest("organizationId must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .RemoveSubDataProcessor(id, organizationId.Value)
-				.Match(_ => Ok(), FromOperationError);
-		}
-
-		[HttpPatch]
         [Route("{id}/agreement-concluded-at")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -399,6 +401,55 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateAgreementConcludedAt(id, concludedAt.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/state")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage SetTransferToInsecureCountriesState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        {
+            if (value == null)
+                return BadRequest("value must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateTransferToInsecureThirdCountries(id, value.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        {
+            if (countryId == null)
+                return BadRequest($"{nameof(countryId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignInsecureThirdCountry(id, countryId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/insecure-third-countries/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        {
+            if (countryId == null)
+                return BadRequest($"{nameof(countryId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveInsecureThirdCountry(id, countryId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -422,6 +473,7 @@ namespace Presentation.Web.Controllers.API
         private List<DataProcessingRegistrationDTO> ToDTOs(IQueryable<DataProcessingRegistration> value, int organizationId)
         {
             var localDescriptionOverrides = GetLocalDescriptionOverrides(organizationId);
+            var enabledCountryOptions = GetIdsOfAvailableCountryOptions(organizationId);
 
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
@@ -434,10 +486,15 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages.Select(x => x.ItSystem))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
-                .AsNoTracking()
+                .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .AsEnumerable()
-                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides))
+                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions))
                 .ToList();
+        }
+
+        private ISet<int> GetIdsOfAvailableCountryOptions(int organizationId)
+        {
+            return new HashSet<int>(_countryOptionsService.GetAvailableOptions(organizationId).Select(x => x.Id));
         }
 
         private Dictionary<int, Maybe<string>> GetLocalDescriptionOverrides(int organizationId)
@@ -452,10 +509,10 @@ namespace Presentation.Web.Controllers.API
 
         private DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value)
         {
-            return ToDTO(value, GetLocalDescriptionOverrides(value.OrganizationId));
+            return ToDTO(value, GetLocalDescriptionOverrides(value.OrganizationId), GetIdsOfAvailableCountryOptions(value.OrganizationId));
         }
 
-        private static DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value, Dictionary<int, Maybe<string>> localDescriptionOverrides)
+        private static DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value, Dictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> enabledCountryOptions)
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
@@ -486,7 +543,12 @@ namespace Presentation.Web.Controllers.API
                 {
                     Value = value.IsAgreementConcluded,
                     OptionalDateValue = value.AgreementConcludedAt
-                }
+                },
+                TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
+                InsecureThirdCountries = value
+                    .InsecureCountriesSubjectToDataTransfer
+                    .Select(x => new NamedEntityWithExpirationStatusDTO(x.Id, x.Name, enabledCountryOptions.Contains(x.Id) == false))
+                    .ToArray()
             };
         }
 

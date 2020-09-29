@@ -30,6 +30,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
         private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
+        private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
@@ -41,6 +42,7 @@ namespace Core.ApplicationServices.GDPR
             IReferenceRepository referenceRepository,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
             IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
+            IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingRegistrationRight> rightRepository)
         {
@@ -51,6 +53,7 @@ namespace Core.ApplicationServices.GDPR
             _referenceRepository = referenceRepository;
             _systemAssignmentService = systemAssignmentService;
             _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
+            _countryAssignmentService = countryAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -60,6 +63,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingRegistration>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             var error = _namingService.ValidateSuggestedNewRegistrationName(organizationId, name);
 
             if (error.HasValue)
@@ -71,7 +75,9 @@ namespace Core.ApplicationServices.GDPR
                 Name = name
             };
 
-            return _repository.Add(registration);
+            var dataProcessingRegistration = _repository.Add(registration);
+            transaction.Commit();
+            return dataProcessingRegistration;
         }
 
         public Maybe<OperationError> ValidateSuggestedNewRegistrationName(int organizationId, string name)
@@ -84,6 +90,8 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> Delete(int id)
         {
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+
             var result = _repository.GetById(id);
 
             if (result.IsNone)
@@ -95,7 +103,7 @@ namespace Core.ApplicationServices.GDPR
                 return new OperationError(OperationFailure.Forbidden);
 
             _repository.DeleteById(id);
-
+            transaction.Commit();
             return registrationToDelete;
         }
 
@@ -296,6 +304,25 @@ namespace Core.ApplicationServices.GDPR
                 registration.AgreementConcludedAt = concludedAtDate;
                 return registration;
             });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateTransferToInsecureThirdCountries(int id, YesNoUndecidedOption transferToInsecureThirdCountries)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.TransferToInsecureThirdCountries = transferToInsecureThirdCountries;
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId)
+        {
+            return Modify(id, registration => _countryAssignmentService.Assign(registration, countryId));
+        }
+
+        public Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId)
+        {
+            return Modify(id, registration => _countryAssignmentService.Remove(registration, countryId));
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)

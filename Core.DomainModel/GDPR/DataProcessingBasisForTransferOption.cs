@@ -4,6 +4,6 @@ namespace Core.DomainModel.GDPR
 {
     public class DataProcessingBasisForTransferOption : OptionEntity<DataProcessingRegistration>, IOptionReference<DataProcessingRegistration>
     {
-        public ICollection<DataProcessingRegistration> References { get; set; }
+        public virtual ICollection<DataProcessingRegistration> References { get; set; }
     }
 }

@@ -3,29 +3,65 @@
 
     export class YesNoIrrelevantOptions {
 
+        private static getValueToTextMap() {
+            return Object
+                .keys(Models.Api.Shared.YesNoIrrelevantOption)
+                .filter(k => isNaN(parseInt(k)) === false)
+                .reduce((acc, next, _) => {
+                        var text = "";
+
+                        switch (parseInt(next) as Models.Api.Shared.YesNoIrrelevantOption) {
+                        case Models.Api.Shared.YesNoIrrelevantOption.YES:
+                            text = "Ja";
+                            break;
+                        case Models.Api.Shared.YesNoIrrelevantOption.NO:
+                            text = "Nej";
+                            break;
+                        case Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT:
+                            text = "Ikke relevant";
+                            break;
+                        }
+
+                        //Set by numeric and text value
+                        acc[next] = text;
+                        acc[Models.Api.Shared.YesNoIrrelevantOption[next]] = text;
+                        return acc;
+                    },
+                    {}
+                );
+        }
+
+        //Cache the names for quick lookup
+        private static readonly valueToNameMap = YesNoIrrelevantOptions.getValueToTextMap();
+
         static getText(option: Models.Api.Shared.YesNoIrrelevantOption) {
-            switch (option) {
-                case Models.Api.Shared.YesNoIrrelevantOption.YES:
-                    return "Ja";
-                case Models.Api.Shared.YesNoIrrelevantOption.NO:
-                    return "Nej"
-                case Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT:
-                    return "Ikke relevant";
-                default:
-                    return "";
-            }
+            return YesNoIrrelevantOptions.valueToNameMap[option];
         }
 
         options: Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>[];
-        constructor() {
-            const select2BlankOptionTextValue = "\u200B";
 
+        getById(id: number): Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
+            if (id === null) {
+                return null;
+            }
+            return this.options.filter(x => x.id === id)[0];
+        }
+
+        constructor() {
             this.options = [
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED as number, text: select2BlankOptionTextValue, optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.YES as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.YES), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.YES },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.NO as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.NO), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.NO },
-                <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{ id: Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT as number, text: YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT), optionalObjectContext: Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT }
-            ];
+                Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED,
+                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                Models.Api.Shared.YesNoIrrelevantOption.NO,
+                Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
+            ].map(optionType => {
+                return <Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>>{
+                    id: optionType as number,
+                    text: optionType === Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
+                        ? ViewModel.Generic.select2BlankOptionTextValue
+                        : YesNoIrrelevantOptions.getText(optionType),
+                    optionalObjectContext: optionType
+                }
+            });
         }
     }
 }

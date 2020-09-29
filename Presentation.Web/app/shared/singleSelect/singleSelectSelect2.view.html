@@ -1,7 +1,8 @@
 ﻿<input type="hidden"
-       id="{{::id}}"
+       id="{{::id}}_config"
        class="form-control input-sm"
        data-ui-select2="model.select2Config"
        ng-model="model.selectedElement"
        ng-change="model.elementSelected(model.selectedElement)"
-       ng-disabled="disabled" />
+       ng-disabled="disabled" 
+       data-placeholder="{{::placeholder || ''}}"/>
