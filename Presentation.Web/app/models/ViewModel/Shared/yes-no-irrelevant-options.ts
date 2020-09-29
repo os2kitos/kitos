@@ -39,6 +39,14 @@
         }
 
         options: Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>[];
+
+        getById(id: number): Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption> {
+            if (id === null) {
+                return null;
+            }
+            return this.options.filter(x => x.id === id)[0];
+        }
+
         constructor() {
             const select2BlankOptionTextValue = "\u200B";
 

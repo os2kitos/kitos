@@ -35,6 +35,12 @@
             return YesNoUndecidedOptions.valueToTextMap[option];
         }
 
+        getById(id?: number): Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>{
+            if (id === null) {
+                return null;
+            }
+            return this.options.filter(x => x.id === id)[0];
+        }
 
         options: Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>[];
         constructor() {

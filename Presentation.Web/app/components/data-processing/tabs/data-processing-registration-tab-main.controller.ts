@@ -8,7 +8,8 @@
             "dataProcessingRegistration",
             "apiUseCaseFactory",
             "select2LoadingService",
-            "notify"
+            "notify",
+            "thirdCountryOptions"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -19,22 +20,30 @@
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly notify) {
+            private readonly notify,
+            private readonly thirdCountryOptions: Models.IOptionEntity[]) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedAt();
+            this.bindTransferToInsecureThirdCountries();
         }
 
         headerName = this.dataProcessingRegistration.name;
+
+        insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityDTO>;
+
+        enableSelectionOfInsecureThirdCountries: boolean;
+
+        transferToInsecureThirdCountries: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
 
         dataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
         subDataProcessors: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.DataProcessing.IDataProcessorDTO>;
 
-        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;        
+        isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
 
@@ -44,10 +53,54 @@
 
         hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
 
+        private bindTransferToInsecureThirdCountries() {
+            const options = new Models.ViewModel.Shared.YesNoUndecidedOptions();
+            this.transferToInsecureThirdCountries = {
+
+                selectedElement: options.getById(this.dataProcessingRegistration.transferToInsecureThirdCountries),
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options.options, false),
+                elementSelected: (newElement) => {
+                    if (!!newElement) {
+                        this.changeTransferToInsecureThirdCountries(newElement.optionalObjectContext);
+                    }
+                }
+            };
+            this.enableSelectionOfInsecureThirdCountries = this.dataProcessingRegistration.transferToInsecureThirdCountries === Models.Api.Shared.YesNoUndecidedOption.Yes;
+
+            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityDTO>(
+                config => this.insecureThirdCountries = config,
+                () => this.dataProcessingRegistration.insecureThirdCountries,//TODO: Handle "udgået" by testing them against the available options
+                element => this.removeInsecureThirdCountry(element.id),
+                newElement => this.addInsecureThirdCountry(newElement),
+                null,
+                () => {
+                    const selectedCountries = this
+                        .dataProcessingRegistration
+                        .insecureThirdCountries
+                        .reduce((acc, next, _) => {
+                            acc[next.id] = next;
+                            return acc;
+                        },
+                            {});
+                    return this.thirdCountryOptions.filter(x => !selectedCountries[x.Id]).map(x => {
+                        return {
+                            text: x.Name,
+                            id: x.Id,
+                            optionalObjectContext: {
+                                id: x.Id,
+                                name: x.Name
+                            }
+                        };
+                    });
+                }
+            );
+        }
+
         private bindHasSubDataProcessors() {
+            const options = new Models.ViewModel.Shared.YesNoUndecidedOptions();
             this.hasSubDataProcessors = {
-                selectedElement: this.dataProcessingRegistration.hasSubDataProcessors !== null && new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x=>x.id === (this.dataProcessingRegistration.hasSubDataProcessors as number))[0],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
+                selectedElement: options.getById(this.dataProcessingRegistration.hasSubDataProcessors),
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options.options, false),
                 elementSelected: (newElement) => {
                     if (!!newElement) {
                         this.changeHasSubDataProcessor(newElement.optionalObjectContext);
@@ -62,7 +115,17 @@
             getInitialElements: () => TElement[],
             removeFunc: ((element: TElement) => void),
             newFunc: Models.ViewModel.Generic.NewItemSelectedFunc,
-            searchFunc: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>) {
+            searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
+            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]) {
+
+            let select2Config;
+            if (!!searchFunc) {
+                select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false);
+            } else if (!!fixedValueRange) {
+                select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
+            } else {
+                throw new Error("Either searchFunc or fixedValueRange must be provided");
+            }
 
             const configuration = {
                 selectedElements: getInitialElements(),
@@ -70,9 +133,7 @@
                 allowAddition: this.hasWriteAccess,
                 allowRemoval: this.hasWriteAccess,
                 newElementSelection: null,
-                select2Config: this
-                    .select2LoadingService
-                    .loadSelect2WithDataSource(searchFunc, false),
+                select2Config: select2Config,
                 newItemSelected: newFunc
             };
             setField(configuration);
@@ -168,6 +229,36 @@
             }
         }
 
+        private removeInsecureThirdCountry(id: number) {
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeInsecureThirdCountry(this.dataProcessingRegistrationId, id))
+                .executeAsync(success => {
+
+                    //Update the source collection
+                    this.dataProcessingRegistration.insecureThirdCountries = this.dataProcessingRegistration.insecureThirdCountries.filter(x => x.id !== id);
+
+                    //Propagate changes to UI binding
+                    this.bindTransferToInsecureThirdCountries();
+                    return success;
+                });
+        }
+
+        private addInsecureThirdCountry(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityDTO>) {
+            if (!!newElement && !!newElement.optionalObjectContext) {
+                const country = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityDTO;
+                this.apiUseCaseFactory
+                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignInsecureThirdCountry(this.dataProcessingRegistrationId, country.id))
+                    .executeAsync(success => {
+                        //Update the source collection
+                        this.dataProcessingRegistration.insecureThirdCountries.push(country);
+
+                        //Trigger UI update
+                        this.bindTransferToInsecureThirdCountries();
+                        return success;
+                    });
+            }
+        }
+
         private removeSubDataProcessor(id: number) {
             this.apiUseCaseFactory
                 .createAssignmentRemoval(() => this.dataProcessingRegistrationService.removeSubDataProcessor(this.dataProcessingRegistrationId, id))
@@ -203,6 +294,17 @@
                 });
         }
 
+        private changeTransferToInsecureThirdCountries(value: Models.Api.Shared.YesNoUndecidedOption) {
+            this
+                .apiUseCaseFactory
+                .createUpdate("Overførsel til usikkert 3. land", () => this.dataProcessingRegistrationService.updateTransferToInsecureThirdCountry(this.dataProcessingRegistrationId, value))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.transferToInsecureThirdCountries = value;
+                    this.bindTransferToInsecureThirdCountries();
+                    return success;
+                });
+        }
+
         private changeAgreementConcludedAt(agreementConcludedAt: string) {
             var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(agreementConcludedAt);
             if (!!formattedDate.convertedValue) {
@@ -214,7 +316,7 @@
                         return success;
                     });
             }
-            return this.notify.addErrorMessage(formattedDate.errorMessage);            
+            return this.notify.addErrorMessage(formattedDate.errorMessage);
         }
 
         private bindIsAgreementConcluded() {
@@ -233,7 +335,7 @@
             if (id === null) {
                 return null;
             }
-            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().options.filter(option => option.id === id)[0];
+            return new Models.ViewModel.Shared.YesNoIrrelevantOptions().getById(id);
         }
 
         private bindAgreementConcludedAt() {
@@ -251,7 +353,11 @@
                 url: "/main",
                 templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-main.view.html",
                 controller: EditMainDataProcessingRegistrationController,
-                controllerAs: "vm"
+                controllerAs: "vm",
+                resolve: {
+                    thirdCountryOptions: ["localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingCountryOptions).getAll()
+                    ],
+                }
             });
         }]);
 }
