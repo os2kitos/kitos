@@ -164,6 +164,11 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getAgreementConcludedAtDateField().sendKeys(changeToDate);
     }
 
+    public static changeOversightInterval(changeToInterval: string) {
+        console.log(`Changing Oversight Interval to ${changeToInterval}`);
+        return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval");
+    }
+
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());
