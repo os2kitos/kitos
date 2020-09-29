@@ -156,7 +156,7 @@ class DataProcessingRegistrationHelper {
 
     public static changeIsAgreementConcluded(changeToValue: string) {
         console.log("Changing IsAgreementConcluded to: " + changeToValue);
-        return Select2Helper.selectWithNoSearch(changeToValue, "s2id_agreementConcluded");
+        return Select2Helper.selectWithNoSearch(changeToValue, "s2id_agreementConcluded_input_placeholder");
     }
 
     public static changeAgreementConcludedAt(changeToDate: string) {
