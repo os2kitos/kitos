@@ -8,7 +8,7 @@ import DataProcessingRegistrationEditMainPageObject =
     require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 
 class DataProcessingRegistrationHelper {
-
+    private static readonly transferToThirdCountriesSelectionId : string = "s2id_transferToInsecureThirdCountries_input_placeholder";
     private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
@@ -179,6 +179,28 @@ class DataProcessingRegistrationHelper {
     private static waitForKendo() {
         console.log("waiting for kendo grid to load");
         return this.pageObject.waitForKendoGrid();
+    }
+
+    public static enableTransferToInsecureThirdCountries() {
+        console.log("Enabling transfer to unsafe third countries");
+        return Select2Helper.selectWithNoSearch("Ja", DataProcessingRegistrationHelper.transferToThirdCountriesSelectionId);
+    }
+
+    public static verifyHasTransferToInsecureThirdCountriesToBeEnabled() {
+        console.log(`Expecting 'transfer to unsafe third countries' to be set 'Ja'`);
+        expect(Select2Helper.getData(DataProcessingRegistrationHelper.transferToThirdCountriesSelectionId).getText()).toEqual("Ja");
+    }
+
+    public static assignThirdCountry(thirdCountryName) {
+        console.log(`Assigning unsafe third country with name: ${thirdCountryName}`);
+        return Select2Helper.selectWithNoSearch(thirdCountryName, "s2id_insecure-third-country_select-new_input_placeholder");
+    }
+
+    public static removeThirdCountry(thirdCountryName) {
+        console.log(`Removing unsafe third country with name: ${thirdCountryName}`);
+        return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
     }
 }
 

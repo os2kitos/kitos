@@ -43,6 +43,7 @@ describe("Data processing agreement main detail tests", () => {
         () => {
             var name = createName(10);
             var renameValue = createName(30);
+            const thirdCountryName = "Danmark";
 
             dpaHelper.createDataProcessingRegistration(name)
                 //Changing name
@@ -66,6 +67,13 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => verifySubDataProcessorContent([dataProcessorName], []))
                 .then(() => dpaHelper.removeSubDataProcessor(dataProcessorName))
                 .then(() => verifySubDataProcessorContent([], [dataProcessorName]))
+                //Changing transfer to insecure third countries
+                .then(() => dpaHelper.enableTransferToInsecureThirdCountries())
+                .then(() => dpaHelper.verifyHasTransferToInsecureThirdCountriesToBeEnabled())
+                .then(() => dpaHelper.assignThirdCountry(thirdCountryName))
+                .then(() => verifyThirdCountrySelectionContent([thirdCountryName], []))
+                .then(() => dpaHelper.removeThirdCountry(thirdCountryName))
+                .then(() => verifyThirdCountrySelectionContent([], [thirdCountryName]))
                 //COMPLETE - Delete the registration and verify
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
@@ -92,6 +100,17 @@ describe("Data processing agreement main detail tests", () => {
         unpresentNames.forEach(name => {
             console.log(`Expecting sub data processor NOT to be present:${name}`);
             expect(pageObject.getSubDataProcessorRow(name).isPresent()).toBeFalsy();
+        });
+    }
+
+    function verifyThirdCountrySelectionContent(presentNames: string[], unpresentNames: string[]) {
+        presentNames.forEach(name => {
+            console.log(`Expecting country to be present:${name}`);
+            expect(pageObject.getThirdCountryProcessorRow(name).isPresent()).toBeTruthy();
+        });
+        unpresentNames.forEach(name => {
+            console.log(`Expecting country NOT to be present:${name}`);
+            expect(pageObject.getThirdCountryProcessorRow(name).isPresent()).toBeFalsy();
         });
     }
 
