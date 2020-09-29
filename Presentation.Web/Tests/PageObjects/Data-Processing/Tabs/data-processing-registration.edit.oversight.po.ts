@@ -5,6 +5,7 @@ import DataProcessingRegistrationNavigation =
 require("../../../Helpers/SideNavigation/DataProcessingRegistrationNavigation");
 
 class DataProcessingRegistrationEditMainPageObject {
+
     private navigationHelper = new NavigationHelper();
     private cssHelper = new CssLocatorHelper();
 
@@ -20,7 +21,7 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.id("oversightInterval"));
     }
     getOversightIntervalOptionNote() {
-        return element(by.id("oversightIntervalNote"));
+        return element(this.cssHelper.byDataElementType("oversightIntervalNote"));
     }
 
 }
