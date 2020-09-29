@@ -136,7 +136,7 @@ describe("Data processing agreement main detail tests", () => {
 
     function verifyIsAgreementConcluded(selectedValue: string) {
         console.log(`Expecting IsAgreementConcluded to be set to: ${selectedValue}`);
-        expect(Select2Helper.getData("s2id_agreementConcluded_input_placeholder").getText()).toEqual(selectedValue);
+        expect(Select2Helper.getData("s2id_agreementConcluded_config").getText()).toEqual(selectedValue);
     }
 
     function verifyAgreementConcludedAt(selectedDate: string) {

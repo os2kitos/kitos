@@ -44,8 +44,6 @@
 
         options: Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>[];
         constructor() {
-            const select2BlankOptionTextValue = "\u200B";
-
             this.options = [
                 Models.Api.Shared.YesNoUndecidedOption.Undecided,
                 Models.Api.Shared.YesNoUndecidedOption.Yes,
@@ -54,7 +52,7 @@
                 return <Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>>{
                     id: optionType as number,
                     text: optionType === Models.Api.Shared.YesNoUndecidedOption.Undecided
-                        ? select2BlankOptionTextValue
+                        ? ViewModel.Generic.select2BlankOptionTextValue
                         : YesNoUndecidedOptions.getText(optionType),
                     optionalObjectContext: optionType
                 }

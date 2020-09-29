@@ -484,8 +484,8 @@
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
-    <TypeScriptCompile Include="app\models\data-processing\data-processing-agreement-readmodel.ts" />
-    <TypeScriptCompile Include="app\models\data-processing\data-processing-agreementDTO.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
