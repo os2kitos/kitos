@@ -63,16 +63,13 @@
                             </tr>
                         </tbody>
                         <tfoot ng-if="vm.insecureThirdCountries.allowAddition" class="element-selection-list_footer--padding">
-                        <!-- TODO: Use the single select control in stead? -will make this more compact! -->
-                        <tr>
-                                <td colspan="3" style="padding: 0">
-                                    <input type="hidden"
-                                           id="insecure-third-country_select-new"
-                                           class="form-control input-sm"
-                                           data-ui-select2="vm.insecureThirdCountries.select2Config"
-                                           ng-model="vm.insecureThirdCountries.newElementSelection"
-                                           ng-change="vm.insecureThirdCountries.newItemSelected(vm.insecureThirdCountries.newElementSelection)"
-                                           data-placeholder="Vælg usikkert 3. land" />
+                            <!-- TODO:add placeholder! -->
+                            <tr>
+                                <td colspan="2" style="padding: 0">
+                                    <single-select-select2 data-placeholder="Vælg usikkert 3. land"
+                                                           id="insecure-third-country_select-new"
+                                                           ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
+                                                           ng-disabled="!vm.insecureThirdCountries.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
@@ -113,13 +110,10 @@
                         <tfoot ng-if="vm.dataProcessors.allowAddition" class="element-selection-list_footer--padding">
                             <tr>
                                 <td colspan="3" style="padding: 0">
-                                    <input type="hidden"
-                                           id="data-processor_select-new"
-                                           class="form-control input-sm"
-                                           data-ui-select2="vm.dataProcessors.select2Config"
-                                           ng-model="vm.dataProcessors.newElementSelection"
-                                           ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
-                                           data-placeholder="Vælg Databehandler" />
+                                    <single-select-select2 data-placeholder="Vælg Databehandler"
+                                                           id="data-processor_select-new"
+                                                           ng-model="vm.dataProcessors.newItemSelectionConfig"
+                                                           ng-disabled="!vm.dataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
@@ -163,13 +157,10 @@
                         <tfoot ng-if="vm.subDataProcessors.allowAddition" class="element-selection-list_footer--padding">
                             <tr>
                                 <td colspan="3" style="padding: 0">
-                                    <input type="hidden"
-                                           id="sub-data-processor_select-new"
-                                           class="form-control input-sm"
-                                           data-ui-select2="vm.subDataProcessors.select2Config"
-                                           ng-model="vm.subDataProcessors.newElementSelection"
-                                           ng-change="vm.subDataProcessors.newItemSelected(vm.subDataProcessors.newElementSelection)"
-                                           data-placeholder="Vælg Underdatabehandler" />
+                                    <single-select-select2 data-placeholder="Vælg Underdatabehandler"
+                                                           id="sub-data-processor_select-new"
+                                                           ng-model="vm.subDataProcessors.newItemSelectionConfig"
+                                                           ng-disabled="!vm.subDataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>

@@ -114,7 +114,7 @@
             setField: ((finalVm: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<TElement>) => void),
             getInitialElements: () => TElement[],
             removeFunc: ((element: TElement) => void),
-            newFunc: Models.ViewModel.Generic.NewItemSelectedFunc,
+            newFunc: Models.ViewModel.Generic.ElementSelectedFunc<Models.ViewModel.Generic.Select2OptionViewModel<TElement>>,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
             fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]) {
 
@@ -132,9 +132,11 @@
                 removeItemRequested: removeFunc,
                 allowAddition: this.hasWriteAccess,
                 allowRemoval: this.hasWriteAccess,
-                newElementSelection: null,
-                select2Config: select2Config,
-                newItemSelected: newFunc
+                newItemSelectionConfig: {
+                    selectedElement: null,
+                    select2Config: select2Config,
+                    elementSelected: newFunc
+                }
             };
             setField(configuration);
         }
