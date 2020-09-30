@@ -44,6 +44,7 @@ describe("Data processing agreement main detail tests", () => {
             var name = createName(10);
             var renameValue = createName(30);
             const thirdCountryName = "Danmark";
+            const basisForTransfer = "Andet";
 
             dpaHelper.createDataProcessingRegistration(name)
                 //Changing name
@@ -74,6 +75,9 @@ describe("Data processing agreement main detail tests", () => {
                 .then(() => verifyThirdCountrySelectionContent([thirdCountryName], []))
                 .then(() => dpaHelper.removeThirdCountry(thirdCountryName))
                 .then(() => verifyThirdCountrySelectionContent([], [thirdCountryName]))
+                //Changing basisfortransfer
+                .then(() => dpaHelper.selectBasisForTransfer(basisForTransfer))
+                .then(() => dpaHelper.verifyBasisForTransfer(basisForTransfer))
                 //COMPLETE - Delete the registration and verify
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())

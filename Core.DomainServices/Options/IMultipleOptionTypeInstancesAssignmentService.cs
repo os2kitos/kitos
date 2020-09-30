@@ -3,7 +3,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainServices.Options
 {
-    public interface IOptionTypeAssignmentService<in TOwner, TOption> 
+    public interface IMultipleOptionTypeInstancesAssignmentService<in TOwner, TOption> 
         where TOption : OptionEntity<TOwner>
         where TOwner: IOwnedByOrganization
     {

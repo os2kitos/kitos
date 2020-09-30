@@ -14,12 +14,16 @@ namespace Core.DomainServices.GDPR
     public class DataProcessingRegistrationReadModelUpdate : IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>
     {
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleService;
 
-        public DataProcessingRegistrationReadModelUpdate(IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
+        public DataProcessingRegistrationReadModelUpdate(
+            IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService,
             IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
+            _basisForTransferService = basisForTransferService;
             _dataResponsibleService = dataResponsibleService;
         }
 
@@ -33,19 +37,12 @@ namespace Core.DomainServices.GDPR
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
+            PatchBasisForTransfer(source, destination);
         }
 
-        private static void PatchBasicInformation(DataProcessingRegistration source,
-            DataProcessingRegistrationReadModel destination)
+        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.OrganizationId = source.OrganizationId;
-            destination.SourceEntityId = source.Id;
-            destination.Name = source.Name;
-        }
-
-        private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
-        {
-            destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
+            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
         }
 
         private string GetNameOfOption<TOption>(
@@ -66,6 +63,21 @@ namespace Core.DomainServices.GDPR
 
             return null;
         }
+
+        private static void PatchBasicInformation(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            destination.OrganizationId = source.OrganizationId;
+            destination.SourceEntityId = source.Id;
+            destination.Name = source.Name;
+        }
+
+        private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
+        }
+
+      
 
 
         private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

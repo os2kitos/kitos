@@ -12,6 +12,7 @@ using Core.DomainServices.Queries;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Ninject;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -234,19 +235,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)
         {
-            switch (failure)
-            {
-                case OperationFailure.BadInput:
-                    return BadRequest();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.Conflict:
-                    return Conflict();
-                default:
-                    return StatusCode(HttpStatusCode.InternalServerError);
-            }
+            return StatusCode(failure.ToHttpStatusCode());
         }
     }
 }

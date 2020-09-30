@@ -63,16 +63,21 @@
                             </tr>
                         </tbody>
                         <tfoot ng-if="vm.insecureThirdCountries.allowAddition" class="element-selection-list_footer--padding">
-                        <tr>
+                            <tr>
                                 <td colspan="2" style="padding: 0">
                                     <single-select-select2 data-placeholder="Vælg usikkert 3. land"
                                                            id="insecure-third-country_select-new"
                                                            ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
                                                            ng-disabled="!vm.insecureThirdCountries.allowAddition" />
                                 </td>
-                            </tr>
+                        </tr>
                         </tfoot>
                     </table>
+                </div>
+                <!-- Basis for transfer -->
+                <div class="form-group">
+                    <label for="basisForTransfer" class="control-label small">Overførselsgrundlag</label>
+                    <single-select-select2 data-placeholder="Vælg overførselsgrundlag" id="basisForTransfer" ng-model="vm.basisForTransfer" ng-disabled="!vm.hasWriteAccess" />
                 </div>
             </div>
             <div class="col-xs-6">

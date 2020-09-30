@@ -32,17 +32,23 @@ namespace Presentation.Web.Controllers.API
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IDataProcessingRegistrationOptionsApplicationService _dataProcessingRegistrationOptionsApplicationService;
         private readonly IGenericRepository<LocalDataProcessingRegistrationRole> _localRoleRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
         private readonly IGenericRepository<LocalDataProcessingDataResponsibleOption> _localDataResponsibleOptionRepository;
 
         public DataProcessingRegistrationController(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
             IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService,
             IGenericRepository<LocalDataProcessingRegistrationRole> localRoleRepository,
+            IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService,
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService,
             IGenericRepository<LocalDataProcessingDataResponsibleOption> localdataResponsibleOptionRepository)
         {
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _dataProcessingRegistrationOptionsApplicationService = dataProcessingRegistrationOptionsApplicationService;
             _localRoleRepository = localRoleRepository;
+            _countryOptionsService = countryOptionsService;
+            _basisForTransferService = basisForTransferService;
             _localDataResponsibleOptionRepository = localdataResponsibleOptionRepository;
         }
 
@@ -458,6 +464,35 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/basis-for-transfer/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage AssignbBasisForTransfer(int id, [FromBody] SingleValueDTO<int> basisForTransferId)
+        {
+            if (basisForTransferId == null)
+                return BadRequest($"{nameof(basisForTransferId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignBasisForTransfer(id, basisForTransferId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/basis-for-transfer/clear")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage ClearBasisForTransfer(int id)
+        {
+            return _dataProcessingRegistrationApplicationService
+                .ClearBasisForTransfer(id)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         [HttpGet]
         [Route("available-options-in/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -546,6 +581,7 @@ namespace Presentation.Web.Controllers.API
         {
             var localDescriptionOverrides = GetLocalRoleDescriptionOverrides(organizationId);
             var enabledCountryOptions = GetIdsOfAvailableCountryOptions(organizationId);
+            var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(organizationId);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(organizationId);
 
             return value
@@ -560,8 +596,9 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
-                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledDataResponsibleOptions))
+                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions))
                 .ToList();
         }
 
@@ -573,6 +610,11 @@ namespace Presentation.Web.Controllers.API
         private ISet<int> GetIdsOfAvailableDataResponsibleOptions(int organizationId)
         {
             return _dataProcessingRegistrationOptionsApplicationService.GetIdsOfAvailableDataResponsibleOptions(organizationId);
+        }
+
+        private ISet<int> GetIdsOfAvailableBasisForTransferOptions(int organizationId)
+        {
+            return new HashSet<int>(_basisForTransferService.GetAvailableOptions(organizationId).Select(x => x.Id));
         }
 
         private Dictionary<int, Maybe<string>> GetLocalRoleDescriptionOverrides(int organizationId)
@@ -587,13 +629,10 @@ namespace Presentation.Web.Controllers.API
 
         private DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value)
         {
-            return ToDTO(value, GetLocalRoleDescriptionOverrides(value.OrganizationId), GetIdsOfAvailableCountryOptions(value.OrganizationId), GetIdsOfAvailableDataResponsibleOptions(value.OrganizationId));
+            return ToDTO(value, GetLocalRoleDescriptionOverrides(value.OrganizationId), GetIdsOfAvailableCountryOptions(value.OrganizationId), GetIdsOfAvailableBasisForTransferOptions(value.OrganizationId), GetIdsOfAvailableDataResponsibleOptions(value.OrganizationId));
         }
 
-        private static DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value, 
-            Dictionary<int, Maybe<string>> localDescriptionOverrides, 
-            ISet<int> enabledCountryOptions,
-            ISet<int> enabledDataResponsibleOptions)
+        private static DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value, Dictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> enabledCountryOptions, ISet<int> enabledBasisForTransferOptions, ISet<int> enabledDataResponsibleOptions)
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
@@ -630,6 +669,11 @@ namespace Presentation.Web.Controllers.API
                     .InsecureCountriesSubjectToDataTransfer
                     .Select(x => new NamedEntityWithExpirationStatusDTO(x.Id, x.Name, enabledCountryOptions.Contains(x.Id) == false))
                     .ToArray(),
+                BasisForTransfer = value
+                    .BasisForTransfer
+                    .FromNullable()
+                    .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
+                    .GetValueOrDefault(),
                 DataResponsible = value
                     .DataResponsible
                     .FromNullable()

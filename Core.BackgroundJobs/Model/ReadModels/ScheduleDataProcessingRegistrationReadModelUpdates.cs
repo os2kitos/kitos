@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
@@ -47,6 +48,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOrganizationUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleBasisForTransferUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleDataResponsibleUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
@@ -67,6 +69,21 @@ namespace Core.BackgroundJobs.Model.ReadModels
             return updatesExecuted;
         }
 
+        private int HandleBasisForTransferUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_BasisForTransfer, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x=>x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
         private int HandleOrganizationUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
         {
             foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization, BatchSize).ToList())
@@ -75,13 +92,10 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var updates = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId) //Org id is not stored in read model so search the source model
-                    .Where(x => alreadyScheduledIds.Contains(x.Id) == false)
-                    .ToList()
-                    .Select(dpa => PendingReadModelUpdate.Create(dpa.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
-                    .ToList();
 
-                updatesExecuted = CompleteUpdate(updatesExecuted, updates, update, transaction);
+                //Org id is not stored in read model so search the source model
+                var ids = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
             return updatesExecuted;
@@ -89,19 +103,15 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         private int HandleSystemUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
         {
-            foreach (var userUpdate in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem, BatchSize).ToList())
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem, BatchSize).ToList())
             {
                 if (token.IsCancellationRequested)
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var updates = _dataProcessingRegistrationRepository.GetBySystemId(userUpdate.SourceId) //System id is not stored in read model so search the source model
-                    .Where(x => alreadyScheduledIds.Contains(x.Id) == false)
-                    .ToList()
-                    .Select(dpa => PendingReadModelUpdate.Create(dpa.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
-                    .ToList();
-
-                updatesExecuted = CompleteUpdate(updatesExecuted, updates, userUpdate, transaction);
+                //System id is not stored in read model so search the source model
+                var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
             return updatesExecuted;
@@ -109,19 +119,14 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         private int HandleUserUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
         {
-            foreach (var userUpdate in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User, BatchSize).ToList())
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User, BatchSize).ToList())
             {
                 if (token.IsCancellationRequested)
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var updates = _readModelRepository.GetByUserId(userUpdate.SourceId)
-                    .Where(x => alreadyScheduledIds.Contains(x.SourceEntityId) == false)
-                    .ToList()
-                    .Select(dpa => PendingReadModelUpdate.Create(dpa.SourceEntityId, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
-                    .ToList();
-
-                updatesExecuted = CompleteUpdate(updatesExecuted, updates, userUpdate, transaction);
+                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x=>x.SourceEntityId);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
             return updatesExecuted;

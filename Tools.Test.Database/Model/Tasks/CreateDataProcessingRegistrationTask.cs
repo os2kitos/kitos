@@ -36,6 +36,11 @@ namespace Tools.Test.Database.Model.Tasks
             var readModel = new DataProcessingRegistrationReadModel();
             var update = new DataProcessingRegistrationReadModelUpdate(
                 new GenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>(dbContext),
+                new OptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOption>
+                (
+                    new GenericRepository<LocalDataProcessingBasisForTransferOption>(dbContext),
+                    new GenericRepository<DataProcessingBasisForTransferOption>(dbContext)
+                ),
                 new OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>
                 (
                     new GenericRepository<LocalDataProcessingDataResponsibleOption>(dbContext),

@@ -81,6 +81,13 @@ namespace Core.DomainServices.Repositories.GDPR
                 );
         }
 
+        public IQueryable<DataProcessingRegistration> GetByBasisForTransferId(int basisForTransferId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.BasisForTransferId == basisForTransferId);
+        }
+
         public IQueryable<DataProcessingRegistration> GetByDataResponsibleId(int dataResponsibleId)
         {
             return _repository

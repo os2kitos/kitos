@@ -173,6 +173,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("BasisForTransfer")
+                            .withTitle("Overførselsgrundlag")
+                            .withId("dpBasisForTransfer")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("IsAgreementConcluded")
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")

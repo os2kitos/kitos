@@ -23,6 +23,8 @@ namespace Core.DomainServices.Model.EventHandlers
         IDomainEventHandler<NamedEntityChangedNameEvent<ItSystem>>,
         IDomainEventHandler<EnabledStatusChanged<ItSystem>>,
         IDomainEventHandler<EntityUpdatedEvent<Organization>>,
+        IDomainEventHandler<EntityUpdatedEvent<DataProcessingBasisForTransferOption>>,
+        IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingDataResponsibleOption>>,
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>>
     {
@@ -99,6 +101,17 @@ namespace Core.DomainServices.Model.EventHandlers
         public void Handle(EntityUpdatedEvent<Organization> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_Organization));
+        }
+
+        public void Handle(EntityUpdatedEvent<DataProcessingBasisForTransferOption> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_BasisForTransfer));
+        }
+
+        public void Handle(EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption> domainEvent)
+        {
+            //Point to parent id since that's what the dpr knows about
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_BasisForTransfer));
         }
 
         public void Handle(EntityUpdatedEvent<DataProcessingDataResponsibleOption> domainEvent)

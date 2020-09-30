@@ -624,9 +624,13 @@
     <Compile Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.designer.cs">
       <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009300900519_Added_Data_Responsible.cs" />
-    <Compile Include="Migrations\202009300900519_Added_Data_Responsible.designer.cs">
-      <DependentUpon>202009300900519_Added_Data_Responsible.cs</DependentUpon>
+    <Compile Include="Migrations\202009300439332_DPR_BasisForTransfer.cs" />
+    <Compile Include="Migrations\202009300439332_DPR_BasisForTransfer.designer.cs">
+      <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009301801560_Added_Data_Responsible.cs" />
+    <Compile Include="Migrations\202009301801560_Added_Data_Responsible.designer.cs">
+      <DependentUpon>202009301801560_Added_Data_Responsible.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1018,8 +1022,11 @@
     <EmbeddedResource Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.resx">
       <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009300900519_Added_Data_Responsible.resx">
-      <DependentUpon>202009300900519_Added_Data_Responsible.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202009300439332_DPR_BasisForTransfer.resx">
+      <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009301801560_Added_Data_Responsible.resx">
+      <DependentUpon>202009301801560_Added_Data_Responsible.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

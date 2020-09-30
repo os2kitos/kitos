@@ -8,7 +8,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_User = 1,
         DataProcessingRegistration_ItSystem = 2,
         DataProcessingRegistration_Organization = 3,
-        DataProcessingRegistration_DataResponsible = 4//TODO: After merge with master you will have conflict
+        DataProcessingRegistration_BasisForTransfer = 4,
+        DataProcessingRegistration_DataResponsible = 5
     }
 
     public class PendingReadModelUpdate

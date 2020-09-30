@@ -19,5 +19,6 @@
         IsAgreementConcluded?: Models.Api.Shared.YesNoIrrelevantOption;
         AgreementConcludedAt?: Date;
         TransferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
+        BasisForTransfer?: string;
     }
 }

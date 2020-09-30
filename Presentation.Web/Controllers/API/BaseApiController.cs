@@ -14,6 +14,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
+using Presentation.Web.Extensions;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
@@ -160,14 +161,7 @@ namespace Presentation.Web.Controllers.API
 
         protected HttpResponseMessage FromOperationError(OperationError failure)
         {
-            HttpStatusCode statusCode = failure.FailureType switch
-            {
-                OperationFailure.BadInput => HttpStatusCode.BadRequest,
-                OperationFailure.NotFound => HttpStatusCode.NotFound,
-                OperationFailure.Forbidden => HttpStatusCode.Forbidden,
-                OperationFailure.Conflict => HttpStatusCode.Conflict,
-                _ => HttpStatusCode.InternalServerError
-            };
+            var statusCode = failure.FailureType.ToHttpStatusCode();
 
             return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
