@@ -8,7 +8,6 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;

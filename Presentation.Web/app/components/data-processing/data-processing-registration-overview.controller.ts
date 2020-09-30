@@ -43,9 +43,6 @@
             //Lookup maps
             var dpaRoleIdToUserNamesMap = {};
 
-            const yesNoIrrelevantOptionValueToTextMap = Models.Api.Shared.YesNoIrrelevantOptionMapper.getValueToTextMap();
-            const yearMonthUndecidedOptionValueToTextMap = Models.ViewModel.Shared.YearMonthUndecidedIntervalOption;
-
             //Build and launch kendo grid
             var launcher =
                 kendoGridLauncherFactory
@@ -223,14 +220,14 @@
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Other
                                 ].map(value => {
                                     return {
-                                        textValue: yearMonthUndecidedOptionValueToTextMap[value],
+                                        textValue: Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(value),
                                         remoteValue: value
                                     }
                                 })
                                 , false
                         )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap.getText(dataItem.OversightInterval)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap.getText(dataItem.OversightInterval))))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval))))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>

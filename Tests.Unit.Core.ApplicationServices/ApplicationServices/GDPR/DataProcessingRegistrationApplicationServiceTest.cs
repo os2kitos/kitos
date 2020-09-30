@@ -888,18 +888,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_OversightInterval_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var oversightInterval = A<YearMonthIntervalOption>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.UpdateOversightInterval(id, oversightInterval);
-
-            //Assert
-            AssertModificationFailure(result,OperationFailure.Forbidden);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightInterval(id, A<YearMonthIntervalOption>()));
         }
 
         [Fact]
@@ -927,18 +916,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_OversightIntervalRemark_Returns_Forbidden()
         {
-            //Arrange
-            var id = A<int>();
-            var oversightIntervalRemark = A<string>();
-            var registration = new DataProcessingRegistration();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, false);
-
-            //Act
-            var result = _sut.UpdateOversightIntervalRemark(id, oversightIntervalRemark);
-
-            //Assert
-            AssertModificationFailure(result, OperationFailure.Forbidden);
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightIntervalRemark(id, A<string>()));
         }
 
         private Mock<IDatabaseTransaction> ExpectTransaction()

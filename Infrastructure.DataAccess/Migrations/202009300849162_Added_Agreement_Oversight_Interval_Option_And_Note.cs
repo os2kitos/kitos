@@ -8,14 +8,14 @@
         public override void Up()
         {
             AddColumn("dbo.DataProcessingRegistrations", "OversightInterval", c => c.Int());
-            AddColumn("dbo.DataProcessingRegistrations", "OversightIntervalNote", c => c.String());
+            AddColumn("dbo.DataProcessingRegistrations", "OversightIntervalRemark", c => c.String());
             AddColumn("dbo.DataProcessingRegistrationReadModels", "OversightInterval", c => c.Int());
         }
         
         public override void Down()
         {
             DropColumn("dbo.DataProcessingRegistrationReadModels", "OversightInterval");
-            DropColumn("dbo.DataProcessingRegistrations", "OversightIntervalNote");
+            DropColumn("dbo.DataProcessingRegistrations", "OversightIntervalRemark");
             DropColumn("dbo.DataProcessingRegistrations", "OversightInterval");
         }
     }
