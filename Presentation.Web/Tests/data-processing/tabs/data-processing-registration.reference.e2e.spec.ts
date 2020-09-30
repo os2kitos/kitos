@@ -35,6 +35,7 @@ describe("Data Processing registration reference test ",
             //Creating DPR
             dpaHelper.createAndOpenDataProcessingRegistration(registrationName)
                 // creating reference
+                .then(() => pageObjectReference.goToDpaReferenceTab())
                 .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                 .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
