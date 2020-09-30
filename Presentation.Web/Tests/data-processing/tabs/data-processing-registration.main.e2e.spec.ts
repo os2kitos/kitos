@@ -8,7 +8,7 @@ import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingR
 import GetDateHelper = require("../../Helpers/GetDateHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
 
-describe("Data processing agreement main detail tests", () => {
+describe("Data processing registration main detail tests", () => {
 
     const loginHelper = new Login();
     const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();

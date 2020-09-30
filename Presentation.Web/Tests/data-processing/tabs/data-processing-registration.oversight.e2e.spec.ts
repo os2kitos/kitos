@@ -6,7 +6,7 @@ import DataProcessingRegistrationEditOversightPageObject = require("../../PageOb
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
 
-describe("Data processing agreement oversight detail tests", () => {
+describe("Data processing registration oversight detail tests", () => {
 
     const loginHelper = new Login();
     const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();
