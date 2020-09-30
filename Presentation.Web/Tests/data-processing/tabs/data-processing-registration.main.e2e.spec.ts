@@ -44,10 +44,8 @@ describe("Data processing agreement main detail tests", () => {
             var name = createName(10);
             var renameValue = createName(30);
 
-            dpaHelper.createDataProcessingRegistration(name)
+            dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
-                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
                 .then(() => renameNameAndVerify(renameValue))
                 //Changing IsAgreementConcluded and AgreementConcludedAt
                 .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))

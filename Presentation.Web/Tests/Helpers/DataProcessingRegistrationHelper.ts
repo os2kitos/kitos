@@ -90,6 +90,14 @@ class DataProcessingRegistrationHelper {
         });
     }
 
+    public static createAndOpenDataProcessingRegistration(name: string) {
+        console.log(`Creating registration and navigating to ${name}`);
+        return DataProcessingRegistrationHelper.createDataProcessingRegistration(name)
+            .then(() => this.pageObject.findSpecificDpaInNameColumn(name))
+            .then(() => DataProcessingRegistrationHelper.goToSpecificDataProcessingRegistration(name));
+    }
+
+
     public static assignDataProcessor(name: string) {
         console.log("Assigning data processor with name: " + name);
         return Select2Helper.searchFor(name, "s2id_data-processor_select-new")

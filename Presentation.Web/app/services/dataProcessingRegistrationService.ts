@@ -21,8 +21,8 @@
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]>;
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
-        updateOversightInterval(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YearMonthUndecidedIntervalOption);
-        updateOversightIntervalNote(dataProcessingRegistrationId: number, note: string);
+        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption);
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, note: string);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -256,12 +256,12 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
         }
 
-        updateOversightInterval(dataProcessingRegistrationId: number, yearMonthUndecidedId: Models.Api.Shared.YearMonthUndecidedIntervalOption) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option"), yearMonthUndecidedId);
+        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option"), oversightInterval );
         }
 
-        updateOversightIntervalNote(dataProcessingRegistrationId: number, note: string) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option-note"), note);
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, note: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option-remark"), note);
         }
 
         static $inject = ["$http"];

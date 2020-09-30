@@ -5,10 +5,10 @@ using System.Web;
 
 namespace Presentation.Web.Models
 {
-    public class ValueWithOptionalNoteDTO<T>
+    public class ValueWithOptionalRemarkDTO<T>
     {
         public T Value { get; set; }
 
-        public string Note { get; set; }
+        public string Remark { get; set; }
     }
 }

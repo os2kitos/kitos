@@ -29,14 +29,12 @@ describe("Data Processing registration reference test ",
             var referenceName = createReferenceName();
             var referenceId = createReferenceId();
             var validUrl = generateValidUrl();
-            var agreementName = createAgreementName();
+            var registrationName = createRegistrationName();
             var invalidUrl = generateInvalidUrl();
 
-            //Creating DPA
-            dpaHelper.createDataProcessingRegistration(agreementName)
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(agreementName))
-                .then(() => pageObjectReference.goToDpaReferenceTab())
-            // creating reference
+            //Creating DPR
+            dpaHelper.createAndOpenDataProcessingRegistration(registrationName)
+                // creating reference
                 .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                 .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
@@ -65,8 +63,8 @@ describe("Data Processing registration reference test ",
         }
 
 
-        function createAgreementName() {
-            return `DpaRefTest${new Date().getTime()}`;
+        function createRegistrationName() {
+            return `DprRefTest${new Date().getTime()}`;
         }
 
         function createReferenceName() {

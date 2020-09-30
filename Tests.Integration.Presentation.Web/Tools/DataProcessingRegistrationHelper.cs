@@ -87,13 +87,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionNoteRequestAsync(int id, string note, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var body = new SingleValueDTO<string> { Value = note };
+            var body = new SingleValueDTO<string> { Value = remark };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-note"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-remark"), cookie, body);
 
         }
 

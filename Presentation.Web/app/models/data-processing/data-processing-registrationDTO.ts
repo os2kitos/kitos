@@ -14,7 +14,7 @@
         hasSubDataProcessors?: Models.Api.Shared.YesNoUndecidedOption;
         subDataProcessors: IDataProcessorDTO[];
         agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
-        oversightInterval: Models.Generic.ValueWithOptionalNoteDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
+        oversightInterval: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

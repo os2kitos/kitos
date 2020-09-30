@@ -240,6 +240,6 @@ namespace Core.DomainModel.GDPR
 
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
-        public string OversightIntervalNote { get; set; }
+        public string OversightIntervalRemark { get; set; }
     }
 }

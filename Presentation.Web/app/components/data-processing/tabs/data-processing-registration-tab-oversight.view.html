@@ -3,21 +3,20 @@
     <div class="panel panel-default">
         <div class="row">
             <div class="col-xs-6">
-                <!-- Agreement concluded -->
+                <!--Tilsyn Interval  -->
                 <div class="form-group">
                     <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
-                    <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
+                    <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" data-element-type="oversightInterval" />
                 </div>
-
-                <!-- Tilsyn Interval Note -->
+                <!-- Tilsyn Interval Bemærkning -->
                 <div class="form-group">
-                    <label for="oversightIntervalNote" class="control-label small">Tilsynsinterval note</label>
-                    <textarea id="oversightIntervalNote" class="form-control input-sm" rows="2"
+                    <label for="oversightIntervalRemark" class="control-label small">Tilsynsinterval bemærkning</label>
+                    <textarea id="oversightIntervalRemark" class="form-control input-sm" rows="2"
                               ng-disabled="!vm.hasWriteAccess"
-                              ng-model="vm.oversightIntervalNote"
-                              data-element-type="oversightIntervalNote"
-                              ng-blur="vm.changeOversightIntervalNote(vm.oversightIntervalNote)"
-                              data-field="oversightIntervalNote">
+                              ng-model="vm.oversightIntervalRemark"
+                              data-element-type="oversightIntervalRemark"
+                              ng-blur="vm.changeOversightIntervalRemark(vm.oversightIntervalRemark)"
+                              data-field="oversightIntervalRemark">
                     </textarea>
                 </div>
             </div>

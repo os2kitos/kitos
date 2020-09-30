@@ -59,7 +59,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
             var agreementConcludedAt = A<DateTime>();
             var oversightInterval = A<YearMonthIntervalOption>();
-            var oversightNote = A<string>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 

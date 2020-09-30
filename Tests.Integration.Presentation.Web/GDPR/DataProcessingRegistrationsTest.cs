@@ -410,20 +410,20 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
-        public async Task Can_Change_Oversight_Option_Note()
+        public async Task Can_Change_Oversight_Option_Remark()
         {
             //Arrange
             var name = A<string>();
             var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
-            var oversightNote = A<string>();
+            var oversightRemark = A<string>();
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionNoteRequestAsync(dprDTO.Id, oversightNote);
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRemarkRequestAsync(dprDTO.Id, oversightRemark);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
-            Assert.Equal(dto.OversightInterval.Note, oversightNote);
+            Assert.Equal(dto.OversightInterval.Remark, oversightRemark);
         }
 
         [Fact]

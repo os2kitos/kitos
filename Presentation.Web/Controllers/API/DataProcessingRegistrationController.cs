@@ -420,18 +420,18 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/oversight-option-note")]
+        [Route("{id}/oversight-interval-remark")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightOptionNote(int id, [FromBody] SingleValueDTO<string> oversightIntervalNote)
+        public HttpResponseMessage PatchOversightIntervalRemark(int id, [FromBody] SingleValueDTO<string> oversightIntervalRemark)
         {
-            if (oversightIntervalNote == null)
-                return BadRequest(nameof(oversightIntervalNote) +" must be provided");
+            if (oversightIntervalRemark == null)
+                return BadRequest(nameof(oversightIntervalRemark) +" must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateOversightIntervalNote(id, oversightIntervalNote.Value)
+                .UpdateOversightIntervalRemark(id, oversightIntervalRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -506,10 +506,10 @@ namespace Presentation.Web.Controllers.API
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
-                OversightInterval = new ValueWithOptionalNoteDTO<YearMonthIntervalOption?>()
+                OversightInterval = new ValueWithOptionalRemarkDTO<YearMonthIntervalOption?>()
                 {
                     Value = value.OversightInterval,
-                    Note = value.OversightIntervalNote
+                    Remark = value.OversightIntervalRemark
                 },
                 DataProcessors = value
                     .DataProcessors

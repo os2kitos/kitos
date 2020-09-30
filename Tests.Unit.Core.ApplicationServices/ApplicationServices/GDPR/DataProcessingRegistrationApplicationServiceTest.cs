@@ -1198,11 +1198,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Can_Update_OversightIntervalNote()
+        public void Can_Update_OversightIntervalRemark()
         {
             //Arrange
             var id = A<int>();
-            var oversightIntervalNote = A<string>();
+            var oversightIntervalRemark = A<string>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
@@ -1210,27 +1210,27 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
-            var result = _sut.UpdateOversightIntervalNote(id, oversightIntervalNote);
+            var result = _sut.UpdateOversightIntervalRemark(id, oversightIntervalRemark);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(oversightIntervalNote, result.Value.OversightIntervalNote);
+            Assert.Equal(oversightIntervalRemark, result.Value.OversightIntervalRemark);
             transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
         [Fact]
-        public void Update_OversightIntervalNote_Returns_Forbidden()
+        public void Update_OversightIntervalRemark_Returns_Forbidden()
         {
             //Arrange
             var id = A<int>();
-            var oversightIntervalNote = A<string>();
+            var oversightIntervalRemark = A<string>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, false);
 
             //Act
-            var result = _sut.UpdateOversightIntervalNote(id, oversightIntervalNote);
+            var result = _sut.UpdateOversightIntervalRemark(id, oversightIntervalRemark);
 
             //Assert
             AssertModificationFailure(result, OperationFailure.Forbidden);

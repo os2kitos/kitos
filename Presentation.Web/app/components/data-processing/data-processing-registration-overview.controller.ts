@@ -44,7 +44,7 @@
             var dpaRoleIdToUserNamesMap = {};
 
             const yesNoIrrelevantOptionValueToTextMap = Models.Api.Shared.YesNoIrrelevantOptionMapper.getValueToTextMap();
-            const yearMonthUndecidedOptionValueToTextMap = Models.Api.Shared.YearMonthUndecidedOptionMapper.getValueToTextMap();
+            const yearMonthUndecidedOptionValueToTextMap = Models.ViewModel.Shared.YearMonthUndecidedIntervalOption;
 
             //Build and launch kendo grid
             var launcher =
@@ -207,8 +207,8 @@
                                 })
                                 , false
                         )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval]))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap[dataItem.OversightInterval])))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap.getText(dataItem.OversightInterval)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && yearMonthUndecidedOptionValueToTextMap.getText(dataItem.OversightInterval))))
                     .withStandardSorting("Name");
 
             roles.forEach(role =>

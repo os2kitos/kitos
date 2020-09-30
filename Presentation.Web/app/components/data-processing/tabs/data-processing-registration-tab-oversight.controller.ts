@@ -18,14 +18,12 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService) {
 
             this.bindOversightInterval();
-            this.bindOversightIntervalNote();
+            this.bindOversightIntervalRemark();
         }
 
         headerName = this.dataProcessingRegistration.name;
-
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
-        oversightIntervalNote: string;
-
+        oversightIntervalRemark: string;
 
         private bindOversightInterval() {
             this.oversightInterval = {
@@ -35,20 +33,20 @@
             }
         }
 
-        private bindOversightIntervalNote() {
-            this.oversightIntervalNote = this.dataProcessingRegistration.oversightInterval.note;
+        private bindOversightIntervalRemark() {
+            this.oversightIntervalRemark = this.dataProcessingRegistration.oversightInterval.remark;
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
             if (id === null) {
                 return null;
             }
-            return new Models.ViewModel.Shared.YearMonthUndecidedIntervalOption().options.filter(option => option.id === id)[0];
+            return new Models.ViewModel.Shared.YearMonthUndecidedIntervalOption().getById(id);
         } 
 
         private changeOversightInterval(oversightInterval: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>) {
             this.apiUseCaseFactory
-                .createUpdate("Tilsyn Interval sat", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistration.id, oversightInterval.optionalObjectContext))
+                .createUpdate("Tilsynsinterval", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistration.id, oversightInterval.optionalObjectContext))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.value = oversightInterval.optionalObjectContext;
                     this.bindOversightInterval();
@@ -56,12 +54,12 @@
                 });
         }
 
-        changeOversightIntervalNote(oversightIntervalNote: string) {
+        private changeOversightIntervalRemark(oversightIntervalRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Tilsyn Interval note sat", () => this.dataProcessingRegistrationService.updateOversightIntervalNote(this.dataProcessingRegistration.id, oversightIntervalNote))
+                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.oversightInterval.note = oversightIntervalNote;
-                    this.bindOversightIntervalNote();
+                    this.dataProcessingRegistration.oversightInterval.remark = oversightIntervalRemark;
+                    this.bindOversightIntervalRemark();
                     return success;
                 });
         }

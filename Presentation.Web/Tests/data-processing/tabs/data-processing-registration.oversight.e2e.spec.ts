@@ -5,6 +5,8 @@ import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects
 import DataProcessingRegistrationEditOversightPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
+import YearMonthUndecidedIntervalOption = Kitos.Models.Api.Shared.YearMonthUndecidedIntervalOption;
+import YearMonthUndecidedOptionMapper = Kitos.Models.Api.Shared.YearMonthUndecidedOptionMapper;
 
 describe("Data processing agreement oversight detail tests", () => {
 
@@ -14,14 +16,14 @@ describe("Data processing agreement oversight detail tests", () => {
     const testFixture = new TestFixtureWrapper();
     const dpaHelper = DataProcessingRegistrationHelper;
 
-    const createName = (index: number) => {
-        return `Dpa${new Date().getTime()}_${index}`;
+    const createName = () => {
+        return `Dpa_${new Date().getTime()}`;
     }
 
-    const createNote = () => {
-        return `OversightNote_${new Date().getTime()}`;
+    const createRemark = () => {
+        return `OversightRemark_${new Date().getTime()}`;
     }
-   
+
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
@@ -37,18 +39,17 @@ describe("Data processing agreement oversight detail tests", () => {
 
     it("Is able to set oversight data",
         () => {
-            var name = createName(10);
-            var dropdownInterval = "Hver andet år";
-            var intervalNote = createNote();
+            var name = createName();
+            var yearMonthUndecidedOptionValueToTextMap = YearMonthUndecidedOptionMapper.getValueToTextMap();
+            var dropdownInterval = yearMonthUndecidedOptionValueToTextMap[YearMonthUndecidedIntervalOption.Every_second_year];
+            var intervalRemark = createRemark();
 
-            dpaHelper.createDataProcessingRegistration(name)
-                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
+            dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => pageObject.getOversightPage())
-                .then(() => pageObject.getOversightIntervalOptionNote().sendKeys(intervalNote))
+                .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(intervalRemark))
                 .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
                 .then(() => verifyOversightInterval(dropdownInterval))
-                .then(() => verifyOversightIntervalNote(intervalNote));
+                .then(() => verifyOversightIntervalNote(intervalRemark));
         });
 
     function verifyOversightInterval(selectedValue: string) {
@@ -58,8 +59,10 @@ describe("Data processing agreement oversight detail tests", () => {
 
     function verifyOversightIntervalNote(expectedValue: string) {
         console.log(`Expecting oversight interval note to be set to: ${expectedValue}`);
-        expect(pageObject.getOversightIntervalOptionNote().getAttribute("value")).toEqual(expectedValue);
+        expect(pageObject.getOversightIntervalOptionRemark().getAttribute("value")).toEqual(expectedValue);
     }
+
+
 
 
 });

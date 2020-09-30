@@ -308,16 +308,16 @@ namespace Core.ApplicationServices.GDPR
                 });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalNote(int id, string note)
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark)
         {
-            if (note == null)
+            if (remark == null)
             {
                 return new OperationError(OperationFailure.BadInput);
             }
 
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.OversightIntervalNote = note;
+                registration.OversightIntervalRemark = remark;
                 return registration;
             });
         }

@@ -1,34 +1,72 @@
 ﻿module Kitos.Models.ViewModel.Shared {
+
     import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
 
     export class YearMonthUndecidedIntervalOption {
 
+        private static getValueToTextMap() {
+            return Object
+                .keys(Models.Api.Shared.YearMonthUndecidedIntervalOption)
+                .filter(k => isNaN(parseInt(k)) === false)
+                .reduce((acc, next, _) => {
+                    var text = "";
+
+                    switch (parseInt(next) as Models.Api.Shared.YearMonthUndecidedIntervalOption) {
+                        case Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly:
+                            text = "Halvårlig";
+                            break;
+                        case Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly:
+                            text = "Årligt";
+                            break;
+                        case Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year:
+                            text = "Hver andet år";
+                            break;
+                        case Models.Api.Shared.YearMonthUndecidedIntervalOption.Other:
+                            text = "Andet";
+                            break;
+                    }
+
+                    acc[next] = text;
+                    acc[Models.Api.Shared.YearMonthUndecidedIntervalOption[next]] = text;
+                    return acc;
+                },
+                    {}
+                );
+        }
+
+        private static readonly valueToNameMap = YearMonthUndecidedIntervalOption.getValueToTextMap();
+
         static getText(option: Models.Api.Shared.YearMonthUndecidedIntervalOption) {
-            switch (option) {
-                case Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly:
-                    return "Halvårlig";
-                case Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly:
-                    return "Årligt";
-                case Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year:
-                    return "Hver andet år";
-                case Models.Api.Shared.YearMonthUndecidedIntervalOption.Other:
-                    return "Andet";
-                default:
-                    return "";
-            }
+            return YearMonthUndecidedIntervalOption.valueToNameMap[option];
         }
 
         options: Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>[];
+
+        getById(id: number): Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
+            if (id === null) {
+                return null;
+            }
+            return this.options.filter(x => x.id === id)[0];
+        }
+
         constructor() {
             const select2BlankOptionTextValue = "\u200B";
 
             this.options = [
-                <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{ id: Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided as number, text: select2BlankOptionTextValue, optionalObjectContext: Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided },
-                <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{ id: Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly as number, text: YearMonthUndecidedIntervalOption.getText(Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly), optionalObjectContext: Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly },
-                <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{ id: Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly as number, text: YearMonthUndecidedIntervalOption.getText(Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly), optionalObjectContext: Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly },
-                <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{ id: Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year as number, text: YearMonthUndecidedIntervalOption.getText(Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year), optionalObjectContext: Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year },
-                <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{ id: Models.Api.Shared.YearMonthUndecidedIntervalOption.Other as number, text: YearMonthUndecidedIntervalOption.getText(Models.Api.Shared.YearMonthUndecidedIntervalOption.Other), optionalObjectContext: Models.Api.Shared.YearMonthUndecidedIntervalOption.Other }
-            ];
+                Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided,
+                Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly,
+                Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly,
+                Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year,
+                Models.Api.Shared.YearMonthUndecidedIntervalOption.Other
+            ].map(optionType => {
+                return <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{
+                    id: optionType as number,
+                    text: optionType === Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided
+                        ? select2BlankOptionTextValue
+                        : YearMonthUndecidedIntervalOption.getText(optionType),
+                    optionalObjectContext: optionType
+                }
+            });
         }
     }
 }

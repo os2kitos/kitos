@@ -19,7 +19,7 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithEnabledStatusDTO[] ItSystems { get; set; }
 
-        public ValueWithOptionalNoteDTO<YearMonthIntervalOption?> OversightInterval { get; set; }
+        public ValueWithOptionalRemarkDTO<YearMonthIntervalOption?> OversightInterval { get; set; }
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
