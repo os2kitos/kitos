@@ -31,7 +31,7 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithExpirationStatusDTO[] InsecureThirdCountries { get; set; }
 
-        public OptionWithDescriptionAndExpirationDTO DataResponsible { get; set; }
-        public string DataResponsibleRemark { get; set; }
+        public ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO> DataResponsible { get; set; }
+
     }
 }

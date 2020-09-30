@@ -40,4 +40,9 @@
     export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         email: string,
     }
+
+    export interface IDataProcessingRegistrationOptions {
+        countryOptions: Models.Generic.NamedEntity.NamedEntityDTO[],
+        dataResponsibleOptions: Models.Generic.IOptionWithDescription[],
+    }
 }

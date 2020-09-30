@@ -37,9 +37,6 @@
                     ],
                     dataProcessingRegistration: [
                         "dataProcessingRegistrationService", "$stateParams", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, $stateParams) => dataProcessingRegistrationService.get($stateParams.id)
-                    ],
-                    dataProcessingRegistrationOptions: [
-                        "dataProcessingRegistrationService", "dataProcessingRegistration", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, dataProcessingRegistration) => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(dataProcessingRegistration.id)
                     ]
                 }
             });

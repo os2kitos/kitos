@@ -617,7 +617,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Equal(dataResponsibleOption.Id, updateRegistrationDto.DataResponsible.Id);
+            Assert.Equal(dataResponsibleOption.Id, updateRegistrationDto.DataResponsible.Value.Id);
         }
 
         [Fact]
@@ -637,7 +637,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Equal(HttpStatusCode.OK, clearResponse.StatusCode);
             var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Null(updateRegistrationDto.DataResponsible);
+            Assert.Null(updateRegistrationDto.DataResponsible.Value);
         }
 
         [Fact]
@@ -654,7 +654,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Equal(remark, updateRegistrationDto.DataResponsibleRemark);
+            Assert.Equal(remark, updateRegistrationDto.DataResponsible.Remark);
         }
     }
 }

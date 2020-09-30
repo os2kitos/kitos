@@ -651,9 +651,15 @@ namespace Presentation.Web.Controllers.API
                 DataResponsible = value
                     .DataResponsible
                     .FromNullable()
-                    .Select(responsible => new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, enabledDataResponsibleOptions.Contains(responsible.Id) == false, responsible.Description))
-                    .GetValueOrDefault(),
-                DataResponsibleRemark = value.DataResponsibleRemark
+                    .Select(responsible => new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>() { 
+                        Value = new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, enabledDataResponsibleOptions.Contains(responsible.Id) == false, responsible.Description),
+                        Remark = value.DataResponsibleRemark
+                    })
+                    .GetValueOrFallback(new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
+                    {
+                        Value = null,
+                        Remark = value.DataResponsibleRemark
+                    })
             };
         }
 

@@ -24,7 +24,7 @@
         updateTransferToInsecureThirdCountry(dataProcessingRegistrationId: number, value: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         removeInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number);
+        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -270,18 +270,8 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
         }
 
-        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number) {
-            return this
-                .$http
-                .get<API.Models.IApiWrapper<any>>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId,
-                    "data-processing-registration-options"))
-                .then(
-                    result => {
-                        var response = result.data as { response }
-                        return response.response;
-                    },
-                    error => this.handleServerError(error)
-                );
+        getApplicableDataProcessingRegistrationOptions(organizationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>{
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationOptions>(`available-options-in/${organizationId}`);
         }
 
         static $inject = ["$http"];
