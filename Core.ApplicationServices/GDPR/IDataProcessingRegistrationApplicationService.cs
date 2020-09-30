@@ -39,5 +39,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateTransferToInsecureThirdCountries(int id, YesNoUndecidedOption transferToInsecureThirdCountries);
         Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
+        Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId);
+        Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
     }
 }

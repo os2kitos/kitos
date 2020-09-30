@@ -45,5 +45,7 @@ namespace Core.DomainModel.GDPR.Read
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }
+
+        public string BasisForTransfer { get; set; }
     }
 }

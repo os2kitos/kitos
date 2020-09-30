@@ -273,5 +273,9 @@ namespace Core.DomainModel.GDPR
         public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
 
         public DateTime? AgreementConcludedAt { get; set; }
+
+        public int? BasisForTransferId { get; set; }
+
+        public virtual DataProcessingBasisForTransferOption BasisForTransfer { get; set; }
     }
 }

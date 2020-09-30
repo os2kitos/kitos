@@ -5,7 +5,7 @@ using Core.DomainServices.Options;
 namespace Core.DomainServices.GDPR
 {
     public class DataProcessingRegistrationInsecureCountriesAssignmentService :
-        OptionTypeAssignmentServiceBase<DataProcessingRegistration, DataProcessingCountryOption>,
+        MultipleOptionTypeInstancesAssignmentServiceBase<DataProcessingRegistration, DataProcessingCountryOption>,
         IDataProcessingRegistrationInsecureCountriesAssignmentService
     {
         public DataProcessingRegistrationInsecureCountriesAssignmentService(IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> optionsService)

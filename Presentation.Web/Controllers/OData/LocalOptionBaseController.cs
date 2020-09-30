@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using static System.String;
 
@@ -120,6 +121,7 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     localOption.IsActive = true;
+                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -135,6 +137,7 @@ namespace Presentation.Web.Controllers.OData
                     entity.OrganizationId = organizationId;
 
                     Repository.Insert(entity);
+                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(entity));
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -198,6 +201,7 @@ namespace Presentation.Web.Controllers.OData
                     }
 
                     delta.Patch(entity);
+                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(entity));
                     Repository.Insert(entity);
                     Repository.Save();
                 }
@@ -215,7 +219,7 @@ namespace Presentation.Web.Controllers.OData
 
         public virtual IHttpActionResult Delete(int organizationId, int key)
         {
-            LocalOptionEntity<TOptionType> localOption = Repository
+            var localOption = Repository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
                 .FirstOrDefault(x => x.OptionId == key);
@@ -231,6 +235,8 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 localOption.IsActive = false;
+                DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
+
                 Repository.Save();
             }
             catch (Exception e)

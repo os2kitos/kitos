@@ -586,7 +586,34 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.InsecureThirdCountries);
+        }
 
+        [Fact]
+        public async Task Can_Assign_And_Clear_BasisForTransfer()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var options = (await DataProcessingRegistrationHelper.GetBasisForTransferOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var randomOption = options[Math.Abs(A<int>()) % options.Count];
+
+            //Act - assign basis for transfer
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignBasisForTransferRequestAsync(registration.Id, randomOption.Id);
+
+            //Assert - basis for transfer set
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+
+            Assert.NotNull(dto.BasisForTransfer);
+            Assert.Equal(randomOption.Id, dto.BasisForTransfer.Id);
+            Assert.Equal(randomOption.Name, dto.BasisForTransfer.Name);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingRegistrationHelper.SendClearBasisForTransferRequestAsync(registration.Id);
+
+            //Assert country removed again
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Null(dto.BasisForTransfer);
         }
     }
 }

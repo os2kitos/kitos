@@ -36,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationSystemAssignmentService> _systemAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
+        private readonly Mock<IDataProcessingRegistrationBasisForTransferAssignmentService> _basisForTransferAssignmentServiceMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -49,6 +50,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _systemAssignmentServiceMock = new Mock<IDataProcessingRegistrationSystemAssignmentService>();
             _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
+            _basisForTransferAssignmentServiceMock = new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -58,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _systemAssignmentServiceMock.Object,
                 _dpAssignmentService.Object,
                 _insecureThirdCountryAssignmentMock.Object,
+                _basisForTransferAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -83,7 +86,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            transaction.Verify(x=>x.Commit());
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -136,7 +139,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             _repositoryMock.Verify(x => x.DeleteById(id), Times.Once);
             Assert.True(result.Ok);
-            transaction.Verify(x=>x.Commit());
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -1046,6 +1049,81 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Cannot_RemoveInsecureThirdCountry_If_Write_Access_Is_Denied()
         {
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveInsecureThirdCountry(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_AssignBasisForTransfer()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var optionId = A<int>();
+                _basisForTransferAssignmentServiceMock.Setup(x => x.Assign(registration, optionId)).Returns(Result<DataProcessingBasisForTransferOption, OperationError>.Success(new DataProcessingBasisForTransferOption()));
+
+                //Act
+                return _sut.AssignBasisForTransfer(registration.Id, optionId);
+            });
+        }
+
+        [Fact]
+        public void Cannot_AssignBasisForTransfer_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignBasisForTransfer(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_AssignBasisForTransfer_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignBasisForTransfer(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_ClearBasisForTransfer()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                _basisForTransferAssignmentServiceMock.Setup(x => x.Clear(registration)).Returns(Result<DataProcessingBasisForTransferOption, OperationError>.Success(new DataProcessingBasisForTransferOption()));
+
+                //Act
+                return _sut.ClearBasisForTransfer(registration.Id);
+            });
+        }
+
+        [Fact]
+        public void Cannot_ClearBasisForTransfer_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.ClearBasisForTransfer(id));
+        }
+
+        [Fact]
+        public void Cannot_ClearBasisForTransfer_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearBasisForTransfer(id));
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Modify succeeds" case
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="assertAdditionalConditions">Additional assertions besides Result=OK AND transaction committed</param>
+        private void Test_Command_Which_ModifiesState_With_Success<TSuccess>(
+            Func<DataProcessingRegistration, Result<TSuccess, OperationError>> command,
+            Action<DataProcessingRegistration, TSuccess> assertAdditionalConditions = null)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration { Id = id };
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = ExpectTransaction();
+            //Act
+            var result = command(registration);
+
+            //Assert
+            Assert.True(result.Ok);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
         }
 
         /// <summary>

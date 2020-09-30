@@ -31,6 +31,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
         private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
         private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
+        private readonly IDataProcessingRegistrationBasisForTransferAssignmentService _basisForTransferAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
@@ -43,6 +44,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
             IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
             IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
+            IDataProcessingRegistrationBasisForTransferAssignmentService basisForTransferAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingRegistrationRight> rightRepository)
         {
@@ -54,6 +56,7 @@ namespace Core.ApplicationServices.GDPR
             _systemAssignmentService = systemAssignmentService;
             _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
             _countryAssignmentService = countryAssignmentService;
+            _basisForTransferAssignmentService = basisForTransferAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -323,6 +326,17 @@ namespace Core.ApplicationServices.GDPR
         public Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId)
         {
             return Modify(id, registration => _countryAssignmentService.Remove(registration, countryId));
+        }
+
+        public Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId)
+        {
+            return Modify(id, registration => _basisForTransferAssignmentService.Assign(registration, basisForTransferId));
+        }
+
+        public Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id)
+        {
+            return Modify(id, registration => _basisForTransferAssignmentService.Clear(registration));
+
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
