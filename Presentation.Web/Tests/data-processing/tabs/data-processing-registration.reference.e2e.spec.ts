@@ -12,7 +12,7 @@ describe("Data Processing registration reference test ",
         var refHelper = new ReferenceHelper();
         var testFixture = new TestFixtureWrapper();
         var dpaHelper = DataProcessingHelper;
-
+        const ec = protractor.ExpectedConditions;
 
         beforeAll(() => {
             loginHelper.loginAsLocalAdmin();
@@ -59,7 +59,8 @@ describe("Data Processing registration reference test ",
         function deleteReferenceFromDpa(reference: string) {
 
             console.log(`Deleting ${reference}`);
-            refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference).click()
+            browser.wait(ec.elementToBeClickable(refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference)))
+                .then(() => refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference).click())
                 .then(() => browser.switchTo().alert().accept());
         }
 
