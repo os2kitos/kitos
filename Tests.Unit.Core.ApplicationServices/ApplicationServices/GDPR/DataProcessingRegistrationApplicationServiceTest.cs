@@ -58,6 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _systemAssignmentServiceMock.Object,
                 _dpAssignmentService.Object,
                 _insecureThirdCountryAssignmentMock.Object,
+                new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>().Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -83,7 +84,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            transaction.Verify(x=>x.Commit());
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -136,7 +137,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             _repositoryMock.Verify(x => x.DeleteById(id), Times.Once);
             Assert.True(result.Ok);
-            transaction.Verify(x=>x.Commit());
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]

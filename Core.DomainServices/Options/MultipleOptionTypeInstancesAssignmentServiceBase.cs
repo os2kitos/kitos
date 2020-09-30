@@ -4,13 +4,13 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainServices.Options
 {
-    public abstract class OptionTypeAssignmentServiceBase<TOwner, TOption> : IOptionTypeAssignmentService<TOwner, TOption>
+    public abstract class MultipleOptionTypeInstancesAssignmentServiceBase<TOwner, TOption> : IMultipleOptionTypeInstancesAssignmentService<TOwner, TOption>
         where TOption : OptionEntity<TOwner>
         where TOwner : IOwnedByOrganization
     {
         private readonly IOptionsService<TOwner, TOption> _optionsService;
 
-        protected OptionTypeAssignmentServiceBase(IOptionsService<TOwner, TOption> optionsService)
+        protected MultipleOptionTypeInstancesAssignmentServiceBase(IOptionsService<TOwner, TOption> optionsService)
         {
             _optionsService = optionsService;
         }

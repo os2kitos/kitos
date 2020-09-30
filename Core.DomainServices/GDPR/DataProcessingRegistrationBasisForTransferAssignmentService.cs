@@ -1,10 +1,11 @@
 ﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
-    public class DataProcessingRegistrationBasisForTransferAssignmentService : OptionTypeAssignmentServiceBase<DataProcessingRegistration,DataProcessingBasisForTransferOption>,IDataProcessingRegistrationBasisForTransferAssignmentService
+    public class DataProcessingRegistrationBasisForTransferAssignmentService : SingleOptionTypeInstanceAssignmentServiceBase<DataProcessingRegistration, DataProcessingBasisForTransferOption>, IDataProcessingRegistrationBasisForTransferAssignmentService
     {
         public DataProcessingRegistrationBasisForTransferAssignmentService(IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> optionsService) : base(optionsService)
         {
@@ -16,13 +17,16 @@ namespace Core.DomainServices.GDPR
             return option;
         }
 
-        protected override Result<DataProcessingBasisForTransferOption, OperationError> PerformRemove(DataProcessingRegistration owner, DataProcessingBasisForTransferOption option)
+        protected override Maybe<OperationError> PerformClear(DataProcessingRegistration owner)
         {
-            if(option.Id != owner.BasisForTransferId)
-                return new OperationError("Option id does not point to the assigned option", OperationFailure.BadInput);
-            
             owner.BasisForTransfer = null;
-            return option;
+            return Maybe<OperationError>.None;
+        }
+
+
+        protected override Maybe<DataProcessingBasisForTransferOption> GetAssignmentState(DataProcessingRegistration owner)
+        {
+            return owner.BasisForTransfer;
         }
     }
 }

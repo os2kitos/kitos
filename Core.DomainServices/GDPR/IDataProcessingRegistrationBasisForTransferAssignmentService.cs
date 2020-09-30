@@ -4,7 +4,7 @@ using Core.DomainServices.Options;
 
 namespace Core.DomainServices.GDPR
 {
-    public interface IDataProcessingRegistrationBasisForTransferAssignmentService : IOptionTypeAssignmentService<DataProcessingRegistration,DataProcessingBasisForTransferOption>
+    public interface IDataProcessingRegistrationBasisForTransferAssignmentService : ISingleOptionTypeInstanceAssignmentService<DataProcessingRegistration,DataProcessingBasisForTransferOption>
     {
     }
 }

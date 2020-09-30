@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.Result;
 using Microsoft.AspNet.OData;
+using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -16,14 +17,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected IHttpActionResult FromOperationError(OperationError failure)
         {
-            HttpStatusCode statusCode = failure.FailureType switch
-            {
-                OperationFailure.BadInput => HttpStatusCode.BadRequest,
-                OperationFailure.NotFound => HttpStatusCode.NotFound,
-                OperationFailure.Forbidden => HttpStatusCode.Forbidden,
-                OperationFailure.Conflict => HttpStatusCode.Conflict,
-                _ => HttpStatusCode.InternalServerError
-            };
+            HttpStatusCode statusCode = failure.FailureType.ToHttpStatusCode();
 
             return ResponseMessage(new HttpResponseMessage(statusCode) {Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G")))});
         }

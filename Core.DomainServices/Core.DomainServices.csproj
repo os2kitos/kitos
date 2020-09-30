@@ -87,10 +87,12 @@
     <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
+    <Compile Include="Options\ISingleOptionTypeInstanceAssignmentService.cs" />
     <Compile Include="Options\IOptionsService.cs" />
-    <Compile Include="Options\IOptionTypeAssignmentService.cs" />
+    <Compile Include="Options\IMultipleOptionTypeInstancesAssignmentService.cs" />
+    <Compile Include="Options\SingleOptionTypeInstanceAssignmentServiceBase.cs" />
     <Compile Include="Options\OptionsService.cs" />
-    <Compile Include="Options\OptionTypeAssignmentServiceBase.cs" />
+    <Compile Include="Options\MultipleOptionTypeInstancesAssignmentServiceBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
