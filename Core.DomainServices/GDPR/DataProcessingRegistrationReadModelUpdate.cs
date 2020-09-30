@@ -26,8 +26,6 @@ namespace Core.DomainServices.GDPR
             PatchSystems(source, destination);
             PatchOversightInterval(source,destination);
             PatchDataProcessors(source, destination);
-            PatchDataProcessors(source, destination); 
-            PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
         }

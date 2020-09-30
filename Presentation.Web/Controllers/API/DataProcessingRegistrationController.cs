@@ -471,7 +471,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/oversight-interval-remark")]
+        [Route("{id}/oversight-option-remark")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
