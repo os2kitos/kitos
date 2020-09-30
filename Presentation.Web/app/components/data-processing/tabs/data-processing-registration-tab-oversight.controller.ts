@@ -24,6 +24,7 @@
         headerName = this.dataProcessingRegistration.name;
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;
+        
 
         private bindOversightInterval() {
             this.oversightInterval = {
@@ -40,9 +41,6 @@
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
-            if (id === null) {
-                return null;
-            }
             return new Models.ViewModel.Shared.YearMonthUndecidedIntervalOption().getById(id);
         } 
 

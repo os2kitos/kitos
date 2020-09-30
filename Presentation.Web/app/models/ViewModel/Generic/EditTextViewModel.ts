@@ -1,15 +1,18 @@
 ﻿module Kitos.Models.ViewModel.Generic {
     export interface IEditTextViewModel {
         currentText: string;
-        newText: NewTextAdded;
+        newText: TextChanged;
     }
 
-    export type NewTextAdded = (newText: string) => void;
+    export type TextChanged = (newText: string) => void;
 
     export class EditTextViewModel implements IEditTextViewModel {
         currentText: string;
-        newText: NewTextAdded;
-        constructor(currentText: string, newText: NewTextAdded) {
+        newText: TextChanged;
+        constructor(currentText: string, newText: TextChanged) {
+            if (newText == null) {
+                throw new Error("newText is not set as a function");
+            }
             this.currentText = currentText;
             this.newText = newText;
         }

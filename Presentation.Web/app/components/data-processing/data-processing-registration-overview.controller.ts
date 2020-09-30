@@ -209,8 +209,8 @@
                             .withDataSourceName("OversightInterval")
                             .withTitle("Tilsynsinterval")
                             .withId("oversightInterval")
-                            .withStandardWidth(100)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
                                 [

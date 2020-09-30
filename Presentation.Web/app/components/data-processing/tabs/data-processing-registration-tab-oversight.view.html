@@ -3,17 +3,18 @@
     <div class="panel panel-default">
         <div class="row">
             <div class="col-xs-6">
-                <!--Tilsyn Interval  -->
+                <!--Oversight Interval  -->
                 <div class="form-group">
                     <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
                     <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
                 </div>
-                <!-- Tilsyn Interval Bemærkning -->
+                <!-- Oversight Interval Remark -->
                 <div class="form-group">
-                    <label for="oversightIntervalRemark" class="control-label small">Tilsynsinterval bemærkning</label>
+                    <label for="oversightIntervalRemark" class="control-label small">Tilsynsinterval Bemærkninger</label>
                     <remark-field id="oversightIntervalRemark"
+                                  rows="2"
                                   ng-model="vm.oversightIntervalRemark"
-                                  ng-disabled="!vm.hasWriteAccess"/>
+                                  ng-disabled="!vm.hasWriteAccess" />
                 </div>
             </div>
         </div>

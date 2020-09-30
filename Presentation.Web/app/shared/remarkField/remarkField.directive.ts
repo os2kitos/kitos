@@ -6,11 +6,10 @@
             templateUrl: "app/shared/remarkField/remarkField.view.html",
             scope: {
                 id: "@",
+                rows: "@",
                 model: "=ngModel",
-                appendurl: "@",
                 disabled: "=ngDisabled",
                 required: "@",
-                elementType: "=dataElementType"
             }
         })
     ]);

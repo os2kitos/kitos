@@ -50,7 +50,6 @@
         }
 
         constructor() {
-            const select2BlankOptionTextValue = "\u200B";
 
             this.options = [
                 Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided,
@@ -62,7 +61,7 @@
                 return <Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>>{
                     id: optionType as number,
                     text: optionType === Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided
-                        ? select2BlankOptionTextValue
+                        ? ViewModel.Generic.select2BlankOptionTextValue
                         : YearMonthUndecidedIntervalOption.getText(optionType),
                     optionalObjectContext: optionType
                 }

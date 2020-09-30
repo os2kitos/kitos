@@ -9,7 +9,6 @@ import Select2Helper = require("../../Helpers/Select2Helper");
 describe("Data processing registration oversight detail tests", () => {
 
     const loginHelper = new Login();
-    const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();
     const pageObject = new DataProcessingRegistrationEditOversightPageObject();
     const testFixture = new TestFixtureWrapper();
     const dpaHelper = DataProcessingRegistrationHelper;
@@ -46,7 +45,7 @@ describe("Data processing registration oversight detail tests", () => {
                 .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(intervalRemark))
                 .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
                 .then(() => verifyOversightInterval(dropdownInterval))
-                .then(() => verifyOversightIntervalNote(intervalRemark));
+                .then(() => verifyOversightIntervalRemark(intervalRemark));
         });
 
     function verifyOversightInterval(selectedValue: string) {
@@ -54,7 +53,7 @@ describe("Data processing registration oversight detail tests", () => {
         expect(Select2Helper.getData("s2id_oversightInterval_config").getText()).toEqual(selectedValue);
     }
 
-    function verifyOversightIntervalNote(expectedValue: string) {
+    function verifyOversightIntervalRemark(expectedValue: string) {
         console.log(`Expecting oversight interval note to be set to: ${expectedValue}`);
         expect(pageObject.getOversightIntervalOptionRemark().getAttribute("value")).toEqual(expectedValue);
     }
