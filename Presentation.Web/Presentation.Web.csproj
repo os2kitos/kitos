@@ -430,6 +430,7 @@
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
+    <Compile Include="Models\NamedEntityWithExpirationStatusDTO.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportColumns.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
     <Compile Include="Models\Qa\BrokenExternalReferencesReportStatusDTO.cs" />

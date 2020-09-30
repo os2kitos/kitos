@@ -178,6 +178,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationRoleAssignmentsService>().To<DataProcessingRegistrationRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelService>().To<DataProcessingRegistrationReadModelService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationDataProcessorAssignmentService>().To<DataProcessingRegistrationDataProcessorAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationInsecureCountriesAssignmentService>().To<DataProcessingRegistrationInsecureCountriesAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -218,9 +219,9 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
-            
+
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-            
+
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
 
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
@@ -252,6 +253,9 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>>()
                 .To<OptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>()
+                .To<OptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

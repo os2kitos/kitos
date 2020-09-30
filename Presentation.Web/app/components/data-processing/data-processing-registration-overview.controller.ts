@@ -154,10 +154,32 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("TransferToInsecureThirdCountries")
+                            .withTitle("Overførsel til usikkert 3. land")
+                            .withId("dpTransferToInsecureThirdCountries")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.Api.Shared.YesNoUndecidedOption.Yes,
+                                    Models.Api.Shared.YesNoUndecidedOption.No
+                                ].map(value => {
+                                    return {
+                                        textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                        remoteValue: value
+                                    }
+                                })
+                                , false
+                            )
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("IsAgreementConcluded")
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
-                            .withStandardWidth(100)
+                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
@@ -167,14 +189,14 @@
                                     Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
                                 ].map(value => {
                                     return {
-                                        textValue: yesNoIrrelevantOptionValueToTextMap[value],
+                                        textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
                                         remoteValue: value
                                     }
                                 })
                                 , false
                             )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded && yesNoIrrelevantOptionValueToTextMap[dataItem.IsAgreementConcluded]))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && yesNoIrrelevantOptionValueToTextMap[dataItem.IsAgreementConcluded])))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dataItem.IsAgreementConcluded)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dataItem.IsAgreementConcluded))))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("AgreementConcludedAt")

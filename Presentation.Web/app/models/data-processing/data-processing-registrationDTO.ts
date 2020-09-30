@@ -14,6 +14,9 @@
         hasSubDataProcessors?: Models.Api.Shared.YesNoUndecidedOption;
         subDataProcessors: IDataProcessorDTO[];
         agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
+        transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
+        insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO[];
+        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
         oversightInterval: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
     }
 

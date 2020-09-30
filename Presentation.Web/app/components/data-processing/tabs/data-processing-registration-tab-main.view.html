@@ -21,14 +21,58 @@
                     <single-select-select2 id="agreementConcluded" ng-model="vm.isAgreementConcluded" ng-disabled="!vm.hasWriteAccess" />
                 </div>
 
-                <div ng-if="vm.shouldShowAgreementConcludedAt">
+                <div class="form-group" ng-if="vm.shouldShowAgreementConcludedAt">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
-                        <date-picker id="agreementConcludedAt" 
-                                     ng-model="vm.agreementConcludedAt" 
-                                     ng-disabled="!vm.hasWriteAccess"/>
+                        <date-picker id="agreementConcludedAt"
+                                     ng-model="vm.agreementConcludedAt"
+                                     ng-disabled="!vm.hasWriteAccess" />
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <!-- Transfer to insecure third country -->
+                    <label for="transferToInsecureThirdCountries" class="control-label small">Overførsel til usikkert 3. land</label>
+                    <single-select-select2 id="transferToInsecureThirdCountries" ng-model="vm.transferToInsecureThirdCountries" ng-disabled="!vm.hasWriteAccess" />
+                </div>
+                <div class="form-group" ng-if="vm.enableSelectionOfInsecureThirdCountries">
+                    <!-- Insecure third countries -->
+                    <label for="insecureThirdCountriesTable" class="control-label small">Lande der overføres til</label>
+                    <table id="insecureThirdCountriesTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="element-selection-list_header--padding noRightBorder">
+                                    <p class="small">Navn</p>
+                                </th>
+                                <th class="element-selection-list_header--padding noLeftBorder"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="country in vm.insecureThirdCountries.selectedElements" data-element-type="data-processing_insecure_third_countries">
+                                <td>{{::country.name }}<span ng-if="country.expired"> (udgået)</span></td>
+                                <td class="text-right noLeftBorder" style="width: 20px;">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-confirmed-click="vm.insecureThirdCountries.removeItemRequested({{::country}})"
+                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                            ng-if="vm.insecureThirdCountries.allowRemoval">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot ng-if="vm.insecureThirdCountries.allowAddition" class="element-selection-list_footer--padding">
+                        <tr>
+                                <td colspan="2" style="padding: 0">
+                                    <single-select-select2 data-placeholder="Vælg usikkert 3. land"
+                                                           id="insecure-third-country_select-new"
+                                                           ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
+                                                           ng-disabled="!vm.insecureThirdCountries.allowAddition" />
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
             <div class="col-xs-6">
@@ -38,13 +82,13 @@
                     <table id="dpTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th class="data-processors-table_header--padding">
+                                <th class="element-selection-list_header--padding">
                                     <p class="small">Navn</p>
                                 </th>
-                                <th class="data-processors-table_header--padding noRightBorder">
+                                <th class="element-selection-list_header--padding noRightBorder">
                                     <p class="small">CVR</p>
                                 </th>
-                                <th class="data-processors-table_header--padding noLeftBorder"></th>
+                                <th class="element-selection-list_header--padding noLeftBorder"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,16 +106,13 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot ng-if="vm.dataProcessors.allowAddition" class="data-processors-table_footer--padding">
+                        <tfoot ng-if="vm.dataProcessors.allowAddition" class="element-selection-list_footer--padding">
                             <tr>
                                 <td colspan="3" style="padding: 0">
-                                    <input type="hidden"
-                                           id="data-processor_select-new"
-                                           class="form-control input-sm"
-                                           data-ui-select2="vm.dataProcessors.select2Config"
-                                           ng-model="vm.dataProcessors.newElementSelection"
-                                           ng-change="vm.dataProcessors.newItemSelected(vm.dataProcessors.newElementSelection)"
-                                           data-placeholder="Vælg Databehandler" />
+                                    <single-select-select2 data-placeholder="Vælg Databehandler"
+                                                           id="data-processor_select-new"
+                                                           ng-model="vm.dataProcessors.newItemSelectionConfig"
+                                                           ng-disabled="!vm.dataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
@@ -80,7 +121,7 @@
                 <div class="form-group">
                     <!-- Sub Data processors State -->
                     <label for="hasSubDataProcessorsSelection" class="control-label small">Underdatabehandlere</label>
-                    <single-select-select2 id="hasSubDataProcessorsSelection" ng-model="vm.hasSubDataProcessors" ng-disabled="!vm.hasWriteAccess"/>
+                    <single-select-select2 id="hasSubDataProcessorsSelection" ng-model="vm.hasSubDataProcessors" ng-disabled="!vm.hasWriteAccess" />
 
                 </div>
                 <div class="form-group" ng-if="vm.enableDataProcessorSelection">
@@ -88,13 +129,13 @@
                     <table id="subDpTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th class="data-processors-table_header--padding">
+                                <th class="element-selection-list_header--padding">
                                     <p class="small">Navn</p>
                                 </th>
-                                <th class="data-processors-table_header--padding noRightBorder">
+                                <th class="element-selection-list_header--padding noRightBorder">
                                     <p class="small">CVR</p>
                                 </th>
-                                <th class="data-processors-table_header--padding noLeftBorder"></th>
+                                <th class="element-selection-list_header--padding noLeftBorder"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,16 +153,13 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot ng-if="vm.subDataProcessors.allowAddition" class="data-processors-table_footer--padding">
+                        <tfoot ng-if="vm.subDataProcessors.allowAddition" class="element-selection-list_footer--padding">
                             <tr>
                                 <td colspan="3" style="padding: 0">
-                                    <input type="hidden"
-                                           id="sub-data-processor_select-new"
-                                           class="form-control input-sm"
-                                           data-ui-select2="vm.subDataProcessors.select2Config"
-                                           ng-model="vm.subDataProcessors.newElementSelection"
-                                           ng-change="vm.subDataProcessors.newItemSelected(vm.subDataProcessors.newElementSelection)"
-                                           data-placeholder="Vælg Underdatabehandler" />
+                                    <single-select-select2 data-placeholder="Vælg Underdatabehandler"
+                                                           id="sub-data-processor_select-new"
+                                                           ng-model="vm.subDataProcessors.newItemSelectionConfig"
+                                                           ng-disabled="!vm.subDataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
