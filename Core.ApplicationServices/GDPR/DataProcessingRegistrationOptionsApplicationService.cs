@@ -11,11 +11,11 @@ namespace Core.ApplicationServices.GDPR
 {
     public class DataProcessingRegistrationOptionsApplicationService : IDataProcessingRegistrationOptionsApplicationService
     {
-        private readonly IDataProcessingRegistrationOptionRepository _optionRepository; 
+        private readonly IDataProcessingRegistrationOptionRepository _optionRepository;
         private readonly IAuthorizationContext _authorizationContext;
 
         public DataProcessingRegistrationOptionsApplicationService(
-            IAuthorizationContext authorizationContext, 
+            IAuthorizationContext authorizationContext,
             IDataProcessingRegistrationOptionRepository optionRepository)
         {
             _authorizationContext = authorizationContext;
@@ -41,15 +41,13 @@ namespace Core.ApplicationServices.GDPR
             return _optionRepository.GetIdsOfAvailableDataResponsibleOptions(organizationId);
         }
 
-        private Result<DataProcessingRegistrationOptions, OperationError> WithOrganizationReadAccess(
-            int organizationId, 
-            Func<Result<DataProcessingRegistrationOptions, OperationError>> authorizedAction)
+        private Result<DataProcessingRegistrationOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<DataProcessingRegistrationOptions, OperationError>> authorizedAction)
         {
             var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
-            if (readAccessLevel > OrganizationDataReadAccessLevel.None)
-                return authorizedAction();
 
-            return new OperationError(OperationFailure.Forbidden);
+            return readAccessLevel < OrganizationDataReadAccessLevel.All
+                ? new OperationError(OperationFailure.Forbidden)
+                : authorizedAction();
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using Core.DomainModel.GDPR;
+﻿using System;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
+    [Obsolete("Du skal  nok lige have master ind så du ikke har din egen lokale kopi af det hele")]
     public class DataProcessingRegistrationDataResponsibleAssigmentService : 
         SingleOptionTypeInstanceAssignmentServiceBase<DataProcessingRegistration, DataProcessingDataResponsibleOption>,
         IDataProcessingRegistrationDataResponsibleAssignmentService
