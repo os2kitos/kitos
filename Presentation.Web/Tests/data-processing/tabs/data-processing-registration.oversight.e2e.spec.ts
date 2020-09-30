@@ -5,8 +5,6 @@ import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects
 import DataProcessingRegistrationEditOversightPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
-import YearMonthUndecidedIntervalOption = Kitos.Models.Api.Shared.YearMonthUndecidedIntervalOption;
-import YearMonthUndecidedOptionMapper = Kitos.Models.Api.Shared.YearMonthUndecidedOptionMapper;
 
 describe("Data processing agreement oversight detail tests", () => {
 
@@ -40,8 +38,7 @@ describe("Data processing agreement oversight detail tests", () => {
     it("Is able to set oversight data",
         () => {
             var name = createName();
-            var yearMonthUndecidedOptionValueToTextMap = YearMonthUndecidedOptionMapper.getValueToTextMap();
-            var dropdownInterval = yearMonthUndecidedOptionValueToTextMap[YearMonthUndecidedIntervalOption.Every_second_year];
+            var dropdownInterval = "Hver andet år";
             var intervalRemark = createRemark();
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
@@ -54,7 +51,7 @@ describe("Data processing agreement oversight detail tests", () => {
 
     function verifyOversightInterval(selectedValue: string) {
         console.log(`Expecting oversight interval to be set to: ${selectedValue}`);
-        expect(Select2Helper.getData("s2id_oversightInterval").getText()).toEqual(selectedValue);
+        expect(Select2Helper.getData("s2id_oversightInterval_config").getText()).toEqual(selectedValue);
     }
 
     function verifyOversightIntervalNote(expectedValue: string) {

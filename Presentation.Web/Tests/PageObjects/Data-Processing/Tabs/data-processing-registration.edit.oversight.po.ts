@@ -18,10 +18,10 @@ class DataProcessingRegistrationEditMainPageObject {
     }
     
     getOversightIntervalOption() {
-        return element(this.cssHelper.byDataElementType("oversightInterval"));
+        return element(by.id("oversightInterval"));
     }
     getOversightIntervalOptionRemark() {
-        return element(this.cssHelper.byDataElementType("oversightIntervalRemark"));
+        return element(by.id("oversightIntervalRemark_remark"));
     }
 
 }

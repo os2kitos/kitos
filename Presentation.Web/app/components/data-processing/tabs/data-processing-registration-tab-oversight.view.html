@@ -6,13 +6,12 @@
                 <!--Tilsyn Interval  -->
                 <div class="form-group">
                     <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
-                    <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" data-element-type="oversightInterval" />
+                    <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
                 </div>
                 <!-- Tilsyn Interval Bemærkning -->
                 <div class="form-group">
                     <label for="oversightIntervalRemark" class="control-label small">Tilsynsinterval bemærkning</label>
                     <remark-field id="oversightIntervalRemark"
-                                  data-element-type="oversightIntervalRemark"
                                   ng-model="vm.oversightIntervalRemark"
                                   ng-disabled="!vm.hasWriteAccess"/>
                 </div>

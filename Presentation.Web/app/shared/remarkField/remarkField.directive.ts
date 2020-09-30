@@ -5,10 +5,12 @@
         () => ({
             templateUrl: "app/shared/remarkField/remarkField.view.html",
             scope: {
+                id: "@",
                 model: "=ngModel",
                 appendurl: "@",
                 disabled: "=ngDisabled",
-                required: "@"
+                required: "@",
+                elementType: "=dataElementType"
             }
         })
     ]);

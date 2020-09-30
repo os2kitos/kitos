@@ -174,7 +174,7 @@ class DataProcessingRegistrationHelper {
 
     public static changeOversightInterval(changeToInterval: string) {
         console.log(`Changing Oversight Interval to ${changeToInterval}`);
-        return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval");
+        return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval_config");
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

@@ -1,6 +1,8 @@
 ﻿<textarea class="form-control input-sm" 
+          id="{{::id}}_remark"
           rows="2"
           ng-disabled="disabled"
+          data-element-field=""
           ng-model="model.currentText"
           ng-blur="model.newText(model.currentText)"
           data-field="oversightIntervalRemark">
