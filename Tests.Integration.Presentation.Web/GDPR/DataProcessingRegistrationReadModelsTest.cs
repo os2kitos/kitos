@@ -109,10 +109,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Console.Out.WriteLine("Read models are up to date");
 
             //Act
-            var result = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+            var readModels = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
 
             //Assert
-            var readModel = Assert.Single(result);
+            var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
             Assert.Equal(name, readModel.Name);
             Assert.Equal(registration.Id, readModel.SourceEntityId);
@@ -136,6 +136,13 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(user.Name, roleAssignment.UserFullName);
 
             Console.Out.WriteLine("Role data verified");
+
+            //Assert that the source object can be deleted and that the readmodel is gone now
+            var deleteResponse = await DataProcessingRegistrationHelper.SendDeleteRequestAsync(registration.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+
+            readModels = (await DataProcessingRegistrationHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+            Assert.Empty(readModels);
         }
 
         [Fact]
