@@ -4,6 +4,7 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainServices;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
@@ -25,7 +26,8 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _pendingUpdatesRepository = new Mock<IPendingReadModelUpdateRepository>();
             _sut = new BuildDataProcessingRegistrationReadModelOnChangesHandler(_repository.Object,
                 new DataProcessingRegistrationReadModelUpdate(
-                    Mock.Of<IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>>()),
+                    Mock.Of<IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>>(),
+                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>().Object),
                 _pendingUpdatesRepository.Object);
         }
 

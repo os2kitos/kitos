@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
+using Core.DomainServices.Options;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
@@ -12,10 +14,14 @@ namespace Core.DomainServices.GDPR
     public class DataProcessingRegistrationReadModelUpdate : IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>
     {
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
 
-        public DataProcessingRegistrationReadModelUpdate(IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository)
+        public DataProcessingRegistrationReadModelUpdate(
+            IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
+            _basisForTransferService = basisForTransferService;
         }
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -27,6 +33,31 @@ namespace Core.DomainServices.GDPR
             PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
+            PatchBasisForTransfer(source, destination);
+        }
+
+        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
+        }
+
+        private string GetNameOfOption<TOption>(
+            DataProcessingRegistration parent,
+            TOption optionEntity,
+            IOptionsService<DataProcessingRegistration, TOption> service)
+            where TOption : OptionEntity<DataProcessingRegistration>
+        {
+            if (optionEntity != null)
+            {
+                var available = service
+                    .GetOption(parent.OrganizationId, optionEntity.Id)
+                    .Select(x => x.available)
+                    .GetValueOrFallback(false);
+
+                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
+            }
+
+            return null;
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,

@@ -44,6 +44,11 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(x => x.InsecureCountriesSubjectToDataTransfer)
                 .WithMany(x => x.InsecureDataTransferSubjectsInDataProcessingRegistrations);
             Property(x => x.TransferToInsecureThirdCountries).IsOptional();
+
+            //Basis for transfer
+            HasOptional(x => x.BasisForTransfer)
+                .WithMany(x => x.References)
+                .HasForeignKey(x => x.BasisForTransferId);
         }
     }
 }
