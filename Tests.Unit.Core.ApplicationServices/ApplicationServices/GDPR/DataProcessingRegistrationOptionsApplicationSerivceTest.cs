@@ -72,7 +72,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private void ExpectOrganizationReadAccess(int organizationId)
         {
-            _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.Public);
+            _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
         }
 
         private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)
