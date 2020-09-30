@@ -18,12 +18,12 @@ namespace Core.DomainServices.Repositories.GDPR
             _dataResponsibleOptionsService = dataResponsibleOptionsService;
         }
 
-        public IEnumerable<DataProcessingCountryOption> GetAvailableCountryOptions(int organizationId)
+        public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> GetAvailableCountryOptions(int organizationId)
         {
-            return _countryOptionsService.GetAvailableOptions(organizationId);
+            return _countryOptionsService.GetAvailableOptionsDetails(organizationId);
         }
 
-        public IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(int organizationId)
+        public IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> GetAvailableDataResponsibleOptions(int organizationId)
         {
             return _dataResponsibleOptionsService.GetAvailableOptionsDetails(organizationId);
         }

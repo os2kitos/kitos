@@ -7,11 +7,11 @@ namespace Core.ApplicationServices.Model.GDPR
     public class DataProcessingRegistrationOptions
     {
         public IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> DataProcessingRegistrationDataResponsibleOptions { get; }
-        public IEnumerable<DataProcessingCountryOption> DataProcessingRegistrationCountryOptions { get; }
+        public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> DataProcessingRegistrationCountryOptions { get; }
 
         public DataProcessingRegistrationOptions(
             IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataProcessingRegistrationDataResponsibleOptions,
-            IEnumerable<DataProcessingCountryOption> dataProcessingRegistrationCountryOptions)
+            IEnumerable<OptionDescriptor<DataProcessingCountryOption>> dataProcessingRegistrationCountryOptions)
         {
             DataProcessingRegistrationDataResponsibleOptions = dataProcessingRegistrationDataResponsibleOptions;
             DataProcessingRegistrationCountryOptions = dataProcessingRegistrationCountryOptions;

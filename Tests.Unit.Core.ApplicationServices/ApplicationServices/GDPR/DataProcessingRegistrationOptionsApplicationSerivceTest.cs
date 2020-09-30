@@ -40,9 +40,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 new OptionDescriptor<DataProcessingDataResponsibleOption>(new DataProcessingDataResponsibleOption(), ""),
             };
             ExpectDataResponsibleOptions(organizationId, dataResponsibleOptions);
-            var countryOptions = new List<DataProcessingCountryOption>()
+            var countryOptions = new List<OptionDescriptor<DataProcessingCountryOption>>()
             {
-                new DataProcessingCountryOption(),
+                new OptionDescriptor<DataProcessingCountryOption>(new DataProcessingCountryOption(), ""),
             };
             ExpectCountryOptions(organizationId, countryOptions);
 
@@ -77,10 +77,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)
         {
-            _optionRepositoryMock.Setup(x => x.GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(organizationId)).Returns(dataResponsibleOptions);
+            _optionRepositoryMock.Setup(x => x.GetAvailableDataResponsibleOptions(organizationId)).Returns(dataResponsibleOptions);
         }
 
-        private void ExpectCountryOptions(int organizationId, IEnumerable<DataProcessingCountryOption> countryOptions)
+        private void ExpectCountryOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingCountryOption>> countryOptions)
         {
             _optionRepositoryMock.Setup(x => x.GetAvailableCountryOptions(organizationId)).Returns(countryOptions);
         }

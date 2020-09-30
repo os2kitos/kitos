@@ -28,9 +28,9 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         {
             //Arrange
             var organizationId = A<int>(); 
-            var countryOptions = new List<DataProcessingCountryOption>()
+            var countryOptions = new List<OptionDescriptor<DataProcessingCountryOption>>()
             {
-                new DataProcessingCountryOption(),
+                new OptionDescriptor<DataProcessingCountryOption>(new DataProcessingCountryOption(), ""),
             };
             ExpectCountryOptions(organizationId, countryOptions);
 
@@ -53,7 +53,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             ExpectDataResponsibleOptions(organizationId, dataResponsibleOptions);
 
             //Act
-            var assignableDataResponsibleOptions = _sut.GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(organizationId);
+            var assignableDataResponsibleOptions = _sut.GetAvailableDataResponsibleOptions(organizationId);
 
             //Assert
             Assert.Equal(dataResponsibleOptions, assignableDataResponsibleOptions);
@@ -64,9 +64,9 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             _dataResponsibleOptionsServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(dataResponsibleOptions);
         }
 
-        private void ExpectCountryOptions(int organizationId, IEnumerable<DataProcessingCountryOption> countryOptions)
+        private void ExpectCountryOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingCountryOption>> countryOptions)
         {
-            _countryOptionsServiceMock.Setup(x => x.GetAvailableOptions(organizationId)).Returns(countryOptions);
+            _countryOptionsServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(countryOptions);
         }
     }
 }

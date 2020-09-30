@@ -6,7 +6,6 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
-    [Obsolete("Du skal  nok lige have master ind så du ikke har din egen lokale kopi af det hele")]
     public class DataProcessingRegistrationDataResponsibleAssigmentService : 
         SingleOptionTypeInstanceAssignmentServiceBase<DataProcessingRegistration, DataProcessingDataResponsibleOption>,
         IDataProcessingRegistrationDataResponsibleAssignmentService
