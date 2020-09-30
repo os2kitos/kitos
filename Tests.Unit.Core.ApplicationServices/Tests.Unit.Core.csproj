@@ -176,6 +176,7 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationBasisForTransferAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataProcessorAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationInsecureCountriesAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationNamingServiceTest.cs" />
