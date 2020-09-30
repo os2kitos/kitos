@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model;
+using Core.DomainServices.Options;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
@@ -12,10 +14,13 @@ namespace Core.DomainServices.GDPR
     public class DataProcessingRegistrationReadModelUpdate : IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>
     {
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleService;
 
-        public DataProcessingRegistrationReadModelUpdate(IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository)
+        public DataProcessingRegistrationReadModelUpdate(IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
+            _dataResponsibleService = dataResponsibleService;
         }
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -26,7 +31,7 @@ namespace Core.DomainServices.GDPR
             PatchSystems(source, destination);
             PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
-            PatchTransferToInsecureThirdCountries(source, destination); 
+            PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
         }
 
@@ -38,11 +43,30 @@ namespace Core.DomainServices.GDPR
             destination.Name = source.Name;
         }
 
-        private static void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.DataResponsible = source.DataResponsible == null ? "" : source.DataResponsible.Name;
-            destination.DataResponsibleRemark = source.DataResponsibleRemark;
+            destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
         }
+
+        private string GetNameOfOption<TOption>(
+            DataProcessingRegistration parent,
+            TOption optionEntity,
+            IOptionsService<DataProcessingRegistration, TOption> service)
+            where TOption : OptionEntity<DataProcessingRegistration>
+        {
+            if (optionEntity != null)
+            {
+                var available = service
+                    .GetOption(parent.OrganizationId, optionEntity.Id)
+                    .Select(x => x.available)
+                    .GetValueOrFallback(false);
+
+                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
+            }
+
+            return null;
+        }
+
 
         private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {

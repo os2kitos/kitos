@@ -173,6 +173,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGDPRExportService>().To<GDPRExportService>().InCommandScope(Mode);
             kernel.Bind<IFallbackUserResolver>().To<FallbackUserResolver>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationApplicationService>().To<DataProcessingRegistrationApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationOptionsApplicationService>().To<DataProcessingRegistrationOptionsApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationNamingService>().To<DataProcessingRegistrationNamingService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationSystemAssignmentService>().To<DataProcessingRegistrationSystemAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationRoleAssignmentsService>().To<DataProcessingRegistrationRoleAssignmentsService>().InCommandScope(Mode);
@@ -298,6 +299,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationRepository>().To<DataProcessingRegistrationRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelRepository>().To<DataProcessingRegistrationReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

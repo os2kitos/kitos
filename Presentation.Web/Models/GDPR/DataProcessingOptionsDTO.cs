@@ -8,7 +8,6 @@ namespace Presentation.Web.Models.GDPR
 {
     public class DataProcessingOptionsDTO
     {
-        public IEnumerable<BusinessRoleDTO> roles { get; set; }
         public IEnumerable<OptionWithDescriptionDTO> dataResponsibleOptions { get; set; }
     }
 }

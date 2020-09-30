@@ -40,8 +40,8 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateTransferToInsecureThirdCountries(int id, YesNoUndecidedOption transferToInsecureThirdCountries);
         Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
-        Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id);
-        Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(int id, int? dataResponsibleId);
+        Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId);
+        Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
     }
 }

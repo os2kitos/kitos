@@ -89,8 +89,10 @@
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\IOptionTypeAssignmentService.cs" />
+    <Compile Include="Options\ISingleOptionTypeInstanceAssignmentService.cs" />
     <Compile Include="Options\OptionsService.cs" />
     <Compile Include="Options\OptionTypeAssignmentServiceBase.cs" />
+    <Compile Include="Options\SingleOptionTypeInstanceAssignmentServiceBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
@@ -111,11 +113,13 @@
     <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingRegistrationOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationReadModelRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingRegistrationOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\IDataProcessingRegistrationReadModelRepository.cs" />
     <Compile Include="Repositories\GDPR\IDataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
@@ -183,7 +187,9 @@
       <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Model\Options\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>

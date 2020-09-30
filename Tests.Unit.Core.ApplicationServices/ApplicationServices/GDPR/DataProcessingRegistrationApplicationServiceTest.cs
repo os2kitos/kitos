@@ -1065,14 +1065,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
-            _dataResponsibleAssignmentServiceMock.Setup(x => x.UpdateDataResponsible(registration, dataResponsibleOption.Id)).Returns(updatedRegistration);
+            _dataResponsibleAssignmentServiceMock.Setup(x => x.Assign(registration, dataResponsibleOption.Id)).Returns(dataResponsibleOption);
 
             //Act
-            var result = _sut.UpdateDataResponsible(id, dataResponsibleOption.Id);
+            var result = _sut.AssignDataResponsible(id, dataResponsibleOption.Id);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(dataResponsibleOption, result.Value.DataResponsible);
+            Assert.Equal(dataResponsibleOption, result.Value);
             transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
@@ -1082,7 +1082,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration();
+            var dataResponsibleOption = new DataProcessingDataResponsibleOption() { Id = A<int>() };
+            var registration = new DataProcessingRegistration()
+            {
+                DataResponsible_Id = dataResponsibleOption.Id,
+                DataResponsible = dataResponsibleOption
+            };
 
             var updatedRegistration = registration;
             updatedRegistration.DataResponsible = null;
@@ -1090,14 +1095,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
-            _dataResponsibleAssignmentServiceMock.Setup(x => x.UpdateDataResponsible(registration, null)).Returns(updatedRegistration);
+            _dataResponsibleAssignmentServiceMock.Setup(x => x.Clear(registration)).Returns(dataResponsibleOption);
 
             //Act
-            var result = _sut.UpdateDataResponsible(id, null);
+            var result = _sut.ClearDataResponsible(id);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Null(result.Value.DataResponsible);
+            Assert.Equal(dataResponsibleOption, result.Value);
             transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
@@ -1105,7 +1110,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Update_DataResponsible_Returns_Forbidden()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateDataResponsible(id, A<int>()));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignDataResponsible(id, A<int>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignDataResponsible(id, A<int>()));
         }
 
         [Fact]
@@ -1135,6 +1146,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Update_DataResponsibleRemark_Returns_Forbidden()
         {
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
         }
 
         /// <summary>
@@ -1190,63 +1207,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Act
             var result = command(id);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void Can_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_ReadAccess_Is_Permitted()
-        {
-            //Arrange
-            var registrationId = A<int>();
-            var registration = new DataProcessingRegistration();
-            var dataResponsibleOptions = new[] { new DataProcessingDataResponsibleOption() };
-            var agreementRoles = new[] { new DataProcessingRegistrationRole(), new DataProcessingRegistrationRole() };
-
-            ExpectRepositoryGetToReturn(registrationId, registration);
-            ExpectAllowReadReturns(registration, true);
-            _dataResponsibleAssignmentServiceMock.Setup(x => x.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration)).Returns(dataResponsibleOptions);
-            _roleAssignmentServiceMock.Setup(x => x.GetApplicableRoles(registration)).Returns(agreementRoles);
-
-            //Act
-            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
-
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Equal(dataResponsibleOptions, result.Value.DataProcessingRegistrationDataResponsibleOptions);
-            Assert.Equal(agreementRoles, result.Value.DataProcessingRegistrationRoles);
-        }
-
-        [Fact]
-        public void Cannot_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_ReadAccess_Is_Denied()
-        {
-            //Arrange
-            var registrationId = A<int>();
-            var registration = new DataProcessingRegistration();
-
-            ExpectRepositoryGetToReturn(registrationId, registration);
-            ExpectAllowReadReturns(registration, false);
-
-            //Act
-            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void Cannot_GetDataProcessingRegistrationOptionsWhichCanBeAssigned_If_Dpa_Is_Not_Found()
-        {
-            //Arrange
-            var registrationId = A<int>();
-
-            ExpectRepositoryGetToReturn(registrationId, Maybe<DataProcessingRegistration>.None);
-
-            //Act
-            var result = _sut.GetDataProcessingRegistrationOptionsWhichCanBeAssigned(registrationId);
 
             //Assert
             Assert.True(result.Failed);

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Options;
-using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -26,75 +23,11 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _optionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>();
             _localOptionsRepositoty = new Mock<IGenericRepository<LocalDataProcessingDataResponsibleOption>>();
             _sut = new DataProcessingRegistrationDataResponsibleAssigmentService(
-                _optionsServiceMock.Object,
-                _localOptionsRepositoty.Object);
+                _optionsServiceMock.Object);
         }
 
         [Fact]
-        public void Can_GetApplicableOptionsWithLocalDescriptionOverrides()
-        {
-            //Arrange
-            var registration = CreateDpa();
-            var origDescription = A<string>();
-            var availableOptions = new[] { 
-                new DataProcessingDataResponsibleOption() { 
-                    Description =origDescription,
-                } 
-            };
-            var availableLocalOptions = new[] 
-            { 
-                new LocalDataProcessingDataResponsibleOption() {
-                    OrganizationId = registration.OrganizationId,
-                    Description = A<string>(),
-                } 
-            };
-            _optionsServiceMock.Setup(x => x.GetAvailableOptions(registration.OrganizationId)).Returns(availableOptions);
-            ExpectLocalOptionsReturns(availableLocalOptions.AsQueryable());
-
-            //Act
-            var dataResponsibleOptions = _sut.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration);
-
-            //Assert
-            var dataResponsibleOption = Assert.Single(dataResponsibleOptions);
-            Assert.Equal(availableOptions[0].Id, dataResponsibleOption.Id);
-            Assert.Equal(availableLocalOptions[0].Description, dataResponsibleOption.Description);
-        }
-
-        [Fact]
-        public void Can_GetApplicableOptionsWithNoLocalDescriptionOverrides()
-        {
-            //Arrange
-            var registration = CreateDpa();
-            var origDescription = A<string>();
-            var availableOptions = new[] {
-                new DataProcessingDataResponsibleOption() {
-                    Description =origDescription,
-                }
-            };
-            var availableLocalOptions = new List<LocalDataProcessingDataResponsibleOption>();
-            _optionsServiceMock.Setup(x => x.GetAvailableOptions(registration.OrganizationId)).Returns(availableOptions);
-            ExpectLocalOptionsReturns(availableLocalOptions.AsQueryable());
-
-            //Act
-            var dataResponsibleOptions = _sut.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration);
-
-            //Assert
-            var dataResponsibleOption = Assert.Single(dataResponsibleOptions);
-            Assert.Equal(availableOptions[0].Id, dataResponsibleOption.Id);
-            Assert.Equal(origDescription, dataResponsibleOption.Description);
-        }
-
-        [Fact]
-        public void Can_Not_GetApplicableOptionsWithNoLocalDescriptionOverrides_If_No_Registration()
-        {
-            //Arrange
-            //Act
-            //Assert
-            Assert.Throws<ArgumentNullException>(() => _sut.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(null));
-        }
-
-        [Fact]
-        public void Can_Update_DataResponsible()
+        public void Can_Assign_DataResponsible()
         {
             //Arrange
             var registration = CreateDpa();
@@ -107,55 +40,60 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _optionsServiceMock.Setup(x => x.GetAvailableOption(registration.OrganizationId, optionId)).Returns(availableOption);
 
             //Act
-            var updatedRegistrationResult = _sut.UpdateDataResponsible(registration, optionId);
+            var updatedRegistrationResult = _sut.Assign(registration, optionId);
 
             //Assert
             Assert.True(updatedRegistrationResult.Ok);
-            var updatedRegistration = updatedRegistrationResult.Value;
-            Assert.Equal(availableOption, updatedRegistration.DataResponsible);
+            var optionSet = updatedRegistrationResult.Value;
+            Assert.Equal(availableOption, optionSet);
         }
 
         [Fact]
-        public void Can_Update_DataResponsible_To_Null()
+        public void Can_Clear_DataResponsible()
+        {
+            //Arrange
+            var assignedDataResponsible = new DataProcessingDataResponsibleOption();
+            var registration = CreateDpa(assignedDataResponsible);
+            Assert.Equal(assignedDataResponsible, registration.DataResponsible);
+
+            //Act
+            var updatedRegistrationResult = _sut.Clear(registration);
+
+            //Assert
+            Assert.True(updatedRegistrationResult.Ok);
+            Assert.Equal(assignedDataResponsible, updatedRegistrationResult.Value);
+            Assert.Null(registration.DataResponsible);
+        }
+
+        [Fact]
+        public void Cannot_Clear_DataResponsible_WithNoDataResponsibleAssigned()
         {
             //Arrange
             var registration = CreateDpa();
-            var origDescription = A<string>();
-            var optionId = A<int>();
 
             //Act
-            var updatedRegistrationResult = _sut.UpdateDataResponsible(registration, null);
+            var updatedRegistrationResult = _sut.Clear(registration);
 
             //Assert
-            Assert.True(updatedRegistrationResult.Ok);
-            var updatedRegistration = updatedRegistrationResult.Value;
-            Assert.Null(updatedRegistration.DataResponsible);
+            Assert.True(updatedRegistrationResult.Failed);
+            Assert.Equal(OperationFailure.BadState, updatedRegistrationResult.Error.FailureType);
         }
 
         [Fact]
-        public void Can_Not_Update_DataResponsible()
+        public void Can_Not_Assign_DataResponsible()
         {
-            //Arrange
-            //Act
-            //Assert
-            Assert.Throws<ArgumentNullException>(() => _sut.UpdateDataResponsible(null, null));
+            Assert.Throws<ArgumentNullException>(() => _sut.Assign(null, A<int>()));
         }
 
 
-        private DataProcessingRegistration CreateDpa((int righRole, int rightUserId)? right = null)
+        private DataProcessingRegistration CreateDpa(DataProcessingDataResponsibleOption dataResponsible = null)
         {
             var registration = new DataProcessingRegistration
             {
                 OrganizationId = A<int>(),
+                DataResponsible = dataResponsible,
             };
             return registration;
-        }
-
-        private void ExpectLocalOptionsReturns(IQueryable<LocalDataProcessingDataResponsibleOption> result)
-        {
-            _localOptionsRepositoty.Setup(x => x
-                    .AsQueryable())
-                .Returns(result);
         }
     }
 }

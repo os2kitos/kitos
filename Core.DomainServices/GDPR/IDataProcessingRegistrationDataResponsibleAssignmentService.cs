@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
+﻿using Core.DomainModel.GDPR;
+using Core.DomainServices.Options;
 
 namespace Core.DomainServices.GDPR
 {
-    public interface IDataProcessingRegistrationDataResponsibleAssignmentService
+    public interface IDataProcessingRegistrationDataResponsibleAssignmentService : ISingleOptionTypeInstanceAssignmentService<DataProcessingRegistration, DataProcessingDataResponsibleOption>
     {
-        IEnumerable<DataProcessingDataResponsibleOption> GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(DataProcessingRegistration registration);
-        Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(DataProcessingRegistration registration, int? dataResponsibleOptionId);
     }
 }

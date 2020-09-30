@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.DomainModel.Organization;
-using Core.ApplicationServices.Model.GDPR;
+using Core.DomainServices.Options;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -35,6 +35,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
+
 
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
@@ -329,20 +330,14 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _countryAssignmentService.Remove(registration, countryId));
         }
 
-        public Result<DataProcessingRegistrationOptions, OperationError> GetDataProcessingRegistrationOptionsWhichCanBeAssigned(int id)
+        public Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId)
         {
-            return WithReadAccess<DataProcessingRegistrationOptions>(
-                id,
-                registration => new DataProcessingRegistrationOptions() {
-                    Registration = registration,
-                    DataProcessingRegistrationRoles = _roleAssignmentsService.GetApplicableRoles(registration).ToList(),
-                    DataProcessingRegistrationDataResponsibleOptions = _dataResponsibleAssigmentService.GetApplicableDataResponsibleOptionsWithLocalDescriptionOverrides(registration).ToList()
-                });
+            return Modify(id, registration => _dataResponsibleAssigmentService.Assign(registration, dataResponsibleId));
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateDataResponsible(int id, int? dataResponsibleId)
+        public Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id)
         {
-            return Modify(id, registration => _dataResponsibleAssigmentService.UpdateDataResponsible(registration, dataResponsibleId));
+            return Modify(id, registration => _dataResponsibleAssigmentService.Clear(registration));
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark)
@@ -393,5 +388,6 @@ namespace Core.ApplicationServices.GDPR
 
             return authorizedAction(registration);
         }
+
     }
 }

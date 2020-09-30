@@ -58,7 +58,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
-            var dataResponsibleRemark = A<string>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
@@ -82,8 +81,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
             using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
-            using var setDataResponsibleRemarkResponse = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRemarkRequestAsync(registration.Id, dataResponsibleRemark);
-            Assert.Equal(HttpStatusCode.OK, setDataResponsibleRemarkResponse.StatusCode);
             // Data responsible done
 
             //Enable and set sub processors
@@ -128,7 +125,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
             Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
-            Assert.Equal(dataResponsibleRemark, readModel.DataResponsibleRemark);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

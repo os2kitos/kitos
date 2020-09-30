@@ -9,10 +9,7 @@ namespace Core.DomainServices.GDPR
         IDataProcessingRegistrationInsecureCountriesAssignmentService
     {
         public DataProcessingRegistrationInsecureCountriesAssignmentService(IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> optionsService)
-        : base(optionsService)
-        {
-
-        }
+        : base(optionsService) { }
 
         protected override Result<DataProcessingCountryOption, OperationError> PerformAssign(DataProcessingRegistration owner, DataProcessingCountryOption option)
         {
