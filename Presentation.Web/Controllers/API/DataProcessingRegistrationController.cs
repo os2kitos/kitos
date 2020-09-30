@@ -520,6 +520,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.DataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SubDataProcessors)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
                 .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions))
                 .ToList();

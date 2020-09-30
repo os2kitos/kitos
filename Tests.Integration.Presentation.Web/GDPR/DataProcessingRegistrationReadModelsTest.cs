@@ -70,9 +70,16 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
+            //Basis for transfer
+            var options = (await DataProcessingRegistrationHelper.GetBasisForTransferOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
+            var basisForTransfer = options[Math.Abs(A<int>()) % options.Count];
+
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignBasisForTransferRequestAsync(registration.Id, basisForTransfer.Id);
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+
             //Enable and set third country
             var transferToThirdCountries = A<YesNoUndecidedOption>();
-            using var setInsecureCountryStateResponse = await DataProcessingRegistrationHelper.SendSetUseTransferToInsecureThirdCountriesStateRequestAsync(registration.Id,  transferToThirdCountries);
+            using var setInsecureCountryStateResponse = await DataProcessingRegistrationHelper.SendSetUseTransferToInsecureThirdCountriesStateRequestAsync(registration.Id, transferToThirdCountries);
             Assert.Equal(HttpStatusCode.OK, setInsecureCountryStateResponse.StatusCode);
 
             //Enable and set sub processors
@@ -81,7 +88,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             using var sendAssignDataProcessorRequestAsync = await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(registration.Id, dataProcessor.Id);
             Assert.Equal(HttpStatusCode.OK, sendAssignDataProcessorRequestAsync.StatusCode);
-            
+
             using var sendAssignSubDataProcessorRequestAsync = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(registration.Id, subDataProcessor.Id);
             Assert.Equal(HttpStatusCode.OK, sendAssignSubDataProcessorRequestAsync.StatusCode);
 
@@ -90,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //References
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
-            
+
             //Systems
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
@@ -116,6 +123,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
+            Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

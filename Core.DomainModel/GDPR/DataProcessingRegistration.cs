@@ -276,6 +276,6 @@ namespace Core.DomainModel.GDPR
 
         public int? BasisForTransferId { get; set; }
 
-        public DataProcessingBasisForTransferOption BasisForTransfer { get; set; }
+        public virtual DataProcessingBasisForTransferOption BasisForTransfer { get; set; }
     }
 }

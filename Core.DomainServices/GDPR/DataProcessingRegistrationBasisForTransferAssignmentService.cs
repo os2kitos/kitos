@@ -24,9 +24,6 @@ namespace Core.DomainServices.GDPR
         }
 
 
-        protected override Maybe<DataProcessingBasisForTransferOption> GetAssignmentState(DataProcessingRegistration owner)
-        {
-            return owner.BasisForTransfer;
-        }
+        protected override Maybe<DataProcessingBasisForTransferOption> GetAssignmentState(DataProcessingRegistration owner) => owner.BasisForTransfer;
     }
 }
