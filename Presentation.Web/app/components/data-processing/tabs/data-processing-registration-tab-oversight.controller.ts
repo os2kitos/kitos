@@ -23,7 +23,7 @@
 
         headerName = this.dataProcessingRegistration.name;
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
-        oversightIntervalRemark: string;
+        oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
         private bindOversightInterval() {
             this.oversightInterval = {
@@ -34,7 +34,9 @@
         }
 
         private bindOversightIntervalRemark() {
-            this.oversightIntervalRemark = this.dataProcessingRegistration.oversightInterval.remark;
+            this.oversightIntervalRemark = new Models.ViewModel.Generic.EditTextViewModel(
+                this.dataProcessingRegistration.oversightInterval.remark,
+                (newText) => this.changeOversightIntervalRemark(newText));
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {

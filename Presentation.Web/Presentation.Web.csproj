@@ -360,6 +360,7 @@
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
+    <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
@@ -497,6 +498,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />
@@ -540,6 +542,7 @@
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
+    <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
