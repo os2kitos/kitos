@@ -9,7 +9,8 @@
             "apiUseCaseFactory",
             "select2LoadingService",
             "notify",
-            "thirdCountryOptions"
+            "thirdCountryOptions",
+            "basisForTransferOptions"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -20,7 +21,8 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
-            private readonly thirdCountryOptions: Models.IOptionEntity[]) {
+            private readonly thirdCountryOptions: Models.IOptionEntity[],
+            private readonly basisForTransferOptions: Models.IOptionEntity[]) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -28,6 +30,7 @@
             this.bindIsAgreementConcluded();
             this.bindAgreementConcludedAt();
             this.bindTransferToInsecureThirdCountries();
+            this.bindBasisForTransfer();
         }
 
         headerName = this.dataProcessingRegistration.name;
@@ -51,6 +54,41 @@
         enableDataProcessorSelection: boolean;
 
         hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+
+        basisForTransfer: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>;
+
+        private bindBasisForTransfer() {
+            const optionMap = this.basisForTransferOptions.reduce((acc, next, _) => {
+                acc[next.Id] = {
+                    text: next.Name,
+                    id: next.Id,
+                    optionalObjectContext: {
+                        id: next.Id,
+                        name: next.Name,
+                        expired: false //We only allow selection of non-expired and this object is based on the available objects
+                    }
+                };
+                return acc;
+            }, {});
+
+            //If selected state is expired, add it for presentation reasons
+            const existingChoice = this.dataProcessingRegistration.basisForTransfer;
+            if (existingChoice && !optionMap[existingChoice.id]) {
+                optionMap[existingChoice.id] = {
+                    text: existingChoice.name,
+                    id: existingChoice.id,
+                    optionalObjectContext: existingChoice
+                }
+            }
+
+            const options = this.basisForTransferOptions.map(option => optionMap[option.Id]);
+
+            this.basisForTransfer = {
+                selectedElement: existingChoice && optionMap[existingChoice.id],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true), //TODO: Possible to filter out the selected one?... disabled is possible
+                elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
+            };
+        }
 
         private bindTransferToInsecureThirdCountries() {
             const options = new Models.ViewModel.Shared.YesNoUndecidedOptions();
@@ -275,6 +313,21 @@
                 });
         }
 
+        private updateBasisForTransfer(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>) {
+
+            const updateFunc = newValue
+                ? () => this.dataProcessingRegistrationService.assignBasisForTransfer(this.dataProcessingRegistration.id, newValue.id)
+                : () => this.dataProcessingRegistrationService.clearBasisForTransfer(this.dataProcessingRegistration.id);
+
+            this.apiUseCaseFactory
+                .createUpdate("Overførselsgrundlag", () => updateFunc())
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.basisForTransfer = newValue.optionalObjectContext;
+                    this.bindBasisForTransfer();
+                    return success;
+                });
+        }
+
         private changeIsAgreementConcluded(isAgreementConcluded: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>) {
             this.apiUseCaseFactory
                 .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded.optionalObjectContext))
@@ -359,6 +412,8 @@
                 resolve: {
                     thirdCountryOptions: ["localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingCountryOptions).getAll()
                     ],
+                    basisForTransferOptions: ["localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingBasisForTransferOptions).getAll()
+                    ]
                 }
             });
         }]);

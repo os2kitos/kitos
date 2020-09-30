@@ -24,6 +24,8 @@
         updateTransferToInsecureThirdCountry(dataProcessingRegistrationId: number, value: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         removeInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignBasisForTransfer(dataProcessingRegistrationId: number, basisForTransferId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        clearBasisForTransfer(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -188,6 +190,14 @@
 
         assignInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "insecure-third-countries/assign"), countryId);
+        }
+
+        assignBasisForTransfer(dataProcessingRegistrationId: number, basisForTransferId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "basis-for-transfer/assign"), basisForTransferId);
+        }
+
+        clearBasisForTransfer(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "basis-for-transfer/clear"), {});
         }
 
         getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]> {
