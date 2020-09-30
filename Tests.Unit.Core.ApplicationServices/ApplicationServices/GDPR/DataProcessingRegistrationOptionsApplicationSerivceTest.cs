@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -33,9 +35,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Arrange
             var organizationId = A<int>();
             ExpectOrganizationReadAccess(organizationId);
-            var dataResponsibleOptions = new List<DataProcessingDataResponsibleOption>()
+            var dataResponsibleOptions = new List<OptionDescriptor<DataProcessingDataResponsibleOption>>()
             {
-                new DataProcessingDataResponsibleOption(),
+                new OptionDescriptor<DataProcessingDataResponsibleOption>(new DataProcessingDataResponsibleOption(), ""),
             };
             ExpectDataResponsibleOptions(organizationId, dataResponsibleOptions);
             var countryOptions = new List<DataProcessingCountryOption>()
@@ -73,9 +75,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.Public);
         }
 
-        private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<DataProcessingDataResponsibleOption> dataResponsibleOptions)
+        private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)
         {
-            _optionRepositoryMock.Setup(x => x.GetAvailableDataResponsibleOptions(organizationId)).Returns(dataResponsibleOptions);
+            _optionRepositoryMock.Setup(x => x.GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(organizationId)).Returns(dataResponsibleOptions);
         }
 
         private void ExpectCountryOptions(int organizationId, IEnumerable<DataProcessingCountryOption> countryOptions)

@@ -7,7 +7,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration = 0,
         DataProcessingRegistration_User = 1,
         DataProcessingRegistration_ItSystem = 2,
-        DataProcessingRegistration_Organization = 3
+        DataProcessingRegistration_Organization = 3,
+        DataProcessingRegistration_DataResponsible = 4
     }
 
     public class PendingReadModelUpdate

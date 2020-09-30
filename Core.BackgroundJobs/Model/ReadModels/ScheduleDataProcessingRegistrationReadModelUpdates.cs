@@ -47,8 +47,24 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOrganizationUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleDataResponsibleUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
+        }
+
+        private int HandleDataResponsibleUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_DataResponsible, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _dataProcessingRegistrationRepository.GetByDataResponsibleId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
         }
 
         private int HandleOrganizationUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
@@ -108,6 +124,23 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 updatesExecuted = CompleteUpdate(updatesExecuted, updates, userUpdate, transaction);
             }
 
+            return updatesExecuted;
+        }
+
+        private int PerformUpdate(
+            int updatesExecuted,
+            HashSet<int> alreadyScheduledIds,
+            IQueryable<int> dataProcessingRegistrationIds,
+            PendingReadModelUpdate update,
+            IDatabaseTransaction transaction)
+        {
+            var updates = dataProcessingRegistrationIds
+                .Where(id => alreadyScheduledIds.Contains(id) == false)
+                .ToList()
+                .Select(id => PendingReadModelUpdate.Create(id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
+                .ToList();
+
+            updatesExecuted = CompleteUpdate(updatesExecuted, updates, update, transaction);
             return updatesExecuted;
         }
 

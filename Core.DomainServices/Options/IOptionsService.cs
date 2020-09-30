@@ -11,6 +11,12 @@ namespace Core.DomainServices.Options
         /// </summary>
         /// <param name="organizationId"></param>
         /// <returns></returns>
+        IEnumerable<OptionDescriptor<TOption>> GetAvailableOptionsDetails(int organizationId);
+        /// <summary>
+        /// Returns a list of options available to the organization
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
         IEnumerable<TOption> GetAvailableOptions(int organizationId);
         /// <summary>
         /// Returns the option if it is available in the organization
@@ -26,5 +32,17 @@ namespace Core.DomainServices.Options
         /// <param name="optionId"></param>
         /// <returns></returns>
         Maybe<(TOption option, bool available)> GetOption(int organizationId, int optionId);
+    }
+
+    public class OptionDescriptor<TOption>
+    {
+        public TOption Option { get; }
+        public string Description { get; }
+
+        public OptionDescriptor(TOption option, string description)
+        {
+            Option = option;
+            Description = description;
+        }
     }
 }

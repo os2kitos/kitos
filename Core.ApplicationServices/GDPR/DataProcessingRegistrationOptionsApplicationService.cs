@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;
 using Core.DomainModel.Result;
@@ -25,9 +26,19 @@ namespace Core.ApplicationServices.GDPR
         {
             return WithOrganizationReadAccess(organizationId,
                 () => new DataProcessingRegistrationOptions(
-                        _optionRepository.GetAvailableDataResponsibleOptions(organizationId),
+                        _optionRepository.GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(organizationId),
                         _optionRepository.GetAvailableCountryOptions(organizationId)
                     ));
+        }
+
+        public ISet<int> GetIdsOfAvailableCountryOptions(int organizationId)
+        {
+            return _optionRepository.GetIdsOfAvailableCountryOptions(organizationId);
+        }
+
+        public ISet<int> GetIdsOfAvailableDataResponsibleOptions(int organizationId)
+        {
+            return _optionRepository.GetIdsOfAvailableDataResponsibleOptions(organizationId);
         }
 
         private Result<DataProcessingRegistrationOptions, OperationError> WithOrganizationReadAccess(

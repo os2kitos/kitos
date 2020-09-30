@@ -21,23 +21,32 @@ namespace Core.DomainServices.Options
             _optionRepository = optionRepository;
         }
 
-        public IEnumerable<TOption> GetAvailableOptions(int organizationId)
+        public IEnumerable<OptionDescriptor<TOption>> GetAvailableOptionsDetails(int organizationId)
         {
             var allOptions = GetAvailableOptionsFromOrganization(organizationId);
 
             return allOptions
-                .OrderBy(option => option.Name)
+                .OrderBy(option => option.Option.Name)
                 .ToList();
         }
 
-        private IQueryable<TOption> GetAvailableOptionsFromOrganization(int organizationId)
+        public IEnumerable<TOption> GetAvailableOptions(int organizationId)
         {
-            var activeOptionIds = _localOptionRepository
+            return GetAvailableOptionsDetails(organizationId).Select(x => x.Option).ToList();
+        }
+
+        private IEnumerable<OptionDescriptor<TOption>> GetAvailableOptionsFromOrganization(int organizationId)
+        {
+            var localOptions = _localOptionRepository
                 .AsQueryable()
-                .ByOrganizationId(organizationId)
+                .ByOrganizationId(organizationId);
+
+            var activeOptionIds = localOptions
                 .Where(x => x.IsActive)
                 .Select(x => x.OptionId)
                 .ToList();
+
+            var localDescriptions = localOptions.ToDictionary(x => x.OptionId, x => x.GetActiveDescription());
 
             var allLocallyEnabled = _optionRepository
                 .AsQueryable()
@@ -51,13 +60,16 @@ namespace Core.DomainServices.Options
                 .Where(x => x.IsObligatory); //Add enabled global options which are obligatory as well
 
             var allOptions = allObligatory.Concat(allLocallyEnabled);
-            return allOptions;
+            return allOptions
+                .AsEnumerable()
+                .Select(x => new OptionDescriptor<TOption>(x, localDescriptions.ContainsKey(x.Id) ? localDescriptions[x.Id] : x.Description));
         }
 
         public Maybe<TOption> GetAvailableOption(int organizationId, int optionId)
         {
             return GetAvailableOptionsFromOrganization(organizationId)
-                .FirstOrDefault(option => option.Id == optionId);
+                .FirstOrDefault(option => option.Option.Id == optionId)?
+                .Option;
         }
 
         public Maybe<(TOption option, bool available)> GetOption(int organizationId, int optionId)

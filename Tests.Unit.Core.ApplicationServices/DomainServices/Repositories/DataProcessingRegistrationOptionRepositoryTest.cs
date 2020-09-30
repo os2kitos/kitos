@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
@@ -45,22 +46,22 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         {
             //Arrange
             var organizationId = A<int>();
-            var dataResponsibleOptions = new List<DataProcessingDataResponsibleOption>()
+            var dataResponsibleOptions = new List<OptionDescriptor<DataProcessingDataResponsibleOption>>()
             {
-                new DataProcessingDataResponsibleOption(),
+                new OptionDescriptor<DataProcessingDataResponsibleOption>(new DataProcessingDataResponsibleOption(), ""),
             };
             ExpectDataResponsibleOptions(organizationId, dataResponsibleOptions);
 
             //Act
-            var assignableDataResponsibleOptions = _sut.GetAvailableDataResponsibleOptions(organizationId);
+            var assignableDataResponsibleOptions = _sut.GetAvailableDataResponsibleOptionsWithLocallyUpdatedDescriptions(organizationId);
 
             //Assert
             Assert.Equal(dataResponsibleOptions, assignableDataResponsibleOptions);
         }
 
-        private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<DataProcessingDataResponsibleOption> dataResponsibleOptions)
+        private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)
         {
-            _dataResponsibleOptionsServiceMock.Setup(x => x.GetAvailableOptions(organizationId)).Returns(dataResponsibleOptions);
+            _dataResponsibleOptionsServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(dataResponsibleOptions);
         }
 
         private void ExpectCountryOptions(int organizationId, IEnumerable<DataProcessingCountryOption> countryOptions)
