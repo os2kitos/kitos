@@ -8,6 +8,7 @@ import DataProcessingRegistrationEditMainPageObject =
     require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 
 class DataProcessingRegistrationHelper {
+    private static readonly  selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
     private static readonly transferToThirdCountriesSelectionId : string = "s2id_transferToInsecureThirdCountries_config";
     private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
@@ -201,6 +202,14 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
             .click()
             .then(() => browser.switchTo().alert().accept());
+    }
+
+    static selectBasisForTransfer(basisForTransfer: string) {
+        return Select2Helper.selectWithNoSearch(basisForTransfer, DataProcessingRegistrationHelper.selectBasisForTransferSelectionId);
+    }
+
+    static verifyBasisForTransfer(basisForTransfer: string) {
+        expect(Select2Helper.getData(DataProcessingRegistrationHelper.selectBasisForTransferSelectionId).getText()).toEqual(basisForTransfer);
     }
 }
 
