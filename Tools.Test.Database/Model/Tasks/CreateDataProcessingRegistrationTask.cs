@@ -1,6 +1,8 @@
 ﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.LocalOptions;
 using Core.DomainServices.GDPR;
+using Core.DomainServices.Options;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
 
@@ -32,7 +34,16 @@ namespace Tools.Test.Database.Model.Tasks
             dbContext.SaveChanges();
 
             var readModel = new DataProcessingRegistrationReadModel();
-            new DataProcessingRegistrationReadModelUpdate(new GenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>(dbContext)).Apply(agreement, readModel);
+            var update = new DataProcessingRegistrationReadModelUpdate(
+                new GenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>(dbContext),
+                new OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>
+                (
+                    new GenericRepository<LocalDataProcessingDataResponsibleOption>(dbContext),
+                    new GenericRepository<DataProcessingDataResponsibleOption>(dbContext)
+                )
+            );
+
+            update.Apply(agreement, readModel);
 
             dbContext.DataProcessingRegistrationReadModels.Add(readModel);
             dbContext.SaveChanges();

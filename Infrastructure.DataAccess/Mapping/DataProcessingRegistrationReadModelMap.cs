@@ -46,6 +46,11 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.TransferToInsecureThirdCountries)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_TransferToInsecureThirdCountries", 0);
+
+            Property(x => x.DataResponsible)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
         }
     }
 }

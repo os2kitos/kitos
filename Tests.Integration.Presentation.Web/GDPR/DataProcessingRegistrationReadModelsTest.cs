@@ -77,9 +77,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, setInsecureCountryStateResponse.StatusCode);
 
             // Set data responsible
-            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registration.Id);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(organizationId);
             var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
-            using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
+            using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
             // Data responsible done
 
