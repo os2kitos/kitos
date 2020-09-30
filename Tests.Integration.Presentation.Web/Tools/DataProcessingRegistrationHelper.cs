@@ -84,7 +84,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new SingleValueDTO<YearMonthIntervalOption?> {Value = oversightInterval };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-interval"), cookie, body);
         }
 
         public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
@@ -93,7 +93,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new SingleValueDTO<string> { Value = remark };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-remark"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-interval-remark"), cookie, body);
 
         }
 
