@@ -75,8 +75,9 @@
             const existingChoice = this.dataProcessingRegistration.basisForTransfer;
             if (existingChoice && !optionMap[existingChoice.id]) {
                 optionMap[existingChoice.id] = {
-                    text: existingChoice.name,
+                    text: `${existingChoice.name} (udgået)`,
                     id: existingChoice.id,
+                    disabled: true,
                     optionalObjectContext: existingChoice
                 }
             }
@@ -85,7 +86,7 @@
 
             this.basisForTransfer = {
                 selectedElement: existingChoice && optionMap[existingChoice.id],
-                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true), //TODO: Possible to filter out the selected one?... disabled is possible
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
                 elementSelected: (newElement) => this.updateBasisForTransfer(newElement)
             };
         }
@@ -322,7 +323,7 @@
             this.apiUseCaseFactory
                 .createUpdate("Overførselsgrundlag", () => updateFunc())
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.basisForTransfer = newValue.optionalObjectContext;
+                    this.dataProcessingRegistration.basisForTransfer = newValue && newValue.optionalObjectContext;
                     this.bindBasisForTransfer();
                     return success;
                 });
