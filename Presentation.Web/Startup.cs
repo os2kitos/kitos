@@ -61,6 +61,12 @@ namespace Presentation.Web
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
+
+            new RecurringJobManager().AddOrUpdate(
+                recurringJobId: StandardJobIds.PurgeOrphanedAdvice,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync()),
+                cronExpression: Cron.Hourly(),
+                timeZone: TimeZoneInfo.Local);
         }
     }
 }
