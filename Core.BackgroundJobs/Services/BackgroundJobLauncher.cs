@@ -30,7 +30,7 @@ namespace Core.BackgroundJobs.Services
             _checkExternalLinksJob = checkExternalLinksJob;
             _rebuildDataProcessingRegistrationReadModels = rebuildDataProcessingRegistrationReadModels;
             _scheduleDataProcessingRegistrationReadModelUpdates = scheduleDataProcessingRegistrationReadModelUpdates;
-			_purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
+            _purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
@@ -38,12 +38,12 @@ namespace Core.BackgroundJobs.Services
             await Launch(_checkExternalLinksJob, token);
         }
 
-        public async Task LaunchAdviceCleanupAsync()
+        public async Task LaunchAdviceCleanupAsync(CancellationToken token = default)
         {
-            await Launch(_purgeOrphanedAdviceBackgroundJob);
+            await Launch(_purgeOrphanedAdviceBackgroundJob, token);
         }
-		
-		public async Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default)
+
+        public async Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default)
         {
             await Launch(_rebuildDataProcessingRegistrationReadModels, token);
         }

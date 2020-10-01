@@ -5,7 +5,7 @@ namespace Infrastructure.Services.BackgroundJobs
 {
     public interface IBackgroundJobLauncher
     {
-        Task LaunchAdviceCleanupAsync();
+        Task LaunchAdviceCleanupAsync(CancellationToken token = default);
         Task LaunchLinkCheckAsync(CancellationToken token = default);
         Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default);
         Task LaunchScheduleDataProcessingRegistrationReadUpdates(CancellationToken token = default);
