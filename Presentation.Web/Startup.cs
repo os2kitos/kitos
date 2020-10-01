@@ -68,7 +68,7 @@ namespace Presentation.Web
 
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.PurgeOrphanedAdvice,
-                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync()),
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync(CancellationToken.None)),
                 cronExpression: Cron.Hourly(),
                 timeZone: TimeZoneInfo.Local);
         }
