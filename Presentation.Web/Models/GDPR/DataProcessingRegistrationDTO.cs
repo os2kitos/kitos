@@ -31,5 +31,7 @@ namespace Presentation.Web.Models.GDPR
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
 
         public NamedEntityWithExpirationStatusDTO[] InsecureThirdCountries { get; set; }
+
+        public NamedEntityWithExpirationStatusDTO BasisForTransfer { get; set; }
     }
 }

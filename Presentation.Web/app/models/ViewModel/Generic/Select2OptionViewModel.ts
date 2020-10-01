@@ -5,6 +5,7 @@
     export interface Select2OptionViewModel<T> {
         id: number;
         text: string;
-        optionalObjectContext? : T;
+        optionalObjectContext?: T;
+        disabled?: boolean;
     }
 }

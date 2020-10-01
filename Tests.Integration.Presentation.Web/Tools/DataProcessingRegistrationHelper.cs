@@ -221,7 +221,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/sub-data-processors/state"), cookie, new SingleValueDTO<YesNoUndecidedOption> { Value = value });
-		}
+        }
 
         public static async Task<HttpResponseMessage> SendChangeIsAgreementConcludedRequestAsync(int id, YesNoIrrelevantOption? yesNoIrrelevantOption, Cookie optionalLogin = null)
         {
@@ -266,6 +266,26 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalDataProcessingCountryOptions?organizationId={organizationId}"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
+        }
+
+        public static async Task<IEnumerable<OptionDTO>> GetBasisForTransferOptionsAsync(int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalDataProcessingBasisForTransferOptions?organizationId={organizationId}"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignBasisForTransferRequestAsync(int registrationId, int basisForTransferId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/basis-for-transfer/assign"), cookie, new SingleValueDTO<int> { Value = basisForTransferId });
+        }
+
+        public static async Task<HttpResponseMessage> SendClearBasisForTransferRequestAsync(int registrationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/basis-for-transfer/clear"), cookie, new { });
         }
     }
 }

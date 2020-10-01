@@ -274,6 +274,10 @@ namespace Core.DomainModel.GDPR
 
         public DateTime? AgreementConcludedAt { get; set; }
 
+        public int? BasisForTransferId { get; set; }
+
+        public virtual DataProcessingBasisForTransferOption BasisForTransfer { get; set; }
+
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public string OversightIntervalRemark { get; set; }
