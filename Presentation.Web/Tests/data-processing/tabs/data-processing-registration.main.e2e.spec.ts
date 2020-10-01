@@ -49,7 +49,7 @@ describe("Data processing agreement main detail tests", () => {
             var renameValue = createName(30);
             const thirdCountryName = "Danmark";
             const basisForTransfer = "Andet";
-            const dataResponsibleOptionName = "";
+            const dataResponsibleOptionName = "Fællesdataansvar";
             var dataResponsibleRemark = createRemark();
 
             dpaHelper.createDataProcessingRegistration(name)
@@ -168,7 +168,7 @@ describe("Data processing agreement main detail tests", () => {
     function verifyDataReponsibleRemark(dataResponsibleRemark: string) {
         setFocusOnNameToActivateBlur();
         console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
-        expect(pageObject.getDataResponsibleRemark().getText()).toEqual(dataResponsibleRemark);
+        expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
     }
 
     function setFocusOnNameToActivateBlur() {
