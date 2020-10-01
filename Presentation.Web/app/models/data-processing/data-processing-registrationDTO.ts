@@ -17,6 +17,7 @@
         transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
         insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO[];
         basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
+        dataResponsible: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.IOptionWithDescription>;
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {
@@ -43,7 +44,8 @@
     }
 
     export interface IDataProcessingRegistrationOptions {
-        countryOptions: Models.Generic.NamedEntity.NamedEntityDTO[],
+        countryOptions: Models.Generic.IOptionWithDescription[],
         dataResponsibleOptions: Models.Generic.IOptionWithDescription[],
+        basisForTransferOptions: Models.Generic.IOptionWithDescription[],
     }
 }

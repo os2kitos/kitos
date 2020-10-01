@@ -15,6 +15,27 @@
                            autofocus
                            maxlength="150">
                 </div>
+
+
+                <!-- Data responsible -->
+                <div class="form-group">
+                    <label for="dataResponsible" class="control-label small">Dataansvarlig</label>
+                    <single-select-select2 id="dataResponsible"
+                                           data-placeholder="Vælg dataansvarlig"
+                                           ng-model="vm.dataResponsible"
+                                           ng-disabled="!vm.hasWriteAccess" />
+                </div>
+
+                <!-- Data responsible Remark -->
+                <div class="form-group">
+                    <label for="dataResponsibleRemark" class="control-label small">Dataansvarlig bemærkninger</label>
+                    <remark-field id="dataResponsibleRemark"
+                                  rows="2"
+                                  ng-model="vm.dataResponsibleRemark"
+                                  ng-disabled="!vm.hasWriteAccess" />
+                </div>
+
+
                 <!-- Agreement concluded -->
                 <div class="form-group">
                     <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
@@ -70,7 +91,7 @@
                                                            ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
                                                            ng-disabled="!vm.insecureThirdCountries.allowAddition" />
                                 </td>
-                        </tr>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
