@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Advice\PurgeOrphanedAdviceBackgroundJob.cs" />
     <Compile Include="Model\ExternalLinks\CheckExternalLinksBackgroundJob.cs" />
     <Compile Include="Model\IAsyncBackgroundJob.cs" />
     <Compile Include="Model\ReadModels\RebuildDataProcessingRegistrationReadModelsBatchJob.cs" />
