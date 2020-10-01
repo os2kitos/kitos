@@ -632,6 +632,10 @@
     <Compile Include="Migrations\202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.designer.cs">
       <DependentUpon>202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202010010924177_Added_Agreement_Oversight_Completed_Date_And_Remark.cs" />
+    <Compile Include="Migrations\202010010924177_Added_Agreement_Oversight_Completed_Date_And_Remark.designer.cs">
+      <DependentUpon>202010010924177_Added_Agreement_Oversight_Completed_Date_And_Remark.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1027,6 +1031,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.resx">
       <DependentUpon>202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010010924177_Added_Agreement_Oversight_Completed_Date_And_Remark.resx">
+      <DependentUpon>202010010924177_Added_Agreement_Oversight_Completed_Date_And_Remark.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
