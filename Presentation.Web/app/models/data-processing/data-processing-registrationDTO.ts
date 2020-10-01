@@ -15,9 +15,9 @@
         subDataProcessors: IDataProcessorDTO[];
         agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
         transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
-        insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO[];
-        basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
-        dataResponsible: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.IOptionWithDescription>;
+        insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
+        basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
+        dataResponsible: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {
@@ -44,8 +44,8 @@
     }
 
     export interface IDataProcessingRegistrationOptions {
-        countryOptions: Models.Generic.IOptionWithDescription[],
-        dataResponsibleOptions: Models.Generic.IOptionWithDescription[],
-        basisForTransferOptions: Models.Generic.IOptionWithDescription[],
+        thirdCountryOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
+        dataResponsibleOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
+        basisForTransferOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
     }
 }

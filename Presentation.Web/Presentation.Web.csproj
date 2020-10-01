@@ -492,7 +492,6 @@
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
-    <TypeScriptCompile Include="app\models\generic\OptionWithDescription.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueWithOptionalRemarkDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />

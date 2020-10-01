@@ -182,6 +182,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer)))
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("DataResponsible")
+                            .withTitle("Dataansvarlig")
+                            .withId("dpDataResponsible")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("IsAgreementConcluded")
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")

@@ -501,7 +501,7 @@ namespace Presentation.Web.Controllers.API
                 .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO()
                 {
                     dataResponsibleOptions = ToDTOs(result.DataProcessingRegistrationDataResponsibleOptions, organizationId).ToList(),
-                    countryOptions = ToDTOs(result.DataProcessingRegistrationCountryOptions, organizationId).ToList(),
+                    thirdCountryOptions = ToDTOs(result.DataProcessingRegistrationCountryOptions, organizationId).ToList(),
                     basisForTransferOptions = ToDTOs(result.DataProcessingRegistrationBasisForTransferOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);

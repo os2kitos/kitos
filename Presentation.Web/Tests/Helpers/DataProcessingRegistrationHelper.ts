@@ -9,7 +9,8 @@ import DataProcessingRegistrationEditMainPageObject =
 
 class DataProcessingRegistrationHelper {
     private static readonly  selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
-    private static readonly transferToThirdCountriesSelectionId : string = "s2id_transferToInsecureThirdCountries_config";
+    private static readonly transferToThirdCountriesSelectionId: string = "s2id_transferToInsecureThirdCountries_config";
+    private static readonly dataResponsibleSelectionId: string = "s2id_dataResponsible_config";
     private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
@@ -202,6 +203,11 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
             .click()
             .then(() => browser.switchTo().alert().accept());
+    }
+
+    public static assignDataResponsible(dataResponsibleOptionName) {
+        console.log(`Assigning data responsible option with name: ${dataResponsibleOptionName}`);
+        return Select2Helper.selectWithNoSearch(dataResponsibleOptionName, DataProcessingRegistrationHelper.dataResponsibleSelectionId);
     }
 
     static selectBasisForTransfer(basisForTransfer: string) {

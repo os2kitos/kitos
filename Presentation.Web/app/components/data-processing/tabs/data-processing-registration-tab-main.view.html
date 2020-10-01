@@ -24,6 +24,10 @@
                                            data-placeholder="Vælg dataansvarlig"
                                            ng-model="vm.dataResponsible"
                                            ng-disabled="!vm.hasWriteAccess" />
+                    <span class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        {{vm.dataResponsible.selectedElement.optionalObjectContext.description}}
+                    </span>
                 </div>
 
                 <!-- Data responsible Remark -->
