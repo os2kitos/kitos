@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Added_Agreement_Oversight_Interval_Option_And_Note : DbMigration
+    public partial class Added_Agreement_Oversight_Interval_Option_And_Remark : DbMigration
     {
         public override void Up()
         {

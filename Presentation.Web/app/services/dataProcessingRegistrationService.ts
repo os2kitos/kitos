@@ -26,8 +26,6 @@
         assignInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignBasisForTransfer(dataProcessingRegistrationId: number, basisForTransferId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         clearBasisForTransfer(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
-        updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
         updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption);
         updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string);
     }
