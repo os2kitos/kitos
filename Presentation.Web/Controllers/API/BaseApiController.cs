@@ -14,8 +14,10 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
+using Presentation.Web.Extensions;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
@@ -159,25 +161,7 @@ namespace Presentation.Web.Controllers.API
 
         protected HttpResponseMessage FromOperationError(OperationError failure)
         {
-            HttpStatusCode statusCode;
-            switch (failure.FailureType)
-            {
-                case OperationFailure.BadInput:
-                    statusCode = HttpStatusCode.BadRequest;
-                    break;
-                case OperationFailure.NotFound:
-                    statusCode = HttpStatusCode.NotFound;
-                    break;
-                case OperationFailure.Forbidden:
-                    statusCode = HttpStatusCode.Forbidden;
-                    break;
-                case OperationFailure.Conflict:
-                    statusCode = HttpStatusCode.Conflict;
-                    break;
-                default:
-                    statusCode = HttpStatusCode.InternalServerError;
-                    break;
-            }
+            var statusCode = failure.FailureType.ToHttpStatusCode();
 
             return CreateResponse(statusCode, failure.Message.GetValueOrFallback(string.Empty));
         }
@@ -241,7 +225,7 @@ namespace Presentation.Web.Controllers.API
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected virtual bool AllowCreate<T>(int organizationId ,IEntity entity)
+        protected virtual bool AllowCreate<T>(int organizationId, IEntity entity)
         {
             return CrudAuthorization.AllowCreate<T>(organizationId, entity);
         }
@@ -259,6 +243,82 @@ namespace Presentation.Web.Controllers.API
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
             return AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
+        }
+
+        protected virtual IEntity GetEntity(int id) => throw new NotSupportedException("This endpoint does not support access rights");
+
+        protected virtual bool AllowCreateNewEntity(int organizationId) => throw new NotSupportedException("This endpoint does not support generic creation rights");
+
+        [HttpGet]
+        [InternalApi]
+        /// <summary>
+        /// GET api/T/GetAccessRights
+        /// Checks what access rights the user has for the given entities
+        /// </summary>
+        public virtual HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
+        {
+            if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
+            {
+                return Forbidden();
+            }
+            return Ok(new EntitiesAccessRightsDTO
+            {
+                CanCreate = AllowCreateNewEntity(organizationId),
+                CanView = true
+            });
+        }
+
+        [HttpGet]
+        [InternalApi]
+        /// <summary>
+        /// GET api/T/id?GetAccessRightsForEntity
+        /// Checks what access rights the user has for the given entity
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        public virtual HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
+        {
+            var item = GetEntity(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(GetAccessRightsForEntity(item));
+        }
+
+        private EntityAccessRightsDTO GetAccessRightsForEntity(IEntity item)
+        {
+            return new EntityAccessRightsDTO
+            {
+                Id = item.Id,
+                CanDelete = AllowDelete(item),
+                CanEdit = AllowModify(item),
+                CanView = AllowRead(item)
+            };
+        }
+
+        [HttpPost]
+        [InternalApi]
+        /// <summary>
+        /// POST api/T/idListAsCsv?getEntityListAccessRights
+        /// Uses POST verb to allow use of body for potentially long list of ids
+        /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
+        /// </summary>
+        /// <param name="ids">The ids of the objects</param>
+        public virtual HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
+        {
+            if (ids == null || ids.Length == 0)
+            {
+                return BadRequest();
+            }
+
+            return Ok(
+                ids
+                    .Distinct()
+                    .Select(GetEntity)
+                    .Where(entity => entity != null)
+                    .Select(GetAccessRightsForEntity)
+                    .ToList()
+            );
         }
 
         #endregion

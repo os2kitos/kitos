@@ -3,18 +3,17 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Options;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.DomainEvents;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -249,7 +248,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository.Verify(x => x.Save(), Times.Once);
             _referenceService.Verify(x => x.DeleteBySystemUsageId(id), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
-            _domainEvents.Verify(x => x.Raise(It.Is<SystemUsageDeleted>(ev => ev.DeletedSystemUsage == itSystemUsage)));
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityLifeCycleEvent<ItSystemUsage>>(ev => ev.Entity == itSystemUsage && ev.ChangeType == LifeCycleEventType.Deleted)));
         }
 
         [Fact]

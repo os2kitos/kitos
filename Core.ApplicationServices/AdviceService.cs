@@ -8,47 +8,68 @@ using Core.DomainServices;
 using Hangfire;
 using Ninject;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
-using System.Collections.Generic;
+using Core.DomainModel.GDPR;
+using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices
 {
     using DomainModel.ItSystemUsage;
     using Ninject.Extensions.Logging;
 
-    public class AdviceService: IAdviceService
+    public class AdviceService : IAdviceService
     {
         [Inject]
-        public MailClient _mailClient {  get; set; }
+        public MailClient MailClient { get; set; }
+
         [Inject]
-        public IGenericRepository<User> _userRepository { get; set;}
+        public IGenericRepository<User> UserRepository { get; set; }
+
         [Inject]
-        public IGenericRepository<Advice> _adviceRepository { get; set; }
+        public IGenericRepository<Advice> AdviceRepository { get; set; }
+
         [Inject]
-        public IGenericRepository<AdviceSent> _adviceSentRepository { get; set; }
+        public IGenericRepository<AdviceSent> AdviceSentRepository { get; set; }
+
         [Inject]
-        public IGenericRepository<ItContractRight> _ItContractRights { get; set; }
+        public IGenericRepository<ItContractRight> ItContractRights { get; set; }
+
         [Inject]
-        public IGenericRepository<ItProjectRight> _ItprojectRights { get; set; }
+        public IGenericRepository<ItProjectRight> ItprojectRights { get; set; }
+
         [Inject]
-        public IGenericRepository<ItSystemRight> _ItSystemRights { get; set; }
+        public IGenericRepository<ItSystemRight> ItSystemRights { get; set; }
+
+        [Inject]
+        public IGenericRepository<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
+
         [Inject]
         public ILogger Logger { get; set; }
-        [Inject]
-        public IGenericRepository<ItContract> _itContractRepository { get; set; }
-        [Inject]
-        public IGenericRepository<ItInterface> _itInterfaceRepository { get; set; }
-        [Inject]
-        public IGenericRepository<ItProject> _itProjectRepository { get; set; }
-        [Inject]
-        public IGenericRepository<ItSystemUsage> _itSystemUsageRepository { get; set; }
-        public AdviceService() {}
 
-        public bool SendAdvice(int id){
+        [Inject]
+        public IGenericRepository<ItContract> ItContractRepository { get; set; }
 
-            var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+        [Inject]
+        public IGenericRepository<ItInterface> ItInterfaceRepository { get; set; }
+
+        [Inject]
+        public IGenericRepository<ItProject> ItProjectRepository { get; set; }
+
+        [Inject]
+        public IGenericRepository<ItSystemUsage> ItSystemUsageRepository { get; set; }
+
+        [Inject]
+        public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
+
+        public AdviceService() { }
+
+        public bool SendAdvice(int id)
+        {
+
+            var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
             if (advice != null)
             {
@@ -65,7 +86,7 @@ namespace Core.ApplicationServices
                             IsBodyHtml = true
                         };
 
-                   
+
 
                         //Add recivers for Email
                         foreach (var r in advice.Reciepients)
@@ -73,100 +94,39 @@ namespace Core.ApplicationServices
                             //add To's
                             if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
                             {
-                                if (!string.IsNullOrEmpty(r.Name))
-                                {
-                                    message.To.Add(r.Name);
-                                }
+                                AddRecipientByName(r, message, message.To);
                             }
                             if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
                             {
-                                switch (advice.Type)
-                                {
-                                    case ObjectType.itContract:
-
-                                        var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in itContractRoles) {
-                                                    message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                    case ObjectType.itProject:
-                                        var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in projectRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                    case ObjectType.itSystemUsage:
-
-                                        var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in systemRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                }
+                                AddRecipientByRole(advice, r, message, message.To);
                             }
 
-                            //ADD CCs
+                            //ADD Role receivers
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
                             {
-                                if (!string.IsNullOrEmpty(r.Name))
-                                {
-                                    message.CC.Add(r.Name);
-                                }
+                                AddRecipientByName(r, message, message.CC);
                             }
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
                             {
-                                switch (advice.Type)
-                                {
-                                    case ObjectType.itContract:
-
-                                        var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in itContractRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                    case ObjectType.itProject:
-                                        var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in projectRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                    case ObjectType.itSystemUsage:
-
-                                        var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in systemRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
-                                }
+                                AddRecipientByRole(advice, r, message, message.CC);
                             }
                         }
 
                         //Send Mail.
-                        _mailClient.Send(message);
+                        MailClient.Send(message);
                         advice.SentDate = DateTime.Now;
 
-                        _adviceRepository.Update(advice);
-                        _adviceRepository.Save();
+                        AdviceRepository.Update(advice);
+                        AdviceRepository.Save();
 
 
-                        _adviceSentRepository.Insert(new AdviceSent()
+                        AdviceSentRepository.Insert(new AdviceSent()
                         {
                             AdviceId = id,
                             AdviceSentDate = DateTime.Now
                         });
 
-                        _adviceSentRepository.Save();
+                        AdviceSentRepository.Save();
 
                         return true;
                     }
@@ -176,18 +136,17 @@ namespace Core.ApplicationServices
                         return false;
                     }
                 }
-                else
+
+                if (advice.StopDate < DateTime.Now)
                 {
-                    if (advice.StopDate < DateTime.Now)
+                    RecurringJob.RemoveIfExists(advice.JobId);
+                    return false;
+                }
+                if (advice.AlarmDate.Value.Date <= DateTime.Now.Date)
+                {
+                    try
                     {
-                        RecurringJob.RemoveIfExists(advice.JobId);
-                        return false;
-                    }
-                    if (advice.AlarmDate.Value.Date <= DateTime.Now.Date)
-                    {
-                        try
-                        {
-                            //Setup mail//Setup mail
+                        //Setup mail//Setup mail
                         var message = new MailMessage()
                         {
                             Body = advice.Body,
@@ -195,117 +154,54 @@ namespace Core.ApplicationServices
                             BodyEncoding = Encoding.UTF8,
                             IsBodyHtml = true
                         };
-                          //  message.From = new MailAddress("no_reply@kitos.dk");
+                        //  message.From = new MailAddress("no_reply@kitos.dk");
 
-                            //Add recivers for Email
-                            foreach (var r in advice.Reciepients)
+                        //Add recivers for Email
+                        foreach (var r in advice.Reciepients)
+                        {
+                            switch (r.RecieverType)
                             {
-                                if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
-                                {
-                                    if (!string.IsNullOrEmpty(r.Name))
-                                    {
-                                        message.To.Add(r.Name);
-                                    }
-                                }
-                                if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
-                                {
-                                        if (!string.IsNullOrEmpty(r.Name))
-                                        {
-                                            message.CC.Add(r.Name);
-                                        }
-                                }
-                                if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
-                                {
-
-                                    switch (advice.Type)
-                                    {
-                                        case ObjectType.itContract:
-
-                                            var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in itContractRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                        case ObjectType.itProject:
-                                            var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in projectRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                        case ObjectType.itSystemUsage:
-
-                                            var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in systemRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                    }
-
-
-                                }
-                                if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
-                                {
-                                    switch (advice.Type)
-                                    {
-                                        case ObjectType.itContract:
-
-                                            var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in itContractRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                        case ObjectType.itProject:
-                                            var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in projectRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                        case ObjectType.itSystemUsage:
-
-                                            var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                            && I.Role.Name == r.Name);
-                                            foreach (var t in systemRoles)
-                                            {
-                                                message.To.Add(t.User.Email);
-                                            }
-                                            break;
-                                    }
-                                }
+                                case RecieverType.RECIEVER when r.RecpientType == RecieverType.USER:
+                                    AddRecipientByName(r, message, message.To);
+                                    break;
+                                case RecieverType.CC when r.RecpientType == RecieverType.USER:
+                                    AddRecipientByName(r, message, message.CC);
+                                    break;
                             }
 
-                            //Send Mail.
-                            _mailClient.Send(message);
-                            advice.SentDate = DateTime.Now;
-
-                            _adviceRepository.Update(advice);
-                            _adviceRepository.Save();
-
-
-                            _adviceSentRepository.Insert(new AdviceSent()
+                            switch (r.RecieverType)
                             {
-                                AdviceId = id,
-                                AdviceSentDate = DateTime.Now
-                            });
-
-                            _adviceSentRepository.Save();
-
-                            return true;
+                                case RecieverType.RECIEVER when r.RecpientType == RecieverType.ROLE:
+                                    AddRecipientByRole(advice, r, message, message.To);
+                                    break;
+                                case RecieverType.CC when r.RecpientType == RecieverType.ROLE:
+                                    AddRecipientByRole(advice, r, message, message.CC);
+                                    break;
+                            }
                         }
-                        catch (Exception e)
+
+                        //Send Mail.
+                        MailClient.Send(message);
+                        advice.SentDate = DateTime.Now;
+
+                        AdviceRepository.Update(advice);
+                        AdviceRepository.Save();
+
+
+                        AdviceSentRepository.Insert(new AdviceSent()
                         {
-                            this.Logger?.Error(e, "Error in Advis service");
-                            return false;
-                        }
+                            AdviceId = id,
+                            AdviceSentDate = DateTime.Now
+                        });
+
+                        AdviceSentRepository.Save();
+
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        this.Logger?.Error(e, "Error in Advis service");
+                        return false;
                     }
                 }
             }
@@ -313,10 +209,65 @@ namespace Core.ApplicationServices
             return false;
         }
 
-        public IEnumerable<Advice> GetAdvicesForOrg(int orgKey)
+        public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3");
-            return result;
+            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
+            return result.AsQueryable();
+        }
+
+        private static void AddRecipientByName(AdviceUserRelation r, MailMessage message, MailAddressCollection mailAddressCollection)
+        {
+            if (!string.IsNullOrEmpty(r.Name))
+            {
+                mailAddressCollection.Add(r.Name);
+            }
+        }
+
+        private void AddRecipientByRole(Advice advice, AdviceUserRelation r, MailMessage message, MailAddressCollection mailAddressCollection)
+        {
+            switch (advice.Type)
+            {
+                case ObjectType.itContract:
+
+                    var itContractRoles = ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                        && I.Role.Name == r.Name);
+                    foreach (var t in itContractRoles)
+                    {
+                        mailAddressCollection.Add(t.User.Email);
+                    }
+
+                    break;
+                case ObjectType.itProject:
+                    var projectRoles = ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                        && I.Role.Name == r.Name);
+                    foreach (var t in projectRoles)
+                    {
+                        mailAddressCollection.Add(t.User.Email);
+                    }
+
+                    break;
+                case ObjectType.itSystemUsage:
+
+                    var systemRoles = ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                                                              && I.Role.Name == r.Name);
+                    foreach (var t in systemRoles)
+                    {
+                        mailAddressCollection.Add(t.User.Email);
+                    }
+
+                    break;
+                case ObjectType.dataProcessingRegistration:
+
+                    var dpaRoles = DataProcessingRegistrationRights.AsQueryable().Where(I =>
+                        I.ObjectId == advice.RelationId
+                        && I.Role.Name == r.Name);
+                    foreach (var t in dpaRoles)
+                    {
+                        mailAddressCollection.Add(t.User.Email);
+                    }
+
+                    break;
+            }
         }
     }
 }

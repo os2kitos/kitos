@@ -10,6 +10,7 @@
     <RootNamespace>Core.DomainServices</RootNamespace>
     <AssemblyName>Core.DomainServices</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,24 +59,47 @@
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="Factories\ItProjectFactory.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationNamingService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationSystemAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationBasisForTransferAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationNamingService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationRoleAssignmentsService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\EventHandlers\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
+    <Compile Include="Model\EventHandlers\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
-    <Compile Include="Model\EventHandlers\SystemUsageDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
+    <Compile Include="Model\IReadModelUpdate.cs" />
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
+    <Compile Include="Options\ISingleOptionTypeInstanceAssignmentService.cs" />
+    <Compile Include="Options\IOptionsService.cs" />
+    <Compile Include="Options\IMultipleOptionTypeInstancesAssignmentService.cs" />
+    <Compile Include="Options\SingleOptionTypeInstanceAssignmentServiceBase.cs" />
+    <Compile Include="Options\OptionsService.cs" />
+    <Compile Include="Options\MultipleOptionTypeInstancesAssignmentServiceBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
     <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\QueryByOrganizationIds.cs" />
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationIds.cs" />
+    <Compile Include="Queries\QueryUserByNameOrEmail.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
@@ -89,10 +112,16 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Advice\IAdviceRepository.cs" />
     <Compile Include="Repositories\Advice\AdviceRepository.cs" />
+    <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
+    <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingRegistrationReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingRegistrationReadModelRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationUnitRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />

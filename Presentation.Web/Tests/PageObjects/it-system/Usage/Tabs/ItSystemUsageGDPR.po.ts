@@ -149,6 +149,10 @@ class ItSystemUsageGDPR {
     static getLatestRiskAssesmentDateField() {
         return element(by.id(this.consts.gdprLatestRiskAssesmentDateDateId));
     }
+
+    static getDataProcessingRegistrationView() {
+        return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessingRegistrationView));
+    }
 }
 
 export = ItSystemUsageGDPR;

@@ -6,6 +6,7 @@
         NotFound,
         Forbidden,
         Conflict,
+        BadState,
         UnknownError
     }
 }

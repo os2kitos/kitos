@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Model.EventHandlers;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -63,7 +64,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new InterfaceDeleted(affectedInterface));
+            _sut.Handle(new EntityDeletedEvent<ItInterface>(affectedInterface));
 
             //Assert that all interface fields were reset
             Assert.True(affectedInterface.AssociatedSystemRelations.All(x => x.RelationInterface == null));

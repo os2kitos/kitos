@@ -5,9 +5,11 @@
         name: string;
     }
 
-    export interface NamedEntityWithEnabledStatusDTO {
-        id: number;
-        name: string;
+    export interface NamedEntityWithEnabledStatusDTO extends NamedEntityDTO{
         disabled : boolean;
+    }
+
+    export interface NamedEntityWithExpirationStatusDTO extends NamedEntityDTO {
+        expired: boolean;
     }
 }

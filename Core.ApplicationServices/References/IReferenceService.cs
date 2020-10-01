@@ -13,5 +13,6 @@ namespace Core.ApplicationServices.References
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemUsageId(int usageId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId);
+        Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id);
     }
 }

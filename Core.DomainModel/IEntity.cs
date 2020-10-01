@@ -2,9 +2,8 @@
 
 namespace Core.DomainModel
 {
-    public interface IEntity
+    public interface IEntity : IHasId
     {
-        int Id { get; set; }
         DateTime LastChanged { get; set; }
         User LastChangedByUser { get; set; }
         int? LastChangedByUserId { get; set; }

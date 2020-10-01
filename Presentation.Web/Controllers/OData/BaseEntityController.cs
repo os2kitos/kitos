@@ -9,7 +9,10 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
+using Ninject;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -18,6 +21,9 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
+        [Inject]
+        public IDomainEvents DomainEvents { get; set; }
+
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
@@ -93,6 +99,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 entity = Repository.Insert(entity);
+                DomainEvents.Raise(new EntityCreatedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -140,6 +147,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 // patch the entity
                 delta.Patch(entity);
+                DomainEvents.Raise(new EntityUpdatedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -169,6 +177,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 Repository.DeleteByKey(key);
+                DomainEvents.Raise(new EntityDeletedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -226,19 +235,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)
         {
-            switch (failure)
-            {
-                case OperationFailure.BadInput:
-                    return BadRequest();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.Conflict:
-                    return Conflict();
-                default:
-                    return StatusCode(HttpStatusCode.InternalServerError);
-            }
+            return StatusCode(failure.ToHttpStatusCode());
         }
     }
 }

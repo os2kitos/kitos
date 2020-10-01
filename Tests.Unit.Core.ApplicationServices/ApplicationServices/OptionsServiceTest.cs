@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Core.ApplicationServices.Options;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
+using Core.DomainServices.Options;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

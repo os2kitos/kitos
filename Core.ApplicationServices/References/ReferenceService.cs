@@ -6,12 +6,14 @@ using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.References
 {
@@ -22,9 +24,11 @@ namespace Core.ApplicationServices.References
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository;
         private readonly IItProjectRepository _projectRepository;
+        private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IOperationClock _operationClock;
+        private readonly IDomainEvents _domainEvents;
 
 
         public ReferenceService(
@@ -33,18 +37,22 @@ namespace Core.ApplicationServices.References
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IItProjectRepository projectRepository,
+            IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            IOperationClock operationClock)
+            IOperationClock operationClock,
+            IDomainEvents domainEvents)
         {
             _referenceRepository = referenceRepository;
             _itSystemRepository = itSystemRepository;
             _systemUsageRepository = systemUsageRepository;
             _contractRepository = contractRepository;
             _projectRepository = projectRepository;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _operationClock = operationClock;
+            _domainEvents = domainEvents;
         }
 
 
@@ -81,6 +89,7 @@ namespace Core.ApplicationServices.References
                                 onSuccess: createdReference =>
                                 {
                                     _referenceRepository.SaveRootEntity(root);
+                                    _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
                                     return createdReference;
                                 },
                                 onFailure: error => error
@@ -102,10 +111,11 @@ namespace Core.ApplicationServices.References
                             return OperationFailure.Forbidden;
                         }
 
+                        _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(referenceAndOwner.externalReference));
                         _referenceRepository.Delete(referenceAndOwner.externalReference);
                         return referenceAndOwner.externalReference;
                     })
-                    .Match<Result<ExternalReference, OperationFailure>>
+                    .Match
                     (
                         onValue: result => result,
                         onNone: () => OperationFailure.NotFound
@@ -137,6 +147,14 @@ namespace Core.ApplicationServices.References
             return DeleteExternalReferences(project);
         }
 
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id)
+        {
+            return _dataProcessingRegistrationRepository
+                .GetById(id)
+                .Select(DeleteExternalReferences)
+                .Match(r => r, () => OperationFailure.NotFound);
+        }
+
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)
         {
             if (root == null)
@@ -149,23 +167,22 @@ namespace Core.ApplicationServices.References
                 return OperationFailure.Forbidden;
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            var systemExternalReferences = root.ExternalReferences.ToList();
+
+            if (systemExternalReferences.Count == 0)
             {
-                var systemExternalReferences = root.ExternalReferences.ToList();
-
-                if (systemExternalReferences.Count == 0)
-                {
-                    return systemExternalReferences;
-                }
-
-                foreach (var reference in systemExternalReferences)
-                {
-                    _referenceRepository.Delete(reference);
-                }
-
-                transaction.Commit();
                 return systemExternalReferences;
             }
+
+            foreach (var reference in systemExternalReferences)
+            {
+                _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(reference));
+                _referenceRepository.Delete(reference);
+            }
+
+            transaction.Commit();
+            return systemExternalReferences;
         }
     }
 }

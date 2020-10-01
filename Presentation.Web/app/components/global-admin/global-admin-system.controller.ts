@@ -1,4 +1,4 @@
-﻿(function(ng, app) {
+﻿((ng, app) => {
 
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("global-admin.system", {

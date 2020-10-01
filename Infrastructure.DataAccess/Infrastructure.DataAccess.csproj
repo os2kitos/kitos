@@ -11,6 +11,7 @@
     <RootNamespace>Infrastructure.DataAccess</RootNamespace>
     <AssemblyName>Infrastructure.DataAccess</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -27,7 +28,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -63,6 +63,15 @@
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationReadModelMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRightMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRoleAssignmentReadModelMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationRoleMap.cs" />
+    <Compile Include="Mapping\DataProcessingCountryOptionMap.cs" />
+    <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
+    <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
+    <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -599,6 +608,26 @@
     <Compile Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.designer.cs">
       <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.cs" />
+    <Compile Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.designer.cs">
+      <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009212152110_DataProcessingRegistration.cs" />
+    <Compile Include="Migrations\202009212152110_DataProcessingRegistration.designer.cs">
+      <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009280554135_Dpr_Dqa_Processors_And_Concluded.cs" />
+    <Compile Include="Migrations\202009280554135_Dpr_Dqa_Processors_And_Concluded.designer.cs">
+      <DependentUpon>202009280554135_Dpr_Dqa_Processors_And_Concluded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.cs" />
+    <Compile Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.designer.cs">
+      <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202009300439332_DPR_BasisForTransfer.cs" />
+    <Compile Include="Migrations\202009300439332_DPR_BasisForTransfer.designer.cs">
+      <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -977,12 +1006,33 @@
     <EmbeddedResource Include="Migrations\202008051206316_Indexes_And_Remove_Default_Organization_Id.resx">
       <DependentUpon>202008051206316_Indexes_And_Remove_Default_Organization_Id.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009031031093_Local_Admin_Toggle_DataProcessing.resx">
+      <DependentUpon>202009031031093_Local_Admin_Toggle_DataProcessing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009212152110_DataProcessingRegistration.resx">
+      <DependentUpon>202009212152110_DataProcessingRegistration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009280554135_Dpr_Dqa_Processors_And_Concluded.resx">
+      <DependentUpon>202009280554135_Dpr_Dqa_Processors_And_Concluded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009281002528_DPR_Transfer_To_Third_Countries.resx">
+      <DependentUpon>202009281002528_DPR_Transfer_To_Third_Countries.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009300439332_DPR_BasisForTransfer.resx">
+      <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Clear_ArchiveDuty_On_ItSystem.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_Orphaned_AttachedOptions.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\SensitiveDataLevelUpdate.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\EnableDataProcessing.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\AddDefaultDpaTypesToExistingDb.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

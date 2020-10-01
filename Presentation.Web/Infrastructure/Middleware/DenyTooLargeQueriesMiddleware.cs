@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Core.ApplicationServices.Authentication;
+using Core.ApplicationServices.Shared;
 using Microsoft.Owin;
 using Ninject;
 using Serilog;
@@ -12,7 +13,7 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
-        private const int MaxPageSize = 100;
+        private const int MaxPageSize = PagingContraints.MaxPageSize;
 
         public override async Task Invoke(IOwinContext context)
         {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
-using Core.DomainModel.References.DomainEvents;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Reference
@@ -34,7 +33,7 @@ namespace Core.DomainServices.Repositories.Reference
         private readonly IGenericRepository<ItSystem> _systemRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<ItProject> _projectRepository;
-        private readonly IDomainEvents _domainEvents;
+        private readonly IGenericRepository<DataProcessingRegistration> _dataProcessingRegistrationRepository;
 
         public ReferenceRepository(
             IGenericRepository<ExternalReference> referenceRepository,
@@ -42,14 +41,14 @@ namespace Core.DomainServices.Repositories.Reference
             IGenericRepository<ItSystem> systemRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<ItProject> projectRepository,
-            IDomainEvents domainEvents)
+            IGenericRepository<DataProcessingRegistration> dataProcessingRegistrationRepository)
         {
             _referenceRepository = referenceRepository;
             _contractRepository = contractRepository;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
             _projectRepository = projectRepository;
-            _domainEvents = domainEvents;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
         }
 
         public Maybe<ExternalReference> Get(int referenceId)
@@ -65,19 +64,15 @@ namespace Core.DomainServices.Repositories.Reference
         public IQueryable<ExternalReference> GetByRootType(ReferenceRootType rootType)
         {
             var baseQuery = _referenceRepository.AsQueryable();
-            switch (rootType)
+            return rootType switch
             {
-                case ReferenceRootType.System:
-                    return baseQuery.Where(x => x.ItSystem_Id != null);
-                case ReferenceRootType.SystemUsage:
-                    return baseQuery.Where(x => x.ItSystemUsage_Id != null);
-                case ReferenceRootType.Contract:
-                    return baseQuery.Where(x => x.Itcontract_Id != null);
-                case ReferenceRootType.Project:
-                    return baseQuery.Where(x => x.ItProject_Id != null);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type");
-            }
+                ReferenceRootType.System => baseQuery.Where(x => x.ItSystem_Id != null),
+                ReferenceRootType.SystemUsage => baseQuery.Where(x => x.ItSystemUsage_Id != null),
+                ReferenceRootType.Contract => baseQuery.Where(x => x.Itcontract_Id != null),
+                ReferenceRootType.Project => baseQuery.Where(x => x.ItProject_Id != null),
+                ReferenceRootType.DataProcessingRegistration => baseQuery.Where(x => x.DataProcessingRegistration_Id != null),
+                _ => throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type")
+            };
         }
 
         public void SaveRootEntity(IEntityWithExternalReferences root)
@@ -92,19 +87,20 @@ namespace Core.DomainServices.Repositories.Reference
 
         private ReferenceRootRepositoryOperations ResolveRepositoryOperations(ReferenceRootType rootType)
         {
-            switch (rootType)
+            return rootType switch
             {
-                case ReferenceRootType.System:
-                    return new ReferenceRootRepositoryOperations(innerId => _systemRepository.GetByKey(innerId), _systemRepository.Save);
-                case ReferenceRootType.SystemUsage:
-                    return new ReferenceRootRepositoryOperations(innerId => _systemUsageRepository.GetByKey(innerId), _systemUsageRepository.Save);
-                case ReferenceRootType.Contract:
-                    return new ReferenceRootRepositoryOperations(innerId => _contractRepository.GetByKey(innerId), _contractRepository.Save);
-                case ReferenceRootType.Project:
-                    return new ReferenceRootRepositoryOperations(innerId => _projectRepository.GetByKey(innerId), _projectRepository.Save);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type");
-            }
+                ReferenceRootType.System =>
+                    new ReferenceRootRepositoryOperations(innerId => _systemRepository.GetByKey(innerId), _systemRepository.Save),
+                ReferenceRootType.SystemUsage =>
+                    new ReferenceRootRepositoryOperations(innerId => _systemUsageRepository.GetByKey(innerId), _systemUsageRepository.Save),
+                ReferenceRootType.Contract =>
+                    new ReferenceRootRepositoryOperations(innerId => _contractRepository.GetByKey(innerId), _contractRepository.Save),
+                ReferenceRootType.Project =>
+                    new ReferenceRootRepositoryOperations(innerId => _projectRepository.GetByKey(innerId), _projectRepository.Save),
+                ReferenceRootType.DataProcessingRegistration =>
+                    new ReferenceRootRepositoryOperations(innerId => _dataProcessingRegistrationRepository.GetByKey(innerId), _dataProcessingRegistrationRepository.Save),
+                _ => throw new ArgumentOutOfRangeException(nameof(rootType), rootType, "Unknown reference root type")
+            };
         }
 
         public void Delete(ExternalReference reference)
@@ -113,7 +109,6 @@ namespace Core.DomainServices.Repositories.Reference
             {
                 throw new ArgumentNullException(nameof(reference));
             }
-            _domainEvents.Raise(new ExternalReferenceDeleted(reference));
             _referenceRepository.Delete(reference);
             _referenceRepository.Save();
         }

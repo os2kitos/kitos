@@ -18,12 +18,14 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
-using Presentation.Web.Infrastructure.Odata;
 using Presentation.Web.Models;
 using Presentation.Web.Controllers.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
@@ -53,11 +55,8 @@ namespace Presentation.Web
 
             var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: routePrefix, configureAction: (builder => builder
             .AddService(ServiceLifetime.Singleton, sp => GetModel())
-            .AddService(ServiceLifetime.Singleton, sp => new StringAsEnumResolver())
-            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver())
-            .AddService(ServiceLifetime.Singleton, sp => new UnqualifiedODataUriResolver())
-            .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp =>
-                        ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
+            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true})
+            .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp => ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
@@ -187,11 +186,6 @@ namespace Presentation.Web
             removeUserAction.Parameter<int>("orgKey").Required();
             removeUserAction.Parameter<int>("userId").Required();
             removeUserAction.Namespace = orgNameSpace;
-
-            var getAdviceByOrgFunction = organizations.EntityType.Collection.Function("GetByOrganization").ReturnsCollectionFromEntitySet<Advice>("Advice");
-            getAdviceByOrgFunction.Parameter<int>("userId").Required();
-            getAdviceByOrgFunction.ReturnsCollectionFromEntitySet<Advice>(nameof(Controllers.OData.AdviceController).Replace(ControllerSuffix, string.Empty));
-            getAdviceByOrgFunction.Namespace = orgNameSpace;
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace(ControllerSuffix, string.Empty));
             orgUnits.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
@@ -405,15 +399,13 @@ namespace Presentation.Web
             config.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
 
+            var getAdvicesByOrg = builder.Function("GetAdvicesByOrganizationId");
+            getAdvicesByOrg.Parameter<int>("organizationId").Required();
+            getAdvicesByOrg.ReturnsCollectionFromEntitySet<Advice>("Advice");
+
             BindEntitySet<Advice, AdviceController>(builder);
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
-
-            var getAdvicesByObjectId = builder.Function("GetAdvicesByObjectID");
-            getAdvicesByObjectId.Parameter<int>("id");
-            getAdvicesByObjectId.Parameter<int>("type");
-            getAdvicesByObjectId.ReturnsCollectionFromEntitySet<Advice>("Advice");
-
 
             BindEntitySet<GlobalConfig, GlobalConfigsController>(builder);
 
@@ -436,11 +428,32 @@ namespace Presentation.Web
             var itProjectStatusUpdates = BindEntitySet<ItProjectStatusUpdate, ItProjectStatusUpdatesController>(builder);
             itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
 
+            BindDataProcessingRegistrationModule(builder);
 
             return builder.GetEdmModel();
         }
 
-        private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : Entity
+        private static void BindDataProcessingRegistrationModule(ODataConventionModelBuilder builder)
+        {
+            //Read model to provide slim search options
+            BindEntitySet<DataProcessingRegistrationReadModel, DataProcessingRegistrationReadModelsController>(builder);
+
+            //Generic global options
+            BindEntitySet<DataProcessingRegistrationRole, DataProcessingRegistrationRolesController>(builder);
+            BindEntitySet<DataProcessingBasisForTransferOption, DataProcessingBasisForTransferOptionsController>(builder);
+            BindEntitySet<DataProcessingOversightOption, DataProcessingOversightOptionsController>(builder);
+            BindEntitySet<DataProcessingDataResponsibleOption, DataProcessingDataResponsibleOptionsController>(builder);
+            BindEntitySet<DataProcessingCountryOption, DataProcessingCountryOptionsController>(builder);
+
+            //Generic local options
+            BindEntitySet<LocalDataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingOversightOption, LocalDataProcessingOversightOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);
+            BindEntitySet<LocalDataProcessingRegistrationRole, LocalDataProcessingRegistrationRolesController>(builder);
+        }
+
+        private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class, IHasId
         {
             var entitySetConfiguration = BindTypeSet<TEntitySet, TController>(builder);
             entitySetConfiguration.EntityType.HasKey(x => x.Id);

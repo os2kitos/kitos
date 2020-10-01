@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -20,6 +20,7 @@ namespace Presentation.Web.Controllers.OData
             _repository = repository;
         }
 
+        [InternalApi]
         public override IHttpActionResult Patch(int key, Delta<TType> delta)
         {
             if (delta == null)
@@ -76,6 +77,7 @@ namespace Presentation.Web.Controllers.OData
             return base.Patch(key, delta);
         }
 
+        [InternalApi]
         public override IHttpActionResult Post(int organizationId, TType entity)
         {
             if (_repository.AsQueryable().Any())
@@ -90,43 +92,8 @@ namespace Presentation.Web.Controllers.OData
             return base.Post(organizationId, entity);
         }
 
-        public override IHttpActionResult Delete(int key)
-        {
-            var entity = Repository.GetByKey(key);
-            if (entity == null)
-                return NotFound();
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-            if (!AllowDelete(entity))
-            {
-                return Forbidden();
-            }
-
-            var liste = _repository.Get().Where(o => o.Id != key).OrderBy(o => o.Priority);
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            try
-            {
-                int i = 0;
-                foreach (var type in liste)
-                {
-                    type.Priority = i++;
-                }
-                _repository.Save();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Could not reprioritize!");
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
     }
 }

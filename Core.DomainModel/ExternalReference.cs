@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -16,8 +17,12 @@ namespace Core.DomainModel
         ExternalId = 1,
         Url = 2
     }
-    public class ExternalReference : Entity, IProjectModule, ISystemModule, IContractModule
+    public class ExternalReference : Entity, IProjectModule, ISystemModule, IContractModule, IDataProcessingModule
     {
+        public ExternalReference()
+        {
+            BrokenLinkReports = new List<BrokenLinkInExternalReference>();
+        }
 
         public int? ItProject_Id { get; set; }
         public virtual ItProject.ItProject ItProject { get; set; }
@@ -30,6 +35,9 @@ namespace Core.DomainModel
 
         public int? ItSystem_Id { get; set; }
         public virtual ItSystem.ItSystem ItSystem { get; set; }
+
+        public int? DataProcessingRegistration_Id { get; set; }
+        public virtual DataProcessingRegistration DataProcessingRegistration { get; set; }
 
 
         public string Title { get; set; }
@@ -44,6 +52,7 @@ namespace Core.DomainModel
                 ItSystemUsage ??
                 ItContract ??
                 ItProject ??
+                DataProcessingRegistration ??
                 (IEntityWithExternalReferences)ItSystem;
         }
 

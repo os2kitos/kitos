@@ -32,11 +32,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
             setTargetId(body);
 
-            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ExternalReferenceDTO>();
-            }
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ExternalReferenceDTO>();
         }
 
         public static async Task<HttpResponseMessage> DeleteReferenceAsync(int id)

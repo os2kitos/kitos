@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -81,7 +82,7 @@ namespace Presentation.Web.Controllers.API
 
                 var query = Page(systemQuery, paging)
                     .AsEnumerable()
-                    .Select(system=>system.MapToNamedEntityWithEnabledStatusDTO())
+                    .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToList();
 
                 return Ok(query);
@@ -106,7 +107,7 @@ namespace Presentation.Web.Controllers.API
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToList();
 
-                
+
                 return Ok(systems);
             }
             catch (Exception e)
@@ -350,15 +351,25 @@ namespace Presentation.Web.Controllers.API
             // try get name value
             JToken nameToken;
             obj.TryGetValue("name", out nameToken);
+            var namechange = false;
             if (nameToken != null)
             {
                 string name = nameToken.Value<string>();
+                namechange = name != itSystem.Name;
                 var system = Repository.Get(x => x.Name == name && x.OrganizationId == organizationId && x.Id != id);
                 if (system.Any())
                     return Conflict("Name is already taken!");
+
             }
 
-            return base.Patch(id, organizationId, obj);
+            var httpResponseMessage = base.Patch(id, organizationId, obj);
+
+            if (httpResponseMessage.IsSuccessStatusCode && namechange)
+            {
+                DomainEvents.Raise(new NamedEntityChangedNameEvent<ItSystem>(itSystem));
+            }
+
+            return httpResponseMessage;
         }
 
         [SwaggerResponse(HttpStatusCode.OK)]

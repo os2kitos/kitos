@@ -5,6 +5,5 @@ namespace Core.DomainModel
     public interface IHasReferences
     {
        ICollection<ExternalReference>  ExternalReferences { get; set; }
-        
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
+using Core.BackgroundJobs.Model.ReadModels;
 using Core.DomainModel.Result;
 using Infrastructure.Services.BackgroundJobs;
 using Serilog;
@@ -14,35 +16,51 @@ namespace Core.BackgroundJobs.Services
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
         private readonly PurgeOrphanedAdviceBackgroundJob _purgeOrphanedAdviceBackgroundJob;
+        private readonly RebuildDataProcessingRegistrationReadModelsBatchJob _rebuildDataProcessingRegistrationReadModels;
+        private readonly ScheduleDataProcessingRegistrationReadModelUpdates _scheduleDataProcessingRegistrationReadModelUpdates;
 
         public BackgroundJobLauncher(
             ILogger logger,
             CheckExternalLinksBackgroundJob checkExternalLinksJob,
-            PurgeOrphanedAdviceBackgroundJob purgeOrphanedAdviceBackgroundJob)
+            PurgeOrphanedAdviceBackgroundJob purgeOrphanedAdviceBackgroundJob,
+            RebuildDataProcessingRegistrationReadModelsBatchJob rebuildDataProcessingRegistrationReadModels,
+            ScheduleDataProcessingRegistrationReadModelUpdates scheduleDataProcessingRegistrationReadModelUpdates)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
-            _purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
+            _rebuildDataProcessingRegistrationReadModels = rebuildDataProcessingRegistrationReadModels;
+            _scheduleDataProcessingRegistrationReadModelUpdates = scheduleDataProcessingRegistrationReadModelUpdates;
+			_purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
         }
 
-        public async Task LaunchLinkCheckAsync()
+        public async Task LaunchLinkCheckAsync(CancellationToken token = default)
         {
-            await Launch(_checkExternalLinksJob);
+            await Launch(_checkExternalLinksJob, token);
         }
 
         public async Task LaunchAdviceCleanupAsync()
         {
             await Launch(_purgeOrphanedAdviceBackgroundJob);
         }
+		
+		public async Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default)
+        {
+            await Launch(_rebuildDataProcessingRegistrationReadModels, token);
+        }
 
-        private async Task Launch(IAsyncBackgroundJob job)
+        public async Task LaunchScheduleDataProcessingRegistrationReadUpdates(CancellationToken token = default)
+        {
+            await Launch(_scheduleDataProcessingRegistrationReadModelUpdates, token);
+        }
+
+        private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
         {
             var jobId = job.Id;
 
             LogJobStarted(jobId);
             try
             {
-                var result = await job.ExecuteAsync();
+                var result = await job.ExecuteAsync(token);
                 LogJobResult(jobId, result);
             }
             catch (Exception e)

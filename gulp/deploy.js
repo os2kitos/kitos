@@ -1,6 +1,6 @@
 "use strict";
 
-const { src, dest, series, parallel} = require("gulp");
+const { src, dest, series, parallel } = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var del = require("del");
@@ -16,7 +16,13 @@ var tsProject = ts.createProject("tsconfig.json");
 
 //Synchronously delete the output script file(s)
 const cleanJsAndMaps = function (callBack) {
-    return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
+    return del
+    (
+        [
+            paths.typescriptOutput,
+            paths.appMaps
+        ].concat(paths.allJavaScriptNoTests)
+    );
 };
 
 // create css bundled file
@@ -117,14 +123,14 @@ const tinyMCEFonts = function (callBack) {
 
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
-    .pipe(dest(paths.sourceScript + "/skins/lightgray"))
-    .pipe(rename("skin.min.css"))
-    .pipe(dest(paths.sourceScript + "/skins/lightgray"));
+        .pipe(dest(paths.sourceScript + "/skins/lightgray"))
+        .pipe(rename("skin.min.css"))
+        .pipe(dest(paths.sourceScript + "/skins/lightgray"));
 };
 
 const tinyMCEFixLang = function (callBack) {
     return file("da.js", "//Dummy file from gulp", { src: true })
-    .pipe(dest(paths.sourceScript + "/langs"));
+        .pipe(dest(paths.sourceScript + "/langs"));
 };
 
 // bundle, minify and copy styles, fonts and assets

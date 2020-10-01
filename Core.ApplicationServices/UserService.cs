@@ -10,6 +10,7 @@ using Core.DomainServices;
 using System.Security.Cryptography;
 using Core.ApplicationServices.Authorization;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices
 {
@@ -26,6 +27,7 @@ namespace Core.ApplicationServices
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
         private static readonly RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
@@ -39,7 +41,8 @@ namespace Core.ApplicationServices
             IGenericRepository<PasswordResetRequest> passwordResetRequestRepository,
             IMailClient mailClient,
             ICryptoService cryptoService,
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext,
+            IDomainEvents domainEvents)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -52,6 +55,7 @@ namespace Core.ApplicationServices
             _mailClient = mailClient;
             _cryptoService = cryptoService;
             _authorizationContext = authorizationContext;
+            _domainEvents = domainEvents;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -76,7 +80,10 @@ namespace Core.ApplicationServices
 
             _userRepository.Insert(user);
             _userRepository.Save();
+            
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
+
+            _domainEvents.Raise(new EntityDeletedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
                 IssueAdvisMail(savedUser, false, orgId);

@@ -5,6 +5,7 @@ import WaitTimers = require("../Utility/WaitTimers");
 class Login {
     public logout() {
         var navigationBarHelper = new LoginPage().navigationBarHelper;
+        navigationBarHelper.dropDownExpand();
         return navigationBarHelper.logout();
     }
 
