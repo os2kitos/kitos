@@ -9,8 +9,7 @@
                 rows: "@",
                 model: "=ngModel",
                 disabled: "=ngDisabled",
-                required: "@",
             }
         })
     ]);
-})(angular, app); 
+})(angular, app);

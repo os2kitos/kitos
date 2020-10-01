@@ -488,6 +488,39 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/oversight-interval")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightOption(int id, [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
+        {
+            if (oversightInterval == null)
+                return BadRequest(nameof(oversightInterval) + " must provided");
+            
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightInterval(id, oversightInterval.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-interval-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightIntervalRemark(int id, [FromBody] SingleValueDTO<string> oversightIntervalRemark)
+        {
+            if (oversightIntervalRemark == null)
+                return BadRequest(nameof(oversightIntervalRemark) +" must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightIntervalRemark(id, oversightIntervalRemark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         [HttpGet]
         [Route("available-options-in/{organizationId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
@@ -648,6 +681,11 @@ namespace Presentation.Web.Controllers.API
                     .GetAssignedSystems()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
+                OversightInterval = new ValueWithOptionalRemarkDTO<YearMonthIntervalOption?>()
+                {
+                    Value = value.OversightInterval,
+                    Remark = value.OversightIntervalRemark
+                },
                 DataProcessors = value
                     .DataProcessors
                     .Select(x => x.MapToShallowOrganizationDTO())

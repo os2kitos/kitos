@@ -48,6 +48,8 @@ namespace Core.DomainModel.GDPR.Read
 
         public string BasisForTransfer { get; set; }
 
+        public YearMonthIntervalOption? OversightInterval { get; set; }
+
         public string DataResponsible { get; set; }
     }
 }

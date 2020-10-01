@@ -52,6 +52,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_DRP_BasisForTransfer", 0);
 
+            Property(x => x.OversightInterval)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_OversightInterval", 0);
+
+
             Property(x => x.DataResponsible)
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
                 .IsOptional()

@@ -18,6 +18,7 @@
         insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
         basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
         dataResponsible: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
+        oversightInterval: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

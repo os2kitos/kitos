@@ -38,8 +38,7 @@ describe("Data processing registration it-systems test", () => {
         () => {
             const dpaName = createName(3);
 
-            dpaHelper.createDataProcessingRegistration(dpaName)
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(dpaName))
+            dpaHelper.createAndOpenDataProcessingRegistration(dpaName)
                 .then(() => dpaHelper.goToItSystems())
                 .then(() => dpaHelper.assignSystem(system1))
                 .then(() => dpaHelper.assignSystem(system2))

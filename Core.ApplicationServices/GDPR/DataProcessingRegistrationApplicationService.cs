@@ -344,6 +344,29 @@ namespace Core.ApplicationServices.GDPR
 
         }
 
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+                {
+                    registration.OversightInterval = oversightInterval;
+                    return registration;
+                });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark)
+        {
+            if (remark == null)
+            {
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.OversightIntervalRemark = remark;
+                return registration;
+            });
+        }
         public Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId)
         {
             return Modify(id, registration => _dataResponsibleAssigmentService.Assign(registration, dataResponsibleId));

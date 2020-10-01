@@ -58,6 +58,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
+            var agreementConcludedAt = A<DateTime>();
+            var oversightInterval = A<YearMonthIntervalOption>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
@@ -68,6 +70,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, role.Id);
             var user = availableUsers.First();
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
+                oversightInterval);
+
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -127,6 +132,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refName, readModel.MainReferenceTitle);
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
+            Assert.Equal(oversightInterval, readModel.OversightInterval);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);

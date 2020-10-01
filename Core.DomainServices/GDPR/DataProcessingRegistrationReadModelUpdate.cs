@@ -33,6 +33,7 @@ namespace Core.DomainServices.GDPR
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
+            PatchOversightInterval(source,destination);
             PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
@@ -125,6 +126,12 @@ namespace Core.DomainServices.GDPR
             }
 
             _roleAssignmentRepository.Save();
+        }
+
+        private void PatchOversightInterval(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            destination.OversightInterval = source.OversightInterval;
         }
 
         private void RemoveAssignments(DataProcessingRegistrationReadModel destination, List<DataProcessingRegistrationRoleAssignmentReadModel> assignmentsToBeRemoved)

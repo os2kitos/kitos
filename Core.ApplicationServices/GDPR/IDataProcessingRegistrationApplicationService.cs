@@ -28,6 +28,8 @@ namespace Core.ApplicationServices.GDPR
         Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<ItSystem, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystem, OperationError> RemoveSystem(int id, int systemId);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark);
         Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
         Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId);
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);

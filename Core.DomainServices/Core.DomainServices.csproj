@@ -113,6 +113,8 @@
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\Advice\IAdviceRepository.cs" />
+    <Compile Include="Repositories\Advice\AdviceRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />

@@ -869,6 +869,62 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Can_Update_OversightInterval()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightInterval = A<YearMonthIntervalOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration,true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateOversightInterval(id, oversightInterval);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(oversightInterval,result.Value.OversightInterval);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration),Times.Once);
+        }
+
+        [Fact]
+        public void Update_OversightInterval_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightInterval(id, A<YearMonthIntervalOption>()));
+        }
+
+        [Fact]
+        public void Can_Update_OversightIntervalRemark()
+        {
+            //Arrange
+            var id = A<int>();
+            var oversightIntervalRemark = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateOversightIntervalRemark(id, oversightIntervalRemark);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(oversightIntervalRemark, result.Value.OversightIntervalRemark);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_OversightIntervalRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightIntervalRemark(id, A<string>()));
+        }
+
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();

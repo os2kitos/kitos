@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Data_Responsible : IMigrationMetadata
+    public sealed partial class Added_Agreement_Oversight_Interval_Option_And_Remark : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Data_Responsible));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Agreement_Oversight_Interval_Option_And_Remark));
         
         string IMigrationMetadata.Id
         {
-            get { return "202009301801560_Added_Data_Responsible"; }
+            get { return "202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark"; }
         }
         
         string IMigrationMetadata.Source

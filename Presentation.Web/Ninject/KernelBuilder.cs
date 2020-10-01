@@ -21,6 +21,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
@@ -40,6 +41,7 @@ using Core.DomainServices.Context;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Model;
 using Core.DomainServices.Model.EventHandlers;
+using Core.DomainServices.Repositories.Advice;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
@@ -304,6 +306,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
+            kernel.Bind<IAdviceRepository>().To<AdviceRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationRepository>().To<DataProcessingRegistrationRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelRepository>().To<DataProcessingRegistrationReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
@@ -370,6 +373,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleDataProcessingRegistrationReadModelUpdates>().ToSelf().InCommandScope(Mode);
         }

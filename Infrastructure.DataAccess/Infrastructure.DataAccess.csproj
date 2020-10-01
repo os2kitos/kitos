@@ -628,9 +628,13 @@
     <Compile Include="Migrations\202009300439332_DPR_BasisForTransfer.designer.cs">
       <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202009301801560_Added_Data_Responsible.cs" />
-    <Compile Include="Migrations\202009301801560_Added_Data_Responsible.designer.cs">
-      <DependentUpon>202009301801560_Added_Data_Responsible.cs</DependentUpon>
+    <Compile Include="Migrations\202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.cs" />
+    <Compile Include="Migrations\202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.designer.cs">
+      <DependentUpon>202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010011354026_Added_Data_Responsible.cs" />
+    <Compile Include="Migrations\202010011354026_Added_Data_Responsible.designer.cs">
+      <DependentUpon>202010011354026_Added_Data_Responsible.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1025,8 +1029,11 @@
     <EmbeddedResource Include="Migrations\202009300439332_DPR_BasisForTransfer.resx">
       <DependentUpon>202009300439332_DPR_BasisForTransfer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202009301801560_Added_Data_Responsible.resx">
-      <DependentUpon>202009301801560_Added_Data_Responsible.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.resx">
+      <DependentUpon>202010010743097_Added_Agreement_Oversight_Interval_Option_And_Remark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010011354026_Added_Data_Responsible.resx">
+      <DependentUpon>202010011354026_Added_Data_Responsible.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

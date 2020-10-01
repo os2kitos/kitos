@@ -354,6 +354,7 @@
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
@@ -459,6 +460,7 @@
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference.controller.ts" />
@@ -488,6 +490,7 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
@@ -501,6 +504,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\DateSelectionViewModel.ts" />
@@ -543,6 +547,7 @@
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
+    <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
@@ -816,6 +821,7 @@
     <TypeScriptCompile Include="Tests\data-processing\data-processing-registration.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.it-systems.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.main.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.oversight.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
@@ -856,6 +862,7 @@
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-registration.overview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.main.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.oversight.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.reference.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
