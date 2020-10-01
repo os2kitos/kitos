@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Core.BackgroundJobs.Model;
+using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.DomainModel.Result;
 using Infrastructure.Services.BackgroundJobs;
@@ -12,18 +13,26 @@ namespace Core.BackgroundJobs.Services
     {
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
+        private readonly PurgeOrphanedAdviceBackgroundJob _purgeOrphanedAdviceBackgroundJob;
 
         public BackgroundJobLauncher(
             ILogger logger,
-            CheckExternalLinksBackgroundJob checkExternalLinksJob)
+            CheckExternalLinksBackgroundJob checkExternalLinksJob,
+            PurgeOrphanedAdviceBackgroundJob purgeOrphanedAdviceBackgroundJob)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
+            _purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
         }
 
         public async Task LaunchLinkCheckAsync()
         {
             await Launch(_checkExternalLinksJob);
+        }
+
+        public async Task LaunchAdviceCleanupAsync()
+        {
+            await Launch(_purgeOrphanedAdviceBackgroundJob);
         }
 
         private async Task Launch(IAsyncBackgroundJob job)

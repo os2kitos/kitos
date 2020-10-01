@@ -87,6 +87,8 @@
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\Advice\IAdviceRepository.cs" />
+    <Compile Include="Repositories\Advice\AdviceRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
@@ -156,6 +158,7 @@
       <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>
