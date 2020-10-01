@@ -27,7 +27,7 @@
         updateIsAgreementConcluded(dataProcessingRegistrationId: number, yesNoIrrelevantId: Models.Api.Shared.YesNoIrrelevantOption);
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateTime: string);
         updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption);
-        updateOversightIntervalRemark(dataProcessingRegistrationId: number, note: string);
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string);
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -277,8 +277,8 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval"), oversightInterval );
         }
 
-        updateOversightIntervalRemark(dataProcessingRegistrationId: number, note: string) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval-remark"), note);
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval-remark"), remark);
         }
 
         static $inject = ["$http"];

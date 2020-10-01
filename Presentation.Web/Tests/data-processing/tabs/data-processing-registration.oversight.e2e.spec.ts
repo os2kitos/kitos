@@ -37,8 +37,8 @@ describe("Data processing registration oversight detail tests", () => {
     it("Is able to set oversight data",
         () => {
             var name = createName();
-            var dropdownInterval = "Hver andet år";
             var intervalRemark = createRemark();
+            const dropdownInterval = "Hver andet år";
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => pageObject.getOversightPage())
@@ -54,7 +54,7 @@ describe("Data processing registration oversight detail tests", () => {
     }
 
     function verifyOversightIntervalRemark(expectedValue: string) {
-        console.log(`Expecting oversight interval note to be set to: ${expectedValue}`);
+        console.log(`Expecting oversight interval remark to be set to: ${expectedValue}`);
         expect(pageObject.getOversightIntervalOptionRemark().getAttribute("value")).toEqual(expectedValue);
     }
 
