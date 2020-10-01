@@ -92,6 +92,7 @@
     <Compile Include="Options\ISingleOptionTypeInstanceAssignmentService.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\IMultipleOptionTypeInstancesAssignmentService.cs" />
+    <Compile Include="Model\Options\OptionDescriptor.cs" />
     <Compile Include="Options\SingleOptionTypeInstanceAssignmentServiceBase.cs" />
     <Compile Include="Options\OptionsService.cs" />
     <Compile Include="Options\MultipleOptionTypeInstancesAssignmentServiceBase.cs" />
@@ -189,9 +190,7 @@
       <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\Options\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>

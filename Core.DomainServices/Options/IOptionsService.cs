@@ -33,17 +33,4 @@ namespace Core.DomainServices.Options
         /// <returns></returns>
         Maybe<(TOption option, bool available)> GetOption(int organizationId, int optionId);
     }
-
-    //TODO: Why is it still here?
-    public class OptionDescriptor<TOption>
-    {
-        public TOption Option { get; }
-        public string Description { get; }
-
-        public OptionDescriptor(TOption option, string description)
-        {
-            Option = option;
-            Description = description;
-        }
-    }
 }

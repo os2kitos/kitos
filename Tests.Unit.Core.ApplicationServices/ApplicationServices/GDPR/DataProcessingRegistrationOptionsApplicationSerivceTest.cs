@@ -45,6 +45,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 new OptionDescriptor<DataProcessingCountryOption>(new DataProcessingCountryOption(), ""),
             };
             ExpectCountryOptions(organizationId, countryOptions);
+            var basisForTransferOptions = new List<OptionDescriptor<DataProcessingBasisForTransferOption>>()
+            {
+                new OptionDescriptor<DataProcessingBasisForTransferOption>(new DataProcessingBasisForTransferOption(), ""),
+            };
+            ExpectBasisForTransferOptions(organizationId, basisForTransferOptions);
 
             //Act
             var assignableOptionsResult = _sut.GetAssignableDataProcessingRegistrationOptions(organizationId);
@@ -54,6 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var dataProcessingRegistrationOptions = assignableOptionsResult.Value;
             Assert.Equal(dataResponsibleOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationDataResponsibleOptions);
             Assert.Equal(countryOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationCountryOptions);
+            Assert.Equal(basisForTransferOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationBasisForTransferOptions);
         }
 
         [Fact]
@@ -83,6 +89,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectCountryOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingCountryOption>> countryOptions)
         {
             _optionRepositoryMock.Setup(x => x.GetAvailableCountryOptions(organizationId)).Returns(countryOptions);
+        }
+
+        private void ExpectBasisForTransferOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> basisForTransferOptions)
+        {
+            _optionRepositoryMock.Setup(x => x.GetAvailableBasisForTransferOptions(organizationId)).Returns(basisForTransferOptions);
         }
 
     }
