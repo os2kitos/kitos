@@ -1,6 +1,5 @@
 ﻿namespace Core.DomainServices.Options
 {
-    //TODO: Why is it still here?
     public class OptionDescriptor<TOption>
     {
         public TOption Option { get; }
