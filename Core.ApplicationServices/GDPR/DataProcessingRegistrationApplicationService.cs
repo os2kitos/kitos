@@ -339,6 +339,29 @@ namespace Core.ApplicationServices.GDPR
 
         }
 
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+                {
+                    registration.OversightInterval = oversightInterval;
+                    return registration;
+                });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark)
+        {
+            if (remark == null)
+            {
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.OversightIntervalRemark = remark;
+                return registration;
+            });
+        }
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);

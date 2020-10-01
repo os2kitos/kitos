@@ -6,8 +6,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Core.DomainModel.Organization;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -82,8 +82,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name)
-                .ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
 
             //Act
             using var deleteResponse = await DataProcessingRegistrationHelper.SendDeleteRequestAsync(dto.Id);
@@ -314,8 +313,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), Display.Url, r => r.DataProcessingRegistration_Id = registration.Id);
 
             //Act - check its possible to set a reference as master in a data processing registration
-            using var setMasterResponse =
-                await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, reference.Id);
+            using var setMasterResponse = await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, reference.Id);
 
             //Assert response
             Assert.Equal(HttpStatusCode.OK, setMasterResponse.StatusCode);
@@ -328,8 +326,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act - check its not possible to set a reference as master in a data processing registration with a invalid reference id
-            using var setMasterResponse =
-                await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, A<int>());
+            using var setMasterResponse = await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, A<int>());
 
             //Assert response
             Assert.Equal(HttpStatusCode.BadRequest, setMasterResponse.StatusCode);
@@ -357,7 +354,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(2, dtos.Count);
-            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { system1.Id, system1.Name }, new { system2.Id, system2.Name } });
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] {new {system1.Id, system1.Name}, new {system2.Id, system2.Name}});
         }
 
         [Fact]
@@ -392,6 +389,40 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveResponse.StatusCode);
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.ItSystems);
+        }
+
+        [Fact]
+        public async Task Can_Change_Oversight_Option()
+        {
+            //Arrange
+            var name = A<string>();
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
+            var oversightInterval = A<YearMonthIntervalOption>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(dprDTO.Id, oversightInterval);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
+            Assert.Equal(dto.OversightInterval.Value.Value, oversightInterval);
+        }
+
+        [Fact]
+        public async Task Can_Change_Oversight_Option_Remark()
+        {
+            //Arrange
+            var name = A<string>();
+            var dprDTO = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
+            var oversightRemark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRemarkRequestAsync(dprDTO.Id, oversightRemark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
+            Assert.Equal(dto.OversightInterval.Remark, oversightRemark);
         }
 
         [Fact]

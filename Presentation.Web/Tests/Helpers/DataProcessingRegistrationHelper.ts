@@ -91,6 +91,14 @@ class DataProcessingRegistrationHelper {
         });
     }
 
+    public static createAndOpenDataProcessingRegistration(name: string) {
+        console.log(`Creating registration and navigating to ${name}`);
+        return DataProcessingRegistrationHelper.createDataProcessingRegistration(name)
+            .then(() => this.pageObject.findSpecificDpaInNameColumn(name))
+            .then(() => DataProcessingRegistrationHelper.goToSpecificDataProcessingRegistration(name));
+    }
+
+
     public static assignDataProcessor(name: string) {
         console.log("Assigning data processor with name: " + name);
         return Select2Helper.searchFor(name, "s2id_data-processor_select-new_config")
@@ -163,6 +171,11 @@ class DataProcessingRegistrationHelper {
     public static changeAgreementConcludedAt(changeToDate: string) {
         console.log("Changing AgreementConcludedAt to date: " + changeToDate);
         return this.editMainPo.getAgreementConcludedAtDateField().sendKeys(changeToDate);
+    }
+
+    public static changeOversightInterval(changeToInterval: string) {
+        console.log(`Changing Oversight Interval to ${changeToInterval}`);
+        return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval_config");
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

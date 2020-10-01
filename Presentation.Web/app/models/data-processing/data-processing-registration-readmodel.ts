@@ -20,5 +20,6 @@
         AgreementConcludedAt?: Date;
         TransferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
         BasisForTransfer?: string;
+        OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
     }
 }

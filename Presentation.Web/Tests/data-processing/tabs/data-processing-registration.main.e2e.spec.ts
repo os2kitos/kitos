@@ -8,7 +8,7 @@ import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingR
 import GetDateHelper = require("../../Helpers/GetDateHelper");
 import Select2Helper = require("../../Helpers/Select2Helper");
 
-describe("Data processing agreement main detail tests", () => {
+describe("Data processing registration main detail tests", () => {
 
     const loginHelper = new Login();
     const pageObjectOverview = new DataProcessingRegistrationOverviewPageObject();
@@ -46,10 +46,8 @@ describe("Data processing agreement main detail tests", () => {
             const thirdCountryName = "Danmark";
             const basisForTransfer = "Andet";
 
-            dpaHelper.createDataProcessingRegistration(name)
+            dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
-                .then(() => pageObjectOverview.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
                 .then(() => renameNameAndVerify(renameValue))
                 //Changing IsAgreementConcluded and AgreementConcludedAt
                 .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))

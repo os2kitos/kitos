@@ -26,6 +26,8 @@
         assignInsecureThirdCountry(dataProcessingRegistrationId: number, countryId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         assignBasisForTransfer(dataProcessingRegistrationId: number, basisForTransferId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         clearBasisForTransfer(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval: Models.Api.Shared.YearMonthUndecidedIntervalOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -277,6 +279,14 @@
 
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateString: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
+        }
+
+        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval"), oversightInterval );
+        }
+
+        updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval-remark"), remark);
         }
 
         static $inject = ["$http"];

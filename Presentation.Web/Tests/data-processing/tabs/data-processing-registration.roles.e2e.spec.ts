@@ -38,9 +38,7 @@ describe("Data processing agreement main detail tests", () => {
         () => {
             var name = createName();
 
-            dpaHelper.createDataProcessingRegistration(name)
-                .then(() => pageObject.findSpecificDpaInNameColumn(name))
-                .then(() => dpaHelper.goToSpecificDataProcessingRegistration(name))
+            dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => dpaHelper.goToRoles())
                 .then(() => dpaHelper.assignRole(roleName1, apiUserSearchPhrase))
                 .then(() => dpaHelper.assignRole(roleName2, localAdminSearchPhrase))

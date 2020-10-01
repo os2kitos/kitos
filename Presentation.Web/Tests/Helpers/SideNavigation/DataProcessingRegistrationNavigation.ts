@@ -11,6 +11,10 @@ class DataProcessingRegistrationNavigation {
     public static referencePage() {
         return DataProcessingRegistrationNavigation.navigation.goToSubMenuElement(DataProcessingRegistrationNavigationSrefs.referencePageSref);
     }
+
+    public static oversightPage() {
+        return DataProcessingRegistrationNavigation.navigation.goToSubMenuElement(DataProcessingRegistrationNavigationSrefs.oversightPageSref);
+    }
 }
 
 export = DataProcessingRegistrationNavigation;
@@ -18,4 +22,5 @@ export = DataProcessingRegistrationNavigation;
 class DataProcessingRegistrationNavigationSrefs {
     static mainPageSref = "data-processing.edit-registration.main";
     static referencePageSref = "data-processing.edit-registration.reference";
+    static oversightPageSref = "data-processing.edit-registration.oversight";
 }

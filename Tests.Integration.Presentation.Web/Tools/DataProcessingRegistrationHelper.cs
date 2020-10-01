@@ -78,6 +78,25 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/master-reference"), cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionRequestAsync(int id, YearMonthIntervalOption? oversightInterval, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<YearMonthIntervalOption?> {Value = oversightInterval };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-interval"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendChangeOversightIntervalOptionRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = remark };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-interval-remark"), cookie, body);
+
+        }
+
         public static async Task<HttpResponseMessage> SendCanCreateRequestAsync(int organizationId, string name, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
