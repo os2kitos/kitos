@@ -43,5 +43,8 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId);
         Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
+        Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
+        Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate);
+        Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompletedRemark(int id, string note);
     }
 }

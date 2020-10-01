@@ -281,5 +281,11 @@ namespace Core.DomainModel.GDPR
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public string OversightIntervalRemark { get; set; }
+
+        public YesNoUndecidedOption? IsOversightCompleted { get; set; }
+
+        public DateTime? LatestOversightDate { get; set; }
+
+        public string IsOversightCompletedRemark { get; set; }
     }
 }

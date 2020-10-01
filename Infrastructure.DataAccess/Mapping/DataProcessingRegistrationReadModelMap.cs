@@ -56,6 +56,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_OversightInterval", 0);
 
+            Property(x => x.IsOversightCompleted)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_IsOversightCompleted", 0);
+
         }
     }
 }

@@ -646,5 +646,50 @@ namespace Tests.Integration.Presentation.Web.GDPR
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Null(dto.BasisForTransfer);
         }
+
+        [Fact]
+        public async Task Can_Change_IsOversightCompleted()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var yesNoUndecidedOption = A<YesNoUndecidedOption>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, yesNoUndecidedOption);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_LatestOversightDate()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var date = A<DateTime>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registrationDto.Id, date);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Change_IsOversightCompleted_Remark()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeUpdateIsOversightCompletedRemarkRequestAsync(registrationDto.Id, remark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
     }
 }

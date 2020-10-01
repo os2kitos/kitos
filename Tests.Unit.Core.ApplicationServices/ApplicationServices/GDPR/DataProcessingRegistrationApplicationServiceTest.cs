@@ -1158,6 +1158,90 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearBasisForTransfer(id));
         }
 
+        [Fact]
+        public void Can_Update_IsOversightCompleted()
+        {
+            //Arrange
+            var id = A<int>();
+            var isOversightCompleted = A<YesNoUndecidedOption>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateIsOversightCompleted(id, isOversightCompleted);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(isOversightCompleted, result.Value.IsOversightCompleted);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_IsOversightCompleted_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Can_Update_LatestOversightDate()
+        {
+            //Arrange
+            var id = A<int>();
+            var latestOversightDate = A<DateTime>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateLatestOversightDate(id, latestOversightDate);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(latestOversightDate, result.Value.LatestOversightDate);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_LatestOversightDate_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Can_Update_IsOversightCompletedRemark()
+        {
+            //Arrange
+            var id = A<int>();
+            var isOversightCompletedRemark = A<string>();
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateIsOversightCompletedRemark(id, isOversightCompletedRemark);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(isOversightCompletedRemark, result.Value.IsOversightCompletedRemark);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompletedRemark(id, A<string>()));
+        }
+
         /// <summary>
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>

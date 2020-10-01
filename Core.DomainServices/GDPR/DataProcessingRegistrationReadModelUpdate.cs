@@ -35,6 +35,8 @@ namespace Core.DomainServices.GDPR
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchBasisForTransfer(source, destination);
+            PatchIsOversightCompleted(source, destination);
+            PatchLatestOversightDate(source, destination);
         }
 
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -151,6 +153,16 @@ namespace Core.DomainServices.GDPR
                 destination.RoleAssignments.Remove(assignmentToBeRemoved);
                 _roleAssignmentRepository.Delete(assignmentToBeRemoved);
             });
+        }
+
+        private static void PatchIsOversightCompleted(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.IsOversightCompleted = source.IsOversightCompleted;
+        }
+
+        private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.LatestOversightDate = source.LatestOversightDate;
         }
     }
 }

@@ -518,6 +518,54 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/is-oversight-completed")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchIsOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        {
+            if (completed == null)
+                return BadRequest("concluded must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsOversightCompleted(id, completed.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/latest-oversight-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchLatestOversightDate(int id, [FromBody] SingleValueDTO<DateTime?> latestDate)
+        {
+            if (latestDate == null)
+                return BadRequest("concludedAt must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateLatestOversightDate(id, latestDate.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/is-oversight-completed-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchIsOversightCompletedNote(int id, [FromBody] SingleValueDTO<string> isOversightCompletedNote)
+        {
+            if (isOversightCompletedNote == null)
+                return BadRequest(nameof(isOversightCompletedNote) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsOversightCompletedRemark(id, isOversightCompletedNote.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
