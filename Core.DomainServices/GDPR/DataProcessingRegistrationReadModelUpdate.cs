@@ -40,30 +40,6 @@ namespace Core.DomainServices.GDPR
             PatchBasisForTransfer(source, destination);
         }
 
-        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
-        {
-            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
-        }
-
-        private string GetNameOfOption<TOption>(
-            DataProcessingRegistration parent,
-            TOption optionEntity,
-            IOptionsService<DataProcessingRegistration, TOption> service)
-            where TOption : OptionEntity<DataProcessingRegistration>
-        {
-            if (optionEntity != null)
-            {
-                var available = service
-                    .GetOption(parent.OrganizationId, optionEntity.Id)
-                    .Select(x => x.available)
-                    .GetValueOrFallback(false);
-
-                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
-            }
-
-            return null;
-        }
-
         private static void PatchBasicInformation(DataProcessingRegistration source,
             DataProcessingRegistrationReadModel destination)
         {
@@ -72,13 +48,15 @@ namespace Core.DomainServices.GDPR
             destination.Name = source.Name;
         }
 
+        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
+        }
+
         private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
         }
-
-      
-
 
         private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
@@ -156,6 +134,25 @@ namespace Core.DomainServices.GDPR
                 destination.RoleAssignments.Remove(assignmentToBeRemoved);
                 _roleAssignmentRepository.Delete(assignmentToBeRemoved);
             });
+        }
+
+        private string GetNameOfOption<TOption>(
+            DataProcessingRegistration parent,
+            TOption optionEntity,
+            IOptionsService<DataProcessingRegistration, TOption> service)
+            where TOption : OptionEntity<DataProcessingRegistration>
+        {
+            if (optionEntity != null)
+            {
+                var available = service
+                    .GetOption(parent.OrganizationId, optionEntity.Id)
+                    .Select(x => x.available)
+                    .GetValueOrFallback(false);
+
+                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
+            }
+
+            return null;
         }
     }
 }
