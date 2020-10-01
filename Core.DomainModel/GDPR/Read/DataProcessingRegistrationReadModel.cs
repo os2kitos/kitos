@@ -51,7 +51,5 @@ namespace Core.DomainModel.GDPR.Read
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
-
-        public DateTime? LatestOversightDate { get; set; }
     }
 }

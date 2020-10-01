@@ -527,7 +527,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchIsOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
         {
             if (completed == null)
-                return BadRequest("concluded must be provided");
+                return BadRequest(nameof(completed) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
@@ -543,7 +543,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchLatestOversightDate(int id, [FromBody] SingleValueDTO<DateTime?> latestDate)
         {
             if (latestDate == null)
-                return BadRequest("concludedAt must be provided");
+                return BadRequest(nameof(latestDate) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateLatestOversightDate(id, latestDate.Value)
@@ -556,13 +556,13 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsOversightCompletedNote(int id, [FromBody] SingleValueDTO<string> isOversightCompletedNote)
+        public HttpResponseMessage PatchIsOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> isOversightCompletedRemark)
         {
-            if (isOversightCompletedNote == null)
-                return BadRequest(nameof(isOversightCompletedNote) + " must be provided");
+            if (isOversightCompletedRemark == null)
+                return BadRequest(nameof(isOversightCompletedRemark) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateIsOversightCompletedRemark(id, isOversightCompletedNote.Value)
+                .UpdateIsOversightCompletedRemark(id, isOversightCompletedRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

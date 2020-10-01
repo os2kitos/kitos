@@ -36,7 +36,6 @@ namespace Core.DomainServices.GDPR
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchBasisForTransfer(source, destination);
             PatchIsOversightCompleted(source, destination);
-            PatchLatestOversightDate(source, destination);
         }
 
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -158,11 +157,6 @@ namespace Core.DomainServices.GDPR
         private static void PatchIsOversightCompleted(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.IsOversightCompleted = source.IsOversightCompleted;
-        }
-
-        private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
-        {
-            destination.LatestOversightDate = source.LatestOversightDate;
         }
     }
 }

@@ -45,6 +45,6 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
         Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate);
-        Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompletedRemark(int id, string note);
+        Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompletedRemark(int id, string remark);
     }
 }
