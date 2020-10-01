@@ -9,7 +9,6 @@
                 rows: "@",
                 model: "=ngModel",
                 disabled: "=ngDisabled",
-                required: "@",
             }
         })
     ]);
