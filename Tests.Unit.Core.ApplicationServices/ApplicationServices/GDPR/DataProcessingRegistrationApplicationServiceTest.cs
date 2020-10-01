@@ -1187,6 +1187,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Update_IsOversightCompleted_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
         public void Can_Update_LatestOversightDate()
         {
             //Arrange
@@ -1215,6 +1221,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Update_LatestOversightDate_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
         public void Can_Update_IsOversightCompletedRemark()
         {
             //Arrange
@@ -1240,6 +1252,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Update_IsOversightCompletedRemark_Returns_Forbidden()
         {
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompletedRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateIsOversightCompletedRemark(id, A<string>()));
         }
 
         /// <summary>
