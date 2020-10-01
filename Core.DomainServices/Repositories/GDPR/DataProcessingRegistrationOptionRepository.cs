@@ -9,13 +9,16 @@ namespace Core.DomainServices.Repositories.GDPR
     {
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleOptionsService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferOptionsService;
 
         public DataProcessingRegistrationOptionRepository(
             IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService,
-            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleOptionsService)
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleOptionsService,
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferOptionsService)
         {
             _countryOptionsService = countryOptionsService;
             _dataResponsibleOptionsService = dataResponsibleOptionsService;
+            _basisForTransferOptionsService = basisForTransferOptionsService;
         }
 
         public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> GetAvailableCountryOptions(int organizationId)
@@ -27,15 +30,9 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             return _dataResponsibleOptionsService.GetAvailableOptionsDetails(organizationId);
         }
-
-        public ISet<int> GetIdsOfAvailableCountryOptions(int organizationId)
+        public IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> GetAvailableBasisForTransferOptions(int organizationId)
         {
-            return new HashSet<int>(_countryOptionsService.GetAvailableOptions(organizationId).Select(x => x.Id));
-        }
-
-        public ISet<int> GetIdsOfAvailableDataResponsibleOptions(int organizationId)
-        {
-            return new HashSet<int>(_dataResponsibleOptionsService.GetAvailableOptions(organizationId).Select(x => x.Id));
+            return _basisForTransferOptionsService.GetAvailableOptionsDetails(organizationId);
         }
     }
 }

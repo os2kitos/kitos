@@ -27,18 +27,9 @@ namespace Core.ApplicationServices.GDPR
             return WithOrganizationReadAccess(organizationId,
                 () => new DataProcessingRegistrationOptions(
                         _optionRepository.GetAvailableDataResponsibleOptions(organizationId),
-                        _optionRepository.GetAvailableCountryOptions(organizationId)
+                        _optionRepository.GetAvailableCountryOptions(organizationId),
+                        _optionRepository.GetAvailableBasisForTransferOptions(organizationId)
                     ));
-        }
-
-        public ISet<int> GetIdsOfAvailableCountryOptions(int organizationId)
-        {
-            return _optionRepository.GetIdsOfAvailableCountryOptions(organizationId);
-        }
-
-        public ISet<int> GetIdsOfAvailableDataResponsibleOptions(int organizationId)
-        {
-            return _optionRepository.GetIdsOfAvailableDataResponsibleOptions(organizationId);
         }
 
         private Result<DataProcessingRegistrationOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<DataProcessingRegistrationOptions, OperationError>> authorizedAction)
