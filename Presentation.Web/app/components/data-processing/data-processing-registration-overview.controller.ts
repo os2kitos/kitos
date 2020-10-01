@@ -169,8 +169,8 @@
                                 })
                                 , false
                             )
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries)))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsAgreementConcluded && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("BasisForTransfer")
