@@ -206,12 +206,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            var expectedDpaString = usage.AssociatedDataProcessingRegistrations?.Where(x =>
-                    x.IsAgreementConcluded != null && x.IsAgreementConcluded != YesNoIrrelevantOption.UNDECIDED)
-                .Select(x => x.IsAgreementConcluded.GetValueOrDefault().ToDanishString() + "(" + x.Name + ")")
-                .Transform(choiceWithName => string.Join(", ", choiceWithName)) ?? string.Empty;
-
-            Assert.Equal(expectedDpaString, gdprExportReport.DataProcessingAgreementConcluded);
+            Assert.Equal(usage.AssociatedDataProcessingRegistrations?.Any(x=>x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true, gdprExportReport.DataProcessingAgreementConcluded);
 
             if (usage.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE))
             {

@@ -55,11 +55,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             return new GDPRExportReport
             {
                 BusinessCritical = input.isBusinessCritical,
-                DataProcessingAgreementConcluded = 
-                    input
-                        .AssociatedDataProcessingRegistrations?.Where(x=>x.IsAgreementConcluded != null && x.IsAgreementConcluded != YesNoIrrelevantOption.UNDECIDED )
-                        .Select(x=> x.IsAgreementConcluded.GetValueOrDefault().ToDanishString() + "(" +x.Name+ ")")
-                        .Transform(choiceWithName => string.Join(", ",choiceWithName)) ?? string.Empty,
+                DataProcessingAgreementConcluded = input.HasDataProcessingAgreement(),
                 DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
                 HostedAt = input.HostedAt,
@@ -83,7 +79,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
             return attachedOptions
-                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && 
+                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE &&
                             x.ObjectId == usageId &&
                             x.OptionType == OptionType.SENSITIVEPERSONALDATA)
                 .Select(x => x.OptionId)

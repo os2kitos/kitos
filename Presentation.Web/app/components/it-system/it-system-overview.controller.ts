@@ -869,7 +869,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "AssociatedDataProcessingRegistrations", title: "Databehandleraftale er indgået", width: 150,
+                        field: "DataProcessingRegistrationsConcluded", title: "Databehandleraftale er indgået", width: 150,
                         persistId: "dataProcessingAgreementConcluded",
                         template: dataItem => {
                             if (dataItem.AssociatedDataProcessingRegistrations && dataItem.AssociatedDataProcessingRegistrations.length > 0) {
@@ -892,7 +892,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         sortable: false
                     },
                     {
-                        field: "AssociatedDataProcessingRegistrations@count", title: "Databehandling", width: 150,
+                        field: "AssociatedDataProcessingRegistrations", title: "Databehandling", width: 150,
                         persistId: "dataProcessingRegistrations",
                         template: dataItem => {
                             if (dataItem.AssociatedDataProcessingRegistrations && dataItem.AssociatedDataProcessingRegistrations.length > 0) {
