@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Models
