@@ -406,7 +406,7 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.IsOversightCompleted = isOversightCompleted;
+                registration.SetIsOversightCompleted(isOversightCompleted);
                 return registration;
             });
         }

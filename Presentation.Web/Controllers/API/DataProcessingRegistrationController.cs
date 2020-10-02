@@ -531,7 +531,7 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
-                .Match(_ => Ok(), FromOperationError);
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
@@ -678,7 +678,13 @@ namespace Presentation.Web.Controllers.API
                     .BasisForTransfer
                     .FromNullable()
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
-                    .GetValueOrDefault()
+                    .GetValueOrDefault(),
+                IsOversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
+                {
+                    Value = value.IsOversightCompleted,
+                    OptionalDateValue = value.LatestOversightDate,
+                    Remark = value.IsOversightCompletedRemark
+                }
             };
         }
 
