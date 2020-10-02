@@ -30,6 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationRepository> _repositoryMock;
         private readonly Mock<IDataProcessingRegistrationNamingService> _namingServiceMock;
         private readonly Mock<IDataProcessingRegistrationRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IDataProcessingRegistrationDataResponsibleAssignmentService> _dataResponsibleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
@@ -44,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _namingServiceMock = new Mock<IDataProcessingRegistrationNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingRegistrationRoleAssignmentsService>();
+            _dataResponsibleAssignmentServiceMock = new Mock<IDataProcessingRegistrationDataResponsibleAssignmentService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
@@ -57,6 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _namingServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
                 _referenceRepositoryMock.Object,
+                _dataResponsibleAssignmentServiceMock.Object,
                 _systemAssignmentServiceMock.Object,
                 _dpAssignmentService.Object,
                 _insecureThirdCountryAssignmentMock.Object,
@@ -1229,6 +1232,67 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearBasisForTransfer(id));
         }
 
+        [Fact]
+        public void Can_Update_DataResponsible()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var optionId = A<int>();
+                _dataResponsibleAssignmentServiceMock.Setup(x => x.Assign(registration, optionId)).Returns(Result<DataProcessingDataResponsibleOption, OperationError>.Success(new DataProcessingDataResponsibleOption()));
+
+                //Act
+                return _sut.AssignDataResponsible(registration.Id, optionId);
+            });
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsible_To_Null()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                _dataResponsibleAssignmentServiceMock.Setup(x => x.Clear(registration)).Returns(Result<DataProcessingDataResponsibleOption, OperationError>.Success(new DataProcessingDataResponsibleOption()));
+
+                //Act
+                return _sut.ClearDataResponsible(registration.Id);
+            });
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignDataResponsible(id, A<int>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignDataResponsible(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsibleRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Act
+                return _sut.UpdateDataResponsibleRemark(registration.Id, A<string>());
+            });
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
         /// <summary>
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>
@@ -1311,7 +1375,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
-
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)
         {

@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.Shared;
+﻿using System;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.Shared;
 using Presentation.Web.Models.References;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Shared;
@@ -33,5 +35,8 @@ namespace Presentation.Web.Models.GDPR
         public NamedEntityWithExpirationStatusDTO[] InsecureThirdCountries { get; set; }
 
         public NamedEntityWithExpirationStatusDTO BasisForTransfer { get; set; }
+
+        public ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO> DataResponsible { get; set; }
+
     }
 }

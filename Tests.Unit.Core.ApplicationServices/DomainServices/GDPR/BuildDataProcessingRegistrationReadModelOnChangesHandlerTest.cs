@@ -27,7 +27,8 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             _sut = new BuildDataProcessingRegistrationReadModelOnChangesHandler(_repository.Object,
                 new DataProcessingRegistrationReadModelUpdate(
                     Mock.Of<IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>>(),
-                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>().Object),
+                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>().Object,
+                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>().Object),
                 _pendingUpdatesRepository.Object);
         }
 

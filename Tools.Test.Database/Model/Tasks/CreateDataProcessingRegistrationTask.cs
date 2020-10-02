@@ -40,6 +40,11 @@ namespace Tools.Test.Database.Model.Tasks
                 (
                     new GenericRepository<LocalDataProcessingBasisForTransferOption>(dbContext),
                     new GenericRepository<DataProcessingBasisForTransferOption>(dbContext)
+                ),
+                new OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>
+                (
+                    new GenericRepository<LocalDataProcessingDataResponsibleOption>(dbContext),
+                    new GenericRepository<DataProcessingDataResponsibleOption>(dbContext)
                 )
             );
 
