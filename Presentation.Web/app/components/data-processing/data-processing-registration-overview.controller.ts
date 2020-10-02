@@ -208,11 +208,10 @@
                             .withDataSourceName("AgreementConcludedAt")
                             .withTitle("Dato for indgåelse af databehandleraftale")
                             .withId("agreementConcludedAt")
-                            .withStandardWidth(150)
+                            .withStandardWidth(160)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.AgreementConcludedAt))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt))
-                            .withInitialVisibility(false))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt)))
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("OversightInterval")
