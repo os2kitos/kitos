@@ -432,7 +432,7 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.SetIsOversightCompleted(isOversightCompleted);
+                registration.SetOversightCompleted(isOversightCompleted);
                 return registration;
             });
         }
@@ -455,7 +455,7 @@ namespace Core.ApplicationServices.GDPR
 
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.IsOversightCompletedRemark = remark;
+                registration.OversightCompletedRemark = remark;
                 return registration;
             });
         }
