@@ -63,7 +63,7 @@ describe("Data processing registration it-systems test", () => {
     }
 
     function verifyDprIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
-        return SystemUsageHelper.openLocalSystem(systemName)
+        return dpaHelper.clickSystem(systemName)
             .then(() => LocalItSystemNavigation.openGDPRPage())
             .then(() => expect(ItSystemUsageGdpr.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
             .then(() => ItSystemUsageGdpr.getDataProcessingLink(dprName).click())
