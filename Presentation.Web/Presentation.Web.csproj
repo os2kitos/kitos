@@ -493,6 +493,7 @@
     <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
+    <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />

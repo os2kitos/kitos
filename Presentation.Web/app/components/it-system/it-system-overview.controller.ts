@@ -177,6 +177,7 @@
                                 var urlParameters = `?$expand=ItSystem($expand=BelongsTo,BusinessType,Parent,TaskRefs),\
 ArchivePeriods,\
 Reference,\
+AssociatedDataProcessingRegistrations,\
 Organization,\
 ResponsibleUsage($expand=OrganizationUnit),\
 MainContract($expand=ItContract($expand=Supplier)),\
@@ -868,18 +869,48 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                         }
                     },
                     {
-                        field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
-                        persistId: "ItContractDataHandler",
+                        field: "AssociatedDataProcessingRegistrations", title: "Databehandleraftale er indgået", width: 150,
+                        persistId: "dataProcessingAgreementConcluded",
                         template: dataItem => {
-                            if (dataItem.Contracts != null) {
-                                if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {
-                                    return "Ja";
-                                } else {
-                                    return "Nej";
+                            if (dataItem.AssociatedDataProcessingRegistrations && dataItem.AssociatedDataProcessingRegistrations.length > 0) {
+                                const choicesToRender = dataItem
+                                    .AssociatedDataProcessingRegistrations
+                                    .filter(registration => registration.IsAgreementConcluded !== null &&
+                                        registration.IsAgreementConcluded !==
+                                        Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
+                                if (choicesToRender.length > 0) {
+                                    return choicesToRender
+                                        .map(dpr => Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dpr.IsAgreementConcluded))
+                                        .reduce((combined: string, next: string, _) => combined.length === 0 ? next : `${combined}, ${next}`, "");
                                 }
-                            } else {
-                                return "Nej";
                             }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "AssociatedDataProcessingRegistrations@count", title: "Databehandling", width: 150,
+                        persistId: "dataProcessingRegistrations",
+                        template: dataItem => {
+                            if (dataItem.AssociatedDataProcessingRegistrations && dataItem.AssociatedDataProcessingRegistrations.length > 0) {
+                                return dataItem
+                                    .AssociatedDataProcessingRegistrations
+                                    .map(dpr => `<a data-ui-sref='data-processing.edit-registration.main({id: ${dpr.Id}})'>${dpr.Name}</a>`)
+                                    .reduce((combined: string, next: string, _) => combined.length === 0 ? next : `${combined}, ${next}`, "");
+                            }
+                            return "";
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.AssociatedDataProcessingRegistrations && dataItem.AssociatedDataProcessingRegistrations.length > 0) {
+                                return dataItem
+                                    .AssociatedDataProcessingRegistrations
+                                    .map(dpr => dpr.Name)
+                                    .reduce((combined: string, next: string, _) => combined.length === 0 ? next : `${combined}, ${next}`, "");
+                            }
+                            return "";
                         },
                         attributes: { "class": "text-left" },
                         hidden: true,
