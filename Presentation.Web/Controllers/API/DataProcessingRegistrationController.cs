@@ -775,7 +775,6 @@ namespace Presentation.Web.Controllers.API
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
                 },
-                    .GetValueOrDefault(),
                 OversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
                 {
                     Value = value.IsOversightCompleted,
