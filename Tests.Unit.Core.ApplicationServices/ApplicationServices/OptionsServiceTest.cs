@@ -58,7 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var enabledOption1 = MakeOptionPair(organizationId, true, true, true);
             var enabledOption2 = MakeOptionPair(organizationId, false, true, true);
             var discardedOption = MakeOptionPair(organizationId, false, true);
-            SetupRepositories(enabledOption1, enabledOption2, discardedOption, discardedOption);
+            SetupRepositories(enabledOption1, enabledOption2, discardedOption);
 
             //Act
             var frequencyTypes = _sut.GetAvailableOptions(organizationId).ToList();

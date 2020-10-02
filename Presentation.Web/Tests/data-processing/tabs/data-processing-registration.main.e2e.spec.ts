@@ -23,6 +23,10 @@ describe("Data processing registration main detail tests", () => {
         return `Dpa${new Date().getTime()}_${index}`;
     }
 
+    const createRemark = () => {
+        return `Remark: ${new Date().getTime()}`;
+    }
+
     var dropdownYes = "Ja";
 
     var today = GetDateHelper.getTodayAsString();
@@ -45,6 +49,8 @@ describe("Data processing registration main detail tests", () => {
             var renameValue = createName(30);
             const thirdCountryName = "Danmark";
             const basisForTransfer = "Andet";
+            const dataResponsibleOptionName = "Fællesdataansvar";
+            var dataResponsibleRemark = createRemark();
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
@@ -54,6 +60,11 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => verifyIsAgreementConcluded(dropdownYes))
                 .then(() => dpaHelper.changeAgreementConcludedAt(today))
                 .then(() => verifyAgreementConcludedAt(today))
+                //Changing data responsible
+                .then(() => dpaHelper.assignDataResponsible(dataResponsibleOptionName))
+                .then(() => verifyDataReponsible(dataResponsibleOptionName))
+                .then(() => pageObject.getDataResponsibleRemark().sendKeys(dataResponsibleRemark))
+                .then(() => verifyDataReponsibleRemark(dataResponsibleRemark))
                 //Changing data processors
                 .then(() => dpaHelper.assignDataProcessor(dataProcessorName))
                 .then(() => verifyDataProcessorContent([dataProcessorName], []))
@@ -145,6 +156,17 @@ describe("Data processing registration main detail tests", () => {
         setFocusOnNameToActivateBlur();
         console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
         expect(pageObject.getAgreementConcludedAtDateField().getAttribute("value")).toEqual(selectedDate);
+    }
+
+    function verifyDataReponsible(selectedDataResponsible: string) {
+        console.log(`Expecting DataReponsible to be set to: ${selectedDataResponsible}`);
+        expect(Select2Helper.getData("s2id_dataResponsible_config").getText()).toEqual(selectedDataResponsible);
+    }
+
+    function verifyDataReponsibleRemark(dataResponsibleRemark: string) {
+        setFocusOnNameToActivateBlur();
+        console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
+        expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
     }
 
     function setFocusOnNameToActivateBlur() {

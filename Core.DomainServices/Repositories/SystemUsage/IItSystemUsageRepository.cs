@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 
 namespace Core.DomainServices.Repositories.SystemUsage
@@ -9,6 +9,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
 
         ItSystemUsage GetSystemUsage(int systemId);
 
-        IEnumerable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId);
+        IQueryable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId);
     }
 }

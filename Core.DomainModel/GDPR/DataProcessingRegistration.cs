@@ -46,7 +46,25 @@ namespace Core.DomainModel.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
+        public void SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
+        {
+            HasSubDataProcessors = hasSubDataProcessors;
+            if (hasSubDataProcessors != YesNoUndecidedOption.Yes)
+            {
+                SubDataProcessors.Clear();
+            }
+        }
+
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public void SetTransferToInsecureThirdCountries(YesNoUndecidedOption transferToInsecureThirdCountries)
+        {
+            TransferToInsecureThirdCountries = transferToInsecureThirdCountries;
+            if (transferToInsecureThirdCountries != YesNoUndecidedOption.Yes)
+            {
+                InsecureCountriesSubjectToDataTransfer.Clear();
+            }
+        }
 
         public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; }
 
@@ -60,12 +78,15 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<Organization.Organization> SubDataProcessors { get; set; }
 
+        public virtual DataProcessingDataResponsibleOption DataResponsible { get; set; }
+        public int? DataResponsible_Id { get; set; }
+
+        public string DataResponsibleRemark { get; set; }
+
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {
             return Rights.Where(x => x.RoleId == roleId);
         }
-
-        public IEnumerable<ItSystem.ItSystem> GetAssignedSystems() => SystemUsages.Select(x => x.ItSystem);
 
         public Result<Organization.Organization, OperationError> AssignDataProcessor(Organization.Organization dataProcessor)
         {
@@ -157,40 +178,28 @@ namespace Core.DomainModel.GDPR
             return DataProcessors.Any(x => x.Id == dataProcessor.Id);
         }
 
-        public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
+        public Result<ItSystemUsage.ItSystemUsage, OperationError> AssignSystem(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            if (system == null) throw new ArgumentNullException(nameof(system));
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
 
-            var usageResult = system.GetUsageForOrganization(OrganizationId);
-            if (usageResult.IsNone)
-                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
-
-            var usage = usageResult.Value;
-
-            if (GetAssignedSystemUsage(usage.Id).HasValue)
+            if (GetAssignedSystemUsage(systemUsage.Id).HasValue)
                 return new OperationError("System usage is already assigned", OperationFailure.Conflict);
 
-            SystemUsages.Add(usage);
+            SystemUsages.Add(systemUsage);
 
-            return system;
+            return systemUsage;
         }
 
-        public Result<ItSystem.ItSystem, OperationError> RemoveSystem(ItSystem.ItSystem system)
+        public Result<ItSystemUsage.ItSystemUsage, OperationError> RemoveSystem(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            if (system == null) throw new ArgumentNullException(nameof(system));
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
 
-            var usageResult = system.GetUsageForOrganization(OrganizationId);
-            if (usageResult.IsNone)
-                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
-
-            var usage = usageResult.Value;
-
-            if (GetAssignedSystemUsage(usage.Id).IsNone)
+            if (GetAssignedSystemUsage(systemUsage.Id).IsNone)
                 return new OperationError("Usage not assigned", OperationFailure.BadInput);
 
-            SystemUsages.Remove(usage);
+            SystemUsages.Remove(systemUsage);
 
-            return system;
+            return systemUsage;
         }
 
         private Maybe<ItSystemUsage.ItSystemUsage> GetAssignedSystemUsage(int usageId)
@@ -281,5 +290,14 @@ namespace Core.DomainModel.GDPR
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public string OversightIntervalRemark { get; set; }
+
+        public void SetIsAgreementConcluded(YesNoIrrelevantOption concluded)
+        {
+            IsAgreementConcluded = concluded;
+            if (IsAgreementConcluded != YesNoIrrelevantOption.YES)
+            {
+                AgreementConcludedAt = null;
+            }
+        }
     }
 }

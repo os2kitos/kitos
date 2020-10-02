@@ -88,6 +88,13 @@ namespace Core.DomainServices.Repositories.GDPR
                 .Where(x => x.BasisForTransferId == basisForTransferId);
         }
 
+        public IQueryable<DataProcessingRegistration> GetByDataResponsibleId(int dataResponsibleId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.DataResponsible_Id == dataResponsibleId);
+        }
+
         private void Notify(DataProcessingRegistration dataProcessingRegistration, LifeCycleEventType changeType)
         {
             switch (changeType)
@@ -105,5 +112,7 @@ namespace Core.DomainServices.Repositories.GDPR
                     throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
             }
         }
+
+        
     }
 }

@@ -7,6 +7,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -30,6 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationRepository> _repositoryMock;
         private readonly Mock<IDataProcessingRegistrationNamingService> _namingServiceMock;
         private readonly Mock<IDataProcessingRegistrationRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IDataProcessingRegistrationDataResponsibleAssignmentService> _dataResponsibleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
@@ -44,6 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _repositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _namingServiceMock = new Mock<IDataProcessingRegistrationNamingService>();
             _roleAssignmentServiceMock = new Mock<IDataProcessingRegistrationRoleAssignmentsService>();
+            _dataResponsibleAssignmentServiceMock = new Mock<IDataProcessingRegistrationDataResponsibleAssignmentService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
@@ -57,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _namingServiceMock.Object,
                 _roleAssignmentServiceMock.Object,
                 _referenceRepositoryMock.Object,
+                _dataResponsibleAssignmentServiceMock.Object,
                 _systemAssignmentServiceMock.Object,
                 _dpAssignmentService.Object,
                 _insecureThirdCountryAssignmentMock.Object,
@@ -541,15 +545,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowReadReturns(registration, true);
-            var itSystems = new[] { new ItSystem { Id = system1Id, Name = $"{nameQuery}{1}" }, new ItSystem { Id = system2Id, Name = $"{nameQuery}{2}" } };
-            _systemAssignmentServiceMock.Setup(x => x.GetApplicableSystems(registration)).Returns(itSystems.AsQueryable());
+            var itSystemUsages = new[] { new ItSystemUsage() { Id = system1Id, ItSystem = new ItSystem() { Name = $"{nameQuery}{1}" } }, new ItSystemUsage() { Id = system1Id, ItSystem = new ItSystem() { Name = $"{nameQuery}{2}" } } };
+            _systemAssignmentServiceMock.Setup(x => x.GetApplicableSystems(registration)).Returns(itSystemUsages.AsQueryable());
 
             //Act
             var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(itSystems, result.Value);
+            Assert.Equal(itSystemUsages, result.Value);
         }
 
         [Fact]
@@ -571,10 +575,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var systemId = A<int>();
-            var itSystem = new ItSystem();
+            var itSystemUsage = new ItSystemUsage();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
-            _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystem);
+            _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -583,7 +587,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
@@ -606,10 +610,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var systemId = A<int>();
-            var itSystem = new ItSystem();
+            var itSystemUsage = new ItSystemUsage();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
-            _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystem);
+            _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -618,7 +622,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
@@ -843,6 +847,29 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             transaction.Verify(x => x.Commit());
         }
 
+        [Theory]
+        [InlineData(YesNoUndecidedOption.No)]
+        [InlineData(YesNoUndecidedOption.Undecided)]
+        public void Can_SetSubDataProcessorsState_Clears_SubdataProcessors_On_Negating_Setting(YesNoUndecidedOption clearingSetting)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration(){SubDataProcessors = {new Organization()}};
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.SetSubDataProcessorsState(id, clearingSetting);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(registration.HasSubDataProcessors, clearingSetting);
+            Assert.Empty(registration.SubDataProcessors);
+            transaction.Verify(x => x.Commit());
+        }
+
         [Fact]
         public void Cannot_SetSubDataProcessorsState_If_Dpr_Is_Not_Found()
         {
@@ -874,7 +901,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var oversightInterval = A<YearMonthIntervalOption>();
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration,true);
+            ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -883,9 +910,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(oversightInterval,result.Value.OversightInterval);
+            Assert.Equal(oversightInterval, result.Value.OversightInterval);
             transaction.Verify(x => x.Commit());
-            _repositoryMock.Verify(x => x.Update(registration),Times.Once);
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
 
         [Fact]
@@ -947,6 +974,31 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(isAgreementConcluded, result.Value.IsAgreementConcluded);
+            transaction.Verify(x => x.Commit());
+            _repositoryMock.Verify(x => x.Update(registration), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(YesNoIrrelevantOption.IRRELEVANT)]
+        [InlineData(YesNoIrrelevantOption.NO)]
+        [InlineData(YesNoIrrelevantOption.UNDECIDED)]
+        public void Can_Update_IsAgreementConcluded_And_Clear_Date_On_Toggle_Off(YesNoIrrelevantOption clearingSetting)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration {AgreementConcludedAt = A<DateTime>()};
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.UpdateIsAgreementConcluded(id, clearingSetting);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(clearingSetting, result.Value.IsAgreementConcluded);
+            Assert.Null(registration.AgreementConcludedAt);
             transaction.Verify(x => x.Commit());
             _repositoryMock.Verify(x => x.Update(registration), Times.Once);
         }
@@ -1024,6 +1076,29 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(registration.TransferToInsecureThirdCountries, newValue);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Theory]
+        [InlineData(YesNoUndecidedOption.Undecided)]
+        [InlineData(YesNoUndecidedOption.No)]
+        public void Can_UpdateTransferToInsecureThirdCountries_Clears_ThirdCountries_On_Negating_Option(YesNoUndecidedOption clearingSetting)
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration(){InsecureCountriesSubjectToDataTransfer = {new DataProcessingCountryOption()}};
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+
+            //Act
+            var result = _sut.UpdateTransferToInsecureThirdCountries(id, clearingSetting);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(registration.TransferToInsecureThirdCountries, clearingSetting);
+            Assert.Empty(registration.InsecureCountriesSubjectToDataTransfer);
             transaction.Verify(x => x.Commit());
         }
 
@@ -1158,6 +1233,67 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearBasisForTransfer(id));
         }
 
+        [Fact]
+        public void Can_Update_DataResponsible()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var optionId = A<int>();
+                _dataResponsibleAssignmentServiceMock.Setup(x => x.Assign(registration, optionId)).Returns(Result<DataProcessingDataResponsibleOption, OperationError>.Success(new DataProcessingDataResponsibleOption()));
+
+                //Act
+                return _sut.AssignDataResponsible(registration.Id, optionId);
+            });
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsible_To_Null()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                _dataResponsibleAssignmentServiceMock.Setup(x => x.Clear(registration)).Returns(Result<DataProcessingDataResponsibleOption, OperationError>.Success(new DataProcessingDataResponsibleOption()));
+
+                //Act
+                return _sut.ClearDataResponsible(registration.Id);
+            });
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignDataResponsible(id, A<int>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsible_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignDataResponsible(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_Update_DataResponsibleRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Act
+                return _sut.UpdateDataResponsibleRemark(registration.Id, A<string>());
+            });
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_DataResponsibleRemark_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
         /// <summary>
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>
@@ -1240,7 +1376,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
-
 
         private void VerifyExpectedDbSideEffect(bool expectSideEffect, DataProcessingRegistration dataProcessingRegistration, Mock<IDatabaseTransaction> transaction)
         {
