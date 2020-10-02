@@ -333,8 +333,8 @@
             this.apiUseCaseFactory
                 .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded.optionalObjectContext))
                 .executeAsync(success => {
-                    if (isAgreementConcluded.optionalObjectContext !== Models.Api.Shared.YesNoIrrelevantOption.YES) {
-                        this.dataProcessingRegistration.agreementConcluded.optionalDateValue = null;
+                    if (success.optionalServerDataPush) {
+                        this.dataProcessingRegistration.agreementConcluded = success.optionalServerDataPush.agreementConcluded;
                     }
                     this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded.optionalObjectContext;
                     this.bindIsAgreementConcluded();
@@ -349,8 +349,8 @@
                 .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, value))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.hasSubDataProcessors = value;
-                    if (value !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
-                        this.dataProcessingRegistration.subDataProcessors = [];
+                    if (success.optionalServerDataPush) {
+                        this.dataProcessingRegistration.subDataProcessors = success.optionalServerDataPush.subDataProcessors;
                     }
                     this.bindHasSubDataProcessors();
                     this.bindSubDataProcessors();
@@ -363,8 +363,8 @@
                 .apiUseCaseFactory
                 .createUpdate("Overførsel til usikkert 3. land", () => this.dataProcessingRegistrationService.updateTransferToInsecureThirdCountry(this.dataProcessingRegistrationId, value))
                 .executeAsync(success => {
-                    if (value !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
-                        this.dataProcessingRegistration.insecureThirdCountries = [];
+                    if (success.optionalServerDataPush) {
+                        this.dataProcessingRegistration.insecureThirdCountries = success.optionalServerDataPush.insecureThirdCountries;
                     }
                     this.dataProcessingRegistration.transferToInsecureThirdCountries = value;
                     this.bindTransferToInsecureThirdCountries();
