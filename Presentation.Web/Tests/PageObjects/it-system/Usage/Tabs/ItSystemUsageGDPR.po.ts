@@ -153,6 +153,10 @@ class ItSystemUsageGDPR {
     static getDataProcessingRegistrationView() {
         return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessingRegistrationView));
     }
+
+    static getDataProcessingLink(dprName: string) {
+        return element(by.linkText(dprName));
+    }
 }
 
 export = ItSystemUsageGDPR;
