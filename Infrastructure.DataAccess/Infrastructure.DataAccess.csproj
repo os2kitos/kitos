@@ -636,6 +636,10 @@
     <Compile Include="Migrations\202010011354026_Added_Data_Responsible.designer.cs">
       <DependentUpon>202010011354026_Added_Data_Responsible.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202010020801067_Dpr_Rename_Country_References_Table.cs" />
+    <Compile Include="Migrations\202010020801067_Dpr_Rename_Country_References_Table.designer.cs">
+      <DependentUpon>202010020801067_Dpr_Rename_Country_References_Table.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1034,6 +1038,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202010011354026_Added_Data_Responsible.resx">
       <DependentUpon>202010011354026_Added_Data_Responsible.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010020801067_Dpr_Rename_Country_References_Table.resx">
+      <DependentUpon>202010020801067_Dpr_Rename_Country_References_Table.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

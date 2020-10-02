@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
@@ -10,7 +9,6 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
-using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.GDPR
 {
@@ -44,7 +42,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             var attachedOptions = _attachedOptionRepository.GetAttachedOptions();
             var sensitivePersonalDataTypes = _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes();
 
-            var gdpExportReports = itSystems.Select(x => Map(x, attachedOptions, sensitivePersonalDataTypes));
+            var gdpExportReports = itSystems.AsEnumerable().Select(x => Map(x, attachedOptions, sensitivePersonalDataTypes));
             return Result<IEnumerable<GDPRExportReport>, OperationError>.Success(gdpExportReports);
         }
 

@@ -73,11 +73,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system2 = CreateItSystem(orgId);
             var usage2 = CreateSystemUsage(system2, null, orgId);
 
-            IEnumerable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
+            IQueryable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
             {
                 usage,
                 usage2
-            };
+            }.AsQueryable();
 
             IEnumerable<AttachedOption> attachedOptions = new List<AttachedOption>()
             {
@@ -129,11 +129,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system2 = CreateItSystem(orgId);
             var usage2 = CreateSystemUsage(system2, null, orgId);
 
-            IEnumerable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
+            IQueryable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
             {
                 usage,
                 usage2
-            };
+            }.AsQueryable();
 
             IEnumerable<AttachedOption> attachedOptions = new List<AttachedOption>()
             {
