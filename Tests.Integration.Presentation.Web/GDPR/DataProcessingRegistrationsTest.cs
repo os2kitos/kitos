@@ -678,7 +678,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Equal(HttpStatusCode.OK,response.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Equal(dto.IsOversightCompleted.OptionalDateValue, date);
+            Assert.Equal(dto.OversightCompleted.OptionalDateValue, date);
         }
 
         [Fact]
@@ -690,12 +690,12 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var remark = A<string>();
 
             //Act
-            using var response = await DataProcessingRegistrationHelper.SendChangeUpdateIsOversightCompletedRemarkRequestAsync(registrationDto.Id, remark);
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightCompletedRemark(registrationDto.Id, remark);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Equal(dto.IsOversightCompleted.Remark, remark);
+            Assert.Equal(dto.OversightCompleted.Remark, remark);
         }
     }
 }

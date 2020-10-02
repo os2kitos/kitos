@@ -519,12 +519,12 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/is-oversight-completed")]
+        [Route("{id}/oversight-completed")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        public HttpResponseMessage IsPatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
         {
             if (completed == null)
                 return BadRequest(nameof(completed) + " must be provided");
@@ -551,18 +551,18 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/is-oversight-completed-remark")]
+        [Route("{id}/oversight-completed-remark")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> isOversightCompletedRemark)
+        public HttpResponseMessage PatchOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> oversightCompletedRemark)
         {
-            if (isOversightCompletedRemark == null)
-                return BadRequest(nameof(isOversightCompletedRemark) + " must be provided");
+            if (oversightCompletedRemark == null)
+                return BadRequest(nameof(oversightCompletedRemark) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateIsOversightCompletedRemark(id, isOversightCompletedRemark.Value)
+                .UpdateIsOversightCompletedRemark(id, oversightCompletedRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -679,11 +679,11 @@ namespace Presentation.Web.Controllers.API
                     .FromNullable()
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
                     .GetValueOrDefault(),
-                IsOversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
+                OversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
                 {
                     Value = value.IsOversightCompleted,
                     OptionalDateValue = value.LatestOversightDate,
-                    Remark = value.IsOversightCompletedRemark
+                    Remark = value.OversightCompletedRemark
                 }
             };
         }

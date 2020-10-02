@@ -313,9 +313,9 @@ namespace Core.DomainModel.GDPR
 
         public DateTime? LatestOversightDate { get; set; }
 
-        public string IsOversightCompletedRemark { get; set; }
+        public string OversightCompletedRemark { get; set; }
 
-        public void SetIsOversightCompleted(YesNoUndecidedOption completed)
+        public void SetOversightCompleted(YesNoUndecidedOption completed)
         {
             IsOversightCompleted = completed;
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)

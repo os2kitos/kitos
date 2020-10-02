@@ -33,7 +33,7 @@ namespace Presentation.Web.Models.GDPR
 
         public NamedEntityWithExpirationStatusDTO BasisForTransfer { get; set; }
 
-        public ValueWithOptionalDateAndRemark<YesNoUndecidedOption?> IsOversightCompleted { get; set; }
+        public ValueWithOptionalDateAndRemark<YesNoUndecidedOption?> OversightCompleted { get; set; }
 
    
     }

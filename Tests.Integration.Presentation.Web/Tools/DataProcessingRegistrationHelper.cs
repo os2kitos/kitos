@@ -294,7 +294,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new SingleValueDTO<YesNoUndecidedOption?> { Value = yesNoUndecidedOption };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/is-oversight-completed"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-completed"), cookie, body);
         }
 
         public static async Task<HttpResponseMessage> SendChangeLatestOversightDateRequestAsync(int id, DateTime? dateTime, Cookie optionalLogin = null)
@@ -306,13 +306,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/latest-oversight-date"), cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> SendChangeUpdateIsOversightCompletedRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendChangeOversightCompletedRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var body = new SingleValueDTO<string> { Value = remark };
 
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/is-oversight-completed-remark"), cookie, body);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-completed-remark"), cookie, body);
         }
     }
 }
