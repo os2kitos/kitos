@@ -4,15 +4,18 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -64,6 +67,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system = CreateItSystem(orgId);
             var contract = CreateItContract(datahandlerContractTypeId, datahandlerContractTypeName);
             var usage = CreateSystemUsage(system, contract, orgId);
+            usage.AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
+            {
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.YES, Name = A<string>()},
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.IRRELEVANT, Name = A<string>()}
+            };
 
             var sensitivePersonalDataType = CreateSensitivePersonalDataType();
 
@@ -189,7 +197,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(usage.riskAssessment, gdprExportReport.RiskAssessment);
             Assert.Equal(usage.preriskAssessment, gdprExportReport.PreRiskAssessment);
 
-            if (! string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
+            if (!string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
             {
                 Assert.True(gdprExportReport.LinkToDirectory);
             }
@@ -198,21 +206,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            if (usage.Contracts.Any(x =>
-            {
-                if (x.ItContract.ContractType != null)
-                {
-                    return x.ItContract.ContractType.Id == datahandlerContractTypeId;
-                }
-                return false;
-            }))
-            {
-                Assert.True(gdprExportReport.DataProcessorContract);
-            }
-            else
-            {
-                Assert.False(gdprExportReport.DataProcessorContract);
-            }
+            var expectedDpaString = usage.AssociatedDataProcessingRegistrations?.Where(x =>
+                    x.IsAgreementConcluded != null && x.IsAgreementConcluded != YesNoIrrelevantOption.UNDECIDED)
+                .Select(x => x.IsAgreementConcluded.GetValueOrDefault().ToDanishString() + "(" + x.Name + ")")
+                .Transform(choiceWithName => string.Join(", ", choiceWithName)) ?? string.Empty;
+
+            Assert.Equal(expectedDpaString, gdprExportReport.DataProcessingAgreementConcluded);
 
             if (usage.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE))
             {
