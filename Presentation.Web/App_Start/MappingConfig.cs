@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.ItSystemUsage;
@@ -506,6 +507,9 @@ namespace Presentation.Web
 
             CreateMap<ItSystemUsageSensitiveDataLevel, ItSystemUsageSensitiveDataLevelDTO>()
                 .ForMember(dest => dest.DataSensitivityLevel, opt => opt.MapFrom(src => src.SensitivityDataLevel));
+
+            //DPR
+            CreateMap<DataProcessingRegistration, NamedEntityDTO>();
         }
     }
 }
