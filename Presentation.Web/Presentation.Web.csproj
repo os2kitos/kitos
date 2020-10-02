@@ -398,6 +398,7 @@
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
@@ -438,6 +439,8 @@
     <Compile Include="Models\References\ReferenceDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\ShallowOrganizationDTO.cs" />
+    <Compile Include="Models\Shared\OptionWithDescriptionDTO.cs" />
+    <Compile Include="Models\Shared\OptionWithDescriptionAndExpirationDTO.cs" />
     <Compile Include="Models\Shared\ValueOptionWithDateDTO.cs" />
     <Compile Include="Models\SingleValueDTO.cs" />
     <Compile Include="Models\SystemRelations\CreateSystemRelationDTO.cs" />
@@ -804,6 +807,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
     <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />

@@ -49,6 +49,11 @@ namespace Infrastructure.DataAccess.Mapping
             HasOptional(x => x.BasisForTransfer)
                 .WithMany(x => x.References)
                 .HasForeignKey(x => x.BasisForTransferId);
+
+            //Data responsible
+            HasOptional(x => x.DataResponsible)
+                .WithMany(x => x.References)
+                .HasForeignKey(x => x.DataResponsible_Id);
         }
     }
 }

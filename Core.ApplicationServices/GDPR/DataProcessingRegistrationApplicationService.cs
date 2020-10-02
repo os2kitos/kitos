@@ -19,6 +19,7 @@ using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Options;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -28,6 +29,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationRepository _repository;
         private readonly IDataProcessingRegistrationNamingService _namingService;
         private readonly IDataProcessingRegistrationRoleAssignmentsService _roleAssignmentsService;
+        private readonly IDataProcessingRegistrationDataResponsibleAssignmentService _dataResponsibleAssigmentService;
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
         private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
@@ -36,12 +38,14 @@ namespace Core.ApplicationServices.GDPR
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
+
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingRegistrationRepository repository,
             IDataProcessingRegistrationNamingService namingService,
             IDataProcessingRegistrationRoleAssignmentsService roleAssignmentsService,
             IReferenceRepository referenceRepository,
+            IDataProcessingRegistrationDataResponsibleAssignmentService dataResponsibleAssigmentService,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
             IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
             IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
@@ -54,6 +58,7 @@ namespace Core.ApplicationServices.GDPR
             _namingService = namingService;
             _roleAssignmentsService = roleAssignmentsService;
             _referenceRepository = referenceRepository;
+            _dataResponsibleAssigmentService = dataResponsibleAssigmentService;
             _systemAssignmentService = systemAssignmentService;
             _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
             _countryAssignmentService = countryAssignmentService;
@@ -363,7 +368,26 @@ namespace Core.ApplicationServices.GDPR
                 return registration;
             });
         }
-        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
+        public Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId)
+        {
+            return Modify(id, registration => _dataResponsibleAssigmentService.Assign(registration, dataResponsibleId));
+        }
+
+        public Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id)
+        {
+            return Modify(id, registration => _dataResponsibleAssigmentService.Clear(registration));
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.DataResponsibleRemark = remark;
+                return registration;
+            });
+        }
+
+            private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
@@ -402,5 +426,6 @@ namespace Core.ApplicationServices.GDPR
 
             return authorizedAction(registration);
         }
+
     }
 }

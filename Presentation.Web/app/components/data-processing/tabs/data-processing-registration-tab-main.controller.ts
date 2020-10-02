@@ -9,8 +9,7 @@
             "apiUseCaseFactory",
             "select2LoadingService",
             "notify",
-            "thirdCountryOptions",
-            "basisForTransferOptions"
+            "dataProcessingRegistrationOptions"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -21,8 +20,7 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
-            private readonly thirdCountryOptions: Models.IOptionEntity[],
-            private readonly basisForTransferOptions: Models.IOptionEntity[]) {
+            private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -31,11 +29,13 @@
             this.bindAgreementConcludedAt();
             this.bindTransferToInsecureThirdCountries();
             this.bindBasisForTransfer();
+            this.bindDataResponsible();
+            this.bindDataResponsibleRemark();
         }
 
         headerName = this.dataProcessingRegistration.name;
 
-        insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>;
+        insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
 
         enableSelectionOfInsecureThirdCountries: boolean;
 
@@ -55,16 +55,60 @@
 
         hasSubDataProcessors: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
 
-        basisForTransfer: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>;
+        basisForTransfer: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
+
+        dataResponsible: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
+
+        dataResponsibleRemark: Models.ViewModel.Generic.IEditTextViewModel;
+
+        private bindDataResponsible() {
+            const optionMap = this.dataProcessingRegistrationOptions.dataResponsibleOptions.reduce((acc, next, _) => {
+                acc[next.id] = {
+                    text: next.name,
+                    id: next.id,
+                    optionalObjectContext: {
+                        id: next.id,
+                        name: next.name,
+                        description: next.description 
+                    }
+                };
+                return acc;
+            }, {});
+
+            //If selected state is expired, add it for presentation reasons
+            const existingChoice = this.dataProcessingRegistration.dataResponsible.value;
+            if (existingChoice && !optionMap[existingChoice.id]) {
+                optionMap[existingChoice.id] = {
+                    text: `${existingChoice.name} (udgået)`,
+                    id: existingChoice.id,
+                    disabled: true,
+                    optionalObjectContext: existingChoice
+                }
+            }
+
+            const options = this.dataProcessingRegistrationOptions.dataResponsibleOptions.map(option => optionMap[option.id]);
+
+            this.dataResponsible = {
+                selectedElement: existingChoice && optionMap[existingChoice.id],
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => options, true),
+                elementSelected: (newElement) => this.updateDataResponsible(newElement)
+            };
+        }
+
+        private bindDataResponsibleRemark() {
+            this.dataResponsibleRemark = new Models.ViewModel.Generic.EditTextViewModel(
+                this.dataProcessingRegistration.dataResponsible.remark,
+                (newText) => this.changeDataResponsibleRemark(newText));
+        }
 
         private bindBasisForTransfer() {
-            const optionMap = this.basisForTransferOptions.reduce((acc, next, _) => {
-                acc[next.Id] = {
-                    text: next.Name,
-                    id: next.Id,
+            const optionMap = this.dataProcessingRegistrationOptions.basisForTransferOptions.reduce((acc, next, _) => {
+                acc[next.id] = {
+                    text: next.name,
+                    id: next.id,
                     optionalObjectContext: {
-                        id: next.Id,
-                        name: next.Name,
+                        id: next.id,
+                        name: next.name,
                         expired: false //We only allow selection of non-expired and this object is based on the available objects
                     }
                 };
@@ -82,7 +126,7 @@
                 }
             }
 
-            const options = this.basisForTransferOptions.map(option => optionMap[option.Id]);
+            const options = this.dataProcessingRegistrationOptions.basisForTransferOptions.map(option => optionMap[option.id]);
 
             this.basisForTransfer = {
                 selectedElement: existingChoice && optionMap[existingChoice.id],
@@ -105,7 +149,7 @@
             };
             this.enableSelectionOfInsecureThirdCountries = this.dataProcessingRegistration.transferToInsecureThirdCountries === Models.Api.Shared.YesNoUndecidedOption.Yes;
 
-            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>(
+            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
                 () => this.dataProcessingRegistration.insecureThirdCountries,
                 element => this.removeInsecureThirdCountry(element.id),
@@ -120,13 +164,14 @@
                             return acc;
                         },
                             {});
-                    return this.thirdCountryOptions.filter(x => !selectedCountries[x.Id]).map(x => {
+                    return this.dataProcessingRegistrationOptions.thirdCountryOptions.filter(x => !selectedCountries[x.id]).map(x => {
                         return {
-                            text: x.Name,
-                            id: x.Id,
+                            text: x.name,
+                            id: x.id,
                             optionalObjectContext: {
-                                id: x.Id,
-                                name: x.Name,
+                                id: x.id,
+                                name: x.name,
+                                description: x.description,
                                 expired: false //We only allow selection of non-expired and this object is based on the available objects
                             }
                         };
@@ -284,9 +329,9 @@
                 });
         }
 
-        private addInsecureThirdCountry(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>) {
+        private addInsecureThirdCountry(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const country = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO;
+                const country = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
                 this.apiUseCaseFactory
                     .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignInsecureThirdCountry(this.dataProcessingRegistrationId, country.id))
                     .executeAsync(success => {
@@ -314,7 +359,7 @@
                 });
         }
 
-        private updateBasisForTransfer(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithExpirationStatusDTO>) {
+        private updateBasisForTransfer(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
 
             const updateFunc = newValue
                 ? () => this.dataProcessingRegistrationService.assignBasisForTransfer(this.dataProcessingRegistration.id, newValue.id)
@@ -325,6 +370,31 @@
                 .executeAsync(success => {
                     this.dataProcessingRegistration.basisForTransfer = newValue && newValue.optionalObjectContext;
                     this.bindBasisForTransfer();
+                    return success;
+                });
+        }
+
+        private updateDataResponsible(newValue?: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
+
+            const updateFunc = newValue
+                ? () => this.dataProcessingRegistrationService.assignDataResponsible(this.dataProcessingRegistration.id, newValue.id)
+                : () => this.dataProcessingRegistrationService.clearDataResponsible(this.dataProcessingRegistration.id);
+
+            this.apiUseCaseFactory
+                .createUpdate("Dataansvarlig", () => updateFunc())
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.dataResponsible.value = newValue && newValue.optionalObjectContext;
+                    this.bindBasisForTransfer();
+                    return success;
+                });
+        }
+
+        private changeDataResponsibleRemark(oversightIntervalRemark: string) {
+            this.apiUseCaseFactory
+                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateDataResponsibleRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.dataResponsible.remark = oversightIntervalRemark;
+                    this.bindDataResponsibleRemark();
                     return success;
                 });
         }
@@ -422,10 +492,6 @@
                 controller: EditMainDataProcessingRegistrationController,
                 controllerAs: "vm",
                 resolve: {
-                    thirdCountryOptions: ["localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingCountryOptions).getAll()
-                    ],
-                    basisForTransferOptions: ["localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) => localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingBasisForTransferOptions).getAll()
-                    ]
                 }
             });
         }]);

@@ -49,8 +49,24 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOrganizationUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleBasisForTransferUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleDataResponsibleUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
+        }
+
+        private int HandleDataResponsibleUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_DataResponsible, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _dataProcessingRegistrationRepository.GetByDataResponsibleId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
         }
 
         private int HandleBasisForTransferUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)

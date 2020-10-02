@@ -496,7 +496,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var processors = await DataProcessingRegistrationHelper.GetAvailableSubDataProcessors(registration.Id, orgPrefix);
 
             //Assert
-            Assert.True(processors.Any(x => x.Id == organization.Id));
+            Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
         [Fact]
@@ -645,6 +645,74 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Null(dto.BasisForTransfer);
+        }
+
+        [Fact]
+        public async Task Can_Get_AvailableDataResponsibleOptions()
+        {
+            //Arrange
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
+
+            //Act
+            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+
+            //Assert
+            Assert.NotEmpty(dataProcessingOptions.DataResponsibleOptions);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsible()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dataResponsibleOption.Id, updateRegistrationDto.DataResponsible.Value.Id);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsible_ToNull()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
+            using var assingResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
+            Assert.Equal(HttpStatusCode.OK, assingResponse.StatusCode);
+
+            //Act
+            using var clearResponse = await DataProcessingRegistrationHelper.SendClearDataResponsibleRequestAsync(registrationDto.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, clearResponse.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Null(updateRegistrationDto.DataResponsible.Value);
+        }
+
+        [Fact]
+        public async Task Can_Change_DataResponsibleRemark()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendUpdateDataResponsibleRemarkRequestAsync(registrationDto.Id, remark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(remark, updateRegistrationDto.DataResponsible.Remark);
         }
     }
 }

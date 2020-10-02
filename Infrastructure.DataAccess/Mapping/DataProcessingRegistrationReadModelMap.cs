@@ -56,6 +56,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_OversightInterval", 0);
 
+
+            Property(x => x.DataResponsible)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
         }
     }
 }

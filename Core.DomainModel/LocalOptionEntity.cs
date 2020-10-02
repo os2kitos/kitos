@@ -13,5 +13,10 @@
         public int OptionId { get; set; }
 
         public bool IsActive { get; set; }
+
+        public string GetActiveDescription()
+        {
+            return string.IsNullOrWhiteSpace(Description) ? Option.Description : Description;
+        }
     }
 }

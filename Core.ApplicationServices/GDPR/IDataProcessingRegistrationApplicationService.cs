@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Model.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -43,5 +44,8 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId);
         Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
+        Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId);
+        Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id);
+        Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
     }
 }

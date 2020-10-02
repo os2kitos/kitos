@@ -62,6 +62,7 @@
     <Compile Include="GDPR\DataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationDataProcessorAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationDataResponsibleAssigmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRoleAssignmentsService.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="GDPR\IDataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationInsecureCountriesAssignmentService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationDataResponsibleAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Options\ISingleOptionTypeInstanceAssignmentService.cs" />
     <Compile Include="Options\IOptionsService.cs" />
     <Compile Include="Options\IMultipleOptionTypeInstancesAssignmentService.cs" />
+    <Compile Include="Model\Options\OptionDescriptor.cs" />
     <Compile Include="Options\SingleOptionTypeInstanceAssignmentServiceBase.cs" />
     <Compile Include="Options\OptionsService.cs" />
     <Compile Include="Options\MultipleOptionTypeInstancesAssignmentServiceBase.cs" />
@@ -115,11 +118,13 @@
     <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\DataProcessingRegistrationOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationReadModelRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\GDPR\IDataProcessingRegistrationOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\IDataProcessingRegistrationReadModelRepository.cs" />
     <Compile Include="Repositories\GDPR\IDataProcessingRegistrationRepository.cs" />
     <Compile Include="Repositories\Organization\IOrganizationRepository.cs" />
