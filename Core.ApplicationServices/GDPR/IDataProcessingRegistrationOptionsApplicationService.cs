@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using Core.ApplicationServices.Model.GDPR;
+﻿using Core.ApplicationServices.Model.GDPR;
 using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.GDPR

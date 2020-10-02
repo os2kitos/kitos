@@ -201,8 +201,7 @@
         }
 
         private mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
-            const isExpired = !_.some(this.roles, role => role.id === input.role.id);
-            input.role.name = this.formatRoleName(input.role, isExpired);
+            input.role.name = this.formatRoleName(input.role, input.role.expired);
             const newUser = <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.ISimpleUserDTO>>{
                 id: input.user.id,
                 text: input.user.name,
@@ -321,8 +320,8 @@
                 controller: EditRolesDataProcessingRegistrationController,
                 controllerAs: "vm",
                 resolve: {
-                    dataProcessingRegistrationRoles: ["dataProcessingRegistrationService", "dataProcessingRegistration",
-                        (dataProcessingRegistrationService, dataProcessingRegistration) => dataProcessingRegistrationService.getAvailableRoles(dataProcessingRegistration.id)],
+                    dataProcessingRegistrationRoles: ["dataProcessingRegistrationOptions",
+                        (dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) => dataProcessingRegistrationOptions.roles],
                     dataProcessingRegistration: [
                         "dataProcessingRegistrationService", "$stateParams", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, $stateParams) => dataProcessingRegistrationService.get($stateParams.id)
                     ]
