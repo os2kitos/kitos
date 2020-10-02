@@ -46,7 +46,25 @@ namespace Core.DomainModel.GDPR
 
         public YesNoUndecidedOption? HasSubDataProcessors { get; set; }
 
+        public void SetHasSubDataProcessors(YesNoUndecidedOption hasSubDataProcessors)
+        {
+            HasSubDataProcessors = hasSubDataProcessors;
+            if (hasSubDataProcessors != YesNoUndecidedOption.Yes)
+            {
+                SubDataProcessors.Clear();
+            }
+        }
+
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
+
+        public void SetTransferToInsecureThirdCountries(YesNoUndecidedOption transferToInsecureThirdCountries)
+        {
+            TransferToInsecureThirdCountries = transferToInsecureThirdCountries;
+            if (transferToInsecureThirdCountries != YesNoUndecidedOption.Yes)
+            {
+                InsecureCountriesSubjectToDataTransfer.Clear();
+            }
+        }
 
         public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; }
 
@@ -281,6 +299,15 @@ namespace Core.DomainModel.GDPR
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public string OversightIntervalRemark { get; set; }
+
+        public void SetIsAgreementConcluded(YesNoIrrelevantOption concluded)
+        {
+            IsAgreementConcluded = concluded;
+            if (IsAgreementConcluded != YesNoIrrelevantOption.YES)
+            {
+                AgreementConcludedAt = null;
+            }
+        }
 
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
 

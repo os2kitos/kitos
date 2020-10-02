@@ -41,6 +41,7 @@
 
     export interface IDataProcessingRegistrationPatchResult {
         valueModifiedTo: any;
+        optionalServerDataPush?: Models.DataProcessing.IDataProcessingRegistrationDTO;
     }
 
     export class DataProcessingRegistrationService implements IDataProcessingRegistrationService {
@@ -79,8 +80,10 @@
                 .patch<API.Models.IApiWrapper<any>>(url, payload)
                 .then(
                     response => {
+                        var res = response.data as { response: Models.DataProcessing.IDataProcessingRegistrationDTO };
                         return <IDataProcessingRegistrationPatchResult>{
                             valueModifiedTo: value,
+                            optionalServerDataPush: res.response
                         };
                     },
                     error => this.handleServerError(error)
@@ -281,8 +284,8 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
         }
 
-        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval : Models.Api.Shared.YearMonthUndecidedIntervalOption) {
-            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval"), oversightInterval );
+        updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval: Models.Api.Shared.YearMonthUndecidedIntervalOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval"), oversightInterval);
         }
 
         updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string) {

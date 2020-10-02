@@ -339,7 +339,7 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .SetSubDataProcessorsState(id, value.Value)
-                .Match(_ => Ok(), FromOperationError);
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
@@ -388,7 +388,7 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateIsAgreementConcluded(id, concluded.Value)
-                .Match(_ => Ok(), FromOperationError);
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
@@ -420,7 +420,7 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateTransferToInsecureThirdCountries(id, value.Value)
-                .Match(_ => Ok(), FromOperationError);
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]

@@ -275,7 +275,7 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.HasSubDataProcessors = state;
+                registration.SetHasSubDataProcessors(state);
                 return registration;
             });
         }
@@ -295,7 +295,7 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.IsAgreementConcluded = concluded;
+                registration.SetIsAgreementConcluded(concluded);
                 return registration;
             });
         }
@@ -313,7 +313,7 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.TransferToInsecureThirdCountries = transferToInsecureThirdCountries;
+                registration.SetTransferToInsecureThirdCountries(transferToInsecureThirdCountries);
                 return registration;
             });
         }
