@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Presentation.Web.Models.ItSystemUsage;
 
 namespace Presentation.Web.Models
@@ -126,6 +127,7 @@ namespace Presentation.Web.Models
         public DateTime? DPIADeleteDate { get; set; }
         public int NumberDPIA { get; set; }
         public HostedAt? HostedAt { get; set; }
+        public NamedEntityDTO[] AssociatedDataProcessingRegistrations { get; set; }
         #endregion
     }
 }
