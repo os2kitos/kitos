@@ -39,6 +39,7 @@ namespace Core.DomainServices.GDPR
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
             PatchBasisForTransfer(source, destination);
+            PatchOverSightOptions(source, destination);
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -47,6 +48,10 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
+        }
+        private void PatchOverSightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.OverSightOptionNamesAsCsv = string.Join(", ", source.OversightOptions.Select(x => x.Name));
         }
 
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

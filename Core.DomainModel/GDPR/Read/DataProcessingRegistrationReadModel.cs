@@ -51,5 +51,7 @@ namespace Core.DomainModel.GDPR.Read
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
         public string DataResponsible { get; set; }
+
+        public string OverSightOptionNamesAsCsv { get; set; }
     }
 }

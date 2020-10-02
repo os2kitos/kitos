@@ -34,6 +34,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationDataProcessorAssignmentService _dataProcessingRegistrationDataProcessorAssignmentService;
         private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
         private readonly IDataProcessingRegistrationBasisForTransferAssignmentService _basisForTransferAssignmentService;
+        private readonly IDataProcessingRegistrationOversightOptionsAssignmentService _oversightOptionAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
@@ -49,6 +50,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationDataProcessorAssignmentService dataProcessingRegistrationDataProcessorAssignmentService,
             IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
             IDataProcessingRegistrationBasisForTransferAssignmentService basisForTransferAssignmentService,
+            IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingRegistrationRight> rightRepository)
         {
@@ -62,6 +64,7 @@ namespace Core.ApplicationServices.GDPR
             _dataProcessingRegistrationDataProcessorAssignmentService = dataProcessingRegistrationDataProcessorAssignmentService;
             _countryAssignmentService = countryAssignmentService;
             _basisForTransferAssignmentService = basisForTransferAssignmentService;
+            _oversightOptionAssignmentService = oversightOptionAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -344,7 +347,6 @@ namespace Core.ApplicationServices.GDPR
 
         }
 
-
         public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
         {
             return Modify<DataProcessingRegistration>(id, registration =>
@@ -367,6 +369,7 @@ namespace Core.ApplicationServices.GDPR
                 return registration;
             });
         }
+
         public Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId)
         {
             return Modify(id, registration => _dataResponsibleAssigmentService.Assign(registration, dataResponsibleId));
@@ -386,7 +389,26 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-            private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightOptionRemark(int id, string remark)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.OverSightOptionRemark = remark;
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int countryId)
+        {
+            return Modify(id, registration => _oversightOptionAssignmentService.Assign(registration, countryId));
+        }
+
+        public Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(int id, int countryId)
+        {
+            return Modify(id, registration => _oversightOptionAssignmentService.Remove(registration, countryId));
+        }
+
+        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 

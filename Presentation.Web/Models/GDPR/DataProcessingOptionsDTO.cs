@@ -11,5 +11,6 @@ namespace Presentation.Web.Models.GDPR
         public IEnumerable<OptionWithDescriptionDTO> DataResponsibleOptions { get; set; }
         public IEnumerable<OptionWithDescriptionDTO> ThirdCountryOptions { get; set; }
         public IEnumerable<OptionWithDescriptionDTO> BasisForTransferOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionDTO> OversightOptions { get; set; }
     }
 }

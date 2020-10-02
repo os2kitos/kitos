@@ -10,15 +10,18 @@ namespace Core.DomainServices.Repositories.GDPR
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleOptionsService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferOptionsService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> _oversightOptionsService;
 
         public DataProcessingRegistrationOptionRepository(
             IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService,
             IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleOptionsService,
-            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferOptionsService)
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferOptionsService,
+            IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> oversightOptionsService)
         {
             _countryOptionsService = countryOptionsService;
             _dataResponsibleOptionsService = dataResponsibleOptionsService;
             _basisForTransferOptionsService = basisForTransferOptionsService;
+            _oversightOptionsService = oversightOptionsService;
         }
 
         public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> GetAvailableCountryOptions(int organizationId)
@@ -30,9 +33,14 @@ namespace Core.DomainServices.Repositories.GDPR
         {
             return _dataResponsibleOptionsService.GetAvailableOptionsDetails(organizationId);
         }
+
         public IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> GetAvailableBasisForTransferOptions(int organizationId)
         {
             return _basisForTransferOptionsService.GetAvailableOptionsDetails(organizationId);
+        }
+        public IEnumerable<OptionDescriptor<DataProcessingOversightOption>> GetAvailableOversightOptions(int organizationId)
+        {
+            return _oversightOptionsService.GetAvailableOptionsDetails(organizationId);
         }
     }
 }

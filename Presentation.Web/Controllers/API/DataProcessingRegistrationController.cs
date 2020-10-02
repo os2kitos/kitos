@@ -535,7 +535,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
                     ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
-                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList()
+                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
+                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);
         }
@@ -585,6 +586,55 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/oversight-option/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        {
+            if (oversightOptionId == null)
+                return BadRequest($"{nameof(oversightOptionId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignOversightOption(id, oversightOptionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-option/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        {
+            if (oversightOptionId == null)
+                return BadRequest($"{nameof(oversightOptionId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveOversightOption(id, oversightOptionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-option-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightOptionRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        {
+            if (remark == null)
+                return BadRequest($"{nameof(remark)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightOptionRemark(id, remark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -610,6 +660,7 @@ namespace Presentation.Web.Controllers.API
             var enabledCountryOptions = GetIdsOfAvailableCountryOptions(assignableDataProcessingRegistrationOptions);
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
+            var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
 
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
@@ -625,7 +676,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
-                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions))
+                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions, enabledOversightOptions))
                 .ToList();
         }
 
@@ -642,6 +693,10 @@ namespace Presentation.Web.Controllers.API
         private ISet<int> GetIdsOfAvailableBasisForTransferOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
         {
             return new HashSet<int>(dataProcessingRegistrationOptions.BasisForTransferOptions.Select(x => x.Option.Id));
+        }
+        private ISet<int> GetIdsOfAvailableOversightOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
+        {
+            return new HashSet<int>(dataProcessingRegistrationOptions.OversightOptions.Select(x => x.Option.Id));
         }
 
         private Dictionary<int, Maybe<string>> GetLocalRoleDescriptionOverrides(int organizationId)
@@ -660,10 +715,17 @@ namespace Presentation.Web.Controllers.API
             var enabledCountryOptions = GetIdsOfAvailableCountryOptions(assignableDataProcessingRegistrationOptions);
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
-            return ToDTO(value, GetLocalRoleDescriptionOverrides(value.OrganizationId), enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions);
+            var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
+            return ToDTO(value, GetLocalRoleDescriptionOverrides(value.OrganizationId), enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions, enabledOversightOptions);
         }
 
-        private static DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value, Dictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> enabledCountryOptions, ISet<int> enabledBasisForTransferOptions, ISet<int> enabledDataResponsibleOptions)
+        private static DataProcessingRegistrationDTO ToDTO(
+            DataProcessingRegistration value, 
+            Dictionary<int, Maybe<string>> localDescriptionOverrides, 
+            ISet<int> enabledCountryOptions, 
+            ISet<int> enabledBasisForTransferOptions, 
+            ISet<int> enabledDataResponsibleOptions,
+            ISet<int> enabledOversightOptions)
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
@@ -718,6 +780,14 @@ namespace Presentation.Web.Controllers.API
                             .Select(responsible => new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, enabledDataResponsibleOptions.Contains(responsible.Id) == false, responsible.Description))
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
+                },
+                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>()
+                {
+                    Value = value
+                            .OversightOptions
+                            .Select(oversightOption => new NamedEntityWithExpirationStatusDTO(oversightOption.Id, oversightOption.Name, enabledOversightOptions.Contains(oversightOption.Id) == false))
+                            .ToArray(),
+                    Remark = value.OverSightOptionRemark
                 },
             };
         }

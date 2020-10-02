@@ -25,6 +25,7 @@ namespace Core.DomainModel.GDPR
             DataProcessors = new List<Organization.Organization>();
             SubDataProcessors = new List<Organization.Organization>();
             InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
+            OversightOptions = new List<DataProcessingOversightOption>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -82,6 +83,9 @@ namespace Core.DomainModel.GDPR
         public int? DataResponsible_Id { get; set; }
 
         public string DataResponsibleRemark { get; set; }
+
+        public virtual ICollection<DataProcessingOversightOption> OversightOptions { get; set; }
+        public string OverSightOptionRemark { get; set; }
 
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {
@@ -165,6 +169,28 @@ namespace Core.DomainModel.GDPR
             return country;
         }
 
+        public Result<DataProcessingOversightOption, OperationError> AssignOversightOption(DataProcessingOversightOption oversightOption)
+        {
+            if (oversightOption == null) throw new ArgumentNullException(nameof(oversightOption));
+            if (HasOversightOption(oversightOption))
+                return new OperationError("Oversight option already assigned", OperationFailure.Conflict);
+
+            OversightOptions.Add(oversightOption);
+
+            return oversightOption;
+        }
+
+        public Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(DataProcessingOversightOption oversightOption)
+        {
+            if (oversightOption == null) throw new ArgumentNullException(nameof(oversightOption));
+            if (!HasOversightOption(oversightOption))
+                return new OperationError("Oversight option not assigned", OperationFailure.BadInput);
+
+            OversightOptions.Remove(oversightOption);
+
+            return oversightOption;
+        }
+
         private bool HasInsecureCountry(DataProcessingCountryOption country)
         {
             return InsecureCountriesSubjectToDataTransfer.Any(c => c.Id == country.Id);
@@ -178,6 +204,11 @@ namespace Core.DomainModel.GDPR
         private bool HasDataProcessor(Organization.Organization dataProcessor)
         {
             return DataProcessors.Any(x => x.Id == dataProcessor.Id);
+        }
+
+        private bool HasOversightOption(DataProcessingOversightOption oversightOption)
+        {
+            return OversightOptions.Any(x => x.Id == oversightOption.Id);
         }
 
         public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
