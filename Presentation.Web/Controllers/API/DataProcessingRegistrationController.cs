@@ -744,7 +744,7 @@ namespace Presentation.Web.Controllers.API
 
         private static BusinessRoleDTO ToDto(OptionDescriptor<DataProcessingRegistrationRole> availableRole)
         {
-            return ToDTO(availableRole.Option, new Dictionary<int, Maybe<string>> { { availableRole.Option.Id, availableRole.Description.FromString() } }, new HashSet<int> { availableRole.Option.Id });
+            return new BusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description);
         }
 
         private static BusinessRoleDTO ToDTO(DataProcessingRegistrationRole role, IReadOnlyDictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> idsOfAvailableRoles)
