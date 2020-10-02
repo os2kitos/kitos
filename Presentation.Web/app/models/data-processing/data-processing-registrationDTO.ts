@@ -38,6 +38,7 @@
     export interface IDataProcessingRoleDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         note: string,
         hasWriteAccess: boolean,
+        expired:boolean;
     }
 
     export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
@@ -48,5 +49,6 @@
         thirdCountryOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         dataResponsibleOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
         basisForTransferOptions: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[],
+        roles: IDataProcessingRoleDTO[],
     }
 }

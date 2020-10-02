@@ -28,8 +28,8 @@ namespace Core.ApplicationServices.GDPR
                 () => new DataProcessingRegistrationOptions(
                         _optionRepository.GetAvailableDataResponsibleOptions(organizationId),
                         _optionRepository.GetAvailableCountryOptions(organizationId),
-                        _optionRepository.GetAvailableBasisForTransferOptions(organizationId)
-                    ));
+                        _optionRepository.GetAvailableBasisForTransferOptions(organizationId),
+                        _optionRepository.GetAvailableRoles(organizationId)));
         }
 
         private Result<DataProcessingRegistrationOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<DataProcessingRegistrationOptions, OperationError>> authorizedAction)
