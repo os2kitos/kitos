@@ -4,7 +4,6 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper")
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
-import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
 import ItSystemUsageGdpr = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageGDPR.po");
 import LocalItSystemNavigation = require("../../Helpers/SideNavigation/LocalItSystemNavigation");
 
