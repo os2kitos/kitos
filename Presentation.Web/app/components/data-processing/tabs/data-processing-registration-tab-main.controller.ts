@@ -333,8 +333,12 @@
             this.apiUseCaseFactory
                 .createUpdate("Databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateIsAgreementConcluded(this.dataProcessingRegistration.id, isAgreementConcluded.optionalObjectContext))
                 .executeAsync(success => {
+                    if (isAgreementConcluded.optionalObjectContext !== Models.Api.Shared.YesNoIrrelevantOption.YES) {
+                        this.dataProcessingRegistration.agreementConcluded.optionalDateValue = null;
+                    }
                     this.dataProcessingRegistration.agreementConcluded.value = isAgreementConcluded.optionalObjectContext;
                     this.bindIsAgreementConcluded();
+                    this.bindAgreementConcludedAt();
                     return success;
                 });
         }
@@ -345,7 +349,11 @@
                 .createUpdate("Underdatabehandlere", () => this.dataProcessingRegistrationService.updateSubDataProcessorsState(this.dataProcessingRegistrationId, value))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.hasSubDataProcessors = value;
+                    if (value !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
+                        this.dataProcessingRegistration.subDataProcessors = [];
+                    }
                     this.bindHasSubDataProcessors();
+                    this.bindSubDataProcessors();
                     return success;
                 });
         }
@@ -355,6 +363,9 @@
                 .apiUseCaseFactory
                 .createUpdate("Overførsel til usikkert 3. land", () => this.dataProcessingRegistrationService.updateTransferToInsecureThirdCountry(this.dataProcessingRegistrationId, value))
                 .executeAsync(success => {
+                    if (value !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
+                        this.dataProcessingRegistration.insecureThirdCountries = [];
+                    }
                     this.dataProcessingRegistration.transferToInsecureThirdCountries = value;
                     this.bindTransferToInsecureThirdCountries();
                     return success;
@@ -365,7 +376,7 @@
             var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(agreementConcludedAt);
             if (!!formattedDate.convertedValue) {
                 return this.apiUseCaseFactory
-                    .createUpdate("Dato for databehandleraftale indgået", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, formattedDate.convertedValue))
+                    .createUpdate("Dato for indgåelse af databehandleraftale", () => this.dataProcessingRegistrationService.updateAgreementConcludedAt(this.dataProcessingRegistration.id, formattedDate.convertedValue))
                     .executeAsync(success => {
                         this.dataProcessingRegistration.agreementConcluded.optionalDateValue = agreementConcludedAt;
                         this.bindAgreementConcludedAt();
