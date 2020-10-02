@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -57,7 +58,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
-            var agreementConcludedAt = A<DateTime>();
             var oversightInterval = A<YearMonthIntervalOption>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
@@ -87,6 +87,13 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var setInsecureCountryStateResponse = await DataProcessingRegistrationHelper.SendSetUseTransferToInsecureThirdCountriesStateRequestAsync(registration.Id, transferToThirdCountries);
             Assert.Equal(HttpStatusCode.OK, setInsecureCountryStateResponse.StatusCode);
 
+            // Set data responsible
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(organizationId);
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
+            using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
+            Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
+            // Data responsible done
+
             //Enable and set sub processors
             using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
             Assert.Equal(HttpStatusCode.OK, setStateRequest.StatusCode);
@@ -105,8 +112,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Systems
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
-            using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, itSystemDto.Id);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
+            using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, usage.Id);
             Assert.Equal(HttpStatusCode.OK, assignSystemResponse.StatusCode);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
@@ -130,6 +137,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
             Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
+            Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

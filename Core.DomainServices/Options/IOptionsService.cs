@@ -1,11 +1,18 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainServices.Model.Options;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Options
 {
     public interface IOptionsService<TReference, TOption> where TOption : OptionEntity<TReference>
     {
+        /// <summary>
+        /// Returns a list of options available to the organization
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
+        IEnumerable<OptionDescriptor<TOption>> GetAvailableOptionsDetails(int organizationId);
         /// <summary>
         /// Returns a list of options available to the organization
         /// </summary>

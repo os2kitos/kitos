@@ -15,13 +15,16 @@ namespace Core.DomainServices.GDPR
     {
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleService;
 
         public DataProcessingRegistrationReadModelUpdate(
             IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
-            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService)
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService,
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _basisForTransferService = basisForTransferService;
+            _dataResponsibleService = dataResponsibleService;
         }
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -34,32 +37,9 @@ namespace Core.DomainServices.GDPR
             PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
+            PatchDataResponsible(source, destination);
             PatchBasisForTransfer(source, destination);
             PatchIsOversightCompleted(source, destination);
-        }
-
-        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
-        {
-            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
-        }
-
-        private string GetNameOfOption<TOption>(
-            DataProcessingRegistration parent,
-            TOption optionEntity,
-            IOptionsService<DataProcessingRegistration, TOption> service)
-            where TOption : OptionEntity<DataProcessingRegistration>
-        {
-            if (optionEntity != null)
-            {
-                var available = service
-                    .GetOption(parent.OrganizationId, optionEntity.Id)
-                    .Select(x => x.available)
-                    .GetValueOrFallback(false);
-
-                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
-            }
-
-            return null;
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -68,6 +48,16 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
+        }
+
+        private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
+        }
+
+        private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
         }
 
         private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -152,6 +142,25 @@ namespace Core.DomainServices.GDPR
                 destination.RoleAssignments.Remove(assignmentToBeRemoved);
                 _roleAssignmentRepository.Delete(assignmentToBeRemoved);
             });
+        }
+
+        private string GetNameOfOption<TOption>(
+            DataProcessingRegistration parent,
+            TOption optionEntity,
+            IOptionsService<DataProcessingRegistration, TOption> service)
+            where TOption : OptionEntity<DataProcessingRegistration>
+        {
+            if (optionEntity != null)
+            {
+                var available = service
+                    .GetOption(parent.OrganizationId, optionEntity.Id)
+                    .Select(x => x.available)
+                    .GetValueOrFallback(false);
+
+                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
+            }
+
+            return null;
         }
 
         private static void PatchIsOversightCompleted(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

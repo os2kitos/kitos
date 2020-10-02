@@ -5,7 +5,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices.GDPR;
-using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -14,12 +14,12 @@ namespace Tests.Unit.Core.DomainServices.GDPR
 {
     public class DataProcessingRegistrationSystemAssignmentServiceTest : WithAutoFixture
     {
-        private readonly Mock<IItSystemRepository> _systemRepository;
+        private readonly Mock<IItSystemUsageRepository> _systemRepository;
         private readonly DataProcessingRegistrationSystemAssignmentService _sut;
 
         public DataProcessingRegistrationSystemAssignmentServiceTest()
         {
-            _systemRepository = new Mock<IItSystemRepository>();
+            _systemRepository = new Mock<IItSystemUsageRepository>();
             _sut = new DataProcessingRegistrationSystemAssignmentService(_systemRepository.Object);
         }
 
@@ -27,19 +27,15 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         public void Can_GetApplicableSystems()
         {
             //Arrange
-            var alreadyAssignedSystem = new ItSystem { Id = A<int>() };
-            var availableSystem = new ItSystem { Id = A<int>() };
+            var alreadyAssignedSystem = new ItSystemUsage { Id = A<int>() };
+            var availableSystem = new ItSystemUsage { Id = A<int>() };
 
             var organizationId = A<int>();
 
             var registration = new DataProcessingRegistration
             {
                 OrganizationId = organizationId,
-                SystemUsages = new List<ItSystemUsage> { new ItSystemUsage
-                {
-                    OrganizationId = organizationId,
-                    ItSystem = alreadyAssignedSystem
-                } }
+                SystemUsages = { alreadyAssignedSystem }
             };
             ExpectSystemsInUse(organizationId, availableSystem, alreadyAssignedSystem);
 
@@ -56,48 +52,18 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         {
             //Arrange
             var organizationId = A<int>();
-            var systemId = A<int>();
+            var systemUsageId = A<int>();
             var registration = new DataProcessingRegistration { OrganizationId = organizationId };
             var itSystemUsage = new ItSystemUsage { OrganizationId = registration.OrganizationId };
-            var itSystem = new ItSystem
-            {
-                //Add usage in same organization as dpa
-                Usages = {itSystemUsage}
-            };
-
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(itSystem);
+            _systemRepository.Setup(x => x.GetSystemUsage(systemUsageId)).Returns(itSystemUsage);
 
             //Act
-            var result = _sut.AssignSystem(registration, systemId);
+            var result = _sut.AssignSystem(registration, systemUsageId);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             Assert.True(registration.SystemUsages.Contains(itSystemUsage));
-        }
-
-        [Fact]
-        public void Cannot_AssignSystem_If_System_Is_Not_UsedInOrganization()
-        {
-            //Arrange
-            var organizationId = A<int>();
-            var systemId = A<int>();
-            var registration = new DataProcessingRegistration { OrganizationId = organizationId };
-            var itSystem = new ItSystem
-            {
-                //Add usage in a different organization than the DPA so assignment is not possible
-                Usages = { new ItSystemUsage { OrganizationId = A<int>() } }
-            };
-
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(itSystem);
-
-            //Act
-            var result = _sut.AssignSystem(registration, systemId);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            Assert.Empty(registration.SystemUsages);
         }
 
         [Fact]
@@ -105,13 +71,13 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         {
             //Arrange
             var organizationId = A<int>();
-            var systemId = A<int>();
+            var systemUsageId = A<int>();
             var registration = new DataProcessingRegistration { OrganizationId = organizationId };
 
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(default(ItSystem));
+            _systemRepository.Setup(x => x.GetSystemUsage(systemUsageId)).Returns(default(ItSystemUsage));
 
             //Act
-            var result = _sut.AssignSystem(registration, systemId);
+            var result = _sut.AssignSystem(registration, systemUsageId);
 
             //Assert
             Assert.True(result.Failed);
@@ -127,22 +93,17 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             var systemId = A<int>();
 
             var itSystemUsage = new ItSystemUsage { OrganizationId = organizationId, Id = A<int>() };
-            var itSystem = new ItSystem
-            {
-                //Add usage in same organization as dpa
-                Usages = { itSystemUsage }
-            };
 
             var registration = new DataProcessingRegistration { OrganizationId = organizationId, SystemUsages = { itSystemUsage } };
 
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(itSystem);
+            _systemRepository.Setup(x => x.GetSystemUsage(systemId)).Returns(itSystemUsage);
 
             //Act
             var result = _sut.RemoveSystem(registration, systemId);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             Assert.Empty(registration.SystemUsages);
         }
 
@@ -154,7 +115,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             var systemId = A<int>();
             var registration = new DataProcessingRegistration { OrganizationId = organizationId };
 
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(default(ItSystem));
+            _systemRepository.Setup(x => x.GetSystemUsage(systemId)).Returns(default(ItSystemUsage));
 
             //Act
             var result = _sut.RemoveSystem(registration, systemId);
@@ -172,15 +133,10 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             var systemId = A<int>();
 
             var itSystemUsage = new ItSystemUsage { OrganizationId = A<int>(), Id = A<int>() };
-            var itSystem = new ItSystem
-            {
-                //Add usage in different organization than dpa
-                Usages = { itSystemUsage }
-            };
 
-            var registration = new DataProcessingRegistration { OrganizationId = organizationId, SystemUsages = { itSystemUsage } };
+            var registration = new DataProcessingRegistration { OrganizationId = organizationId, SystemUsages = { new ItSystemUsage() { Id = A<int>() } } };
 
-            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(itSystem);
+            _systemRepository.Setup(x => x.GetSystemUsage(systemId)).Returns(itSystemUsage);
 
             //Act
             var result = _sut.RemoveSystem(registration, systemId);
@@ -191,10 +147,10 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             Assert.NotEmpty(registration.SystemUsages);
         }
 
-        private void ExpectSystemsInUse(int organizationId, params ItSystem[] systems)
+        private void ExpectSystemsInUse(int organizationId, params ItSystemUsage[] systemUsages)
         {
-            _systemRepository.Setup(x => x.GetSystemsInUse(organizationId))
-                .Returns(systems.AsQueryable());
+            _systemRepository.Setup(x => x.GetSystemUsagesFromOrganization(organizationId))
+                .Returns(systemUsages.AsQueryable());
         }
     }
 }

@@ -9,7 +9,8 @@
         disabled : boolean;
     }
 
-    export interface NamedEntityWithExpirationStatusDTO extends NamedEntityDTO {
+    export interface NamedEntityWithDescriptionAndExpirationStatusDTO extends NamedEntityDTO {
         expired: boolean;
+        description: string;
     }
 }

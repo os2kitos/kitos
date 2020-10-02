@@ -76,5 +76,9 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.id("agreementConcludedAt")).element(by.tagName("input"));
     }
 
+    getDataResponsibleRemark() {
+        return element(by.id("dataResponsibleRemark_remark"));
+    }
+
 }
 export = DataProcessingRegistrationEditMainPageObject;

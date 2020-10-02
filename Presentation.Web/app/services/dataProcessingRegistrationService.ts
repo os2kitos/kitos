@@ -28,6 +28,10 @@
         clearBasisForTransfer(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightInterval(dataProcessingRegistrationId: number, oversightInterval: Models.Api.Shared.YearMonthUndecidedIntervalOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        assignDataResponsible(dataProcessingRegistrationId: number, dataResponsibleId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        clearDataResponsible(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateDataResponsibleRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -205,6 +209,18 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "basis-for-transfer/clear"), {});
         }
 
+        assignDataResponsible(dataProcessingRegistrationId: number, dataResponsibleId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-responsible/assign"), dataResponsibleId);
+        }
+
+        clearDataResponsible(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-responsible/clear"), {});
+        }
+
+        updateDataResponsibleRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-responsible-remark"), remark);
+        }
+
         getAvailableSystems(dataProcessingRegistrationId: number, query: string): angular.IPromise<Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[]> {
             return this
                 .$http
@@ -279,7 +295,6 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded"), value);
         }
 
-
         updateAgreementConcludedAt(dataProcessingRegistrationId: number, dateString: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "agreement-concluded-at"), dateString);
         }
@@ -290,6 +305,10 @@
 
         updateOversightIntervalRemark(dataProcessingRegistrationId: number, remark: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval-remark"), remark);
+        }
+
+        getApplicableDataProcessingRegistrationOptions(organizationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>{
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationOptions>(this.getUri(`available-options-in/${organizationId}`));
         }
 
         static $inject = ["$http"];

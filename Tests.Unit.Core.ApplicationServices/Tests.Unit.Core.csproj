@@ -162,6 +162,7 @@
       <Link>UserMock.cs</Link>
     </Compile>
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
@@ -176,12 +177,13 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationBasisForTransferAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataProcessorAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationInsecureCountriesAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataResponsibleAssigmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationNamingServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationRoleAssignmentsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Repositories\DataProcessingRegistrationOptionRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
