@@ -6,8 +6,8 @@
             controller: "object.EditAdviceCtrl",
             controllerAs: "Vm",
             resolve: {
-                Roles: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataProcessingRegistrationRoles).getAll()],
+                Roles: ["dataProcessingRegistrationOptions", (dataProcessingRegistrationOptions: Kitos.Models.DataProcessing.IDataProcessingRegistrationOptions) =>
+                    dataProcessingRegistrationOptions.roles],
                 object: ["dataProcessingRegistration", agreement => agreement],
                 type: [() => "dataProcessingRegistration"],
                 advicename: ["dataProcessingRegistration",

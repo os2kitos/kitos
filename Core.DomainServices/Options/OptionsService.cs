@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Model.Options;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Options

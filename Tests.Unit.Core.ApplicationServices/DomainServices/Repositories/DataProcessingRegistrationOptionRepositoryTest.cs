@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;
@@ -16,16 +17,19 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>> _countryOptionsServiceMock;
         private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>> _dataResponsibleOptionsServiceMock;
         private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>> _basisForTransferOptionsServiceMock;
+        private readonly Mock<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>> _roleServiceMock;
 
         public DataProcessingRegistrationOptionRepositoryTest()
         {
             _countryOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>();
             _dataResponsibleOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>();
             _basisForTransferOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>();
+            _roleServiceMock = new Mock<IOptionsService<DataProcessingRegistrationRight,DataProcessingRegistrationRole>>();
             _sut = new DataProcessingRegistrationOptionRepository(
                 _countryOptionsServiceMock.Object, 
                 _dataResponsibleOptionsServiceMock.Object,
-                _basisForTransferOptionsServiceMock.Object);
+                _basisForTransferOptionsServiceMock.Object,
+                _roleServiceMock.Object);
         }
 
         [Fact]
@@ -80,6 +84,29 @@ namespace Tests.Unit.Core.DomainServices.Repositories
 
             //Assert
             Assert.Equal(basisForTransferOptions, assignableBasisForTransferOptions);
+        }
+
+        [Fact]
+        public void Can_GetAvailableRoles()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var roles = new List<OptionDescriptor<DataProcessingRegistrationRole>>()
+            {
+                new OptionDescriptor<DataProcessingRegistrationRole>(new DataProcessingRegistrationRole(), ""),
+            };
+            ExpectRoles(organizationId, roles);
+
+            //Act
+            var availableRoles = _sut.GetAvailableRoles(organizationId);
+
+            //Assert
+            Assert.Equal(roles, availableRoles);
+        }
+
+        private void ExpectRoles(int organizationId, IEnumerable<OptionDescriptor<DataProcessingRegistrationRole>> roles)
+        {
+            _roleServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(roles);
         }
 
         private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)

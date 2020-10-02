@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Core.DomainModel.GDPR;
+using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 
 namespace Core.DomainServices.Repositories.GDPR
@@ -10,15 +10,18 @@ namespace Core.DomainServices.Repositories.GDPR
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> _countryOptionsService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleOptionsService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferOptionsService;
+        private readonly IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole> _roleOptionsService;
 
         public DataProcessingRegistrationOptionRepository(
             IOptionsService<DataProcessingRegistration, DataProcessingCountryOption> countryOptionsService,
             IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleOptionsService,
-            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferOptionsService)
+            IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferOptionsService,
+            IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole> roleOptionsService)
         {
             _countryOptionsService = countryOptionsService;
             _dataResponsibleOptionsService = dataResponsibleOptionsService;
             _basisForTransferOptionsService = basisForTransferOptionsService;
+            _roleOptionsService = roleOptionsService;
         }
 
         public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> GetAvailableCountryOptions(int organizationId)
@@ -33,6 +36,11 @@ namespace Core.DomainServices.Repositories.GDPR
         public IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> GetAvailableBasisForTransferOptions(int organizationId)
         {
             return _basisForTransferOptionsService.GetAvailableOptionsDetails(organizationId);
+        }
+
+        public IEnumerable<OptionDescriptor<DataProcessingRegistrationRole>> GetAvailableRoles(int organizationId)
+        {
+            return _roleOptionsService.GetAvailableOptionsDetails(organizationId);
         }
     }
 }
