@@ -231,7 +231,7 @@ namespace Presentation.Web.Controllers.API
         {
             return _dataProcessingRegistrationApplicationService
                 .GetSystemsWhichCanBeAssigned(id, nameQuery, pageSize)
-                .Match(systems => Ok(systems.MapToNamedEntityDTOs().ToList()), FromOperationError);
+                .Match(systems => Ok(systems.Select(x => x.MapToNamedEntityWithEnabledStatusDTO()).ToList()), FromOperationError);
         }
 
         [HttpPatch]
@@ -495,7 +495,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (oversightInterval == null)
                 return BadRequest(nameof(oversightInterval) + " must provided");
-            
+
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightInterval(id, oversightInterval.Value)
@@ -511,7 +511,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PatchOversightIntervalRemark(int id, [FromBody] SingleValueDTO<string> oversightIntervalRemark)
         {
             if (oversightIntervalRemark == null)
-                return BadRequest(nameof(oversightIntervalRemark) +" must be provided");
+                return BadRequest(nameof(oversightIntervalRemark) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
                 .UpdateOversightIntervalRemark(id, oversightIntervalRemark.Value)
@@ -599,7 +599,7 @@ namespace Presentation.Web.Controllers.API
                     .Select(externalReference => ToDTO(value.ReferenceId, externalReference))
                     .ToArray(),
                 ItSystems = value
-                    .GetAssignedSystems()
+                    .SystemUsages
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToArray(),
                 OversightInterval = new ValueWithOptionalRemarkDTO<YearMonthIntervalOption?>()

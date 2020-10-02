@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.GDPR
@@ -203,28 +204,28 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<IEnumerable<ItSystem>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
             if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
-            return WithReadAccess<IEnumerable<ItSystem>>(id, registration =>
+            return WithReadAccess<IEnumerable<ItSystemUsage>>(id, registration =>
                 _systemAssignmentService
                     .GetApplicableSystems(registration)
-                    .ByPartOfName(nameQuery)
+                    .Where(x=>x.ItSystem.Name.Contains(nameQuery))
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
-                    .OrderBy(x => x.Name)
+                    .OrderBy(x => x.ItSystem.Name)
                     .ToList()
             );
         }
 
-        public Result<ItSystem, OperationError> AssignSystem(int id, int systemId)
+        public Result<ItSystemUsage, OperationError> AssignSystem(int id, int systemId)
         {
             return Modify(id, registration => _systemAssignmentService.AssignSystem(registration, systemId));
         }
 
-        public Result<ItSystem, OperationError> RemoveSystem(int id, int systemId)
+        public Result<ItSystemUsage, OperationError> RemoveSystem(int id, int systemId)
         {
             return Modify(id, registration => _systemAssignmentService.RemoveSystem(registration, systemId));
         }

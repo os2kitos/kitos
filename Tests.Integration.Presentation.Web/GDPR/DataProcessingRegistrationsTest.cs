@@ -345,8 +345,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId, AccessModifier.Public);
             var filteredOutSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId, AccessModifier.Public);
-            await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
-            await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
             await ItSystemHelper.TakeIntoUseAsync(filteredOutSystem.Id, organizationId);
 
             //Act
@@ -354,7 +354,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(2, dtos.Count);
-            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] {new {system1.Id, system1.Name}, new {system2.Id, system2.Name}});
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] {new {usage1.Id, system1.Name}, new {usage2.Id, system2.Name}});
         }
 
         [Fact]
@@ -366,23 +366,23 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var system1Name = $"{systemPrefix}{1}";
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
-            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             //Act - Add
-            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, system.Id);
-            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, system.Id);
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, usage.Id);
+            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, usage.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
             Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             var systemDTO = Assert.Single(dto.ItSystems);
-            Assert.Equal(system.Id, systemDTO.Id);
+            Assert.Equal(usage.Id, systemDTO.Id);
             Assert.Equal(system.Name, systemDTO.Name);
 
             //Act - remove
-            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(registration.Id, system.Id);
-            using var duplicateRemoveResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(registration.Id, system.Id);
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(registration.Id, usage.Id);
+            using var duplicateRemoveResponse = await DataProcessingRegistrationHelper.SendRemoveSystemRequestAsync(registration.Id, usage.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);

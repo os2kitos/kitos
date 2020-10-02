@@ -57,7 +57,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
-            var agreementConcludedAt = A<DateTime>();
             var oversightInterval = A<YearMonthIntervalOption>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
@@ -105,8 +104,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Systems
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
-            await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
-            using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, itSystemDto.Id);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(itSystemDto.Id, organizationId);
+            using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, usage.Id);
             Assert.Equal(HttpStatusCode.OK, assignSystemResponse.StatusCode);
 
             //Wait for read model to rebuild (wait for the LAST mutation)

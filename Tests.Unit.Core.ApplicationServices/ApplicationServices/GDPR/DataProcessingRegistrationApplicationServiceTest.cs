@@ -7,6 +7,7 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -541,15 +542,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowReadReturns(registration, true);
-            var itSystems = new[] { new ItSystem { Id = system1Id, Name = $"{nameQuery}{1}" }, new ItSystem { Id = system2Id, Name = $"{nameQuery}{2}" } };
-            _systemAssignmentServiceMock.Setup(x => x.GetApplicableSystems(registration)).Returns(itSystems.AsQueryable());
+            var itSystemUsages = new[] { new ItSystemUsage() { Id = system1Id, ItSystem = new ItSystem() { Name = $"{nameQuery}{1}" } }, new ItSystemUsage() { Id = system1Id, ItSystem = new ItSystem() { Name = $"{nameQuery}{2}" } } };
+            _systemAssignmentServiceMock.Setup(x => x.GetApplicableSystems(registration)).Returns(itSystemUsages.AsQueryable());
 
             //Act
             var result = _sut.GetSystemsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(itSystems, result.Value);
+            Assert.Equal(itSystemUsages, result.Value);
         }
 
         [Fact]
@@ -571,10 +572,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var systemId = A<int>();
-            var itSystem = new ItSystem();
+            var itSystemUsage = new ItSystemUsage();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
-            _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystem);
+            _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -583,7 +584,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
@@ -606,10 +607,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var id = A<int>();
             var registration = new DataProcessingRegistration();
             var systemId = A<int>();
-            var itSystem = new ItSystem();
+            var itSystemUsage = new ItSystemUsage();
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
-            _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystem);
+            _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
@@ -618,7 +619,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem, result.Value);
+            Assert.Same(itSystemUsage, result.Value);
             transaction.Verify(x => x.Commit());
         }
 
