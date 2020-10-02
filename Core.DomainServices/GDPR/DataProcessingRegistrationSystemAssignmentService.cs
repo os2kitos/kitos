@@ -2,45 +2,47 @@
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.GDPR
 {
     public class DataProcessingRegistrationSystemAssignmentService : IDataProcessingRegistrationSystemAssignmentService
     {
-        private readonly IItSystemRepository _repository;
+        private readonly IItSystemUsageRepository _repository;
 
-        public DataProcessingRegistrationSystemAssignmentService(IItSystemRepository repository)
+        public DataProcessingRegistrationSystemAssignmentService(IItSystemUsageRepository repository)
         {
             _repository = repository;
         }
 
-        public IQueryable<ItSystem> GetApplicableSystems(DataProcessingRegistration registration)
+        public IQueryable<ItSystemUsage> GetApplicableSystems(DataProcessingRegistration registration)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 
             return
                 registration
                     .SystemUsages
-                    .Select(x => x.ItSystem.Id)
+                    .Select(x => x.Id)
                     .ToList()
                     .Transform
                     (
                         idsInUse => _repository
-                            .GetSystemsInUse(registration.OrganizationId)
+                            .GetSystemUsagesFromOrganization(registration.OrganizationId)
                             .ExceptEntitiesWithIds(idsInUse)
                     );
         }
 
-        public Result<ItSystem, OperationError> AssignSystem(DataProcessingRegistration registration, int systemId)
+        public Result<ItSystemUsage, OperationError> AssignSystem(DataProcessingRegistration registration, int systemId)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 
             return _repository
-                .GetSystem(systemId)
+                .GetSystemUsage(systemId)
                 .FromNullable()
                 .Match
                 (
@@ -49,11 +51,11 @@ namespace Core.DomainServices.GDPR
                 );
         }
 
-        public Result<ItSystem, OperationError> RemoveSystem(DataProcessingRegistration registration, int systemId)
+        public Result<ItSystemUsage, OperationError> RemoveSystem(DataProcessingRegistration registration, int systemId)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             return _repository
-                .GetSystem(systemId)
+                .GetSystemUsage(systemId)
                 .FromNullable()
                 .Match
                 (

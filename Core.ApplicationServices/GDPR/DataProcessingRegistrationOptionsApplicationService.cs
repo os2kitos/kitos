@@ -29,6 +29,7 @@ namespace Core.ApplicationServices.GDPR
                         _optionRepository.GetAvailableDataResponsibleOptions(organizationId),
                         _optionRepository.GetAvailableCountryOptions(organizationId),
                         _optionRepository.GetAvailableBasisForTransferOptions(organizationId),
+                        _optionRepository.GetAvailableRoles(organizationId),
                         _optionRepository.GetAvailableOversightOptions(organizationId)
                     ));
         }

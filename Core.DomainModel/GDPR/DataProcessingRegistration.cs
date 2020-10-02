@@ -92,8 +92,6 @@ namespace Core.DomainModel.GDPR
             return Rights.Where(x => x.RoleId == roleId);
         }
 
-        public IEnumerable<ItSystem.ItSystem> GetAssignedSystems() => SystemUsages.Select(x => x.ItSystem);
-
         public Result<Organization.Organization, OperationError> AssignDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
@@ -211,40 +209,28 @@ namespace Core.DomainModel.GDPR
             return OversightOptions.Any(x => x.Id == oversightOption.Id);
         }
 
-        public Result<ItSystem.ItSystem, OperationError> AssignSystem(ItSystem.ItSystem system)
+        public Result<ItSystemUsage.ItSystemUsage, OperationError> AssignSystem(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            if (system == null) throw new ArgumentNullException(nameof(system));
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
 
-            var usageResult = system.GetUsageForOrganization(OrganizationId);
-            if (usageResult.IsNone)
-                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
-
-            var usage = usageResult.Value;
-
-            if (GetAssignedSystemUsage(usage.Id).HasValue)
+            if (GetAssignedSystemUsage(systemUsage.Id).HasValue)
                 return new OperationError("System usage is already assigned", OperationFailure.Conflict);
 
-            SystemUsages.Add(usage);
+            SystemUsages.Add(systemUsage);
 
-            return system;
+            return systemUsage;
         }
 
-        public Result<ItSystem.ItSystem, OperationError> RemoveSystem(ItSystem.ItSystem system)
+        public Result<ItSystemUsage.ItSystemUsage, OperationError> RemoveSystem(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            if (system == null) throw new ArgumentNullException(nameof(system));
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
 
-            var usageResult = system.GetUsageForOrganization(OrganizationId);
-            if (usageResult.IsNone)
-                return new OperationError($"System is not in use in organization with id {OrganizationId}", OperationFailure.BadInput);
-
-            var usage = usageResult.Value;
-
-            if (GetAssignedSystemUsage(usage.Id).IsNone)
+            if (GetAssignedSystemUsage(systemUsage.Id).IsNone)
                 return new OperationError("Usage not assigned", OperationFailure.BadInput);
 
-            SystemUsages.Remove(usage);
+            SystemUsages.Remove(systemUsage);
 
-            return system;
+            return systemUsage;
         }
 
         private Maybe<ItSystemUsage.ItSystemUsage> GetAssignedSystemUsage(int usageId)

@@ -1,4 +1,4 @@
-﻿namespace Core.DomainServices.Options
+﻿namespace Core.DomainServices.Model.Options
 {
     public class OptionDescriptor<TOption>
     {

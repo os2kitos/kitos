@@ -17,7 +17,6 @@
             "user",
             "userAccessRights",
             "kendoGridLauncherFactory",
-            "roles",
             "dataProcessingRegistrationOptions"
         ];
 
@@ -28,14 +27,13 @@
             user,
             userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
-            roles: Models.IOptionEntity[],
-            dataProcessingRegistrationOptions: Kitos.Models.DataProcessing.IDataProcessingRegistrationOptions) {
+            dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) {
 
             //Prepare the page
             $rootScope.page.title = "Databehandling - Overblik";
 
             //Helper functions
-            const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
+            const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
@@ -61,9 +59,9 @@
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                         if (parameterMap.$filter) {
-                            roles.forEach(role => {
+                            dataProcessingRegistrationOptions.roles.forEach(role => {
                                 parameterMap.$filter =
-                                    replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
+                                    replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                             });
                         }
 
@@ -273,18 +271,18 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval))))
                     .withStandardSorting("Name");
 
-            roles.forEach(role =>
+            dataProcessingRegistrationOptions.roles.forEach(role =>
                 launcher = launcher.withColumn(builder =>
                     builder
                         .withDataSourceName(getRoleKey(role))
-                        .withTitle(role.Name)
+                        .withTitle(role.name)
                         .withId(`dpa${getRoleKey(role)}`)
                         .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-registration.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.Id]))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.Id])))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpa-${getRoleKey(role)}-rendering`, "data-processing.edit-registration.roles", dataItem.SourceEntityId, dpaRoleIdToUserNamesMap[dataItem.Id][role.id]))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dpaRoleIdToUserNamesMap[dataItem.Id][role.id])))
             );
 
             //Launch kendo grid
@@ -304,10 +302,6 @@
                     resolve: {
                         user: [
                             "userService", userService => userService.getUser()
-                        ],
-                        roles: [
-                            "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.DataProcessingRegistrationRoles).getAll()
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
