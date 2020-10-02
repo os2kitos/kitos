@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
@@ -407,6 +408,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// DPAs using this system
         /// </summary>
         public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
+
+        public bool HasDataProcessingAgreement() =>
+            AssociatedDataProcessingRegistrations?.Any(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true;
+
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             ItSystemUsage toSystemUsage,
