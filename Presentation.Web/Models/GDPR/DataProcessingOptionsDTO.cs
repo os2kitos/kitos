@@ -8,8 +8,8 @@ namespace Presentation.Web.Models.GDPR
 {
     public class DataProcessingOptionsDTO
     {
-        public IEnumerable<OptionWithDescriptionDTO> dataResponsibleOptions { get; set; }
-        public IEnumerable<OptionWithDescriptionDTO> thirdCountryOptions { get; set; }
-        public IEnumerable<OptionWithDescriptionDTO> basisForTransferOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionDTO> DataResponsibleOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionDTO> ThirdCountryOptions { get; set; }
+        public IEnumerable<OptionWithDescriptionDTO> BasisForTransferOptions { get; set; }
     }
 }

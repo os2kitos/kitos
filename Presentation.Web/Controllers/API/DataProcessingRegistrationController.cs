@@ -533,9 +533,9 @@ namespace Presentation.Web.Controllers.API
                 .GetAssignableDataProcessingRegistrationOptions(organizationId)
                 .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO()
                 {
-                    dataResponsibleOptions = ToDTOs(result.DataProcessingRegistrationDataResponsibleOptions, organizationId).ToList(),
-                    thirdCountryOptions = ToDTOs(result.DataProcessingRegistrationCountryOptions, organizationId).ToList(),
-                    basisForTransferOptions = ToDTOs(result.DataProcessingRegistrationBasisForTransferOptions, organizationId).ToList()
+                    DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
+                    ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
+                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);
         }
@@ -631,17 +631,17 @@ namespace Presentation.Web.Controllers.API
 
         private ISet<int> GetIdsOfAvailableCountryOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
         {
-            return new HashSet<int>(dataProcessingRegistrationOptions.DataProcessingRegistrationCountryOptions.Select(x => x.Option.Id));
+            return new HashSet<int>(dataProcessingRegistrationOptions.ThirdCountryOptions.Select(x => x.Option.Id));
         }
 
         private ISet<int> GetIdsOfAvailableDataResponsibleOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
         {
-            return new HashSet<int>(dataProcessingRegistrationOptions.DataProcessingRegistrationDataResponsibleOptions.Select(x => x.Option.Id));
+            return new HashSet<int>(dataProcessingRegistrationOptions.DataResponsibleOptions.Select(x => x.Option.Id));
         }
 
         private ISet<int> GetIdsOfAvailableBasisForTransferOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
         {
-            return new HashSet<int>(dataProcessingRegistrationOptions.DataProcessingRegistrationBasisForTransferOptions.Select(x => x.Option.Id));
+            return new HashSet<int>(dataProcessingRegistrationOptions.BasisForTransferOptions.Select(x => x.Option.Id));
         }
 
         private Dictionary<int, Maybe<string>> GetLocalRoleDescriptionOverrides(int organizationId)
@@ -710,18 +710,15 @@ namespace Presentation.Web.Controllers.API
                     .FromNullable()
                     .Select(basisForTransfer => new NamedEntityWithExpirationStatusDTO(basisForTransfer.Id, basisForTransfer.Name, enabledBasisForTransferOptions.Contains(basisForTransfer.Id) == false))
                     .GetValueOrDefault(),
-                DataResponsible = value
-                    .DataResponsible
-                    .FromNullable()
-                    .Select(responsible => new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>() { 
-                        Value = new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, enabledDataResponsibleOptions.Contains(responsible.Id) == false, responsible.Description),
-                        Remark = value.DataResponsibleRemark
-                    })
-                    .GetValueOrFallback(new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
-                    {
-                        Value = null,
-                        Remark = value.DataResponsibleRemark
-                    })
+                DataResponsible = new ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO>()
+                {
+                    Value = value
+                            .DataResponsible
+                            .FromNullable()
+                            .Select(responsible => new OptionWithDescriptionAndExpirationDTO(responsible.Id, responsible.Name, enabledDataResponsibleOptions.Contains(responsible.Id) == false, responsible.Description))
+                            .GetValueOrDefault(),
+                    Remark = value.DataResponsibleRemark
+                },
             };
         }
 
@@ -748,32 +745,12 @@ namespace Presentation.Web.Controllers.API
             };
         }
 
-        private IEnumerable<OptionWithDescriptionDTO> ToDTOs(IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> options, int organizationId)
+        private IEnumerable<OptionWithDescriptionDTO> ToDTOs<T>(IEnumerable<OptionDescriptor<T>> options, int organizationId) where T: OptionEntity<DataProcessingRegistration>
         {
-            return options.Select(dataResponsibleOption => ToDTO(dataResponsibleOption));
+            return options.Select(option => ToDTO(option));
         }
 
-        private static OptionWithDescriptionDTO ToDTO(OptionDescriptor<DataProcessingDataResponsibleOption> option)
-        {
-            return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
-        }
-
-        private IEnumerable<OptionWithDescriptionDTO> ToDTOs(IEnumerable<OptionDescriptor<DataProcessingCountryOption>> options, int organizationId)
-        {
-            return options.Select(countryOption => ToDTO(countryOption));
-        }
-
-        private static OptionWithDescriptionDTO ToDTO(OptionDescriptor<DataProcessingCountryOption> option)
-        {
-            return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
-        }
-
-        private IEnumerable<OptionWithDescriptionDTO> ToDTOs(IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> options, int organizationId)
-        {
-            return options.Select(basisForTransferOption => ToDTO(basisForTransferOption));
-        }
-
-        private static OptionWithDescriptionDTO ToDTO(OptionDescriptor<DataProcessingBasisForTransferOption> option)
+        private static OptionWithDescriptionDTO ToDTO<T>(OptionDescriptor<T> option) where T : OptionEntity<DataProcessingRegistration>
         {
             return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
         }

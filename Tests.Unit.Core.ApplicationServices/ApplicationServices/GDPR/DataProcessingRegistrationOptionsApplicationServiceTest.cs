@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
@@ -13,14 +12,14 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.GDPR
 {
-    public class DataProcessingRegistrationOptionsApplicationSerivceTest : WithAutoFixture
+    public class DataProcessingRegistrationOptionsApplicationServiceTest : WithAutoFixture
     {
 
         private readonly DataProcessingRegistrationOptionsApplicationService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingRegistrationOptionRepository> _optionRepositoryMock;
 
-        public DataProcessingRegistrationOptionsApplicationSerivceTest()
+        public DataProcessingRegistrationOptionsApplicationServiceTest()
         {
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _optionRepositoryMock = new Mock<IDataProcessingRegistrationOptionRepository>();
@@ -34,7 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var organizationId = A<int>();
-            ExpectOrganizationReadAccess(organizationId);
+            ExpectOrganizationReadAccess(organizationId, OrganizationDataReadAccessLevel.All);
             var dataResponsibleOptions = new List<OptionDescriptor<DataProcessingDataResponsibleOption>>()
             {
                 new OptionDescriptor<DataProcessingDataResponsibleOption>(new DataProcessingDataResponsibleOption(), ""),
@@ -57,16 +56,19 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(assignableOptionsResult.Ok);
             var dataProcessingRegistrationOptions = assignableOptionsResult.Value;
-            Assert.Equal(dataResponsibleOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationDataResponsibleOptions);
-            Assert.Equal(countryOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationCountryOptions);
-            Assert.Equal(basisForTransferOptions, dataProcessingRegistrationOptions.DataProcessingRegistrationBasisForTransferOptions);
+            Assert.Equal(dataResponsibleOptions, dataProcessingRegistrationOptions.DataResponsibleOptions);
+            Assert.Equal(countryOptions, dataProcessingRegistrationOptions.ThirdCountryOptions);
+            Assert.Equal(basisForTransferOptions, dataProcessingRegistrationOptions.BasisForTransferOptions);
         }
 
-        [Fact]
-        public void Cannot_GetAssignableOptions_OrganizationAccess()
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        public void Cannot_GetAssignableOptions_OrganizationAccess(OrganizationDataReadAccessLevel readAccessLevel)
         {
             //Arrange
             var organizationId = A<int>();
+            ExpectOrganizationReadAccess(organizationId, readAccessLevel);
 
             //Act
             var assignableOptionsResult = _sut.GetAssignableDataProcessingRegistrationOptions(organizationId);
@@ -76,9 +78,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.Forbidden, assignableOptionsResult.Error.FailureType);
         }
 
-        private void ExpectOrganizationReadAccess(int organizationId)
+        private void ExpectOrganizationReadAccess(int organizationId, OrganizationDataReadAccessLevel readAccessLevel)
         {
-            _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(readAccessLevel);
         }
 
         private void ExpectDataResponsibleOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions)

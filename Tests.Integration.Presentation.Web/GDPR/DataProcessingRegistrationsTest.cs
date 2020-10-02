@@ -657,7 +657,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
 
             //Assert
-            Assert.NotEmpty(dataProcessingOptions.dataResponsibleOptions);
+            Assert.NotEmpty(dataProcessingOptions.DataResponsibleOptions);
         }
 
         [Fact]
@@ -667,7 +667,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
-            var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
@@ -685,7 +685,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
-            var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var assingResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, assingResponse.StatusCode);
 

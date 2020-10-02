@@ -90,7 +90,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             // Set data responsible
             var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(organizationId);
-            var dataResponsibleOption = dataOptions.dataResponsibleOptions.First();
+            var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
             // Data responsible done

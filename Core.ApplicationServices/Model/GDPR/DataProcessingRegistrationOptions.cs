@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Options;
 
@@ -6,18 +7,18 @@ namespace Core.ApplicationServices.Model.GDPR
 {
     public class DataProcessingRegistrationOptions
     {
-        public IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> DataProcessingRegistrationDataResponsibleOptions { get; }
-        public IEnumerable<OptionDescriptor<DataProcessingCountryOption>> DataProcessingRegistrationCountryOptions { get; }
-        public IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> DataProcessingRegistrationBasisForTransferOptions { get; }
+        public IReadOnlyList<OptionDescriptor<DataProcessingDataResponsibleOption>> DataResponsibleOptions { get; }
+        public IReadOnlyList<OptionDescriptor<DataProcessingCountryOption>> ThirdCountryOptions { get; }
+        public IReadOnlyList<OptionDescriptor<DataProcessingBasisForTransferOption>> BasisForTransferOptions { get; }
 
         public DataProcessingRegistrationOptions(
-            IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataProcessingRegistrationDataResponsibleOptions,
-            IEnumerable<OptionDescriptor<DataProcessingCountryOption>> dataProcessingRegistrationCountryOptions,
-            IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> dataProcessingRegistrationBasisForTransferOptions)
+            IEnumerable<OptionDescriptor<DataProcessingDataResponsibleOption>> dataResponsibleOptions,
+            IEnumerable<OptionDescriptor<DataProcessingCountryOption>> thirdCountryOptions,
+            IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> basisForTransferOptions)
         {
-            DataProcessingRegistrationDataResponsibleOptions = dataProcessingRegistrationDataResponsibleOptions;
-            DataProcessingRegistrationCountryOptions = dataProcessingRegistrationCountryOptions;
-            DataProcessingRegistrationBasisForTransferOptions = dataProcessingRegistrationBasisForTransferOptions;
+            DataResponsibleOptions = dataResponsibleOptions.ToList();
+            ThirdCountryOptions = thirdCountryOptions.ToList();
+            BasisForTransferOptions = basisForTransferOptions.ToList();
         }
     }
 }

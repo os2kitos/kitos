@@ -69,7 +69,7 @@
                     optionalObjectContext: {
                         id: next.id,
                         name: next.name,
-                        description: next.description //We only allow selection of non-expired and this object is based on the available objects
+                        description: next.description 
                     }
                 };
                 return acc;
@@ -381,7 +381,7 @@
                 : () => this.dataProcessingRegistrationService.clearDataResponsible(this.dataProcessingRegistration.id);
 
             this.apiUseCaseFactory
-                .createUpdate("Overførselsgrundlag", () => updateFunc())
+                .createUpdate("Dataansvarlig", () => updateFunc())
                 .executeAsync(success => {
                     this.dataProcessingRegistration.dataResponsible.value = newValue && newValue.optionalObjectContext;
                     this.bindBasisForTransfer();

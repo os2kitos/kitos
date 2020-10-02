@@ -17,7 +17,8 @@
             "user",
             "userAccessRights",
             "kendoGridLauncherFactory",
-            "roles"
+            "roles",
+            "dataProcessingRegistrationOptions"
         ];
 
         constructor(
@@ -27,7 +28,8 @@
             user,
             userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
-            roles: Models.IOptionEntity[]) {
+            roles: Models.IOptionEntity[],
+            dataProcessingRegistrationOptions: Kitos.Models.DataProcessing.IDataProcessingRegistrationOptions) {
 
             //Prepare the page
             $rootScope.page.title = "Databehandling - Overblik";
@@ -177,7 +179,19 @@
                             .withTitle("Overførselsgrundlag")
                             .withId("dpBasisForTransfer")
                             .withStandardWidth(150)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                dataProcessingRegistrationOptions
+                                    .basisForTransferOptions
+                                    .map(value => {
+                                        return {
+                                            textValue: value.name,
+                                            remoteValue: value.name
+                                        }
+                                    })
+                                , false
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer)))
                     .withColumn(builder =>
@@ -185,8 +199,20 @@
                             .withDataSourceName("DataResponsible")
                             .withTitle("Dataansvarlig")
                             .withId("dpDataResponsible")
-                            .withStandardWidth(150)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withStandardWidth(170)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                dataProcessingRegistrationOptions
+                                    .dataResponsibleOptions
+                                    .map(value => {
+                                    return {
+                                        textValue: value.name,
+                                        remoteValue: value.name
+                                    }
+                                    })
+                                , false
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible)))
                     .withColumn(builder =>
@@ -287,7 +313,10 @@
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
                                 .createDataProcessingRegistrationAuthorization()
-                                .getOverviewAuthorization()]
+                                .getOverviewAuthorization()],
+                        dataProcessingRegistrationOptions: [
+                            "dataProcessingRegistrationService", "user", (dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService, user) => dataProcessingRegistrationService.getApplicableDataProcessingRegistrationOptions(user.currentOrganizationId)
+                        ]
                     }
                 });
             }
