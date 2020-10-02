@@ -288,7 +288,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/basis-for-transfer/clear"), cookie, new { });
         }
 
-        public static async Task<DataProcessingOptionsDTO> GetAvailableDataResponsibleOptionsRequestAsync(int organizationId, Cookie optionalLogin = null)
+        public static async Task<DataProcessingOptionsDTO> GetAvailableOptionsRequestAsync(int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
