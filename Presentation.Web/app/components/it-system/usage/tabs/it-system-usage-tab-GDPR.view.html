@@ -55,17 +55,17 @@
                 <div data-ng-if="user.currentConfig.showDataProcessing">
                     <div class="form-group" data-element-type="gdprDataProcessingRegistrationView">
                         <div ng-show="filterDataProcessor">
-                            <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
+                            <label for="dataProcessingAgreement" class="control-label small">Databehandling</label>
                             <div class="well">
                                 <ul id="dataProcessingAgreement"
                                     style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
-                                    ng-repeat="contract in contracts">
-                                    <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
+                                    ng-repeat="dpr in dataProcessingRegistrations">
+                                    <li><a data-element-type="gdpr_data-processing-registration--link" data-ui-sref="data-processing.edit-registration.main({id: dpr.id})"> {{dpr.name}} </a></li>
                                 </ul>
                             </div>
                         </div>
                         <div ng-hide="filterDataProcessor">
-                            <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
+                            <label for="dataProcessingAgreementNone" class="control-label small">Databehandling</label>
                             <ul ng-disabled="true"
                                 id="dataProcessingAgreementNone"
                                 class="form-control input-sm"
@@ -75,7 +75,7 @@
                         </div>
                         <span class="help-block small">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.
+                            Link til registreringer i Databehandlingsmodulet der er oprettet med tilknytning til dette IT System.
                         </span>
                     </div>
                 </div>

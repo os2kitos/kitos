@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using CsvHelper.Configuration.Attributes;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
@@ -265,6 +266,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            var dataProcessingRegistrationDto = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistrationDto.Id, YesNoIrrelevantOption.YES);
+            using var setSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistrationDto.Id, usage.Id);
+            Assert.Equal(HttpStatusCode.OK, setSystemResponse.StatusCode);
             var body = new
             {
                 HostedAt = A<HostedAt>(),
@@ -276,7 +281,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             };
             var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
-            await ItContractHelper.PatchContract(contract.Id, organizationId, new {contractTypeId = datahandlerContractTypeId });
+            await ItContractHelper.PatchContract(contract.Id, organizationId, new { contractTypeId = datahandlerContractTypeId });
             await ItContractHelper.AddItSystemUsage(contract.Id, usage.Id, organizationId);
             await ItSystemUsageHelper.PatchSystemUsage(usage.Id, organizationId, body);
             await ItSystemUsageHelper.AddSensitiveDataLevel(usage.Id, sensitiveDataLevel);
@@ -300,7 +305,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
-            
+
             var expectedUsage = await ItSystemHelper.GetItSystemUsage(usage.Id);
 
             //Act
@@ -313,7 +318,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
 
-        private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasDatahandlerContract)
+        private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasConcludedDataProcessingAgreement)
         {
             AssertDataOption(expected.IsBusinessCritical, actual.BusinessCritical);
             AssertDataOption(expected.DataProcessorControl, actual.DatahandlerControl);
@@ -321,7 +326,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             AssertDataOption(expected.DPIA, actual.DPIA);
             AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
             AssertHostedAt(expected.HostedAt, actual.HostedAt);
-            if (hasDatahandlerContract)
+            if (hasConcludedDataProcessingAgreement)
             {
                 AssertYes(actual.Datahandler);
             }

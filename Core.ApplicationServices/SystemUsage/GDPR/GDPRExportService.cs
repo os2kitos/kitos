@@ -6,9 +6,11 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.SystemUsage.GDPR
 {
@@ -53,14 +55,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             return new GDPRExportReport
             {
                 BusinessCritical = input.isBusinessCritical,
-                DataProcessorContract = input.Contracts.Any(x =>
-                {
-                    if (x.ItContract.ContractType != null)
-                    {
-                        return x.ItContract.ContractType.Id == dataHandlerContractTypeId;
-                    }
-                    return false;
-                }),
+                DataProcessingAgreementConcluded = input.HasDataProcessingAgreement(),
                 DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
                 HostedAt = input.HostedAt,
@@ -84,7 +79,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
             return attachedOptions
-                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && 
+                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE &&
                             x.ObjectId == usageId &&
                             x.OptionType == OptionType.SENSITIVEPERSONALDATA)
                 .Select(x => x.OptionId)

@@ -126,6 +126,7 @@ namespace Presentation.Web.Models
         public DateTime? DPIADeleteDate { get; set; }
         public int NumberDPIA { get; set; }
         public HostedAt? HostedAt { get; set; }
+        public NamedEntityDTO[] AssociatedDataProcessingRegistrations { get; set; }
         #endregion
     }
 }

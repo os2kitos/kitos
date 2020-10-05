@@ -206,7 +206,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 {
                     return Task.FromResult(
                         DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(15));
+                }, TimeSpan.FromSeconds(30));
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             stopwatch.Start();
             do
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(250));
+                await Task.Delay(TimeSpan.FromMilliseconds(500));
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 
