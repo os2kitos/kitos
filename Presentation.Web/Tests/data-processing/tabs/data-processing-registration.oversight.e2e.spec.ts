@@ -40,6 +40,8 @@ describe("Data processing registration oversight detail tests", () => {
             const remark = createRemark();
             const dropdownInterval = "Hver andet år";
             const dropdownCompleted = "Ja";
+            const oversightIntervalId = "s2id_oversightInterval_config";
+            const oversightCompletedId = "s2id_oversightCompleted_config";
             const date = DateHelper.getTodayAsString();
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
@@ -51,10 +53,10 @@ describe("Data processing registration oversight detail tests", () => {
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
                 .then(() => dpaHelper.changeOversightCompletedLatestDate(date))
                 .then(() => activateBlur())
-                .then(() => verifySelect2Value(dropdownInterval, "s2id_oversightInterval_config"))
+                .then(() => verifySelect2Value(dropdownInterval, oversightIntervalId))
                 .then(() => VerifyAttributeValueIs(remark, pageObject.getOversightIntervalOptionRemark()))
                 .then(() => VerifyAttributeValueIs(remark, pageObject.getOversightCompletedRemark()))
-                .then(() => verifySelect2Value(dropdownCompleted, "s2id_oversightCompleted_config"))
+                .then(() => verifySelect2Value(dropdownCompleted, oversightCompletedId ))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
                 .then(() => VerifyAttributeValueIs(date, pageObject.getOversightCompletedLatestDate()));
         });
