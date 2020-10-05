@@ -6,6 +6,8 @@ import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
 import DataProcessingRegistrationEditMainPageObject =
     require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+import DataProcessingRegistrationEditOversightPageObject =
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 
 class DataProcessingRegistrationHelper {
     private static readonly  selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
@@ -15,6 +17,7 @@ class DataProcessingRegistrationHelper {
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
     private static navigation = new NavigationHelper();
     private static editMainPo = new DataProcessingRegistrationEditMainPageObject();
+    private static editOversightPo = new DataProcessingRegistrationEditOversightPageObject();
 
     public static loadOverview() {
         return this.pageObject.getPage()
@@ -176,6 +179,16 @@ class DataProcessingRegistrationHelper {
     public static changeOversightInterval(changeToInterval: string) {
         console.log(`Changing Oversight Interval to ${changeToInterval}`);
         return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval_config");
+    }
+
+    public static changeOversightCompleted(changeToCompleted: string) {
+        console.log(`Changing Oversight Completed to ${changeToCompleted}`);
+        return Select2Helper.selectWithNoSearch(changeToCompleted, "s2id_oversightCompleted_config");
+    }
+
+    public static changeOversightCompletedLatestDate(changeToDate: string) {
+        console.log("Changing Oversight Completed Latest Date to date: " + changeToDate);
+        return this.editOversightPo.getOversightCompletedLatestDate().sendKeys(changeToDate);
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

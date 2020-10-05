@@ -1346,7 +1346,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Can_Update_IsOversightCompletedRemark()
+        public void Can_Update_OversightCompletedRemark()
         {
             Test_Command_Which_ModifiesState_With_Success(registration =>
             {
@@ -1354,20 +1354,20 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 var oversightCompletedRemark = A<string>();
 
                 //Act
-                return _sut.UpdateIsOversightCompletedRemark(registration.Id, oversightCompletedRemark);
+                return _sut.UpdateOversightCompletedRemark(registration.Id, oversightCompletedRemark);
             });
         }
 
         [Fact]
         public void Update_IsOversightCompletedRemark_Returns_Forbidden()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompletedRemark(id, A<string>()));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
         }
 
         [Fact]
         public void Update_IsOversightCompletedRemark_Returns_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateIsOversightCompletedRemark(id, A<string>()));
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
         }
 
         /// <summary>
