@@ -20,8 +20,25 @@ class DataProcessingRegistrationEditMainPageObject {
     getOversightIntervalOption() {
         return element(by.id("oversightInterval"));
     }
-    getOversightIntervalOptionRemark() {
+
+    getOversightIntervalRemark() {
         return element(by.id("oversightIntervalRemark_remark"));
+    }
+
+    getOversightOptionRemark() {
+        return element(by.id("oversightOptionRemark_remark"));
+    }
+
+    getOversightOptionRow(dpName: string) {
+        return element(by.xpath(this.getOversightOptionRowExpression(dpName)));
+    }
+
+    getRemoveOversightOptionButton(dpName: string) {
+        return element(by.xpath(`${this.getOversightOptionRowExpression(dpName)}//button`));
+    }
+
+    private getOversightOptionRowExpression(dpName: string) {
+        return `//*/table[@id="oversightTable"]//*/td[text()="${dpName}"]/..`;
     }
 
 }

@@ -62,7 +62,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
 
-            Property(x => x.OverSightOptionNamesAsCsv).IsOptional();
+            Property(x => x.OversightOptionNamesAsCsv).IsOptional();
         }
     }
 }

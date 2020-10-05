@@ -143,7 +143,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
             Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
             Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
-            Assert.Equal(oversightOption.Name, readModel.OverSightOptionNamesAsCsv);
+            Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

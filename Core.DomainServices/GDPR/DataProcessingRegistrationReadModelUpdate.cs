@@ -16,15 +16,18 @@ namespace Core.DomainServices.GDPR
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> _oversightOptionService;
 
         public DataProcessingRegistrationReadModelUpdate(
             IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
             IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService,
-            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService)
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService,
+            IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> oversightOptionService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _basisForTransferService = basisForTransferService;
             _dataResponsibleService = dataResponsibleService;
+            _oversightOptionService = oversightOptionService;
         }
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -51,7 +54,8 @@ namespace Core.DomainServices.GDPR
         }
         private void PatchOverSightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.OverSightOptionNamesAsCsv = string.Join(", ", source.OversightOptions.Select(x => x.Name));
+            destination.OversightOptionNamesAsCsv = string.Join(", ", 
+                source.OversightOptions.Select(x => GetNameOfOption(source, x, _oversightOptionService)));
         }
 
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
