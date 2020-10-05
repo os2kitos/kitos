@@ -36,8 +36,8 @@ describe("Data processing registration oversight detail tests", () => {
 
     it("Is able to set oversight data",
         () => {
-            var name = createName();
-            var Remark = createRemark();
+            const name = createName();
+            const remark = createRemark();
             const dropdownInterval = "Hver andet år";
             const dropdownCompleted = "Ja";
             const date = DateHelper.getTodayAsString();
@@ -45,49 +45,33 @@ describe("Data processing registration oversight detail tests", () => {
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => pageObject.getOversightPage())
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
-                .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(Remark))
-                .then(() => pageObject.getOversightCompletedRemark().sendKeys(Remark))
+                .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(remark))
+                .then(() => pageObject.getOversightCompletedRemark().sendKeys(remark))
                 .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
                 .then(() => dpaHelper.changeOversightCompletedLatestDate(date))
                 .then(() => activateBlur())
-                .then(() => verifyOversightInterval(dropdownInterval))
-                .then(() => verifyOversightIntervalRemark(Remark))
-                .then(() => verifyOversightCompletedRemark(Remark))
-                .then(() => verifyOversightCompleted(dropdownCompleted))
+                .then(() => verifySelect2Value(dropdownInterval, "s2id_oversightInterval_config"))
+                .then(() => VerifyAttributeValueIs(remark, pageObject.getOversightIntervalOptionRemark()))
+                .then(() => VerifyAttributeValueIs(remark, pageObject.getOversightCompletedRemark()))
+                .then(() => verifySelect2Value(dropdownCompleted, "s2id_oversightCompleted_config"))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
-                .then(() => verifyOversightCompletedLatestDate(date));
+                .then(() => VerifyAttributeValueIs(date, pageObject.getOversightCompletedLatestDate()));
         });
 
-    function verifyOversightInterval(selectedValue: string) {
-        console.log(`Expecting oversight interval to be set to: ${selectedValue}`);
-        expect(Select2Helper.getData("s2id_oversightInterval_config").getText()).toEqual(selectedValue);
-    }
-
-    function verifyOversightIntervalRemark(expectedValue: string) {
-        console.log(`Expecting oversight interval remark to be set to: ${expectedValue}`);
-        expect(pageObject.getOversightIntervalOptionRemark().getAttribute("value")).toEqual(expectedValue);
-    }
-
-    function verifyOversightCompleted(selectedValue: string) {
+    function verifySelect2Value(selectedValue: string, selectedId: string) {
         console.log(`Expecting oversight completed to be set to: ${selectedValue}`);
-        expect(Select2Helper.getData("s2id_oversightCompleted_config").getText()).toEqual(selectedValue);
-    }
-
-    function verifyOversightCompletedRemark(expectedValue: string) {
-        console.log(`Expecting oversight completed remark to be set to: ${expectedValue}`);
-        expect(pageObject.getOversightCompletedRemark().getAttribute("value")).toEqual(expectedValue);
-    }
-
-    function verifyOversightCompletedLatestDate(expectedValue: string)
-    {
-        console.log(`Expecting completed latest date to be set to: ${expectedValue}`);
-        expect(pageObject.getOversightCompletedLatestDate().getAttribute("value")).toEqual(expectedValue);
+        expect(Select2Helper.getData(selectedId).getText()).toEqual(selectedValue);
     }
 
     function expectOversightCompletedLatestDateVisibility(visible: boolean) {
         console.log(`Expecting visiblity of oversight completed date to be set to: ${visible}`);
         expect(pageObject.getOversightCompletedLatestDate().isPresent()).toBe(visible);
+    }
+
+    function VerifyAttributeValueIs(expectedValue: string, element: protractor.ElementFinder) {
+        console.log(`Expecting completed latest date to be set to: ${expectedValue}`);
+        expect(element.getAttribute("value")).toEqual(expectedValue);
     }
 
     function activateBlur() {
