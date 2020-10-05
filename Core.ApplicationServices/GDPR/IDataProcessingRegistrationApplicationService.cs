@@ -49,6 +49,6 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
         Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate);
-        Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompletedRemark(int id, string remark);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark);
     }
 }

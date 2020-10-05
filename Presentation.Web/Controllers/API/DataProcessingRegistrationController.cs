@@ -583,7 +583,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage IsPatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        public HttpResponseMessage PatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
         {
             if (completed == null)
                 return BadRequest(nameof(completed) + " must be provided");
@@ -621,7 +621,7 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest(nameof(oversightCompletedRemark) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateIsOversightCompletedRemark(id, oversightCompletedRemark.Value)
+                .UpdateOversightCompletedRemark(id, oversightCompletedRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 

@@ -446,7 +446,7 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompletedRemark(int id, string remark)
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)
         {
             if (remark == null)
             {
