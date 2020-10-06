@@ -33,7 +33,7 @@
         updateDataResponsibleRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>;
         updateOversightCompleted(dataProcessingRegistrationId: number, isOversightCompleted: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
-        updateOversightLatestDate(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateLatestOversightCompletedDate(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
 
     }
@@ -319,7 +319,7 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-completed"), isOversightCompleted);
         }
 
-        updateOversightLatestDate(dataProcessingRegistrationId: number, dateString: string) {
+        updateLatestOversightCompletedDate(dataProcessingRegistrationId: number, dateString: string) {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "latest-oversight-date"), dateString);
         }
 

@@ -24,11 +24,11 @@
                     <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
                 </div>
                 <!-- Latest Oversight -->
-                <div class="form-group" ng-if="vm.shouldShowOversightCompletedLatestDate">
+                <div class="form-group" ng-if="vm.shouldShowLatestOversightCompletedDate">
                     <div class="form-group">
-                        <label for="oversightCompletedLatestDate" class="control-label small">Dato for seneste tilsyn</label>
-                        <date-picker id="oversightCompletedLatestDate"
-                                     ng-model="vm.oversightCompletedLatestDate"
+                        <label for="latestOversightCompletedDate" class="control-label small">Dato for seneste tilsyn</label>
+                        <date-picker id="latestOversightCompletedDate"
+                                     ng-model="vm.latestOversightCompletedDate"
                                      ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>

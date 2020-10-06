@@ -22,7 +22,7 @@
             this.bindOversightInterval();
             this.bindOversightIntervalRemark();
             this.bindOversightCompleted();
-            this.bindOversightCompletedLatestDate();
+            this.bindLatestOversightCompletedDate();
             this.bindOversightCompletedRemark();
         }
 
@@ -30,9 +30,9 @@
         oversightInterval: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;
         isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
-        oversightCompletedLatestDate: Models.ViewModel.Generic.IDateSelectionViewModel;
+        latestOversightCompletedDate: Models.ViewModel.Generic.IDateSelectionViewModel;
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
-        shouldShowOversightCompletedLatestDate: boolean;
+        shouldShowLatestOversightCompletedDate: boolean;
 
 
         private bindOversightInterval() {
@@ -56,15 +56,15 @@
                 elementSelected: (newElement) => this.changeIsOversightCompleted(newElement)
             }
 
-            this.shouldShowOversightCompletedLatestDate =
+            this.shouldShowLatestOversightCompletedDate =
                 this.isOversightCompleted.selectedElement !== null &&
                 this.isOversightCompleted.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
 
-        private bindOversightCompletedLatestDate() {
-            this.oversightCompletedLatestDate = new Models.ViewModel.Generic.DateSelectionViewModel(
+        private bindLatestOversightCompletedDate() {
+            this.latestOversightCompletedDate = new Models.ViewModel.Generic.DateSelectionViewModel(
                 this.dataProcessingRegistration.oversightCompleted.optionalDateValue,
-                (newDate) => this.changeOversightCompletedLatestDate(newDate));
+                (newDate) => this.changeLatestOversightCompletedDate (newDate));
         }
 
         private bindOversightCompletedRemark() {
@@ -93,7 +93,7 @@
 
         private changeOversightIntervalRemark(oversightIntervalRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightIntervalRemark;
                     this.bindOversightIntervalRemark();
@@ -111,25 +111,24 @@
 
                     this.dataProcessingRegistration.oversightCompleted.value = isOversightCompleted.optionalObjectContext;
                     this.bindOversightCompleted();
-                    this.bindOversightCompletedLatestDate();
+                    this.bindLatestOversightCompletedDate();
                     return success;
                 });
 
         }
 
-        private changeOversightCompletedLatestDate(oversightCompletedLatestDate: string) {
-            if (!!oversightCompletedLatestDate) {
-                var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(oversightCompletedLatestDate);
+        private changeLatestOversightCompletedDate(latestOversightCompletedDate: string) {
+            if (!!latestOversightCompletedDate) {
+                var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(latestOversightCompletedDate);
                 if (!!formattedDate.convertedValue) {
                     return this.apiUseCaseFactory
                         .createUpdate("Dato for seneste tilsyn",
-                            () => this.dataProcessingRegistrationService.updateOversightLatestDate(
+                            () => this.dataProcessingRegistrationService.updateLatestOversightCompletedDate(
                                 this.dataProcessingRegistration.id,
                                 formattedDate.convertedValue))
                         .executeAsync(success => {
-                            this.dataProcessingRegistration.oversightCompleted.optionalDateValue =
-                                oversightCompletedLatestDate;
-                            this.bindOversightCompletedLatestDate();
+                            this.dataProcessingRegistration.oversightCompleted.optionalDateValue = latestOversightCompletedDate;
+                            this.bindLatestOversightCompletedDate();
                             return success;
                         });
                 }

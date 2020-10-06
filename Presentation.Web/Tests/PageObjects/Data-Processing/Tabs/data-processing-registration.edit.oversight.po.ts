@@ -32,8 +32,8 @@ class DataProcessingRegistrationEditOversightPageObject {
         return element(by.id("oversightCompletedRemark_remark"));
     }
 
-    getOversightCompletedLatestDate() {
-        return element(by.id("oversightCompletedLatestDate")).element(by.tagName("input"));
+    getLatestOversightCompletedDate() {
+        return element(by.id("latestOversightCompletedDate")).element(by.tagName("input"));
     }
 
 }
