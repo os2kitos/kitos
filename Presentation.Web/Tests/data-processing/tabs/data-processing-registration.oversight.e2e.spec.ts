@@ -54,11 +54,9 @@ describe("Data processing registration oversight detail tests", () => {
                 .then(() => dpaHelper.changeOversightCompletedLatestDate(date))
                 .then(() => pageObject.getOversightCompletedRemark().sendKeys(completedRemark))
             // Inserting data into interval oversight section
-                .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
                 .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(intervalRemark))
-            // making sure that the last field is also saved
-                .then(() => activateBlur())
-            // verifying fields for interval oversight section
+                .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
+                // verifying fields for interval oversight section
                 .then(() => verifySelect2Value(dropdownInterval, oversightIntervalId))
                 .then(() => VerifyAttributeValueIs(intervalRemark, pageObject.getOversightIntervalOptionRemark()))
             // verifying fields for completed oversight section
@@ -79,12 +77,7 @@ describe("Data processing registration oversight detail tests", () => {
     }
 
     function VerifyAttributeValueIs(expectedValue: string, element: protractor.ElementFinder) {
-        console.log(`Expecting completed latest date to be set to: ${expectedValue}`);
+        console.log(`Expecting element to have value: ${expectedValue}`);
         expect(element.getAttribute("value")).toEqual(expectedValue);
     }
-
-    function activateBlur() {
-        return pageObject.getOversightIntervalOptionRemark().click();
-    }
-
 }); 
