@@ -10,7 +10,7 @@ import DataProcessingRegistrationEditOversightPageObject =
     require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 
 class DataProcessingRegistrationHelper {
-    private static readonly  selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
+    private static readonly selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
     private static readonly transferToThirdCountriesSelectionId: string = "s2id_transferToInsecureThirdCountries_config";
     private static pageObject = new DataProcessingRegistrationOverviewPageObject();
     private static waitUpTo = new WaitTimers();
@@ -126,7 +126,7 @@ class DataProcessingRegistrationHelper {
         return Select2Helper.selectWithNoSearch("Ja", "s2id_hasSubDataProcessorsSelection_config");
     }
 
-    public static  verifyHasSubDataProcessorsToBeEnabled() {
+    public static verifyHasSubDataProcessorsToBeEnabled() {
         console.log(`Expecting 'has sub data processors' to be set 'Ja'`);
         expect(Select2Helper.getData("s2id_hasSubDataProcessorsSelection_config").getText()).toEqual("Ja");
     }
@@ -244,6 +244,8 @@ class DataProcessingRegistrationHelper {
     static verifyBasisForTransfer(basisForTransfer: string) {
         expect(Select2Helper.getData(DataProcessingRegistrationHelper.selectBasisForTransferSelectionId).getText()).toEqual(basisForTransfer);
     }
+
+    static clickSystem(systemName: string) { return element(by.linkText(systemName)).click() };
 }
 
 export = DataProcessingRegistrationHelper;

@@ -70,6 +70,7 @@
         LinkToDirectoryUrlName: string;
 
         SensitiveDataLevels: Models.Odata.ItSystemUsage.IItSystemUsageSensitiveDataLevelDTO[];
-        
+
+        AssociatedDataProcessingRegistrations: Models.OData.DataProcessing.IDataProcessingRegistration[];
     }
 }

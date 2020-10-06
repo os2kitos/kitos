@@ -4,6 +4,8 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper")
 import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
+import ItSystemUsageGdpr = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageGDPR.po");
+import LocalItSystemNavigation = require("../../Helpers/SideNavigation/LocalItSystemNavigation");
 
 describe("Data processing registration it-systems test", () => {
 
@@ -36,13 +38,14 @@ describe("Data processing registration it-systems test", () => {
 
     it("Assigning and removing systems",
         () => {
-            const dpaName = createName(3);
+            const dprName = createName(3);
 
-            dpaHelper.createAndOpenDataProcessingRegistration(dpaName)
+            dpaHelper.createAndOpenDataProcessingRegistration(dprName)
                 .then(() => dpaHelper.goToItSystems())
                 .then(() => dpaHelper.assignSystem(system1))
                 .then(() => dpaHelper.assignSystem(system2))
                 .then(() => verifySystemContent([system1, system2], []))
+                .then(() => verifyDprIsPresentOnItSystemGDPRPage(system1, dprName))
                 .then(() => dpaHelper.removeSystem(system1))
                 .then(() => verifySystemContent([system2], [system1]));
         });
@@ -56,5 +59,13 @@ describe("Data processing registration it-systems test", () => {
             console.log(`Expecting system NOT to be present:${name}`);
             expect(pageObject.getSystemRow(name).isPresent()).toBeFalsy();
         });
+    }
+
+    function verifyDprIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
+        return dpaHelper.clickSystem(systemName)
+            .then(() => LocalItSystemNavigation.openGDPRPage())
+            .then(() => expect(ItSystemUsageGdpr.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
+            .then(() => ItSystemUsageGdpr.getDataProcessingLink(dprName).click())
+            .then(() => dpaHelper.goToItSystems());
     }
 });
