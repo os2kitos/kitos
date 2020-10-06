@@ -138,7 +138,7 @@
 
         private changeOversightCompletedRemark(oversightCompletedRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistration.id, oversightCompletedRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistration.id, oversightCompletedRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightCompletedRemark;
                     this.bindOversightIntervalRemark();

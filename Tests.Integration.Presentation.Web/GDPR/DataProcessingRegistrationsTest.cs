@@ -750,7 +750,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
-        public async Task Can_Change_IsOversightCompleted_Remark()
+        public async Task Can_Change_OversightCompletedRemark()
         {
             //Arrange
             var name = A<string>();
