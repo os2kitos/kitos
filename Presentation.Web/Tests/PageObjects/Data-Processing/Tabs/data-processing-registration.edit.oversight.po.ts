@@ -29,16 +29,16 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.id("oversightOptionRemark_remark"));
     }
 
-    getOversightOptionRow(dpName: string) {
-        return element(by.xpath(this.getOversightOptionRowExpression(dpName)));
+    getOversightOptionRow(oversightOptionName: string) {
+        return element(by.xpath(this.getOversightOptionRowExpression(oversightOptionName)));
     }
 
-    getRemoveOversightOptionButton(dpName: string) {
-        return element(by.xpath(`${this.getOversightOptionRowExpression(dpName)}//button`));
+    getRemoveOversightOptionButton(oversightOptionName: string) {
+        return element(by.xpath(`${this.getOversightOptionRowExpression(oversightOptionName)}//button`));
     }
 
-    private getOversightOptionRowExpression(dpName: string) {
-        return `//*/table[@id="oversightTable"]//*/td[text()="${dpName}"]/..`;
+    private getOversightOptionRowExpression(oversightOptionName: string) {
+        return `//*/table[@id="oversightTable"]//*/td[text()="${oversightOptionName}"]/..`;
     }
 
 }
