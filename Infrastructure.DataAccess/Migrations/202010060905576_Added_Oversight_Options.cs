@@ -22,7 +22,7 @@
                 .Index(t => t.DataProcessingRegistration_Id)
                 .Index(t => t.DataProcessingOversightOption_Id);
             
-            AddColumn("dbo.DataProcessingRegistrations", "OverSightOptionRemark", c => c.String());
+            AddColumn("dbo.DataProcessingRegistrations", "OversightOptionRemark", c => c.String());
             AddColumn("dbo.DataProcessingRegistrationReadModels", "OversightOptionNamesAsCsv", c => c.String());
             DropColumn("dbo.DataProcessingRegistrations", "DataProcessingOversightOption_Id");
         }
@@ -35,7 +35,7 @@
             DropIndex("dbo.DataProcessingRegistrationDataProcessingOversightOptions", new[] { "DataProcessingOversightOption_Id" });
             DropIndex("dbo.DataProcessingRegistrationDataProcessingOversightOptions", new[] { "DataProcessingRegistration_Id" });
             DropColumn("dbo.DataProcessingRegistrationReadModels", "OversightOptionNamesAsCsv");
-            DropColumn("dbo.DataProcessingRegistrations", "OverSightOptionRemark");
+            DropColumn("dbo.DataProcessingRegistrations", "OversightOptionRemark");
             DropTable("dbo.DataProcessingRegistrationDataProcessingOversightOptions");
             CreateIndex("dbo.DataProcessingRegistrations", "DataProcessingOversightOption_Id");
             AddForeignKey("dbo.DataProcessingRegistrations", "DataProcessingOversightOption_Id", "dbo.DataProcessingOversightOptions", "Id");

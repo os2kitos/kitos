@@ -394,19 +394,19 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.OverSightOptionRemark = remark;
+                registration.OversightOptionRemark = remark;
                 return registration;
             });
         }
 
-        public Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int countryId)
+        public Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int oversightOptionId)
         {
-            return Modify(id, registration => _oversightOptionAssignmentService.Assign(registration, countryId));
+            return Modify(id, registration => _oversightOptionAssignmentService.Assign(registration, oversightOptionId));
         }
 
-        public Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(int id, int countryId)
+        public Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(int id, int oversightOptionId)
         {
-            return Modify(id, registration => _oversightOptionAssignmentService.Remove(registration, countryId));
+            return Modify(id, registration => _oversightOptionAssignmentService.Remove(registration, oversightOptionId));
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)

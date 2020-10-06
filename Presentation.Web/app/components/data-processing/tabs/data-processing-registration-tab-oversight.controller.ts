@@ -8,7 +8,8 @@
             "dataProcessingRegistration",
             "apiUseCaseFactory",
             "select2LoadingService",
-            "dataProcessingRegistrationOptions"
+            "dataProcessingRegistrationOptions",
+            "bindingService"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -18,7 +19,8 @@
             private readonly dataProcessingRegistration: Models.DataProcessing.IDataProcessingRegistrationDTO,
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
-            private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) {
+            private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
+            private readonly bindingService: Kitos.Services.Generic.IBindingService) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -34,11 +36,13 @@
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
         private bindOversigthOptions() {
-            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
+            this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.oversigthOptions = config,
                 () => this.dataProcessingRegistration.oversightOptions.value,
                 element => this.removeOversightOption(element.id),
                 newElement => this.addOversightOption(newElement),
+                this.hasWriteAccess,
+                this.hasWriteAccess,
                 null,
                 () => {
                     const selectedOversightOptions = this
@@ -102,7 +106,7 @@
 
         private changeOversightIntervalRemark(oversightIntervalRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightIntervalRemark;
                     this.bindOversightIntervalRemark();
@@ -112,43 +116,12 @@
 
         private changeOversightOptionRemark(oversightOptionRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistration.id, oversightOptionRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistration.id, oversightOptionRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightOptions.remark = oversightOptionRemark;
                     this.bindOversigthOptionsRemark();
                     return success;
                 });
-        }
-
-        private bindMultiSelectConfiguration<TElement>(
-            setField: ((finalVm: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<TElement>) => void),
-            getInitialElements: () => TElement[],
-            removeFunc: ((element: TElement) => void),
-            newFunc: Models.ViewModel.Generic.ElementSelectedFunc<Models.ViewModel.Generic.Select2OptionViewModel<TElement>>,
-            searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
-            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]) {
-
-            let select2Config;
-            if (!!searchFunc) {
-                select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false);
-            } else if (!!fixedValueRange) {
-                select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
-            } else {
-                throw new Error("Either searchFunc or fixedValueRange must be provided");
-            }
-
-            const configuration = {
-                selectedElements: getInitialElements(),
-                removeItemRequested: removeFunc,
-                allowAddition: this.hasWriteAccess,
-                allowRemoval: this.hasWriteAccess,
-                newItemSelectionConfig: {
-                    selectedElement: null,
-                    select2Config: select2Config,
-                    elementSelected: newFunc
-                }
-            };
-            setField(configuration);
         }
 
         private removeOversightOption(id: number) {

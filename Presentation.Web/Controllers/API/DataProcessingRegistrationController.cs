@@ -797,7 +797,7 @@ namespace Presentation.Web.Controllers.API
                             .OversightOptions
                             .Select(oversightOption => new NamedEntityWithExpirationStatusDTO(oversightOption.Id, oversightOption.Name, enabledOversightOptions.Contains(oversightOption.Id) == false))
                             .ToArray(),
-                    Remark = value.OverSightOptionRemark
+                    Remark = value.OversightOptionRemark
                 },
             };
         }

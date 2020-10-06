@@ -85,7 +85,7 @@ namespace Core.DomainModel.GDPR
         public string DataResponsibleRemark { get; set; }
 
         public virtual ICollection<DataProcessingOversightOption> OversightOptions { get; set; }
-        public string OverSightOptionRemark { get; set; }
+        public string OversightOptionRemark { get; set; }
 
         public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
         {

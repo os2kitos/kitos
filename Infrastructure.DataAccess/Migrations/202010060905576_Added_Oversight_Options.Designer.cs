@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202010050833383_Added_Oversight_Options"; }
+            get { return "202010060905576_Added_Oversight_Options"; }
         }
         
         string IMigrationMetadata.Source
