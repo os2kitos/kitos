@@ -227,8 +227,7 @@ class DataProcessingRegistrationHelper {
 
     public static assignOversightOption(name: string) {
         console.log("Assigning oversight option with name: " + name);
-        return Select2Helper.searchFor(name, "s2id_oversight-option_select-new_config")
-            .then(() => Select2Helper.waitForDataAndSelect());
+        return Select2Helper.selectWithNoSearch(name, "s2id_oversight-option_select-new_config");
     }
 
     public static removeOversightOption(name: string) {

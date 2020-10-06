@@ -36,7 +36,7 @@ describe("Data processing registration oversight detail tests", () => {
             var name = createName();
             var intervalRemark = createRemark();
             const dropdownInterval = "Hver andet år";
-            const oversightOptionName = "";
+            const oversightOptionName = "Egen kontrol";
             const oversightOptionRemark = createRemark();
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
