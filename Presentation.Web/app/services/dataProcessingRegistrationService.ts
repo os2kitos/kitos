@@ -32,6 +32,10 @@
         clearDataResponsible(dataProcessingRegistrationId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateDataResponsibleRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         getApplicableDataProcessingRegistrationOptions(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>;
+
+        assignOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        removeOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightOptionRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -307,8 +311,19 @@
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-interval-remark"), remark);
         }
 
-        getApplicableDataProcessingRegistrationOptions(organizationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions>{
+        getApplicableDataProcessingRegistrationOptions(organizationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions> {
             return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationOptions>(this.getUri(`available-options-in/${organizationId}`));
+        }
+
+        assignOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option/assign"), oversightOptionId);
+        }
+        removeOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option/remove"), oversightOptionId);
+        }
+
+        updateOversightOptionRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option-remark"), remark);
         }
 
         static $inject = ["$http"];

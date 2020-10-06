@@ -537,6 +537,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
+    <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />

@@ -184,6 +184,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationInsecureCountriesAssignmentService>().To<DataProcessingRegistrationInsecureCountriesAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationBasisForTransferAssignmentService>().To<DataProcessingRegistrationBasisForTransferAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationDataResponsibleAssignmentService>().To<DataProcessingRegistrationDataResponsibleAssigmentService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationOversightOptionsAssignmentService>().To<DataProcessingRegistrationOversightOptionsAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -246,6 +247,8 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -271,6 +274,9 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>()
                 .To<OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>()
+                .To<OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

@@ -61,6 +61,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
+
+            Property(x => x.OversightOptionNamesAsCsv).IsOptional();
         }
     }
 }

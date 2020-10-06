@@ -50,6 +50,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 new OptionDescriptor<DataProcessingBasisForTransferOption>(new DataProcessingBasisForTransferOption(), ""),
             };
             ExpectBasisForTransferOptions(organizationId, basisForTransferOptions);
+            var oversightOptions = new List<OptionDescriptor<DataProcessingOversightOption>>()
+            {
+                new OptionDescriptor<DataProcessingOversightOption>(new DataProcessingOversightOption(), ""),
+            };
+            ExpectOversightOptions(organizationId, oversightOptions);
 
             //Act
             var assignableOptionsResult = _sut.GetAssignableDataProcessingRegistrationOptions(organizationId);
@@ -60,6 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(dataResponsibleOptions, dataProcessingRegistrationOptions.DataResponsibleOptions);
             Assert.Equal(countryOptions, dataProcessingRegistrationOptions.ThirdCountryOptions);
             Assert.Equal(basisForTransferOptions, dataProcessingRegistrationOptions.BasisForTransferOptions);
+            Assert.Equal(oversightOptions, dataProcessingRegistrationOptions.OversightOptions);
         }
 
         [Theory]
@@ -97,6 +103,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectBasisForTransferOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> basisForTransferOptions)
         {
             _optionRepositoryMock.Setup(x => x.GetAvailableBasisForTransferOptions(organizationId)).Returns(basisForTransferOptions);
+        }
+
+        private void ExpectOversightOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingOversightOption>> oversightOptions)
+        {
+            _optionRepositoryMock.Setup(x => x.GetAvailableOversightOptions(organizationId)).Returns(oversightOptions);
         }
 
     }

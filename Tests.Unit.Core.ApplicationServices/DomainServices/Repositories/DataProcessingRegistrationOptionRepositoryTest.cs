@@ -18,6 +18,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>> _dataResponsibleOptionsServiceMock;
         private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>> _basisForTransferOptionsServiceMock;
         private readonly Mock<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>> _roleServiceMock;
+        private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>> _oversightOptionsServiceMock;
 
         public DataProcessingRegistrationOptionRepositoryTest()
         {
@@ -25,11 +26,13 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             _dataResponsibleOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>();
             _basisForTransferOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>();
             _roleServiceMock = new Mock<IOptionsService<DataProcessingRegistrationRight,DataProcessingRegistrationRole>>();
+            _oversightOptionsServiceMock = new Mock<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>();
             _sut = new DataProcessingRegistrationOptionRepository(
                 _countryOptionsServiceMock.Object, 
                 _dataResponsibleOptionsServiceMock.Object,
                 _basisForTransferOptionsServiceMock.Object,
-                _roleServiceMock.Object);
+                _roleServiceMock.Object,
+                _oversightOptionsServiceMock.Object);
         }
 
         [Fact]
@@ -87,6 +90,24 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         }
 
         [Fact]
+        public void Can_GetAvailableOversightOptions()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var oversightOptions = new List<OptionDescriptor<DataProcessingOversightOption>>()
+            {
+                new OptionDescriptor<DataProcessingOversightOption>(new DataProcessingOversightOption(), ""),
+            };
+            ExpectOversightOptions(organizationId, oversightOptions);
+
+            //Act
+            var assignableOversightOptions = _sut.GetAvailableOversightOptions(organizationId);
+
+            //Assert
+            Assert.Equal(oversightOptions, assignableOversightOptions);
+        }
+
+        [Fact]
         public void Can_GetAvailableRoles()
         {
             //Arrange
@@ -122,6 +143,11 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         private void ExpectBasisForTransferOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> basisForTransferOptions)
         {
             _basisForTransferOptionsServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(basisForTransferOptions);
+        }
+
+        private void ExpectOversightOptions(int organizationId, IEnumerable<OptionDescriptor<DataProcessingOversightOption>> oversightOptions)
+        {
+            _oversightOptionsServiceMock.Setup(x => x.GetAvailableOptionsDetails(organizationId)).Returns(oversightOptions);
         }
     }
 }

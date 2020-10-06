@@ -38,5 +38,7 @@ namespace Presentation.Web.Models.GDPR
 
         public ValueWithOptionalRemarkDTO<OptionWithDescriptionAndExpirationDTO> DataResponsible { get; set; }
 
+        public ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]> OversightOptions { get; set; }
+
     }
 }

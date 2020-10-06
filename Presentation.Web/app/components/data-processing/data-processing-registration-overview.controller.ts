@@ -251,7 +251,7 @@
                             .withTitle("Tilsynsinterval")
                             .withId("oversightInterval")
                             .withStandardWidth(150)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
                                 [
@@ -266,9 +266,30 @@
                                     }
                                 })
                                 , false
-                        )
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval))))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("OversightOptionNamesAsCsv")
+                            .withTitle("Tilsynsmuligheder")
+                            .withId("dpOversightOptionNamesAsCsv")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                dataProcessingRegistrationOptions
+                                    .oversightOptions
+                                    .map(value => {
+                                        return {
+                                            textValue: value.name,
+                                            remoteValue: value.name
+                                        }
+                                    })
+                                , true
+                            )
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>
