@@ -767,30 +767,28 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
-        public async Task Latest_Date_Is_Null_If_Completed_Is_Not_Yes()
+        public async Task LatestDate_IsResetToNull_WhenIsCompletedNotYes()
         {
 
             //Arrange
             var name = A<string>();
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var date = A<DateTime>();
-            const YesNoUndecidedOption isCompletedYes = YesNoUndecidedOption.Yes;
-            const YesNoUndecidedOption isCompletedNo = YesNoUndecidedOption.No;
+            using var isCompletedYesResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, isCompletedYesResponse.StatusCode);
+            using var latestDateResponse = await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registrationDto.Id, date);
+            Assert.Equal(HttpStatusCode.OK, latestDateResponse.StatusCode);
+            var dtoWithDate = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dtoWithDate.OversightCompleted.OptionalDateValue, date);
 
             //Act
-            using var responseIsCompleted = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, isCompletedYes);
-            using var responseLatestDate = await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registrationDto.Id, date);
+            using var isCompletedNoResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.No);
+
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK, responseIsCompleted.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, responseLatestDate.StatusCode);
-            var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Equal(dto.OversightCompleted.OptionalDateValue, date);
-
-            using var responseNull = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, isCompletedNo);
-            Assert.Equal(HttpStatusCode.OK, responseNull.StatusCode);
-            dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
-            Assert.Null(dto.OversightCompleted.OptionalDateValue);
+            Assert.Equal(HttpStatusCode.OK, isCompletedNoResponse.StatusCode);
+            var dtoWithNullDate = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Null(dtoWithNullDate.OversightCompleted.OptionalDateValue);
         }
     }
 }
