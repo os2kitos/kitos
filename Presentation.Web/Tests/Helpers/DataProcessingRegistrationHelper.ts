@@ -186,7 +186,7 @@ class DataProcessingRegistrationHelper {
 
     public static changeOversightCompletedLatestDate(changeToDate: string) {
         console.log("Changing Oversight Completed Latest Date to date: " + changeToDate);
-        return this.editOversightPo.getOversightCompletedLatestDate().sendKeys(changeToDate);
+        return this.editOversightPo.getLatestOversightCompletedDate().sendKeys(changeToDate);
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

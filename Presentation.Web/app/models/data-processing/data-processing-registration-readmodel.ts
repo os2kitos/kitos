@@ -22,6 +22,6 @@
         BasisForTransfer?: string;
         OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
         DataResponsible?: string;
-        OversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
+        IsOversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
     }
 }
