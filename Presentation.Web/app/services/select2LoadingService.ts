@@ -37,6 +37,8 @@
             const config = <any>{
                 minimumInputLength: 1,
                 allowClear: allowClear,
+                initSelection(elem, callback) {
+                },
                 ajax: {
                     data(term, _) {
                         return { query: term };
