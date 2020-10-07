@@ -290,6 +290,28 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder
+                        .withDataSourceName("IsOversightCompleted")
+                        .withTitle("Gennemført tilsyn")
+                        .withId("isOversightCompleted")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange
+                        (
+                            [
+                                Models.Api.Shared.YesNoUndecidedOption.Yes,
+                                Models.Api.Shared.YesNoUndecidedOption.No
+                            ].map(value => {
+                                return {
+                                    textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                    remoteValue: value
+                                }
+                            })
+                            , false
+                        )
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>

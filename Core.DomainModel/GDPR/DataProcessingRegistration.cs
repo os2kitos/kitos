@@ -330,5 +330,21 @@ namespace Core.DomainModel.GDPR
                 AgreementConcludedAt = null;
             }
         }
+
+        public YesNoUndecidedOption? IsOversightCompleted { get; set; }
+
+        public DateTime? LatestOversightDate { get; set; }
+
+        public string OversightCompletedRemark { get; set; }
+
+        public void SetOversightCompleted(YesNoUndecidedOption completed)
+        {
+            IsOversightCompleted = completed;
+            if (IsOversightCompleted != YesNoUndecidedOption.Yes)
+            {
+                LatestOversightDate = null;
+            }
+
+        }
     }
 }

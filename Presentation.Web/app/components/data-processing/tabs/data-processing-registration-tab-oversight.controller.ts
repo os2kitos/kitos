@@ -9,7 +9,8 @@
             "apiUseCaseFactory",
             "select2LoadingService",
             "dataProcessingRegistrationOptions",
-            "bindingService"
+            "bindingService",
+            "notify"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -20,13 +21,17 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
-            private readonly bindingService: Kitos.Services.Generic.IBindingService) {
+            private readonly bindingService: Kitos.Services.Generic.IBindingService,
+            private readonly notify) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
             this.bindOversightIntervalRemark();
             this.bindOversigthOptions();
             this.bindOversigthOptionsRemark();
+            this.bindOversightCompleted();
+            this.bindLatestOversightCompletedDate();
+            this.bindOversightCompletedRemark();
         }
 
         headerName = this.dataProcessingRegistration.name;
@@ -34,6 +39,10 @@
         oversightIntervalRemark: Models.ViewModel.Generic.IEditTextViewModel;
         oversigthOptions: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
+        isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+        latestOversightCompletedDate: Models.ViewModel.Generic.IDateSelectionViewModel;
+        oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
+        shouldShowLatestOversightCompletedDate: boolean;
 
         private bindOversigthOptions() {
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
@@ -90,13 +99,41 @@
                 (newText) => this.changeOversightIntervalRemark(newText));
         }
 
+        private bindOversightCompleted() {
+            this.isOversightCompleted = {
+                selectedElement: this.getYesNoUndecidedOversightCompletedOptionFromId(this.dataProcessingRegistration.oversightCompleted.value),
+                select2Config: this.select2LoadingService.select2LocalDataNoSearch(() => new Models.ViewModel.Shared.YesNoUndecidedOptions().options, false),
+                elementSelected: (newElement) => this.changeIsOversightCompleted(newElement)
+            }
+
+            this.shouldShowLatestOversightCompletedDate =
+                this.isOversightCompleted.selectedElement !== null &&
+                this.isOversightCompleted.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoUndecidedOption.Yes;
+        }
+
+        private bindLatestOversightCompletedDate() {
+            this.latestOversightCompletedDate = new Models.ViewModel.Generic.DateSelectionViewModel(
+                this.dataProcessingRegistration.oversightCompleted.optionalDateValue,
+                (newDate) => this.changeLatestOversightCompletedDate(newDate));
+        }
+
+        private bindOversightCompletedRemark() {
+            this.oversightCompletedRemark = new Models.ViewModel.Generic.EditTextViewModel(
+                this.dataProcessingRegistration.oversightCompleted.remark,
+                (newText) => this.changeOversightCompletedRemark(newText));
+        }
+
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
             return new Models.ViewModel.Shared.YearMonthUndecidedIntervalOption().getById(id);
-        } 
+        }
+
+        private getYesNoUndecidedOversightCompletedOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption> {
+            return new Models.ViewModel.Shared.YesNoUndecidedOptions().getById(id);
+        }
 
         private changeOversightInterval(oversightInterval: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>) {
             this.apiUseCaseFactory
-                .createUpdate("Tilsynsinterval", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistration.id, oversightInterval.optionalObjectContext))
+                .createUpdate("Tilsynsinterval", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistrationId, oversightInterval.optionalObjectContext))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.value = oversightInterval.optionalObjectContext;
                     this.bindOversightInterval();
@@ -106,7 +143,7 @@
 
         private changeOversightIntervalRemark(oversightIntervalRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistrationId, oversightIntervalRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightIntervalRemark;
                     this.bindOversightIntervalRemark();
@@ -116,7 +153,7 @@
 
         private changeOversightOptionRemark(oversightOptionRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistration.id, oversightOptionRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistrationId, oversightOptionRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightOptions.remark = oversightOptionRemark;
                     this.bindOversigthOptionsRemark();
@@ -138,21 +175,72 @@
                 });
         }
 
-        private addOversightOption(newElement: Models.ViewModel.Generic.Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
+        private addOversightOption(newElement: Models.ViewModel.Generic.
+            Select2OptionViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>) {
             if (!!newElement && !!newElement.optionalObjectContext) {
-                const oversightOption = newElement.optionalObjectContext as Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;
+                const oversightOption =
+                    newElement.optionalObjectContext as Models.Generic.NamedEntity.
+                    NamedEntityWithDescriptionAndExpirationStatusDTO;
                 this.apiUseCaseFactory
-                    .createAssignmentCreation(() => this.dataProcessingRegistrationService.assignOversightOption(this.dataProcessingRegistrationId, oversightOption.id))
+                    .createAssignmentCreation(
+                        () => this.dataProcessingRegistrationService.assignOversightOption(
+                            this.dataProcessingRegistrationId,
+                            oversightOption.id))
                     .executeAsync(success => {
                         //Update the source collection 
                         this.dataProcessingRegistration.oversightOptions.value.push(oversightOption);
-                        
+
 
                         //Trigger UI update
                         this.bindOversigthOptions();
                         return success;
                     });
             }
+        }
+
+        private changeIsOversightCompleted(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
+            this.apiUseCaseFactory
+                .createUpdate("Gennemført tilsyn", () => this.dataProcessingRegistrationService.updateOversightCompleted(this.dataProcessingRegistrationId, isOversightCompleted.optionalObjectContext))
+                .executeAsync(success => {
+                    if (success.optionalServerDataPush) {
+                        this.dataProcessingRegistration.oversightCompleted = success.optionalServerDataPush.oversightCompleted;
+                    }
+
+                    this.dataProcessingRegistration.oversightCompleted.value = isOversightCompleted.optionalObjectContext;
+                    this.bindOversightCompleted();
+                    this.bindLatestOversightCompletedDate();
+                    return success;
+                });
+
+        }
+
+        private changeLatestOversightCompletedDate(latestOversightCompletedDate: string) {
+            if (!!latestOversightCompletedDate) {
+                var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(latestOversightCompletedDate);
+                if (!!formattedDate.convertedValue) {
+                    return this.apiUseCaseFactory
+                        .createUpdate("Dato for seneste tilsyn",
+                            () => this.dataProcessingRegistrationService.updateLatestOversightCompletedDate(
+                                this.dataProcessingRegistrationId,
+                                formattedDate.convertedValue))
+                        .executeAsync(success => {
+                            this.dataProcessingRegistration.oversightCompleted.optionalDateValue = latestOversightCompletedDate;
+                            this.bindLatestOversightCompletedDate();
+                            return success;
+                        });
+                }
+                return this.notify.addErrorMessage(formattedDate.errorMessage);
+            }
+        }
+
+        private changeOversightCompletedRemark(oversightCompletedRemark: string) {
+            this.apiUseCaseFactory
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistrationId, oversightCompletedRemark))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.oversightInterval.remark = oversightCompletedRemark;
+                    this.bindOversightIntervalRemark();
+                    return success;
+                });
         }
     }
 

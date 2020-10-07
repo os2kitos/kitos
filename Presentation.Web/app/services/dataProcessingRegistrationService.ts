@@ -36,6 +36,10 @@
         assignOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         removeOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult>;
         updateOversightOptionRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightCompleted(dataProcessingRegistrationId: number, isOversightCompleted: Models.Api.Shared.YesNoUndecidedOption): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateLatestOversightCompletedDate(dataProcessingRegistrationId: number, dateTime: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+        updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult>;
+
     }
 
     export interface IDataProcessingRegistrationCreatedResult {
@@ -324,6 +328,18 @@
 
         updateOversightOptionRemark(dataProcessingRegistrationId: number, remark: string): angular.IPromise<IDataProcessingRegistrationPatchResult> {
             return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-option-remark"), remark);
+        }
+
+        updateOversightCompleted(dataProcessingRegistrationId: number, isOversightCompleted: Models.Api.Shared.YesNoUndecidedOption) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-completed"), isOversightCompleted);
+        }
+
+        updateLatestOversightCompletedDate(dataProcessingRegistrationId: number, dateString: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "latest-oversight-date"), dateString);
+        }
+
+        updateOversightCompletedRemark(dataProcessingRegistrationId: number, remark: string) {
+            return this.simplePatch(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "oversight-completed-remark"), remark);
         }
 
         static $inject = ["$http"];

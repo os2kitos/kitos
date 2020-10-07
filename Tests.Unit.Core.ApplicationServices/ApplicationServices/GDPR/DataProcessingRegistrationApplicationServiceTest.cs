@@ -1387,6 +1387,81 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightOptionRemark(id, A<string>()));
         }
 
+        [Fact]
+        public void Can_Update_IsOversightCompleted()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var oversightCompleted = A<YesNoUndecidedOption>();
+                
+                //Act
+                return _sut.UpdateIsOversightCompleted(registration.Id, oversightCompleted);
+            });
+        }
+
+        [Fact]
+        public void Update_IsOversightCompleted_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Update_IsOversightCompleted_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Can_Update_LatestOversightDate()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var latestOversightDate = A<DateTime>();
+
+                //Act
+                return _sut.UpdateLatestOversightDate(registration.Id, latestOversightDate);
+            });
+        }
+
+        [Fact]
+        public void Update_LatestOversightDate_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Update_LatestOversightDate_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Can_Update_OversightCompletedRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var oversightCompletedRemark = A<string>();
+
+                //Act
+                return _sut.UpdateOversightCompletedRemark(registration.Id, oversightCompletedRemark);
+            });
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
+        }
+
         /// <summary>
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>

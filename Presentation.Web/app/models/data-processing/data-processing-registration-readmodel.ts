@@ -23,5 +23,6 @@
         OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
         DataResponsible?: string;
         OversightOptionNamesAsCsv: string;
+        IsOversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
     }
 }

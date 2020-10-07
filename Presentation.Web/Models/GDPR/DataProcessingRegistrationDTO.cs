@@ -2,7 +2,6 @@
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.References;
-using Presentation.Web.Models;
 using Presentation.Web.Models.Shared;
 
 namespace Presentation.Web.Models.GDPR
@@ -40,5 +39,9 @@ namespace Presentation.Web.Models.GDPR
 
         public ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]> OversightOptions { get; set; }
 
+
+        public ValueWithOptionalDateAndRemark<YesNoUndecidedOption?> OversightCompleted { get; set; }
+
+   
     }
 }

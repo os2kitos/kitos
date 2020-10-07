@@ -2,7 +2,6 @@
     <h4 data-element-type="dpaMainDetailHeader">{{vm.headerName}}</h4>
     <div class="panel panel-default">
         <div class="row">
-
             <div class="col-xs-6">
                 <div class="form-group">
                     <!-- Oversight options -->
@@ -44,14 +43,13 @@
                 </div>
                 <!-- Oversight Option Remark -->
                 <div class="form-group">
-                    <label for="oversightOptionRemark" class="control-label small">Bemærkning</label>
+                    <label for="oversightOptionRemark" class="control-label small">Bemærkninger</label>
                     <remark-field id="oversightOptionRemark"
                                   rows="2"
                                   ng-model="vm.oversightOptionsRemark"
                                   ng-disabled="!vm.hasWriteAccess" />
                 </div>
             </div>
-
             <div class="col-xs-6">
                 <!--Oversight Interval  -->
                 <div class="form-group">
@@ -64,6 +62,28 @@
                     <remark-field id="oversightIntervalRemark"
                                   rows="2"
                                   ng-model="vm.oversightIntervalRemark"
+                                  ng-disabled="!vm.hasWriteAccess" />
+                </div>
+                <!--Oversight Completed  -->
+                <div class="form-group">
+                    <label for="oversightCompleted" class="control-label small">Gennemført tilsyn</label>
+                    <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
+                </div>
+                <!-- Latest Oversight -->
+                <div class="form-group" ng-if="vm.shouldShowLatestOversightCompletedDate">
+                    <div class="form-group">
+                        <label for="latestOversightCompletedDate" class="control-label small">Dato for seneste tilsyn</label>
+                        <date-picker id="latestOversightCompletedDate"
+                                     ng-model="vm.latestOversightCompletedDate"
+                                     ng-disabled="!vm.hasWriteAccess" />
+                    </div>
+                </div>
+                <!-- Oversight Completed Remark -->
+                <div class="form-group">
+                    <label for="oversightCompletedRemark " class="control-label small">Bemærkninger</label>
+                    <remark-field id="oversightCompletedRemark"
+                                  rows="2"
+                                  ng-model="vm.oversightCompletedRemark"
                                   ng-disabled="!vm.hasWriteAccess" />
                 </div>
             </div>
