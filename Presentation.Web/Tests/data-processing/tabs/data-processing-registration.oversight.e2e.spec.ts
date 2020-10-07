@@ -121,6 +121,7 @@ describe("Data processing registration oversight detail tests", () => {
 
     function activateBlur() {
         return pageObject.getOversightIntervalRemark().click();
+
     }
 
 }); 
