@@ -135,7 +135,7 @@
 
         private changeOversightInterval(oversightInterval: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption>) {
             this.apiUseCaseFactory
-                .createUpdate("Tilsynsinterval", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistration.id, oversightInterval.optionalObjectContext))
+                .createUpdate("Tilsynsinterval", () => this.dataProcessingRegistrationService.updateOversightInterval(this.dataProcessingRegistrationId, oversightInterval.optionalObjectContext))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.value = oversightInterval.optionalObjectContext;
                     this.bindOversightInterval();
@@ -145,7 +145,7 @@
 
         private changeOversightIntervalRemark(oversightIntervalRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistration.id, oversightIntervalRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistrationId, oversightIntervalRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightIntervalRemark;
                     this.bindOversightIntervalRemark();
@@ -155,7 +155,7 @@
 
         private changeOversightOptionRemark(oversightOptionRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistration.id, oversightOptionRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightOptionRemark(this.dataProcessingRegistrationId, oversightOptionRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightOptions.remark = oversightOptionRemark;
                     this.bindOversigthOptionsRemark();
@@ -202,7 +202,7 @@
 
         private changeIsOversightCompleted(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
             this.apiUseCaseFactory
-                .createUpdate("Gennemført tilsyn", () => this.dataProcessingRegistrationService.updateOversightCompleted(this.dataProcessingRegistration.id, isOversightCompleted.optionalObjectContext))
+                .createUpdate("Gennemført tilsyn", () => this.dataProcessingRegistrationService.updateOversightCompleted(this.dataProcessingRegistrationId, isOversightCompleted.optionalObjectContext))
                 .executeAsync(success => {
                     if (success.optionalServerDataPush) {
                         this.dataProcessingRegistration.oversightCompleted = success.optionalServerDataPush.oversightCompleted;
@@ -223,7 +223,7 @@
                     return this.apiUseCaseFactory
                         .createUpdate("Dato for seneste tilsyn",
                             () => this.dataProcessingRegistrationService.updateLatestOversightCompletedDate(
-                                this.dataProcessingRegistration.id,
+                                this.dataProcessingRegistrationId,
                                 formattedDate.convertedValue))
                         .executeAsync(success => {
                             this.dataProcessingRegistration.oversightCompleted.optionalDateValue = latestOversightCompletedDate;
@@ -237,7 +237,7 @@
 
         private changeOversightCompletedRemark(oversightCompletedRemark: string) {
             this.apiUseCaseFactory
-                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistration.id, oversightCompletedRemark))
+                .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistrationId, oversightCompletedRemark))
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightInterval.remark = oversightCompletedRemark;
                     this.bindOversightIntervalRemark();
