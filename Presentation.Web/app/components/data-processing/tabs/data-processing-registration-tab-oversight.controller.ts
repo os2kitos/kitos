@@ -79,8 +79,6 @@
             );
         }
 
-
-
         private bindOversigthOptionsRemark() {
             this.oversightOptionsRemark = new Models.ViewModel.Generic.EditTextViewModel(
                 this.dataProcessingRegistration.oversightOptions.remark,
@@ -116,7 +114,7 @@
         private bindLatestOversightCompletedDate() {
             this.latestOversightCompletedDate = new Models.ViewModel.Generic.DateSelectionViewModel(
                 this.dataProcessingRegistration.oversightCompleted.optionalDateValue,
-                (newDate) => this.changeLatestOversightCompletedDate (newDate));
+                (newDate) => this.changeLatestOversightCompletedDate(newDate));
         }
 
         private bindOversightCompletedRemark() {
@@ -182,7 +180,7 @@
             if (!!newElement && !!newElement.optionalObjectContext) {
                 const oversightOption =
                     newElement.optionalObjectContext as Models.Generic.NamedEntity.
-                        NamedEntityWithDescriptionAndExpirationStatusDTO;
+                    NamedEntityWithDescriptionAndExpirationStatusDTO;
                 this.apiUseCaseFactory
                     .createAssignmentCreation(
                         () => this.dataProcessingRegistrationService.assignOversightOption(
@@ -246,7 +244,7 @@
         }
     }
 
-            angular
+    angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
             $stateProvider.state("data-processing.edit-registration.oversight", {

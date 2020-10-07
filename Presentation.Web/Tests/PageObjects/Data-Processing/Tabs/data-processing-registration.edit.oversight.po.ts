@@ -53,5 +53,8 @@ class DataProcessingRegistrationEditOversightPageObject {
         return element(by.id("latestOversightCompletedDate")).element(by.tagName("input"));
     }
 
+    getDpaMainNameHeader() {
+        return element(this.cssHelper.byDataElementType("dpaMainDetailHeader"));
+    }
 }
 export = DataProcessingRegistrationEditOversightPageObject;

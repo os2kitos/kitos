@@ -1420,7 +1420,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 //Arrange
                 var latestOversightDate = A<DateTime>();
 
-
                 //Act
                 return _sut.UpdateLatestOversightDate(registration.Id, latestOversightDate);
             });
