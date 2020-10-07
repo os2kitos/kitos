@@ -357,6 +357,7 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
@@ -468,6 +469,7 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-edit.controller.ts" />
@@ -493,6 +495,7 @@
     <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />

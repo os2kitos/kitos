@@ -58,5 +58,10 @@ namespace Core.DomainServices.Repositories.Contract
             _contractRepository.DeleteWithReferencePreload(contract);
             _contractRepository.Save();
         }
+
+        public void Update()
+        {
+            _contractRepository.Save();
+        }
     }
 }

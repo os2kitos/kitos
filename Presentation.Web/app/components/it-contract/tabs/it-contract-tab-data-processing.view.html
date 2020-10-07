@@ -1,0 +1,55 @@
+﻿<div class="object-section-container">
+    <h4>{{vm.contract.name}}</h4>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            IT Kontrakten gælder flg. databehandlingsregisteringer
+        </div>
+        <table class="table table-condensed table-striped small">
+            <thead>
+                <tr>
+                    <th class="col-xs-8" style="padding-left: 15px">
+                        Databehandlingsregistrering
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
+                    <!-- the system -->
+                    <td style="padding-left: 15px">
+                        <a data-ui-sref="it-system.usage.main({ id: associatedSystemUsage.id })">{{ formatSystemName(associatedSystemUsage.itSystemName, associatedSystemUsage.itSystemDisabled) }}</a>
+                    </td>
+
+                    <td>
+                        <div class="pull-right" ng-show="vm.hasWriteAccess">
+                            <a class="btn btn-danger btn-xs delete-system-usage"
+                               data-confirmed-click="associatedSystemUsage.delete()"
+                               data-confirm-click="Er du sikker på at du vil slette rækken?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+
+            </tbody>
+            <tfoot ng-show="vm.hasWriteAccess">
+                <!-- new row -->
+                <tr>
+                    <td colspan="3">
+                        <input type="hidden"
+                               id="new-system-usage"
+                               class="form-control input-sm"
+                               data-ui-select2="itSystemUsagesSelectOptions"
+                               data-ng-model="newAssociatedSystemUsage.selectedSystem"
+                               data-ng-change="newAssociatedSystemUsage.save()"
+                               data-placeholder="Vælg IT system">
+                    </td>
+                </tr>
+            </tfoot>
+
+
+        </table>
+    </div>
+</div>
