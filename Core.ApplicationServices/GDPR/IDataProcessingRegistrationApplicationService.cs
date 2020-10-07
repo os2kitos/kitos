@@ -47,6 +47,9 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId);
         Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
+        Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int oversightOptionId);
+        Result<DataProcessingOversightOption, OperationError> RemoveOversightOption(int id, int oversightOptionId);
+        Result<DataProcessingRegistration, OperationError> UpdateOversightOptionRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
         Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate);
         Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark);

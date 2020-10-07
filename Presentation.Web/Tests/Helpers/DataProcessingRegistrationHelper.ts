@@ -4,8 +4,10 @@ import LocalDataProcessing = require("../PageObjects/Local-admin/LocalDataProces
 import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
-import DataProcessingRegistrationEditMainPageObject = require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
-import DataProcessingRegistrationEditOversightPageObject = require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
+import DataProcessingRegistrationEditMainPageObject =
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+import DataProcessingRegistrationEditOversightPageObject =
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 
 class DataProcessingRegistrationHelper {
     private static readonly selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
@@ -231,6 +233,18 @@ class DataProcessingRegistrationHelper {
     public static assignDataResponsible(dataResponsibleOptionName) {
         console.log(`Assigning data responsible option with name: ${dataResponsibleOptionName}`);
         return Select2Helper.selectWithNoSearch(dataResponsibleOptionName, "s2id_dataResponsible_config");
+    }
+
+    public static assignOversightOption(name: string) {
+        console.log("Assigning oversight option with name: " + name);
+        return Select2Helper.selectWithNoSearch(name, "s2id_oversight-option_select-new_config");
+    }
+
+    public static removeOversightOption(name: string) {
+        console.log("Removing oversight option with name: " + name);
+        return this.editOversightPo.getRemoveOversightOptionButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
     static selectBasisForTransfer(basisForTransfer: string) {

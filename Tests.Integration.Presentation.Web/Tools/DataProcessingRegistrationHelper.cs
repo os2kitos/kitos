@@ -288,7 +288,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{registrationId}/basis-for-transfer/clear"), cookie, new { });
         }
 
-        public static async Task<DataProcessingOptionsDTO> GetAvailableDataResponsibleOptionsRequestAsync(int organizationId, Cookie optionalLogin = null)
+        public static async Task<DataProcessingOptionsDTO> GetAvailableOptionsRequestAsync(int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -321,6 +321,33 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new SingleValueDTO<string> { Value = dataResponsibleRemark };
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/data-responsible-remark"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignOversightOptionRequestAsync(int id, int oversightOptionId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<int> { Value = oversightOptionId };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option/assign"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendRemoveOversightOptionRequestAsync(int id, int oversightOptionId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<int> { Value = oversightOptionId };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option/remove"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateOversightOptionRemarkRequestAsync(int id, string remark, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = remark };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/oversight-option-remark"), cookie, body);
         }
 
         public static async Task<HttpResponseMessage> SendChangeIsOversightCompletedRequestAsync(int id, YesNoUndecidedOption? yesNoUndecidedOption, Cookie optionalLogin = null)

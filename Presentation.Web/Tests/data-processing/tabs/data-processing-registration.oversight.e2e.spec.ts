@@ -21,7 +21,6 @@ describe("Data processing registration oversight detail tests", () => {
         return `OversightRemark_${new Date().getTime()}`;
     }
 
-
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
@@ -33,13 +32,14 @@ describe("Data processing registration oversight detail tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-
     it("Is able to set oversight data",
         () => {
             const name = createName();
             const intervalRemark = createRemark();
             const completedRemark = createRemark();
             const dropdownInterval = "Hver andet år";
+            const oversightOptionName = "Egen kontrol";
+            const oversightOptionRemark = createRemark();
             const dropdownCompleted = "Ja";
             const oversightIntervalId = "s2id_oversightInterval_config";
             const oversightCompletedId = "s2id_oversightCompleted_config";
@@ -48,20 +48,25 @@ describe("Data processing registration oversight detail tests", () => {
             // Creating and navigating to DPR
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => pageObject.getOversightPage())
-            // Inserting data into completed oversight section
+                .then(() => pageObject.getOversightIntervalRemark().sendKeys(intervalRemark))
+                .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
+            //    .then(() => verifyOversightInterval(dropdownInterval))
+                .then(() => verifyOversightIntervalRemark(intervalRemark))
+                // Oversight options
+                .then(() => dpaHelper.assignOversightOption(oversightOptionName))
+                .then(() => verifyOversightOptionContent([oversightOptionName], []))
+                .then(() => dpaHelper.removeOversightOption(oversightOptionName))
+                .then(() => verifyOversightOptionContent([], [oversightOptionName]))
+                // Oversight option remark
+                .then(() => pageObject.getOversightOptionRemark().sendKeys(oversightOptionRemark))
+                .then(() => verifyOversightOptionRemark(intervalRemark))
+            // Oversight is completed
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
                 .then(() => dpaHelper.changeOversightCompletedLatestDate(date))
                 .then(() => pageObject.getOversightCompletedRemark().sendKeys(completedRemark))
-            // Inserting data into interval oversight section
-                .then(() => pageObject.getOversightIntervalOptionRemark().sendKeys(intervalRemark))
-                .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
-                // verifying fields for interval oversight section
-                .then(() => verifySelect2Value(dropdownInterval, oversightIntervalId))
-                .then(() => VerifyAttributeValueIs(intervalRemark, pageObject.getOversightIntervalOptionRemark()))
-            // verifying fields for completed oversight section
                 .then(() => VerifyAttributeValueIs(completedRemark, pageObject.getOversightCompletedRemark()))
-                .then(() => verifySelect2Value(dropdownCompleted, oversightCompletedId ))
+                .then(() => verifySelect2Value(dropdownCompleted, oversightCompletedId))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
                 .then(() => VerifyAttributeValueIs(date, pageObject.getLatestOversightCompletedDate()));
         });
@@ -71,9 +76,30 @@ describe("Data processing registration oversight detail tests", () => {
         expect(Select2Helper.getData(selectedId).getText()).toEqual(selectedValue);
     }
 
+    function verifyOversightIntervalRemark(expectedValue: string) {
+        console.log(`Expecting oversight interval remark to be set to: ${expectedValue}`);
+        expect(pageObject.getOversightIntervalRemark().getAttribute("value")).toEqual(expectedValue);
+    }
+
     function expectOversightCompletedLatestDateVisibility(visible: boolean) {
         console.log(`Expecting visiblity of oversight completed date to be set to: ${visible}`);
         expect(pageObject.getLatestOversightCompletedDate().isPresent()).toBe(visible);
+    }
+
+    function verifyOversightOptionRemark(expectedValue: string) {
+        console.log(`Expecting oversight option remark to be set to: ${expectedValue}`);
+        expect(pageObject.getOversightOptionRemark().getAttribute("value")).toEqual(expectedValue);
+    }
+
+    function verifyOversightOptionContent(presentNames: string[], unpresentNames: string[]) {
+        presentNames.forEach(name => {
+            console.log(`Expecting oversight option to be present:${name}`);
+            expect(pageObject.getOversightOptionRow(name).isPresent()).toBeTruthy();
+        });
+        unpresentNames.forEach(name => {
+            console.log(`Expecting oversight option NOT to be present:${name}`);
+            expect(pageObject.getOversightOptionRow(name).isPresent()).toBeFalsy();
+        });
     }
 
     function VerifyAttributeValueIs(expectedValue: string, element: protractor.ElementFinder) {

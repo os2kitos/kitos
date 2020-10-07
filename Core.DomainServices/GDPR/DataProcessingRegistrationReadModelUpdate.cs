@@ -16,15 +16,18 @@ namespace Core.DomainServices.GDPR
         private readonly IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> _basisForTransferService;
         private readonly IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> _dataResponsibleService;
+        private readonly IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> _oversightOptionService;
 
         public DataProcessingRegistrationReadModelUpdate(
             IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel> roleAssignmentRepository,
             IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption> basisForTransferService,
-            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService)
+            IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption> dataResponsibleService,
+            IOptionsService<DataProcessingRegistration, DataProcessingOversightOption> oversightOptionService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _basisForTransferService = basisForTransferService;
             _dataResponsibleService = dataResponsibleService;
+            _oversightOptionService = oversightOptionService;
         }
 
         public void Apply(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -39,6 +42,7 @@ namespace Core.DomainServices.GDPR
             PatchTransferToInsecureThirdCountries(source, destination);
             PatchDataResponsible(source, destination);
             PatchBasisForTransfer(source, destination);
+            PatchOversightOptions(source, destination);
             PatchIsOversightCompleted(source, destination);
         }
 
@@ -48,6 +52,11 @@ namespace Core.DomainServices.GDPR
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.Name = source.Name;
+        }
+        private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.OversightOptionNamesAsCsv = string.Join(", ", 
+                source.OversightOptions.Select(x => GetNameOfOption(source, x, _oversightOptionService)));
         }
 
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

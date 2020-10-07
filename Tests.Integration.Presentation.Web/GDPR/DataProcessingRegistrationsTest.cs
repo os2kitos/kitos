@@ -654,7 +654,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
 
             //Act
-            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
 
             //Assert
             Assert.NotEmpty(dataProcessingOptions.DataResponsibleOptions);
@@ -666,7 +666,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name = A<string>();
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
 
             //Act
@@ -684,7 +684,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name = A<string>();
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(registrationDto.Id);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var assingResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, assingResponse.StatusCode);
@@ -713,6 +713,51 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
             Assert.Equal(remark, updateRegistrationDto.DataResponsible.Remark);
+        }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_OversightOption()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(TestEnvironment.DefaultOrganizationId);
+            var randomOversightOption = dataOptions.OversightOptions.ToArray()[Math.Abs(A<int>()) % dataOptions.OversightOptions.Count()];
+
+            //Act - add oversight option
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignOversightOptionRequestAsync(registration.Id, randomOversightOption.Id);
+            using var duplicateResponse = await DataProcessingRegistrationHelper.SendAssignOversightOptionRequestAsync(registration.Id, randomOversightOption.Id);
+
+            //Assert - oversight option added
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            var oversightOption = Assert.Single(dto.OversightOptions.Value);
+            Assert.Equal(randomOversightOption.Id, oversightOption.Id);
+            Assert.Equal(randomOversightOption.Name, oversightOption.Name);
+
+            //Act - remove
+            using var removeResponse = await DataProcessingRegistrationHelper.SendRemoveOversightOptionRequestAsync(registration.Id, randomOversightOption.Id);
+
+            //Assert oversight option removed again
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Empty(dto.OversightOptions.Value);
+        }
+
+        [Fact]
+        public async Task Can_Change_OversightOptionRemark()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendUpdateOversightOptionRemarkRequestAsync(registration.Id, remark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
+            Assert.Equal(remark, updateRegistrationDto.OversightOptions.Remark);
         }
 
         [Fact]

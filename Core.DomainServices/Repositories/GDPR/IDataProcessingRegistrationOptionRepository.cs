@@ -11,5 +11,6 @@ namespace Core.DomainServices.Repositories.GDPR
         IEnumerable<OptionDescriptor<DataProcessingCountryOption>> GetAvailableCountryOptions(int organizationId);
         IEnumerable<OptionDescriptor<DataProcessingBasisForTransferOption>> GetAvailableBasisForTransferOptions(int organizationId);
         IEnumerable<OptionDescriptor<DataProcessingRegistrationRole>> GetAvailableRoles(int organizationId);
+        IEnumerable<OptionDescriptor<DataProcessingOversightOption>> GetAvailableOversightOptions(int organizationId);
     }
 }
