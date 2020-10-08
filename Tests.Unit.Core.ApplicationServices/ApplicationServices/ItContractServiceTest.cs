@@ -8,6 +8,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Contract;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -28,6 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<ILogger> _logger;
+        private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
 
         public ItContractServiceTest()
         {
@@ -38,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext = new Mock<IAuthorizationContext>();
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
+            _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -45,7 +48,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _transactionManager.Object,
                 _domainEvents.Object,
                 _authorizationContext.Object,
-                _logger.Object);
+                _logger.Object,
+                _contractDataProcessingRegistrationAssignmentService.Object);
         }
 
         [Fact]
