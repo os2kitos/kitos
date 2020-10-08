@@ -129,5 +129,7 @@
         ReferenceId: number;
         Reference: IReference;
         AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
+
+        DataProcessingRegistrations: Models.DataProcessing.IDataProcessingRegistration[];
     }
 }
