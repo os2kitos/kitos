@@ -10,7 +10,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_Organization = 3,
         DataProcessingRegistration_BasisForTransfer = 4,
         DataProcessingRegistration_DataResponsible = 5,
-        DataProcessingRegistration_OversightOption = 6
+        DataProcessingRegistration_OversightOption = 6,
+        DataProcessingRegistration_ItContract = 7
     }
 
     public class PendingReadModelUpdate

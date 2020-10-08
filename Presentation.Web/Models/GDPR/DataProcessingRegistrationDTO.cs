@@ -42,6 +42,8 @@ namespace Presentation.Web.Models.GDPR
 
         public ValueWithOptionalDateAndRemark<YesNoUndecidedOption?> OversightCompleted { get; set; }
 
+        public NamedEntityDTO[] AssociatedContracts { get; set; }
+
    
     }
 }

@@ -52,6 +52,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var dpName = $"Dp:{name}";
             var subDpName = $"Sub_Dp:{name}";
             var systemName = $"SYSTEM:{name}";
+            var contractName = $"CONTRACT:{name}";
             var refName = $"REF:{name}";
             var refUserAssignedId = $"REF:{name}EXT_ID";
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
@@ -124,6 +125,11 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var assignSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(registration.Id, usage.Id);
             Assert.Equal(HttpStatusCode.OK, assignSystemResponse.StatusCode);
 
+            //Contracts
+            var contractDto = await ItContractHelper.CreateContract(contractName, organizationId);
+            using var assignDataProcessingResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contractDto.Id, registration.Id);
+            Assert.Equal(HttpStatusCode.OK, assignDataProcessingResponse.StatusCode);
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -148,6 +154,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
             Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
             Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
+            Assert.Equal(contractName, readModel.ContractNamesAsCsv);
+            Assert.Equal(systemName, readModel.SystemNamesAsCsv);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

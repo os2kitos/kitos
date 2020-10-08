@@ -20,6 +20,7 @@
                 .Index(t => t.ItContract_Id)
                 .Index(t => t.DataProcessingRegistration_Id);
             
+            AddColumn("dbo.DataProcessingRegistrationReadModels", "ContractNamesAsCsv", c => c.String());
         }
         
         public override void Down()
@@ -28,6 +29,7 @@
             DropForeignKey("dbo.ItContractDataProcessingRegistrations", "ItContract_Id", "dbo.ItContract");
             DropIndex("dbo.ItContractDataProcessingRegistrations", new[] { "DataProcessingRegistration_Id" });
             DropIndex("dbo.ItContractDataProcessingRegistrations", new[] { "ItContract_Id" });
+            DropColumn("dbo.DataProcessingRegistrationReadModels", "ContractNamesAsCsv");
             DropTable("dbo.ItContractDataProcessingRegistrations");
         }
     }

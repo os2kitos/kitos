@@ -852,7 +852,11 @@ namespace Presentation.Web.Controllers.API
                     Value = value.IsOversightCompleted,
                     OptionalDateValue = value.LatestOversightDate,
                     Remark = value.OversightCompletedRemark
-                }
+                },
+                AssociatedContracts = value
+                    .AssociatedContracts
+                    .Select(contract => new NamedEntityDTO(contract.Id, contract.Name))
+                    .ToArray()
             };
         }
 

@@ -39,8 +39,7 @@ namespace Core.DomainServices.Contract
             if (contract == null) throw new ArgumentNullException(nameof(contract));
 
             return _dataProcessingRegistrationRepository
-                .GetProcessingRegistration(dataProcessingRegistrationId)
-                .FromNullable()
+                .GetById(dataProcessingRegistrationId)
                 .Match
                 (
                     contract.AssignDataProcessingRegistration,
@@ -53,8 +52,7 @@ namespace Core.DomainServices.Contract
             if (contract == null) throw new ArgumentNullException(nameof(contract));
 
             return _dataProcessingRegistrationRepository
-                .GetProcessingRegistration(dataProcessingRegistrationId)
-                .FromNullable()
+                .GetById(dataProcessingRegistrationId)
                 .Match
                 (
                     contract.RemoveDataProcessingRegistration,

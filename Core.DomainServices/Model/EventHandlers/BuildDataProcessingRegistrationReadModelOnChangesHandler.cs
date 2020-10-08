@@ -3,6 +3,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
@@ -28,7 +29,8 @@ namespace Core.DomainServices.Model.EventHandlers
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingDataResponsibleOption>>,
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingOversightOption>>,
-        IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingOversightOption>>
+        IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingOversightOption>>,
+        IDomainEventHandler<EntityUpdatedEvent<ItContract>>
     {
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _mapper;
@@ -136,6 +138,11 @@ namespace Core.DomainServices.Model.EventHandlers
         {
             //Point to parent id since that's what the dpr knows about
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_OversightOption));
+        }
+
+        public void Handle(EntityUpdatedEvent<ItContract> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract));
         }
     }
 }

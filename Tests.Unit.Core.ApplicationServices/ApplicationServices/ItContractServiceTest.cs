@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
@@ -12,6 +15,7 @@ using Core.DomainServices.Contract;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -120,6 +124,110 @@ namespace Tests.Unit.Core.ApplicationServices
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
+        [Fact]
+        public void Can_GetDataProcessingRegistrationsWhichCanBeAssigned()
+        {
+            //Arrange
+            var id = A<int>();
+            var dataProcessingRegistration1Id = A<int>();
+            var dataProcessingRegistration2Id = dataProcessingRegistration1Id + 1;
+            var nameQuery = A<string>();
+            var contract = new ItContract();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowReadReturns(contract, true);
+            var dataProcessingRegistrations = new[] { new DataProcessingRegistration() { Id = dataProcessingRegistration1Id,  Name = $"{nameQuery}{1}" }, new DataProcessingRegistration() { Id = dataProcessingRegistration2Id, Name = $"{nameQuery}{1}" } };
+            _contractDataProcessingRegistrationAssignmentService.Setup(x => x.GetApplicableDataProcessingRegistrations(contract)).Returns(dataProcessingRegistrations.AsQueryable());
+
+            //Act
+            var result = _sut.GetDataProcessingRegistrationsWhichCanBeAssigned(id, nameQuery, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(dataProcessingRegistrations, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_GetDataProcessingRegistrationsWhichCanBeAssigned_If_Contract_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.GetDataProcessingRegistrationsWhichCanBeAssigned(id, A<string>(), new Random().Next(2, 100)));
+        }
+
+        [Fact]
+        public void Cannot_GetDataProcessingRegistrationsWhichCanBeAssigned_If_Read_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_ReadAccess(id => _sut.GetDataProcessingRegistrationsWhichCanBeAssigned(id, A<string>(), new Random().Next(2, 100)));
+        }
+
+        [Fact]
+        public void Can_AssignDataProcessingRegistration()
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            var dataProcessingRegistrationId = A<int>();
+            var dataProcessingRegistration = new DataProcessingRegistration();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            _contractDataProcessingRegistrationAssignmentService.Setup(x => x.AssignDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.AssignDataProcessingRegistration(id, dataProcessingRegistrationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(dataProcessingRegistration, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_AssignDataProcessingRegistration_If_Contract_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.AssignDataProcessingRegistration(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_AssignDataProcessingRegistration_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.AssignDataProcessingRegistration(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_RemoveDataProcessingRegistration()
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            var dataProcessingRegistrationId = A<int>();
+            var dataProcessingRegistration = new DataProcessingRegistration();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, true);
+            _contractDataProcessingRegistrationAssignmentService.Setup(x => x.RemoveDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveDataProcessingRegistration(id, dataProcessingRegistrationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(dataProcessingRegistration, result.Value);
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveDataProcessingRegistration_If_Contract_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Contract_NotFound(id => _sut.RemoveDataProcessingRegistration(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_RemoveDataProcessingRegistration_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.RemoveDataProcessingRegistration(id, A<int>()));
+        }
+
         private EconomyStream CreateEconomyStream()
         {
             return new EconomyStream { Id = A<int>() };
@@ -130,9 +238,78 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowDelete(itContract)).Returns(value);
         }
 
+        private void ExpectAllowReadReturns(ItContract itContract, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowReads(itContract)).Returns(value);
+        }
+
+        private void ExpectAllowModifyReturns(ItContract itContract, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowModify(itContract)).Returns(value);
+        }
+
         private void ExpectGetContractReturns(int contractId, ItContract itContract)
         {
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(itContract);
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing Write access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowModifyReturns(contract, false);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "Missing read access" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Contract_Insufficient_ReadAccess<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            var contract = new ItContract();
+            ExpectGetContractReturns(id, contract);
+            ExpectAllowReadReturns(contract, false);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+
+        /// <summary>
+        /// Helper test to make it easy to cover the "DRP not found" case
+        /// </summary>
+        /// <param name="command"></param>
+        private void Test_Command_Which_Fails_With_Contract_NotFound<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetContractReturns(id, null);
+
+            //Act
+            var result = command(id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Core.DomainModel.GDPR
             SubDataProcessors = new List<Organization.Organization>();
             InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
             OversightOptions = new List<DataProcessingOversightOption>();
+            AssociatedContracts = new List<ItContract.ItContract>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&

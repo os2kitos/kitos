@@ -51,6 +51,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleBasisForTransferUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleDataResponsibleUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOversightOptionUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleContractUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -126,6 +127,22 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 //System id is not stored in read model so search the source model
                 var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
+        private int HandleContractUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                //System id is not stored in read model so search the source model
+                var ids = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 

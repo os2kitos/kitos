@@ -133,6 +133,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SystemNamesAsCsv)))
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("ContractNamesAsCsv")
+                            .withTitle("IT Kontrakter")
+                            .withId("dpContractNamesAsCsv")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ContractNamesAsCsv))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.ContractNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("DataProcessorNamesAsCsv")
                             .withTitle("Databehandlere")
                             .withId("dpDataProcessorNamesAsCsv")

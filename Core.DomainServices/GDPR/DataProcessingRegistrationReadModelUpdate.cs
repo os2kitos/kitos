@@ -44,6 +44,7 @@ namespace Core.DomainServices.GDPR
             PatchBasisForTransfer(source, destination);
             PatchOversightOptions(source, destination);
             PatchIsOversightCompleted(source, destination);
+            PatchContracts(source, destination);
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -89,6 +90,11 @@ namespace Core.DomainServices.GDPR
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(x => (x.ItSystem.Name, x.ItSystem.Disabled)).Select(nameStatus => $"{nameStatus.Name}{(nameStatus.Disabled ? " (Ikke aktivt)" : "")}"));
+        }
+
+        private static void PatchContracts(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.ContractNamesAsCsv = string.Join(", ", source.AssociatedContracts.Select(x => (x.Name)));
         }
 
         private static void PatchReference(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

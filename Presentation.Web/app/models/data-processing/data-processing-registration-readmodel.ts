@@ -24,5 +24,6 @@
         DataResponsible?: string;
         OversightOptionNamesAsCsv: string;
         IsOversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
+        ContractNamesAsCsv: string;
     }
 }
