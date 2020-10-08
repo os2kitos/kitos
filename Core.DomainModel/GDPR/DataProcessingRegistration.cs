@@ -346,5 +346,7 @@ namespace Core.DomainModel.GDPR
             }
 
         }
+
+        public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
     }
 }
