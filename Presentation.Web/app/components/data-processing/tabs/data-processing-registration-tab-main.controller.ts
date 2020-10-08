@@ -9,7 +9,8 @@
             "apiUseCaseFactory",
             "select2LoadingService",
             "notify",
-            "dataProcessingRegistrationOptions"
+            "dataProcessingRegistrationOptions",
+            "bindingService"
         ];
 
         private readonly dataProcessingRegistrationId: number;
@@ -20,7 +21,8 @@
             private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly notify,
-            private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions) {
+            private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
+            private readonly bindingService: Kitos.Services.Generic.IBindingService) {
             this.bindDataProcessors();
             this.bindSubDataProcessors();
             this.bindHasSubDataProcessors();
@@ -149,11 +151,13 @@
             };
             this.enableSelectionOfInsecureThirdCountries = this.dataProcessingRegistration.transferToInsecureThirdCountries === Models.Api.Shared.YesNoUndecidedOption.Yes;
 
-            this.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
+            this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
                 config => this.insecureThirdCountries = config,
                 () => this.dataProcessingRegistration.insecureThirdCountries,
                 element => this.removeInsecureThirdCountry(element.id),
                 newElement => this.addInsecureThirdCountry(newElement),
+                this.hasWriteAccess,
+                this.hasWriteAccess,
                 null,
                 () => {
                     const selectedCountries = this
@@ -194,37 +198,6 @@
             this.enableDataProcessorSelection = this.dataProcessingRegistration.hasSubDataProcessors === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
 
-        private bindMultiSelectConfiguration<TElement>(
-            setField: ((finalVm: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<TElement>) => void),
-            getInitialElements: () => TElement[],
-            removeFunc: ((element: TElement) => void),
-            newFunc: Models.ViewModel.Generic.ElementSelectedFunc<Models.ViewModel.Generic.Select2OptionViewModel<TElement>>,
-            searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
-            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]) {
-
-            let select2Config;
-            if (!!searchFunc) {
-                select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false);
-            } else if (!!fixedValueRange) {
-                select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
-            } else {
-                throw new Error("Either searchFunc or fixedValueRange must be provided");
-            }
-
-            const configuration = {
-                selectedElements: getInitialElements(),
-                removeItemRequested: removeFunc,
-                allowAddition: this.hasWriteAccess,
-                allowRemoval: this.hasWriteAccess,
-                newItemSelectionConfig: {
-                    selectedElement: null,
-                    select2Config: select2Config,
-                    elementSelected: newFunc
-                }
-            };
-            setField(configuration);
-        }
-
         private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
             return dataProcessors.map(
                 dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
@@ -236,11 +209,13 @@
         }
 
         private bindDataProcessors() {
-            this.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
+            this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
                 () => this.dataProcessingRegistration.dataProcessors,
                 element => this.removeDataProcessor(element.id),
                 newElement => this.addDataProcessor(newElement),
+                this.hasWriteAccess,
+                this.hasWriteAccess,
                 (query) => this
                     .dataProcessingRegistrationService
                     .getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
@@ -248,11 +223,13 @@
             );
         }
         private bindSubDataProcessors() {
-            this.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
+            this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.subDataProcessors = config,
                 () => this.dataProcessingRegistration.subDataProcessors,
                 element => this.removeSubDataProcessor(element.id),
                 newElement => this.addSubDataProcessor(newElement),
+                this.hasWriteAccess,
+                this.hasWriteAccess,
                 (query) => this
                     .dataProcessingRegistrationService
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)

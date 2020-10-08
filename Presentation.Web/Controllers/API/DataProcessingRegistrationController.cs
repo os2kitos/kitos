@@ -527,7 +527,8 @@ namespace Presentation.Web.Controllers.API
                     DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
                     ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
                     BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
-                    Roles = result.Roles.Select(ToDto).ToList()
+                    Roles = result.Roles.Select(ToDto).ToList(),
+                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
                 })
                 .Match(Ok, FromOperationError);
         }
@@ -577,6 +578,103 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/oversight-option/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        {
+            if (oversightOptionId == null)
+                return BadRequest($"{nameof(oversightOptionId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .AssignOversightOption(id, oversightOptionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-option/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        {
+            if (oversightOptionId == null)
+                return BadRequest($"{nameof(oversightOptionId)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveOversightOption(id, oversightOptionId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-option-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightOptionRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        {
+            if (remark == null)
+                return BadRequest($"{nameof(remark)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightOptionRemark(id, remark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-completed")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        {
+            if (completed == null)
+                return BadRequest(nameof(completed) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsOversightCompleted(id, completed.Value)
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/latest-oversight-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchLatestOversightDate(int id, [FromBody] SingleValueDTO<DateTime?> latestDate)
+        {
+            if (latestDate == null)
+                return BadRequest(nameof(latestDate) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateLatestOversightDate(id, latestDate.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-completed-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> oversightCompletedRemark)
+        {
+            if (oversightCompletedRemark == null)
+                return BadRequest(nameof(oversightCompletedRemark) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightCompletedRemark(id, oversightCompletedRemark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -605,6 +703,7 @@ namespace Presentation.Web.Controllers.API
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
             var enabledRoles = GetIdsOfAvailableRoles(assignableDataProcessingRegistrationOptions);
+            var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
 
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
@@ -620,7 +719,7 @@ namespace Presentation.Web.Controllers.API
                 .Include(dataProcessingRegistration => dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.BasisForTransfer)
                 .AsEnumerable()
-                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions, enabledRoles))
+                .Select(dataProcessingRegistration => ToDTO(dataProcessingRegistration, localDescriptionOverrides, enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions, enabledRoles, enabledOversightOptions))
                 .ToList();
         }
 
@@ -643,6 +742,10 @@ namespace Presentation.Web.Controllers.API
         {
             return new HashSet<int>(dataProcessingRegistrationOptions.BasisForTransferOptions.Select(x => x.Option.Id));
         }
+        private ISet<int> GetIdsOfAvailableOversightOptions(DataProcessingRegistrationOptions dataProcessingRegistrationOptions)
+        {
+            return new HashSet<int>(dataProcessingRegistrationOptions.OversightOptions.Select(x => x.Option.Id));
+        }
 
         private Dictionary<int, Maybe<string>> GetLocalRoleDescriptionOverrides(Result<DataProcessingRegistrationOptions, OperationError> options)
         {
@@ -661,8 +764,16 @@ namespace Presentation.Web.Controllers.API
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
             var enabledRoles = GetIdsOfAvailableRoles(assignableDataProcessingRegistrationOptions);
+            var enabledOversightOptions = GetIdsOfAvailableOversightOptions(assignableDataProcessingRegistrationOptions);
             int organizationId = value.OrganizationId;
-            return ToDTO(value, GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)), enabledCountryOptions, enabledBasisForTransferOptions, enabledDataResponsibleOptions, enabledRoles);
+            return ToDTO(
+                value, 
+                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)), 
+                enabledCountryOptions, 
+                enabledBasisForTransferOptions, 
+                enabledDataResponsibleOptions, 
+                enabledRoles, 
+                enabledOversightOptions);
         }
 
         private static DataProcessingRegistrationDTO ToDTO(
@@ -671,7 +782,8 @@ namespace Presentation.Web.Controllers.API
             ISet<int> enabledCountryOptions,
             ISet<int> enabledBasisForTransferOptions,
             ISet<int> enabledDataResponsibleOptions,
-            ISet<int> idsOfAvailableRoles)
+            ISet<int> idsOfAvailableRoles,
+            ISet<int> enabledOversightOptions)
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
@@ -727,6 +839,20 @@ namespace Presentation.Web.Controllers.API
                             .GetValueOrDefault(),
                     Remark = value.DataResponsibleRemark
                 },
+                OversightOptions = new ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]>()
+                {
+                    Value = value
+                            .OversightOptions
+                            .Select(oversightOption => new NamedEntityWithExpirationStatusDTO(oversightOption.Id, oversightOption.Name, enabledOversightOptions.Contains(oversightOption.Id) == false))
+                            .ToArray(),
+                    Remark = value.OversightOptionRemark
+                },
+                OversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
+                {
+                    Value = value.IsOversightCompleted,
+                    OptionalDateValue = value.LatestOversightDate,
+                    Remark = value.OversightCompletedRemark
+                }
             };
         }
 

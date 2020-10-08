@@ -59,6 +59,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
             var oversightInterval = A<YearMonthIntervalOption>();
+            var oversightCompleted = A<YesNoUndecidedOption>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
@@ -71,6 +72,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var user = availableUsers.First();
             await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
                 oversightInterval);
+
+            await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id,
+                oversightCompleted);
 
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -88,11 +92,15 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, setInsecureCountryStateResponse.StatusCode);
 
             // Set data responsible
-            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableDataResponsibleOptionsRequestAsync(organizationId);
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(organizationId);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
-            // Data responsible done
+
+            // Set oversight option
+            var oversightOption = dataOptions.OversightOptions.First();
+            using var setOversightOptionResponse = await DataProcessingRegistrationHelper.SendAssignOversightOptionRequestAsync(registration.Id, oversightOption.Id);
+            Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);
 
             //Enable and set sub processors
             using var setStateRequest = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(registration.Id, YesNoUndecidedOption.Yes);
@@ -132,12 +140,14 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(refUrl, readModel.MainReferenceUrl);
             Assert.Equal(refUserAssignedId, readModel.MainReferenceUserAssignedId);
             Assert.Equal(oversightInterval, readModel.OversightInterval);
+            Assert.Equal(oversightCompleted, readModel.IsOversightCompleted);
             Assert.Equal(dataProcessor.Name, readModel.DataProcessorNamesAsCsv);
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
             Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
             Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
+            Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

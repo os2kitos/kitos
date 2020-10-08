@@ -447,6 +447,7 @@
     <Compile Include="Models\SystemRelations\SystemRelationDTO.cs" />
     <Compile Include="Models\SystemRelations\SystemRelationOptionsDTO.cs" />
     <Compile Include="Models\UserWithEmailDTO.cs" />
+    <Compile Include="Models\ValueWithOptionalDateAndRemark.cs" />
     <Compile Include="Models\ValueWithOptionalRemarkDTO.cs" />
     <Compile Include="Ninject\HangfireNinjectResolutionScope.cs" />
     <Compile Include="Ninject\BindingSyntaxExtensions.cs" />
@@ -497,6 +498,7 @@
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueOptionWithOptionalDateDTO.ts" />
+    <TypeScriptCompile Include="app\models\generic\ValueWithOptionalDateAndRemarkDTO.ts" />
     <TypeScriptCompile Include="app\models\generic\ValueWithOptionalRemarkDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
@@ -537,6 +539,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
+    <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />

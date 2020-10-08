@@ -5,7 +5,9 @@ import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
 import DataProcessingRegistrationEditMainPageObject =
-require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+import DataProcessingRegistrationEditOversightPageObject =
+    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 
 class DataProcessingRegistrationHelper {
     private static readonly selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
@@ -15,6 +17,7 @@ class DataProcessingRegistrationHelper {
     private static kendoToolbarWrapper = new KendoToolbarWrapper();
     private static navigation = new NavigationHelper();
     private static editMainPo = new DataProcessingRegistrationEditMainPageObject();
+    private static editOversightPo = new DataProcessingRegistrationEditOversightPageObject();
 
     public static loadOverview() {
         return this.pageObject.getPage()
@@ -178,6 +181,16 @@ class DataProcessingRegistrationHelper {
         return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval_config");
     }
 
+    public static changeOversightCompleted(changeToCompleted: string) {
+        console.log(`Changing Oversight Completed to ${changeToCompleted}`);
+        return Select2Helper.selectWithNoSearch(changeToCompleted, "s2id_oversightCompleted_config");
+    }
+
+    public static changeOversightCompletedLatestDate(changeToDate: string) {
+        console.log("Changing Oversight Completed Latest Date to date: " + changeToDate);
+        return this.editOversightPo.getLatestOversightCompletedDate().sendKeys(changeToDate);
+    }
+
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());
@@ -220,6 +233,18 @@ class DataProcessingRegistrationHelper {
     public static assignDataResponsible(dataResponsibleOptionName) {
         console.log(`Assigning data responsible option with name: ${dataResponsibleOptionName}`);
         return Select2Helper.selectWithNoSearch(dataResponsibleOptionName, "s2id_dataResponsible_config");
+    }
+
+    public static assignOversightOption(name: string) {
+        console.log("Assigning oversight option with name: " + name);
+        return Select2Helper.selectWithNoSearch(name, "s2id_oversight-option_select-new_config");
+    }
+
+    public static removeOversightOption(name: string) {
+        console.log("Removing oversight option with name: " + name);
+        return this.editOversightPo.getRemoveOversightOptionButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
     static selectBasisForTransfer(basisForTransfer: string) {

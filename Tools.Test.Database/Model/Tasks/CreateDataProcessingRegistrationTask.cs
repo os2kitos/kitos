@@ -45,6 +45,11 @@ namespace Tools.Test.Database.Model.Tasks
                 (
                     new GenericRepository<LocalDataProcessingDataResponsibleOption>(dbContext),
                     new GenericRepository<DataProcessingDataResponsibleOption>(dbContext)
+                ),
+                new OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>
+                (
+                    new GenericRepository<LocalDataProcessingOversightOption>(dbContext),
+                    new GenericRepository<DataProcessingOversightOption>(dbContext)
                 )
             );
 

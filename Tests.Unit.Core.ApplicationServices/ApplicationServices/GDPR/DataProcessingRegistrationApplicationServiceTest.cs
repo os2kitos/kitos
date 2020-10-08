@@ -39,6 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
         private readonly Mock<IDataProcessingRegistrationBasisForTransferAssignmentService> _basisForTransferAssignmentServiceMock;
+        private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -54,6 +55,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
             _basisForTransferAssignmentServiceMock = new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>();
+            _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -65,6 +67,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _dpAssignmentService.Object,
                 _insecureThirdCountryAssignmentMock.Object,
                 _basisForTransferAssignmentServiceMock.Object,
+                _oversightOptionAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -1292,6 +1295,171 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Update_DataResponsibleRemark_Returns_NotFound()
         {
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateDataResponsibleRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Can_AssignOversightOption()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var oversightOptionId = A<int>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _oversightOptionAssignmentServiceMock.Setup(x => x.Assign(registration, oversightOptionId)).Returns(Result<DataProcessingOversightOption, OperationError>.Success(new DataProcessingOversightOption()));
+
+            //Act
+            var result = _sut.AssignOversightOption(id, oversightOptionId);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_AssignOversightOption_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignOversightOption(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_AssignOversightOption_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignOversightOption(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_RemoveOversightOption()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var oversightOptionId = A<int>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _oversightOptionAssignmentServiceMock.Setup(x => x.Remove(registration, oversightOptionId)).Returns(Result<DataProcessingOversightOption, OperationError>.Success(new DataProcessingOversightOption()));
+
+            //Act
+            var result = _sut.RemoveOversightOption(id, oversightOptionId);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveOversightOption_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveOversightOption(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_RemoveOversightOption_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveOversightOption(id, A<int>()));
+        }
+
+        [Fact]
+        public void Can_Update_OversightOptionRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Act
+                return _sut.UpdateOversightOptionRemark(registration.Id, A<string>());
+            });
+        }
+
+        [Fact]
+        public void Update_OversightOptionRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightOptionRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_OversightOptionRemark_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightOptionRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Can_Update_IsOversightCompleted()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var oversightCompleted = A<YesNoUndecidedOption>();
+                
+                //Act
+                return _sut.UpdateIsOversightCompleted(registration.Id, oversightCompleted);
+            });
+        }
+
+        [Fact]
+        public void Update_IsOversightCompleted_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Update_IsOversightCompleted_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateIsOversightCompleted(id, A<YesNoUndecidedOption>()));
+        }
+
+        [Fact]
+        public void Can_Update_LatestOversightDate()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var latestOversightDate = A<DateTime>();
+
+                //Act
+                return _sut.UpdateLatestOversightDate(registration.Id, latestOversightDate);
+            });
+        }
+
+        [Fact]
+        public void Update_LatestOversightDate_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Update_LatestOversightDate_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+        }
+
+        [Fact]
+        public void Can_Update_OversightCompletedRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration =>
+            {
+                //Arrange
+                var oversightCompletedRemark = A<string>();
+
+                //Act
+                return _sut.UpdateOversightCompletedRemark(registration.Id, oversightCompletedRemark);
+            });
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_IsOversightCompletedRemark_Returns_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
         }
 
         /// <summary>
