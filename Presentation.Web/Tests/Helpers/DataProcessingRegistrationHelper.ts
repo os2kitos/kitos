@@ -181,6 +181,16 @@ class DataProcessingRegistrationHelper {
         return Select2Helper.selectWithNoSearch(changeToInterval, "s2id_oversightInterval_config");
     }
 
+    public static changeOversightCompleted(changeToCompleted: string) {
+        console.log(`Changing Oversight Completed to ${changeToCompleted}`);
+        return Select2Helper.selectWithNoSearch(changeToCompleted, "s2id_oversightCompleted_config");
+    }
+
+    public static changeOversightCompletedLatestDate(changeToDate: string) {
+        console.log("Changing Oversight Completed Latest Date to date: " + changeToDate);
+        return this.editOversightPo.getLatestOversightCompletedDate().sendKeys(changeToDate);
+    }
+
     private static validateSaveDpaClickable(isClickable: boolean) {
         console.log(`Expecting 'save' have clickable state equal ${isClickable}`);
         const expectation = expect(this.pageObject.getNewDpaSubmitButton().isEnabled());

@@ -627,6 +627,54 @@ namespace Presentation.Web.Controllers.API
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [HttpPatch]
+        [Route("{id}/oversight-completed")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        {
+            if (completed == null)
+                return BadRequest(nameof(completed) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateIsOversightCompleted(id, completed.Value)
+                .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/latest-oversight-date")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchLatestOversightDate(int id, [FromBody] SingleValueDTO<DateTime?> latestDate)
+        {
+            if (latestDate == null)
+                return BadRequest(nameof(latestDate) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateLatestOversightDate(id, latestDate.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-completed-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> oversightCompletedRemark)
+        {
+            if (oversightCompletedRemark == null)
+                return BadRequest(nameof(oversightCompletedRemark) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateOversightCompletedRemark(id, oversightCompletedRemark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
         {
             return users.Select(ToDTO);
@@ -799,6 +847,12 @@ namespace Presentation.Web.Controllers.API
                             .ToArray(),
                     Remark = value.OversightOptionRemark
                 },
+                OversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
+                {
+                    Value = value.IsOversightCompleted,
+                    OptionalDateValue = value.LatestOversightDate,
+                    Remark = value.OversightCompletedRemark
+                }
             };
         }
 

@@ -759,5 +759,81 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Equal(remark, updateRegistrationDto.OversightOptions.Remark);
         }
+
+        [Fact]
+        public async Task Can_Change_IsOversightCompleted()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var yesNoUndecidedOption = A<YesNoUndecidedOption>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, yesNoUndecidedOption);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dto.OversightCompleted.Value, yesNoUndecidedOption);
+        }
+
+        [Fact]
+        public async Task Can_Change_LatestOversightDate()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var date = A<DateTime>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registrationDto.Id, date);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dto.OversightCompleted.OptionalDateValue, date);
+        }
+
+        [Fact]
+        public async Task Can_Change_OversightCompletedRemark()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeOversightCompletedRemarkRequestAsync(registrationDto.Id, remark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dto.OversightCompleted.Remark, remark);
+        }
+
+        [Fact]
+        public async Task LatestDate_IsResetToNull_WhenIsCompletedNotYes()
+        {
+
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var date = A<DateTime>();
+            using var isCompletedYesResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, isCompletedYesResponse.StatusCode);
+            using var latestDateResponse = await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registrationDto.Id, date);
+            Assert.Equal(HttpStatusCode.OK, latestDateResponse.StatusCode);
+            var dtoWithDate = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(dtoWithDate.OversightCompleted.OptionalDateValue, date);
+
+            //Act
+            using var isCompletedNoResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.No);
+
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, isCompletedNoResponse.StatusCode);
+            var dtoWithNullDate = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Null(dtoWithNullDate.OversightCompleted.OptionalDateValue);
+        }
     }
 }

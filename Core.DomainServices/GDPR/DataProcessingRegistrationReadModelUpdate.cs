@@ -43,6 +43,7 @@ namespace Core.DomainServices.GDPR
             PatchDataResponsible(source, destination);
             PatchBasisForTransfer(source, destination);
             PatchOversightOptions(source, destination);
+            PatchIsOversightCompleted(source, destination);
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -169,6 +170,11 @@ namespace Core.DomainServices.GDPR
             }
 
             return null;
+        }
+
+        private static void PatchIsOversightCompleted(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.IsOversightCompleted = source.IsOversightCompleted;
         }
     }
 }

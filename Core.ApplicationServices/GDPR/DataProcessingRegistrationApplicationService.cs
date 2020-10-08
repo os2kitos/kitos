@@ -449,5 +449,37 @@ namespace Core.ApplicationServices.GDPR
             return authorizedAction(registration);
         }
 
+
+        public Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption isOversightCompleted)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.SetOversightCompleted(isOversightCompleted);
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.LatestOversightDate = latestDate;
+                return registration;
+            });
+        }
+
+        public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)
+        {
+            if (remark == null)
+            {
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.OversightCompletedRemark = remark;
+                return registration;
+            });
+        }
     }
 }

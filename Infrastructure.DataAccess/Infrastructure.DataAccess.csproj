@@ -644,9 +644,13 @@
     <Compile Include="Migrations\202010060905576_Added_Oversight_Options.designer.cs">
       <DependentUpon>202010060905576_Added_Oversight_Options.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202010071205483_Added_DataProcessingRegistrations_To_Contracts.cs" />
-    <Compile Include="Migrations\202010071205483_Added_DataProcessingRegistrations_To_Contracts.designer.cs">
-      <DependentUpon>202010071205483_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
+    <Compile Include="Migrations\202010070800337_Added_Agreement_Oversight_Completed_Date_And_Remark.cs" />
+    <Compile Include="Migrations\202010070800337_Added_Agreement_Oversight_Completed_Date_And_Remark.designer.cs">
+      <DependentUpon>202010070800337_Added_Agreement_Oversight_Completed_Date_And_Remark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010080843260_Added_DataProcessingRegistrations_To_Contracts.cs" />
+    <Compile Include="Migrations\202010080843260_Added_DataProcessingRegistrations_To_Contracts.designer.cs">
+      <DependentUpon>202010080843260_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1053,8 +1057,11 @@
     <EmbeddedResource Include="Migrations\202010060905576_Added_Oversight_Options.resx">
       <DependentUpon>202010060905576_Added_Oversight_Options.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202010071205483_Added_DataProcessingRegistrations_To_Contracts.resx">
-      <DependentUpon>202010071205483_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202010070800337_Added_Agreement_Oversight_Completed_Date_And_Remark.resx">
+      <DependentUpon>202010070800337_Added_Agreement_Oversight_Completed_Date_And_Remark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010080843260_Added_DataProcessingRegistrations_To_Contracts.resx">
+      <DependentUpon>202010080843260_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
