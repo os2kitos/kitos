@@ -5,12 +5,11 @@
         <div class="panel-heading">
             IT Kontrakten gælder flg. databehandlingsregisteringer
         </div>
-        <!--<label for="dateProcessingRegistrationsTable" class="control-label small">Databehandlerregistreringer</label>-->
-        <table id="dateProcessingRegistrationsTable" class="table table-striped table-bordered">
+        <table id="dateProcessingRegistrationsTable" class="table table-striped">
             <thead>
                 <tr>
                     <th class="element-selection-list_header--padding">
-                        <p class="small">Navn</p>
+                        <p>Registering</p>
                     </th>
                     <th class="element-selection-list_header--padding noLeftBorder"></th>
                 </tr>
@@ -29,9 +28,9 @@
                     </td>
                 </tr>
             </tbody>
-            <tfoot ng-if="vm.dataProcessingRegistrations.allowAddition" class="element-selection-list_footer--padding">
+            <tfoot ng-if="vm.dataProcessingRegistrations.allowAddition">
                 <tr>
-                    <td colspan="3" style="padding: 0">
+                    <td colspan="2">
                         <single-select-select2 data-placeholder="Vælg databehandlerregistrering"
                                                id="data-processing-registration_select-new"
                                                ng-model="vm.dataProcessingRegistrations.newItemSelectionConfig"
