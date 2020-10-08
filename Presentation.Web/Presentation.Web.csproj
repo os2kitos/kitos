@@ -354,6 +354,7 @@
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
@@ -457,6 +458,7 @@
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-it-systems.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-modal-create.controller.ts" />
