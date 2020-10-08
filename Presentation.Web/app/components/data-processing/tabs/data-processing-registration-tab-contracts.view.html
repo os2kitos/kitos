@@ -1,0 +1,26 @@
+﻿<div class="object-section-container">
+    <h4 data-element-type="dpaMainDetailHeader">{{vm.headerName}}</h4>
+    <div class="panel panel-default">
+        <div class="panel-heading">Databehandling har følgende IT kontrakter tilknyttet:</div>
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        IT Kontrakt
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr data-ng-repeat="contract in vm.contracts">
+                <td>
+                        <a data-ui-sref="it-contract.edit.main({id: contract.id})">
+                             {{contract.name ? contract.name : 'Unavngiven'}}
+                        </a> 
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<div class="object-section-container"></div>
