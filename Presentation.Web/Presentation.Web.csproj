@@ -478,6 +478,7 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-dataProcessing.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-data-processing-registration-rights.directive.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
