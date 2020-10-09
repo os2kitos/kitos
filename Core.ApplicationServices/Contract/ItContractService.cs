@@ -164,7 +164,7 @@ namespace Core.ApplicationServices.Contract
 
             if (mutationResult.Ok)
             {
-                _repository.Update();
+                _repository.Update(contract);
                 transaction.Commit();
             }
 

@@ -67,5 +67,14 @@ namespace Core.DomainServices.Repositories.GDPR
                 .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
                 .Distinct();
         }
+
+        public IQueryable<DataProcessingRegistrationReadModel> GetByContractName(string contractName)
+        {
+            //Gets all read models which has the contract name as part of their ContractNamesAsCsv
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ContractNamesAsCsv.Contains(contractName))
+                .Distinct();
+        }
     }
 }
