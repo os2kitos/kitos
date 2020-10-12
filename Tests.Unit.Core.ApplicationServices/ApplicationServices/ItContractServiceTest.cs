@@ -295,7 +295,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
 
         /// <summary>
-        /// Helper test to make it easy to cover the "DRP not found" case
+        /// Helper test to make it easy to cover the "Contract not found" case
         /// </summary>
         /// <param name="command"></param>
         private void Test_Command_Which_Fails_With_Contract_NotFound<TSuccess>(Func<int, Result<TSuccess, OperationError>> command)
