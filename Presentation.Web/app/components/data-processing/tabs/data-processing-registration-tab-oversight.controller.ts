@@ -142,6 +142,9 @@
         }
 
         private changeOversightIntervalRemark(oversightIntervalRemark: string) {
+            if (oversightIntervalRemark == null) {
+                return;
+            }
             this.apiUseCaseFactory
                 .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightIntervalRemark(this.dataProcessingRegistrationId, oversightIntervalRemark))
                 .executeAsync(success => {
@@ -234,11 +237,15 @@
         }
 
         private changeOversightCompletedRemark(oversightCompletedRemark: string) {
+
+            if (oversightCompletedRemark == null) {
+                return;
+            }
             this.apiUseCaseFactory
                 .createUpdate("Bemærkninger", () => this.dataProcessingRegistrationService.updateOversightCompletedRemark(this.dataProcessingRegistrationId, oversightCompletedRemark))
                 .executeAsync(success => {
-                    this.dataProcessingRegistration.oversightInterval.remark = oversightCompletedRemark;
-                    this.bindOversightIntervalRemark();
+                    this.dataProcessingRegistration.oversightCompleted.remark = oversightCompletedRemark;
+                    this.bindOversightCompletedRemark();
                     return success;
                 });
         }
