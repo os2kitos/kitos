@@ -65,6 +65,10 @@ class DataProcessingRegistrationHelper {
         return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles");
     }
 
+    public static goToItContracts() {
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.contracts");
+    }
+
     public static assignRole(role: string, user: string) {
         console.log("Assigning role: " + role + " to user: " + user);
         return Select2Helper.searchFor(role, "s2id_add-role")
@@ -256,6 +260,8 @@ class DataProcessingRegistrationHelper {
     }
 
     static clickSystem(systemName: string) { return element(by.linkText(systemName)).click() };
+
+    static clickContract(contractName: string) { return element(by.linkText(contractName)).click() };
 }
 
 export = DataProcessingRegistrationHelper;

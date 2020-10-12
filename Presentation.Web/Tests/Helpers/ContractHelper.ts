@@ -1,8 +1,11 @@
 ﻿import ContractPage = require("../PageObjects/It-contract/ItContractOverview.po");
+import ContractDprPage = require("../PageObjects/It-contract/Tabs/ContractDpr.po");
 import ContractTimePage = require("../PageObjects/It-contract/ContractTimeOverview.po");
 import CssHelper = require("../Object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
+import NavigationHelper = require("../Utility/NavigationHelper");
+import Select2Helper = require("./Select2Helper");
 
 class ContractHelper {
 
@@ -10,7 +13,9 @@ class ContractHelper {
     private static contractTimePage = new ContractTimePage();
     private static cssHelper = new CssHelper();
     private static consts = new Constants();
+    private static navigation = new NavigationHelper();
     private static waitUpTo = new WaitTimers();
+    private static contractDprPage = new ContractDprPage();
 
     public static createContract(name: string) {
         console.log(`Creating contract with name: ${name}`);
@@ -51,6 +56,26 @@ class ContractHelper {
     public static waitForEconomyPageKendoGrid() {
         browser.wait(this.contractTimePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
+
+    public static goToDpr() {
+        return ContractHelper.navigation.goToSubMenuElement("it-contract.edit.data-processing");
+    }
+
+    public static assignDpr(name: string) {
+        console.log("Assigning dpr with name: " + name);
+        return Select2Helper.searchFor(name, "data-processing-registration_select-new")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static removeDpr(name: string) {
+        console.log("Removing dpr with name: " + name);
+        return this.contractDprPage.getRemoveDprButton(name)
+            .click()
+            .then(() => browser.switchTo().alert().accept());
+    }
+
+    static clickDpr(dprName: string) { return element(by.linkText(dprName)).click() };
+
 }
 
 export = ContractHelper;

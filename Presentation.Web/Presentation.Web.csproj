@@ -354,9 +354,11 @@
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
@@ -456,6 +458,7 @@
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-it-systems.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-modal-create.controller.ts" />
@@ -469,6 +472,7 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-edit.controller.ts" />
@@ -494,6 +498,7 @@
     <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
@@ -849,6 +854,7 @@
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemUsageHelper.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\contract.data-processing-registration.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
@@ -865,6 +871,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\data-processing-registration.overview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.contract.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.main.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.oversight.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\Data-Processing\Tabs\data-processing-registration.edit.reference.po.ts" />
@@ -872,6 +879,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalOrg.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractDpr.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ContractTimeOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\Tabs\ContractItSystem.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />

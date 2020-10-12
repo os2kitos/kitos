@@ -7,6 +7,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
@@ -22,6 +23,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IItContractRepository _contractRepository;
         private readonly ITransactionManager _transactionManager;
         public string Id => StandardJobIds.ScheduleDataProcessingRegistrationReadModelUpdates;
         private const int BatchSize = 250;
@@ -31,12 +33,14 @@ namespace Core.BackgroundJobs.Model.ReadModels
             IDataProcessingRegistrationReadModelRepository readModelRepository,
             IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
             IOrganizationRepository organizationRepository,
+            IItContractRepository contractRepository,
             ITransactionManager transactionManager)
         {
             _updateRepository = updateRepository;
             _readModelRepository = readModelRepository;
             _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
             _organizationRepository = organizationRepository;
+            _contractRepository = contractRepository;
             _transactionManager = transactionManager;
         }
 
@@ -51,6 +55,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleBasisForTransferUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleDataResponsibleUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOversightOptionUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleContractUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -126,6 +131,26 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 //System id is not stored in read model so search the source model
                 var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
+        private int HandleContractUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                //Contract id is not stored in read model so search the source model
+                var contractName = _contractRepository.GetById(update.SourceId).Name;
+                var dataProcessingRegistrationReadModelIds = _readModelRepository.GetByContractName(contractName).Select(x => x.SourceEntityId);
+                var dataProcessingRegistrationIds = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id);
+                var ids = dataProcessingRegistrationReadModelIds.Concat(dataProcessingRegistrationIds).Distinct();
+
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 

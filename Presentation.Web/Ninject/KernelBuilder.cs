@@ -79,6 +79,8 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Properties;
 using Serilog;
+using Core.DomainServices.Contract;
+using Core.DomainModel.ItContract;
 
 namespace Presentation.Web.Ninject
 {
@@ -185,6 +187,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationBasisForTransferAssignmentService>().To<DataProcessingRegistrationBasisForTransferAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationDataResponsibleAssignmentService>().To<DataProcessingRegistrationDataResponsibleAssigmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightOptionsAssignmentService>().To<DataProcessingRegistrationOversightOptionsAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IContractDataProcessingRegistrationAssignmentService>().To<ContractDataProcessingRegistrationAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -249,6 +252,8 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
