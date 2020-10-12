@@ -1,9 +1,11 @@
-﻿using Core.DomainModel;
+﻿using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
@@ -30,7 +32,8 @@ namespace Core.DomainServices.Model.EventHandlers
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingOversightOption>>,
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingOversightOption>>,
-        IDomainEventHandler<EntityUpdatedEvent<ItContract>>
+        IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
+        IDomainEventHandler<ContractDeleted>
     {
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _mapper;
@@ -143,6 +146,16 @@ namespace Core.DomainServices.Model.EventHandlers
         public void Handle(EntityUpdatedEvent<ItContract> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract));
+        }
+
+        public void Handle(ContractDeleted domainEvent)
+        {
+            domainEvent
+                .DeletedContract
+                .DataProcessingRegistrations
+                .Select(x => PendingReadModelUpdate.Create(x.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
+                .ToList()
+                .ForEach(_pendingReadModelUpdateRepository.Add);
         }
     }
 }
