@@ -66,7 +66,7 @@ BEGIN
         ('Leverandøren er databehandler',                   1,  1,  0,  '(Det er vurderet at leverandøren behandler persondata på instruks fra kommunen og der skal indgås en databehandleraftale)',   1,  0,  @defaultUserId, GetDate(),  @defaultUserId),
         ('Leverandøren behandler ikke personoplysninger',   1,  1,  0,  '(Og derfor skal der ikke indgås en databehandleraftale)',   1,  1,  @defaultUserId, GetDate(),  @defaultUserId),
         ('Leverandøren er selvstændig dataansvarlig',       1,  1,  0,  '(Deres anvendelse af data er ikke noget vi har indflydelse på)',   1,  2,  @defaultUserId, GetDate(),  @defaultUserId),
-        ('Fællesdataansvar',                                1,  1,  0,  '(der skal typisk indgås en anden type aftale – fortrolighedserklæring eller…)',   1,  3,  @defaultUserId, GetDate(),  @defaultUserId),
+        ('Fællesdataansvar',                                1,  1,  0,  '(Der skal typisk indgås en anden type aftale – fortrolighedserklæring eller…)',   1,  3,  @defaultUserId, GetDate(),  @defaultUserId),
         ('Kommunen er selv dataansvarlig',                  1,  1,  0,  null,   1,  4,  @defaultUserId, GetDate(),  @defaultUserId)
 	END
 END
