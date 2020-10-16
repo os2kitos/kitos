@@ -570,7 +570,6 @@
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\HealthCheckController.cs" />
-    <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />

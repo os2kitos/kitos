@@ -95,7 +95,6 @@
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
-    <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
     <Compile Include="KLE\KLEChange.cs" />

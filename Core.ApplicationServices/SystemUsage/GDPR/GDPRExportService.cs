@@ -6,11 +6,9 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
-using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
-using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.SystemUsage.GDPR
 {
@@ -20,8 +18,6 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IAttachedOptionRepository _attachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
-
-        private const int dataHandlerContractTypeId = 5;
 
         public GDPRExportService(
             IItSystemUsageRepository systemUsageRepository,
@@ -56,7 +52,6 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             {
                 BusinessCritical = input.isBusinessCritical,
                 DataProcessingAgreementConcluded = input.HasDataProcessingAgreement(),
-                DataProcessorControl = input.dataProcessorControl,
                 DPIA = input.DPIA,
                 HostedAt = input.HostedAt,
                 NoData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE),

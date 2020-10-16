@@ -188,7 +188,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.NotSame(input, createdUsage);
             Assert.Same(usageCreatedByRepo, createdUsage);
             Assert.Equal(input.OrganizationId, createdUsage.OrganizationId);
-            Assert.Empty(createdUsage.AssociatedDataWorkers);
             Assert.Equal(input.ItSystemId, createdUsage.ItSystemId);
             _usageRepository.Verify(x => x.Insert(usageCreatedByRepo), Times.Once);
             _usageRepository.Verify(x => x.Save(), Times.Once);

@@ -192,7 +192,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             Assert.Equal(usage.ItSystem.Name, gdprExportReport.SystemName);
             Assert.Equal(usage.isBusinessCritical, gdprExportReport.BusinessCritical);
-            Assert.Equal(usage.dataProcessorControl, gdprExportReport.DataProcessorControl);
             Assert.Equal(usage.DPIA, gdprExportReport.DPIA);
             Assert.Equal(usage.riskAssessment, gdprExportReport.RiskAssessment);
             Assert.Equal(usage.preriskAssessment, gdprExportReport.PreRiskAssessment);
@@ -308,7 +307,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 } : new List<ItContractItSystemUsage>(),
                 OrganizationId = orgId,
                 isBusinessCritical = A<DataOptions>(),
-                dataProcessorControl = A<DataOptions>(),
                 DPIA = A<DataOptions>(),
                 riskAssessment = A<DataOptions>(),
                 LinkToDirectoryUrl = A<string>(),

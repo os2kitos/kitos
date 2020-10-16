@@ -233,7 +233,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-            modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
             modelBuilder.Configurations.Add(new SystemRelationMap());
