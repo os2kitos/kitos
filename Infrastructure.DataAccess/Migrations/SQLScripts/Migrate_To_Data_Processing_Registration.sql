@@ -16,7 +16,7 @@ BEGIN
 	DECLARE @MigrationContext1 TABLE 
     (
 		rowNumber int IDENTITY(1,1) PRIMARY KEY,
-        ItContractId int,
+		ItContractId int,
 		ItSystemUsageId int,
 		OrganizationId int,
 		LastChanged datetime2(7),
