@@ -11,7 +11,6 @@ namespace Presentation.Web.Models
     public class ItSystemUsageDTO
     {
         public ItSystemUsageDTO(){
-            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelationDTO>();
         }
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
@@ -82,16 +81,7 @@ namespace Presentation.Web.Models
         #region GDPR
         public string GeneralPurpose { get; set; }
         public DataOptions? IsBusinessCritical { get; set; }
-        public string DataProcessor { get; set; }
-
-        public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
-
-        public DataOptions? DataProcessorControl { get; set; }
-        public DateTime? LastControl { get; set; }
-        public string DatahandlerSupervisionDocumentationUrlName { get; set; }
-        public string DatahandlerSupervisionDocumentationUrl { get; set; }
-
-        public string NoteUsage { get; set; }
+        
         public string LinkToDirectoryUrlName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
 

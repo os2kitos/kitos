@@ -105,7 +105,6 @@
         personalDataSelected: boolean;
         noDataSelected: boolean;
         isBusinessCritical: DataOption;
-        dataProcessorControl: DataOption;
         precautions: DataOption;
         userSupervision: DataOption;
         riskAssessment: DataOption;
@@ -128,7 +127,6 @@
         isActive: boolean;
         active: boolean;
         isBusinessCritical: DataOption;
-        dataProcessorControl: DataOption;
         precautions: DataOption;
         userSupervision: DataOption;
         riskAssessment: DataOption;
@@ -153,7 +151,6 @@
             this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
-            this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);
             this.precautions = this.mapDataOption(itSystemUsage.precautions);
             this.userSupervision = this.mapDataOption(itSystemUsage.userSupervision);
             this.riskAssessment = this.mapDataOption(itSystemUsage.riskAssessment);

@@ -192,18 +192,6 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
-
-
-	/* 
-		Adding dpr's to pending readmodel updates so readmodel is updated
-	*/
-	INSERT INTO
-		PendingReadModelUpdates (SourceId, Category, CreatedAt)
-	SELECT
-		id, 0, GETUTCDATE()
-	FROM
-		@DprIds1
-
 END
 
 /*
@@ -321,17 +309,6 @@ BEGIN
 	WHERE
 		AgreementConcludedUrl IS NOT NULL
 
-	/* 
-		Adding dpr's to pending readmodel updates so readmodel is updated
-	*/
-
-	INSERT INTO
-		PendingReadModelUpdates (SourceId, Category, CreatedAt)
-	SELECT
-		id, 0, GETUTCDATE()
-	FROM
-		@DprIds2
-
 END
 
 /*
@@ -447,17 +424,6 @@ BEGIN
 		@DprsWithContractKeys2
 	WHERE
 		AgreementConcludedUrl IS NOT NULL
-
-	/* 
-		Adding dpr's to pending readmodel updates so readmodel is updated
-	*/
-
-	INSERT INTO
-		PendingReadModelUpdates (SourceId, Category, CreatedAt)
-	SELECT
-		id, 0, GETUTCDATE()
-	FROM
-		@DprIds3
 
 END
 
@@ -621,17 +587,6 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
-	/* 
-		Adding dpr's to pending readmodel updates so readmodel is updated
-	*/
-
-	INSERT INTO
-		PendingReadModelUpdates (SourceId, Category, CreatedAt)
-	SELECT
-		id, 0, GETUTCDATE()
-	FROM
-		@DprIds4
-
 END
 
 
@@ -652,5 +607,16 @@ BEGIN
 	UPDATE DataProcessingRegistrations
 	SET Name = Name + CAST(Id as varchar(max))
 	WHERE Name = 'Konverteret_Databehandling_'
+
+
+	/* 
+		Adding dpr's to pending readmodel updates so readmodel is updated
+	*/
+	INSERT INTO
+		PendingReadModelUpdates (SourceId, Category, CreatedAt)
+	SELECT
+		id, 0, GETUTCDATE()
+	FROM
+		DataProcessingRegistrations
 
 END

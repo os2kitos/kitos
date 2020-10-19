@@ -58,21 +58,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task Can_Change_DataProcessorControl()
-        {
-            //Arrange
-            var dataOption = A<DataOptions>();
-            var body = new { DataProcessorControl = dataOption };
-
-            //Act
-            var itSystemUsageDTO = await Create_System_Usage_And_Change_Value_By_Body(body);
-
-            //Assert
-            Assert.NotNull(itSystemUsageDTO.DataProcessorControl);
-            Assert.Equal(dataOption, itSystemUsageDTO.DataProcessorControl.Value);
-        }
-
-        [Fact]
         public async Task Can_Change_Precautions()
         {
             //Arrange
@@ -321,7 +306,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private void AssertCorrectGdprExportReport(ItSystemUsageDTO expected, GdprExportReportCsvFormat actual, bool hasConcludedDataProcessingAgreement)
         {
             AssertDataOption(expected.IsBusinessCritical, actual.BusinessCritical);
-            AssertDataOption(expected.DataProcessorControl, actual.DatahandlerControl);
             AssertDataOption(expected.RiskAssessment, actual.RiskAssessment);
             AssertDataOption(expected.DPIA, actual.DPIA);
             AssertRiskLevel(expected.PreRiskAssessment, actual.PreRiskAssessment);
@@ -484,8 +468,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public string BusinessCritical { get; set; }
         [Name("Databehandleraftale")]
         public string Datahandler { get; set; }
-        [Name("Tilsyn/kontrol af databehandleren")]
-        public string DatahandlerControl { get; set; }
         [Name("Link til fortegnelse")]
         public string DirectoryUrl { get; set; }
         [Name("Foretaget risikovurdering")]
