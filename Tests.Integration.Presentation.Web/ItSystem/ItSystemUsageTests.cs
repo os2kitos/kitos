@@ -87,24 +87,5 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.True(response.OrganizationId == TestEnvironment.DefaultOrganizationId);
             }
         }
-
-        [Theory, Description("Validates: KITOSUDV-276")]
-        [InlineData(OrganizationRole.User)]
-        public async Task Cannot_Add_SystemUsage_Data_Worker(OrganizationRole role)
-        {
-            //Arrange
-            var login = await HttpApi.GetCookieAsync(role);
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
-
-            //Act
-            using (var result = await ItSystemHelper.SendSetUsageDataWorkerRequestAsync(usage.Id, organizationId, optionalLogin: login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
-        }
     }
 }
