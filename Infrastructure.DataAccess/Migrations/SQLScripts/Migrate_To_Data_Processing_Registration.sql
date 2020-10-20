@@ -66,7 +66,7 @@ BEGIN
 			ItSystemUsage.ObjectOwnerId
         FROM 
 		ItContractItSystemUsages 
-			INNER JOIN ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId
+			INNER JOIN ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId 
 			INNER JOIN ItSystemUsage ON ItSystemUsage.Id = ItContractItSystemUsages.ItSystemUsageId
 		WHERE 
 			ItContractItSystemUsages.ItContractId 
@@ -263,7 +263,7 @@ BEGIN
 	DECLARE @DprsWithContractKeys table (dprId int, ItContractId int, AgreementConcludedUrlName varchar(max), AgreementConcludedUrl varchar(max), contractOwnerId int)
 
 	/*
-		Create temp table with dprId's and Contract and SystemUsage Id's to be used when creating relations
+		Create temp table with dprId's and Contract Id's to be used when creating relations
 	*/
 
 	INSERT INTO 
@@ -379,7 +379,7 @@ BEGIN
 	DECLARE @DprsWithContractKeys2 table (dprId int, ItContractId int, AgreementConcludedUrlName varchar(max), AgreementConcludedUrl varchar(max), contractOwnerId int)
 
 	/*
-		Create temp table with dprId's and Contract and SystemUsage Id's to be used when creating relations
+		Create temp table with dprId's and Contract Id's to be used when creating relations
 	*/
 
 	INSERT INTO 
@@ -528,7 +528,7 @@ BEGIN
 	DECLARE @DprsWithSystemKeys table (dprId int, ItSystemUsageId int, DatahandlerSupervisionLinkName varchar(max), DatahandlerSupervisionLink varchar(max), systemOwnerId int)
 
 	/*
-		Create temp table with dprId's and Contract and SystemUsage Id's to be used when creating relations
+		Create temp table with dprId's and SystemUsage Id's to be used when creating relations
 	*/
 
 	INSERT INTO 
