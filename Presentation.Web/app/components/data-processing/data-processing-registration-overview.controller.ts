@@ -32,6 +32,12 @@
             //Prepare the page
             $rootScope.page.title = "Databehandling - Overblik";
 
+            // Column names for specific parameter mapping
+            const transferToInsecureThirdCountriesColumnName = "TransferToInsecureThirdCountries";
+            const isAgreementConcludedColumnName = "IsAgreementConcluded";
+            const oversightIntervalColumnName = "OversightInterval";
+            const isOversightCompletedColumnName = "IsOversightCompleted";
+
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
 
@@ -99,13 +105,13 @@
                                     replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                             });
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "TransferToInsecureThirdCountries", Models.Api.Shared.YesNoUndecidedOption.Undecided);
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, transferToInsecureThirdCountriesColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "IsAgreementConcluded", Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isAgreementConcludedColumnName, Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
                             
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "OversightInterval", Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, oversightIntervalColumnName, Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
                             
-                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "IsOversightCompleted", Models.Api.Shared.YesNoUndecidedOption.Undecided);
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isOversightCompletedColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                             parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
 
@@ -207,7 +213,7 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("TransferToInsecureThirdCountries")
+                            .withDataSourceName(transferToInsecureThirdCountriesColumnName)
                             .withTitle("Overførsel til usikkert 3. land")
                             .withId("dpTransferToInsecureThirdCountries")
                             .withStandardWidth(150)
@@ -286,7 +292,7 @@
                     })
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("IsAgreementConcluded")
+                            .withDataSourceName(isAgreementConcludedColumnName)
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
                             .withStandardWidth(150)
@@ -319,7 +325,7 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt)))
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("OversightInterval")
+                            .withDataSourceName(oversightIntervalColumnName)
                             .withTitle("Tilsynsinterval")
                             .withId("oversightInterval")
                             .withStandardWidth(150)
@@ -372,25 +378,25 @@
                     })
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName("IsOversightCompleted")
-                        .withTitle("Gennemført tilsyn")
-                        .withId("isOversightCompleted")
-                        .withStandardWidth(150)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange
-                        (
-                            [
-                                Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                Models.Api.Shared.YesNoUndecidedOption.No,
-                                Models.Api.Shared.YesNoUndecidedOption.Undecided
-                            ].map(value => {
-                                return {
-                                    textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
-                                    remoteValue: value
-                                }
-                            })
-                            , false
-                        )
+                            .withDataSourceName(isOversightCompletedColumnName)
+                            .withTitle("Gennemført tilsyn")
+                            .withId("isOversightCompleted")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.Api.Shared.YesNoUndecidedOption.Yes,
+                                    Models.Api.Shared.YesNoUndecidedOption.No,
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided
+                                ].map(value => {
+                                    return {
+                                        textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                        remoteValue: value
+                                    }
+                                })
+                                , false
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withStandardSorting("Name");
