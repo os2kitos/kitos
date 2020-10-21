@@ -59,6 +59,22 @@
                 return filterUrl;
             };
 
+            const replaceNullOptionQuery = (filterUrl: string): string => {
+                if (filterUrl.indexOf("'null'") === -1) {
+                    return filterUrl; // _blank not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+
+                return filterUrl.replace(/'null'/g, "null");
+            };
+
+            const replaceEmptyOptionQuery = (filterUrl: string): string => {
+                if (filterUrl.indexOf("'_empty_'") === -1) {
+                    return filterUrl; // _blank not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+
+                return filterUrl.replace(/contains\((\w+),'_empty_'\)/g, "$1 eq ''");
+            };
+
             //Lookup maps
             var dpaRoleIdToUserNamesMap = {};
 
@@ -90,6 +106,10 @@
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "OversightInterval", Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
                             
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "IsOversightCompleted", Models.Api.Shared.YesNoUndecidedOption.Undecided);
+
+                            parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
+
+                            parameterMap.$filter = replaceEmptyOptionQuery(parameterMap.$filter);
                         }
 
                         return parameterMap;
@@ -208,8 +228,21 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
-                    .withColumn(builder =>
-                        builder
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .basisForTransferOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "null"
+                        })
+
+                        return builder
                             .withDataSourceName("BasisForTransfer")
                             .withTitle("Overførselsgrundlag")
                             .withId("dpBasisForTransfer")
@@ -217,20 +250,27 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .basisForTransferOptions
-                                    .map(value => {
-                                        return {
-                                            textValue: value.name,
-                                            remoteValue: value.name
-                                        }
-                                    })
+                                options
                                 , false
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer)))
-                    .withColumn(builder =>
-                        builder
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer))
+                    })
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .dataResponsibleOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "null"
+                        })
+
+                        return builder
                             .withDataSourceName("DataResponsible")
                             .withTitle("Dataansvarlig")
                             .withId("dpDataResponsible")
@@ -238,18 +278,12 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .dataResponsibleOptions
-                                    .map(value => {
-                                    return {
-                                        textValue: value.name,
-                                        remoteValue: value.name
-                                    }
-                                    })
+                                options
                                 , false
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible))
+                    })
                     .withColumn(builder =>
                         builder
                             .withDataSourceName("IsAgreementConcluded")
@@ -308,8 +342,21 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval))))
-                    .withColumn(builder =>
-                        builder
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .oversightOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "_empty_"
+                        })
+
+                        return builder
                             .withDataSourceName("OversightOptionNamesAsCsv")
                             .withTitle("Tilsynsmuligheder")
                             .withId("dpOversightOptionNamesAsCsv")
@@ -317,18 +364,12 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .oversightOptions
-                                    .map(value => {
-                                        return {
-                                            textValue: value.name,
-                                            remoteValue: value.name
-                                        }
-                                    })
+                                options
                                 , true
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv));
+                    })
                     .withColumn(builder =>
                         builder
                         .withDataSourceName("IsOversightCompleted")
