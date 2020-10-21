@@ -35,9 +35,28 @@
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
 
+            const extractOptionKey = (filterRequest: string, optionName: string) : number => {
+                var pattern = new RegExp(`(.*\\(?${optionName} eq ')(\\d)('.*)`);
+                var matchedString = filterRequest.replace(pattern, "$2");
+                return parseInt(matchedString);
+            }
+
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+            };
+
+            const replaceOptionQuery = (filterUrl: string, optionName: string, emptyOptionKey: number): string => {
+                if (filterUrl.indexOf(optionName) === -1) {
+                    return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+                
+                var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
+                var key = extractOptionKey(filterUrl, optionName);
+                if (key === emptyOptionKey) {
+                    return filterUrl.replace(pattern, `$1(${optionName} eq '${key}' or ${optionName} eq null)$3`);
+                }
+                return filterUrl;
             };
 
             //Lookup maps
@@ -63,6 +82,14 @@
                                 parameterMap.$filter =
                                     replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                             });
+
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "TransferToInsecureThirdCountries", Models.Api.Shared.YesNoUndecidedOption.Undecided);
+
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "IsAgreementConcluded", Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
+                            
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "OversightInterval", Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
+                            
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, "IsOversightCompleted", Models.Api.Shared.YesNoUndecidedOption.Undecided);
                         }
 
                         return parameterMap;
@@ -169,7 +196,8 @@
                             (
                                 [
                                     Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                    Models.Api.Shared.YesNoUndecidedOption.No
+                                    Models.Api.Shared.YesNoUndecidedOption.No,
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
@@ -234,7 +262,8 @@
                                 [
                                     Models.Api.Shared.YesNoIrrelevantOption.YES,
                                     Models.Api.Shared.YesNoIrrelevantOption.NO,
-                                    Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
+                                    Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT,
+                                    Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
@@ -267,7 +296,8 @@
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly,
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly,
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year,
-                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Other
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Other,
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(value),
@@ -310,7 +340,8 @@
                         (
                             [
                                 Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                Models.Api.Shared.YesNoUndecidedOption.No
+                                Models.Api.Shared.YesNoUndecidedOption.No,
+                                Models.Api.Shared.YesNoUndecidedOption.Undecided
                             ].map(value => {
                                 return {
                                     textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
