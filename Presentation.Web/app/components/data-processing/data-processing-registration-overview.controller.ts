@@ -67,7 +67,7 @@
 
             const replaceNullOptionQuery = (filterUrl: string): string => {
                 if (filterUrl.indexOf("'null'") === -1) {
-                    return filterUrl; // _blank not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                    return filterUrl; // 'null' not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
                 }
 
                 return filterUrl.replace(/'null'/g, "null");
@@ -75,7 +75,7 @@
 
             const replaceEmptyOptionQuery = (filterUrl: string): string => {
                 if (filterUrl.indexOf("'_empty_'") === -1) {
-                    return filterUrl; // _blank not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                    return filterUrl; // '_empty_' not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
                 }
 
                 return filterUrl.replace(/contains\((\w+),'_empty_'\)/g, "$1 eq ''");
