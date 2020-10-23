@@ -831,10 +831,12 @@ namespace Presentation.Web.Controllers.API
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
                 HasSubDataProcessors = value.HasSubDataProcessors,
-                AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>
+                AgreementConcluded = new ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?>
                 {
                     Value = value.IsAgreementConcluded,
-                    OptionalDateValue = value.AgreementConcludedAt
+                    OptionalDateValue = value.AgreementConcludedAt,
+                    Remark = value.AgreementConcludedRemark
+                    
                 },
                 TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
                 InsecureThirdCountries = value
