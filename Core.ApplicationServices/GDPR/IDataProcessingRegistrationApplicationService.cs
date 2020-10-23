@@ -38,6 +38,7 @@ namespace Core.ApplicationServices.GDPR
         Result<Organization, OperationError> AssignSubDataProcessor(int id, int organizationId);
         Result<Organization, OperationError> RemoveSubDataProcessor(int id, int organizationId);
         Result<DataProcessingRegistration, OperationError> UpdateIsAgreementConcluded(int id, YesNoIrrelevantOption concluded);
+        Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedAt(int id, DateTime? concludedAtDate);
         Result<DataProcessingRegistration, OperationError> UpdateTransferToInsecureThirdCountries(int id, YesNoUndecidedOption transferToInsecureThirdCountries);
         Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId);

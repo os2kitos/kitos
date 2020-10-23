@@ -27,7 +27,7 @@ namespace Presentation.Web.Models.GDPR
         
         public ShallowOrganizationDTO[] SubDataProcessors { get; set; }
 
-        public ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
+        public ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?> AgreementConcluded { get; set; }
 
         public YesNoUndecidedOption? TransferToInsecureThirdCountries { get; set; }
 

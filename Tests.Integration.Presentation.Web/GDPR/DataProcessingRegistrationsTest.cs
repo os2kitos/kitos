@@ -559,6 +559,23 @@ namespace Tests.Integration.Presentation.Web.GDPR
         }
 
         [Fact]
+        public async Task Can_Change_IsAgreementConcludedRemark()
+        {
+            //Arrange
+            var name = A<string>();
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var remark = A<string>();
+
+            //Act
+            using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedRemarkRequestAsync(registrationDto.Id, remark);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updateRegistrationDto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
+            Assert.Equal(remark, updateRegistrationDto.AgreementConcluded.Remark);
+        }
+
+        [Fact]
         public async Task Can_Change_AgreementConcludedAt()
         {
             //Arrange
