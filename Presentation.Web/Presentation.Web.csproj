@@ -367,6 +367,7 @@
     <Content Include="Logout.ashx" />
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\OData\DataProcessingRegistrationRightsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
@@ -495,6 +496,7 @@
     <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
