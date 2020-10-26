@@ -176,6 +176,7 @@
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataProcessorAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationInsecureCountriesAssignmentServiceTest.cs" />

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -88,6 +90,56 @@ namespace Tests.Integration.Presentation.Web.Contract
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessingRegistrations()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var registrationName = A<string>();
+            var registration1 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, registrationName + "1");
+            var registration2 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, registrationName + "2");
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+
+            //Act
+            var dtos = (await ItContractHelper.GetAvailableDataProcessingRegistrationsAsync(contract.Id, registrationName)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { registration1.Id, registration1.Name }, new { registration2.Id, registration2.Name } });
+        }
+
+        [Fact]
+        public async Task Can_Assign_And_Remove_DataProcessingRegistration()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
+
+
+            //Act - Add
+            using var assignResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, registration.Id);
+            using var duplicateResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract.Id, registration.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            var dto = await ItContractHelper.GetItContract(contract.Id);
+            var namedEntityDTO = Assert.Single(dto.DataProcessingRegistrations);
+            Assert.Equal(registration.Id, namedEntityDTO.Id);
+            Assert.Equal(registration.Name, namedEntityDTO.Name);
+
+            //Act - remove
+            using var removeResponse = await ItContractHelper.SendRemoveDataProcessingRegistrationAsync(contract.Id, registration.Id);
+            using var duplicateRemoveResponse = await ItContractHelper.SendRemoveDataProcessingRegistrationAsync(contract.Id, registration.Id);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveResponse.StatusCode);
+            dto = await ItContractHelper.GetItContract(contract.Id);
+            Assert.Empty(dto.DataProcessingRegistrations);
         }
     }
 }

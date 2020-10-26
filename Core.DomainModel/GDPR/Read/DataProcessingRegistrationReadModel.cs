@@ -55,5 +55,7 @@ namespace Core.DomainModel.GDPR.Read
         public string OversightOptionNamesAsCsv { get; set; }
 
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
+
+        public string ContractNamesAsCsv { get; set; }
     }
 }

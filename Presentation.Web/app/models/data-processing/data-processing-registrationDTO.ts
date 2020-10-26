@@ -21,6 +21,7 @@
         oversightInterval: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightOptions: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]>;
         oversightCompleted: Models.Generic.ValueWithOptionalDateAndRemarkDTO<Models.Api.Shared.YesNoUndecidedOption>;
+        associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

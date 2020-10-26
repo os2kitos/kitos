@@ -32,12 +32,53 @@
             //Prepare the page
             $rootScope.page.title = "Databehandling - Overblik";
 
+            // Column names for specific parameter mapping
+            const transferToInsecureThirdCountriesColumnName = "TransferToInsecureThirdCountries";
+            const isAgreementConcludedColumnName = "IsAgreementConcluded";
+            const oversightIntervalColumnName = "OversightInterval";
+            const isOversightCompletedColumnName = "IsOversightCompleted";
+
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
+
+            const extractOptionKey = (filterRequest: string, optionName: string) : number => {
+                var pattern = new RegExp(`(.*\\(?${optionName} eq ')(\\d)('.*)`);
+                var matchedString = filterRequest.replace(pattern, "$2");
+                return parseInt(matchedString);
+            }
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+            };
+
+            const replaceOptionQuery = (filterUrl: string, optionName: string, emptyOptionKey: number): string => {
+                if (filterUrl.indexOf(optionName) === -1) {
+                    return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+                
+                var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
+                var key = extractOptionKey(filterUrl, optionName);
+                if (key === emptyOptionKey) {
+                    return filterUrl.replace(pattern, `$1(${optionName} eq '${key}' or ${optionName} eq null)$3`);
+                }
+                return filterUrl;
+            };
+
+            const replaceNullOptionQuery = (filterUrl: string): string => {
+                if (filterUrl.indexOf("'null'") === -1) {
+                    return filterUrl; // 'null' not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+
+                return filterUrl.replace(/'null'/g, "null");
+            };
+
+            const replaceEmptyOptionQuery = (filterUrl: string): string => {
+                if (filterUrl.indexOf("'_empty_'") === -1) {
+                    return filterUrl; // '_empty_' not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                }
+
+                return filterUrl.replace(/contains\((\w+),'_empty_'\)/g, "$1 eq ''");
             };
 
             //Lookup maps
@@ -63,6 +104,18 @@
                                 parameterMap.$filter =
                                     replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                             });
+
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, transferToInsecureThirdCountriesColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
+
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isAgreementConcludedColumnName, Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
+                            
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, oversightIntervalColumnName, Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
+                            
+                            parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isOversightCompletedColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
+
+                            parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
+
+                            parameterMap.$filter = replaceEmptyOptionQuery(parameterMap.$filter);
                         }
 
                         return parameterMap;
@@ -133,6 +186,15 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SystemNamesAsCsv)))
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("ContractNamesAsCsv")
+                            .withTitle("IT Kontrakter")
+                            .withId("dpContractNamesAsCsv")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ContractNamesAsCsv))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.ContractNamesAsCsv)))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("DataProcessorNamesAsCsv")
                             .withTitle("Databehandlere")
                             .withId("dpDataProcessorNamesAsCsv")
@@ -151,7 +213,7 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.SubDataProcessorNamesAsCsv)))
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("TransferToInsecureThirdCountries")
+                            .withDataSourceName(transferToInsecureThirdCountriesColumnName)
                             .withTitle("Overførsel til usikkert 3. land")
                             .withId("dpTransferToInsecureThirdCountries")
                             .withStandardWidth(150)
@@ -160,7 +222,8 @@
                             (
                                 [
                                     Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                    Models.Api.Shared.YesNoUndecidedOption.No
+                                    Models.Api.Shared.YesNoUndecidedOption.No,
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
@@ -171,8 +234,21 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.TransferToInsecureThirdCountries && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.TransferToInsecureThirdCountries))))
-                    .withColumn(builder =>
-                        builder
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .basisForTransferOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "null"
+                        })
+
+                        return builder
                             .withDataSourceName("BasisForTransfer")
                             .withTitle("Overførselsgrundlag")
                             .withId("dpBasisForTransfer")
@@ -180,20 +256,27 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .basisForTransferOptions
-                                    .map(value => {
-                                        return {
-                                            textValue: value.name,
-                                            remoteValue: value.name
-                                        }
-                                    })
+                                options
                                 , false
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer)))
-                    .withColumn(builder =>
-                        builder
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer))
+                    })
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .dataResponsibleOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "null"
+                        })
+
+                        return builder
                             .withDataSourceName("DataResponsible")
                             .withTitle("Dataansvarlig")
                             .withId("dpDataResponsible")
@@ -201,21 +284,15 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .dataResponsibleOptions
-                                    .map(value => {
-                                    return {
-                                        textValue: value.name,
-                                        remoteValue: value.name
-                                    }
-                                    })
+                                options
                                 , false
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible))
+                    })
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("IsAgreementConcluded")
+                            .withDataSourceName(isAgreementConcludedColumnName)
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
                             .withStandardWidth(150)
@@ -225,7 +302,8 @@
                                 [
                                     Models.Api.Shared.YesNoIrrelevantOption.YES,
                                     Models.Api.Shared.YesNoIrrelevantOption.NO,
-                                    Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT
+                                    Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT,
+                                    Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
@@ -247,7 +325,7 @@
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.AgreementConcludedAt)))
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName("OversightInterval")
+                            .withDataSourceName(oversightIntervalColumnName)
                             .withTitle("Tilsynsinterval")
                             .withId("oversightInterval")
                             .withStandardWidth(150)
@@ -258,7 +336,8 @@
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Half_yearly,
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Yearly,
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Every_second_year,
-                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Other
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Other,
+                                    Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided
                                 ].map(value => {
                                     return {
                                         textValue: Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(value),
@@ -269,8 +348,21 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightInterval && Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(dataItem.OversightInterval))))
-                    .withColumn(builder =>
-                        builder
+                    .withColumn(builder => {
+                        var options = dataProcessingRegistrationOptions
+                            .oversightOptions
+                            .map(value => {
+                                return {
+                                    textValue: value.name,
+                                    remoteValue: value.name
+                                }
+                            });
+                        options.push({
+                            textValue: "",
+                            remoteValue: "_empty_"
+                        })
+
+                        return builder
                             .withDataSourceName("OversightOptionNamesAsCsv")
                             .withTitle("Tilsynsmuligheder")
                             .withId("dpOversightOptionNamesAsCsv")
@@ -278,38 +370,33 @@
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange
                             (
-                                dataProcessingRegistrationOptions
-                                    .oversightOptions
-                                    .map(value => {
-                                        return {
-                                            textValue: value.name,
-                                            remoteValue: value.name
-                                        }
-                                    })
+                                options
                                 , true
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.OversightOptionNamesAsCsv))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.OversightOptionNamesAsCsv));
+                    })
                     .withColumn(builder =>
                         builder
-                        .withDataSourceName("IsOversightCompleted")
-                        .withTitle("Gennemført tilsyn")
-                        .withId("isOversightCompleted")
-                        .withStandardWidth(150)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange
-                        (
-                            [
-                                Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                Models.Api.Shared.YesNoUndecidedOption.No
-                            ].map(value => {
-                                return {
-                                    textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
-                                    remoteValue: value
-                                }
-                            })
-                            , false
-                        )
+                            .withDataSourceName(isOversightCompletedColumnName)
+                            .withTitle("Gennemført tilsyn")
+                            .withId("isOversightCompleted")
+                            .withStandardWidth(150)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange
+                            (
+                                [
+                                    Models.Api.Shared.YesNoUndecidedOption.Yes,
+                                    Models.Api.Shared.YesNoUndecidedOption.No,
+                                    Models.Api.Shared.YesNoUndecidedOption.Undecided
+                                ].map(value => {
+                                    return {
+                                        textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                        remoteValue: value
+                                    }
+                                })
+                                , false
+                            )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
                     .withStandardSorting("Name");

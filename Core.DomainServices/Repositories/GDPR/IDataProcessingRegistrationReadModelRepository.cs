@@ -13,5 +13,6 @@ namespace Core.DomainServices.Repositories.GDPR
         IQueryable<DataProcessingRegistrationReadModel> GetByOrganizationId(int organizationId);
         void Delete(DataProcessingRegistrationReadModel readModel);
         IQueryable<DataProcessingRegistrationReadModel> GetByUserId(int userId);
+        IQueryable<DataProcessingRegistrationReadModel> GetByContractName(string contractName);
     }
 }
