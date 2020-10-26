@@ -232,6 +232,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded"), cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendChangeAgreementConcludedRemarkRequestAsync(int id, string agreementConcludedRemark, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new SingleValueDTO<string> { Value = agreementConcludedRemark };
+
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/{id}/agreement-concluded-remark"), cookie, body);
+        }
+
         public static async Task<HttpResponseMessage> SendChangeAgreementConcludedAtRequestAsync(int id, DateTime? dateTime, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

@@ -13,7 +13,7 @@
         dataProcessors: IDataProcessorDTO[];
         hasSubDataProcessors?: Models.Api.Shared.YesNoUndecidedOption;
         subDataProcessors: IDataProcessorDTO[];
-        agreementConcluded: Models.Generic.ValueOptionWithOptionalDateDTO<Models.Api.Shared.YesNoIrrelevantOption>;
+        agreementConcluded: Models.Generic.ValueWithOptionalDateAndRemarkDTO<Models.Api.Shared.YesNoIrrelevantOption>;
         transferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
         insecureThirdCountries: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[];
         basisForTransfer: Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO;

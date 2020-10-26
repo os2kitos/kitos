@@ -652,6 +652,10 @@
     <Compile Include="Migrations\202010081315181_Added_DataProcessingRegistrations_To_Contracts.designer.cs">
       <DependentUpon>202010081315181_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.cs" />
+    <Compile Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.designer.cs">
+      <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1062,6 +1066,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202010081315181_Added_DataProcessingRegistrations_To_Contracts.resx">
       <DependentUpon>202010081315181_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.resx">
+      <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

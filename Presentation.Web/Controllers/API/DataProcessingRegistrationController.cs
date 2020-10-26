@@ -386,6 +386,22 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
+        [Route("{id}/agreement-concluded-remark")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage PatchIsAgreementConcludedRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        {
+            if (remark == null)
+                return BadRequest($"{nameof(remark)} must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .UpdateAgreementConcludedRemark(id, remark.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
         [Route("{id}/agreement-concluded-at")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -815,10 +831,12 @@ namespace Presentation.Web.Controllers.API
                     .Select(x => x.MapToShallowOrganizationDTO())
                     .ToArray(),
                 HasSubDataProcessors = value.HasSubDataProcessors,
-                AgreementConcluded = new Models.Shared.ValueOptionWithOptionalDateDTO<YesNoIrrelevantOption?>
+                AgreementConcluded = new ValueWithOptionalDateAndRemark<YesNoIrrelevantOption?>
                 {
                     Value = value.IsAgreementConcluded,
-                    OptionalDateValue = value.AgreementConcludedAt
+                    OptionalDateValue = value.AgreementConcludedAt,
+                    Remark = value.AgreementConcludedRemark
+                    
                 },
                 TransferToInsecureThirdCountries = value.TransferToInsecureThirdCountries,
                 InsecureThirdCountries = value
