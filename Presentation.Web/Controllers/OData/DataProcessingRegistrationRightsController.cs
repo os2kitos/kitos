@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            // TODO: Make check on Maybe
+            // ChildEntityCrudAuthorization uses FromNullable when accessing the object. So even if .Value returns null it will be resolved.
             return new ChildEntityCrudAuthorization<DataProcessingRegistrationRight, DataProcessingRegistration>(r => _dataProcessingRegistrationRepository.GetById(r.ObjectId).Value, base.GetCrudAuthorization());
         }
 
