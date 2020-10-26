@@ -80,5 +80,9 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.id("dataResponsibleRemark_remark"));
     }
 
+    getAgreementConcludedRemark() {
+        return element(by.id("agreementConcludedRemark_remark"));
+    }
+
 }
 export = DataProcessingRegistrationEditMainPageObject;

@@ -28,6 +28,7 @@
             this.bindHasSubDataProcessors();
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindIsAgreementConcluded();
+            this.bindAgreementConcludedRemark();
             this.bindAgreementConcludedAt();
             this.bindTransferToInsecureThirdCountries();
             this.bindBasisForTransfer();
@@ -50,6 +51,8 @@
         isAgreementConcluded: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoIrrelevantOption>;
 
         agreementConcludedAt: Models.ViewModel.Generic.IDateSelectionViewModel;
+
+        agreementConcludedRemark: Models.ViewModel.Generic.IEditTextViewModel;
 
         shouldShowAgreementConcludedAt: boolean;
 
@@ -101,6 +104,12 @@
             this.dataResponsibleRemark = new Models.ViewModel.Generic.EditTextViewModel(
                 this.dataProcessingRegistration.dataResponsible.remark,
                 (newText) => this.changeDataResponsibleRemark(newText));
+        }
+
+        private bindAgreementConcludedRemark() {
+            this.agreementConcludedRemark = new Models.ViewModel.Generic.EditTextViewModel(
+                this.dataProcessingRegistration.agreementConcluded.remark,
+                (newText) => this.changeAgreementConcludedRemark(newText));
         }
 
         private bindBasisForTransfer() {
@@ -375,6 +384,18 @@
                     return success;
                 });
         }
+
+        //AgreementConcludedRemark
+        private changeAgreementConcludedRemark(agreementConcludedRemark: string) {
+            this.apiUseCaseFactory
+                .createUpdate("Bemærkning", () => this.dataProcessingRegistrationService.updateAgreementConcludedRemark(this.dataProcessingRegistration.id, agreementConcludedRemark))
+                .executeAsync(success => {
+                    this.dataProcessingRegistration.agreementConcluded.remark = agreementConcludedRemark;
+                    this.bindAgreementConcludedRemark();
+                    return success;
+                });
+        }
+
 
         private changeIsAgreementConcluded(isAgreementConcluded: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoIrrelevantOption>) {
             this.apiUseCaseFactory
