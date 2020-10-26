@@ -369,6 +369,7 @@
     <Content Include="Logout.ashx" />
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
+    <Compile Include="Controllers\OData\DataProcessingRegistrationRightsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
@@ -482,6 +483,7 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-dataProcessing.controller.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-data-processing-registration-rights.directive.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
@@ -499,6 +501,7 @@
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
+    <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
