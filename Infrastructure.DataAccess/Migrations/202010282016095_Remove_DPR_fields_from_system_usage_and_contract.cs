@@ -9,7 +9,12 @@
         public override void Up()
         {
 
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration1.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration2.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration3.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration4.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration5.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("AddDPRsToReadModel.sql"));
 
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "DataWorkerId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "ItSystemUsageId", "dbo.ItSystemUsage");

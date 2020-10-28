@@ -1090,7 +1090,22 @@
     <EmbeddedResource Include="Migrations\SQLScripts\AddDefaultDpaTypesToExistingDb.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration1.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration2.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration5.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration4.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration3.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\AddDPRsToReadModel.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
