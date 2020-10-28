@@ -39,7 +39,6 @@
                                   ng-disabled="!vm.hasWriteAccess" />
                 </div>
 
-
                 <!-- Agreement concluded -->
                 <div class="form-group">
                     <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
@@ -54,6 +53,15 @@
                                      ng-model="vm.agreementConcludedAt"
                                      ng-disabled="!vm.hasWriteAccess" />
                     </div>
+                </div>
+
+                <!-- Agreement concluded Remark -->
+                <div class="form-group">
+                    <label for="agreementConcludedRemark" class="control-label small">Bemærkninger</label>
+                    <remark-field id="agreementConcludedRemark"
+                                  rows="2"
+                                  ng-model="vm.agreementConcludedRemark"
+                                  ng-disabled="!vm.hasWriteAccess" />
                 </div>
 
                 <div class="form-group">

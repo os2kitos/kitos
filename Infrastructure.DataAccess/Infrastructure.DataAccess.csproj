@@ -651,9 +651,13 @@
     <Compile Include="Migrations\202010081315181_Added_DataProcessingRegistrations_To_Contracts.designer.cs">
       <DependentUpon>202010081315181_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202010161056029_Remove_DPR_fields_from_system_usage_and_contract.cs" />
-    <Compile Include="Migrations\202010161056029_Remove_DPR_fields_from_system_usage_and_contract.designer.cs">
-      <DependentUpon>202010161056029_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
+    <Compile Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.cs" />
+    <Compile Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.designer.cs">
+      <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010282016095_Remove_DPR_fields_from_system_usage_and_contract.cs" />
+    <Compile Include="Migrations\202010282016095_Remove_DPR_fields_from_system_usage_and_contract.designer.cs">
+      <DependentUpon>202010282016095_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1066,8 +1070,11 @@
     <EmbeddedResource Include="Migrations\202010081315181_Added_DataProcessingRegistrations_To_Contracts.resx">
       <DependentUpon>202010081315181_Added_DataProcessingRegistrations_To_Contracts.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202010161056029_Remove_DPR_fields_from_system_usage_and_contract.resx">
-      <DependentUpon>202010161056029_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.resx">
+      <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010282016095_Remove_DPR_fields_from_system_usage_and_contract.resx">
+      <DependentUpon>202010282016095_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

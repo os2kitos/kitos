@@ -315,6 +315,8 @@ namespace Core.DomainModel.GDPR
 
         public DateTime? AgreementConcludedAt { get; set; }
 
+        public string AgreementConcludedRemark { get; set; }
+
         public int? BasisForTransferId { get; set; }
 
         public virtual DataProcessingBasisForTransferOption BasisForTransfer { get; set; }

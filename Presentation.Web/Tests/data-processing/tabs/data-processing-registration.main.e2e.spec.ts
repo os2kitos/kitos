@@ -51,15 +51,18 @@ describe("Data processing registration main detail tests", () => {
             const basisForTransfer = "Andet";
             const dataResponsibleOptionName = "Fællesdataansvar";
             var dataResponsibleRemark = createRemark();
+            var agreementConcludedRemark = createRemark();
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
                 .then(() => renameNameAndVerify(renameValue))
-                //Changing IsAgreementConcluded and AgreementConcludedAt
+                //Changing IsAgreementConcluded, AgreementConcludedAt and AgreementConcludedRemark
                 .then(() => dpaHelper.changeIsAgreementConcluded(dropdownYes))
                 .then(() => verifyIsAgreementConcluded(dropdownYes))
                 .then(() => dpaHelper.changeAgreementConcludedAt(today))
                 .then(() => verifyAgreementConcludedAt(today))
+                .then(() => pageObject.getAgreementConcludedRemark().sendKeys(agreementConcludedRemark))
+                .then(() => verifyAgreementConcludedRemark(dataResponsibleRemark))
                 //Changing data responsible
                 .then(() => dpaHelper.assignDataResponsible(dataResponsibleOptionName))
                 .then(() => verifyDataReponsible(dataResponsibleOptionName))
@@ -167,6 +170,12 @@ describe("Data processing registration main detail tests", () => {
         setFocusOnNameToActivateBlur();
         console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
         expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
+    }
+
+    function verifyAgreementConcludedRemark(agreementConcludedRemark: string) {
+        setFocusOnNameToActivateBlur();
+        console.log(`Expecting DataReponsibleRemark to be set to: ${agreementConcludedRemark}`);
+        expect(pageObject.getAgreementConcludedRemark().getAttribute("value")).toEqual(agreementConcludedRemark);
     }
 
     function setFocusOnNameToActivateBlur() {

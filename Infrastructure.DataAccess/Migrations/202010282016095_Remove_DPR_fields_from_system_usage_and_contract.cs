@@ -2,14 +2,11 @@
 {
     using System;
     using System.Data.Entity.Migrations;
-    using Infrastructure.DataAccess.Tools;
-
+    
     public partial class Remove_DPR_fields_from_system_usage_and_contract : DbMigration
     {
         public override void Up()
         {
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration.sql"));
-
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "DataWorkerId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "ItSystemUsageId", "dbo.ItSystemUsage");
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "LastChangedByUserId", "dbo.User");

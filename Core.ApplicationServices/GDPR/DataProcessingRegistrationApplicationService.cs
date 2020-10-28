@@ -318,6 +318,15 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
+        public Result<DataProcessingRegistration, OperationError> UpdateAgreementConcludedRemark(int id, string remark)
+        {
+            return Modify<DataProcessingRegistration>(id, registration =>
+            {
+                registration.AgreementConcludedRemark = remark;
+                return registration;
+            });
+        }
+
         public Result<DataProcessingRegistration, OperationError> UpdateTransferToInsecureThirdCountries(int id, YesNoUndecidedOption transferToInsecureThirdCountries)
         {
             return Modify<DataProcessingRegistration>(id, registration =>

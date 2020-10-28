@@ -1062,6 +1062,24 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Can_Update_AgreementConcludedRemark()
+        {
+            Test_Command_Which_ModifiesState_With_Success(registration => _sut.UpdateAgreementConcludedRemark(registration.Id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_AgreementConcludedRemark_Returns_Forbidden()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateAgreementConcludedRemark(id, A<string>()));
+        }
+
+        [Fact]
+        public void Update_AgreementConcludedRemark_Returns_NotFound()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateAgreementConcludedRemark(id, A<string>()));
+        }
+
+        [Fact]
         public void Can_UpdateTransferToInsecureThirdCountries()
         {
             //Arrange
