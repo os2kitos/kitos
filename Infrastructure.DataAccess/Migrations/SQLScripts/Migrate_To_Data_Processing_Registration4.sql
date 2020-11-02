@@ -4,7 +4,6 @@ Content:
  Migrates existing system and contract GDPR data to Data Processing Registrations according to the logic described in https://os2web.atlassian.net/browse/KITOSUDV-1271
 
 */
-
 /*
 	Fourth migration situation
 	Contract with ContractType as NOT "Databehandleraftale" (5) and DPR related 0 + other data on Contract
@@ -21,7 +20,11 @@ BEGIN
 	SELECT Id
 	FROM ItContract
 	WHERE
-		ContractTypeId != 5
+		(
+			ContractTypeId != 5
+			OR
+			ContractTypeId IS NULL
+		)
 		AND 
 		(
 			ContainsDataHandlerAgreement != 0
@@ -101,15 +104,22 @@ BEGIN
 				)
 			OR
 			Id IN (
-				SELECT ItContractAgreementElementTypes.ItContract_Id
-				FROM ItContractAgreementElementTypes
-					INNER JOIN AgreementElementTypes ON Id = AgreementElementType_Id
-				WHERE AgreementElementTypes.Name != ''
+			SELECT ItContractAgreementElementTypes.ItContract_Id
+			FROM ItContractAgreementElementTypes
+				INNER JOIN AgreementElementTypes ON Id = AgreementElementType_Id
+			WHERE AgreementElementTypes.Name != 'Databehandleraftale'
+			)
+			OR
+			Id IN (
+				SELECT EconomyStream.ExternPaymentForId
+				FROM EconomyStream
+				WHERE ExternPaymentForId IS NOT NULL
 				)
 			OR
 			Id IN (
-				SELECT EconomyStream.ObjectOwnerId
+				SELECT EconomyStream.InternPaymentForId
 				FROM EconomyStream
+				WHERE InternPaymentForId IS NOT NULL
 				)
 		)
 
@@ -212,17 +222,33 @@ BEGIN
 		)
 	GROUP BY ItContractId
 	HAVING 
-		COUNT(DISTINCT dataProcessor) < 2
+		COUNT(DISTINCT case when dataProcessor IS NOT NULL AND dataProcessor != '' then dataProcessor else null end) < 2
 		AND
-		COUNT(case when dataProcessorControl = 0 OR dataProcessorControl = 1 OR dataProcessorControl = 2 then 1 else null end) < 2
+		COUNT( DISTINCT
+		CASE WHEN dataProcessorControl = 0 OR dataProcessorControl = 1 OR dataProcessorControl = 2 THEN dataProcessorControl  
+			 WHEN dataProcessorControl = 3 
+				AND (
+					 (dataProcessor IS NOT NULL AND dataProcessor != '')
+					 OR
+					 lastControl IS NOT NULL
+					 OR
+					 (noteUsage IS NOT NULL AND noteUsage != '')
+					 OR
+					 (datahandlerSupervisionDocumentationUrl IS NOT NULL AND datahandlerSupervisionDocumentationUrl != '')
+					 OR
+					 (datahandlerSupervisionDocumentationUrlName IS NOT NULL AND datahandlerSupervisionDocumentationUrlName != '')
+				)
+			THEN dataProcessorControl 
+			ELSE null END) < 2
 		AND
 		COUNT(DISTINCT lastControl) < 2
 		AND
-		COUNT(DISTINCT noteUsage) < 2
+		COUNT(DISTINCT case when noteUsage IS NOT NULL AND noteUsage != '' then noteUsage else null end) < 2
 		AND
-		COUNT(DISTINCT datahandlerSupervisionDocumentationUrl) < 2
+		COUNT(DISTINCT case when datahandlerSupervisionDocumentationUrl IS NOT NULL AND datahandlerSupervisionDocumentationUrl != '' then datahandlerSupervisionDocumentationUrl else null end) < 2
 		AND
-		COUNT(DISTINCT datahandlerSupervisionDocumentationUrlName) < 2
+		COUNT(DISTINCT case when datahandlerSupervisionDocumentationUrlName IS NOT NULL AND datahandlerSupervisionDocumentationUrlName != '' then datahandlerSupervisionDocumentationUrlName else null end) < 2
+
 
 	DECLARE @AllContractsWithEqualSystemGDPRData TABLE 
 	(
@@ -238,10 +264,63 @@ BEGIN
 	INSERT INTO @AllContractsWithEqualSystemGDPRData
 	SELECT *
 	FROM @AllContractsWithMultipleSystemUsagesGrouped
-	WHERE ItContractId IN (
-		SELECT ItContractId
-		FROM @ContractIdWhereSystemUsagesDataIsEqual
-	)
+	WHERE 
+		ItContractId IN (
+			SELECT ItContractId
+			FROM @ContractIdWhereSystemUsagesDataIsEqual
+		)
+		AND
+		(
+			ItContractId NOT IN (
+					SELECT ItContractId
+					FROM @AllContractsWithMultipleSystemUsagesGrouped
+					GROUP BY ItContractId
+					HAVING COUNT(*) > 1
+			)
+			OR
+			(
+				(
+					dataProcessor IS NOT NULL
+					AND
+					dataProcessor != ''
+				)
+				OR
+				lastControl IS NOT NULL
+				OR
+				(
+					noteUsage IS NOT NULL
+					AND
+					noteUsage != ''
+				)
+				OR
+				(
+					datahandlerSupervisionDocumentationUrl IS NOT NULL
+					AND
+					datahandlerSupervisionDocumentationUrl != ''
+				)
+				OR
+				(
+					datahandlerSupervisionDocumentationUrlName IS NOT NULL
+					AND
+					datahandlerSupervisionDocumentationUrlName != ''
+				)
+			)
+		)
+
+	INSERT INTO @AllContractsWithEqualSystemGDPRData
+	SELECT ItContractId, MAX(dataProcessor), MIN(dataProcessorControl), MAX(lastControl), MAX(noteUsage), MAX(datahandlerSupervisionDocumentationUrl), MAX(datahandlerSupervisionDocumentationUrlName)
+	FROM @AllContractsWithMultipleSystemUsagesGrouped
+	WHERE
+		ItContractId IN (
+			SELECT ItContractId
+			FROM @ContractIdWhereSystemUsagesDataIsEqual
+		)
+		AND
+		ItContractId NOT IN (
+			SELECT ItContractId
+			FROM @AllContractsWithEqualSystemGDPRData
+		)
+	GROUP BY ItContractId
 
 	DECLARE @ContractIdsWithUnequalSystemGDPRData TABLE
 	(
@@ -392,13 +471,19 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys1 AS dprsWithForeign
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON dprsWithForeign.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Copy contract advices to DPR
@@ -633,7 +718,7 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys2 AS dprsWithForeign
@@ -642,6 +727,12 @@ BEGIN
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON ItContractItSystemUsages.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Copy contract advices to DPR
@@ -782,7 +873,7 @@ BEGIN
 			ItContractItSystemUsages.ItSystemUsageId,
 			ItContract.OrganizationId,
 			GETUTCDATE(),
-			ItContract.Name + '_' + ItSystemUsage.Id,
+			ItContract.Name + '_' + CAST(ItSystemUsage.Id as varchar(max)),
 			ItContract.ContainsDataHandlerAgreement,
 			ItContract.DataHandlerAgreementUrl,
 			ItContract.DataHandlerAgreementUrlName,
@@ -808,16 +899,7 @@ BEGIN
 			ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId 
 			INNER JOIN 
 			ItSystemUsage ON ItSystemUsage.Id = ItContractItSystemUsages.ItSystemUsageId
-		WHERE 
-			ItContractItSystemUsages.ItContractId 
-				IN (
-					SELECT 
-						Id 
-					FROM 
-						ItContract 
-					WHERE 
-						ContractTypeId = 5
-				)
+
 
 	DECLARE @DprIds3 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
 
@@ -894,13 +976,19 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys3 AS dprsWithForeign
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON dprsWithForeign.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Copy contract advices to DPR
@@ -984,18 +1072,8 @@ BEGIN
 
 
 	/*
-		Resets contract type and associate contract with DPR
+		Associate contract with DPR
 	*/
-
-	UPDATE 
-		ItContract
-	SET
-		ContractTypeId = null
-	WHERE 
-		Id IN (
-		SELECT ItContractId
-		FROM @DprsWithForeignKeys3
-	)
 
 	INSERT INTO
 		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
@@ -1005,4 +1083,3 @@ BEGIN
 		@DprsWithForeignKeys3
 
 END
-

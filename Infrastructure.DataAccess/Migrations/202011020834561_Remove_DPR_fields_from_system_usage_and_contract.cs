@@ -9,6 +9,13 @@
         public override void Up()
         {
 
+            DropIndex("dbo.DataProcessingRegistrations", "DataProcessingRegistration_Index_Name");
+            DropIndex("dbo.DataProcessingRegistrationReadModels", "DataProcessingRegistrationReadModel_Index_Name");
+            AlterColumn("dbo.DataProcessingRegistrations", "Name", c => c.String(nullable: false, maxLength: 200));
+            AlterColumn("dbo.DataProcessingRegistrationReadModels", "Name", c => c.String(nullable: false, maxLength: 200));
+            CreateIndex("dbo.DataProcessingRegistrations", "Name", name: "DataProcessingRegistration_Index_Name");
+            CreateIndex("dbo.DataProcessingRegistrationReadModels", "Name", name: "DataProcessingRegistrationReadModel_Index_Name");
+
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration1.sql"));
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration2.sql"));
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration3.sql"));
@@ -60,10 +67,16 @@
             AddColumn("dbo.ItSystemUsage", "lastControl", c => c.DateTime(precision: 7, storeType: "datetime2"));
             AddColumn("dbo.ItSystemUsage", "dataProcessorControl", c => c.Int());
             AddColumn("dbo.ItSystemUsage", "dataProcessor", c => c.String());
+            DropIndex("dbo.DataProcessingRegistrationReadModels", "DataProcessingRegistrationReadModel_Index_Name");
+            DropIndex("dbo.DataProcessingRegistrations", "DataProcessingRegistration_Index_Name");
+            AlterColumn("dbo.DataProcessingRegistrationReadModels", "Name", c => c.String(nullable: false, maxLength: 100));
+            AlterColumn("dbo.DataProcessingRegistrations", "Name", c => c.String(nullable: false, maxLength: 100));
             CreateIndex("dbo.ItSystemUsageDataWorkerRelations", "LastChangedByUserId");
             CreateIndex("dbo.ItSystemUsageDataWorkerRelations", "ObjectOwnerId");
             CreateIndex("dbo.ItSystemUsageDataWorkerRelations", "DataWorkerId");
             CreateIndex("dbo.ItSystemUsageDataWorkerRelations", "ItSystemUsageId");
+            CreateIndex("dbo.DataProcessingRegistrationReadModels", "Name", name: "DataProcessingRegistrationReadModel_Index_Name");
+            CreateIndex("dbo.DataProcessingRegistrations", "Name", name: "DataProcessingRegistration_Index_Name");
             AddForeignKey("dbo.ItSystemUsageDataWorkerRelations", "ObjectOwnerId", "dbo.User", "Id");
             AddForeignKey("dbo.ItSystemUsageDataWorkerRelations", "LastChangedByUserId", "dbo.User", "Id");
             AddForeignKey("dbo.ItSystemUsageDataWorkerRelations", "ItSystemUsageId", "dbo.ItSystemUsage", "Id", cascadeDelete: true);

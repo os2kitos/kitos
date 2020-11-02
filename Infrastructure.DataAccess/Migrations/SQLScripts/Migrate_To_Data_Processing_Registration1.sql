@@ -5,7 +5,6 @@ Content:
 
 */
 
-
 /*
 	First migration situation
 	Contract with ContractType as "Databehandleraftale" (5) and only DPR related data on Contract
@@ -96,12 +95,19 @@ BEGIN
 			SELECT ItContractAgreementElementTypes.ItContract_Id
 			FROM ItContractAgreementElementTypes
 				INNER JOIN AgreementElementTypes ON Id = AgreementElementType_Id
-			WHERE AgreementElementTypes.Name != ''
+			WHERE AgreementElementTypes.Name != 'Databehandleraftale'
 			)
 		AND
 		Id NOT IN (
-			SELECT EconomyStream.ObjectOwnerId
+			SELECT EconomyStream.ExternPaymentForId
 			FROM EconomyStream
+			WHERE ExternPaymentForId IS NOT NULL
+			)
+		AND
+		Id NOT IN (
+			SELECT EconomyStream.InternPaymentForId
+			FROM EconomyStream
+			WHERE InternPaymentForId IS NOT NULL
 			)
 
 	DECLARE @ContractsWithAtLeast2SystemUsages TABLE
@@ -203,17 +209,33 @@ BEGIN
 		)
 	GROUP BY ItContractId
 	HAVING 
-		COUNT(DISTINCT dataProcessor) < 2
+		COUNT(DISTINCT case when dataProcessor IS NOT NULL AND dataProcessor != '' then dataProcessor else null end) < 2
 		AND
-		COUNT(case when dataProcessorControl = 0 OR dataProcessorControl = 1 OR dataProcessorControl = 2 then 1 else null end) < 2
+		COUNT(  DISTINCT
+		CASE WHEN dataProcessorControl = 0 OR dataProcessorControl = 1 OR dataProcessorControl = 2 THEN dataProcessorControl  
+			 WHEN dataProcessorControl = 3 
+				AND (
+					 (dataProcessor IS NOT NULL AND dataProcessor != '')
+					 OR
+					 lastControl IS NOT NULL
+					 OR
+					 (noteUsage IS NOT NULL AND noteUsage != '')
+					 OR
+					 (datahandlerSupervisionDocumentationUrl IS NOT NULL AND datahandlerSupervisionDocumentationUrl != '')
+					 OR
+					 (datahandlerSupervisionDocumentationUrlName IS NOT NULL AND datahandlerSupervisionDocumentationUrlName != '')
+				)
+			THEN dataProcessorControl 
+			ELSE null END) < 2
 		AND
 		COUNT(DISTINCT lastControl) < 2
 		AND
-		COUNT(DISTINCT noteUsage) < 2
+		COUNT(DISTINCT case when noteUsage IS NOT NULL AND noteUsage != '' then noteUsage else null end) < 2
 		AND
-		COUNT(DISTINCT datahandlerSupervisionDocumentationUrl) < 2
+		COUNT(DISTINCT case when datahandlerSupervisionDocumentationUrl IS NOT NULL AND datahandlerSupervisionDocumentationUrl != '' then datahandlerSupervisionDocumentationUrl else null end) < 2
 		AND
-		COUNT(DISTINCT datahandlerSupervisionDocumentationUrlName) < 2
+		COUNT(DISTINCT case when datahandlerSupervisionDocumentationUrlName IS NOT NULL AND datahandlerSupervisionDocumentationUrlName != '' then datahandlerSupervisionDocumentationUrlName else null end) < 2
+
 
 	DECLARE @AllContractsWithEqualSystemGDPRData TABLE 
 	(
@@ -229,10 +251,63 @@ BEGIN
 	INSERT INTO @AllContractsWithEqualSystemGDPRData
 	SELECT *
 	FROM @AllContractsWithMultipleSystemUsagesGrouped
-	WHERE ItContractId IN (
-		SELECT ItContractId
-		FROM @ContractIdWhereSystemUsagesDataIsEqual
-	)
+	WHERE 
+		ItContractId IN (
+			SELECT ItContractId
+			FROM @ContractIdWhereSystemUsagesDataIsEqual
+		)
+		AND
+		(
+			ItContractId NOT IN (
+					SELECT ItContractId
+					FROM @AllContractsWithMultipleSystemUsagesGrouped
+					GROUP BY ItContractId
+					HAVING COUNT(*) > 1
+			)
+			OR
+			(
+				(
+					dataProcessor IS NOT NULL
+					AND
+					dataProcessor != ''
+				)
+				OR
+				lastControl IS NOT NULL
+				OR
+				(
+					noteUsage IS NOT NULL
+					AND
+					noteUsage != ''
+				)
+				OR
+				(
+					datahandlerSupervisionDocumentationUrl IS NOT NULL
+					AND
+					datahandlerSupervisionDocumentationUrl != ''
+				)
+				OR
+				(
+					datahandlerSupervisionDocumentationUrlName IS NOT NULL
+					AND
+					datahandlerSupervisionDocumentationUrlName != ''
+				)
+			)
+		)
+
+	INSERT INTO @AllContractsWithEqualSystemGDPRData
+	SELECT ItContractId, MAX(dataProcessor), MIN(dataProcessorControl), MAX(lastControl), MAX(noteUsage), MAX(datahandlerSupervisionDocumentationUrl), MAX(datahandlerSupervisionDocumentationUrlName)
+	FROM @AllContractsWithMultipleSystemUsagesGrouped
+	WHERE
+		ItContractId IN (
+			SELECT ItContractId
+			FROM @ContractIdWhereSystemUsagesDataIsEqual
+		)
+		AND
+		ItContractId NOT IN (
+			SELECT ItContractId
+			FROM @AllContractsWithEqualSystemGDPRData
+		)
+	GROUP BY ItContractId
 
 	DECLARE @ContractIdsWithUnequalSystemGDPRData TABLE
 	(
@@ -250,6 +325,7 @@ BEGIN
 		FROM 
 			@ContractIdWhereSystemUsagesDataIsEqual
 		)
+
 
 	/*
 		Migration 1 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 0 or 1 It System Usages associated.
@@ -383,13 +459,19 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys1 AS dprsWithForeign
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON dprsWithForeign.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Copy contract advices to DPR
@@ -471,21 +553,7 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
-
-	/*
-		Delete contracts as they were created as DPR's
-	*/
-
-	DELETE
-	FROM 
-		ItContract
-	WHERE 
-		Id IN (
-		SELECT ItContractId
-		FROM @DprsWithForeignKeys1
-	)
-
-
+			
 	/*
 		Migration 2 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where all system GDPR data is the same.
 	*/
@@ -561,6 +629,8 @@ BEGIN
 		Create temp table with dprId's and Contract and SystemUsage Id's to be used when creating relations
 	*/
 
+	
+
 	INSERT INTO 
 		@DprsWithForeignKeys2 (dprId, ItContractId, AgreementConcludedUrlName, AgreementConcludedUrl, DatahandlerSupervisionLinkName, DatahandlerSupervisionLink, contractOwnerId)
 	SELECT
@@ -573,6 +643,7 @@ BEGIN
 		Create contract parent -> DPR relations
 	*/
 
+	
 	INSERT INTO
 		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
 	SELECT
@@ -590,7 +661,7 @@ BEGIN
 
 	INSERT INTO
 		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
-	SELECT
+	SELECT 
 		DprId, Id
 	FROM 
 		@DprsWithForeignKeys2 AS dprsWithForeign
@@ -616,7 +687,7 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys2 AS dprsWithForeign
@@ -625,6 +696,13 @@ BEGIN
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON ItContractItSystemUsages.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
+	
 
 	/*
 		Copy contract advices to DPR
@@ -707,14 +785,9 @@ BEGIN
 		DatahandlerSupervisionLink IS NOT NULL
 
 
-	DELETE
-	FROM 
-		ItContract
-	WHERE 
-		Id IN (
-		SELECT ItContractId
-		FROM @DprsWithForeignKeys2
-	)
+	
+
+	
 
 	/*
 		Migration 3 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where system GDPR data is different.
@@ -741,7 +814,6 @@ BEGIN
 		ContractLastChangedBy int,
 		SystemUsageUserId int
     )
-	
 
 	/*
 		Get all info needed for first migration situation
@@ -753,7 +825,7 @@ BEGIN
 			ItContractItSystemUsages.ItSystemUsageId,
 			ItContract.OrganizationId,
 			GETUTCDATE(),
-			ItContract.Name + '_' + ItSystemUsage.Id,
+			ItContract.Name + '_' + CAST(ItSystemUsage.Id as varchar(max)),
 			ItContract.ContainsDataHandlerAgreement,
 			ItContract.DataHandlerAgreementUrl,
 			ItContract.DataHandlerAgreementUrlName,
@@ -779,16 +851,8 @@ BEGIN
 			ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId 
 			INNER JOIN 
 			ItSystemUsage ON ItSystemUsage.Id = ItContractItSystemUsages.ItSystemUsageId
-		WHERE 
-			ItContractItSystemUsages.ItContractId 
-				IN (
-					SELECT 
-						Id 
-					FROM 
-						ItContract 
-					WHERE 
-						ContractTypeId = 5
-				)
+
+	
 
 	DECLARE @DprIds3 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
 
@@ -811,6 +875,8 @@ BEGIN
 	/*
 		Create temp table with dprId's and Contract and SystemUsage Id's to be used when creating relations
 	*/
+
+	
 
 	INSERT INTO 
 		@DprsWithForeignKeys3 (dprId, ItContractId, ItSystemUsageId, AgreementConcludedUrlName, AgreementConcludedUrl, DatahandlerSupervisionLinkName, DatahandlerSupervisionLink, contractOwnerId, systemOwnerId)
@@ -852,6 +918,8 @@ BEGIN
 		Create system DPR relations
 	*/
 
+	
+
 	INSERT INTO
 		DataProcessingRegistrationItSystemUsages (DataProcessingRegistration_Id, ItSystemUsage_Id)
 	SELECT
@@ -865,13 +933,19 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithForeignKeys3 AS dprsWithForeign
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON dprsWithForeign.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Copy contract advices to DPR
@@ -954,6 +1028,63 @@ BEGIN
 		DatahandlerSupervisionLink IS NOT NULL
 
 
+	
+
+END
+
+BEGIN
+
+	/*
+		
+	*/
+
+	/*
+		Prepare contracts to be deleted by removing child's foreign keys and then
+		delete contracts as they were created as DPR's
+	*/
+
+	UPDATE ItContract
+	SET ParentId = null
+	WHERE
+		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys1
+	)
+
+	DELETE
+	FROM 
+		ItContract
+	WHERE 
+		Id IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys1
+	)
+
+	UPDATE ItContract
+	SET ParentId = null
+	WHERE
+		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys2
+	)
+
+	DELETE
+	FROM 
+		ItContract
+	WHERE 
+		Id IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys2
+	)
+
+	UPDATE ItContract
+	SET ParentId = null
+	WHERE
+		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys3
+	)
+
 	DELETE
 	FROM 
 		ItContract
@@ -963,5 +1094,5 @@ BEGIN
 		FROM @DprsWithForeignKeys3
 	)
 
+	
 END
-

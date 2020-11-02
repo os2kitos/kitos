@@ -14,7 +14,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_Name", 0);
 
             Property(x => x.MainReferenceTitle)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
                 .IsOptional()
                 .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_MainReferenceTitle", 0);
 
@@ -48,7 +48,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_DPR_TransferToInsecureThirdCountries", 0);
 
             Property(x => x.BasisForTransfer)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DRP_BasisForTransfer", 0);
 
@@ -58,7 +58,7 @@ namespace Infrastructure.DataAccess.Mapping
 
 
             Property(x => x.DataResponsible)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
 

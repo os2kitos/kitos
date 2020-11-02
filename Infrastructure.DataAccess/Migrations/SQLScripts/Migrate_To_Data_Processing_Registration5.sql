@@ -4,7 +4,6 @@ Content:
  Migrates existing system and contract GDPR data to Data Processing Registrations according to the logic described in https://os2web.atlassian.net/browse/KITOSUDV-1271
 
 */
-
 /*
 	Fifth migration situation
 	Systems with GDPR data and not associated with contracts
@@ -65,14 +64,23 @@ BEGIN
 					ItContractItSystemUsages
 					INNER JOIN
 					ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId
-				WHERE
-					ItContract.ContractTypeId = 5
+			)
+			AND
+			ItSystemUsage.Id NOT IN (
+				SELECT
+					ItSystemUsage_Id
+				FROM
+					DataProcessingRegistrationItSystemUsages
 			)
 			AND 
 			(
 				ItSystemUsage.dataProcessor IS NOT NULL
 				OR
-				ItSystemUsage.dataProcessorControl IS NOT NULL
+				(
+					ItSystemUsage.dataProcessorControl IS NOT NULL
+					AND
+					ItSystemUsage.dataProcessorControl != 0
+				)
 				OR
 				ItSystemUsage.lastControl IS NOT NULL
 				OR
@@ -136,13 +144,19 @@ BEGIN
 
 	INSERT INTO
 		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
-	SELECT
+	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithSystemKeys AS dprWithSystem
 		INNER JOIN
 		ItSystemUsageDataWorkerRelations ON dprWithSystem.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
+		AND
+		DataWorkerId NOT IN (
+			SELECT Organization_Id
+			FROM DataProcessingRegistrationOrganizations
+			WHERE DataProcessingRegistration_Id = DprId
+		)
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"

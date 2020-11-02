@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202010282016095_Remove_DPR_fields_from_system_usage_and_contract"; }
+            get { return "202011020834561_Remove_DPR_fields_from_system_usage_and_contract"; }
         }
         
         string IMigrationMetadata.Source
