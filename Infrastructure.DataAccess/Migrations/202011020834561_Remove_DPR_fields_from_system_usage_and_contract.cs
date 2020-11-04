@@ -16,12 +16,7 @@
             CreateIndex("dbo.DataProcessingRegistrations", "Name", name: "DataProcessingRegistration_Index_Name");
             CreateIndex("dbo.DataProcessingRegistrationReadModels", "Name", name: "DataProcessingRegistrationReadModel_Index_Name");
 
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration1.sql"));
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration2.sql"));
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration3.sql"));
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration4.sql"));
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration5.sql"));
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("AddDPRsToReadModel.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_To_Data_Processing_Registration.sql"));
 
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "DataWorkerId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageDataWorkerRelations", "ItSystemUsageId", "dbo.ItSystemUsage");
