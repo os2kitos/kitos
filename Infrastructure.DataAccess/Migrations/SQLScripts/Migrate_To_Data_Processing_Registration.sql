@@ -485,18 +485,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_1_1 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_1_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -716,18 +717,19 @@ BEGIN
 	
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_1_2 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_1_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -961,18 +963,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_1_3 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_1_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -1535,18 +1538,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_3_1 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_3_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -1762,18 +1766,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_3_2 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_3_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -2001,18 +2006,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_3_3 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_3_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -2745,18 +2751,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_2_1 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_2_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -2974,18 +2981,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_2_2 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_2_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -3211,18 +3219,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_2_3 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_2_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -3790,18 +3799,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_4_1 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_4_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -4018,18 +4028,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_4_2 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_4_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
@@ -4255,18 +4266,19 @@ BEGIN
 		)
 
 	/*
-		Copy contract advices to DPR
+		Update contract advices to DPR 
 	*/
 
-	INSERT INTO
-		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
-	SELECT
-		IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, dprsWithForeign.dprId, 4, Scheduling, StopDate, Body, JobId
+	UPDATE
+		Advice
+	SET
+		RelationId = dprsWithForeign.dprId,
+		Type = 4
 	FROM 
-		@DprsWithForeignKeys_4_3 AS dprsWithForeign
+		Advice
 		INNER JOIN
-		Advice ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0
+		@DprsWithForeignKeys_4_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
+	WHERE Type = 0 
 
 	/*
 		Copy contract refernces to DPR
