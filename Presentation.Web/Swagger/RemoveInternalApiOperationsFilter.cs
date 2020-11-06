@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using Presentation.Web.Extensions;
@@ -13,10 +14,14 @@ namespace Presentation.Web.Swagger
         {
             foreach (var apiDescription in apiExplorer.ApiDescriptions)
             {
-                if (IsControllerInternal(apiDescription) || IsActionInternal(apiDescription))
+                if (IsActionInternal(apiDescription))
                 {
                     var route = "/" + apiDescription.RelativePath.TrimEnd('/');
-
+                    swaggerDoc.paths.Remove(route);
+                }
+                if (IsControllerInternal(apiDescription))
+                {
+                    var route = Regex.Replace("/" + apiDescription.RelativePath.TrimEnd('/'), @"(\?.*)", "");
                     swaggerDoc.paths.Remove(route);
                 }
             }
