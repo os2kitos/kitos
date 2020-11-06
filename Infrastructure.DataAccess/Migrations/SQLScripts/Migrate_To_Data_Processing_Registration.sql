@@ -1890,6 +1890,7 @@ BEGIN
 			ItContract.ContainsDataHandlerAgreement,
 			ItContract.DataHandlerAgreementUrl,
 			ItContract.DataHandlerAgreementUrlName,
+			ItContract.Note,
 			ItSystemUsage.dataProcessor,
 			CASE
 				WHEN ItSystemUsage.dataProcessorControl = 0 THEN 1
@@ -1901,7 +1902,6 @@ BEGIN
 			ItSystemUsage.noteUsage,
 			ItSystemUsage.datahandlerSupervisionDocumentationUrl,
 			ItSystemUsage.datahandlerSupervisionDocumentationUrlName,
-			ItContract.Name,
 			ItContract.ObjectOwnerId,
 			ItContract.LastChangedByUserId,
 			ItSystemUsage.ObjectOwnerId
