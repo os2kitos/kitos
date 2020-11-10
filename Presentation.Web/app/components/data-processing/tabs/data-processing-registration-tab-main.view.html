@@ -16,101 +16,104 @@
                            maxlength="150">
                 </div>
 
-
-                <!-- Data responsible -->
-                <div class="form-group">
-                    <label for="dataResponsible" class="control-label small">Dataansvarlig</label>
-                    <single-select-select2 id="dataResponsible"
-                                           data-placeholder="Vælg dataansvarlig"
-                                           ng-model="vm.dataResponsible"
-                                           ng-disabled="!vm.hasWriteAccess" />
-                    <span class="help-block small" ng-if="vm.dataResponsible.selectedElement.optionalObjectContext.description">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        {{vm.dataResponsible.selectedElement.optionalObjectContext.description}}
-                    </span>
-                </div>
-
-                <!-- Data responsible Remark -->
-                <div class="form-group">
-                    <label for="dataResponsibleRemark" class="control-label small">Bemærkninger</label>
-                    <remark-field id="dataResponsibleRemark"
-                                  rows="2"
-                                  ng-model="vm.dataResponsibleRemark"
-                                  ng-disabled="!vm.hasWriteAccess" />
-                </div>
-
-                <!-- Agreement concluded -->
-                <div class="form-group">
-                    <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
-                    <single-select-select2 id="agreementConcluded" ng-model="vm.isAgreementConcluded" ng-disabled="!vm.hasWriteAccess" />
-                </div>
-
-                <div class="form-group" ng-if="vm.shouldShowAgreementConcludedAt">
-                    <!-- Date of last control of the data processor -->
+                <div class="well">
+                    <!-- Data responsible -->
                     <div class="form-group">
-                        <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
-                        <date-picker id="agreementConcludedAt"
-                                     ng-model="vm.agreementConcludedAt"
-                                     ng-disabled="!vm.hasWriteAccess" />
+                        <label for="dataResponsible" class="control-label small">Dataansvarlig</label>
+                        <single-select-select2 id="dataResponsible"
+                                               data-placeholder="Vælg dataansvarlig"
+                                               ng-model="vm.dataResponsible"
+                                               ng-disabled="!vm.hasWriteAccess" />
+                        <span class="help-block small" ng-if="vm.dataResponsible.selectedElement.optionalObjectContext.description">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            {{vm.dataResponsible.selectedElement.optionalObjectContext.description}}
+                        </span>
+                    </div>
+
+                    <!-- Data responsible Remark -->
+                    <div class="form-group">
+                        <label for="dataResponsibleRemark" class="control-label small">Bemærkninger</label>
+                        <remark-field id="dataResponsibleRemark"
+                                      rows="2"
+                                      ng-model="vm.dataResponsibleRemark"
+                                      ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>
+                <div class="well">
+                    <!-- Agreement concluded -->
+                    <div class="form-group">
+                        <label for="agreementConcluded" class="control-label small">Databehandleraftale er indgået</label>
+                        <single-select-select2 id="agreementConcluded" ng-model="vm.isAgreementConcluded" ng-disabled="!vm.hasWriteAccess" />
+                    </div>
 
-                <!-- Agreement concluded Remark -->
-                <div class="form-group">
-                    <label for="agreementConcludedRemark" class="control-label small">Bemærkninger</label>
-                    <remark-field id="agreementConcludedRemark"
-                                  rows="2"
-                                  ng-model="vm.agreementConcludedRemark"
-                                  ng-disabled="!vm.hasWriteAccess" />
-                </div>
+                    <div class="form-group" ng-if="vm.shouldShowAgreementConcludedAt">
+                        <!-- Date of last control of the data processor -->
+                        <div class="form-group">
+                            <label for="agreementConcludedAt" class="control-label small">Dato for indgåelse af databehandleraftale</label>
+                            <date-picker id="agreementConcludedAt"
+                                         ng-model="vm.agreementConcludedAt"
+                                         ng-disabled="!vm.hasWriteAccess" />
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <!-- Transfer to insecure third country -->
-                    <label for="transferToInsecureThirdCountries" class="control-label small">Overførsel til usikkert 3. land</label>
-                    <single-select-select2 id="transferToInsecureThirdCountries" ng-model="vm.transferToInsecureThirdCountries" ng-disabled="!vm.hasWriteAccess" />
+                    <!-- Agreement concluded Remark -->
+                    <div class="form-group">
+                        <label for="agreementConcludedRemark" class="control-label small">Bemærkninger</label>
+                        <remark-field id="agreementConcludedRemark"
+                                      rows="2"
+                                      ng-model="vm.agreementConcludedRemark"
+                                      ng-disabled="!vm.hasWriteAccess" />
+                    </div>
                 </div>
-                <div class="form-group" ng-if="vm.enableSelectionOfInsecureThirdCountries">
-                    <!-- Insecure third countries -->
-                    <label for="insecureThirdCountriesTable" class="control-label small">Lande der overføres til</label>
-                    <table id="insecureThirdCountriesTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="element-selection-list_header--padding noRightBorder">
-                                    <p class="small">Navn</p>
-                                </th>
-                                <th class="element-selection-list_header--padding noLeftBorder"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="country in vm.insecureThirdCountries.selectedElements" data-element-type="data-processing_insecure_third_countries">
-                                <td>{{::country.name }}<span ng-if="country.expired"> (udgået)</span></td>
-                                <td class="text-right noLeftBorder" style="width: 20px;">
-                                    <button type="button"
-                                            class="btn btn-danger btn-xs"
-                                            data-confirmed-click="vm.insecureThirdCountries.removeItemRequested({{::country}})"
-                                            data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
-                                            ng-if="vm.insecureThirdCountries.allowRemoval">
-                                        <i class="glyphicon glyphicon-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot ng-if="vm.insecureThirdCountries.allowAddition" class="element-selection-list_footer--padding">
-                            <tr>
-                                <td colspan="2" style="padding: 0">
-                                    <single-select-select2 data-placeholder="Vælg usikkert 3. land"
-                                                           id="insecure-third-country_select-new"
-                                                           ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
-                                                           ng-disabled="!vm.insecureThirdCountries.allowAddition" />
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <!-- Basis for transfer -->
-                <div class="form-group">
-                    <label for="basisForTransfer" class="control-label small">Overførselsgrundlag</label>
-                    <single-select-select2 data-placeholder="Vælg overførselsgrundlag" id="basisForTransfer" ng-model="vm.basisForTransfer" ng-disabled="!vm.hasWriteAccess" />
+                <div class="well">
+                    <div class="form-group">
+                        <!-- Transfer to insecure third country -->
+                        <label for="transferToInsecureThirdCountries" class="control-label small">Overførsel til usikkert 3. land</label>
+                        <single-select-select2 id="transferToInsecureThirdCountries" ng-model="vm.transferToInsecureThirdCountries" ng-disabled="!vm.hasWriteAccess" />
+                    </div>
+                    <div class="form-group" ng-if="vm.enableSelectionOfInsecureThirdCountries">
+                        <!-- Insecure third countries -->
+                        <label for="insecureThirdCountriesTable" class="control-label small">Lande der overføres til</label>
+                        <table id="insecureThirdCountriesTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="element-selection-list_header--padding noRightBorder">
+                                        <p class="small">Navn</p>
+                                    </th>
+                                    <th class="element-selection-list_header--padding noLeftBorder"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="country in vm.insecureThirdCountries.selectedElements" data-element-type="data-processing_insecure_third_countries">
+                                    <td>{{::country.name }}<span ng-if="country.expired"> (udgået)</span></td>
+                                    <td class="text-right noLeftBorder" style="width: 20px;">
+                                        <button type="button"
+                                                class="btn btn-danger btn-xs"
+                                                data-confirmed-click="vm.insecureThirdCountries.removeItemRequested({{::country}})"
+                                                data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                                ng-if="vm.insecureThirdCountries.allowRemoval">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot ng-if="vm.insecureThirdCountries.allowAddition" class="element-selection-list_footer--padding">
+                                <tr>
+                                    <td colspan="2" style="padding: 0">
+                                        <single-select-select2 data-placeholder="Vælg usikkert 3. land"
+                                                               id="insecure-third-country_select-new"
+                                                               ng-model="vm.insecureThirdCountries.newItemSelectionConfig"
+                                                               ng-disabled="!vm.insecureThirdCountries.allowAddition" />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- Basis for transfer -->
+                    <div class="form-group">
+                        <label for="basisForTransfer" class="control-label small">Overførselsgrundlag</label>
+                        <single-select-select2 data-placeholder="Vælg overførselsgrundlag" id="basisForTransfer" ng-model="vm.basisForTransfer" ng-disabled="!vm.hasWriteAccess" />
+                    </div>
                 </div>
             </div>
             <div class="col-xs-6">
@@ -148,9 +151,9 @@
                             <tr>
                                 <td colspan="3" style="padding: 0">
                                     <single-select-select2 data-placeholder="Vælg Databehandler"
-                                                           id="data-processor_select-new"
-                                                           ng-model="vm.dataProcessors.newItemSelectionConfig"
-                                                           ng-disabled="!vm.dataProcessors.allowAddition" />
+                                                            id="data-processor_select-new"
+                                                            ng-model="vm.dataProcessors.newItemSelectionConfig"
+                                                            ng-disabled="!vm.dataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
@@ -195,9 +198,9 @@
                             <tr>
                                 <td colspan="3" style="padding: 0">
                                     <single-select-select2 data-placeholder="Vælg Underdatabehandler"
-                                                           id="sub-data-processor_select-new"
-                                                           ng-model="vm.subDataProcessors.newItemSelectionConfig"
-                                                           ng-disabled="!vm.subDataProcessors.allowAddition" />
+                                                            id="sub-data-processor_select-new"
+                                                            ng-model="vm.subDataProcessors.newItemSelectionConfig"
+                                                            ng-disabled="!vm.subDataProcessors.allowAddition" />
                                 </td>
                             </tr>
                         </tfoot>
