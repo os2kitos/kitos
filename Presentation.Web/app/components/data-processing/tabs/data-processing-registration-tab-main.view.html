@@ -65,6 +65,13 @@
                                       ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>
+
+                <!-- Basis for transfer -->
+                <div class="form-group">
+                    <label for="basisForTransfer" class="control-label small">Overførselsgrundlag</label>
+                    <single-select-select2 data-placeholder="Vælg overførselsgrundlag" id="basisForTransfer" ng-model="vm.basisForTransfer" ng-disabled="!vm.hasWriteAccess" />
+                </div>
+
                 <div class="well">
                     <div class="form-group">
                         <!-- Transfer to insecure third country -->
@@ -108,11 +115,6 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
-                    <!-- Basis for transfer -->
-                    <div class="form-group">
-                        <label for="basisForTransfer" class="control-label small">Overførselsgrundlag</label>
-                        <single-select-select2 data-placeholder="Vælg overførselsgrundlag" id="basisForTransfer" ng-model="vm.basisForTransfer" ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>
             </div>
