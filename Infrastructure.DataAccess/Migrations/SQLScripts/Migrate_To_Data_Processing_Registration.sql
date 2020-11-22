@@ -392,7 +392,7 @@ BEGIN
 		@ContractsAndUsagesWith0Or1SystemUsages_1 AS ContractsWith0Or1SystemUsages
 		INNER JOIN
 		ItContract ON ItContract.Id = ContractsWith0Or1SystemUsages.ItContractId
-		INNER JOIN
+		LEFT JOIN
 		ItSystemUsage ON ItSystemUsage.Id = ContractsWith0Or1SystemUsages.ItSystemUsageId
 
 
@@ -503,8 +503,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_1_1_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_1_1
 	SELECT
 		Title,
 		URL,
@@ -519,36 +523,34 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_1_1
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_1_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+		
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_1_1_2 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_1_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -565,7 +567,66 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
-			
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_1_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+
+	DECLARE @DBRReferences_1_1_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_1_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_1_1
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+		
+		
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_1_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
 	/*
 		Migration 2 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where all system GDPR data is the same.
 	*/
@@ -735,8 +796,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_1_2_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_2_1
 	SELECT
 		Title,
 		URL,
@@ -751,36 +816,34 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_2_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_1_2
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_1_2_2 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_2_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -797,9 +860,64 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_2_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+
+	DECLARE @DBRReferences_1_2_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_2_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_1_2
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
 	
-
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_2_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 	
 
 	/*
@@ -981,8 +1099,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_1_3_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_3_1
 	SELECT
 		Title,
 		URL,
@@ -997,36 +1119,33 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_1_3
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_3_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_1_3_2 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_3_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -1043,6 +1162,64 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_3_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+		
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+
+	DECLARE @DBRReferences_1_3_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_1_3_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_1_3
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_1_3_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 END
 
@@ -1445,7 +1622,7 @@ BEGIN
 		@ContractsAndUsagesWith0Or1SystemUsages_3 AS ContractsWith0Or1SystemUsages
 		INNER JOIN
 		ItContract ON ItContract.Id = ContractsWith0Or1SystemUsages.ItContractId
-		INNER JOIN
+		LEFT JOIN
 		ItSystemUsage ON ItSystemUsage.Id = ContractsWith0Or1SystemUsages.ItSystemUsageId
 
 
@@ -1555,9 +1732,13 @@ BEGIN
 	/*
 		Copy contract refernces to DPR
 	*/
+	
+	DECLARE @DBRReferences_3_1_1 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_1_1
 	SELECT
 		Title,
 		URL,
@@ -1572,36 +1753,33 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_3_1
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_1_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_3_1_2 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_1_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -1618,6 +1796,65 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_1_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+
+	DECLARE @DBRReferences_3_1_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_1_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_3_1
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_1_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Migration 2 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where all system GDPR data is the same.
@@ -1784,8 +2021,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_3_2_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_2_1
 	SELECT
 		Title,
 		URL,
@@ -1800,36 +2041,33 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_3_2
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_2_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_3_2_2 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_2_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -1846,7 +2084,64 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_2_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+
+	DECLARE @DBRReferences_3_2_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_2_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_3_2
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_2_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Migration 3 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where system GDPR data is different.
@@ -2024,8 +2319,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_3_3_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_3_1
 	SELECT
 		Title,
 		URL,
@@ -2040,13 +2339,76 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_3_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if systemusage contains "Link til dokumentation"
+		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
+	*/
+	
+	DECLARE @DBRReferences_3_3_2 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_3_2
+	SELECT
+		CASE 
+			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
+			ELSE DatahandlerSupervisionLinkName 
+		END AS Title, 
+		DatahandlerSupervisionLink, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		systemOwnerId
+	FROM 
+		@DprsWithForeignKeys_3_3
+	WHERE
+		DatahandlerSupervisionLink IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_3_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
 	/*
 		Create references if data handler agreement contains a url
 		(Name should be "Link til databehandleraftale")
 	*/
+	
+	DECLARE @DBRReferences_3_3_3 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_3_3_3
 	SELECT
 		CASE 
 			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
@@ -2063,28 +2425,21 @@ BEGIN
 	WHERE
 		AgreementConcludedUrl IS NOT NULL
 
-	/*
-		Create references if systemusage contains "Link til dokumentation"
-		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
-			ELSE DatahandlerSupervisionLinkName 
-		END AS Title, 
-		DatahandlerSupervisionLink, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		systemOwnerId
-	FROM 
-		@DprsWithForeignKeys_3_3
-	WHERE
-		DatahandlerSupervisionLink IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_3_3_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 END
 
@@ -2658,7 +3013,7 @@ BEGIN
 		@ContractsAndUsagesWith0Or1SystemUsages_2 AS ContractsWith0Or1SystemUsages
 		INNER JOIN
 		ItContract ON ItContract.Id = ContractsWith0Or1SystemUsages.ItContractId
-		INNER JOIN
+		LEFT JOIN
 		ItSystemUsage ON ItSystemUsage.Id = ContractsWith0Or1SystemUsages.ItSystemUsageId
 
 
@@ -2769,8 +3124,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_2_1_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_1_1
 	SELECT
 		Title,
 		URL,
@@ -2785,36 +3144,33 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_2_1
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_1_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
+	
+	DECLARE @DBRReferences_2_1_2 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_1_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -2831,8 +3187,64 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_1_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+	
+	DECLARE @DBRReferences_2_1_3 Table (Id int)
 
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_1_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_2_1
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_1_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Migration 2 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where all system GDPR data is the same.
@@ -2998,9 +3410,13 @@ BEGIN
 	/*
 		Copy contract refernces to DPR
 	*/
+	
+	DECLARE @DBRReferences_2_2_1 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_2_1
 	SELECT
 		Title,
 		URL,
@@ -3015,36 +3431,33 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_2_2
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_2_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
+	
+	DECLARE @DBRReferences_2_2_2 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_2_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -3061,6 +3474,66 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+		
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_2_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+	
+	DECLARE @DBRReferences_2_2_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_2_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_2_2
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+		
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_2_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Migration 3 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where system GDPR data is different.
@@ -3236,9 +3709,13 @@ BEGIN
 	/*
 		Copy contract refernces to DPR
 	*/
+	
+	DECLARE @DBRReferences_2_3_1 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_3_1
 	SELECT
 		Title,
 		URL,
@@ -3253,13 +3730,76 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_3_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if systemusage contains "Link til dokumentation"
+		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
+	*/
+	
+	DECLARE @DBRReferences_2_3_2 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_3_2
+	SELECT
+		CASE 
+			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
+			ELSE DatahandlerSupervisionLinkName 
+		END AS Title, 
+		DatahandlerSupervisionLink, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		systemOwnerId
+	FROM 
+		@DprsWithForeignKeys_2_3
+	WHERE
+		DatahandlerSupervisionLink IS NOT NULL
+		
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_3_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
 	/*
 		Create references if data handler agreement contains a url
 		(Name should be "Link til databehandleraftale")
 	*/
+	
+	DECLARE @DBRReferences_2_3_3 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_2_3_3
 	SELECT
 		CASE 
 			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
@@ -3276,28 +3816,22 @@ BEGIN
 	WHERE
 		AgreementConcludedUrl IS NOT NULL
 
-	/*
-		Create references if systemusage contains "Link til dokumentation"
-		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
-			ELSE DatahandlerSupervisionLinkName 
-		END AS Title, 
-		DatahandlerSupervisionLink, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		systemOwnerId
-	FROM 
-		@DprsWithForeignKeys_2_3
-	WHERE
-		DatahandlerSupervisionLink IS NOT NULL
+		
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_2_3_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 
 END
@@ -3706,7 +4240,7 @@ BEGIN
 		@ContractsAndUsagesWith0Or1SystemUsages_4 AS ContractsWith0Or1SystemUsages
 		INNER JOIN
 		ItContract ON ItContract.Id = ContractsWith0Or1SystemUsages.ItContractId
-		INNER JOIN
+		LEFT JOIN
 		ItSystemUsage ON ItSystemUsage.Id = ContractsWith0Or1SystemUsages.ItSystemUsageId
 
 
@@ -3816,9 +4350,13 @@ BEGIN
 	/*
 		Copy contract refernces to DPR
 	*/
+	
+	DECLARE @DBRReferences_4_1_1 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_1_1
 	SELECT
 		Title,
 		URL,
@@ -3833,36 +4371,34 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_1_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_4_1
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
+	
+	DECLARE @DBRReferences_4_1_2 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_1_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -3879,6 +4415,64 @@ BEGIN
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
 
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_1_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
+
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+	
+	DECLARE @DBRReferences_4_1_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_1_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_4_1
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_1_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 
 	/*
@@ -4046,8 +4640,12 @@ BEGIN
 		Copy contract refernces to DPR
 	*/
 
+	DECLARE @DBRReferences_4_2_1 Table (Id int)
+
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_2_1
 	SELECT
 		Title,
 		URL,
@@ -4062,36 +4660,34 @@ BEGIN
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_4_2
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
+				
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_2_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
+	
+	DECLARE @DBRReferences_4_2_2 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_2_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -4107,7 +4703,65 @@ BEGIN
 		@DprsWithForeignKeys_4_2
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
+				
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_2_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+	
+	DECLARE @DBRReferences_4_2_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_2_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_4_2
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+				
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_2_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 	/*
 		Migration 3 - Contract with "Databehandleraftale" type and only DPR related data inserted. With 2 or more It System Usages associated where system GDPR data is different.
@@ -4283,9 +4937,13 @@ BEGIN
 	/*
 		Copy contract refernces to DPR
 	*/
+	
+	DECLARE @DBRReferences_4_3_1 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_3_1
 	SELECT
 		Title,
 		URL,
@@ -4299,37 +4957,35 @@ BEGIN
 		@DprsWithForeignKeys_4_3 AS dprsWithForeign
 		INNER JOIN
 		ExternalReferences ON ExternalReferences.ItContract_Id = dprsWithForeign.ItContractId
+				
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_3_1 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
-	/*
-		Create references if data handler agreement contains a url
-		(Name should be "Link til databehandleraftale")
-	*/
-
-	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
-	SELECT
-		CASE 
-			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
-			ELSE AgreementConcludedUrlName 
-		END AS Title,
-		AgreementConcludedUrl, 
-		0, 
-		GETUTCDATE(), 
-		GETUTCDATE(), 
-		dprId,
-		contractOwnerId
-	FROM 
-		@DprsWithForeignKeys_4_3
-	WHERE
-		AgreementConcludedUrl IS NOT NULL
 
 	/*
 		Create references if systemusage contains "Link til dokumentation"
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
+	
+	DECLARE @DBRReferences_4_3_2 Table (Id int)
 
 	INSERT INTO
 		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_3_2
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -4345,7 +5001,65 @@ BEGIN
 		@DprsWithForeignKeys_4_3
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
+						
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_3_2 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
+	/*
+		Create references if data handler agreement contains a url
+		(Name should be "Link til databehandleraftale")
+	*/
+	
+	DECLARE @DBRReferences_4_3_3 Table (Id int)
+
+	INSERT INTO
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_4_3_3
+	SELECT
+		CASE 
+			WHEN AgreementConcludedUrlName IS NULL THEN 'Link til databehandleraftale'
+			ELSE AgreementConcludedUrlName 
+		END AS Title,
+		AgreementConcludedUrl, 
+		0, 
+		GETUTCDATE(), 
+		GETUTCDATE(), 
+		dprId,
+		contractOwnerId
+	FROM 
+		@DprsWithForeignKeys_4_3
+	WHERE
+		AgreementConcludedUrl IS NOT NULL
+						
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_4_3_3 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 END
 
@@ -4508,8 +5222,12 @@ BEGIN
 		(Name should be "Link til tilsynsdokumentation" if not provided by the link)
 	*/
 
+	DECLARE @DBRReferences_5 Table (Id int)
+
 	INSERT INTO
 		kitos.dbo.ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+	OUTPUT 
+		inserted.Id into @DBRReferences_5
 	SELECT
 		CASE 
 			WHEN DatahandlerSupervisionLinkName IS NULL THEN 'Link til tilsynsdokumentation'
@@ -4525,6 +5243,23 @@ BEGIN
 		@DprsWithSystemKeys_5
 	WHERE
 		DatahandlerSupervisionLink IS NOT NULL
+
+				
+	UPDATE 
+		DataProcessingRegistrations
+	SET
+		ReferenceId = ExtReferenceToUpdate.Id
+	FROM
+		DataProcessingRegistrations
+		INNER JOIN
+		(
+		SELECT	
+			ExternalReferences.Id, ExternalReferences.DataProcessingRegistration_Id
+		FROM
+			@DBRReferences_5 AS ExtReference
+			INNER JOIN 
+			ExternalReferences ON ExternalReferences.Id = ExtReference.Id
+		) AS ExtReferenceToUpdate ON ExtReferenceToUpdate.DataProcessingRegistration_Id = DataProcessingRegistrations.Id
 
 END 
 
