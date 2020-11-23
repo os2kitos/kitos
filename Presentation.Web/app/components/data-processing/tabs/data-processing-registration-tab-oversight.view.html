@@ -50,40 +50,44 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <!--Oversight Interval  -->
-                <div class="form-group">
-                    <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
-                    <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
-                </div>
-                <!-- Oversight Interval Remark -->
-                <div class="form-group">
-                    <label for="oversightIntervalRemark" class="control-label small">Bemærkninger</label>
-                    <remark-field id="oversightIntervalRemark"
-                                  rows="2"
-                                  ng-model="vm.oversightIntervalRemark"
-                                  ng-disabled="!vm.hasWriteAccess" />
-                </div>
-                <!--Oversight Completed  -->
-                <div class="form-group">
-                    <label for="oversightCompleted" class="control-label small">Gennemført tilsyn</label>
-                    <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
-                </div>
-                <!-- Latest Oversight -->
-                <div class="form-group" ng-if="vm.shouldShowLatestOversightCompletedDate">
+                <div class="well">
+                    <!--Oversight Interval  -->
                     <div class="form-group">
-                        <label for="latestOversightCompletedDate" class="control-label small">Dato for seneste tilsyn</label>
-                        <date-picker id="latestOversightCompletedDate"
-                                     ng-model="vm.latestOversightCompletedDate"
-                                     ng-disabled="!vm.hasWriteAccess" />
+                        <label for="oversightInterval" class="control-label small">Tilsynsinterval</label>
+                        <single-select-select2 id="oversightInterval" ng-model="vm.oversightInterval" ng-disabled="!vm.hasWriteAccess" />
+                    </div>
+                    <!-- Oversight Interval Remark -->
+                    <div class="form-group">
+                        <label for="oversightIntervalRemark" class="control-label small">Bemærkninger</label>
+                        <remark-field id="oversightIntervalRemark"
+                                      rows="2"
+                                      ng-model="vm.oversightIntervalRemark"
+                                      ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>
-                <!-- Oversight Completed Remark -->
-                <div class="form-group">
-                    <label for="oversightCompletedRemark " class="control-label small">Bemærkninger</label>
-                    <remark-field id="oversightCompletedRemark"
-                                  rows="2"
-                                  ng-model="vm.oversightCompletedRemark"
-                                  ng-disabled="!vm.hasWriteAccess" />
+                <div class="well">
+                    <!--Oversight Completed  -->
+                    <div class="form-group">
+                        <label for="oversightCompleted" class="control-label small">Gennemført tilsyn</label>
+                        <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
+                    </div>
+                    <!-- Latest Oversight -->
+                    <div class="form-group" ng-if="vm.shouldShowLatestOversightCompletedDate">
+                        <div class="form-group">
+                            <label for="latestOversightCompletedDate" class="control-label small">Dato for seneste tilsyn</label>
+                            <date-picker id="latestOversightCompletedDate"
+                                         ng-model="vm.latestOversightCompletedDate"
+                                         ng-disabled="!vm.hasWriteAccess" />
+                        </div>
+                    </div>
+                    <!-- Oversight Completed Remark -->
+                    <div class="form-group">
+                        <label for="oversightCompletedRemark " class="control-label small">Bemærkninger</label>
+                        <remark-field id="oversightCompletedRemark"
+                                      rows="2"
+                                      ng-model="vm.oversightCompletedRemark"
+                                      ng-disabled="!vm.hasWriteAccess" />
+                    </div>
                 </div>
             </div>
         </div>

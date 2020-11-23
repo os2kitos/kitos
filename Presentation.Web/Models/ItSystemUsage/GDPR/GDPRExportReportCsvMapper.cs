@@ -36,7 +36,6 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
                     .WithColumn(GDPRExportReportColumns.ChosenSensitiveData, x => MapSensitiveDataTypes(x.SensitiveDataTypes))
                     .WithColumn(GDPRExportReportColumns.BusinessCritical, x => MapDataOption(x.BusinessCritical))
                     .WithColumn(GDPRExportReportColumns.DataProcessorContract, x => MapBoolean(x.DataProcessingAgreementConcluded))
-                    .WithColumn(GDPRExportReportColumns.DataProcessorControl, x => MapDataOption(x.DataProcessorControl))
                     .WithColumn(GDPRExportReportColumns.LinkToDirectory, x => MapBoolean(x.LinkToDirectory))
                     .WithColumn(GDPRExportReportColumns.RiskAssessment, x => MapDataOption(x.RiskAssessment))
                     .WithColumn(GDPRExportReportColumns.PreRiskAssessment, x => MapRiskLevel(x.PreRiskAssessment))

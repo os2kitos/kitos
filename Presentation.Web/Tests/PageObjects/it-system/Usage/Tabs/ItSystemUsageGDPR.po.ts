@@ -56,24 +56,12 @@ class ItSystemUsageGDPR {
         return element(this.cssHelper.byDataElementType(this.consts.gdprGDPRSystemPurposeTextField));
     } 
 
-    static getGDPRDataResponsibleTextField() {
-        return element(this.cssHelper.byDataElementType(this.consts.gdprGDPRDataResponsibleTextField));
-    }
-
-    static getGDPRNoteUsageTextField() {
-        return element(this.cssHelper.byDataElementType(this.consts.gdprNoteUsageTextField));
-    }
-
     static getGDPRNoteRiskTextField() {
         return element(this.cssHelper.byDataElementType(this.consts.gdprNoteRiskTextField));
     }
 
     static getGDPRNumberDPIAField() {
         return element(this.cssHelper.byDataElementType(this.consts.gdprNumberDPIATextField));
-    }
-
-    static getDataProcessLinkButton() {
-        return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessLinkButton));
     }
 
     static getNoteLinkButton() {
@@ -94,9 +82,6 @@ class ItSystemUsageGDPR {
 
     static getDPIALinkButton() {
         return element(this.cssHelper.byDataElementType(this.consts.gdprDPIALinkButton));
-    }
-    static getDataProcessLinkField() {
-        return element(this.cssHelper.byDataElementType(this.consts.gdprDataProcessLinkField));
     }
 
     static getNoteLinkField() {
@@ -129,9 +114,6 @@ class ItSystemUsageGDPR {
 
     static getModalNameField() {
         return element(this.cssHelper.byDataElementType(this.consts.gdprModalNameField));
-    }
-    static getLastControlDateField() {
-        return element(by.id(this.consts.gdprLastControlId));
     }
 
     static getRiskAssesmentDateField() {

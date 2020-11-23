@@ -34,7 +34,6 @@ namespace Core.DomainModel.ItSystemUsage
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
-            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
@@ -345,15 +344,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string GeneralPurpose { get; set; }
         public DataOptions? isBusinessCritical { get; set; }
 
-        public string dataProcessor { get; set; }
-        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
-        public DataOptions? dataProcessorControl { get; set; }
-        public DateTime? lastControl { get; set; }
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
-        public string noteUsage { get; set; }
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
 

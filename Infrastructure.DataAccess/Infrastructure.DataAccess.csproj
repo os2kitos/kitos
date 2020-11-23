@@ -80,7 +80,6 @@
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
     <Compile Include="Mapping\ItSystemUsageSensitiveDataLevelMap.cs" />
     <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
-    <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -656,6 +655,10 @@
     <Compile Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.designer.cs">
       <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202011020834561_Remove_DPR_fields_from_system_usage_and_contract.cs" />
+    <Compile Include="Migrations\202011020834561_Remove_DPR_fields_from_system_usage_and_contract.designer.cs">
+      <DependentUpon>202011020834561_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1070,6 +1073,9 @@
     <EmbeddedResource Include="Migrations\202010260915217_Added-Agreementconcluded-Remark-Field.resx">
       <DependentUpon>202010260915217_Added-Agreementconcluded-Remark-Field.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011020834561_Remove_DPR_fields_from_system_usage_and_contract.resx">
+      <DependentUpon>202011020834561_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1082,6 +1088,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\AddDefaultDpaTypesToExistingDb.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -75,15 +75,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<ItSystemUsageDataWorkerRelationDTO> SetUsageDataWorkerAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
-        {
-            using (var response = await SendSetUsageDataWorkerRequestAsync(systemUsageId, organizationId, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDataWorkerRelationDTO>();
-            }
-        }
-
         public static async Task<HttpResponseMessage> SendSetUsageDataWorkerRequestAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

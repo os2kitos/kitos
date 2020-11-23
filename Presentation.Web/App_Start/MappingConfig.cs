@@ -53,12 +53,6 @@ namespace Presentation.Web
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();
 
-            CreateMap<ItSystemUsageDataWorkerRelation, ItSystemUsageDataWorkerRelationDTO>()
-                  .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
-                  .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
-                  .ReverseMap()
-                  .IgnoreDestinationEntityFields();
-
             CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore())

@@ -71,26 +71,6 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 var today = new Date();
-                $scope.dataHandlerLink = '';
-                
-                if ($scope.contract.dataHandler != null) {
-                    $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId + '/main';
-
-                    if (!$scope.contract.dataHandlerAgreementUrlName) {
-                        $scope.dataHandlerLinkName = $scope.contract.dataHandler.name;
-                    } else {
-                        $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
-                    }
-
-                } else if ($scope.contract.dataHandlerAgreementUrl != '') {
-                    $scope.dataHandlerLink = $scope.contract.dataHandlerAgreementUrl;
-
-                    if (!$scope.contract.dataHandlerAgreementUrlName) {
-                        $scope.dataHandlerLinkName = "Databehandleraftale";
-                    } else {
-                        $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
-                    }
-                }
 
                 if (!contract.active) {
                     if (contract.concluded < today && today < contract.expirationDate) {
@@ -216,58 +196,6 @@
                         result += '<div class="small">' + supplier.cvr + '</div>';
                     }
                     return result;
-                }
-
-                $scope.editLink = function () {
-                    $uibModal.open({
-                        templateUrl: 'app/components/it-contract/tabs/it-contract-gdpr-editlink-modal.view.html',
-                        controller: ['$scope', '$state', '$uibModalInstance', 'contracts', 'contract', function ($scope, $state, $uibModalInstance, contracts, contract) {
-                            $scope.contracts = contracts
-                            $scope.contract = contract
-
-                            if ($scope.contract.dataHandlerId == 0){
-                                $scope.contract.dataHandlerId = "";
-                            }
-                            
-                            $scope.ok = function () {
-                                
-                                var msg = notify.addInfoMessage("Gemmer...", false);
-
-                                var payload = {
-                                    Id: contract.id,
-                                    DataHandlerId: $scope.contract.dataHandlerId,
-                                    DataHandlerAgreementUrl: $scope.contract.dataHandlerAgreementUrl,
-                                    DataHandlerAgreementUrlName: $scope.contract.dataHandlerAgreementUrlName
-                                }
-
-                                $http({ method: 'PATCH', url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId, data: payload })
-                                    .success(function () {
-                                        msg.toSuccessMessage("Feltet er opdateret.");
-                                        $state.reload();
-                                    })
-                                    .error(function () {
-                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                    });
-                                $uibModalInstance.close();
-                            };
-
-                            $scope.cancel = function () {
-                                $uibModalInstance.dismiss('cancel');
-                            };
-                        }],
-                        resolve: {
-                            contracts: [
-                                '$http', function ($http) {
-                                    return $http.get(`odata/Organizations(${user.currentOrganizationId})/ItContracts?$filter=Active eq true`).then(function (result) {
-                                        return result.data.value;
-                                    });
-                                }],
-                                contract: [ function () {
-                                    return $scope.contract;
-                                    }
-                            ]
-                        }
-                    })
                 }
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {

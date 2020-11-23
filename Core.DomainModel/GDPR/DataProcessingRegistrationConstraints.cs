@@ -2,6 +2,7 @@
 {
     public static class DataProcessingRegistrationConstraints
     {
-        public const int MaxNameLength = 100;
+        public const int MaxNameLength = 200;
+        public const int MaxReadmodelPropertyLength = 100;
     }
 }

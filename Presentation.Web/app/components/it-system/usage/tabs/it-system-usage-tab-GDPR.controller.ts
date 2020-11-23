@@ -37,29 +37,6 @@
                 $scope.dataProcessingRegistrations = itSystemUsage.associatedDataProcessingRegistrations;
                 $scope.filterDataProcessor = itSystemUsage.associatedDataProcessingRegistrations.length > 0;
 
-                $scope.dataWorkerSelectOptions = select2LoadingService.loadSelect2WithDataHandler(
-                    "api/organization",
-                    true,
-                    ['take=25',`orgId=${user.currentOrganizationId}`],
-                    (item,
-                        items) => {
-                        items.push({
-                            id: item.id,
-                            text: item.name,
-                            cvr: item.cvr
-                        });
-                    },
-                    "q",
-                    formatSupplier);
-
-                function formatSupplier(supplier) {
-                    var result = `<div>${supplier.text}</div>`;
-                    if (supplier.cvr) {
-                        result += `<div class="small">${supplier.cvr}</div>`;
-                    }
-                    return result;
-                }
-
                 $scope.updateDataLevel = (optionId, checked, optionType) => {
                     var msg = notify.addInfoMessage("Arbejder ...", false);
                     if (checked === true) {
@@ -169,43 +146,7 @@
                     else {
                         $scope.selection.push(data);
                     }
-                };
-
-                $scope.saveDataworker = () => {
-                    var data = {
-                        ItSystemUsageId: $scope.usage.id,
-                        DataWorkerId: $scope.selectedDataWorker.id
-                    }
-                    $http.post(`api/UsageDataworker?organizationId=${user.currentOrganizationId}`, data)
-                        .success(() => {
-                            notify.addSuccessMessage("Databehandleren er tilknyttet.");
-                            reload();
-                        })
-                        .error(() => {
-                            notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
-                        });
-                };
-
-                $scope.deleteDataworker = dataworkerId => {
-                    $http.delete(`api/UsageDataWorker/${dataworkerId}?organizationid=${$scope.usage.organizationId}`)
-                        .success(() => {
-                            notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
-                            reload();
-                        })
-                        .error(() => {
-                            notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
-                        });
-                };
-
-                function reload() {
-                    return $state.transitionTo($state.current, $stateParams, {
-                        reload: true
-                    }).then(() => {
-                        $scope.hideContent = true;
-                        return $timeout(() => $scope.hideContent = false, 1);
-                    });
-                }
-                
+                };                
 
                 $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {
