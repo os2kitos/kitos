@@ -463,6 +463,7 @@ BEGIN
 		DprId, ItSystemUsageId
 	FROM 
 		@DprsWithForeignKeys_1_1
+	WHERE ItSystemUsageId IS NOT NULL
 
 	/*
 		Create DPR Data Worker
@@ -1693,6 +1694,7 @@ BEGIN
 		DprId, ItSystemUsageId
 	FROM 
 		@DprsWithForeignKeys_3_1
+	WHERE ItSystemUsageId IS NOT NULL
 
 	/*
 		Create DPR Data Worker
@@ -3084,6 +3086,7 @@ BEGIN
 		DprId, ItSystemUsageId
 	FROM 
 		@DprsWithForeignKeys_2_1
+	WHERE ItSystemUsageId IS NOT NULL
 
 	/*
 		Create DPR Data Worker
@@ -4311,6 +4314,7 @@ BEGIN
 		DprId, ItSystemUsageId
 	FROM 
 		@DprsWithForeignKeys_4_1
+	WHERE ItSystemUsageId IS NOT NULL
 
 	/*
 		Create DPR Data Worker
