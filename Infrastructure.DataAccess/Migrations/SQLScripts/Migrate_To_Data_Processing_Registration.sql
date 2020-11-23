@@ -454,6 +454,20 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_1_1 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+	/*
 		Create system DPR relations
 	*/
 
@@ -741,6 +755,21 @@ BEGIN
 		@DprsWithForeignKeys_1_2 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_1_2 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
 
 	/*
 		Create system DPR relations
@@ -1049,10 +1078,23 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
-		Create system DPR relations
+		Create contract datahandler_id -> DPR relations
 	*/
 
-	
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_1_3 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+
+	/*
+		Create system DPR relations
+	*/
 
 	INSERT INTO
 		DataProcessingRegistrationItSystemUsages (DataProcessingRegistration_Id, ItSystemUsage_Id)
@@ -1685,6 +1727,20 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_3_1 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+	/*
 		Create system DPR relations
 	*/
 
@@ -1968,6 +2024,20 @@ BEGIN
 		@DprsWithForeignKeys_3_2 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_3_2 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
 
 	/*
 		Create system DPR relations
@@ -2272,6 +2342,20 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_3_3 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+	/*
 		Create system DPR relations
 	*/
 
@@ -2452,7 +2536,7 @@ END
 BEGIN
 
 	/*
-		Prepare contracts to be deleted by removing child's foreign keys and then
+		Prepare contracts to be deleted by removing foreign keys and then
 		delete contracts as they were created as DPR's in migration situation 1
 	*/
 
@@ -2464,6 +2548,14 @@ BEGIN
 		FROM @DprsWithForeignKeys_1_1
 	)
 
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_1_1
+	)
+
 	DELETE
 	FROM
 		ItContractAgreementElementTypes
@@ -2481,6 +2573,10 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_1_1
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 
@@ -2488,6 +2584,14 @@ BEGIN
 	SET ParentId = null
 	WHERE
 		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_1_2
+	)
+
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_1_2
 	)
@@ -2509,6 +2613,10 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_1_2
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 
@@ -2516,6 +2624,14 @@ BEGIN
 	SET ParentId = null
 	WHERE
 		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_1_3
+	)
+
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_1_3
 	)
@@ -2537,12 +2653,24 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_1_3
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 	UPDATE ItContract
 	SET ParentId = null
 	WHERE
 		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_3_1
+	)
+	
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_1
 	)
@@ -2564,6 +2692,10 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_1
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 
@@ -2571,6 +2703,14 @@ BEGIN
 	SET ParentId = null
 	WHERE
 		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_3_2
+	)
+	
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_2
 	)
@@ -2592,6 +2732,10 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_2
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 
@@ -2599,6 +2743,14 @@ BEGIN
 	SET ParentId = null
 	WHERE
 		ParentId IN (
+		SELECT ItContractId
+		FROM @DprsWithForeignKeys_3_3
+	)
+	
+	UPDATE ItContract
+	SET DataHandlerId = null
+	WHERE
+		DataHandlerId IN (
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_3
 	)
@@ -2620,6 +2772,10 @@ BEGIN
 		SELECT ItContractId
 		FROM @DprsWithForeignKeys_3_3
 	)
+	AND Id NOT In (
+		SELECT ItContract_Id
+		FROM ItContractDataProcessingRegistrations
+		)
 
 
 END
@@ -3077,6 +3233,20 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_2_1 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+	/*
 		Create system DPR relations
 	*/
 
@@ -3359,6 +3529,20 @@ BEGIN
 		@DprsWithForeignKeys_2_2 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_2_2 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
 
 	/*
 		Create system DPR relations
@@ -3662,6 +3846,20 @@ BEGIN
 		@DprsWithForeignKeys_2_3 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_2_3 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
 
 	/*
 		Create system DPR relations
@@ -4305,6 +4503,20 @@ BEGIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
 
 	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_4_1 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
+
+	/*
 		Create system DPR relations
 	*/
 
@@ -4589,6 +4801,20 @@ BEGIN
 		@DprsWithForeignKeys_4_2 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_4_2 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
 
 	/*
 		Create system DPR relations
@@ -4891,6 +5117,20 @@ BEGIN
 		@DprsWithForeignKeys_4_3 AS dprsWithForeign
 		INNER JOIN
 		ItContract ON ParentId = dprsWithForeign.ItContractId
+
+	/*
+		Create contract datahandler_id -> DPR relations
+	*/
+
+	INSERT INTO
+		ItContractDataProcessingRegistrations (DataProcessingRegistration_Id, ItContract_Id)
+	SELECT
+		DprId, Id
+	FROM 
+		@DprsWithForeignKeys_4_3 AS dprsWithForeign
+		INNER JOIN
+		ItContract ON DataHandlerId = dprsWithForeign.ItContractId
+	WHERE NOT EXISTS (SELECT * FROM ItContractDataProcessingRegistrations)
 
 	/*
 		Create system DPR relations
