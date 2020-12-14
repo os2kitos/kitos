@@ -69,6 +69,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_DPR_IsOversightCompleted", 0);
 
             Property(x => x.ContractNamesAsCsv).IsOptional();
+
         }
     }
 }

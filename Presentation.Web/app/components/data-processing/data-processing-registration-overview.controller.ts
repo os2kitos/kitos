@@ -41,7 +41,7 @@
             //Helper functions
             const getRoleKey = (role: Kitos.Models.DataProcessing.IDataProcessingRoleDTO) => `role${role.id}`;
 
-            const extractOptionKey = (filterRequest: string, optionName: string) : number => {
+            const extractOptionKey = (filterRequest: string, optionName: string): number => {
                 var pattern = new RegExp(`(.*\\(?${optionName} eq ')(\\d)('.*)`);
                 var matchedString = filterRequest.replace(pattern, "$2");
                 return parseInt(matchedString);
@@ -56,7 +56,7 @@
                 if (filterUrl.indexOf(optionName) === -1) {
                     return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
                 }
-                
+
                 var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
                 var key = extractOptionKey(filterUrl, optionName);
                 if (key === emptyOptionKey) {
@@ -108,9 +108,9 @@
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, transferToInsecureThirdCountriesColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isAgreementConcludedColumnName, Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
-                            
+
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, oversightIntervalColumnName, Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided);
-                            
+
                             parameterMap.$filter = replaceOptionQuery(parameterMap.$filter, isOversightCompletedColumnName, Models.Api.Shared.YesNoUndecidedOption.Undecided);
 
                             parameterMap.$filter = replaceNullOptionQuery(parameterMap.$filter);
@@ -399,7 +399,16 @@
                             )
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted)))
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(dataItem.IsOversightCompleted && Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.IsOversightCompleted))))
-                    .withStandardSorting("Name");
+                            .withStandardSorting("Name")
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("LatestOversightDate")
+                        .withTitle("Seneste tilsyn")
+                            .withId("latestOversightDate")
+                        .withStandardWidth(160)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LatestOversightDate))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LatestOversightDate)));
 
             dataProcessingRegistrationOptions.roles.forEach(role =>
                 launcher = launcher.withColumn(builder =>
