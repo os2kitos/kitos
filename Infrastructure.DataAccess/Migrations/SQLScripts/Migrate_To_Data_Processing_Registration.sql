@@ -3456,29 +3456,6 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_2_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_2_1 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_2_1)
-		)
 
 
 	UPDATE
@@ -3825,29 +3802,6 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_2_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_2_2 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_2_2)
-		)
 
 
 	UPDATE
@@ -4193,7 +4147,7 @@ BEGIN
 		CarbonCopyReceiverId, 
 		Subject, 
 		ObjectOwnerId, 
-		LastChanged, 
+		GETUTCDATE(), 
 		LastChangedByUserId, 
 		dprsWithForeign.dprId, 
 		4, 
@@ -4206,29 +4160,6 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_2_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_2_3 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_2_3)
-		)
 
 	UPDATE
 		Advice
@@ -4929,29 +4860,7 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_4_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_4_1 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_4_1)
-		)
+
 
 	UPDATE
 		Advice
@@ -5299,29 +5208,7 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_4_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_4_2 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_4_2)
-		)
+	
 
 	UPDATE
 		Advice
@@ -5678,29 +5565,7 @@ BEGIN
 		INNER JOIN
 		@DprsWithForeignKeys_4_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
 	WHERE Type = 0
-		
-	INSERT INTO 
-		[kitos_HangfireDB].[HangFire].[Set]
-	SELECT
-		[Key],
-		Score,
-		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
-		ExpireAt
-	FROM 
-		[kitos_HangfireDB].[HangFire].[Set]
-		INNER JOIN
-			(Advice 
-			INNER JOIN
-			@New_Advice_4_3 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
-	WHERE 
-		Value IN (
-			SELECT 
-				JobId
-			FROM
-				Advice
-			WHERE 
-				Id IN (SELECT id FROM @New_Advice_4_3)
-		)
+
 
 	UPDATE
 		Advice
