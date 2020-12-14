@@ -659,6 +659,10 @@
     <Compile Include="Migrations\202011020834561_Remove_DPR_fields_from_system_usage_and_contract.designer.cs">
       <DependentUpon>202011020834561_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202012140756598_Added_latest_oversight_date.cs" />
+    <Compile Include="Migrations\202012140756598_Added_latest_oversight_date.designer.cs">
+      <DependentUpon>202012140756598_Added_latest_oversight_date.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1075,6 +1079,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202011020834561_Remove_DPR_fields_from_system_usage_and_contract.resx">
       <DependentUpon>202011020834561_Remove_DPR_fields_from_system_usage_and_contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012140756598_Added_latest_oversight_date.resx">
+      <DependentUpon>202012140756598_Added_latest_oversight_date.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
