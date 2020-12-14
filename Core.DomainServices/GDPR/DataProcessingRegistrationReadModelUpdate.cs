@@ -45,6 +45,7 @@ namespace Core.DomainServices.GDPR
             PatchOversightOptions(source, destination);
             PatchIsOversightCompleted(source, destination);
             PatchContracts(source, destination);
+            PatchLatestOversightDate(source, destination);
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,
@@ -181,6 +182,11 @@ namespace Core.DomainServices.GDPR
         private static void PatchIsOversightCompleted(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.IsOversightCompleted = source.IsOversightCompleted;
+        }
+
+        private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            destination.LatestOversightDate = source.LatestOversightDate;   
         }
     }
 }

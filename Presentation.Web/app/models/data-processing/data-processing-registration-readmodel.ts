@@ -18,6 +18,7 @@
         SubDataProcessorNamesAsCsv: string;
         IsAgreementConcluded?: Models.Api.Shared.YesNoIrrelevantOption;
         AgreementConcludedAt?: Date;
+        LatestOversightDate?: Date;
         TransferToInsecureThirdCountries?: Models.Api.Shared.YesNoUndecidedOption;
         BasisForTransfer?: string;
         OversightInterval?: Models.Api.Shared.YearMonthUndecidedIntervalOption;
