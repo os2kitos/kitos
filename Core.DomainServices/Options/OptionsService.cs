@@ -51,7 +51,10 @@ namespace Core.DomainServices.Options
                 .Select(x => x.OptionId)
                 .ToList();
 
-            var localDescriptions = localOptions.ToDictionary(x => x.OptionId, x => x.GetActiveDescription());
+            // LINQ doesn't like IsNullOrWhiteSpace("")
+            var localDescriptions = localOptions
+                .Where(x => !(x.Description == null || x.Description.Trim() == string.Empty))
+                .ToDictionary(x => x.OptionId, x => x.Description);
 
             var allLocallyEnabled = _optionRepository
                 .AsQueryable()
