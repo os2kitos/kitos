@@ -531,18 +531,19 @@ BEGIN
 	WHERE Type = 0 
 
 	/*
-		Copy contract refernces to DPR
+		Copy contract references to DPR
 	*/
 
 	DECLARE @DBRReferences_1_1_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_1_1_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId,
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -860,12 +861,13 @@ BEGIN
 	DECLARE @DBRReferences_1_2_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_1_2_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -1191,12 +1193,13 @@ BEGIN
 	DECLARE @DBRReferences_1_3_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_1_3_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -1856,12 +1859,13 @@ BEGIN
 	DECLARE @DBRReferences_3_1_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_3_1_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -2174,12 +2178,13 @@ BEGIN
 	DECLARE @DBRReferences_3_2_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_3_2_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -2502,12 +2507,13 @@ BEGIN
 	DECLARE @DBRReferences_3_3_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_3_3_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -3421,16 +3427,68 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	
+	DECLARE @New_Advice_2_1 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_2_1
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_2_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_2_1 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_2_1)
+		)
+
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_2_1 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -3439,12 +3497,13 @@ BEGIN
 	DECLARE @DBRReferences_2_1_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_2_1_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -3738,16 +3797,67 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	DECLARE @New_Advice_2_2 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_2_2
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_2_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_2_2 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_2_2)
+		)
+
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_2_2 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -3756,12 +3866,13 @@ BEGIN
 	DECLARE @DBRReferences_2_2_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_2_2_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -4067,16 +4178,66 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	DECLARE @New_Advice_2_3 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_2_3
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_2_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_2_3 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_2_3)
+		)
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_2_3 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -4085,12 +4246,13 @@ BEGIN
 	DECLARE @DBRReferences_2_3_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_2_3_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -4739,16 +4901,66 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	DECLARE @New_Advice_4_1 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_4_1
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_4_1 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_4_1 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_4_1)
+		)
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_4_1 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -4757,12 +4969,13 @@ BEGIN
 	DECLARE @DBRReferences_4_1_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_4_1_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -5058,16 +5271,66 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	DECLARE @New_Advice_4_2 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_4_2
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_4_2 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_4_2 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_4_2)
+		)
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_4_2 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -5076,12 +5339,13 @@ BEGIN
 	DECLARE @DBRReferences_4_2_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_4_2_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,
@@ -5386,16 +5650,66 @@ BEGIN
 		Update contract advices to DPR 
 	*/
 
-	UPDATE
-		Advice
-	SET
-		RelationId = dprsWithForeign.dprId,
-		Type = 4
+	DECLARE @New_Advice_4_3 table (rowNumber int IDENTITY(1,1) PRIMARY KEY, id int)
+
+	INSERT INTO 
+		Advice (IsActive, Name, AlarmDate, SentDate, ReceiverId, CarbonCopyReceiverId, Subject, ObjectOwnerId, LastChanged, LastChangedByUserId, RelationId, Type, Scheduling, StopDate, Body, JobId)
+	OUTPUT
+		inserted.Id into @New_Advice_4_3
+	SELECT 
+		IsActive, 
+		Name, 
+		AlarmDate, 
+		SentDate, 
+		ReceiverId, 
+		CarbonCopyReceiverId, 
+		Subject, 
+		ObjectOwnerId, 
+		LastChanged, 
+		LastChangedByUserId, 
+		dprsWithForeign.dprId, 
+		4, 
+		Scheduling, 
+		StopDate, 
+		Body, 
+		JobId
 	FROM 
 		Advice
 		INNER JOIN
 		@DprsWithForeignKeys_4_3 AS dprsWithForeign ON Advice.RelationId = dprsWithForeign.ItContractId
-	WHERE Type = 0 
+	WHERE Type = 0
+		
+	INSERT INTO 
+		[kitos_HangfireDB].[HangFire].[Set]
+	SELECT
+		[Key],
+		Score,
+		'Advice: ' + CONVERT(varchar(MAX), Advice.Id),
+		ExpireAt
+	FROM 
+		[kitos_HangfireDB].[HangFire].[Set]
+		INNER JOIN
+			(Advice 
+			INNER JOIN
+			@New_Advice_4_3 AS NewAdvice ON Advice.Id = NewAdvice.id) ON [Value] = JobId
+	WHERE 
+		Value IN (
+			SELECT 
+				JobId
+			FROM
+				Advice
+			WHERE 
+				Id IN (SELECT id FROM @New_Advice_4_3)
+		)
+
+	UPDATE
+		Advice
+	SET
+		JobId = 'Advice: ' + CONVERT(varchar(MAX), Advice.Id)
+	FROM 
+		Advice
+		INNER JOIN
+		@New_Advice_4_3 AS NewAdvice ON Advice.Id = NewAdvice.id
 
 	/*
 		Copy contract refernces to DPR
@@ -5404,12 +5718,13 @@ BEGIN
 	DECLARE @DBRReferences_4_3_1 Table (Id int)
 
 	INSERT INTO
-		ExternalReferences (Title, URL, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, ExternalReferenceId, Display, LastChanged, LastChangedByUserId, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_4_3_1
 	SELECT
 		Title,
 		URL,
+		ExternalReferenceId, 
 		Display,
 		LastChanged,
 		LastChangedByUserId,

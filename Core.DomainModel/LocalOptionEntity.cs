@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System;
+
+namespace Core.DomainModel
 {
     public abstract class LocalOptionEntity<OptionType> : Entity, IOwnedByOrganization
     {
@@ -8,15 +10,12 @@
 
         public int OrganizationId { get; set; }
 
+        [Obsolete("This will never be used")]  
         public virtual OptionEntity<OptionType> Option { get; set; }
 
         public int OptionId { get; set; }
 
         public bool IsActive { get; set; }
 
-        public string GetActiveDescription()
-        {
-            return string.IsNullOrWhiteSpace(Description) ? Option.Description : Description;
-        }
     }
 }
