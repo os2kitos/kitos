@@ -1099,6 +1099,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_To_Data_Processing_Registration.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
