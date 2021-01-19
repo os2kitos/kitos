@@ -23,6 +23,14 @@ class Select2Helper {
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
     }
 
+    public static searchForByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
+        console.log(`select2SearchFor: ${name}, in element with id: ${elementId} under parent: ${parent.getTagName().toString()}`);
+        parent.element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
+            .click()
+            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).click())
+            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
+    }
+
     public static select(name: string, elementId: string) {
         return this.searchFor(name, elementId)
             .then(() => this.waitForDataAndSelect())

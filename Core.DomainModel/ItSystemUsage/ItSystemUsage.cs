@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
@@ -32,7 +34,6 @@ namespace Core.DomainModel.ItSystemUsage
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
-            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
@@ -343,15 +344,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string GeneralPurpose { get; set; }
         public DataOptions? isBusinessCritical { get; set; }
 
-        public string dataProcessor { get; set; }
-        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
-        public DataOptions? dataProcessorControl { get; set; }
-        public DateTime? lastControl { get; set; }
-        public string datahandlerSupervisionDocumentationUrlName { get; set; }
-        public string datahandlerSupervisionDocumentationUrl { get; set; }
-
-        public string noteUsage { get; set; }
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
 
@@ -402,6 +395,14 @@ namespace Core.DomainModel.ItSystemUsage
         /// Defines how this system is used by other systems
         /// </summary>
         public virtual ICollection<SystemRelation> UsedByRelations { get; set; }
+        /// <summary>
+        /// DPAs using this system
+        /// </summary>
+        public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
+
+        public bool HasDataProcessingAgreement() =>
+            AssociatedDataProcessingRegistrations?.Any(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true;
+
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             ItSystemUsage toSystemUsage,

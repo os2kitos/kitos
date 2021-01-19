@@ -37,6 +37,7 @@ namespace Tools.Test.Database.Model.Tasks
             {
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData1"),
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData2"),
+                new CreateDprOptionTypesTask(),
                 new EnableAllOptionsTask(),
                 new CreateOrganizationTask((int)OrganizationTypeKeys.Kommune,SecondOrganizationName),
                 new CreateKitosUserTask(_globalAdmin, OrganizationRole.GlobalAdmin, DefaultOrganizationName),
@@ -49,6 +50,7 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateItContractTask("DefaultTestItContract"),
                 new CreateItProjectTask("DefaultTestItProject"),
                 new CreateItReportTask("DefaultTestReport"),
+                new CreateDataProcessingRegistrationTask("DefaultDpa"),
                 new CreateTaskRefTask(DefaultOrganizationName)
             }.AsReadOnly();
         }

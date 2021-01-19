@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -6,7 +7,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Reference;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.DomainServices
         private readonly Mock<IGenericRepository<ItSystem>> _systemRepository;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
-        private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<IGenericRepository<DataProcessingRegistration>> _dpaRepository;
 
         public ReferenceRepositoryTest()
         {
@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.DomainServices
             _systemRepository = new Mock<IGenericRepository<ItSystem>>();
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _projectRepository = new Mock<IGenericRepository<ItProject>>();
-            _domainEvents = new Mock<IDomainEvents>();
+            _dpaRepository = new Mock<IGenericRepository<DataProcessingRegistration>>();
             _sut = new ReferenceRepository
             (
                 new Mock<IGenericRepository<ExternalReference>>().Object,
@@ -37,7 +37,7 @@ namespace Tests.Unit.Core.DomainServices
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _projectRepository.Object,
-                _domainEvents.Object
+                _dpaRepository.Object
             );
         }
 
@@ -109,6 +109,23 @@ namespace Tests.Unit.Core.DomainServices
             Assert.Equal(expected.FromNullable<IEntityWithExternalReferences>(), actual);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void GetRootEntity_Returns_DataProcessingRegistration(bool returnsSome)
+        {
+            //Arrange
+            var id = A<int>();
+            var expected = returnsSome ? new DataProcessingRegistration() : null;
+            _dpaRepository.Setup(x => x.GetByKey(id)).Returns(expected);
+
+            //Act
+            var actual = _sut.GetRootEntity(id, ReferenceRootType.DataProcessingRegistration);
+
+            //Assert
+            Assert.Equal(expected.FromNullable<IEntityWithExternalReferences>(), actual);
+        }
+
         [Fact]
         public void SaveRootEntity_With_System()
         {
@@ -147,6 +164,16 @@ namespace Tests.Unit.Core.DomainServices
 
             //Assert
             _projectRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void SaveRootEntity_With_DataProcessingRegistration()
+        {
+            //Act
+            _sut.SaveRootEntity(new DataProcessingRegistration());
+
+            //Assert
+            _dpaRepository.Verify(x => x.Save(), Times.Once);
         }
     }
 }

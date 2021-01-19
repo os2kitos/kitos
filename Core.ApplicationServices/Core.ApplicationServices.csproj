@@ -10,6 +10,7 @@
     <RootNamespace>Core.ApplicationServices</RootNamespace>
     <AssemblyName>Core.ApplicationServices</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -109,11 +109,17 @@
     <Compile Include="Authorization\UserContextFactory.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationOptionsApplicationService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
+    <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\GDPR\DataProcessingRegistrationOptions.cs" />
+    <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
-    <Compile Include="Options\IOptionsService.cs" />
-    <Compile Include="Options\OptionsService.cs" />
     <Compile Include="KLE\IKLEApplicationService.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
     <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />
@@ -125,6 +131,7 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />
     <Compile Include="SSO\ISsoFlowApplicationService.cs" />

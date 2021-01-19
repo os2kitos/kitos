@@ -24,6 +24,13 @@ class SystemCatalogHelper {
             .then(() => console.log("System created"));
     }
 
+    public static createSystemAndActivateLocally(name: string) {
+        console.log(`Creating system: ${name}`);
+        return SystemCatalogHelper
+            .createSystem(name)
+            .then(() => SystemCatalogHelper.createLocalSystem(name));
+    }
+
     public static deleteSystem(name: string) {
         console.log(`Deleting system: ${name}`);
         return SystemCatalogHelper.getDeleteButtonForSystem(name)
@@ -34,7 +41,7 @@ class SystemCatalogHelper {
     public static getDeleteButtonForSystem(name: string) {
         console.log(`Getting button for system: ${name}`);
         return SystemCatalogHelper.openSystem(name)
-            .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(),SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => SystemCatalogHelper.systemPage.getDeleteButton());
     }
 
@@ -85,7 +92,8 @@ class SystemCatalogHelper {
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
+        return SystemCatalogHelper.pageObject.waitForKendoGrid();
+
     }
 }
 export = SystemCatalogHelper;

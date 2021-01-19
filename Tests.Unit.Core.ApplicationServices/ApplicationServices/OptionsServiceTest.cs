@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Core.ApplicationServices.Options;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
+using Core.DomainServices.Options;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -58,7 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var enabledOption1 = MakeOptionPair(organizationId, true, true, true);
             var enabledOption2 = MakeOptionPair(organizationId, false, true, true);
             var discardedOption = MakeOptionPair(organizationId, false, true);
-            SetupRepositories(enabledOption1, enabledOption2, discardedOption, discardedOption);
+            SetupRepositories(enabledOption1, enabledOption2, discardedOption);
 
             //Act
             var frequencyTypes = _sut.GetAvailableOptions(organizationId).ToList();

@@ -8,19 +8,20 @@ namespace Core.DomainModel.Advice
 {
     public enum ObjectType
     {
-        itContract,
-        itSystemUsage,
-        itProject,
-        itInterface
+        itContract = 0,
+        itSystemUsage = 1,
+        itProject = 2,
+        itInterface = 3,
+        dataProcessingRegistration = 4
     }
     public enum Scheduling
     {
-       Immediate,
-       Hour,
-       Day,
-       Week,
-       Month,
-       Year
+       Immediate = 0,
+       Hour = 1,
+       Day = 2,
+       Week = 3,
+       Month = 4,
+       Year = 5
 
     }
     /// <summary>

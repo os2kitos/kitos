@@ -23,7 +23,6 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     beforeEach(() => {
         testFixture.enableLongRunningTest();
         pageObject.getPage();
-        browser.waitForAngular();
     });
 
     afterEach(() => {

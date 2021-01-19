@@ -84,7 +84,12 @@
         ReportCategoryTypes,
         SensistivePersonalDataTypes,
         SensitiveDataTypes,
-        TerminationDeadlineTypes
+        TerminationDeadlineTypes,
+        DataProcessingRegistrationRoles,
+        DataProcessingBasisForTransferOptions,
+        DataProcessingOversightOptions,
+        DataProcessingDataResponsibleOptions,
+        DataProcessingCountryOptions,
     }
 
     export interface ILocalOptionUrlResolver {
@@ -173,6 +178,16 @@
                     return "LocalSensitiveDataTypes";
                 case LocalOptionType.TerminationDeadlineTypes:
                     return "LocalTerminationDeadlineTypes";
+                case LocalOptionType.DataProcessingRegistrationRoles:
+                    return "LocalDataProcessingRegistrationRoles";
+                case LocalOptionType.DataProcessingBasisForTransferOptions:
+                    return "LocalDataProcessingBasisForTransferOptions";
+                case LocalOptionType.DataProcessingOversightOptions:
+                    return "LocalDataProcessingOversightOptions";
+                case LocalOptionType.DataProcessingDataResponsibleOptions:
+                    return "LocalDataProcessingDataResponsibleOptions";
+                case LocalOptionType.DataProcessingCountryOptions:
+                    return "LocalDataProcessingCountryOptions";
                 default:
                     throw new Error(`Unknown option type ${type}`);
             }

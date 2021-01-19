@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Owin;
 using Owin;
 using Hangfire;
@@ -7,6 +8,7 @@ using Hangfire.Common;
 using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Web.Hangfire;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
@@ -52,19 +54,21 @@ namespace Presentation.Web
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
 
             app.UseHangfireDashboard();
-            app.UseHangfireServer();
+            app.UseHangfireServer(new KeepReadModelsInSyncProcess());
 
             ServiceEndpointConfiguration.ConfigureValidationOfOutgoingConnections();
 
-            new RecurringJobManager().AddOrUpdate(
+            var recurringJobManager = new RecurringJobManager();
+
+            recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.CheckExternalLinks,
-                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync()),
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync(CancellationToken.None)),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
                 timeZone: TimeZoneInfo.Local);
 
             new RecurringJobManager().AddOrUpdate(
                 recurringJobId: StandardJobIds.PurgeOrphanedAdvice,
-                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync()),
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync(CancellationToken.None)),
                 cronExpression: Cron.Hourly(),
                 timeZone: TimeZoneInfo.Local);
         }

@@ -6,6 +6,7 @@
     readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
     readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
+    readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractNameObject";
     readonly kendoButtonResetFilter = "resetFilterButton";
@@ -17,6 +18,7 @@
     readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
+    readonly kendoDpaNameObjects = "dpaNameKendoObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
@@ -49,6 +51,7 @@
     readonly startMigrationButton = "startMigration";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
+    readonly createDpaForm = "createDpaForm";
     readonly createReferenceForm = "referenceCreatorForm";
     readonly validUrl = "https://strongminds.dk/";
     readonly invalidUrl = "invalidUrl";
@@ -84,6 +87,7 @@
     readonly navigationSystemButton = "systemButton";
     readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
+    readonly navigationDataProcessingButton = "dataProcessingButton";
     readonly navigationReportsButton = "reportButton";
 
     readonly navigationDropdown = "dropdown-button";
@@ -158,7 +162,6 @@
 
     readonly hostedAtSelect2Id = "s2id_HostedAt";
     readonly gdprBusinessCriticalSelect2Id = "s2id_businessCritical";
-    readonly gdprDataProcessorControlSelect2Id = "s2id_dataProcessorControl";
     readonly gdprRiskAssessmentSelect2Id = "s2id_riskAssessment";
     readonly gdprDPIASelect2Id = "s2id_DPIA";
     readonly gdprAnsweringDataDPIASelect2Id = "s2id_answeringDataDPIA";
@@ -166,21 +169,17 @@
     readonly gdprsUserSupervisionSelect2Id = "s2id_userSupervision";
 
     readonly gdprGDPRSystemPurposeTextField = "GDPRSystemPurpose"; 
-    readonly gdprGDPRDataResponsibleTextField = "GDPRDataResponsible";
-    readonly gdprNoteUsageTextField = "GDPRNoteUsage";
     readonly gdprNoteRiskTextField = "GDPRNoteRisk";
 
     readonly gdprPreRiskAssessment = "s2id_preRiskAssessment";
     readonly gdprNumberDPIATextField = "GDPRNumberDPIA";
 
-    readonly gdprDataProcessLinkButton = "dataProcessLinkButton";
     readonly gdprNoteLinkButton = "NoteLinkButton";
     readonly gdprPrecautionLinkButton = "PrecautionLinkButton";
     readonly gdprSuperVisionLinkButton = "superVisionLinkButton";
     readonly gdprRiskLinkButton = "riskLinkButton";
     readonly gdprDPIALinkButton = "dpiaLinkButton";
 
-    readonly gdprDataProcessLinkField = "dataProcessLinkField";
     readonly gdprNoteLinkField = "NoteLinkField";
     readonly gdprPrecautionLinkField = "PrecautionLinkField";
     readonly gdprSuperVisionLinkField = "superVisionLinkField";
@@ -191,15 +190,16 @@
     readonly gdprModalUrlField = "gdprModalUrlField";
     readonly gdprModalNameField = "gdprModalNameField";
 
-    readonly gdprLastControlId = "lastControl";
     readonly gdprRiskAssesmentDateId = "riskAssesmentDate";
     readonly gdprDPIADateForId = "DPIADateFor";
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
+    readonly gdprDataProcessingRegistrationView = "gdprDataProcessingRegistrationView";
 
     //Local admin
 
     readonly itProjectIncludeModuleInput = "project-include";
+    readonly dataProcessingCheckbox = "DataProcessingCheckbox";
 
 }
 export = Constants;

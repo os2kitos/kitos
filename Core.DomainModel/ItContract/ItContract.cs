@@ -5,6 +5,9 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainModel.GDPR;
+using System.Linq;
+using Infrastructure.Services.Types;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -24,6 +27,7 @@ namespace Core.DomainModel.ItContract
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
             ExternalReferences = new List<ExternalReference>();
+            DataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
         /// <summary>
@@ -67,11 +71,6 @@ namespace Core.DomainModel.ItContract
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
-
-        public DataOptions ContainsDataHandlerAgreement { get; set; }
-
-        public string DataHandlerAgreementUrlName { get; set; }
-        public string DataHandlerAgreementUrl { get; set; }
 
         public int? DataHandlerId { get; set; }
         public virtual ItContract DataHandler { get; set; }
@@ -566,5 +565,36 @@ namespace Core.DomainModel.ItContract
         #endregion
 
         public virtual ICollection<SystemRelation> AssociatedSystemRelations { get; set; }
+
+        public virtual ICollection<GDPR.DataProcessingRegistration> DataProcessingRegistrations { get; set; }
+
+        public Result<DataProcessingRegistration, OperationError> AssignDataProcessingRegistration(DataProcessingRegistration registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+
+            if (GetAssignedDataProcessingRegistration(registration.Id).HasValue)
+                return new OperationError("Data processing registration is already assigned", OperationFailure.Conflict);
+
+            DataProcessingRegistrations.Add(registration);
+
+            return registration;
+        }
+
+        public Result<DataProcessingRegistration, OperationError> RemoveDataProcessingRegistration(DataProcessingRegistration registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+
+            if (GetAssignedDataProcessingRegistration(registration.Id).IsNone)
+                return new OperationError("Data processing registration not assigned", OperationFailure.BadInput);
+
+            DataProcessingRegistrations.Remove(registration);
+
+            return registration;
+        }
+
+        private Maybe<DataProcessingRegistration> GetAssignedDataProcessingRegistration(int dataProcessingRegistrationId)
+        {
+            return DataProcessingRegistrations.FirstOrDefault(x => x.Id == dataProcessingRegistrationId).FromNullable();
+        }
     }
 }

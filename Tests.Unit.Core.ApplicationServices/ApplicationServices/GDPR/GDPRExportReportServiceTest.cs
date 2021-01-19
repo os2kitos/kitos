@@ -4,15 +4,18 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -64,6 +67,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system = CreateItSystem(orgId);
             var contract = CreateItContract(datahandlerContractTypeId, datahandlerContractTypeName);
             var usage = CreateSystemUsage(system, contract, orgId);
+            usage.AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
+            {
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.YES, Name = A<string>()},
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.IRRELEVANT, Name = A<string>()}
+            };
 
             var sensitivePersonalDataType = CreateSensitivePersonalDataType();
 
@@ -73,11 +81,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system2 = CreateItSystem(orgId);
             var usage2 = CreateSystemUsage(system2, null, orgId);
 
-            IEnumerable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
+            IQueryable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
             {
                 usage,
                 usage2
-            };
+            }.AsQueryable();
 
             IEnumerable<AttachedOption> attachedOptions = new List<AttachedOption>()
             {
@@ -129,11 +137,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var system2 = CreateItSystem(orgId);
             var usage2 = CreateSystemUsage(system2, null, orgId);
 
-            IEnumerable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
+            IQueryable<ItSystemUsage> itSystemUsages = new List<ItSystemUsage>()
             {
                 usage,
                 usage2
-            };
+            }.AsQueryable();
 
             IEnumerable<AttachedOption> attachedOptions = new List<AttachedOption>()
             {
@@ -184,12 +192,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             Assert.Equal(usage.ItSystem.Name, gdprExportReport.SystemName);
             Assert.Equal(usage.isBusinessCritical, gdprExportReport.BusinessCritical);
-            Assert.Equal(usage.dataProcessorControl, gdprExportReport.DataProcessorControl);
             Assert.Equal(usage.DPIA, gdprExportReport.DPIA);
             Assert.Equal(usage.riskAssessment, gdprExportReport.RiskAssessment);
             Assert.Equal(usage.preriskAssessment, gdprExportReport.PreRiskAssessment);
 
-            if (! string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
+            if (!string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
             {
                 Assert.True(gdprExportReport.LinkToDirectory);
             }
@@ -198,21 +205,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            if (usage.Contracts.Any(x =>
-            {
-                if (x.ItContract.ContractType != null)
-                {
-                    return x.ItContract.ContractType.Id == datahandlerContractTypeId;
-                }
-                return false;
-            }))
-            {
-                Assert.True(gdprExportReport.DataProcessorContract);
-            }
-            else
-            {
-                Assert.False(gdprExportReport.DataProcessorContract);
-            }
+            Assert.Equal(usage.AssociatedDataProcessingRegistrations?.Any(x=>x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true, gdprExportReport.DataProcessingAgreementConcluded);
 
             if (usage.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE))
             {
@@ -314,7 +307,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 } : new List<ItContractItSystemUsage>(),
                 OrganizationId = orgId,
                 isBusinessCritical = A<DataOptions>(),
-                dataProcessorControl = A<DataOptions>(),
                 DPIA = A<DataOptions>(),
                 riskAssessment = A<DataOptions>(),
                 LinkToDirectoryUrl = A<string>(),

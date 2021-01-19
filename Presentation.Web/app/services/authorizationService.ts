@@ -64,6 +64,7 @@
         createContractAuthorization(): IOperationAuthorizationService;
         createProjectAuthorization(): IOperationAuthorizationService;
         createInterfaceAuthorization(): IOperationAuthorizationService;
+        createDataProcessingRegistrationAuthorization(): IOperationAuthorizationService;
     }
 
     export class AuthorizationServiceFactory implements IAuthorizationServiceFactory{
@@ -108,6 +109,10 @@
 
         createInterfaceAuthorization(): IOperationAuthorizationService {
             return this.createFor("ItInterface");
+        }
+
+        createDataProcessingRegistrationAuthorization(): IOperationAuthorizationService {
+            return this.createFor("v1/data-processing-registration");
         }
     }
 

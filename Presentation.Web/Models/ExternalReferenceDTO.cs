@@ -15,6 +15,7 @@ namespace Presentation.Web.Models
         public int? ItContract_Id { get; set; }
         public int? ItSystemUsage_Id { get; set; }
         public int? ItSystem_Id { get; set; }
+        public int? DataProcessingRegistration_Id;
         public DateTime Created { get; set; }
     }
 }

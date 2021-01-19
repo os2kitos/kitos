@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Options;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItContract;
@@ -10,6 +9,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;

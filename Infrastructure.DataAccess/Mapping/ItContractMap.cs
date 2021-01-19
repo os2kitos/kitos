@@ -64,6 +64,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
+
+            HasMany(x => x.DataProcessingRegistrations)
+                .WithMany(x => x.AssociatedContracts);
         }
     }
 }

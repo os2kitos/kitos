@@ -11,8 +11,7 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public bool SensitiveData { get; set; }
         public bool LegalData { get; set; }
         public DataOptions? BusinessCritical { get; set; }
-        public bool DataProcessorContract { get; set; }
-        public DataOptions? DataProcessorControl { get; set; }
+        public bool DataProcessingAgreementConcluded { get; set; }
         public bool LinkToDirectory { get; set; }
         public IEnumerable<string> SensitiveDataTypes { get; set; }
         public DataOptions? RiskAssessment { get; set; }

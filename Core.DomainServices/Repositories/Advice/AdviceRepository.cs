@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using NotImplementedException = System.NotImplementedException;
 
 namespace Core.DomainServices.Repositories.Advice
 {
@@ -16,19 +16,22 @@ namespace Core.DomainServices.Repositories.Advice
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly IGenericRepository<ItProject> _itProjectRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
+        private readonly IGenericRepository<DataProcessingRegistration> _dprRepository;
 
         public AdviceRepository(
             IGenericRepository<DomainModel.Advice.Advice> advicesRepository,
             IGenericRepository<ItContract> contractRepository,
             IGenericRepository<ItInterface> interfaceRepository,
             IGenericRepository<ItProject> itProjectRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
+            IGenericRepository<DataProcessingRegistration> dprRepository)
         {
             _advicesRepository = advicesRepository;
             _contractRepository = contractRepository;
             _interfaceRepository = interfaceRepository;
             _itProjectRepository = itProjectRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
+            _dprRepository = dprRepository;
         }
 
         public IQueryable<DomainModel.Advice.Advice> GetOrphans()
@@ -37,11 +40,13 @@ namespace Core.DomainServices.Repositories.Advice
             var interfaceAdvices = GetOrphans(_interfaceRepository.AsQueryable(), ObjectType.itInterface);
             var systemUsageAdvices = GetOrphans(_itSystemUsageRepository.AsQueryable(), ObjectType.itSystemUsage);
             var projectAdvices = GetOrphans(_itProjectRepository.AsQueryable(), ObjectType.itProject);
+            var dprAdvices = GetOrphans(_dprRepository.AsQueryable(), ObjectType.dataProcessingRegistration);
 
             return contractAdvices
                 .Concat(interfaceAdvices)
                 .Concat(systemUsageAdvices)
                 .Concat(projectAdvices)
+                .Concat(dprAdvices)
                 .Distinct()
                 .OrderBy(x => x.Id);
         }

@@ -20,6 +20,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [RoutePrefix("api/itcontract")]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
 
     {
@@ -267,6 +268,52 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [HttpGet]
+        [Route("{id}/data-processing-registration/available")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetAvailableDataProcessingRegistrations(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            return _itContractService
+                .GetDataProcessingRegistrationsWhichCanBeAssigned(id, nameQuery, pageSize)
+                .Match(systems => Ok(systems.Select(x => x.MapToNamedEntityDTO()).ToList()), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/data-processing-registration/assign")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        {
+            if (dataProcessingRegistrationId == null)
+                return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
+
+            return _itContractService
+                .AssignDataProcessingRegistration(id, dataProcessingRegistrationId.Value)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/data-processing-registration/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> dataProcessingRegistrationId)
+        {
+            if (dataProcessingRegistrationId == null)
+                return BadRequest($"{nameof(dataProcessingRegistrationId)} must be provided");
+
+            return _itContractService
+                .RemoveDataProcessingRegistration(id, dataProcessingRegistrationId.Value)
+                .Match(_ => Ok(), FromOperationError);
         }
 
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)

@@ -11,6 +11,9 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
@@ -137,9 +140,24 @@ namespace Infrastructure.DataAccess
         public DbSet<KLEUpdateHistoryItem> KLEUpdateHistoryItems { get; set; }
         public DbSet<SystemRelation> SystemRelations { get; set; }
         public DbSet<BrokenExternalReferencesReport> BrokenExternalReferencesReports { get; set; }
-        public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels{ get; set; }
+        public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels { get; set; }
         public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
-        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities{ get; set; }
+        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
+        public DbSet<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
+        public DbSet<DataProcessingRegistrationRole> DataProcessingRegistrationRoles { get; set; }
+        public DbSet<LocalDataProcessingRegistrationRole> LocalDataProcessingRegistrationRoles { get; set; }
+        public DbSet<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
+        public DbSet<DataProcessingRegistrationReadModel> DataProcessingRegistrationReadModels { get; set; }
+        public DbSet<DataProcessingRegistrationRoleAssignmentReadModel> DataProcessingRegistrationRoleAssignmentReadModels { get; set; }
+        public DbSet<PendingReadModelUpdate> PendingReadModelUpdates { get; set; }
+        public DbSet<DataProcessingBasisForTransferOption> DataProcessingBasisForTransferOptions { get; set; }
+        public DbSet<DataProcessingOversightOption> DataProcessingOversightOptions { get; set; }
+        public DbSet<DataProcessingDataResponsibleOption> DataProcessingDataResponsibleOptions { get; set; }
+        public DbSet<DataProcessingCountryOption> DataProcessingCountryOptions { get; set; }
+        public DbSet<LocalDataProcessingBasisForTransferOption> LocalDataProcessingBasisForTransferOptions { get; set; }
+        public DbSet<LocalDataProcessingOversightOption> LocalDataProcessingOversightOptions { get; set; }
+        public DbSet<LocalDataProcessingDataResponsibleOption> LocalDataProcessingDataResponsibleOptions { get; set; }
+        public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -215,7 +233,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-            modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
             modelBuilder.Configurations.Add(new SystemRelationMap());
@@ -225,6 +242,15 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
             modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationRightMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationRoleMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationReadModelMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationRoleAssignmentReadModelMap());
+            modelBuilder.Configurations.Add(new DataProcessingBasisForTransferOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingOversightOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingDataResponsibleOptionMap());
+            modelBuilder.Configurations.Add(new DataProcessingCountryOptionMap());
         }
     }
 }

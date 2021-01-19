@@ -85,7 +85,6 @@ describe("Global admin is able to", () => {
         return Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprBusinessCriticalSelect2Id)
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprDPIASelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprAnsweringDataDPIASelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprDataProcessorControlSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprRiskAssessmentSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprPrecautionsSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprsUserSupervisionSelect2Id))
@@ -95,8 +94,7 @@ describe("Global admin is able to", () => {
 
     function fillOutDateFields() {
         console.log("Entering a date into date fields");
-        return ItSystemUsageGDPRPage.getLastControlDateField().sendKeys(dateValue)
-            .then(() => ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue))
+        return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue)
             .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue));
@@ -108,16 +106,12 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(protractor.Key.BACK_SPACE)
             .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(numberValue))
             .then(() => ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(purposeText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField().sendKeys(dataResponsibleText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNoteUsageTextField().sendKeys(noteUsageText))
             .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText));
     }
 
     function fillOutLinkFields() {
         console.log("Entering Urls into the link fields");
-        return ItSystemUsageGDPRPage.getDataProcessLinkButton().click()
-            .then(() => fillOutModalLinkWindow())
-            .then(() => ItSystemUsageGDPRPage.getDPIALinkButton().click())
+        return ItSystemUsageGDPRPage.getDPIALinkButton().click()
             .then(() => fillOutModalLinkWindow())
             .then(() => ItSystemUsageGDPRPage.getNoteLinkButton().click())
             .then(() => fillOutModalLinkWindow())
@@ -157,7 +151,6 @@ describe("Global admin is able to", () => {
     function verifyDropDown() {
         console.log("Verifying drop down");
         expectDropdownValueToEqual(dropdownYes, consts.gdprBusinessCriticalSelect2Id);
-        expectDropdownValueToEqual(dropdownYes, consts.gdprDataProcessorControlSelect2Id);
         expectDropdownValueToEqual(dropdownYes, consts.gdprRiskAssessmentSelect2Id);
         expectDropdownValueToEqual(dropdownYes, consts.gdprDPIASelect2Id);
         expectDropdownValueToEqual(dropdownYes, consts.gdprAnsweringDataDPIASelect2Id);
@@ -167,7 +160,6 @@ describe("Global admin is able to", () => {
 
     function verifyDateFields() {
         console.log("Verifying date fields");
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getLastControlDateField())).toEqual(dateValue);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getRiskAssesmentDateField())).toEqual(dateValue);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADateField())).toEqual(dateValue);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getDPIADeleteDateField())).toEqual(dateValue);
@@ -176,8 +168,6 @@ describe("Global admin is able to", () => {
     function verifyTextFields() {
         console.log("Verifying text fields");
         expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField())).toEqual(purposeText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRDataResponsibleTextField())).toEqual(dataResponsibleText);
-        expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteUsageTextField())).toEqual(noteUsageText);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNoteRiskTextField())).toEqual(noteRiskText);
         expect(getValueAttribute(ItSystemUsageGDPRPage.getGDPRNumberDPIAField())).toEqual(numberValue);
     }
@@ -185,14 +175,12 @@ describe("Global admin is able to", () => {
     function verifyLinkFields() {
         console.log("Verifying link fields");
         console.log("Checking Url");
-        expect(getHrefUrl(ItSystemUsageGDPRPage.getDataProcessLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getNoteLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getPrecautionLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getSuperVisionLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getRiskLinkField())).toEqual(testUrl);
         expect(getHrefUrl(ItSystemUsageGDPRPage.getDPIALinkField())).toEqual(testUrl);
         console.log("Checking Name");
-        expect(ItSystemUsageGDPRPage.getDataProcessLinkField().getText()).toEqual(urlNameText);
         expect(ItSystemUsageGDPRPage.getNoteLinkField().getText()).toEqual(urlNameText);
         expect(ItSystemUsageGDPRPage.getPrecautionLinkField().getText()).toEqual(urlNameText);
         expect(ItSystemUsageGDPRPage.getSuperVisionLinkField().getText()).toEqual(urlNameText);

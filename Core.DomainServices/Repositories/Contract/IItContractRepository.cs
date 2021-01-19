@@ -9,5 +9,6 @@ namespace Core.DomainServices.Repositories.Contract
         ItContract GetById(int contractId);
         IQueryable<ItContract> GetByOrganizationId(int organizationId);
         void DeleteContract(ItContract contract);
+        void Update(ItContract contract);
     }
 }

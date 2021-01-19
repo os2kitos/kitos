@@ -10,6 +10,7 @@
     <RootNamespace>Core.DomainModel</RootNamespace>
     <AssemblyName>Core.DomainModel</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -25,7 +26,6 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,33 +55,46 @@
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
+    <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="Events\EnabledStatusChanged.cs" />
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationConstraints.cs" />
+    <Compile Include="GDPR\DataProcessingRegistration.cs" />
+    <Compile Include="GDPR\DataProcessingCountryOption.cs" />
+    <Compile Include="GDPR\DataProcessingDataResponsibleOption.cs" />
+    <Compile Include="GDPR\DataProcessingOversightOption.cs" />
+    <Compile Include="GDPR\DataProcessingBasisForTransferOption.cs" />
+    <Compile Include="GDPR\Read\DataProcessingRegistrationReadModel.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationRight.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationRole.cs" />
+    <Compile Include="GDPR\Read\DataProcessingRegistrationRoleAssignmentReadModel.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Extensions\HasOrganizationExtensions.cs" />
     <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithEnabledStatus.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />
+    <Compile Include="IHasId.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
+    <Compile Include="IReadModel.cs" />
     <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
+    <Compile Include="ItContract\IDataProcessingModule.cs" />
     <Compile Include="ItContract\ItContractConstraints.cs" />
     <Compile Include="ItProject\ItProjectConstraints.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
-    <Compile Include="ItSystemUsage\DomainEvents\SystemUsageDeleted.cs" />
     <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
     <Compile Include="ItSystemUsage\GDPR\SensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\DomainEvents\ExposingSystemChanged.cs" />
-    <Compile Include="ItSystem\DomainEvents\InterfaceDeleted.cs" />
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
-    <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
     <Compile Include="KLE\KLEChange.cs" />
@@ -89,6 +102,11 @@
     <Compile Include="KLE\KLEMostRecent.cs" />
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingRegistrationRole.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingCountryOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingDataResponsibleOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingOversightOption.cs" />
+    <Compile Include="LocalOptions\LocalDataProcessingBasisForTransferOption.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />
@@ -216,7 +234,6 @@
     <Compile Include="Qa\References\IBrokenLink.cs" />
     <Compile Include="Qa\References\IBrokenLinkWithOrigin.cs" />
     <Compile Include="References\AddReferenceCommand.cs" />
-    <Compile Include="References\DomainEvents\ExternalReferenceDeleted.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
@@ -225,6 +242,9 @@
     <Compile Include="Result\OperationError.cs" />
     <Compile Include="Result\OperationFailure.cs" />
     <Compile Include="Result\Result.cs" />
+    <Compile Include="GDPR\YearMonthIntervalOption.cs" />
+    <Compile Include="Shared\YesNoUndecidedOption.cs" />
+    <Compile Include="Shared\YesNoIrrelevantOption.cs" />
     <Compile Include="SSO\SsoOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
     <Compile Include="Text.cs" />

@@ -45,7 +45,7 @@
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
             private $scope,
-            private localOptionUrlResolver: Kitos.Services.LocalOptions.LocalOptionUrlResolver) {
+            private localOptionUrlResolver: Kitos.Services.LocalOptions.ILocalOptionUrlResolver) {
 
             this.$scope.$state = $state;
             this.editState = $scope.editState;

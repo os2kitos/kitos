@@ -18,6 +18,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 
         [EnableQuery]
         [ODataRoute]
+        [RequireTopOnOdataThroughKitosToken]
         public override IHttpActionResult GetByOrganizationId(int organizationId) => base.GetByOrganizationId(organizationId);
 
         [EnableQuery]

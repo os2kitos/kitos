@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Advice;
@@ -28,38 +29,36 @@ namespace Core.BackgroundJobs.Model.Advice
             _logger = logger;
         }
 
-        public Task<Result<string, OperationError>> ExecuteAsync()
+        public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            var purgedAdviceCount = 0;
+
+            var orphans = _adviceRepository.GetOrphans().ToList();
+            if (orphans.Any())
             {
-                var purgedAdviceCount = 0;
-
-                var orphans = _adviceRepository.GetOrphans().ToList();
-                if (orphans.Any())
+                _logger.Information("Purging {orphanCount} orphaned advices", orphans.Count);
+                foreach (var orphan in orphans)
                 {
-                    _logger.Information("Purging {orphanCount} orphaned advices", orphans.Count);
-                    foreach (var orphan in orphans)
+                    try
                     {
-                        try
-                        {
-                            _logger.Debug("Removing orphaned advice with id '{id}', job id '{jobId}',type '{relationType}', and parent id '{relationId}'", orphan.Id, orphan.JobId ?? string.Empty, orphan.Type, orphan.RelationId);
-                            RecurringJob.RemoveIfExists(orphan.JobId ?? string.Empty);
-                            _adviceRepository.Delete(orphan);
-                            purgedAdviceCount++;
-                            _logger.Debug("Removed advice with id '{adviceId}'", orphan.Id);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.Error(e, "Failed while deleting advice with id: {adviceId}", orphan.Id);
-                        }
-
+                        _logger.Debug("Removing orphaned advice with id '{id}', job id '{jobId}',type '{relationType}', and parent id '{relationId}'", orphan.Id, orphan.JobId ?? string.Empty, orphan.Type, orphan.RelationId);
+                        RecurringJob.RemoveIfExists(orphan.JobId ?? string.Empty);
+                        _adviceRepository.Delete(orphan);
+                        purgedAdviceCount++;
+                        _logger.Debug("Removed advice with id '{adviceId}'", orphan.Id);
                     }
-                    _logger.Information("Purged {orphanCount} orphaned advices", purgedAdviceCount);
-                }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "Failed while deleting advice with id: {adviceId}", orphan.Id);
+                    }
 
-                transaction.Commit();
-                return Task.FromResult(Result<string, OperationError>.Success($"Purged {purgedAdviceCount} advices"));
+                }
+                _logger.Information("Purged {orphanCount} orphaned advices", purgedAdviceCount);
             }
+
+            transaction.Commit();
+            return Task.FromResult(Result<string, OperationError>.Success($"Purged {purgedAdviceCount} advices"));
         }
     }
 }

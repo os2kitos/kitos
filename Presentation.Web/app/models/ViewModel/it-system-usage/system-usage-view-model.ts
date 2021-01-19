@@ -30,25 +30,25 @@
 
 
     export class DataOptions {
-        options: Select2OptionViewModel[];
+        options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel>{ id: 3, text: "&nbsp" },
-                <Select2OptionViewModel>{ id: 1, text: "Ja" },
-                <Select2OptionViewModel>{ id: 0, text: "Nej" },
-                <Select2OptionViewModel>{ id: 2, text: "Ved ikke" }
+                <Select2OptionViewModel<any>>{ id: 3, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 1, text: "Ja" },
+                <Select2OptionViewModel<any>>{ id: 0, text: "Nej" },
+                <Select2OptionViewModel<any>>{ id: 2, text: "Ved ikke" }
             ];
         }
     }
 
     export class RiskLevelOptions {
-        options: Select2OptionViewModel[];
+        options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel>{ id: 3, text: "&nbsp" },
-                <Select2OptionViewModel>{ id: 0, text: "Lav risiko" },
-                <Select2OptionViewModel>{ id: 1, text: "Mellem risiko" },
-                <Select2OptionViewModel>{ id: 2, text: "Høj risiko" }
+                <Select2OptionViewModel<any>>{ id: 3, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 0, text: "Lav risiko" },
+                <Select2OptionViewModel<any>>{ id: 1, text: "Mellem risiko" },
+                <Select2OptionViewModel<any>>{ id: 2, text: "Høj risiko" }
             ];
         }
 
@@ -82,12 +82,12 @@
     }
 
     export class HostedAtOptions {
-        options: Select2OptionViewModel[];
+        options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel>{ id: 0, text: "&nbsp" },
-                <Select2OptionViewModel>{ id: 1, text: "On-premise" },
-                <Select2OptionViewModel>{ id: 2, text: "Eksternt" }
+                <Select2OptionViewModel<any>>{ id: 0, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 1, text: "On-premise" },
+                <Select2OptionViewModel<any>>{ id: 2, text: "Eksternt" }
             ];
         }
     }
@@ -105,7 +105,6 @@
         personalDataSelected: boolean;
         noDataSelected: boolean;
         isBusinessCritical: DataOption;
-        dataProcessorControl: DataOption;
         precautions: DataOption;
         userSupervision: DataOption;
         riskAssessment: DataOption;
@@ -128,7 +127,6 @@
         isActive: boolean;
         active: boolean;
         isBusinessCritical: DataOption;
-        dataProcessorControl: DataOption;
         precautions: DataOption;
         userSupervision: DataOption;
         riskAssessment: DataOption;
@@ -153,7 +151,6 @@
             this.legalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.legal.value);
 
             this.isBusinessCritical = this.mapDataOption(itSystemUsage.isBusinessCritical);
-            this.dataProcessorControl = this.mapDataOption(itSystemUsage.dataProcessorControl);
             this.precautions = this.mapDataOption(itSystemUsage.precautions);
             this.userSupervision = this.mapDataOption(itSystemUsage.userSupervision);
             this.riskAssessment = this.mapDataOption(itSystemUsage.riskAssessment);

@@ -228,8 +228,6 @@
                     return "Ja";
                 case "NO":
                     return "Nej";
-                case "DONTKNOW":
-                    return "Ved ikke";
                 default:
                     return "";
             }
@@ -252,7 +250,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline`;
+                                    `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,DataProcessingRegistrations($select=IsAgreementConcluded)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -571,7 +569,7 @@
                         field: "Reference.ExternalReferenceId", title: "Dokument ID / Sagsnr.", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
+                            return Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
@@ -616,26 +614,27 @@
                         filterable: false
                     },
                     {
-                        field: "ContainsDataHandlerAgreement", title: "Databehandleraftale", width: 150,
-                        persistId: "ContainsDataHandlerAgreement", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem && dataItem.ContainsDataHandlerAgreement || "",
-                        template: dataItem => this.parseOptionEnum(dataItem.ContainsDataHandlerAgreement),
-                        attributes: { "class": "text-right" },
-                        hidden: true,
-                        sortable: false,
-                        filterable: {
-                            cell: {
-                                template: function (args) {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Ja", value: "YES" }, { type: "Nej", value: "NO" }, { type: "Ved ikke", value: "DONTKNOW" }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
+                        field: "DataProcessingRegistrationsConcluded", title: "Databehandleraftale", width: 150,
+                        persistId: "dataProcessingRegistrationsConcluded",
+                        template: dataItem => {
+                            if (dataItem.DataProcessingRegistrations && dataItem.DataProcessingRegistrations.length > 0) {
+                                const choicesToRender = dataItem
+                                    .DataProcessingRegistrations
+                                    .filter(registration => registration.IsAgreementConcluded !== null &&
+                                        registration.IsAgreementConcluded !==
+                                        Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED);
+                                if (choicesToRender.length > 0) {
+                                    return choicesToRender
+                                        .map(dpr => Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(dpr.IsAgreementConcluded))
+                                        .reduce((combined: string, next: string, _) => combined.length === 0 ? next : `${combined}, ${next}`, "");
+                                }
                             }
-                        }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
                     },
                     {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
