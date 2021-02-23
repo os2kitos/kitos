@@ -267,7 +267,7 @@
                             };
 
                             $scope.send = () => {
-                                var url = "Odata/advice";
+                                var url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                                 var payload = createPayload();
                                 httpCall(payload, action, url);
                             };
@@ -354,10 +354,10 @@
                                     }
                                 }).error(function () {
                                     if (action === "POST") {
-                                        notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
+                                        notify.addErrorMessage("Fejl! Kunne ikke oprette advis!");
                                     }
                                     if (action === "PATCH") {
-                                        notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
+                                        notify.addErrorMessage("Fejl! Kunne ikke opdatere advis!");
                                     }
                                 })
                             }
