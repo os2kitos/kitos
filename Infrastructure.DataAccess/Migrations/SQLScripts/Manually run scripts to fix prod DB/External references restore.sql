@@ -1,3 +1,5 @@
+/* KITOSUDV-1285 external references was not initially copied over */
+
 /* Restore external references */
 /* REMEMBER TO CHECK WHICH TABLES ARE SET */
 UPDATE prodTable
