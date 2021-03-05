@@ -128,19 +128,18 @@
 
             this.milestonesActivities = [];
             this.$http.get(url)
-                .success((result, status, headers) => {
-                    var paginationHeader = JSON.parse(headers("X-Pagination"));
+                .then(function onSuccess(result) {
+                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
                     this.totalCount = paginationHeader.TotalCount;
 
-                    _.each(result.response, (value) => {
+                    _.each(result.data.response, (value) => {
                         this.addStatus(value, null);
                     });
 
-                })
-                .error((data, status) => {
+                }, function onError(result) {
                     // only display error when an actual error
                     // 404 just says that there are no statuses
-                    if (status != 404) {
+                    if (result.status != 404) {
                         this.notify.addErrorMessage("Kunne ikke hente projekter!");
                     }
                 });
@@ -181,12 +180,13 @@
 
             activity.delete = () => {
                 var msg = this.notify.addInfoMessage("Sletter...");
-                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId).success(() => {
-                    activity.show = false;
-                    msg.toSuccessMessage("Slettet!");
-                }).error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                });
+                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        activity.show = false;
+                        msg.toSuccessMessage("Slettet!");
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                    });
             };
 
             if (!skipAdding)
@@ -212,26 +212,26 @@
                         usersWithRoles: [
                             "$http", "$stateParams",
                             ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
-                            .then(rightResult => {
-                                var rights = rightResult.data.response;
+                                .then(rightResult => {
+                                    var rights = rightResult.data.response;
 
-                                //get the role names
-                                //the resulting map
-                                var users = {};
-                                _.each(rights, (right: { userId; user; roleName; }) => {
+                                    //get the role names
+                                    //the resulting map
+                                    var users = {};
+                                    _.each(rights, (right: { userId; user; roleName; }) => {
 
-                                    //use the user from the map if possible
-                                    var user = users[right.userId] || right.user;
+                                        //use the user from the map if possible
+                                        var user = users[right.userId] || right.user;
 
-                                    var roleNames = user.roleNames || [];
-                                    roleNames.push(right.roleName);
-                                    user.roleNames = roleNames;
+                                        var roleNames = user.roleNames || [];
+                                        roleNames.push(right.roleName);
+                                        user.roleNames = roleNames;
 
-                                    users[right.userId] = user;
-                                });
+                                        users[right.userId] = user;
+                                    });
 
-                                return users;
-                            })
+                                    return users;
+                                })
                         ],
                         statusUpdates: [
                             "$http", "$stateParams",

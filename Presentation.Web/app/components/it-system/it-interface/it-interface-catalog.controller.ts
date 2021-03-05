@@ -149,7 +149,7 @@
                             });
                             return response;
                         }
-                    },                
+                    },
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
@@ -228,12 +228,12 @@
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
-                            },
+                            return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
+                        },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
-                                return Helpers.InterfaceNameFormat.apply(dataItem.Name,dataItem.Disabled);
-                                } else {
+                                return Helpers.InterfaceNameFormat.apply(dataItem.Name, dataItem.Disabled);
+                            } else {
                                 return "";
                             }
                         },
@@ -312,7 +312,7 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem && dataItem.ExhibitedBy.ItSystem.Name)
-                                return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name,dataItem.ExhibitedBy.ItSystem.Disabled);
+                                return Helpers.SystemNameFormat.apply(dataItem.ExhibitedBy.ItSystem.Name, dataItem.ExhibitedBy.ItSystem.Disabled);
                             else
                                 return "";
                         },
@@ -485,11 +485,11 @@
 
                         var msg = self.notify.addInfoMessage("Opretter snitflade...", false);
                         self.$http.post("api/itinterface", payload)
-                            .success(function (result) {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("En ny snitflade er oprettet!");
-                                var interfaceId = result.response.id;
+                                var interfaceId = result.data.response.id;
                                 $modalInstance.close(interfaceId);
-                            }).error(function () {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette snitflade!");
                             });
                     };
@@ -633,8 +633,8 @@
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                            .createInterfaceAuthorization()
-                            .getOverviewAuthorization()
+                                .createInterfaceAuthorization()
+                                .getOverviewAuthorization()
                         ],
                     }
                 });

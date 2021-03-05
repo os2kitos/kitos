@@ -160,10 +160,9 @@
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: 'PATCH', url: url, data: payload })
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }

@@ -43,18 +43,19 @@
                 AccessModifier: this.org.AccessModifier,
                 Cvr: this.org.Cvr
             }
-            this.$http.post("odata/Organizations", payload).success((organization) => {
-                if (this.org.TypeId === 2) {
-                    this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet med ${this.currentUser.fullName} som lokal admin.`);
-                    this.userService.reAuthorize();
-                } else {
-                    this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet!`);
-                }
+            this.$http.post("odata/Organizations", payload)
+                .then(function onSuccess(result) {
+                    if (this.org.TypeId === 2) {
+                        this.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet med ${this.currentUser.fullName} som lokal admin.`);
+                        this.userService.reAuthorize();
+                    } else {
+                        this.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet!`);
+                    }
 
-                this.$scope.$close(true);
-            }).error((result) => {
-                this.notify.addErrorMessage(`Organisationen ${this.org.Name} kunne ikke oprettes!`);
-            });
+                    this.$scope.$close(true);
+                }, function onError(result) {
+                    this.notify.addErrorMessage(`Organisationen ${this.org.Name} kunne ikke oprettes!`);
+                });
         }
     }
 

@@ -16,7 +16,7 @@
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
         roles: Array<any>;
         Rights: Array<any>;
-        OriginalEntity : any;
+        OriginalEntity: any;
     }
 
     export class OverviewController implements IOverviewController {
@@ -71,7 +71,7 @@
             private needsWidthFixService,
             private exportGridToExcelService,
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
-            private authorizationServiceFactory : Services.Authorization.IAuthorizationServiceFactory) {
+            private authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -117,17 +117,16 @@
                         var msg = self.notify.addInfoMessage('Opretter system...', false);
 
                         self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
-                                let projectId = result.response.id;
+                                let projectId = result.data.response.id;
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
-                                     // add users default org unit to the new project
+                                    // add users default org unit to the new project
                                     self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.go("it-project.edit.main", { id: projectId });
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
                             });
                     };
@@ -144,17 +143,16 @@
                         var msg = self.notify.addInfoMessage('Opretter projekt...', false);
 
                         self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
-                                let projectId = result.response.id;
+                                let projectId = result.data.response.id;
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
                                     // add users default org unit to the new project
                                     self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.reload();
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
                             });
                     };
@@ -238,7 +236,7 @@
 
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                return regexp.test(Url.toLowerCase());
+            return regexp.test(Url.toLowerCase());
         };
         private activate() {
             this.canCreate = this.userAccessRights.canCreate;
@@ -561,9 +559,9 @@
                         persistId: "phasename", // DON'T YOU DARE RENAME!
                         template: dataItem =>
                             dataItem.CurrentPhaseObj
-                            ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj
-                            .Name}</a>`
-                            : "",
+                                ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj
+                                    .Name}</a>`
+                                : "",
                         excelTemplate: dataItem =>
                             dataItem && dataItem.CurrentPhaseObj && dataItem.CurrentPhaseObj.Name || "",
                         sortable: false,
@@ -841,8 +839,7 @@
                         title: "Prioritet: Projekt",
                         width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: (dataItem) =>
-                        {
+                        template: (dataItem) => {
                             dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
                             return `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
@@ -871,8 +868,7 @@
                         title: "Prioritet: Portefølje",
                         width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: (dataItem) =>
-                        {
+                        template: (dataItem) => {
                             dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
                             return `<div class="btn-group btn-group-sm" data-toggle="buttons">
                                                     <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.OriginalEntity.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
@@ -907,10 +903,11 @@
                         // filtering doesn't allow to sort on an array of values, it needs a single value for each row...
                         field: "Rights.Role", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => { return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                        template: (dataItem) => {
+                            return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights,this.projectRoles);
+                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights, this.projectRoles);
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -1011,7 +1008,7 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                          if (selectedIndex > 0) {
+                if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {
@@ -1077,7 +1074,7 @@
 
             return concatRoles;
         }
-        
+
     }
 
     angular
@@ -1092,7 +1089,7 @@
                     resolve: {
                         projectRoles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
+                                localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()
@@ -1103,8 +1100,8 @@
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                            .createProjectAuthorization()
-                            .getOverviewAuthorization()
+                                .createProjectAuthorization()
+                                .getOverviewAuthorization()
                         ],
                     }
                 });

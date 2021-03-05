@@ -20,10 +20,10 @@
                                 templateUrl: "app/shared/helpText/helpTextModal.view.html",
                                 controller: ["$scope", "$uibModalInstance", "notify", function ($scope, $modalInstance, nofity) {
                                     $http.get("odata/HelpTexts?$filter=Key eq '" + parent.key + "'")
-                                        .success((result: any) => {
-                                            if (result.value.length) {
-                                                $scope.title = result.value[0].Title;
-                                                $scope.description = $sce.trustAsHtml(result.value[0].Description);
+                                        .then(function onSuccess(result) {
+                                            if (result.data.value.length) {
+                                                $scope.title = result.data.value[0].Title;
+                                                $scope.description = $sce.trustAsHtml(result.data.value[0].Description);
                                             } else {
                                                 $scope.title = parent.defaultTitle;
                                                 $scope.description = "Ingen hjælpetekst defineret.";
@@ -31,8 +31,8 @@
                                         })
                                 }]
                             });
-                    }
-                }]
+                        }
+                    }]
             };
         }
     ]);

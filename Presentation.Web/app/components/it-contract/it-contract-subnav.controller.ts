@@ -1,4 +1,4 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract', {
             url: '/contract',
@@ -27,11 +27,10 @@
                     var contractId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Kontrakten...", false);
                     $http.delete('api/itcontract/' + contractId + '?organizationId=' + user.currentOrganizationId)
-                        .success(function (result) {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT Kontrakten er slettet!");
                             $state.go('it-contract.overview');
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke slette IT Kontrakten!");
                         });
                 }

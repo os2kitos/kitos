@@ -1,5 +1,5 @@
-﻿(function(ng, app) {
-    app.config(['$stateProvider', function($stateProvider) {
+﻿(function (ng, app) {
+    app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.edit.roles', {
             url: '/roles',
             templateUrl: 'app/components/it-contract/tabs/it-contract-tab-roles.view.html',
@@ -19,8 +19,8 @@
                 }],
                 localItContractRoles: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()],
-                user: ['userService', function(userService) {
-                    return userService.getUser().then(function(user) {
+                user: ['userService', function (userService) {
+                    return userService.getUser().then(function (user) {
                         return user;
                     });
                 }]
@@ -72,27 +72,28 @@
                     "userId": uId
                 };
 
-                $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
-                    notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
+                $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data)
+                    .then(function onSuccess(result) {
+                        notify.addSuccessMessage(result.data.response.user.fullName + " er knyttet i rollen");
 
-                    $scope.rights.push({
-                        objectId: result.response.objectId,
-                        roleId: result.response.roleId,
-                        userId: result.response.userId,
-                        user: result.response.user,
-                        userForSelect: { id: result.response.userId, text: result.response.user.fullName },
-                        roleForSelect: result.response.roleId,
-                        role: _.find(localItContractRoles, { Id: result.response.roleId }),
-                        show: true
+                        $scope.rights.push({
+                            objectId: result.data.response.objectId,
+                            roleId: result.data.response.roleId,
+                            userId: result.data.response.userId,
+                            user: result.data.response.user,
+                            userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
+                            roleForSelect: result.data.response.roleId,
+                            role: _.find(localItContractRoles, { Id: result.data.response.roleId }),
+                            show: true
+                        });
+
+                        $scope.newRole = 1;
+                        $scope.selectedUser = "";
+
+                    }, function onError(result) {
+
+                        notify.addErrorMessage('Fejl!');
                     });
-
-                    $scope.newRole = 1;
-                    $scope.selectedUser = "";
-
-                }).error(function (result) {
-
-                    notify.addErrorMessage('Fejl!');
-                });
             };
 
             $scope.deleteRight = function (right) {
@@ -100,13 +101,14 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itcontractright/" + contractId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
-                    right.show = false;
-                    notify.addSuccessMessage('Rollen er slettet!');
-                }).error(function (deleteResult) {
+                $http.delete("api/itcontractright/" + contractId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        right.show = false;
+                        notify.addSuccessMessage('Rollen er slettet!');
+                    }, function onError(result) {
 
-                    notify.addErrorMessage('Kunne ikke slette rollen!');
-                });
+                        notify.addErrorMessage('Kunne ikke slette rollen!');
+                    });
 
             };
 
@@ -133,41 +135,43 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itcontractright/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete("api/itcontractright/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
 
-                    var data = {
-                        "roleId": rIdNew,
-                        "userId": uIdNew
-                    };
+                        var data = {
+                            "roleId": rIdNew,
+                            "userId": uIdNew
+                        };
 
-                    $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                        $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data)
+                            .then(function onSuccess(result) {
 
-                        right.roleId = result.response.roleId;
-                        right.user = result.response.user;
-                        right.userId = result.response.userId;
+                                right.roleId = result.data.response.roleId;
+                                right.user = result.data.response.user;
+                                right.userId = result.data.response.userId;
 
-                        right.role = _.find(localItContractRoles, { Id: right.roleId }),
+                                right.role = _.find(localItContractRoles, { Id: right.roleId }),
 
-                        right.edit = false;
+                                    right.edit = false;
 
-                        notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
+                                notify.addSuccessMessage(right.user.fullName + " er knyttet i rollen");
 
-                    }).error(function (result) {
+                            }, function onError(result) {
 
-                        //we successfully deleted the old entry, but didn't add a new one
-                        right.show = false;
+                                //we successfully deleted the old entry, but didn't add a new one
+                                right.show = false;
+
+                                notify.addErrorMessage('Fejl!');
+                            });
+
+                    }, function onError(result) {
+
+                        //couldn't delete the old entry, just reset select options
+                        right.userForSelect = { id: right.user.id, text: right.user.fullName };
+                        right.roleForSelect = right.roleId;
 
                         notify.addErrorMessage('Fejl!');
                     });
-
-                }).error(function (deleteResult) {
-
-                    //couldn't delete the old entry, just reset select options
-                    right.userForSelect = { id: right.user.id, text: right.user.fullName };
-                    right.roleForSelect = right.roleId;
-
-                    notify.addErrorMessage('Fejl!');
-                });
             };
 
             $scope.rightSortBy = "roleName";

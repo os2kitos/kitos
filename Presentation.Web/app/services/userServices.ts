@@ -143,14 +143,14 @@
                     method: "PATCH",
                     url: `api/user/${this._user.id}?organizationId=${this._user.currentOrganizationId}`,
                     data: payload
-                }).success(result => {
-                    var newUser = result.response;
+                }).then(function onSuccess(result) {
+                    var newUser = result.data.response;
 
                     // updating the user. the organization and default org unit is unchanged
                     this.saveUser(newUser, this._user.orgAndDefaultUnit);
                     this._loadUserDeferred = null;
                     deferred.resolve(this._user);
-                }).error(() => {
+                }, function onError(result) {
                     deferred.reject("Couldn't patch the user!");
                 });
             }

@@ -170,7 +170,7 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", ($scope, $modalInstance, roles, $window, type, action, object, currentUser : Kitos.Services.IUser) => {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", ($scope, $modalInstance, roles, $window, type, action, object, currentUser: Kitos.Services.IUser) => {
 
                             $scope.showRoleFields = true;
                             modalOpen = true;
@@ -254,11 +254,11 @@
                                     payload.Reciepients = undefined;
                                     $http.patch(url, JSON.stringify(payload))
                                         .then(() => {
-                                                notify.addSuccessMessage("Advisen er opdateret!");
+                                            notify.addSuccessMessage("Advisen er opdateret!");
 
-                                                $("#mainGrid").data("kendoGrid").dataSource.read();
-                                                $scope.$close(true);
-                                            },
+                                            $("#mainGrid").data("kendoGrid").dataSource.read();
+                                            $scope.$close(true);
+                                        },
                                             () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") } }
                                         );
 
@@ -343,7 +343,7 @@
                                     url: url,
                                     data: payload,
                                     type: "application/json"
-                                }).success(function () {
+                                }).then(function onSuccess(result) {
                                     if (action === "POST") {
                                         notify.addSuccessMessage("Advisen er oprettet!");
                                         $scope.$close(true);
@@ -352,7 +352,7 @@
                                     if (action === "PATCH") {
                                         notify.addSuccessMessage("Advisen er opdateret!");
                                     }
-                                }).error(function () {
+                                }, function onError(result) {
                                     if (action === "POST") {
                                         notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
                                     }
@@ -431,7 +431,7 @@
                             modalOpen = false;
                         }],
                         resolve: {
-                            Roles: ['localOptionServiceFactory', (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
+                            Roles: ['localOptionServiceFactory', (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
                                 if (type === "itSystemUsage") {
                                     return localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll();
                                 }

@@ -30,8 +30,8 @@
                 $scope.globalAdmins.push(admin);
             }
 
-            $http.get("api/globaladmin").success(result => {
-                _.each(result.response, pushAdmin);
+            $http.get("api/globaladmin").then(function onSuccess(result) {
+                _.each(result.data.response, pushAdmin);
             });
 
             function newGlobalAdmin() {
@@ -48,38 +48,38 @@
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                $http.post("api/globaladmin", data, { handleBusy: true }).success(result => {
+                $http.post("api/globaladmin", data, { handleBusy: true }).then(function onSuccess(result) {
                     msg.toSuccessMessage(user.text + " er blevet global administrator");
                     $scope.newUser = null;
 
-                    pushAdmin(result.response);
+                    pushAdmin(result.data.response);
 
-                }).error(result => {
+                }, function onError(result) {
                     msg.toErrorMessage("Kunne ikke gøre " + user.text + " til global administrator");
                 });
             }
 
-            $scope.$watch("newUser", function(newVal, oldVal) {
+            $scope.$watch("newUser", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
 
                 newGlobalAdmin();
             });
 
-            $scope.deleteGlobalAdmin = function(admin) {
+            $scope.deleteGlobalAdmin = function (admin) {
 
                 var uId = admin.user.id;
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/globaladmin?userId=" + uId).success(function(deleteResult) {
+                $http.delete("api/globaladmin?userId=" + uId).then(function onSuccess(result) {
                     admin.show = false;
                     msg.toSuccessMessage(admin.user.name + " er ikke længere global administrator");
 
-                }).error(function(deleteResult) {
+                }, function onError(result) {
                     msg.toErrorMessage("Kunne ikke fjerne " + admin.user.name + " som global administrator");
                 });
             };
 
-            $scope.updateGlobalAdmin = function(admin) {
+            $scope.updateGlobalAdmin = function (admin) {
 
                 if (!admin.userForSelect) return;
 
@@ -102,12 +102,12 @@
                 //otherwise, we should delete the old entry, then add a new one
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                $http.delete("api/globaladmin?userId=" + uIdOld, { handleBusy: true }).success(function(deleteResult) {
+                $http.delete("api/globaladmin?userId=" + uIdOld, { handleBusy: true }).then(function onSuccess(result) {
                     var data = {
                         userId: uIdNew
                     };
 
-                    $http.post("api/globaladmin", data, { handleBusy: true }).success(function(result) {
+                    $http.post("api/globaladmin", data, { handleBusy: true }).then(function onSuccess(result) {
                         msg.toSuccessMessage(user.text + " er blevet global administrator");
                         $scope.newUser = null;
 
@@ -122,13 +122,13 @@
 
                         admin.edit = false;
 
-                    }).error(function(result) {
+                    }, function onError(result) {
                         //we successfully deleted the old entry, but didn't add a new one
                         admin.show = false;
 
                         msg.toErrorMessage("Kunne ikke gøre " + user.text + " til global administrator");
                     });
-                }).error(function(deleteResult) {
+                }, function onError(result) {
                     //couldn't delete the old entry, just reset select options
                     admin.userForSelect = { id: admin.user.id, text: admin.user.name };
 
@@ -138,18 +138,18 @@
 
             $scope.adminSortBy = "userName";
             $scope.adminSortReverse = false;
-            $scope.adminSort = function(admin) {
+            $scope.adminSort = function (admin) {
                 switch ($scope.adminSortBy) {
-                case "userName":
-                    return admin.user.name;
-                case "userEmail":
-                    return admin.user.email;
-                default:
-                    return admin.user.name;
+                    case "userName":
+                        return admin.user.name;
+                    case "userEmail":
+                        return admin.user.email;
+                    default:
+                        return admin.user.name;
                 }
             };
 
-            $scope.adminSortChange = function(val) {
+            $scope.adminSortChange = function (val) {
                 if ($scope.adminSortBy == val) {
                     $scope.adminSortReverse = !$scope.adminSortReverse;
                 } else {

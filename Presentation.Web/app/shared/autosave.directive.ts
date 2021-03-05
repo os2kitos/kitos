@@ -82,7 +82,7 @@
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
                                 }, (errorResponse) => {
-                                        if (errorResponse.status === 409) {
+                                    if (errorResponse.status === 409) {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                     } else {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -147,19 +147,17 @@
                         if (e.added) {
                             id = e.added.id;
                             $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function () {
+                                .then(function onSuccess(result) {
                                     msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function () {
+                                }, function onError(result) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
                             $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function () {
+                                .then(function onSuccess(result) {
                                     msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function () {
+                                }, function onError(result) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         }
@@ -171,12 +169,11 @@
                             attrs.appendurl = '';
 
                         $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true })
-                            .success(function () {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
-                            })
-                            .error(function (result, status) {
-                                if (status === 409) {
+                            }, function onError(result) {
+                                if (result.status === 409) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                 } else {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");

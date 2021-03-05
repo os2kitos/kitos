@@ -14,9 +14,9 @@
                 ],
                 userAccessRights: ["authorizationServiceFactory", "$stateParams",
                     (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
-                    authorizationServiceFactory
-                    .createInterfaceAuthorization()
-                    .getAuthorizationForItem($stateParams.id)
+                        authorizationServiceFactory
+                            .createInterfaceAuthorization()
+                            .getAuthorizationForItem($stateParams.id)
                 ],
                 hasWriteAccess: [
                     "userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
@@ -82,11 +82,10 @@
 
                     var msg = notify.addInfoMessage("Deaktiverer snitflade...", false);
                     $http.patch("odata/ItInterfaces(" + itInterface.id + ")", payload)
-                        .success(result => {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Snitflade er deaktiveret!");
                             $state.reload();
-                        })
-                        .error((data, status) => {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke deaktivere snitflade!");
                         });
                 }
@@ -100,11 +99,10 @@
 
                     var msg = notify.addInfoMessage("Aktiverer snitflade...", false);
                     $http.patch("odata/ItInterfaces(" + itInterface.id + ")", payload)
-                        .success(result => {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Snitflade er aktiveret!");
                             $state.reload();
-                        })
-                        .error((data, status) => {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke aktivere snitflade!");
                         });
                 }

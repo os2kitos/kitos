@@ -30,17 +30,17 @@ module.exports = {
     // angular script bundle
     // not minified
     angularSrc: [
-        bower("/angular/angular.min.js"),
-        bower("/angular-i18n/angular-locale_da-dk.js"),
-        bower("/angular-animate/angular-animate.min.js"),
-        bower("/angular-sanitize/angular-sanitize.min.js"),
+        npm("/angular/angular.min.js"),
+        npm("/angular-i18n/angular-locale_da-dk.js"),
+        npm("/angular-animate/angular-animate.min.js"),
+        npm("/angular-sanitize/angular-sanitize.min.js"),
         bower("/angular-ui-router/release/angular-ui-router.min.js"),
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
         bower("/angular-ui-select2/src/select2.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js"),
-        bower("/angular-messages/angular-messages.min.js"),
+        npm("/angular-messages/angular-messages.min.js"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
         bower("/angular-ui-tinymce/src/tinymce.js"),
         bower("/angular-route/angular-route.js"),

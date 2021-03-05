@@ -13,10 +13,10 @@
                         });
                 }],
                 risks: ["$http", "project", function ($http, project) {
-                        return $http.get("api/risk/?getByProject=true&projectId=" + project.id)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
+                    return $http.get("api/risk/?getByProject=true&projectId=" + project.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }],
                 //returns a map with those users who have a role in this project.
                 //the names of the roles is saved in user.roleNames
@@ -52,7 +52,7 @@
     }]);
 
     app.controller("project.EditRiskCtrl", ["$scope", "$http", "$stateParams", "notify", "risks", "usersWithRoles", "user",
-        function($scope, $http, $stateParams, notify, risks, usersWithRoles, user) {
+        function ($scope, $http, $stateParams, notify, risks, usersWithRoles, user) {
 
             var projectId = $stateParams.id;
 
@@ -73,22 +73,23 @@
                 return risk.product;
             };
 
-            $scope.delete = function(risk) {
-                $http.delete(risk.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function (result) {
-                    risk.show = false;
+            $scope.delete = function (risk) {
+                $http.delete(risk.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        risk.show = false;
 
-                    notify.addSuccessMessage("Rækken er slettet");
-                }).error(function() {
+                        notify.addSuccessMessage("Rækken er slettet");
+                    }, function onError(result) {
 
-                    notify.addErrorMessage("Fejl! Kunne ikke slette!");
-                });
+                        notify.addErrorMessage("Fejl! Kunne ikke slette!");
+                    });
             };
 
-            $scope.averageProduct = function() {
+            $scope.averageProduct = function () {
 
                 if ($scope.risks.length == 0) return 0;
 
-                var sum = _.reduce($scope.risks, function(memo, risk: { product }) {
+                var sum = _.reduce($scope.risks, function (memo, risk: { product }) {
                     return memo + risk.product;
                 }, 0);
 
@@ -125,15 +126,14 @@
 
                 var msg = notify.addInfoMessage("Gemmer række", false);
                 $http.post(`api/risk?organizationId=${user.currentOrganizationId}`, data)
-                    .success(function (result) {
+                    .then(function onSuccess(result) {
 
-                        var responseRisk = result.response;
+                        var responseRisk = result.data.response;
                         pushRisk(responseRisk);
                         resetNewRisk();
 
                         msg.toSuccessMessage("Rækken er gemt");
-                    })
-                    .error(function() {
+                    }, function onError(result) {
                         msg.toErrorMessage("Fejl! Prøv igen");
                     });
 
