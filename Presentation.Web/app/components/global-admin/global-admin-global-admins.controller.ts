@@ -111,7 +111,7 @@
                         msg.toSuccessMessage(user.text + " er blevet global administrator");
                         $scope.newUser = null;
 
-                        var newUser = result.response;
+                        var newUser = result.data.response;
 
                         admin.user = newUser;
                         admin.userForSelect = {

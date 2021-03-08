@@ -91,7 +91,7 @@
                                     });
                                 }
 
-                                visit(result.response, "");
+                                visit(result.data.response, "");
 
                                 scope.select.isReady = true;
                             });

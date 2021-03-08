@@ -19,7 +19,7 @@
             $http.get("api/passwordresetrequest?requestId=" + requestId)
                 .then(function onSuccess(result) {
                     $scope.resetStatus = "enterPassword";
-                    $scope.email = result.response.userEmail;
+                    $scope.email = result.data.response.userEmail;
                 }, function onError(result) {
                     $scope.resetStatus = "missingRequest";
                 });
