@@ -52,6 +52,9 @@
             this.editState = $scope.editState;
             this.dirId = $scope.dirId;
             this.optionType = $scope.optionType;
+        }
+
+        $onInit() {            
 
             this.mainGridOptions = {
                 dataSource: {
@@ -230,6 +233,8 @@
                 });
             }
         }
+
+
         public createOption = () => {
             this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
