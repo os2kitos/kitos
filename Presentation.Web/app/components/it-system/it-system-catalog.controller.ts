@@ -895,21 +895,22 @@
         }
 
         public onNewTargetSystemSelected = () => {
+            var self = this;
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
                 this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
                     .then(function onSuccess(result) {
-                        this.migrationReportDTO = result.data.response;
+                        self.migrationReportDTO = result.data.response;
 
-                        this.modalMigrationConsequence.setOptions({
+                        self.modalMigrationConsequence.setOptions({
                             close: (_) => true,
                             resizable: false,
                             title: `Flytning af it-system `,
                         });
-                        this.modalMigration.close();
-                        this.modalMigrationConsequence.center().open();
+                        self.modalMigration.close();
+                        self.modalMigrationConsequence.center().open();
                     }, function onError(result) {
-                        this.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
+                            self.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
                     });
             }
         }
@@ -937,14 +938,15 @@
         };
 
         public performMigration = () => {
+            var self = this;
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
                 this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
                     .then(function onSuccess(result) {
-                        this.modalMigrationConsequence.close();
-                        this.mainGrid.dataSource.fetch();
-                        this.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
+                        self.modalMigrationConsequence.close();
+                        self.mainGrid.dataSource.fetch();
+                        self.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
                     }, function onError(result) {
-                        this.notify.addErrorMessage("Flytning af system anvendelse fejlede");
+                            self.notify.addErrorMessage("Flytning af system anvendelse fejlede");
                     });
             }
         }
@@ -1013,26 +1015,28 @@
 
         // adds system to usage within the current context
         private addUsage(dataItem) {
+            var self = this;
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
-                organizationId: this.user.currentOrganizationId
+                organizationId: self.user.currentOrganizationId
             })
                 .then(function onSuccess(result) {
-                    this.notify.addSuccessMessage("Systemet er taget i anvendelse")
+                    self.notify.addSuccessMessage("Systemet er taget i anvendelse")
                 }, function onError(result) {
-                    this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!")
+                        self.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!")
                 });
         }
 
         // removes system from usage within the current context
         private deleteUsage(systemId) {
+            var self = this;
             var url = `api/itSystemUsage?itSystemId=${systemId}&organizationId=${this.user.currentOrganizationId}`;
 
             return this.$http.delete(url)
                 .then(function onSuccess(result) {
-                    this.notify.addSuccessMessage("Anvendelse af systemet er fjernet")
+                    self.notify.addSuccessMessage("Anvendelse af systemet er fjernet")
                 }, function onError(result) {
-                    this.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!")
+                        self.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!")
                 });
         }
 

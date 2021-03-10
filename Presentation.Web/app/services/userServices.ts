@@ -134,6 +134,7 @@
         };
 
         patchUser = (payload) => {
+            var self = this;
             var deferred = this.$q.defer();
 
             if (this._user == null) {
@@ -141,15 +142,15 @@
             } else {
                 this.$http<Kitos.API.Models.IApiWrapper<any>>({
                     method: "PATCH",
-                    url: `api/user/${this._user.id}?organizationId=${this._user.currentOrganizationId}`,
+                    url: `api/user/${self._user.id}?organizationId=${self._user.currentOrganizationId}`,
                     data: payload
                 }).then(function onSuccess(result) {
                     var newUser = result.data.response;
 
                     // updating the user. the organization and default org unit is unchanged
-                    this.saveUser(newUser, this._user.orgAndDefaultUnit);
-                    this._loadUserDeferred = null;
-                    deferred.resolve(this._user);
+                    self.saveUser(newUser, self._user.orgAndDefaultUnit);
+                    self._loadUserDeferred = null;
+                    deferred.resolve(self._user);
                 }, function onError(result) {
                     deferred.reject("Couldn't patch the user!");
                 });

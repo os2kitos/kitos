@@ -35,6 +35,7 @@
         }
 
         public submit() {
+            var self = this;
             const payload = {
                 Id: this.currentUser.currentOrganizationId,
                 ObjectOwnerId: this.currentUser.id,
@@ -45,16 +46,16 @@
             }
             this.$http.post("odata/Organizations", payload)
                 .then(function onSuccess(result) {
-                    if (this.org.TypeId === 2) {
-                        this.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet med ${this.currentUser.fullName} som lokal admin.`);
-                        this.userService.reAuthorize();
+                    if (self.org.TypeId === 2) {
+                        self.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet med ${self.currentUser.fullName} som lokal admin.`);
+                        self.userService.reAuthorize();
                     } else {
-                        this.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet!`);
+                        self.notify.addSuccessMessage(`Organisationen ${result.data.Name} er blevet oprettet!`);
                     }
 
-                    this.$scope.$close(true);
+                    self.$scope.$close(true);
                 }, function onError(result) {
-                    this.notify.addErrorMessage(`Organisationen ${this.org.Name} kunne ikke oprettes!`);
+                        self.notify.addErrorMessage(`Organisationen ${self.org.Name} kunne ikke oprettes!`);
                 });
         }
     }

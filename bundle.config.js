@@ -6,8 +6,8 @@ module.exports = {
     librarySrc: [
         bower("/lodash/dist/lodash.min.js"),
         bower("/jquery/dist/jquery.min.js"),
-        bower("/select2/select2.min.js"),
-        bower("/select2/select2_locale_da.js"),
+        npm("/select2/select2.js"),
+        npm("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
         bower("/jsonfn-bower/jsonfn.min.js"),
         bower("/tinymce/tinymce.js"),
@@ -19,7 +19,7 @@ module.exports = {
     libraryBundle: "library-bundle.min.js",
 
     libraryStylesSrc: [
-        bower("/select2/select2.css"),
+        npm("/select2/select2.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.css"),
@@ -36,7 +36,7 @@ module.exports = {
         npm("/angular-sanitize/angular-sanitize.min.js"),
         bower("/angular-ui-router/release/angular-ui-router.min.js"),
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
-        bower("/angular-ui-select2/src/select2.js"),
+        npm("/angular-ui-select2/src/select2.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js"),
@@ -82,8 +82,8 @@ module.exports = {
 
     // assets
     assetsSrc: [
-        bower("/select2/*.png"),
-        bower("/select2/*.gif")
+        npm("/select2/*.png"),
+        npm("/select2/*.gif")
     ],
 
     // custom style bundle

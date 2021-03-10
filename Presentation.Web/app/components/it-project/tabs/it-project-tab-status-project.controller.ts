@@ -110,6 +110,7 @@
         };
 
         private loadStatues = () => {
+            var self = this;
             var url = `api/itProjectStatus/${this.project.id}?project=true`;
 
             url += `&skip=${this.pagination.skip}`;
@@ -130,17 +131,17 @@
             this.$http.get(url)
                 .then(function onSuccess(result) {
                     var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    this.totalCount = paginationHeader.TotalCount;
+                    self.totalCount = paginationHeader.TotalCount;
 
                     _.each(result.data.response, (value) => {
-                        this.addStatus(value, null);
+                        self.addStatus(value, null);
                     });
 
                 }, function onError(result) {
                     // only display error when an actual error
                     // 404 just says that there are no statuses
                     if (result.status != 404) {
-                        this.notify.addErrorMessage("Kunne ikke hente projekter!");
+                        self.notify.addErrorMessage("Kunne ikke hente projekter!");
                     }
                 });
         };
