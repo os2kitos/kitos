@@ -66,12 +66,11 @@
                 });
             };
             $scope.updateDefaultOrgUnit = function () {
-                var self = this;
                 userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId)
                     .then(function onSuccess(newUser) {
                         userService.getUser()
                             .then(
-                                data => { self.init(data) }
+                                data => { init(data) }
                             );
                     notify.addSuccessMessage("Feltet er opdateret!");
                 }, function onError() {
