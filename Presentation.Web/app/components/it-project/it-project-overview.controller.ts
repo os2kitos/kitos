@@ -123,7 +123,7 @@
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
                                     // add users default org unit to the new project
-                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${self.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.go("it-project.edit.main", { id: projectId });
                             }, function onError(result) {
@@ -149,7 +149,7 @@
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
                                     // add users default org unit to the new project
-                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${self.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.reload();
                             }, function onError(result) {
