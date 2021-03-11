@@ -145,7 +145,7 @@
                                        ng-model="r.Checked"
                                        data-element-type="{{r.Name}}"
                                        ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
+                                       ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">
                                 {{r.Name}}
                             </label>
                         </div>
@@ -168,7 +168,7 @@
                             <label>
                                 <input type="checkbox" ng-model="r.Checked"
                                        ng-disabled="!hasWriteAccess"
-                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
+                                       ng-change="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
                             </label>
                         </div>
                     </div>
