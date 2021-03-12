@@ -15,7 +15,7 @@ class GlobalOrg implements PageObject {
     private byDataElementType = new CssLocatorHelper().byDataElementType;
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/global-admin/organisations");
+        return this.navigationHelper.getPage("/#!/global-admin/organisations");
     }
 
     refreshPage(): webdriver.promise.Promise<void> {

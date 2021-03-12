@@ -97,7 +97,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (this.hasWriteAccess) {
-                                return `<a id="addReference" data-element-type="createReferenceButton" class="btn btn-success btn-sm" href="\\#/data-processing/edit/${dataProcessingRegistration.id}/reference/createReference/${dataProcessingRegistration.id}"'>Tilføj reference</a>`;
+                                return `<a id="addReference" data-element-type="createReferenceButton" class="btn btn-success btn-sm" href="\\#!/data-processing/edit/${dataProcessingRegistration.id}/reference/createReference/${dataProcessingRegistration.id}"'>Tilføj reference</a>`;
                             } else {
                                 return "";
                             }

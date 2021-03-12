@@ -7,7 +7,7 @@ class LocalProject implements PageObject {
     private static consts = new constants();
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/local-config/project");
+        return this.navigationHelper.getPage("/#!/local-config/project");
     }
 
     static getIncludeModuleInputElement() {

@@ -12,7 +12,7 @@ class ItContractOverview implements PageObject {
     public cssHelper = new CssHelper();
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/contract/overview");
+        return this.navigationHelper.getPage("/#!/contract/overview");
     }
 
     waitForKendoGrid() {

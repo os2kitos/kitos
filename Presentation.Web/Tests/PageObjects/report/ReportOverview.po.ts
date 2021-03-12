@@ -8,7 +8,7 @@ class ReportOverview implements IPageObject {
     private ec = protractor.ExpectedConditions;
 
     public getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("#/rapporter/overblik");
+        return this.navigationHelper.getPage("#!/rapporter/overblik");
     }
 
     public kendoToolbarHelper = new KendoToolbarHelper();

@@ -9,7 +9,7 @@ class LocalDataProcessing implements PageObject {
     private byDataElementType = new CssLocatorHelper().byDataElementType;
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/local-config/data-processing");
+        return this.navigationHelper.getPage("/#!/local-config/data-processing");
     }
 
     getToggleDataProcessingCheckbox() {

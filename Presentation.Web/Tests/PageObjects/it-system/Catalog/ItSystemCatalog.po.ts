@@ -15,7 +15,7 @@ class ItSystemCatalog implements IPageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/system/catalog");
+        return this.navigationHelper.getPage("/#!/system/catalog");
     }
 
     kendoToolbarHelper = new KendoToolbarHelper();

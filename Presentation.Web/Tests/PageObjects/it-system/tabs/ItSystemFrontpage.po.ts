@@ -10,7 +10,7 @@ class ItSystemReference implements IPageObject {
     private cssHelper = new CssLocatorHelper();
 
     public getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/system/edit/1/reference");
+        return this.navigationHelper.getPage("/#!/system/edit/1/reference");
     }
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 

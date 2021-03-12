@@ -108,7 +108,7 @@
                         text: "Tilføj reference til IT System",
                         template: () => {
                             if (hasWriteAccess) {
-                                return "<a id=\"addReferenceItSystemUsaged\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>Tilføj reference til IT System</a>";
+                                return "<a id=\"addReferenceItSystemUsaged\" class=\"btn btn-success btn-sm\" href=\"\\#!/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>Tilføj reference til IT System</a>";
                             } else {
                                 return "";
                             }

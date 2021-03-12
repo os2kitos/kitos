@@ -10,7 +10,7 @@ class UsersPage implements IPageObject {
     private cssLocator = new CssLocatorHelper();
     
     public getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#/organization/user");
+        return this.navigationHelper.getPage("/#!/organization/user");
     }
 
     public kendoToolbarHelper = new KendoToolbarHelper();
