@@ -36,7 +36,6 @@
 
             //normal user roles
             $scope.activeItContractRoles = localItContractRoles;
-            $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
             _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
@@ -62,7 +61,7 @@
             $scope.submitRight = function () {
                 if (!$scope.selectedUser || !$scope.newRole) return;
 
-                var rId = parseInt($scope.newRole);
+                var rId = $scope.newRole.id;
                 var uId = $scope.selectedUser.id;
 
                 if (!rId || !uId) return;
@@ -87,7 +86,6 @@
                             show: true
                         });
 
-                        $scope.newRole = 1;
                         $scope.selectedUser = "";
 
                     }, function onError(result) {
@@ -115,7 +113,7 @@
             $scope.updateRight = function (right) {
                 if (!right.roleForSelect || !right.userForSelect) return;
 
-                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect)) {
+                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect.id)) {
                     right.edit = false;
                     return;
                 }
@@ -125,12 +123,13 @@
                 var uIdOld = right.userId;
 
                 //new values
-                var rIdNew = right.roleForSelect;
+                var rIdNew = right.roleForSelect.id;
                 var uIdNew = right.userForSelect.id;
 
                 //if nothing was changed, just exit edit-mode
                 if (rIdOld == rIdNew && uIdOld == uIdNew) {
                     right.edit = false;
+                    return;
                 }
 
                 //otherwise, we should delete the old entry, then add a new one

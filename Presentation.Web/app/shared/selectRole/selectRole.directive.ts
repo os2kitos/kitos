@@ -2,10 +2,6 @@
     'use strict';
 
     app.controller("selectRoleController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
-
-        
-
-
         var roles = entityMapper.mapRoleToSelect2ViewModel($scope.roles);
 
         if ($scope.preSelectedRole != null) {
@@ -38,6 +34,7 @@
             return {
                 templateUrl: "app/shared/selectRole/selectRole.view.html",
                 scope: {
+                    id: "@",
                     placeholder: "@",
                     roles: "=",
                     selectedRole: "=ngModel",

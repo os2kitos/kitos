@@ -133,16 +133,12 @@
                                     <input type="text" disabled="disabled" class="form-control input-sm" value="{{ orgUnits[right.objectId].name }}" />
                                 </td>
                                 <td>
-                                    <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-if="!checkIfRoleIsAvailable(orgRoles[right.roleId].Id)"
-                                                disabled="disabled"
-                                                value="{{orgRoles[right.roleId].Id}}">
-                                            {{ getRoleName(right.roleId) }} (udgået)
-                                        </option>
-                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{hasWriteAccess && "skriv" || "læs" }})
-                                        </option>
-                                    </select>
+                                    <select-role data-id="edit-right-role"
+                                                 name="selectRole"
+                                                 data-roles="activeOrgRoles"
+                                                 data-ng-model="right.roleForSelect"
+                                                 data-pre-selected-role="right.role">
+                                    </select-role>
                                 </td>
                                 <td colspan="2" class="relative-position">
                                     <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="right.userForSelect" />
@@ -160,13 +156,12 @@
                                     <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" />
                                 </td>
                                 <td>
-                                    <select class="form-control input-sm" name="selectRole"
-                                            data-ui-select2=""
-                                            data-ng-model="newRole"
-                                            data-placeholder="Vælg en organisationsrolle"
-                                            data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.Id }}">{{ orgRole.Name }} ({{ hasWriteAccess && "skriv" || "læs" }})</option>
-                                    </select>
+                                    <select-role data-id="add-right-role"
+                                                 name="selectRole"
+                                                 data-roles="activeOrgRoles"
+                                                 data-ng-model="newRole"
+                                                 data-placeholder="Vælg en organisationsrolle">
+                                    </select-role>
                                 </td>
                                 <td colspan="2" class="form-group">
                                     <input data-select-user="foo" data-org-id="{{ orgId }}" data-user-model="selectedUser" data-add-user="true" />
