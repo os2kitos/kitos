@@ -88,10 +88,6 @@
   version "0.3.11"
   resolved "https://codeload.github.com/gsklee/ngStorage/tar.gz/253b718a0b35b044fba25c78b1b2020d672c4017"
 
-"@bower_components/select2-bootstrap-css@t0m/select2-bootstrap-css#^1.4.6":
-  version "1.4.6"
-  resolved "https://codeload.github.com/t0m/select2-bootstrap-css/tar.gz/dffa8740723d12cf5b9a56a28cc3dcd5e08ac3e2"
-
 "@bower_components/tinymce@tinymce/tinymce-dist#~4.4.3":
   version "4.4.3"
   resolved "https://codeload.github.com/tinymce/tinymce-dist/tar.gz/5d763d8b00bf7bb0f5020b5e9a6e7a602fefa8ac"
@@ -3515,6 +3511,11 @@ sax@>=0.6.0:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+select2-bootstrap-css@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/select2-bootstrap-css/-/select2-bootstrap-css-1.4.6.tgz#5cfb68246f5299ca1858e01efd788804c734997e"
+  integrity sha1-XPtoJG9SmcoYWOAe/XiIBMc0mX4=
 
 select2@^3.4.5:
   version "3.5.1"

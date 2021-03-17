@@ -87,7 +87,7 @@
                         <!-- Interface  -->
                         <div class="form-group">
                             <label for="interface-interface" class="control-label small">Grænseflade</label>
-                            <select-option data-id="interface-interface" data-element-type="InterfaceInterfaceInput"
+                            <select2-option data-id="interface-interface" data-element-type="InterfaceInterfaceInput"
                                            data-placeholder="Vælg grænseflade"
                                            data-selected-text="{{ interface.interfaceName }}"
                                            data-ng-disabled="!hasWriteAccess"
@@ -95,7 +95,7 @@
                                            data-options="interfaces"
                                            data-auto-save-url="{{ interface.updateUrl }}"
                                            data-field="interfaceId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                     </div>
@@ -169,7 +169,7 @@
                                                data-field="data">
                                     </td>
                                     <td class="data-type-selector">
-                                        <select-option data-id="interface-data-type" data-element-type="InterfaceDataTypeInput"
+                                        <select2-option data-id="interface-data-type" data-element-type="InterfaceDataTypeInput"
                                                        data-placeholder="Vælg datatype"
                                                        data-selected-text="{{ dataRow.dataTypeName }}"
                                                        data-ng-disabled="!hasWriteAccess"
@@ -177,7 +177,7 @@
                                                        data-options="dataTypes"
                                                        data-auto-save-url="{{ dataRow.updateUrl }}"
                                                        data-field="dataTypeId">
-                                        </select-option>
+                                        </select2-option>
                                     </td>
                                     <td class="text-right">
                                         <button class="btn btn-danger btn-xs delete-data-row"

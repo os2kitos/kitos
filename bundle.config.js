@@ -20,7 +20,7 @@ module.exports = {
 
     libraryStylesSrc: [
         npm("/select2/select2.css"),
-        bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
+        npm("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.css"),
         bower("/tinymce/skins/lightgray/skin.min.css"),
