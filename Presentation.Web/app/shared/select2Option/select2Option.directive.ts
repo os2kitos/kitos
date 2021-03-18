@@ -35,7 +35,9 @@
 
                     scope.$watch('selectedId', function (value) {
                         var foundSelectedInOptions = _.find(scope.options, function (option: any) {
-                            return option.Id === parseInt(scope.selectedId.id, 10);
+                            if (scope.selectedId != null) {
+                                return option.Id === parseInt(scope.selectedId.id, 10);
+                            }
                         });
 
                         if (foundSelectedInOptions) {

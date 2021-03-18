@@ -43,19 +43,18 @@
     }]);
 
     app.controller("project.EditOrgCtrl",
-        ["$scope", "$http", "$stateParams", "notify", "isTransversal", "orgUnitsTree", "selectedOrgUnits", "responsibleOrgUnitId", "user",
-            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user) {
+        ["$scope", "$http", "$stateParams", "notify", "isTransversal", "orgUnitsTree", "selectedOrgUnits", "responsibleOrgUnitId", "user", "entityMapper", 
+            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user, entityMapper) {
                 $scope.orgUnitsTree = orgUnitsTree;
                 $scope.isTransversal = isTransversal;
-                $scope.selectedOrgUnits = selectedOrgUnits;
-                $scope.responsibleOrgUnitId = responsibleOrgUnitId;
+                $scope.selectedOrgUnits = entityMapper.mapApiResponseToSelect2ViewModel(selectedOrgUnits);
+                $scope.responsibleOrgUnit = _.find($scope.selectedOrgUnits, (orgUnit) => orgUnit.id === responsibleOrgUnitId);
                 var projectId = $stateParams.id;
                 $scope.patchUrl = "api/itproject/" + projectId;
 
-                $scope.saveResponsible = function () {
-                    var orgUnitId = $scope.responsibleOrgUnitId;
-                    var msg = notify.addInfoMessage("Gemmer... ");
-                    if ($scope.responsibleOrgUnitId) {
+                $scope.saveResponsible = function (orgUnitId) {
+                    if (orgUnitId != null) {
+                        var msg = notify.addInfoMessage("Gemmer... ");
                         $http.post("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&orgUnitId=" + orgUnitId + "&responsible")
                             .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
@@ -63,6 +62,7 @@
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
+                        var msg = notify.addInfoMessage("Gemmer... ");
                         $http.delete("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&responsible")
                             .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
@@ -78,7 +78,7 @@
                         $http.post("api/itproject/" + projectId + "?organizationunit=" + obj.id + "&organizationId=" + user.currentOrganizationId)
                             .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
-                                $scope.selectedOrgUnits.push(obj);
+                                $scope.selectedOrgUnits.push({ id: obj.id, text: obj.name });
                             }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });

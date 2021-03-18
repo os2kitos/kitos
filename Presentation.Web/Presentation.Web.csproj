@@ -366,6 +366,7 @@
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="app\shared\select2Option\select2Option.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
+    <Content Include="app\shared\selectSimple\selectSimple.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -825,6 +826,7 @@
     <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
     <TypeScriptCompile Include="app\shared\select2Option\select2Option.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />

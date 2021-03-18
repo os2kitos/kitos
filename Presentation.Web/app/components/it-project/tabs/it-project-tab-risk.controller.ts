@@ -51,13 +51,13 @@
         });
     }]);
 
-    app.controller("project.EditRiskCtrl", ["$scope", "$http", "$stateParams", "notify", "risks", "usersWithRoles", "user",
-        function ($scope, $http, $stateParams, notify, risks, usersWithRoles, user) {
+    app.controller("project.EditRiskCtrl", ["$scope", "$http", "$stateParams", "notify", "risks", "usersWithRoles", "user", "entityMapper", 
+        function ($scope, $http, $stateParams, notify, risks, usersWithRoles, user, entityMapper) {
 
             var projectId = $stateParams.id;
 
             $scope.risks = [];
-            $scope.usersWithRoles = _.values(usersWithRoles);
+            $scope.usersWithRoles = entityMapper.mapApiResponseToSelect2ViewModel(usersWithRoles);
 
             function pushRisk(risk) {
                 risk.show = true;
@@ -121,7 +121,7 @@
                     action: risk.action,
                     probability: risk.probability,
                     consequence: risk.consequence,
-                    responsibleUserId: risk.responsibleUserId
+                    responsibleUserId: risk.responsibleUserId.id
                 };
 
                 var msg = notify.addInfoMessage("Gemmer række", false);

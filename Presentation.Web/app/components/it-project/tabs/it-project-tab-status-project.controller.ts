@@ -45,6 +45,7 @@
             private user,
             public statusUpdates,
             public moment) {
+            var self = this;
 
             this.project.updateUrl = `api/itproject/${project.id}`;
 
@@ -80,7 +81,10 @@
 
             /* STATUS PROJECT */
 
-            this.methodOptions = [{ label: 'Samlet', val: true }, { label: 'Tid, kvalitet og ressourcer', val: false }];
+            this.methodOptions = [{ text: 'Samlet', id: 0 }, { text: 'Tid, kvalitet og ressourcer', id: 1 }];
+
+            // pre select 'Samlet'
+            this.showCombinedChart = this.methodOptions[0];
 
             this.allStatusUpdates = statusUpdates;
 
@@ -91,15 +95,13 @@
 
             this.combinedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return s.IsCombined; });
             this.splittedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return !s.IsCombined; });
-        }
 
-
-
-        private onSelectStatusMethod(showCombined) {
-            if (showCombined) {
-                this.currentStatusUpdate = (this.combinedStatusUpdates.length > 0) ? this.combinedStatusUpdates[0] : null;
-            } else {
-                this.currentStatusUpdate = (this.splittedStatusUpdates.length > 0) ? this.splittedStatusUpdates[0] : null;
+            $scope.onSelectStatusMethod = function(showCombined) {
+                if (showCombined === 0) {
+                    self.currentStatusUpdate = (self.combinedStatusUpdates.length > 0) ? self.combinedStatusUpdates[0] : null;
+                } else {
+                    self.currentStatusUpdate = (self.splittedStatusUpdates.length > 0) ? self.splittedStatusUpdates[0] : null;
+                }
             }
         }
 

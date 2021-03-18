@@ -7,15 +7,15 @@
             <!-- ArchiveDuty -->
             <div class="form-group">
                 <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
-                <select class="form-control input-sm" id="archiveDuty"
-                        ui-select2="{minimumResultsForSearch: -1}"
-                        data-ng-model="usage.archiveDuty"
-                        data-autosave="api/itSystemUsage/{{usageId}}"
-                        data-field="ArchiveDuty"
-                        data-ng-disabled="!hasWriteAccess">
-                    <option hidden selected value />
-                    <option ng-repeat="option in archiveDutyOptions" value="{{option.value}}" ng-bind-html="option.name" />
-                </select>
+                <select-simple data-id="numberOfUsers"
+                               data-label="Arkiveringspligt"
+                               data-options="archiveDutyOptions"
+                               data-ng-model="usage.archiveDuty"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="ArchiveDuty">
+                </select-simple>
+
                 <!-- ArchiveDuty recommendation -->
                 <span class="help-block small" ng-if="usage.itSystem.archiveDuty && usage.itSystem.archiveDuty > 0">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>

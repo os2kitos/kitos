@@ -48,14 +48,12 @@
                                       data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
                         </td>
                         <td>
-                            <select class="form-control input-sm responsible"
-                                    data-ui-select2=""
-                                    data-field="responsibleUserId"
-                                    data-autosave="{{risk.updateUrl}}"
-                                    data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                    data-ng-model="risk.responsibleUserId">
-                                <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
-                            </select>
+                            <select-simple data-options="usersWithRoles"
+                                           data-ng-model="risk.responsibleUserId"
+                                           data-field="responsibleUserId"
+                                           data-autosave="{{risk.updateUrl}}"
+                                           data-ng-disabled="!projectEditVm.hasWriteAccess">
+                            </select-simple>
                         </td>
                         <td>
                             <button class="btn btn-danger btn-sm delete-risk"
@@ -92,15 +90,13 @@
                         </td>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <select id="responsible"
-                                        name="responsbile"
-                                        class="form-control input-sm"
-                                        required
-                                        data-ui-select2=""
-                                        data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                        data-ng-model="newRisk.responsibleUserId">
-                                    <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
-                                </select>
+                                <select-simple data-id="responsible"
+                                               data-ng-required="true"                                                
+                                               name="responsible"
+                                               data-options="usersWithRoles"
+                                               data-ng-model="newRisk.responsibleUserId"
+                                               data-ng-disabled="!projectEditVm.hasWriteAccess">
+                                </select-simple>
                             </div>
                         </td>
                         <td class="text-right">

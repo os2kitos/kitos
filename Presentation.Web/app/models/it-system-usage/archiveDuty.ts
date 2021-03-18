@@ -1,20 +1,20 @@
 ﻿module Kitos.Models.ItSystemUsage {
     export interface IArchiveDuty {
-        value: number;
-        name: string;
+        id: number;
+        text: string;
     }
 
     export class ArchiveDutyFactory {
         static mapFromNumeric(value: number): IArchiveDuty {
             switch (value) {
                 case 0:
-                    return { name: "&nbsp;", value: value}; //Using html encoding for the option to
+                    return { text: "\u00a0", id: value }; //Using non-breaking space character
                 case 1:
-                    return { name: "B", value: value};
+                    return { text: "B", id: value };
                 case 2:
-                    return { name: "K", value: value};
+                    return { text: "K", id: value };
                 case 3:
-                    return { name: "Ved ikke", value: value};
+                    return { text: "Ved ikke", id: value };
                 default:
                     return null;
             }

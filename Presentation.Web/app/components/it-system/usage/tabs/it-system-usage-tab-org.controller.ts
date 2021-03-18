@@ -32,17 +32,16 @@
         });
     }]);
 
-    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user',
-        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user) {
+    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user', "entityMapper", 
+        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user, entityMapper) {
             $scope.orgUnitsTree = orgUnitsTree;
-            $scope.selectedOrgUnits = selectedOrgUnits;
-            $scope.responsibleOrgUnitId = responsibleOrgUnitId;
+            $scope.selectedOrgUnits = entityMapper.mapApiResponseToSelect2ViewModel(selectedOrgUnits);
+            $scope.responsibleOrgUnit = _.find($scope.selectedOrgUnits, (orgUnit) => orgUnit.id === responsibleOrgUnitId);
             var usageId = $stateParams.id;
 
-            $scope.saveResponsible = function () {
-                var orgUnitId = $scope.responsibleOrgUnitId;
+            $scope.saveResponsible = function (orgUnitId) {
                 var msg = notify.addInfoMessage("Gemmer... ");
-                if ($scope.responsibleOrgUnitId) {
+                if (orgUnitId != null) {
                     $http.post('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&orgUnitId=' + orgUnitId + '&responsible=true')
                         .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
@@ -65,7 +64,7 @@
                     $http.post('api/itSystemUsage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
                         .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                            $scope.selectedOrgUnits.push(obj);
+                            $scope.selectedOrgUnits.push({ id: obj.id, text: obj.name });
                         }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
