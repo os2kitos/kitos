@@ -92,7 +92,7 @@
                 for (var i = 0; i < 20; i++) {
                     var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
                     var year = currentDate.year();
-                    var obj = { id: i, half: half, year: year };
+                    var obj = { id: i, text: half + " | " + year, half: half, year: year };
                     $scope.procurementPlans.push(obj);
 
                     // add 6 months for next iter
@@ -133,14 +133,14 @@
                     }
                 }
 
-                $scope.saveProcurement = function () {
+                $scope.saveProcurement = function (input) {
                     var payload;
                     // if empty the value has been cleared
-                    if ($scope.contract.procurementPlan === '') {
+                    if (input == null) {
                         contract = $scope.contract; 
                         payload = { procurementPlanHalf: null, procurementPlanYear: null };
                     } else {
-                        var id = $scope.contract.procurementPlan;
+                        var id = input.id;
                         var result = $scope.procurementPlans[id];
                         payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
                     }
@@ -148,13 +148,6 @@
                     $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
-                };
-
-                $scope.procurementPlanOption = {
-                    allowClear: true,
-                    initSelection: function (element, callback) {
-                        callback({ id: 1, text: 'Text' });
-                    }
                 };
 
                 function patch(payload, url) {

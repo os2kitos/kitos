@@ -33,7 +33,7 @@
         options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 3, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 3, text: "\u00a0" },
                 <Select2OptionViewModel<any>>{ id: 1, text: "Ja" },
                 <Select2OptionViewModel<any>>{ id: 0, text: "Nej" },
                 <Select2OptionViewModel<any>>{ id: 2, text: "Ved ikke" }
@@ -45,7 +45,7 @@
         options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 3, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 3, text: "\u00a0" },
                 <Select2OptionViewModel<any>>{ id: 0, text: "Lav risiko" },
                 <Select2OptionViewModel<any>>{ id: 1, text: "Mellem risiko" },
                 <Select2OptionViewModel<any>>{ id: 2, text: "Høj risiko" }
@@ -85,7 +85,7 @@
         options: Select2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 0, text: "&nbsp" },
+                <Select2OptionViewModel<any>>{ id: 0, text: "\u00a0" },
                 <Select2OptionViewModel<any>>{ id: 1, text: "On-premise" },
                 <Select2OptionViewModel<any>>{ id: 2, text: "Eksternt" }
             ];

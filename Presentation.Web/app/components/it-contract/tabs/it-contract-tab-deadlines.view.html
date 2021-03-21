@@ -304,37 +304,27 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="agreement-running" class="control-label small">Løbende</label>
-                            <select id="agreement-running"
-                                    class="form-control input-sm"
-                                    data-ui-select2="{ allowClear: true }"
-                                    data-placeholder="Vælg varighed"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.running"
-                                    data-autosave="{{autosaveUrl}}"
-                                    data-field="running">
-                                <option value=""></option>
-                                <option value="calendarYear">Kalenderår</option>
-                                <option value="quater">Kvartal</option>
-                                <option value="month">Måned</option>
-                            </select>
+                            <select-simple data-id="agreement-running"
+                                           data-label="Løbende"
+                                           data-options="deadlineOptions"
+                                           data-placeholder="Vælg varighed"
+                                           data-ng-model="contract.running"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-field="running">
+                            </select-simple>
                         </div>
 
                         <div class="form-group">
-                            <label for="agreement-by-ending" class="control-label small">Inden udgangen af</label>
-                            <select id="agreement-by-ending"
-                                    class="form-control input-sm"
-                                    data-ui-select2="{ allowClear: true }"
-                                    data-placeholder="Vælg varighed"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.byEnding"
-                                    data-autosave="{{autosaveUrl}}"
-                                    data-field="byEnding">
-                                <option value=""></option>
-                                <option value="calendarYear">Kalenderår</option>
-                                <option value="quater">Kvartal</option>
-                                <option value="month">Måned</option>
-                            </select>
+                            <select-simple data-id="agreement-by-ending"
+                                           data-label="Inden udgangen af"
+                                           data-options="deadlineOptions"
+                                           data-placeholder="Vælg varighed"
+                                           data-ng-model="contract.byEnding"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-field="byEnding">
+                            </select-simple>
                         </div>
                     </div>
                 </div>

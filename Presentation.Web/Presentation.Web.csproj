@@ -365,6 +365,7 @@
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
     <Content Include="app\shared\select2Option\select2Option.view.html" />
+    <Content Include="app\shared\selectAccessModifier\selectAccess.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
     <Content Include="app\shared\selectSimple\selectSimple.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
@@ -825,6 +826,7 @@
     <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
     <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
     <TypeScriptCompile Include="app\shared\select2Option\select2Option.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccess.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />

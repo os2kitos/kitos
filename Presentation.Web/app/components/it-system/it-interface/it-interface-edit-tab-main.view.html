@@ -75,13 +75,14 @@
 
                         <!-- Access modifier -->
                         <div class="form-group">
-                            <label for="interface-access" class="control-label small">Synlighed</label>
-                            <input id="interface-access" class="form-control input-sm" data-element-type="InterfaceAccesAbilityInput"
-                                   data-autosave="{{interface.updateUrl}}"
-                                   data-field="accessModifier"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="interface.accessModifier"
-                                   data-select-access-modifier="">
+                            <select-access data-id="interface-access"
+                                           data-label="Synlighed"
+                                           data-is-global-admin="{{ isGlobalAdmin }}"
+                                           data-ng-model="interface.accessModifier"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{interface.updateUrl}}"
+                                           data-field="accessModifier">
+                            </select-access>
                         </div>
 
                         <!-- Interface  -->

@@ -97,16 +97,14 @@
 
                         <!-- Procurement plan -->
                         <div class="form-group">
-                            <label for="contract-plan" class="control-label small">Udbudsplan</label>
-                            <select id="contract-plan" class="form-control input-sm"
-                                    data-ui-select2="procurementPlanOption"
-                                    data-placeholder="Vælg udbudsplan"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.procurementPlan"
-                                    data-ng-change="saveProcurement()">
-                                <option value=""></option>
-                                <option data-ng-repeat="procurementPlan in procurementPlans" value="{{procurementPlan.id}}">{{procurementPlan.half + ' | ' + procurementPlan.year}}</option>
-                            </select>
+                            <select-simple data-id="contract-plan"
+                                           data-label="Udbudsplan"
+                                           data-placeholder="Vælg udbudsplan"
+                                           data-options="procurementPlans"
+                                           data-ng-model="contract.procurementPlan"
+                                           data-function="saveProcurement"
+                                           data-ng-disabled="!hasWriteAccess">
+                            </select-simple>
                         </div>
 
                     </div>

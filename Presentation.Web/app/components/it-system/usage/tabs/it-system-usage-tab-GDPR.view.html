@@ -17,29 +17,25 @@
                 </div>
                 <!-- Business critical -->
                 <div class="form-group">
-                    <label for="businessCritical" class="control-label small">Forretningskritisk IT-System</label>
-                    <select class="form-control input-sm" id="businessCritical"
-                            ui-select2="noSearchNoClearSelect2"
-                            ng-model="usageViewModel.isBusinessCritical"
-                            data-autosave="{{autoSaveUrl}}"
-                            data-field="IsBusinessCritical"
-                            ng-disabled="!hasWriteAccess">
-                        <option hidden selected value />
-                        <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                    </select>
+                    <select-simple data-id="businessCritical"
+                                   data-label="Forretningskritisk IT-System"
+                                   data-options="dataOptions"
+                                   data-ng-model="usageViewModel.isBusinessCritical"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-auto-save-url="{{autoSaveUrl}}"
+                                   data-field="IsBusinessCritical">
+                    </select-simple>
                 </div>
                 <!-- HostedAt -->
                 <div class="form-group">
-                    <label for="HostedAt" class="control-label small">IT systemet driftes</label>
-                    <select class="form-control input-sm" id="HostedAt"
-                            ui-select2="{minimumResultsForSearch: -1, allowClear: false}"
-                            ng-model="usageViewModel.hostedAt"
-                            data-autosave="{{autoSaveUrl}}"
-                            data-field="HostedAt"
-                            data-ng-disabled="!hasWriteAccess">
-                        <option hidden selected value />
-                        <option ng-repeat="option in hostedAtOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                    </select>
+                    <select-simple data-id="HostedAt"
+                                   data-label="IT systemet driftes"
+                                   data-options="hostedAtOptions"
+                                   data-ng-model="usageViewModel.hostedAt"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-auto-save-url="{{autoSaveUrl}}"
+                                   data-field="HostedAt">
+                    </select-simple>
                 </div>
                 <!-- Data processing agreement -->
                 <div data-ng-if="user.currentConfig.showDataProcessing">
@@ -178,45 +174,42 @@
                     <div class="well">
                         <!-- Implemented technical precautions -->
                         <div class="form-group">
-                            <label for="precautions" class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
-                            <select class="form-control input-sm" id="precautions"
-                                    ui-select2="noSearchNoClearSelect2"
-                                    ng-model="usageViewModel.precautions"
-                                    data-autosave="{{autoSaveUrl}}"
-                                    data-field="Precautions"
-                                    ng-disabled="!hasWriteAccess">
-                                <option hidden selected value />
-                                <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                            </select>
-
+                            <select-simple data-id="precautions"
+                                           data-label="Implementeret passende tekniske foranstaltninger"
+                                           data-options="dataOptions"
+                                           data-ng-model="usageViewModel.precautions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{autoSaveUrl}}"
+                                           data-field="Precautions">
+                            </select-simple>
                         </div>
                         <!-- Technical precautions consists of -->
-                        <div ng-show="usageViewModel.precautions == 1">
+                        <div ng-show="usageViewModel.precautions.id == 1">
                             <div class="form-group">
                                 <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
                                 <div id="precautionsOptions">
                                     <input type="checkbox"
                                            data-element-type="precautionsEncryptionCheckbox"
                                            ng-model="usage.precautionsOptionsEncryption"
-                                           ng-click="patch('PrecautionsOptionsEncryption', usage.precautionsOptionsEncryption)" />
+                                           ng-change="patch('PrecautionsOptionsEncryption', usage.precautionsOptionsEncryption)" />
                                     <span style="font-size: small;">Kryptering</span><br />
 
                                     <input type="checkbox"
                                            data-element-type="precautionsPseudonomiseringCheckbox"
                                            ng-model="usage.precautionsOptionsPseudonomisering"
-                                           ng-click="patch('PrecautionsOptionsPseudonomisering', usage.precautionsOptionsPseudonomisering)" />
+                                           ng-change="patch('PrecautionsOptionsPseudonomisering', usage.precautionsOptionsPseudonomisering)" />
                                     <span style="font-size: small;">Pseudonomisering</span><br />
 
                                     <input type="checkbox"
                                            data-element-type="precautionsAccessControlCheckbox"
                                            ng-model="usage.precautionsOptionsAccessControl"
-                                           ng-click="patch('PrecautionsOptionsAccessControl', usage.precautionsOptionsAccessControl)" />
+                                           ng-change="patch('PrecautionsOptionsAccessControl', usage.precautionsOptionsAccessControl)" />
                                     <span style="font-size: small;">Adgangsstyring</span><br />
 
                                     <input type="checkbox"
                                            data-element-type="precautionsLogningCheckbox"
                                            ng-model="usage.precautionsOptionsLogning"
-                                           ng-click="patch('PrecautionsOptionsLogning', usage.precautionsOptionsLogning)" />
+                                           ng-change="patch('PrecautionsOptionsLogning', usage.precautionsOptionsLogning)" />
                                     <span style="font-size: small;">Logning</span><br />
                                 </div>
                             </div>
@@ -251,19 +244,16 @@
 
                     <div class="well">
                         <div class="form-group">
-                            <label for="userSupervision" class="control-label small">Logning af brugerkontrol</label><br>
-                            <select class="form-control input-sm" id="userSupervision"
-                                    ui-select2="noSearchNoClearSelect2"
-                                    ng-model="usageViewModel.userSupervision"
-                                    data-autosave="{{autoSaveUrl}}"
-                                    data-field="UserSupervision"
-                                    ng-disabled="!hasWriteAccess">
-                                <option hidden selected value />
-                                <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                            </select>
-
+                            <select-simple data-id="userSupervision"
+                                           data-label="Logning af brugerkontrol"
+                                           data-options="dataOptions"
+                                           data-ng-model="usageViewModel.userSupervision"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{autoSaveUrl}}"
+                                           data-field="UserSupervision">
+                            </select-simple>
                         </div>
-                        <div ng-show="usageViewModel.userSupervision == 1">
+                        <div ng-show="usageViewModel.userSupervision.id == 1">
                             <div class="form-group">
                                 <label class="control-label small">Dato for seneste brugerkontrol</label><br>
                                 <input type="text" id="latestRiskAssesmentDate" class="form-control"
@@ -307,19 +297,16 @@
                 <!-- Risk assessment -->
                 <div class="well">
                     <div class="form-group">
-                        <label for="riskAssessment" class="control-label small">Foretaget risikovurdering</label><br>
-                        <select class="form-control input-sm" id="riskAssessment"
-                                ui-select2="noSearchNoClearSelect2"
-                                ng-model="usageViewModel.riskAssessment"
-                                data-autosave="{{autoSaveUrl}}"
-                                data-field="RiskAssessment"
-                                ng-disabled="!hasWriteAccess">
-                            <option hidden selected value />
-                            <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                        </select>
-
+                        <select-simple data-id="riskAssessment"
+                                       data-label="Foretaget risikovurdering"
+                                       data-options="dataOptions"
+                                       data-ng-model="usageViewModel.riskAssessment"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-auto-save-url="{{autoSaveUrl}}"
+                                       data-field="RiskAssessment">
+                        </select-simple>
                     </div>
-                    <div ng-show="usageViewModel.riskAssessment == 1">
+                    <div ng-show="usageViewModel.riskAssessment.id == 1">
                         <!-- Date of last risk assesment -->
                         <div class="form-group">
                             <label for="riskAssesmentDate" class="control-label small">Dato for seneste risikovurdering</label>
@@ -334,17 +321,14 @@
                         </div>
                         <!-- Previous risk assessment -->
                         <div class="form-group">
-                            <label for="preRiskAssessment" class="control-label small">Hvad viste den seneste risikovurdering?</label>
-                            <select class="form-control input-sm" id="preRiskAssessment"
-                                    ui-select2="noSearchNoClearSelect2"
-                                    ng-model="usageViewModel.preRiskAssessment"
-                                    data-autosave="{{autoSaveUrl}}"
-                                    data-field="PreRiskAssessment"
-                                    ng-disabled="!hasWriteAccess">
-                                <option hidden selected value />
-                                <option ng-repeat="riskLevel in riskLevelOptions" value="{{riskLevel.id}}" ng-bind-html="riskLevel.text" />
-                            </select>
-
+                            <select-simple data-id="preRiskAssessment"
+                                           data-label="Hvad viste den seneste risikovurdering?"
+                                           data-options="riskLevelOptions"
+                                           data-ng-model="usageViewModel.preRiskAssessment"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{autoSaveUrl}}"
+                                           data-field="PreRiskAssessment">
+                            </select-simple>
                         </div>
 
                         <div class="form-group">
@@ -389,19 +373,16 @@
                     <div class="well">
                         <!-- DPIA -->
                         <div class="form-group">
-                            <label for="DPIA" class="control-label small">Gennemført DPIA / Konsekvensanalyse</label>
-                            <select class="form-control input-sm" id="DPIA"
-                                    ui-select2="noSearchNoClearSelect2"
-                                    ng-model="usageViewModel.DPIA"
-                                    data-autosave="{{autoSaveUrl}}"
-                                    data-field="DPIA"
-                                    ng-disabled="!hasWriteAccess">
-                                <option hidden selected value />
-                                <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                            </select>
-
+                            <select-simple data-id="DPIA"
+                                           data-label="Gennemført DPIA / Konsekvensanalyse"
+                                           data-options="dataOptions"
+                                           data-ng-model="usageViewModel.DPIA"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{autoSaveUrl}}"
+                                           data-field="DPIA">
+                            </select-simple>
                         </div>
-                        <div ng-show="usageViewModel.DPIA == 1">
+                        <div ng-show="usageViewModel.DPIA.id == 1">
                             <!-- Date of DPIA -->
                             <div class="form-group">
                                 <label for="DPIADateFor" class="control-label small">Dato for den seneste DPIA</label>
@@ -446,18 +427,16 @@
                 <div class="well">
                     <!-- Answering data DPIA -->
                     <div class="form-group">
-                        <label for="answeringDataDPIA" class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label>
-                        <select class="form-control input-sm" id="answeringDataDPIA"
-                                ui-select2="noSearchNoClearSelect2"
-                                ng-model="usageViewModel.answeringDataDPIA"
-                                data-autosave="{{autoSaveUrl}}"
-                                data-field="AnsweringDataDPIA"
-                                ng-disabled="!hasWriteAccess">
-                            <option hidden selected value />
-                            <option ng-repeat="option in dataOptions" value="{{option.id}}" ng-bind-html="option.text" />
-                        </select>
+                        <select-simple data-id="answeringDataDPIA"
+                                       data-label="Er der bevaringsfrist på data inden de må slettes?"
+                                       data-options="dataOptions"
+                                       data-ng-model="usageViewModel.answeringDataDPIA"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-auto-save-url="{{autoSaveUrl}}"
+                                       data-field="AnsweringDataDPIA">
+                        </select-simple>
                     </div>
-                    <div ng-show="usageViewModel.answeringDataDPIA == 1">
+                    <div ng-show="usageViewModel.answeringDataDPIA.id == 1">
                         <!-- Date of next delete of data DPIA -->
                         <div class="form-group">
                             <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>

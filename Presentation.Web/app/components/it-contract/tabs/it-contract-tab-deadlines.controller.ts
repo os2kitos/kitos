@@ -36,6 +36,14 @@
             $scope.durationMonths = $scope.contract.durationMonths;
             $scope.durationOngoing = $scope.contract.durationOngoing;
 
+            $scope.deadlineOptions = [
+                { id: "", text: "\u00a0" },
+                { id: "calendarYear", text: "Kalenderår" },
+                { id: "quater", text: "Kvartal" },
+                { id: "month", text: "Måned" },
+
+            ]
+
             $scope.saveDurationYears = () => {
                 if ($scope.durationYears === "") {
                     return;

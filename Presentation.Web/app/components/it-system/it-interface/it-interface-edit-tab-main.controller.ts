@@ -27,9 +27,12 @@
             "$scope", "$http", "$state", "notify", "itInterface", "user", "hasWriteAccess", "interfaces", "dataTypes", "dataRows", "select2LoadingService", "_",
             ($scope, $http, $state, notify, itInterface, user, hasWriteAccess, interfaces, dataTypes, dataRows, select2LoadingService, _) => {
 
+                itInterface.accessModifier = String(itInterface.accessModifier); // Small fix to allow select2 to read a selected 0. Since it understands the string "0" but not the number 0. https://github.com/select2/select2/issues/4052. 
+
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
+                $scope.isGlobalAdmin = user.isGlobalAdmin;
 
                 $scope.formatInterfaceName = Kitos.Helpers.InterfaceNameFormat.apply;
                 $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
