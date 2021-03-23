@@ -11,7 +11,7 @@
                     ],
                     agreementElements: [
                         "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.AgreementElementTypes).getAll()
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.AgreementElementTypes).getAll()
                     ]
                 }
             });
@@ -19,16 +19,57 @@
     ]);
 
     app.controller("contract.EditSystemsCtrl", [
-        "$scope", "$http", "$stateParams", "notify", "user", "contract", "agreementElements", "_", "$filter", "systemRelationService",
-        ($scope, $http, $stateParams, notify, user, contract, agreementElements, _, $filter, systemRelationService) => {
+        "$scope", "$http", "$stateParams", "notify", "user", "contract", "agreementElements", "_", "$filter", "systemRelationService", "entityMapper",
+        ($scope, $http, $stateParams, notify, user, contract, agreementElements, _, $filter, systemRelationService, entityMapper) => {
 
             $scope.autoSaveUrl = `api/itcontract/${$stateParams.id}`;
             $scope.contract = contract;
 
             $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
-            $scope.agreementElements = agreementElements;
-            $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");
-            $scope.selectedAgreementElementNames = _.map(contract.agreementElements, "name");
+
+            $scope.availableAgreementElements = entityMapper.mapOptionToSelect2ViewModel(agreementElements);
+
+            $scope.selectedAgreementElements = entityMapper.mapApiResponseToSelect2ViewModel(contract.agreementElements);
+
+            $scope.$watch("elements", function (newValue, oldValue) {
+                if (_.isUndefined(newValue) || _.isUndefined(oldValue)) {
+                    return;
+                }
+                if (newValue.length > oldValue.length) {
+                    // something was added
+                    var toAdd: any = _.difference(newValue, oldValue);
+                    if (!_.isUndefined(toAdd)) {
+                        for (var j = 0; j < toAdd.length; j++) {
+                            var index = j;
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            $http.post($scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId + "&elemId=" + toAdd[index].id)
+                                .then(function onSuccess(result) {
+                                    contract.agreementElements.push({ id: toAdd[index].id, name: toAdd[index].text });
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                }, function onError(error) {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                });
+                        }
+                    }
+                } else if (newValue.length < oldValue.length) {
+                    // something was removed
+                    var toRemove: any = _.difference(oldValue, newValue);
+                    if (!_.isUndefined(toRemove)) {
+                        for (var i = 0; i < toRemove.length; i++) {
+                            var index = i;
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            $http.delete($scope.autoSaveUrl + "?organizationId=" + user.currentOrganizationId + "&elemId=" + toRemove[index].id)
+                                .then(function onSuccess(result) {
+                                    _.remove(contract.agreementElements, (element) => { return element.id === toRemove[index].id });
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                }, function onError(error) {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                });
+                            
+                        }
+                    }
+                }
+            });
 
             const mapDataToViewmodelArray = (systemRelations: [Kitos.Models.Api.ItSystemUsage.Relation.IItSystemUsageRelationDTO]) => {
                 return Kitos.Models.ViewModel.ItSystemUsage.Relation.SystemRelationMapper.mapSystemRelationsToViewModels(
@@ -65,12 +106,12 @@
                     systemUsage.delete = () => {
                         deleteAssociatedSystem(systemUsage)
                             .then(function onSuccess(result) {
-                            notify.addSuccessMessage("Rækken er slettet.");
-                            _.remove(contract.associatedSystemUsages, { id: systemUsage.id });
-                            systemUsage.show = false;
-                        }, function onError(result) {
-                            notify.addErrorMessage("Kunne ikke slette rækken");
-                        });
+                                notify.addSuccessMessage("Rækken er slettet.");
+                                _.remove(contract.associatedSystemUsages, { id: systemUsage.id });
+                                systemUsage.show = false;
+                            }, function onError(result) {
+                                notify.addErrorMessage("Kunne ikke slette rækken");
+                            });
                     };
 
                 });
@@ -83,18 +124,18 @@
                         postAssociatedSystem($scope.newAssociatedSystemUsage)
                             .then(function onSuccess(result) {
 
-                            notify.addSuccessMessage("Rækken er tilføjet.");
+                                notify.addSuccessMessage("Rækken er tilføjet.");
 
-                            //then reformat and redraw the rows
-                            contract.associatedSystemUsages = result.data.response;
-                            formatAssociatedSystems(result.response);
+                                //then reformat and redraw the rows
+                                contract.associatedSystemUsages = result.data.response;
+                                formatAssociatedSystems(result.response);
 
-                        }, function onError(result) {
+                            }, function onError(result) {
 
-                            //couldn't add new binding
-                            notify.addErrorMessage("Fejl! Kunne ikke tilføje rækken!");
+                                //couldn't add new binding
+                                notify.addErrorMessage("Fejl! Kunne ikke tilføje rækken!");
 
-                        });
+                            });
                     }
                 };
             }

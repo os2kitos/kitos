@@ -142,27 +142,6 @@
                         });
                     }
 
-                    function saveMultipleSelect2(e) {
-                        var id, msg = notify.addInfoMessage("Gemmer...", false);
-                        if (e.added) {
-                            id = e.added.id;
-                            $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .then(function onSuccess(result) {
-                                    msg.toSuccessMessage("Feltet er opdateret.");
-                                }, function onError(result) {
-                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                });
-                        } else if (e.removed) {
-                            id = e.removed.id;
-                            $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .then(function onSuccess(result) {
-                                    msg.toSuccessMessage("Feltet er opdateret.");
-                                }, function onError(result) {
-                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                });
-                        }
-                    }
-
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
                         if (!attrs.appendurl)
@@ -183,11 +162,8 @@
 
                     // ui select fields trigger the change event
                     if (!angular.isUndefined(attrs.uiSelect2)) {
-                        if (attrs.multiple) {
-                            element.bind('change', saveMultipleSelect2);
-                        } else {
-                            element.bind('change', saveSelect2);
-                        }
+                        element.bind('change', saveSelect2);
+
                         // kendo date picker
                     } else if (!angular.isUndefined(attrs.kendoDatePicker)) {
                         element.bind('blur', saveDate);

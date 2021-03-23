@@ -28,7 +28,10 @@
 
                     if (scope.function != null) {
                         scope.$watch('selected', (newVal) => {
-                            if (newVal == null) {
+                            if (newVal === undefined) {
+                                return;
+                            }
+                            if (newVal === null) {
                                 scope.function(null);
                             }
                             else {

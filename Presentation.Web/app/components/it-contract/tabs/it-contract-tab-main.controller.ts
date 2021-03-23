@@ -104,14 +104,14 @@
                 });
                 if (foundPlan) {
                     // plan is found in the list, replace it to get object equality
-                    $scope.contract.procurementPlan = foundPlan.id;
+                    $scope.procurementPlanId = foundPlan.id;
                 } else {
                     // plan is not found, add missing plan to begining of list
                     // if not null
                     if (contract.procurementPlanHalf != null) {
-                        var plan = { id: $scope.procurementPlans.length, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                        var plan = { id: $scope.procurementPlans.length, text: half + " | " + year, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
-                        $scope.contract.procurementPlan = plan.id; // select it
+                        $scope.procurementPlanId = plan.id; // select it
                     }
                 }
                 $scope.patchDate = (field, value) => {
