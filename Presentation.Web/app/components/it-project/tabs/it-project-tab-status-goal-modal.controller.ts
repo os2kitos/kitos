@@ -66,6 +66,7 @@
                     if (goal.subGoalDate3) {
                         goal.subGoalDate3 = moment(goal.subGoalDate3, "YYYY-MM-DD").format("DD-MM-YYYY");
                     }
+                    $scope.goalType = goal.goalTypeId;
                 }
 
                 // set to empty object if falsy
@@ -127,6 +128,7 @@
                 $scope.save = function () {
                     var payload = $scope.goal;
                     payload.goalStatusId = project.goalStatus.id;
+                    payload.goalTypeId = $scope.goalType.id;
 
                     var subGoalDate1 = moment(payload.subGoalDate1, "DD-MM-YYYY");
                     if (subGoalDate1.isValid()) {

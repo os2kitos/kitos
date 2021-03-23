@@ -15,7 +15,7 @@ class ItSystemInterfaceCatalog implements IPageObject {
     public cssHelper = new CssHelper();
 
     public getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#!/system/interface-catalog");
+        return this.navigationHelper.getPage("/#/system/interface-catalog");
     }
 
     public isAlertVisible(): webdriver.until.Condition<boolean> {

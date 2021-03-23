@@ -9,7 +9,7 @@ class ItProjectOverview implements IPageObject {
     private kendoLoaderHelper = new KendoLoaderHelper();
 
     public getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#!/project/overview");
+        return this.navigationHelper.getPage("/#/project/overview");
     }
 
     public kendoToolbarHelper = new KendoToolbarHelper();

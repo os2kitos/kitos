@@ -14,7 +14,7 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
     private kendoToolbarWrapper = new KendoToolbarWrapper();
 
     getPage(): webdriver.promise.Promise<void> {
-        return this.navigationHelper.getPage("/#!/data-processing/overview");
+        return this.navigationHelper.getPage("/#/data-processing/overview");
     }
 
     refreshPage(): webdriver.promise.Promise<void> {

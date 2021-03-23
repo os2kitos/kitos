@@ -108,7 +108,7 @@
                             text: "Tilføj reference",
                             template: () => {
                                 if (hasWriteAccess) {
-                                    return "<a id=\"addReference\" class=\"btn btn-success btn-sm\" href=\"\\#!/project/edit/" + project.id + "/reference/createReference/" + project.id + "\"'>Tilføj reference</a>"
+                                    return "<a id=\"addReference\" class=\"btn btn-success btn-sm\" href=\"\\#/project/edit/" + project.id + "/reference/createReference/" + project.id + "\"'>Tilføj reference</a>"
                                 } else {
                                     return "";
                                 }

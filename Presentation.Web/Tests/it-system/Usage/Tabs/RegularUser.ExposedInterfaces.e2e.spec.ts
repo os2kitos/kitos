@@ -81,5 +81,5 @@ function getInterfaceName() {
 }
 
 function urlRegex() {
-    return /\S*\/#!\/system\/edit\/\d+\/interfaces/;
+    return /\S*\/#\/system\/edit\/\d+\/interfaces/;
 }

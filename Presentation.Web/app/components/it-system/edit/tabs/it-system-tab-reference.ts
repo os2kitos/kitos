@@ -121,7 +121,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (hasWriteAccess) {
-                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" data-element-type=\"createReferenceButton\" href=\"\\#!/system/edit/" + itSystem.id + "/reference/createReference/" + itSystem.id + "\"'>Tilføj reference</a>";
+                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" data-element-type=\"createReferenceButton\" href=\"\\#/system/edit/" + itSystem.id + "/reference/createReference/" + itSystem.id + "\"'>Tilføj reference</a>";
                             } else {
                                 return "";
                             }
