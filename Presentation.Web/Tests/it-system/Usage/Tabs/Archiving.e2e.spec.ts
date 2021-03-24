@@ -71,7 +71,7 @@ describe("On the archiving page the user can",
         it("Edit archiving for local IT-system usage",
             () => {
                 const inputs = {
-                    undecidedDuty: " ",
+                    undecidedDuty: "",
                     duty: "B",
                     type: "Arkiveret",
                     place: "Aalborg",

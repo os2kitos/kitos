@@ -196,7 +196,7 @@
 
             $scope.saveTrial = function (handoverTrial) {
                 handoverTrial.itContractId = $scope.contract.id;
-
+                handoverTrial.handoverTrialTypeId = $scope.handoverTrialType.id;
                 var approvedDate = moment(handoverTrial.approved, "DD-MM-YYYY");
                 var expectedDate = moment(handoverTrial.expected, "DD-MM-YYYY");
                 var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);

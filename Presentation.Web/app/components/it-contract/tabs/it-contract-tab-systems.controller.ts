@@ -128,7 +128,7 @@
 
                                 //then reformat and redraw the rows
                                 contract.associatedSystemUsages = result.data.response;
-                                formatAssociatedSystems(result.response);
+                                formatAssociatedSystems(result.data.response);
 
                             }, function onError(result) {
 

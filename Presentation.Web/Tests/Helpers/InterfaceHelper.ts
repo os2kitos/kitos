@@ -41,5 +41,13 @@ class InterfaceHelper {
             return Select2.waitForDataAndSelect();
         });
     }
+
+    public static selectDataFromNoSearchSelect2Field(search: string, id: string) {
+        console.log(`Entering data into select2 field ${id}`);
+        return Select2.selectWithNoSearch(search, id).then(() => {
+            console.log("Waiting for select2 data");
+            return Select2.waitForDataAndSelect();
+        });
+    }
 }
 export = InterfaceHelper
