@@ -1,3 +1,5 @@
+/* KITOSUDV-1287 relation editing and deletion bug */
+
 /* DELETE old orphan data */
 DELETE
 FROM [kitosProd].[dbo].[LocalRelationFrequencyTypes]

@@ -1,3 +1,5 @@
+/* KITOSUDV-1286 Copy advice back to contract module so they are present both in contracts and DPR modules */
+
 DECLARE @ContractAdvice TABLE 
     (
 		AdviceId int,
