@@ -7,6 +7,7 @@ class InterfaceCatalogHelper {
     public static createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
         return this.interfacePage.getPage()
+            .then(() => InterfaceCatalogHelper.waitForKendoGrid())
             .then(() => this.interfacePage.getCreateInterfaceButton().click())
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
@@ -30,6 +31,7 @@ class InterfaceCatalogHelper {
     public static gotoSpecificInterface(name : string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
+            .then(() => InterfaceCatalogHelper.waitForKendoGrid())
             .then(() => this.findSpecificInterfaceInNameColumn(name).click());
     }
 
