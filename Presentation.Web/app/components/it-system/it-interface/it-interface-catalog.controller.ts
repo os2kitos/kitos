@@ -230,6 +230,12 @@
                         template: dataItem => {
                             return `<a data-element-type='InterfaceName' data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${Helpers.InterfaceNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
                         },
+                        attributes: {
+                            "data-element-type": "interfaceNameObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "interfaceNameHeader"
+                        },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 return Helpers.InterfaceNameFormat.apply(dataItem.Name, dataItem.Disabled);

@@ -39,7 +39,7 @@ class ItSystemInterfaceCatalog implements IPageObject {
     }
 
     public waitForKendoGrid() {
-        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+        return this.kendoLoaderHelper.waitForKendoGridData(this.kendoToolbarWrapper.columnObjects().interfaceName.first());
     }
 }
 export = ItSystemInterfaceCatalog;
