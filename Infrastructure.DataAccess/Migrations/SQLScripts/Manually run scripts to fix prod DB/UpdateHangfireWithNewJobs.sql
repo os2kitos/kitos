@@ -1,3 +1,5 @@
+/* KITOSUDV-1286 When Advices are copied they need their original hangfire jobs to be copied as well */
+
 INSERT INTO
 	[kitos_HangfireDB].[HangFire].[Set] ([Key], Score, [Value], ExpireAt)
 
