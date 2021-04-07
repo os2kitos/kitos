@@ -53,7 +53,7 @@
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
 
-        ArchivePeriods: ItSystem.IArchivePeriode;
+        ArchivePeriods: ItSystem.IArchivePeriode[];
 
         ReferenceId: number;
         Reference: IReference;
