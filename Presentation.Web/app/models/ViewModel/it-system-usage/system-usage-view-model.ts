@@ -1,5 +1,6 @@
 ﻿module Kitos.Models.ViewModel.ItSystemUsage {
     import Select2OptionViewModel = ViewModel.Generic.Select2OptionViewModel;
+    import UpdatedSelect2OptionViewModel = ViewModel.Generic.UpdatedSelect2OptionViewModel;
 
     export interface ISensitiveDataLevelModel {
         value: number;
@@ -8,47 +9,47 @@
     }
 
     export enum DataOption {
-        NO = 0,
-        YES = 1,
-        DONTKNOW = 2,
-        UNDECIDED = 3
+        NO = "0",
+        YES = "1",
+        DONTKNOW = "2",
+        UNDECIDED = "3"
     }
 
     export enum RiskLevel {
-        LOW = 0,
-        MIDDLE = 1,
-        HIGH = 2,
-        UNDECIDED = 3
+        LOW = "0",
+        MIDDLE = "1",
+        HIGH = "2",
+        UNDECIDED = "3"
     }
 
     export enum HostedAt {
-        UNDECIDED = 0,
-        ONPREMISE = 1,
-        EXTERNAL = 2,
+        UNDECIDED = "0",
+        ONPREMISE = "1",
+        EXTERNAL = "2",
     }
 
 
 
     export class DataOptions {
-        options: Select2OptionViewModel<any>[];
+        options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 3, text: "\u00a0" },
-                <Select2OptionViewModel<any>>{ id: 1, text: "Ja" },
-                <Select2OptionViewModel<any>>{ id: 0, text: "Nej" },
-                <Select2OptionViewModel<any>>{ id: 2, text: "Ved ikke" }
+                <UpdatedSelect2OptionViewModel<any>>{ id: "3", text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "1", text: "Ja" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "0", text: "Nej" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "2", text: "Ved ikke" }
             ];
         }
     }
 
     export class RiskLevelOptions {
-        options: Select2OptionViewModel<any>[];
+        options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 3, text: "\u00a0" },
-                <Select2OptionViewModel<any>>{ id: 0, text: "Lav risiko" },
-                <Select2OptionViewModel<any>>{ id: 1, text: "Mellem risiko" },
-                <Select2OptionViewModel<any>>{ id: 2, text: "Høj risiko" }
+                <UpdatedSelect2OptionViewModel<any>>{ id: "3", text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "0", text: "Lav risiko" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "1", text: "Mellem risiko" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "2", text: "Høj risiko" }
             ];
         }
 
@@ -82,12 +83,12 @@
     }
 
     export class HostedAtOptions {
-        options: Select2OptionViewModel<any>[];
+        options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <Select2OptionViewModel<any>>{ id: 0, text: "\u00a0" },
-                <Select2OptionViewModel<any>>{ id: 1, text: "On-premise" },
-                <Select2OptionViewModel<any>>{ id: 2, text: "Eksternt" }
+                <UpdatedSelect2OptionViewModel<any>>{ id: "0", text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "1", text: "On-premise" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: "2", text: "Eksternt" }
             ];
         }
     }
