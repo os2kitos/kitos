@@ -24,7 +24,7 @@
                             //get the role names
                             return $http.get("odata/ItProjectRoles?%24format=json&%24top=100&%24orderby=priority+desc&%24count=true")
                                 .then(function (roleResult) {
-                                    var roles: { Name }[] = roleResult.data.value;
+                                    var roles: { Id: number, Name: string }[] = roleResult.data.value;
 
                                     //the resulting map
                                     var users = {};
