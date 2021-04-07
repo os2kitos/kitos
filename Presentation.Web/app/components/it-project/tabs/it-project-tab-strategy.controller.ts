@@ -53,6 +53,13 @@
                 };
 
                 $scope.savejoint = (jointMunicipalProjectId) => {
+                    if (jointMunicipalProjectId === undefined) {
+                        return;
+                    }
+                    if ($scope.jointMunicipalProjectId.id === jointMunicipalProjectId) {
+                        return;
+                    }
+
                     var payload;
                         // if empty the value has been cleared
                     if (jointMunicipalProjectId === null) {
@@ -69,6 +76,13 @@
                 };
 
                 $scope.savecommon = (commonPublicProjectId) => {
+                    if (commonPublicProjectId === undefined) {
+                        return;
+                    }
+                    if ($scope.commonPublicProjectId.id === commonPublicProjectId) {
+                        return;
+                    }
+
                     var payload;
                     // if empty the value has been cleared
                     if (commonPublicProjectId === null) {

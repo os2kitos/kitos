@@ -81,7 +81,7 @@
 
             /* STATUS PROJECT */
 
-            this.methodOptions = [{ text: 'Samlet', id: 0 }, { text: 'Tid, kvalitet og ressourcer', id: 1 }];
+            this.methodOptions = [{ text: 'Samlet', id: 0, val: true }, { text: 'Tid, kvalitet og ressourcer', id: 1, val: false }];
 
             // pre select 'Samlet'
             this.showCombinedChart = this.methodOptions[0];

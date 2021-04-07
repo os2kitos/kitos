@@ -4,7 +4,17 @@
     app.controller("select2OptionController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
         var options = entityMapper.mapOptionToSelect2ViewModel($scope.options);
 
-        var foundSelectedInOptions = _.find(options, function (option: any) { return option.id == $scope.selectedId });
+        var foundSelectedInOptions = _.find(options, function (option: any) {
+            if ($scope.selectedId === undefined) {
+                return false;
+            }
+            if ($scope.selectedId.id === undefined) {
+                return option.id == $scope.selectedId;
+            }
+            else {
+                return option.id == $scope.selectedId.id;
+            }
+        });
         if ($scope.options && $scope.selectedId != null && !foundSelectedInOptions) {
             options.splice(0, 0, { id: $scope.selectedId, text: $scope.selectedText + " (Slettes)", optionalObjectContext: null });
         }
