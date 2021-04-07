@@ -106,13 +106,12 @@
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
                         self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
-                            .success((result: any) => {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                var contract = result.response;
+                                var contract = result.data.response;
                                 $modalInstance.close(contract.id);
                                 self.$state.go("it-contract.edit.main", { id: contract.id });
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
                             });
                     };
@@ -123,13 +122,12 @@
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
                         self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
-                            .success((result: any) => {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                var contract = result.response;
+                                var contract = result.data.response;
                                 $modalInstance.close(contract.id);
                                 self.$state.reload();
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
                             });
                     };

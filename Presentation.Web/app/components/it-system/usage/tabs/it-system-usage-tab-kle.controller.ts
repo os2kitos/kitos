@@ -1,4 +1,4 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config([
         '$stateProvider', $stateProvider => {
             $stateProvider.state('it-system.usage.kle', {
@@ -12,7 +12,7 @@
     ]);
 
     app.controller('system.EditKle', [
-        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'hasWriteAccess',"itSystemUsage",
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'hasWriteAccess', "itSystemUsage",
         ($scope, $http, $state, $stateParams, notify, user, hasWriteAccess, itSystemUsage) => {
             var usageId = $stateParams.id;
             var baseUrl = 'api/itSystemUsage/' + usageId;
@@ -26,14 +26,14 @@
 
             $scope.showAllTasks = true;
 
-            $scope.$watch("selectedTaskGroup", function(newVal, oldVal) {
+            $scope.$watch("selectedTaskGroup", function (newVal, oldVal) {
                 $scope.pagination.skip = 0;
                 loadTasks();
             });
             $scope.$watchCollection('pagination', loadTasks);
 
             //change between show all tasks and only show active tasks
-            $scope.changeTaskView = function() {
+            $scope.changeTaskView = function () {
                 $scope.showAllTasks = !$scope.showAllTasks;
                 $scope.pagination.skip = 0;
                 loadTasks();
@@ -53,56 +53,58 @@
                     if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                 }
 
-                $http.get(url).success(function(result, status, headers) {
-                    $scope.tasklist = result.response;
+                $http.get(url).then(function onSuccess(result) {
+                    $scope.tasklist = result.data.response;
 
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                    var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalCount = paginationHeader.TotalCount;
-                }).error(function() {
+                }, function onError(result) {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
             }
 
             function add(task) {
-                return $http.post(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
-                    task.isSelected = true;
-                });
+                return $http.post(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        task.isSelected = true;
+                    });
             }
 
             function remove(task) {
-                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId).success(function (result) {
-                    task.isSelected = false;
-                });
+                return $http.delete(baseUrl + '?taskId=' + task.taskRef.id + '&organizationId=' + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        task.isSelected = false;
+                    });
             }
 
-            $scope.save = function(task) {
+            $scope.save = function (task) {
                 var msg = notify.addInfoMessage("Opdaterer ...", false);
 
                 if (!task.isSelected) {
-                    add(task).success(function() {
+                    add(task).then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(function() {
+                    }, function onError(result) {
                         msg.toErrorMessage("Fejl!");
                     });
                 } else {
-                    remove(task).success(function() {
+                    remove(task).then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(function() {
+                    }, function onError(result) {
                         msg.toErrorMessage("Fejl!");
                     });
                 }
             };
 
-            $scope.selectAllTasks = function() {
-                _.each($scope.tasklist, function(task: { isSelected; isLocked; }) {
+            $scope.selectAllTasks = function () {
+                _.each($scope.tasklist, function (task: { isSelected; isLocked; }) {
                     if (!task.isSelected && !task.isLocked) {
                         add(task);
                     }
                 });
             };
-            
-            $scope.removeAllTasks = function() {
-                _.each($scope.tasklist, function(task: { isSelected; isLocked; }) {
+
+            $scope.removeAllTasks = function () {
+                _.each($scope.tasklist, function (task: { isSelected; isLocked; }) {
                     if (task.isSelected && !task.isLocked) {
                         remove(task);
                     }
@@ -113,24 +115,26 @@
                 var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post(url).success(function () {
-                    msg.toSuccessMessage("Tilknytningen er oprettet");
-                    reload();
-                }).error(function () {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
+                $http.post(url)
+                    .then(function onSuccess(result) {
+                        msg.toSuccessMessage("Tilknytningen er oprettet");
+                        reload();
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                    });
             };
 
             $scope.removeTaskGroup = function () {
                 var url = baseUrl + '?taskId=' + $scope.selectedTaskGroup + '&organizationId=' + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete(url).success(function () {
-                    msg.toSuccessMessage("Tilknytningen er fjernet");
-                    reload();
-                }).error(function () {
-                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
+                $http.delete(url)
+                    .then(function onSuccess(result) {
+                        msg.toSuccessMessage("Tilknytningen er fjernet");
+                        reload();
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
+                    });
             };
 
             function reload() {

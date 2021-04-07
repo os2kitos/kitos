@@ -63,12 +63,12 @@
                     }
 
                     $http.get(url)
-                        .success(function(result, status, headers) {
+                        .then(function onSuccess(result) {
                             $scope.tasklist = result.response;
 
-                            var paginationHeader = JSON.parse(headers("X-Pagination"));
+                            var paginationHeader = JSON.parse(result.headers("X-Pagination"));
                             $scope.totalCount = paginationHeader.TotalCount;
-                        }).error(function() {
+                        }, function onError(result) {
                             notify.addErrorMessage("Kunne ikke hente opgaver!");
                         });
                 }

@@ -6,12 +6,12 @@
             controller: "system.SystemInterfaceMainCtrl",
             resolve: {
                 interfaces: [
-                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.InterfaceTypes).getAll()
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.InterfaceTypes).getAll()
                 ],
                 dataTypes: [
-                    "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                    localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataTypes).getAll()
+                    "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.DataTypes).getAll()
                 ],
                 dataRows: [
                     "$http", "itInterface",
@@ -27,9 +27,12 @@
             "$scope", "$http", "$state", "notify", "itInterface", "user", "hasWriteAccess", "interfaces", "dataTypes", "dataRows", "select2LoadingService", "_",
             ($scope, $http, $state, notify, itInterface, user, hasWriteAccess, interfaces, dataTypes, dataRows, select2LoadingService, _) => {
 
+                itInterface.accessModifier = String(itInterface.accessModifier); // Small fix to allow select2 to read a selected 0. Since it understands the string "0" but not the number 0. https://github.com/select2/select2/issues/4052. 
+
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.interfaces = interfaces;
                 $scope.dataTypes = dataTypes;
+                $scope.isGlobalAdmin = user.isGlobalAdmin;
 
                 $scope.formatInterfaceName = Kitos.Helpers.InterfaceNameFormat.apply;
                 $scope.linkButtonDisabled = !Kitos.Utility.Validation.validateUrl(itInterface.url);
@@ -58,12 +61,13 @@
                     dataRow.updateUrl = `api/dataRow/${dataRow.id}`;
                     dataRow.delete = () => {
                         var msg = notify.addInfoMessage("Fjerner rækken...", false);
-                        $http.delete(dataRow.updateUrl + "?organizationId=" + user.currentOrganizationId).success(() => {
-                            dataRow.show = false;
-                            msg.toSuccessMessage("Rækken er fjernet!");
-                        }).error(() => {
-                            msg.toErrorMessage("Fejl! Kunne ikke fjerne rækken!");
-                        });
+                        $http.delete(dataRow.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                            .then(function onSuccess(result) {
+                                dataRow.show = false;
+                                msg.toSuccessMessage("Rækken er fjernet!");
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl! Kunne ikke fjerne rækken!");
+                            });
                     };
 
                     $scope.dataRows.push(dataRow);
@@ -74,12 +78,13 @@
                     var payload = { itInterfaceId: itInterface.id };
 
                     var msg = notify.addInfoMessage("Tilføjer række...", false);
-                    $http.post(`api/dataRow?organizationId=${user.currentOrganizationId}`, payload).success(result => {
-                        pushDataRow(result.response);
-                        msg.toSuccessMessage("Rækken er tilføjet!");
-                    }).error(() => {
-                        msg.toErrorMessage("Fejl! Kunne ikke tilføje rækken!");
-                    });
+                    $http.post(`api/dataRow?organizationId=${user.currentOrganizationId}`, payload)
+                        .then(function onSuccess(result) {
+                            pushDataRow(result.data.response);
+                            msg.toSuccessMessage("Rækken er tilføjet!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl! Kunne ikke tilføje rækken!");
+                        });
                 };
 
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2("api/itsystem", true, [`organizationId=${user.currentOrganizationId}`, `take=25`], false);
@@ -120,11 +125,10 @@
                             };
                             var url = `api/exhibit/${itInterface.id}?organizationId=${user.currentOrganizationId}`;
                             $http({ method: "PATCH", url: url, data: patchPayload })
-                                .success(() => {
+                                .then(function onSuccess(result) {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     reload();
-                                })
-                                .error(() => {
+                                }, function onError(result) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         } else {
@@ -133,21 +137,23 @@
                                 itInterfaceId: itInterface.id,
                                 itSystemId: $scope.exposedByObj.id
                             };
-                            $http.post("api/exhibit", postPayload).success(() => {
-                                msg.toSuccessMessage("Feltet er opdateret.");
-                                reload();
-                            }).error(() => {
-                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                            });
+                            $http.post("api/exhibit", postPayload)
+                                .then(function onSuccess(result) {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                    reload();
+                                }, function onError(result) {
+                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                });
                         }
                     } else {
                         // DELETE
-                        $http.delete(`api/exhibit/${itInterface.id}?organizationId=${user.currentOrganizationId}`).success(() => {
-                            msg.toSuccessMessage("Feltet er opdateret.");
-                            reload();
-                        }).error(() => {
-                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                        });
+                        $http.delete(`api/exhibit/${itInterface.id}?organizationId=${user.currentOrganizationId}`)
+                            .then(function onSuccess(result) {
+                                msg.toSuccessMessage("Feltet er opdateret.");
+                                reload();
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                            });
                     }
                 }
             }

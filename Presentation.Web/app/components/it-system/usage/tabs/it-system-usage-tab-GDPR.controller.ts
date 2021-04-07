@@ -47,11 +47,12 @@
                             ObjectType: "ITSYSTEMUSAGE"
                         };
 
-                        $http.post(`odata/AttachedOptions?organizationId=${user.currentOrganizationId}`, data, { handleBusy: true }).success(result => {
-                            msg.toSuccessMessage("Feltet er Opdateret.");
-                        }).error(() => {
-                            msg.toErrorMessage("Fejl!");
-                        });
+                        $http.post(`odata/AttachedOptions?organizationId=${user.currentOrganizationId}`, data, { handleBusy: true })
+                            .then(function onSuccess(result) {
+                                msg.toSuccessMessage("Feltet er Opdateret.");
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl!");
+                            });
                     } else {
                         let optType = 0;
                         switch (optionType) {
@@ -62,11 +63,12 @@
                                 optType = 2;
                                 break;
                         }
-                        $http.delete(`odata/RemoveOption(id=${optionId}, objectId=${itSystemUsage.id},type=${optType}, entityType=1)`).success(() => {
-                            msg.toSuccessMessage("Feltet er Opdateret.");
-                        }).error(() => {
-                            msg.toErrorMessage("Fejl!");
-                        });
+                        $http.delete(`odata/RemoveOption(id=${optionId}, objectId=${itSystemUsage.id},type=${optType}, entityType=1)`)
+                            .then(function onSuccess(result) {
+                                msg.toSuccessMessage("Feltet er Opdateret.");
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl!");
+                            });
                     }
                 }
 
@@ -85,7 +87,7 @@
                         payload[field] = null;
                         itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
-                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                                , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     } else {
@@ -93,7 +95,7 @@
                         payload[field] = date;
                         itSystemUsageService.patchSystemUsage(itSystemUsage.id, user.currentOrganizationId, payload)
                             .then(onSuccess => notify.addSuccessMessage("Feltet er opdateret!")
-                            , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                                , onError => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                     }
                 }
 
@@ -146,7 +148,7 @@
                     else {
                         $scope.selection.push(data);
                     }
-                };                
+                };
 
                 $scope.dataLevelChange = (dataLevel: number) => {
                     switch (dataLevel) {

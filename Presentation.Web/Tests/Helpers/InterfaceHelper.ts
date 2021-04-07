@@ -19,7 +19,7 @@ class InterfaceHelper {
         return element(this.cssHelper.byDataElementType(this.const.interfaceNewRowButton)).click().then(() => {
             return this.writeDataToTextInput(data, this.const.interfaceDataInput);
         }).then(() => {
-            return this.selectDataFromSelect2Field(dataType, this.const.interfaceSelectTableDataType);
+            return this.selectDataFromNoSearchSelect2Field(dataType, this.const.interfaceSelectTableDataType);
         });
     }
 
@@ -40,6 +40,11 @@ class InterfaceHelper {
             console.log("Waiting for select2 data");
             return Select2.waitForDataAndSelect();
         });
+    }
+
+    public static selectDataFromNoSearchSelect2Field(search: string, id: string) {
+        console.log(`Selecting ${search} from select2 no search field ${id}`);
+        return Select2.selectWithNoSearch(search, id);
     }
 }
 export = InterfaceHelper

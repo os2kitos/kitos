@@ -55,7 +55,7 @@
         private mapArchiveDuty(system): IArchiveDuty {
             const archiveDuty = ArchiveDutyRecommendationFactory.mapFromNumeric(system.archiveDuty);
             return <IArchiveDuty> {
-                value: !archiveDuty || archiveDuty.value < 1 ? null : archiveDuty.name,
+                value: !archiveDuty || archiveDuty.id < 1 ? null : archiveDuty.text,
                 optionalComment: system.archiveDutyComment,
                 readMoreLink: Constants.Archiving.ReadMoreUri,
             }

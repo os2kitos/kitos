@@ -6,31 +6,25 @@
         </div>
         <div class="panel-body">
             <form role="form">
-
                 <div class="form-group">
                     <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
-                    <select id="jointDrop" class="form-control input-sm"
-                            data-ui-select2="Options"
-                            data-placeholder="Vælg fælleskommunel projekt"
-                            data-ng-disabled="!projectEditVm.hasWriteAccess"
-                            data-ng-model="jointMunicipalProjectId"
-                            data-ng-change="savejoint()">
-                        <option value=""></option>
-                        <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
-                    </select>
+                    <select-simple data-id="jointDrop"
+                                   data-placeholder="Vælg fælleskommunel projekt"
+                                   data-options="jointMunicipalProjects"
+                                   data-ng-model="jointMunicipalProjectId"
+                                   data-function="savejoint"
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </select-simple>
                 </div>
-
                 <div class="form-group">
                     <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
-                    <select class="form-control input-sm" id="commonDrop"
-                            data-ui-select2="Options"
-                            data-placeholder="Vælg fællesoffentlig projekt"
-                            data-ng-model="commonPublicProjectId"
-                            data-ng-change="savecommon()"
-                            data-ng-disabled="!projectEditVm.hasWriteAccess">
-                        <option value=""></option>
-                        <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
-                    </select>
+                    <select-simple data-id="commonDrop"
+                                   data-placeholder="Vælg fællesoffentlig projekt"
+                                   data-options="commonPublicProjects"
+                                   data-ng-model="commonPublicProjectId"
+                                   data-function="savecommon"
+                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
+                    </select-simple>
                 </div>
             </form>
         </div>

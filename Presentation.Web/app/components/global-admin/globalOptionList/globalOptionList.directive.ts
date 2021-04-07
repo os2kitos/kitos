@@ -52,6 +52,9 @@
             this.editState = $scope.editState;
             this.dirId = $scope.dirId;
             this.optionType = $scope.optionType;
+        }
+
+        $onInit() {            
 
             this.mainGridOptions = {
                 dataSource: {
@@ -230,6 +233,8 @@
                 });
             }
         }
+
+
         public createOption = () => {
             this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
@@ -253,12 +258,11 @@
             var msg = this.notify.addInfoMessage("Gemmer...", false);
 
             this.$http.patch(this.optionsUrl + "(" + entityId + ")", payload)
-                .success(function () {
+                .then(function onSuccess(result) {
                     msg.toSuccessMessage("Feltet er opdateret.");
                     superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
+                }, function onError(result) {
+                    if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                     } else {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");

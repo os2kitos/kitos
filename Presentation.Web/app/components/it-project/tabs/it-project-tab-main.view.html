@@ -30,17 +30,19 @@
 
                         <!-- type -->
                         <div class="form-group">
-                            <select-option data-id="project-type"
-                                           data-label="Type"
-                                           data-placeholder="Vælg projekt type"
-                                           data-selected-text="{{ project.itProjectTypeName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="project.itProjectTypeId"
-                                           data-options="projectTypes"
-                                           data-auto-save-url="{{ autosaveUrl }}"
-                                           data-field="itProjectTypeId">
-                            </select-option>
+                            <select2-option    data-id="project-type"               
+                                               data-label="Type"
+                                               data-options="projectTypes"
+                                               data-ng-model="project.itProjectTypeId"
+                                               data-selected-text="{{ project.itProjectTypeName }}"
+                                               data-placeholder="Vælg projekt type"
+                                               data-auto-save-url="{{ autosaveUrl }}"
+                                               data-field="itProjectTypeId"
+                                               data-ng-disabled="!hasWriteAccess">
+                            </select2-option>
                         </div>
+
+
                     </div>
 
                     <!-- 2nd column -->

@@ -18,10 +18,6 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@bower_components/angular-animate@angular/bower-angular-animate#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-animate/tar.gz/3e63136fc3d882828594f3ceb929784eb43aa944"
-
 "@bower_components/angular-base64@ninjatronic/angular-base64#~2.0.5":
   version "2.0.5"
   resolved "https://codeload.github.com/ninjatronic/angular-base64/tar.gz/6f5fef3d29f25a150f96a7f6f7abff57e2d8953a"
@@ -36,43 +32,19 @@
   version "1.2.6"
   resolved "https://codeload.github.com/Schlogen/angular-confirm/tar.gz/7baa95c84027562589d0034fe3c9bec5bec4b36a"
 
-"@bower_components/angular-i18n@angular/bower-angular-i18n#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-i18n/tar.gz/1276b9f6de3fcd4a4c4dab0de67eadb57586e6b3"
-
 "@bower_components/angular-loading-bar@chieffancypants/angular-loading-bar#^0.9.0":
   version "0.9.0"
   resolved "https://codeload.github.com/chieffancypants/angular-loading-bar/tar.gz/d734873e52ded18fa27d67f52272ae43267dfd63"
 
-"@bower_components/angular-messages@angular/bower-angular-messages#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-messages/tar.gz/8753fbb98fc6fa7e9063ce9dee5e2eca97a517cb"
-
-"@bower_components/angular-mocks@angular/bower-angular-mocks#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-mocks/tar.gz/74c65a6a54f39516be40b0afdd99efb461595fd9"
-
-"@bower_components/angular-resource@angular/bower-angular-resource#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-resource/tar.gz/c97a21f0e610d48045863da9518d8c13b2c1ed9d"
-
 "@bower_components/angular-route@angular/bower-angular-route#~1.3.15":
   version "1.3.20"
   resolved "https://codeload.github.com/angular/bower-angular-route/tar.gz/785879cc163aee00ca7ef262ece356b8d81fd794"
-
-"@bower_components/angular-sanitize@angular/bower-angular-sanitize#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular-sanitize/tar.gz/4f03855cf7cb428107c0a4bcaefcd16db0148a90"
 
 "@bower_components/angular-ui-router@angular-ui/angular-ui-router-bower#^0.3.0":
   version "0.3.2"
   resolved "https://codeload.github.com/angular-ui/angular-ui-router-bower/tar.gz/c1989bcd4185a0f5e206646b267024f45a905c06"
   dependencies:
     angular "^1.0.8"
-
-"@bower_components/angular-ui-select2@angular-ui/ui-select2#^0.0.5":
-  version "0.0.5"
-  resolved "https://codeload.github.com/angular-ui/ui-select2/tar.gz/fb5a7c4abef68b98445e4ea1a0232905a407757d"
 
 "@bower_components/angular-ui-tinymce@angular-ui/ui-tinymce#^0.0.17":
   version "0.0.17"
@@ -81,10 +53,6 @@
 "@bower_components/angular-ui-tree@JimLiu/angular-ui-tree#^2.22.1":
   version "2.22.6"
   resolved "https://codeload.github.com/JimLiu/angular-ui-tree/tar.gz/c37b032def694863e8db1936e9003e1171477921"
-
-"@bower_components/angular@angular/bower-angular#1.4.7":
-  version "1.4.7"
-  resolved "https://codeload.github.com/angular/bower-angular/tar.gz/6bdc6b4855b416bf029105324080ca7d6aca0e9f"
 
 "@bower_components/angularjs-dropdown-multiselect@dotansimha/angularjs-dropdown-multiselect#^1.5.2":
   version "1.11.8"
@@ -119,14 +87,6 @@
 "@bower_components/ngstorage@gsklee/ngStorage#~0.3.4":
   version "0.3.11"
   resolved "https://codeload.github.com/gsklee/ngStorage/tar.gz/253b718a0b35b044fba25c78b1b2020d672c4017"
-
-"@bower_components/select2-bootstrap-css@t0m/select2-bootstrap-css#^1.4.6":
-  version "1.4.6"
-  resolved "https://codeload.github.com/t0m/select2-bootstrap-css/tar.gz/dffa8740723d12cf5b9a56a28cc3dcd5e08ac3e2"
-
-"@bower_components/select2@ivaynberg/select2#~3.4":
-  version "3.4.8"
-  resolved "https://codeload.github.com/ivaynberg/select2/tar.gz/b5f3b2839c48c53f9641d6bb1bccafc5260c7620"
 
 "@bower_components/tinymce@tinymce/tinymce-dist#~4.4.3":
   version "4.4.3"
@@ -237,15 +197,55 @@ align-text@^0.1.1, align-text@^0.1.3:
     longest "^1.0.1"
     repeat-string "^1.5.2"
 
-angular-cookies@1.4.7:
-  version "1.4.7"
-  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.4.7.tgz#03c1ead86cc7f80c322e43ed47106a63cb94daf7"
-  integrity sha1-A8Hq2GzH+AwyLkPtRxBqY8uU2vc=
+angular-animate@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.8.2.tgz#a3045e523ffb8d7fcbebd3cb68d1fdd474665ced"
+  integrity sha512-Jbr9+grNMs9Kj57xuBU3Ju3NOPAjS1+g2UAwwDv7su1lt0/PLDy+9zEwDiu8C8xJceoTbmBNKiWGPJGBdCQLlA==
+
+angular-cookies@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.2.tgz#0791c37c395d9fba8144781f3b2ed135ca7c5925"
+  integrity sha512-M6fCnsnw1pj1+nXuO28ilJ+h6pFCIXQKSEgy9/PIoN0sZr5FqsE9BK18PdBQa8dif+fnHCAYpPU8MgDzT/sZSg==
+
+angular-i18n@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-i18n/-/angular-i18n-1.8.2.tgz#eeeaef6e065d60759c03986397b37a87cbcbea33"
+  integrity sha512-IVXiWS0fWLnDPTy5z/iO/mVATE3/Eyj0aHEUrhSro8Dxtsv0iw6RLBATkawl4z7AZPX3eN6pqScd5dg56m0dpA==
+
+angular-messages@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.8.2.tgz#47f0cf913030bc2231423ab9388acc14dd931837"
+  integrity sha512-M1qNh/30cLJi4yJJ+3YB8saPonRcavz5Dquqz0T/aUySKJhIkUoeCkmF+BcLH4SJ5PBp04yy4CZUUeNRVi7jZA==
+
+angular-mocks@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.8.2.tgz#dc022420b86978cf317a8447c116c0be73a853bf"
+  integrity sha512-I5L3P0l21HPdVsP4A4qWmENt4ePjjbkDFdAzOaM7QiibFySbt14DptPbt2IjeG4vFBr4vSLbhIz8Fk03DISl8Q==
+
+angular-resource@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.8.2.tgz#fc1f1adb93dfb83e295d1cfff2a48cec4296e20a"
+  integrity sha512-CbTu8ypkVZMBLm+Wd+jI9xR7QEVCeUgN8WXsr9Yi9l0s/8ZQa5kEIuYX3F/75Ej8Xs1Jp9DoKjAyvACI6Q8IJA==
+
+angular-sanitize@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.8.2.tgz#ae78040f00c5e2ce1c63780bcc47fa14a1698296"
+  integrity sha512-OB6Goa+QN3byf5asQ7XRl7DKZejm/F/ZOqa9z1skqYVOWA2hoBxoCmt9E7+i7T/TbxZP5zYzKxNZVVJNu860Hg==
+
+angular-ui-select2@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/angular-ui-select2/-/angular-ui-select2-0.0.5.tgz#15e7643afd69ca9063d405eb3be2f95dd5ec87f5"
+  integrity sha1-FedkOv1pypBj1AXrO+L5XdXsh/U=
 
 "angular@>= 1.0.8", angular@^1.0.8, angular@~1:
   version "1.7.9"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.9.tgz#e52616e8701c17724c3c238cfe4f9446fd570bc4"
   integrity sha512-5se7ZpcOtu0MBFlzGv5dsM1quQDoDeUTwZrWjGtTNA7O88cD8TEk5IEKCTDa3uECV9XnvKREVUr7du1ACiWGFQ==
+
+angular@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
+  integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
 
 ansi-colors@^1.0.1:
   version "1.1.0"
@@ -3511,6 +3511,16 @@ sax@>=0.6.0:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+select2-bootstrap-css@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/select2-bootstrap-css/-/select2-bootstrap-css-1.4.6.tgz#5cfb68246f5299ca1858e01efd788804c734997e"
+  integrity sha1-XPtoJG9SmcoYWOAe/XiIBMc0mX4=
+
+select2@^3.4.5:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/select2/-/select2-3.5.1.tgz#f2819489bbc65fd6d328be72bbe2b95dd7e87cfe"
+  integrity sha1-8oGUibvGX9bTKL5yu+K5XdfofP4=
 
 selenium-webdriver@3.6.0, selenium-webdriver@^3.0.1:
   version "3.6.0"

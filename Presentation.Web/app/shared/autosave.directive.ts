@@ -82,7 +82,7 @@
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                     oldValue = ctrl.$modelValue;
                                 }, (errorResponse) => {
-                                        if (errorResponse.status === 409) {
+                                    if (errorResponse.status === 409) {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                     } else {
                                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -142,41 +142,17 @@
                         });
                     }
 
-                    function saveMultipleSelect2(e) {
-                        var id, msg = notify.addInfoMessage("Gemmer...", false);
-                        if (e.added) {
-                            id = e.added.id;
-                            $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function () {
-                                    msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function () {
-                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                });
-                        } else if (e.removed) {
-                            id = e.removed.id;
-                            $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function () {
-                                    msg.toSuccessMessage("Feltet er opdateret.");
-                                })
-                                .error(function () {
-                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                });
-                        }
-                    }
-
                     function save(payload) {
                         var msg = notify.addInfoMessage("Gemmer...", false);
                         if (!attrs.appendurl)
                             attrs.appendurl = '';
 
                         $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true })
-                            .success(function () {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
-                            })
-                            .error(function (result, status) {
-                                if (status === 409) {
+                            }, function onError(result) {
+                                if (result.status === 409) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                 } else {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -186,11 +162,8 @@
 
                     // ui select fields trigger the change event
                     if (!angular.isUndefined(attrs.uiSelect2)) {
-                        if (attrs.multiple) {
-                            element.bind('change', saveMultipleSelect2);
-                        } else {
-                            element.bind('change', saveSelect2);
-                        }
+                        element.bind('change', saveSelect2);
+
                         // kendo date picker
                     } else if (!angular.isUndefined(attrs.kendoDatePicker)) {
                         element.bind('blur', saveDate);

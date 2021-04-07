@@ -44,7 +44,7 @@
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
             $scope.archiveReadMoreLink = Kitos.Constants.Archiving.ReadMoreUri;
-            $scope.translateArchiveDutyRecommendation = (value: number) => Kitos.Models.ItSystem.ArchiveDutyRecommendationFactory.mapFromNumeric(value).name;
+            $scope.translateArchiveDutyRecommendation = (value: number) => Kitos.Models.ItSystem.ArchiveDutyRecommendationFactory.mapFromNumeric(value).text;
             $scope.archiveDutyOptions = Kitos.Models.ItSystemUsage.ArchiveDutyOptions.getAll();
 
             if (!systemUsage.Archived) {

@@ -2,7 +2,7 @@
     interface IRolesController {
         rights: Array<any>;
         activeItProjectRoles: Array<any>;
-        newRole: string;
+        newRole: Models.ViewModel.Generic.Select2OptionViewModel<string>;
         selectedUser: any;
         orgId: number;
 
@@ -15,7 +15,7 @@
     class RolesController implements IRolesController {
         public rights: Array<any>;
         public activeItProjectRoles: Array<any>;
-        public newRole: string;
+        public newRole: Models.ViewModel.Generic.Select2OptionViewModel<string>;
         public selectedUser: any;
         public orgId: number;
         public rightSortBy: string;
@@ -52,7 +52,6 @@
 
             this.orgId = this.user.currentOrganizationId;
             this.activeItProjectRoles = localItProjectRoles;
-            this.newRole = "1";
 
             this.rights = [];
             _.each(itProjectRights, (right: { role; roleId; show; userForSelect; roleForSelect; user; }) => {
@@ -105,7 +104,7 @@
                 return;
             }
 
-            if (!this.checkIfRoleIsAvailable(right.roleForSelect)) {
+            if (!this.checkIfRoleIsAvailable(right.roleForSelect.id)) {
                 right.edit = false;
                 return;
             }
@@ -115,12 +114,13 @@
             var uIdOld = right.userId;
 
             // new values
-            var rIdNew = right.roleForSelect;
+            var rIdNew = right.roleForSelect.id;
             var uIdNew = right.userForSelect.id;
 
             // if nothing was changed, just exit edit-mode
             if (rIdOld === rIdNew && uIdOld === uIdNew) {
                 right.edit = false;
+                return;
             }
 
             // otherwise, we should delete the old entry, then add a new one
@@ -185,7 +185,7 @@
             }
 
             var oId = this.projectId;
-            var rId = parseInt(this.newRole, 10);
+            var rId = this.newRole.id;
             var uId = this.selectedUser.id;
 
             if (!oId || !rId || !uId) {
@@ -213,7 +213,6 @@
                             show: true
                         });
 
-                        this.newRole = "1";
                         this.selectedUser = "";
                     },
                     result => this.notify.addErrorMessage("Fejl!")

@@ -30,7 +30,7 @@
                                 return result.data.response.id;
                             return null;
                         }
-                    );
+                        );
                 }],
                 orgUnitsTree: ["$http", "project", function ($http, project) {
                     return $http.get("api/organizationunit/?organization=" + project.organizationId)
@@ -43,56 +43,53 @@
     }]);
 
     app.controller("project.EditOrgCtrl",
-        ["$scope", "$http", "$stateParams", "notify", "isTransversal", "orgUnitsTree", "selectedOrgUnits", "responsibleOrgUnitId", "user",
-            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user) {
+        ["$scope", "$http", "$stateParams", "notify", "isTransversal", "orgUnitsTree", "selectedOrgUnits", "responsibleOrgUnitId", "user", "entityMapper", 
+            function ($scope, $http, $stateParams, notify, isTransversal, orgUnitsTree, selectedOrgUnits, responsibleOrgUnitId, user, entityMapper) {
                 $scope.orgUnitsTree = orgUnitsTree;
                 $scope.isTransversal = isTransversal;
-                $scope.selectedOrgUnits = selectedOrgUnits;
-                $scope.responsibleOrgUnitId = responsibleOrgUnitId;
+                $scope.selectedOrgUnits = entityMapper.mapApiResponseToSelect2ViewModel(selectedOrgUnits);
+                $scope.responsibleOrgUnit = _.find($scope.selectedOrgUnits, (orgUnit) => orgUnit.id === responsibleOrgUnitId);
                 var projectId = $stateParams.id;
                 $scope.patchUrl = "api/itproject/" + projectId;
 
-                $scope.saveResponsible = function () {
-                    var orgUnitId = $scope.responsibleOrgUnitId;
-                    var msg = notify.addInfoMessage("Gemmer... ");
-                    if ($scope.responsibleOrgUnitId) {
+                $scope.saveResponsible = function (orgUnitId) {
+                    if (orgUnitId != null) {
+                        var msg = notify.addInfoMessage("Gemmer... ");
                         $http.post("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&orgUnitId=" + orgUnitId + "&responsible")
-                            .success(function () {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
-                            })
-                            .error(function () {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
+                        var msg = notify.addInfoMessage("Gemmer... ");
                         $http.delete("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&responsible")
-                            .success(function () {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
-                            })
-                            .error(function () {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     }
                 };
 
-                $scope.save = function(obj) {
+                $scope.save = function (obj) {
                     var msg = notify.addInfoMessage("Gemmer... ");
                     if (obj.selected) {
                         $http.post("api/itproject/" + projectId + "?organizationunit=" + obj.id + "&organizationId=" + user.currentOrganizationId)
-                            .success(function() {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
-                                $scope.selectedOrgUnits.push(obj);
-                            })
-                            .error(function() {
+                                $scope.selectedOrgUnits.push({ id: obj.id, text: obj.name });
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     } else {
                         $http.delete("api/itproject/" + projectId + "?organizationunit=" + obj.id + "&organizationId=" + user.currentOrganizationId)
-                            .success(function() {
+                            .then(function onSuccess(result) {
                                 msg.toSuccessMessage("Gemt!");
 
                                 var indexOf;
                                 // find the index of the orgunit
-                                var found = _.filter($scope.selectedOrgUnits, function(element: { id }, index) {
+                                var found = _.filter($scope.selectedOrgUnits, function (element: { id }, index) {
                                     var equal = element.id == obj.id;
                                     // set outer scope indexOf, to be used later
                                     if (equal) indexOf = index;
@@ -104,8 +101,7 @@
                                 // if responsible is the orgunit being removed unselect it from the dropdown
                                 if (obj.id == $scope.responsibleOrgUnitId)
                                     $scope.responsibleOrgUnitId = "";
-                            })
-                            .error(function() {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                             });
                     }
@@ -125,7 +121,7 @@
                 }
 
                 var selectedOrgUnitIds = _.map(selectedOrgUnits, "id");
-                _.each(selectedOrgUnitIds, function(id) {
+                _.each(selectedOrgUnitIds, function (id) {
                     var found = searchTree(orgUnitsTree[0], id);
                     if (found) {
                         found.selected = true;

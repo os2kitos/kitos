@@ -1,4 +1,4 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project", {
             url: "/project",
@@ -27,11 +27,10 @@
                     var projectId = $state.params.id;
                     var msg = notify.addInfoMessage("Sletter IT Projektet...", false);
                     $http.delete("api/itproject/" + projectId + "?organizationId=" + user.currentOrganizationId)
-                        .success(function(result) {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT Projektet er slettet!");
                             $state.go("it-project.overview");
-                        })
-                        .error(function() {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke slette IT Projektet!");
                         });
                 }

@@ -51,6 +51,10 @@
             this.dirId = $scope.dirId;
             this.optionType = $scope.optionType;
 
+        }
+
+        $onInit() {
+
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -131,7 +135,7 @@
                     {
                         title: "Prioritet",
                         template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-arrow-up' aria-hidden='true'></i></button>` +
-                        `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-arrow-down' aria-hidden='true'></i></button>`,
+                            `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-arrow-down' aria-hidden='true'></i></button>`,
                         width: 100,
                         attributes: { "class": "text-center" },
                         persistId: "command"
@@ -160,7 +164,7 @@
                         persistId: "hasWriteAccess", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template:
-                        `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                            `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -220,12 +224,11 @@
             var msg = this.notify.addInfoMessage("Gemmer...", false);
 
             this.$http.patch(this.optionsUrl + "(" + entityId + ")", payload)
-                .success(function () {
+                .then(function onSuccess(result) {
                     msg.toSuccessMessage("Feltet er opdateret.");
                     superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
+                }, function onError(result) {
+                    if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                     } else {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -251,7 +254,7 @@
             });
         }
 
-        pushUp = (e: JQueryEventObject) => this.changePriority(e,1);
+        pushUp = (e: JQueryEventObject) => this.changePriority(e, 1);
 
         pushDown = (e: JQueryEventObject) => this.changePriority(e, -1);
     }

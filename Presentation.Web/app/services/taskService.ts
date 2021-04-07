@@ -1,6 +1,6 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.factory('taskService', [
-        '$http', '$q', function($http, $q) {
+        '$http', '$q', function ($http, $q) {
             var baseUrl = 'api/taskRef/';
 
             function getRoots() {
@@ -8,14 +8,16 @@
 
                 var url = baseUrl + '?roots=true&take=200';
 
-                $http.get(url).success(function (result) {
+                $http.get(url).then(function onSuccess(result) {
 
-                    deferred.resolve(result.response);
+                    deferred.resolve(result.data.response);
 
-                }).error(reject("Couldn't load tasks"));
+                }, function onError(result) {
+                    reject("Couldn't load tasks");
+                });
 
                 function reject(reason) {
-                    return function() {
+                    return function () {
                         deferred.reject(reason);
                     };
                 }
@@ -28,14 +30,16 @@
 
                 var url = baseUrl + id + '?children=true';
 
-                $http.get(url).success(function (result) {
+                $http.get(url).then(function onSuccess(result) {
 
-                    deferred.resolve(result.response);
+                    deferred.resolve(result.data.response);
 
-                }).error(reject("Couldn't load tasks"));
+                }, function onError(result) {
+                    reject("Couldn't load tasks");
+                });
 
                 function reject(reason) {
-                    return function() {
+                    return function () {
                         deferred.reject(reason);
                     };
                 }

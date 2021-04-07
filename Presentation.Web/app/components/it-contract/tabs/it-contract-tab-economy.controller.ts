@@ -31,7 +31,7 @@
     }]);
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
-        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_","hasWriteAccess",
+        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
         function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
 
             $scope.hasWriteAccess = hasWriteAccess;
@@ -122,13 +122,14 @@
                     stream.delete = function () {
                         var msg = notify.addInfoMessage("Sletter række...");
 
-                        $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function () {
-                            stream.show = false;
+                        $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                            .then(function onSuccess(result) {
+                                stream.show = false;
 
-                            msg.toSuccessMessage("Rækken er slettet!");
-                        }).error(function () {
-                            msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
-                        }).finally(reload);
+                                msg.toSuccessMessage("Rækken er slettet!");
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
+                            }).finally(reload);
                     };
 
                     function updateEan() {
@@ -152,11 +153,12 @@
                     stream[organizationId] = user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Tilføjer ny række...");
-                    $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream).success(function (result) {
-                        msg.toSuccessMessage("Rækken er tilføjet!");
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
-                    }).finally(reload);
+                    $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream)
+                        .then(function onSuccess(result) {
+                            msg.toSuccessMessage("Rækken er tilføjet!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
+                        }).finally(reload);
                 }
 
                 $scope.newExtern = function () {
@@ -185,10 +187,9 @@
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: 'PATCH', url: url, data: payload })
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }

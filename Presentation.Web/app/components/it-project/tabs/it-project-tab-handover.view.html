@@ -26,17 +26,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="participants">Deltagere</label>
-                        <select id="participants"
-                                class="form-control input-sm"
-                                multiple="multiple"
-                                data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                data-ui-select2="select2Options"
-                                data-ng-model="participants"
-                                data-placeholder="Vælg deltagere">
-                            <option value=""></option>
-                            <option value="{{ user.id }}" data-ng-repeat="user in usersWithRoles">{{user.fullName}}</option>
-                        </select>
+                        <label for="agreement-elements">Deltagere</label>
+                        <select2-multiple-option data-id="participants"
+                                                 data-placeholder="Vælg deltagere"
+                                                 data-selected="selectedUsers"
+                                                 data-ng-disabled="!projectEditVm.hasWriteAccess"
+                                                 data-ng-model="participants"
+                                                 data-options="availableUsers">
+                        </select2-multiple-option>
                     </div>
 
                     <div class="form-group">

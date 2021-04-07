@@ -48,13 +48,14 @@
                         </div>
                         <!-- Access modifier -->
                         <div class="form-group">
-                            <label for="system-access" class="control-label small">Synlighed</label>
-                            <input id="system-access" class="form-control input-sm"
-                                   data-autosave="{{system.updateUrl}}"
-                                   data-field="accessModifier"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="system.accessModifier"
-                                   data-select-access-modifier="">
+                            <select-access data-id="system-access"
+                                           data-label="Synlighed"
+                                           data-is-global-admin="{{ isGlobalAdmin }}"
+                                           data-ng-model="system.accessModifier"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{system.updateUrl}}"
+                                           data-field="accessModifier">
+                            </select-access>
                         </div>
                     </div>
 
@@ -132,7 +133,7 @@
 
                         <!-- Business type -->
                         <div class="form-group">
-                            <select-option data-id="system-business-type"
+                            <select2-option data-id="system-business-type"
                                            data-label="Forretningstype"
                                            data-placeholder="Vælg forretningstype"
                                            data-selected-text="{{ system.businessTypeName }}"
@@ -141,25 +142,23 @@
                                            data-options="businessTypes"
                                            data-auto-save-url="{{ system.updateUrl }}"
                                            data-field="businessTypeId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                         <!-- Archive duty -->
                         <div class="form-group">
-                            <label for="archiveDuty" class="control-label small">Rigsarkivets vejledning til arkivering</label>
-                            <select class="form-control input-sm" id="archiveDuty"
-                                    ui-select2="{minimumResultsForSearch: -1}"
-                                    data-ng-model="system.archiveDuty"
-                                    data-autosave="{{system.updateUrl}}"
-                                    data-field="ArchiveDuty"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-element-type="archiveDutyRecommendation">
-                                <option hidden selected value />
-                                <option ng-repeat="recommendation in archiveRecommendations" value="{{recommendation.value}}" ng-bind-html="recommendation.name" />
-                            </select>
-                            <p ng-if="!system.archiveDuty || system.archiveDuty < 1">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
+                            <select-simple data-id="archiveDuty"
+                                           data-label="Rigsarkivets vejledning til arkivering"
+                                           data-options="archiveRecommendations"
+                                           data-ng-model="system.archiveDuty"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{autoSaveUrl}}"
+                                           data-field="ArchiveDuty"
+                                           data-element-type="archiveDutyRecommendation">
+                            </select-simple>
+                            <p ng-if="!system.archiveDuty.id || system.archiveDuty.id < 1">Læs mere hos <a target="_blank" href="{{readMoreArchiveLinkUrl}}">Rigsarkivet</a></p>
                         </div>
-                        <div class="form-group" ng-if="system.archiveDuty && system.archiveDuty > 0">
+                        <div class="form-group" ng-if="system.archiveDuty.id && system.archiveDuty.id > 0">
                             <textarea placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm archiveComments"
                                       data-ng-disabled="!hasWriteAccess"
                                       data-autosave="{{system.updateUrl}}"
