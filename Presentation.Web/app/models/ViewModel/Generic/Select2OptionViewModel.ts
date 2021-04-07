@@ -8,4 +8,11 @@
         optionalObjectContext?: T;
         disabled?: boolean;
     }
+
+    export interface UpdatedSelect2OptionViewModel<T> {
+        id: string;
+        text: string;
+        optionalObjectContext?: T;
+        disabled?: boolean;
+    }
 }
