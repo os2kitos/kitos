@@ -18,7 +18,6 @@
         Operation: number;
         Other: number;
         AuditDate: string;
-        ContainsDataHandlerAgreement: string;
         status: {
             max: number;
             white: number;

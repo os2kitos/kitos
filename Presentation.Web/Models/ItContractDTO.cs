@@ -82,13 +82,6 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
-        public DataOptions ContainsDataHandlerAgreement { get; set; }
-
-        public string DataHandlerAgreementUrlName { get; set; }
-        public string DataHandlerAgreementUrl { get; set; }
-
-        public int? DataHandlerId { get; set; }
-        public virtual ItContractDTO DataHandler { get; set; }
 
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
     }
