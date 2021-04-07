@@ -5,16 +5,16 @@
             templateUrl: 'app/components/it-system/edit/it-system-edit.view.html',
             controller: 'system.EditCtrl',
             resolve: {
-                itSystem: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/itsystem/" + $stateParams.id) 
+                itSystem: ['$http', '$stateParams', ($http, $stateParams) => $http.get("api/itsystem/" + $stateParams.id)
                     .then(result => result.data.response)],
                 user: [
                     'userService', userService => userService.getUser()
                 ],
                 userAccessRights: ["authorizationServiceFactory", "$stateParams",
                     (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
-                    authorizationServiceFactory
-                    .createSystemAuthorization()
-                    .getAuthorizationForItem($stateParams.id)
+                        authorizationServiceFactory
+                            .createSystemAuthorization()
+                            .getAuthorizationForItem($stateParams.id)
                 ],
                 hasWriteAccess: ["userAccessRights", userAccessRights => userAccessRights.canEdit],
             }
@@ -23,16 +23,16 @@
 
     app.controller("system.EditCtrl",
         [
-            "$rootScope", "$scope", "itSystem", "user", "hasWriteAccess", "$state", "notify", "$http", "_", "userAccessRights","SystemDeletedErrorResponseTranslationService",
+            "$rootScope", "$scope", "itSystem", "user", "hasWriteAccess", "$state", "notify", "$http", "_", "userAccessRights", "SystemDeletedErrorResponseTranslationService",
             ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) => {
 
                 $scope.showKLE = user.isGlobalAdmin;
                 $scope.showReference = user.isGlobalAdmin;
 
                 $scope.systemNameHeader = Kitos.Helpers.SystemNameFormat.apply(itSystem.name + " - data i IT systemkatalog", itSystem.disabled);
-				
+
                 $scope.hasWriteAccess = hasWriteAccess;
-               
+
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
@@ -66,11 +66,10 @@
 
                     var msg = notify.addInfoMessage("Deaktiverer IT System...", false);
                     $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
-                        .success(result => {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT System er deaktiveret!");
                             $state.reload();
-                        })
-                        .error((data, status) => {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke deaktivere IT System!");
                         });
                 }
@@ -84,11 +83,10 @@
 
                     var msg = notify.addInfoMessage("Aktiverer IT System...", false);
                     $http.patch("odata/ItSystems(" + itSystem.id + ")", payload)
-                        .success(result => {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT System er aktiveret!");
                             $state.reload();
-                        })
-                        .error((data, status) => {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke aktivere IT System!");
                         });
                 }
@@ -101,12 +99,11 @@
 
                     var msg = notify.addInfoMessage("Sletter IT System...", false);
                     $http.delete("api/itsystem/" + systemId + "?organizationId=" + user.currentOrganizationId)
-                        .success(result => {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("IT System  er slettet!");
                             $state.go("it-system.catalog");
-                        })
-                        .error((data, status) => {
-                            msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(status , data.response));
+                        }, function onError(result) {
+                            msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(result.status, result.data.response));
                         });
                 }
             }

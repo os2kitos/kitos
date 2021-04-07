@@ -22,6 +22,8 @@
             "$rootScope", "$scope", "itSystem", "businessTypes", "user", "autofocus", "hasWriteAccess", "select2LoadingService",
             ($rootScope, $scope, itSystem, businessTypes, user, autofocus, hasWriteAccess, select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
 
+                itSystem.accessModifier = String(itSystem.accessModifier); // Small fix to allow select2 to read a selected 0. Since it understands the string "0" but not the number 0. https://github.com/select2/select2/issues/4052. 
+
                 $rootScope.page.title = "IT System - Rediger system";
                 autofocus();
                 $scope.readMoreArchiveLinkUrl = Kitos.Constants.Archiving.ReadMoreUri;
@@ -32,6 +34,7 @@
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();
                 $scope.system = itSystem;
                 $scope.businessTypes = businessTypes;
+                $scope.isGlobalAdmin = user.isGlobalAdmin;
 
                 $scope.itSystemsSelectOptions = select2LoadingService.loadSelect2(
                     "api/itsystem",

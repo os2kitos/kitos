@@ -63,16 +63,13 @@
                     </div>
                     <!-- Agreement elements -->
                     <div class="form-group" style="padding: 0 10px 0 10px">
-
-                        <select-multiple-option data-id="agreement-elements"
-                                                data-placeholder="Vælg aftaleelementer"
-                                                data-selected-texts="selectedAgreementElementNames"
-                                                data-ng-disabled="!hasWriteAccess"
-                                                data-ng-model="selectedAgreementElementIds"
-                                                data-options="agreementElements"
-                                                data-auto-save-url="{{ autoSaveUrl }}"
-                                                data-field="elemId">
-                        </select-multiple-option>
+                        <select2-multiple-option data-id="agreement-elements"
+                                                 data-placeholder="Vælg aftaleelementer"
+                                                 data-selected="selectedAgreementElements"
+                                                 data-ng-disabled="!hasWriteAccess"
+                                                 data-ng-model="elements"
+                                                 data-options="availableAgreementElements">
+                        </select2-multiple-option>
                     </div>
                 </div>
             </div>

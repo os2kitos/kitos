@@ -364,6 +364,11 @@
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
+    <Content Include="app\shared\select2Option\select2MultipleOption.view.html" />
+    <Content Include="app\shared\select2Option\select2Option.view.html" />
+    <Content Include="app\shared\selectAccessModifier\selectAccess.view.html" />
+    <Content Include="app\shared\selectRole\selectRole.view.html" />
+    <Content Include="app\shared\selectSimple\selectSimple.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -559,6 +564,7 @@
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
+    <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
@@ -820,6 +826,11 @@
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
     <TypeScriptCompile Include="app\shared\select-it-systems\generic-tab-it-systems.controller.ts" />
     <Content Include="app\shared\singleSelect\singleSelectSelect2.view.html" />
+    <TypeScriptCompile Include="app\shared\select2Option\select2MultipleOption.directive.ts" />
+    <TypeScriptCompile Include="app\shared\select2Option\select2Option.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccess.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
     <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
@@ -1033,7 +1044,6 @@
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\services\needsWidthFixService.ts" />
-    <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
     <Content Include="appReport\css\report.css" />
     <Content Include="appReport\Index.html" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
@@ -1043,13 +1053,10 @@
     <Content Include="app\shared\helpText\helpText.view.html" />
     <Content Include="app\shared\helpText\helpTextModal.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
-    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
     <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
-    <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
     <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
-    <Content Include="app\shared\selectOption\selectOption.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />

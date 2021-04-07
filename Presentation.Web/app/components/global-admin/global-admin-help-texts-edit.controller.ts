@@ -25,11 +25,10 @@
             };
             var msg = this.notify.addInfoMessage("Gemmer...", false);
             this.$http({ method: 'PATCH', url: "odata/HelpTexts(" + this.helpText.Id + ")", data: payload, ignoreLoadingBar: true })
-                .success(function () {
+                .then(function onSuccess(result) {
                     msg.toSuccessMessage("Feltet er gemt.");
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
+                }, function onError(result) {
+                    if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                     } else {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
@@ -44,12 +43,11 @@
             var msg = this.notify.addInfoMessage("Sletter...", false);
             var parent = this;
             this.$http({ method: 'DELETE', url: "odata/HelpTexts(" + this.helpText.Id + ")" })
-                .success(function () {
+                .then(function onSuccess(result) {
                     msg.toSuccessMessage("Hjælpeteksten er slettet.");
                     parent.$state.go('global-admin.help-texts');
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
+                }, function onError(result) {
+                    if (result.status === 409) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                     } else {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");

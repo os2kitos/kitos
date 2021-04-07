@@ -48,10 +48,10 @@
     }]);
 
     app.controller("project.EditCommunicationCtrl",
-        ["$scope", "$http", "notify", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user",
-            function ($scope, $http, notify, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
+        ["$scope", "$http", "notify", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user", "entityMapper", 
+            function ($scope, $http, notify, $timeout, $state, $stateParams, comms, usersWithRoles, user, entityMapper) {
             $scope.comms = comms;
-            $scope.usersWithRoles = _.values(usersWithRoles);
+            $scope.usersWithRoles = entityMapper.mapApiResponseToSelect2ViewModel(usersWithRoles);
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
@@ -73,7 +73,17 @@
                     $scope.comm.dueDate = null;
                 }
 
-                $http.post(`api/communication?organizationId=${user.currentOrganizationId}`, $scope.comm).finally(reload);
+                var payload = {
+                    dueDate: $scope.comm.dueDate,
+                    itProjectId: $scope.comm.itProjectId,
+                    responsibleUserId: $scope.comm.responsibleUserId.id,
+                    media: $scope.comm.media,
+                    message: $scope.comm.message,
+                    purpose: $scope.comm.purpose,
+                    targetAudiance: $scope.comm.targetAudiance
+                }
+
+                $http.post(`api/communication?organizationId=${user.currentOrganizationId}`, payload).finally(reload);
             };
 
             $scope.delete = function (id) {

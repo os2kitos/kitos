@@ -1,10 +1,21 @@
 ﻿(function (ng, app) {
     'use strict';
 
-    app.directive("selectOption", [
+    app.controller("select2OptionController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
+        var options = entityMapper.mapOptionToSelect2ViewModel($scope.options);
+
+        var foundSelectedInOptions = _.find(options, function (option: any) { return option.id == $scope.selectedId });
+        if ($scope.options && $scope.selectedId != null && !foundSelectedInOptions) {
+            options.splice(0, 0, { id: $scope.selectedId, text: $scope.selectedText + " (Slettes)", optionalObjectContext: null });
+        }
+
+        $scope.select2Config = select2LoadingService.select2LocalDataNoSearch(() => options, true);
+    }]);
+
+    app.directive("select2Option", [
         function () {
             return {
-                templateUrl: "app/shared/selectOption/selectOption.view.html",
+                templateUrl: "app/shared/select2Option/select2Option.view.html",
                 scope: {
                     id: "@",
                     label: "@",
@@ -13,23 +24,20 @@
                     selectedId: "=ngModel",
                     selectedText: "@",
                     autoSaveUrl: "@",
-                    appendurl: "@",
                     field: "@",
                     disabled: "=ngDisabled",
                     required: "@"
                 },
+                controller: "select2OptionController",
                 link: function (scope, element, attr, ctrl) {
-                    var foundSelectedInOptions = _.find(scope.options, function(option: any) { return option.Id == scope.selectedId });
-                    if (scope.options && scope.selectedId != null && !foundSelectedInOptions) {
-                        scope.options.splice(0, 0, { Id: scope.selectedId, Name: scope.selectedText + " (Slettes)" });
-                    }
-
-                    scope.savedId = scope.selectedId;
+                   
                     scope.optionDescription = null;
 
                     scope.$watch('selectedId', function (value) {
                         var foundSelectedInOptions = _.find(scope.options, function (option: any) {
-                            return option.Id === parseInt(scope.selectedId, 10);
+                            if (scope.selectedId != null) {
+                                return option.Id === parseInt(scope.selectedId.id, 10);
+                            }
                         });
 
                         if (foundSelectedInOptions) {

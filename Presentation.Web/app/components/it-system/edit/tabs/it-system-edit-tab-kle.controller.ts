@@ -55,45 +55,49 @@
                     if ($scope.pagination.descending) url += `&descending=${$scope.pagination.descending}`;
                 }
 
-                $http.get(url).success((result, status, headers) => {
-                    $scope.tasklist = result.response;
+                $http.get(url).then(function onSuccess(result) {
+                    $scope.tasklist = result.data.response;
 
-                    var paginationHeader = JSON.parse(headers("X-Pagination"));
+                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
                     $scope.totalCount = paginationHeader.TotalCount;
-                }).error(() => {
+                }, function onError(result) {
                     notify.addErrorMessage("Kunne ikke hente opgaver!");
                 });
             }
 
             function add(task: any);
             function add(task) {
-                return $http.post(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId).success(result => {
-                    task.isSelected = true;
-                });
+                return $http.post(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        task.isSelected = true;
+                    });
             }
 
             function remove(task: any);
             function remove(task) {
-                return $http.delete(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId).success(result => {
-                    task.isSelected = false;
-                });
+                return $http.delete(baseUrl + "?taskId=" + task.taskRef.id + "&organizationId=" + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        task.isSelected = false;
+                    });
             }
 
             $scope.save = task => {
                 var msg = notify.addInfoMessage("Opdaterer ...", false);
 
                 if (!task.isSelected) {
-                    add(task).success(() => {
-                        msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(() => {
-                        msg.toErrorMessage("Fejl!");
-                    });
+                    add(task)
+                        .then(function onSuccess(result) {
+                            msg.toSuccessMessage("Feltet er opdateret!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl!");
+                        });
                 } else {
-                    remove(task).success(() => {
-                        msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(() => {
-                        msg.toErrorMessage("Fejl!");
-                    });
+                    remove(task)
+                        .then(function onSuccess(result) {
+                            msg.toSuccessMessage("Feltet er opdateret!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl!");
+                        });
                 }
             };
 
@@ -117,24 +121,26 @@
                 var url = baseUrl + "?taskId=" + ($scope.selectedTaskGroup || "") + "&organizationId=" + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post(url).success(() => {
-                    msg.toSuccessMessage("Tilknytningen er oprettet");
-                    reload();
-                }).error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
-                });
+                $http.post(url)
+                    .then(function onSuccess(result) {
+                        msg.toSuccessMessage("Tilknytningen er oprettet");
+                        reload();
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke oprette tilknytningen!");
+                    });
             };
 
             $scope.removeTaskGroup = () => {
                 var url = baseUrl + "?taskId=" + ($scope.selectedTaskGroupc || "") + "&organizationId=" + user.currentOrganizationId;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete(url).success(() => {
-                    msg.toSuccessMessage("Tilknytningen er fjernet");
-                    reload();
-                }).error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
-                });
+                $http.delete(url)
+                    .then(function onSuccess(result) {
+                        msg.toSuccessMessage("Tilknytningen er fjernet");
+                        reload();
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke fjerne tilknytningen!");
+                    });
             };
 
             function reload() {

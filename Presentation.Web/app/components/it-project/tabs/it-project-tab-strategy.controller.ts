@@ -37,13 +37,13 @@
     }]);
 
     app.controller("project.EditStrategyCtrl",
-        ["$scope", "$http", "notify", "project", "jointMunicipalProjects", "commonPublicProjects",
-            function($scope, $http, notify, project, jointMunicipalProjects, commonPublicProjects) {
+        ["$scope", "$http", "notify", "project", "jointMunicipalProjects", "commonPublicProjects", "entityMapper", 
+            function($scope, $http, notify, project, jointMunicipalProjects, commonPublicProjects, entityMapper) {
                 $scope.isStrategy = project.isStrategy;
                 $scope.jointMunicipalProjectId = project.jointMunicipalProjectId;
-                $scope.jointMunicipalProjects = jointMunicipalProjects;
+                $scope.jointMunicipalProjects = entityMapper.mapApiResponseToSelect2ViewModel(jointMunicipalProjects);
                 $scope.commonPublicProjectId = project.commonPublicProjectId;
-                $scope.commonPublicProjects = commonPublicProjects;
+                $scope.commonPublicProjects = entityMapper.mapApiResponseToSelect2ViewModel(commonPublicProjects);
 
                 $scope.Options = {
                     allowClear: true,
@@ -52,13 +52,13 @@
                     }
                 };
 
-                $scope.savejoint = () => {
+                $scope.savejoint = (jointMunicipalProjectId) => {
                     var payload;
                         // if empty the value has been cleared
-                        if ($scope.jointMunicipalProjectId === "") {
+                    if (jointMunicipalProjectId === null) {
                             payload = { "JointMunicipalProjectId": null };
                         } else {
-                            var id = $scope.jointMunicipalProjectId;
+                        var id = jointMunicipalProjectId;
                             payload = { "JointMunicipalProjectId": id };
                     }
                         $http.patch(`/odata/ItProjects(${project.id})`, payload)
@@ -68,13 +68,13 @@
                                 () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 };
 
-                $scope.savecommon = () => {
+                $scope.savecommon = (commonPublicProjectId) => {
                     var payload;
                     // if empty the value has been cleared
-                    if ($scope.commonPublicProjectId === "") {
+                    if (commonPublicProjectId === null) {
                         payload = { "CommonPublicProjectId": null };
                     } else {
-                        var id = $scope.commonPublicProjectId;
+                        var id = commonPublicProjectId;
                         payload = { "CommonPublicProjectId": id };
                     }
                     $http.patch(`/odata/ItProjects(${project.id})`, payload)

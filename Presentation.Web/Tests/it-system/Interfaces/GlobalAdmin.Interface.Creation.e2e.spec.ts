@@ -80,8 +80,8 @@ describe("Only Global Administrator is able to create and fill out an interface"
                 .then(() => InterfaceHelper.writeDataToTextInput(descriptionLink, constants.interfaceDescriptionLinkInput))
                 .then(() => InterfaceHelper.writeDataToTextInput(note, constants.interfaceNoteInput))
                 .then(() => InterfaceHelper.selectDataFromSelect2Field(systemName, constants.interfaceSelectExhibit))
-                .then(() => InterfaceHelper.selectDataFromSelect2Field(systemInterface, constants.interfaceSelectInterface))
-                .then(() => InterfaceHelper.selectDataFromSelect2Field(access, constants.interfaceSelectAccess))
+                .then(() => InterfaceHelper.selectDataFromNoSearchSelect2Field(systemInterface, constants.interfaceSelectInterface))
+                .then(() => InterfaceHelper.selectDataFromNoSearchSelect2Field(access, constants.interfaceSelectAccess))
                 .then(() => InterfaceHelper.writeDataToTextInput(version, constants.interfaceVersionInput))
                 .then(() => InterfaceHelper.writeDataToTable(dataRow, dataTypeTable)));
     };

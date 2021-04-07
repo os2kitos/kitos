@@ -209,18 +209,11 @@
                 $scope.submitRight();
             });
 
-            /* the role of "medarbejder" */
-            function getDefaultNewRole() {
-                return 3;
-            }
-
-            $scope.newRole = getDefaultNewRole();
-
             $scope.submitRight = function () {
                 if (!$scope.selectedUser || !$scope.newRole) return;
 
                 var oId = $scope.chosenOrgUnit.id;
-                var rId = parseInt($scope.newRole);
+                var rId = $scope.newRole.id;
                 var uId = $scope.selectedUser.id;
 
                 if (!oId || !rId || !uId) return;
@@ -243,7 +236,6 @@
                         show: true
                     });
 
-                    $scope.newRole = getDefaultNewRole();
                     $scope.selectedUser = "";
                 }, (error) => {
                     notify.addErrorMessage("Fejl!");
@@ -266,7 +258,7 @@
             $scope.updateRight = function (right) {
                 if (!right.roleForSelect || !right.userForSelect) return;
 
-                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect)) {
+                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect.id)) {
                     right.edit = false;
                     return;
                 }
@@ -278,12 +270,13 @@
 
                 //new values
                 var oIdNew = right.objectId;
-                var rIdNew = right.roleForSelect;
+                var rIdNew = right.roleForSelect.id;
                 var uIdNew = right.userForSelect.id;
 
                 //if nothing was changed, just exit edit-mode
                 if (oIdOld === oIdNew && rIdOld === rIdNew && uIdOld === uIdNew) {
                     right.edit = false;
+                    return;
                 }
 
                 //otherwise, we should delete the old entry, then add a new one

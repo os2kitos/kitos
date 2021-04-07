@@ -9,38 +9,36 @@
         });
     }]);
 
-    app.controller('system.EditContracts', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'notify',
-        function ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, notify) {
+    app.controller('system.EditContracts', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'notify', 'entityMapper',
+        function ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, notify, entityMapper) {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
-            $scope.contracts = itSystemUsage.contracts;
+            $scope.contracts = entityMapper.mapApiResponseToSelect2ViewModel(itSystemUsage.contracts);
             $scope.mainContractId = itSystemUsage.mainContractId;
 
-            function reload() {
-                $state.go('.', null, { reload: true });
-            };
 
-            $scope.saveMainContract = function () {
+            $scope.saveMainContract = function (id) {
+                if (itSystemUsage.mainContractId === id || _.isUndefined(id)) {
+                    return;
+                }
                 var msg = notify.addInfoMessage("Gemmer... ");
-                if ($scope.mainContractId) {
-                    $http.post('api/ItContractItSystemUsage/?contractId=' + $scope.mainContractId + '&usageId=' + usageId)
-                        .success(function () {
+                if (id) {
+                    $http.post('api/ItContractItSystemUsage/?contractId=' + id + '&usageId=' + usageId)
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                            reload();
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
+                    itSystemUsage.mainContractId = id;
                 } else {
                     $http.delete('api/ItContractItSystemUsage/?usageId=' + usageId)
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                            reload();
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
+                    itSystemUsage.mainContractId = null;
                 }
             }
         }]);

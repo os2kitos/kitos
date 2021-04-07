@@ -11,7 +11,7 @@
         /** The admin rights of the user */
         OrganizationRights?: IOrganizationRight[];
 
-        OrganizationUnitRights?: IOrganizationUnitRight;
+        OrganizationUnitRights?: IOrganizationUnitRight[];
         /** Passwords reset request issued for the user */
         PasswordResetRequests?: IPasswordResetRequest[];
         /** Gets or sets the  or  associated with this user */

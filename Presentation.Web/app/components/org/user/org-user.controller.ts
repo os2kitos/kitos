@@ -124,7 +124,7 @@
                             url: `/odata/Organizations(${this.user.currentOrganizationId})/Organizations.GetUsers`,
                             dataType: "json",
                             data: {
-                                $expand: `ObjectOwner,OrganizationUnitRights($expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
+                                $expand: `ObjectOwner,OrganizationUnitRights($filter=ObjectId eq ${this.user.currentOrganizationId}; $expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
                             }
                         },
                         destroy: {
@@ -312,8 +312,10 @@
                         persistId: "role", // DON'T YOU DARE RENAME!
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
-                            this.curOrgCheck = dataItem.OrganizationUnitRights.ObjectId === this.user.currentOrganizationId;
-                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights | filter: { ObjectId: '${this.user.currentOrganizationId}' }"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                            if (dataItem.OrganizationUnitRights.length == 0) {
+                                return "";
+                            }
+                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
                         },
                         hidden: true,
                         filterable: {
@@ -441,7 +443,6 @@
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
-        public curOrgCheck: boolean;
     }
 
     angular

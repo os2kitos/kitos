@@ -30,7 +30,8 @@ app.config([
     "$httpProvider",
     "$windowProvider",
     "notifyProvider",
-    ($httpProvider, $windowProvider, notifyProvider) => {
+    "$locationProvider",
+    ($httpProvider, $windowProvider, notifyProvider, $locationProvider) => {
         $httpProvider.interceptors.push("httpBusyInterceptor");
         // for some reason templates aren't updated so this is needed
         $httpProvider.defaults.headers.get = {
@@ -62,6 +63,10 @@ app.config([
                 return config;
             }
         }));
+
+        $locationProvider
+            .html5Mode(false)
+            .hashPrefix('');
     }
 ]);
 app.config([

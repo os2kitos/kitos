@@ -55,10 +55,11 @@
                     if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                 }
 
-                $http.get(url).success(function(result, status, headers) {
-                    var paginationHeader = JSON.parse(headers('X-Pagination'));
+                $http.get(url)
+                    .then(function onSuccess(result) {
+                    var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalCount = paginationHeader.TotalCount;
-                    $scope.taskUsages = result.response;
+                    $scope.taskUsages = result.data.response;
 
                     /* visit every task usage and delegation */
                     function visit(usage, parent, level) {

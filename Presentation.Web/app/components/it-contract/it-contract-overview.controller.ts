@@ -121,13 +121,12 @@
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
                         self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                var contract = result.response;
+                                var contract = result.data.response;
                                 $modalInstance.close(contract.id);
                                 self.$state.go("it-contract.edit.main", { id: contract.id });
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
                             });
                     };
@@ -138,13 +137,12 @@
                         var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
 
                         self.$http.post(`api/itcontract?organizationId=${self.user.currentOrganizationId}`, { organizationId: orgId, name: $scope.formData.name })
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                                var contract = result.response;
+                                var contract = result.data.response;
                                 $modalInstance.close(contract.id);
                                 self.$state.reload();
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
                             });
                     };
@@ -511,7 +509,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 const system = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem;
-                                value = Helpers.SystemNameFormat.apply(system.Name, system.Disabled); 
+                                value = Helpers.SystemNameFormat.apply(system.Name, system.Disabled);
                             }
 
                             if (dataItem.AssociatedSystemUsages.length > 1) {
@@ -919,7 +917,7 @@
                     resolve: {
                         itContractRoles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
+                                localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()

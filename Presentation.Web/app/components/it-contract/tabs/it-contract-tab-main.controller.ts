@@ -92,7 +92,7 @@
                 for (var i = 0; i < 20; i++) {
                     var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
                     var year = currentDate.year();
-                    var obj = { id: i, half: half, year: year };
+                    var obj = { id: i, text: half + " | " + year, half: half, year: year };
                     $scope.procurementPlans.push(obj);
 
                     // add 6 months for next iter
@@ -104,14 +104,14 @@
                 });
                 if (foundPlan) {
                     // plan is found in the list, replace it to get object equality
-                    $scope.contract.procurementPlan = foundPlan.id;
+                    $scope.procurementPlanId = foundPlan;
                 } else {
                     // plan is not found, add missing plan to begining of list
                     // if not null
                     if (contract.procurementPlanHalf != null) {
-                        var plan = { id: $scope.procurementPlans.length, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                        var plan = { id: $scope.procurementPlans.length, text: half + " | " + year, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
-                        $scope.contract.procurementPlan = plan.id; // select it
+                        $scope.procurementPlanId = plan; // select it
                     }
                 }
                 $scope.patchDate = (field, value) => {
@@ -133,14 +133,13 @@
                     }
                 }
 
-                $scope.saveProcurement = function () {
+                $scope.saveProcurement = function (id) {
                     var payload;
                     // if empty the value has been cleared
-                    if ($scope.contract.procurementPlan === '') {
+                    if (id == null) {
                         contract = $scope.contract; 
                         payload = { procurementPlanHalf: null, procurementPlanYear: null };
                     } else {
-                        var id = $scope.contract.procurementPlan;
                         var result = $scope.procurementPlans[id];
                         payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
                     }
@@ -150,20 +149,12 @@
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 };
 
-                $scope.procurementPlanOption = {
-                    allowClear: true,
-                    initSelection: function (element, callback) {
-                        callback({ id: 1, text: 'Text' });
-                    }
-                };
-
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: 'PATCH', url: url, data: payload })
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }

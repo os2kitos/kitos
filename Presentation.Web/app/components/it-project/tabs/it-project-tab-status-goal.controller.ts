@@ -1,6 +1,6 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config([
-        "$stateProvider", function($stateProvider) {
+        "$stateProvider", function ($stateProvider) {
             $stateProvider.state("it-project.edit.status-goal", {
                 url: "/status-goal",
                 templateUrl: "app/components/it-project/tabs/it-project-tab-status-goal.view.html",
@@ -8,16 +8,16 @@
                 resolve: {
                     // re-resolve data from parent cause changes here wont cascade to it
                     project: [
-                        "$http", "$stateParams", function($http, $stateParams) {
+                        "$http", "$stateParams", function ($http, $stateParams) {
                             return $http.get("api/itproject/" + $stateParams.id)
-                                .then(function(result) {
+                                .then(function (result) {
                                     return result.data.response;
                                 });
                         }
                     ],
                     goalTypes: [
-                        "localOptionServiceFactory", (localOptionServiceFactory : Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.GoalTypes).getAll()
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.GoalTypes).getAll()
                     ]
                 }
             });
@@ -35,7 +35,7 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.getGoalTypeName = function(goalTypeId) {
+            $scope.getGoalTypeName = function (goalTypeId) {
                 var type = _.find(goalTypes, { Id: goalTypeId });
 
                 return type && type.Name;
@@ -62,10 +62,9 @@
             function patch(payload, url) {
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http({ method: 'PATCH', url: url, data: payload })
-                    .success(function () {
+                    .then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret.");
-                    })
-                    .error(function () {
+                    }, function onError(result) {
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     });
             }
@@ -84,18 +83,19 @@
                 //otherwise:
 
                 //easy-access functions
-                goal.edit = function() {
+                goal.edit = function () {
                     $state.go(".modal", { goalId: goal.id });
                 };
 
-                goal.delete = function() {
+                goal.delete = function () {
                     var msg = notify.addInfoMessage("Sletter... ");
-                    $http.delete(goal.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function () {
-                        goal.show = false;
-                        msg.toSuccessMessage("Slettet!");
-                    }).error(function() {
-                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                    });
+                    $http.delete(goal.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                        .then(function onSuccess(result) {
+                            goal.show = false;
+                            msg.toSuccessMessage("Slettet!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                        });
                 };
 
                 goal.updateUrl = "api/goal/" + goal.id;

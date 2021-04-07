@@ -1,20 +1,20 @@
 ﻿module Kitos.Models.ItSystem {
     export interface IArchiveDutyRecommendation {
-        value: number;
-        name: string;
+        id: number;
+        text: string;
     }
 
     export class ArchiveDutyRecommendationFactory {
         static mapFromNumeric(value: number): IArchiveDutyRecommendation {
             switch (value) {
                 case 0:
-                    return { name: "&nbsp;", value: value}; //Using html encoding for the option to
+                    return { text: "\u00a0", id: value}; //Using html encoding for the option to
                 case 1:
-                    return { name: "B", value: value};
+                    return { text: "B", id: value};
                 case 2:
-                    return { name: "K", value: value};
+                    return { text: "K", id: value};
                 case 3:
-                    return { name: "Ingen vejledning", value: value};
+                    return { text: "Ingen vejledning", id: value};
                 default:
                     return null;
             }
