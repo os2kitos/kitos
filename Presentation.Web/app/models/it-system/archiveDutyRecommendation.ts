@@ -8,7 +8,7 @@
         static mapFromNumeric(value: number): IArchiveDutyRecommendation {
             switch (value) {
                 case 0:
-                    return { text: "\u00a0", id: "0"}; //Using html encoding for the option to
+                    return { text: Kitos.Constants.Select2.EmptyField, id: "0" }; //Using html encoding for the option to
                 case 1:
                     return { text: "B", id: "1"};
                 case 2:

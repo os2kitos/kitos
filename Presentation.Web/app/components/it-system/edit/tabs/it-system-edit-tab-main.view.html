@@ -11,7 +11,7 @@
                             <label for="system-name" class="control-label small">IT System</label>
                             <input type="text" id="system-name" class="form-control input-sm" required
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
+                                   data-autosave="{{ ::autosaveUrl }}"
                                    data-field="name"
                                    data-ng-model="system.name">
                         </div>
@@ -21,7 +21,7 @@
                             <input type="hidden" id="system-parent" class="form-control input-sm"
                                    data-ui-select2="itSystemsSelectOptions"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
+                                   data-autosave="{{ ::autosaveUrl }}"
                                    data-field="parentId"
                                    data-placeholder="Vælg system"
                                    data-ng-model="system.parent">
@@ -31,7 +31,7 @@
                             <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>
                             <input type="text" id="system-previousname" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
+                                   data-autosave="{{ ::autosaveUrl }}"
                                    data-field="previousname"
                                    data-ng-model="system.previousName">
                         </div>
@@ -42,7 +42,7 @@
                                    data-ui-select2="organizationSelectOptions"
                                    data-placeholder="Vælg organisation"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{system.updateUrl}}"
+                                   data-autosave="{{ ::autosaveUrl }}"
                                    data-field="belongsToId"
                                    data-ng-model="system.belongsTo">
                         </div>
@@ -53,7 +53,7 @@
                                            data-is-global-admin="{{ isGlobalAdmin }}"
                                            data-ng-model="system.accessModifier"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-auto-save-url="{{system.updateUrl}}"
+                                           data-auto-save-url="{{ ::autosaveUrl }}"
                                            data-field="accessModifier">
                             </select-access>
                         </div>
@@ -65,7 +65,7 @@
                         <div class="form-group">
                             <label for="system-description" class="control-label small">Beskrivelse</label>
                             <textarea id="system-description" class="form-control input-sm" rows="12"
-                                      data-autosave="{{system.updateUrl}}"
+                                      data-autosave="{{ ::autosaveUrl }}"
                                       data-field="description"
                                       data-ng-disabled="!hasWriteAccess"
                                       data-ng-model="system.description"></textarea>
@@ -140,7 +140,7 @@
                                            data-ng-disabled="!hasWriteAccess"
                                            data-ng-model="system.businessTypeId"
                                            data-options="businessTypes"
-                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-auto-save-url="{{ ::autosaveUrl }}"
                                            data-field="businessTypeId">
                             </select2-option>
                         </div>
@@ -152,7 +152,7 @@
                                            data-options="archiveRecommendations"
                                            data-ng-model="system.archiveDuty"
                                            data-ng-disabled="!hasWriteAccess"
-                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-auto-save-url="{{ ::autosaveUrl }}"
                                            data-field="ArchiveDuty"
                                            data-element-type="archiveDutyRecommendation">
                             </select-simple>
@@ -161,7 +161,7 @@
                         <div class="form-group" ng-if="system.archiveDuty.id && system.archiveDuty.id > 0">
                             <textarea placeholder="Indtast bemærkning fra Rigsarkivet" type="text" id="system-archiveDutyComment" class="form-control input-sm archiveComments"
                                       data-ng-disabled="!hasWriteAccess"
-                                      data-autosave="{{system.updateUrl}}"
+                                      data-autosave="{{ ::autosaveUrl }}"
                                       data-field="archiveDutyComment"
                                       data-ng-model="system.archiveDutyComment"
                                       data-element-type="archiveDutyRecommendationComment">

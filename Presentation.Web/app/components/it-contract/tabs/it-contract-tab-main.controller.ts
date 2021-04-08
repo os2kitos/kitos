@@ -135,12 +135,7 @@
 
                 $scope.saveProcurement = function (id) {
                     if (id === null && contract.procurementPlanHalf !== null && contract.procurementPlanYear !== null) {
-                        contract = $scope.contract;
-
-                        var payload = { procurementPlanHalf: null, procurementPlanYear: null };
-                        $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
-                        $scope.contract.procurementPlanYear = payload.procurementPlanYear;
-                        patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                        updateProcurement(null, null);
                     }
                     else {
                         if (id === null) {
@@ -151,14 +146,18 @@
                         if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
                             return;
                         }
-                        contract = $scope.contract;
-
-                        var payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
-                        $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
-                        $scope.contract.procurementPlanYear = payload.procurementPlanYear;
-                        patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                        updateProcurement(result.half, result.year);
                     }
                 };
+
+                function updateProcurement(procurementPlanHalf, procurementPlanYear) {
+                    contract = $scope.contract;
+
+                    var payload = { procurementPlanHalf: procurementPlanHalf, procurementPlanYear: procurementPlanYear };
+                    $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
+                    $scope.contract.procurementPlanYear = payload.procurementPlanYear;
+                    patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                }
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);

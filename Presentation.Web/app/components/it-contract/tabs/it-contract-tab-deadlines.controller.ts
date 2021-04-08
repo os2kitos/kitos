@@ -37,7 +37,7 @@
             $scope.durationOngoing = $scope.contract.durationOngoing;
 
             $scope.deadlineOptions = [
-                { id: "", text: "\u00a0" },
+                { id: "", text: Kitos.Constants.Select2.EmptyField },
                 { id: "calendarYear", text: "Kalenderår" },
                 { id: "quater", text: "Kvartal" },
                 { id: "month", text: "Måned" },
