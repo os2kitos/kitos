@@ -8,7 +8,7 @@
         static mapFromNumeric(value: number): IArchiveDuty {
             switch (value) {
                 case 0:
-                    return { text: "\u00a0", id: value }; //Using non-breaking space character
+                    return { text: Kitos.Constants.Select2.EmptyField, id: value };
                 case 1:
                     return { text: "B", id: value };
                 case 2:

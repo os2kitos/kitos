@@ -1,6 +1,6 @@
 ﻿module Kitos.Models.ItSystem {
     export interface IArchiveDutyRecommendation {
-        id: number;
+        id: string;
         text: string;
     }
 
@@ -8,13 +8,13 @@
         static mapFromNumeric(value: number): IArchiveDutyRecommendation {
             switch (value) {
                 case 0:
-                    return { text: "\u00a0", id: value}; //Using html encoding for the option to
+                    return { text: Kitos.Constants.Select2.EmptyField, id: "0" }; //Using html encoding for the option to
                 case 1:
-                    return { text: "B", id: value};
+                    return { text: "B", id: "1"};
                 case 2:
-                    return { text: "K", id: value};
+                    return { text: "K", id: "2"};
                 case 3:
-                    return { text: "Ingen vejledning", id: value};
+                    return { text: "Ingen vejledning", id: "3"};
                 default:
                     return null;
             }

@@ -9,4 +9,8 @@
     export class Archiving {
         static readonly ReadMoreUri = "https://www.sa.dk/da/offentlig-forvaltning/kommuner-og-regioner/bevaring-kassation-it-systemer/";
     }
+
+    export class Select2 {
+        static readonly EmptyField = "\u00a0";
+    }
 }

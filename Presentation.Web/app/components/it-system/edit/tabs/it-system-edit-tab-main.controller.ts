@@ -28,7 +28,7 @@
                 autofocus();
                 $scope.readMoreArchiveLinkUrl = Kitos.Constants.Archiving.ReadMoreUri;
 
-                itSystem.updateUrl = `api/itsystem/${itSystem.id}`;
+                $scope.autosaveUrl = `api/itsystem/${itSystem.id}`;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: Kitos.Helpers.SystemNameFormat.apply(itSystem.parentName, itSystem.parentDisabled), disabled: itSystem.parentDisabled };
                 $scope.archiveRecommendations = Kitos.Models.ItSystem.ArchiveDutyRecommendationOptions.getAll();

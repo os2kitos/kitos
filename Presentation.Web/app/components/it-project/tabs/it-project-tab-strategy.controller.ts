@@ -53,6 +53,13 @@
                 };
 
                 $scope.savejoint = (jointMunicipalProjectId) => {
+                    if (jointMunicipalProjectId === undefined) {
+                        return;
+                    }
+                    if (project.jointMunicipalProjectId === jointMunicipalProjectId) {
+                        return;
+                    }
+
                     var payload;
                         // if empty the value has been cleared
                     if (jointMunicipalProjectId === null) {
@@ -63,12 +70,20 @@
                     }
                         $http.patch(`/odata/ItProjects(${project.id})`, payload)
                             .then(() => {
-                                    notify.addSuccessMessage("Feltet er opdateret!");
-                                },
+                                notify.addSuccessMessage("Feltet er opdateret!");
+                                project.jointMunicipalProjectId = jointMunicipalProjectId;
+                            },
                                 () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 };
 
                 $scope.savecommon = (commonPublicProjectId) => {
+                    if (commonPublicProjectId === undefined) {
+                        return;
+                    }
+                    if (project.commonPublicProjectId === commonPublicProjectId) {
+                        return;
+                    }
+
                     var payload;
                     // if empty the value has been cleared
                     if (commonPublicProjectId === null) {
@@ -80,6 +95,7 @@
                     $http.patch(`/odata/ItProjects(${project.id})`, payload)
                         .then(() => {
                             notify.addSuccessMessage("Feltet er opdateret!");
+                            project.commonPublicProjectId = commonPublicProjectId;
                         },
                         () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 };
