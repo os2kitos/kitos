@@ -99,7 +99,7 @@
                 .then(function onSuccess(result) {
                     notify.addSuccessMessage("Rollen er slettet!");
 
-                    $scope.rights = _.filter($scope.rights, (r) => checkForDeleted(r, rId, uId, uniqueId));
+                    $scope.rights = _.filter($scope.rights, (r) => checkForDeleted(r, uniqueId));
 
                     itSystemUsage.rights = $scope.rights;
 
@@ -109,11 +109,8 @@
 
         };
 
-        function checkForDeleted(right, deletedRoleId, deletedUserId, deletedUniqueId) {
-            if (right.roleId === deletedRoleId && right.userId === deletedUserId && right.$$hashKey === deletedUniqueId) {
-                return false;
-            }
-            return true;
+        function checkForDeleted(right, deletedUniqueId) {
+            return right.$$hashKey !== deletedUniqueId;
         }
 
         $scope.updateRight = function (right) {
