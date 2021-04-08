@@ -45,14 +45,11 @@
                 <!-- edit -->
                 <tr ng-if="assignedRole.isEditing">
                     <td>
-                        <select id="edit-role"
-                                class="form-control input-sm"
-                                ui-select2
-                                ng-model="assignedRole.newRoleIdAsString">
-                            <option data-ng-repeat="role in ::vm.roles" value="{{role.id}}">
-                                {{role.text}}
-                            </option>
-                        </select>
+                        <input id="edit-role"
+                               type="hidden"
+                               class="form-control input-sm"
+                               ui-select2="vm.rolesSelect2Config"
+                               ng-model="assignedRole.newRole" />
                     </td>
                     <td colspan="2" class="relative-position">
                         <!-- type="hidden" makes it start with a default value if the model already contains a value -->
@@ -76,14 +73,11 @@
             <tbody ng-hide="!vm.hasWriteAccess">
                 <tr>
                     <td>
-                        <select id="add-role"
-                                class="form-control input-sm"
-                                ui-select2
-                                ng-model="vm.selectedRoleIdAsString">
-                            <option data-ng-repeat="role in ::vm.roles" value="{{role.id}}">
-                                {{role.text}}
-                            </option>
-                        </select>
+                        <input id="add-role"
+                               type="hidden"
+                               class="form-control input-sm"
+                               ui-select2="vm.rolesSelect2Config"
+                               ng-model="vm.selectedRoleAsSelect2Entry" />
                     </td>
                     <td colspan="2" class="form-group">
                         <input id="add-user"

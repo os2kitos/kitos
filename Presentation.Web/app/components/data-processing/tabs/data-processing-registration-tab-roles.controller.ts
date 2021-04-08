@@ -14,11 +14,12 @@
         headerName: string;
         roles: Models.ViewModel.Generic.Select2OptionViewModel<any>[];
         assignedRoles: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel[];
-        selectedRoleIdAsString: string;
         selectedUser: Models.ViewModel.Generic.Select2OptionViewModel<any>;
         userOptions: any;
         lastSortedBy: string;
         shouldSortReversed: boolean;
+        rolesSelect2Config : any;
+        selectedRoleAsSelect2Entry: Models.ViewModel.Generic.Select2OptionViewModel<Models.ViewModel.Generic.Roles.IRoleViewModel>;
 
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
@@ -30,7 +31,7 @@
 
             this.headerName = dataProcessingRegistration.name;
             this.roles = dataProcessingRegistrationRoles.map(role => this.mapToRoleOptions(role));
-
+            this.rolesSelect2Config = select2LoadingService.select2LocalDataNoSearch(() => this.roles, false);
             this.lastSortedBy = "";
             this.shouldSortReversed = false;
 
@@ -41,10 +42,10 @@
             this.selectedUser = null;
 
             if (this.roles.length < 1) {
-                this.selectedRoleIdAsString = null;
+                this.selectedRoleAsSelect2Entry = null;
                 this.userOptions = this.getAvailableUserOptions(() => null);
             } else {
-                this.selectedRoleIdAsString = this.roles[0].id.toString();
+                this.selectedRoleAsSelect2Entry = this.roles[0];
                 this.userOptions = this.getAvailableUserOptions(() => this.getSelectedRoleId());
             }
         }
@@ -89,19 +90,19 @@
 
             var msg = this.notify.addInfoMessage("Tilføjer rolle");
 
-            this.dataProcessingRegistrationService.assignNewRole(this.dataProcessingRegistration.id, this.getSelectedRoleId(), this.selectedUser.id)
+            this.dataProcessingRegistrationService.assignNewRole(this.dataProcessingRegistration.id, this.selectedRoleAsSelect2Entry.id, this.selectedUser.id)
                 .then(
                     () => {
                         msg.toSuccessMessage("Rollen er tilføjet");
-                        var assignedRole = this.getRoleFromId(this.selectedRoleIdAsString);
+                        var assignedRole = this.selectedRoleAsSelect2Entry;
                         var user = <Models.ViewModel.Generic.Roles.IUserViewModel>{ id: this.selectedUser.optionalObjectContext.id, name: this.selectedUser.optionalObjectContext.name, email: this.selectedUser.optionalObjectContext.email }
                         var newAssignedRole = this.createEditableAssignedRole(user,
                             assignedRole.optionalObjectContext,
                             this.selectedUser,
-                            assignedRole.id.toString());
+                            assignedRole);
 
                         this.assignedRoles.push(newAssignedRole);
-                        this.selectedRoleIdAsString = this.roles[0].id.toString();
+                        this.selectedRoleAsSelect2Entry = this.roles[0];
                         this.selectedUser = null;
                     },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
@@ -137,7 +138,7 @@
         }
 
         editRole(assignedRole: Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel) {
-            var newRole = this.getRoleFromId(assignedRole.newRoleIdAsString);
+            var newRole = assignedRole.newRole;
 
             if (angular.isUndefined(newRole)) {
                 assignedRole.isEditing = false;
@@ -173,7 +174,7 @@
                         assignedRole.newUser.optionalObjectContext,
                         newRole.optionalObjectContext,
                         assignedRole.newUser,
-                        newRole.id.toString());
+                        newRole);
                     this.assignedRoles.push(newAssignedRole);
                 },
                     (errorResponse: Models.Api.ApiResponseErrorCategory) => {
@@ -197,22 +198,16 @@
         }
 
         private getSelectedRoleId() {
-            return parseInt(this.selectedRoleIdAsString);
+            return this.selectedRoleAsSelect2Entry.optionalObjectContext.id;
         }
 
         private mapToEditableAssignedRole(input: Models.DataProcessing.IAssignedRoleDTO): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
-            input.role.name = this.formatRoleName(input.role, input.role.expired);
             const newUser = <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.ISimpleUserDTO>>{
                 id: input.user.id,
                 text: input.user.name,
                 optionalObjectContext: input.user
             };
-            return this.createEditableAssignedRole(input.user, input.role, newUser, input.role.id.toString());
-        }
-
-        private getRoleFromId(roleIdAsString: string) {
-            var roleId = parseInt(roleIdAsString);
-            return _.find(this.roles, role => role.id === roleId);
+            return this.createEditableAssignedRole(input.user, input.role, newUser,  this.mapToRoleOptions(input.role));
         }
 
         private formatRoleName(input: Models.DataProcessing.IDataProcessingRoleDTO, expired: boolean): string {
@@ -271,14 +266,14 @@
             user: Models.ViewModel.Generic.Roles.IUserViewModel,
             role: Models.ViewModel.Generic.Roles.IRoleViewModel,
             newUser: Models.ViewModel.Generic.Select2OptionViewModel<any>,
-            newRoleIdAsString: string): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
+            newRole: Models.ViewModel.Generic.Select2OptionViewModel<Models.ViewModel.Generic.Roles.IRoleViewModel>): Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel {
             var newAssignedRole = <Models.ViewModel.Generic.Roles.IEditableAssignedRoleViewModel>{
                 user: user,
                 role: role,
                 newUser: newUser,
-                newRoleIdAsString: newRoleIdAsString
+                newRole: newRole
             };
-            newAssignedRole.editUserOptions = this.getAvailableUserOptions(() => parseInt(newAssignedRole.newRoleIdAsString));
+            newAssignedRole.editUserOptions = this.getAvailableUserOptions(() => newAssignedRole.newRole.optionalObjectContext.id);
             return newAssignedRole;
         }
 
@@ -302,7 +297,7 @@
                         {
                             id: result.id,
                             text: result.name,
-                            optionalObjectContext: result
+                            optionalObjectContext: result,
                         }),
                     _ => [])
                 , false
