@@ -16,7 +16,13 @@
         $scope.select2Config = select2LoadingService.select2LocalDataNoSearch(() => roles, true);
 
         if ($scope.selectedRole == null) {
-            $scope.selectedRole = roles[0];
+            if (roles.length <= 0) {
+                $scope.selectedRole = null;
+            }
+            else {
+                $scope.selectedRole = roles[0];
+            }
+            
         }
         else {
             $scope.selectedRole = _.find(roles, function (role: any) { return role.id == $scope.selectedRole });
