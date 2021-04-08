@@ -4,27 +4,27 @@ module.exports = {
     // library script bundle
     // not minified!
     librarySrc: [
-        npm("/lodash/lodash.min.js"),
-        npm("/jquery/dist/jquery.min.js"),
+        bower("/lodash/dist/lodash.min.js"),
+        bower("/jquery/dist/jquery.min.js"),
         npm("/select2/select2.js"),
         npm("/select2/select2_locale_da.js"),
-        npm("/moment/min/moment.min.js"),
-        npm("/json-fn/jsonfn.min.js"),
-        npm("/tinymce/tinymce.js"),
-        npm("/tinymce/plugins/image/plugin.min.js"),
-        npm("/tinymce/plugins/code/plugin.min.js"),
-        npm("/tinymce/plugins/link/plugin.min.js"),
-        npm("/tinymce/themes/modern/theme.min.js")
+        bower("/moment/min/moment.min.js"),
+        bower("/jsonfn-bower/jsonfn.min.js"),
+        bower("/tinymce/tinymce.js"),
+        bower("/tinymce/plugins/image/plugin.min.js"),
+        bower("/tinymce/plugins/code/plugin.min.js"),
+        bower("/tinymce/plugins/link/plugin.min.js"),
+        bower("/tinymce/themes/modern/theme.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
 
     libraryStylesSrc: [
         npm("/select2/select2.css"),
         npm("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        npm("/angular-loading-bar/build/loading-bar.min.css"),
-        npm("/angular-ui-tree/dist/angular-ui-tree.min.css"),
-        npm("/tinymce/skins/lightgray/skin.min.css"),
-        npm("/tinymce/skins/lightgray/content.min.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.css"),
+        bower("/tinymce/skins/lightgray/skin.min.css"),
+        bower("/tinymce/skins/lightgray/content.min.css")
     ],
 
     // angular script bundle
@@ -34,18 +34,18 @@ module.exports = {
         npm("/angular-i18n/angular-locale_da-dk.js"),
         npm("/angular-animate/angular-animate.min.js"),
         npm("/angular-sanitize/angular-sanitize.min.js"),
-        npm("/angular-ui-router/release/angular-ui-router.min.js"),
-        npm("/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"),
+        bower("/angular-ui-router/release/angular-ui-router.min.js"),
+        bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
         npm("/angular-ui-select2/src/select2.js"),
-        npm("/angular-loading-bar/build/loading-bar.min.js"),
-        npm("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
-        npm("/angular-confirm/angular-confirm.min.js"),
+        bower("/angular-loading-bar/build/loading-bar.min.js"),
+        bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
+        bower("/angular-confirm-modal/angular-confirm.min.js"),
         npm("/angular-messages/angular-messages.min.js"),
-        npm("/angular-ui-tree/dist/angular-ui-tree.min.js"),
-        npm("/angular-ui-tinymce/src/tinymce.js"),
-        npm("/angular-route/angular-route.js"),
-        npm("/ngstorage/ngstorage.js"),
-        npm("/angular-base64/angular-base64.js"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
+        bower("/angular-ui-tinymce/src/tinymce.js"),
+        bower("/angular-route/angular-route.js"),
+        bower("/ngstorage/ngstorage.js"),
+        bower("/angular-base64/angular-base64.js"),
         npm("/angular-cookies/angular-cookies.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
@@ -72,12 +72,12 @@ module.exports = {
 
     // font bundle
     fontSrc: [
-        npm("/bootstrap/dist/fonts/*.*"),
-        npm("/font-awesome/fonts/*.*")
+        bower("/bootstrap/dist/fonts/*.*"),
+        bower("/font-awesome/fonts/*.*")
     ],
 
     tinyMCEFontSrc: [
-        npm("/tinymce/skins/lightgray/fonts/*.*")
+        bower("/tinymce/skins/lightgray/fonts/*.*")
     ],
 
     // assets
@@ -100,6 +100,7 @@ module.exports = {
 
     script: script,
     content: content,
+    bower: bower,
     npm: npm
 };
 
@@ -110,6 +111,10 @@ function script(file) {
 
 function content(file) {
     return paths.source + "/Content" + file;
+}
+
+function bower(file) {
+    return paths.bowerComponents + "/" + file;
 }
 
 function npm(file) {
