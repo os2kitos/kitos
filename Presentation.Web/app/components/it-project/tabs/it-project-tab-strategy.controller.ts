@@ -56,7 +56,7 @@
                     if (jointMunicipalProjectId === undefined) {
                         return;
                     }
-                    if ($scope.jointMunicipalProjectId.id === jointMunicipalProjectId) {
+                    if (project.jointMunicipalProjectId === jointMunicipalProjectId) {
                         return;
                     }
 
@@ -70,8 +70,9 @@
                     }
                         $http.patch(`/odata/ItProjects(${project.id})`, payload)
                             .then(() => {
-                                    notify.addSuccessMessage("Feltet er opdateret!");
-                                },
+                                notify.addSuccessMessage("Feltet er opdateret!");
+                                project.jointMunicipalProjectId = jointMunicipalProjectId;
+                            },
                                 () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 };
 
@@ -79,7 +80,7 @@
                     if (commonPublicProjectId === undefined) {
                         return;
                     }
-                    if ($scope.commonPublicProjectId.id === commonPublicProjectId) {
+                    if (project.commonPublicProjectId === commonPublicProjectId) {
                         return;
                     }
 
@@ -94,6 +95,7 @@
                     $http.patch(`/odata/ItProjects(${project.id})`, payload)
                         .then(() => {
                             notify.addSuccessMessage("Feltet er opdateret!");
+                            project.commonPublicProjectId = commonPublicProjectId;
                         },
                         () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 };

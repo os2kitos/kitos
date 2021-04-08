@@ -5,7 +5,7 @@
         var options = entityMapper.mapOptionToSelect2ViewModel($scope.options);
 
         var foundSelectedInOptions = _.find(options, function (option: any) {
-            if ($scope.selectedId === undefined) {
+            if ($scope.selectedId === undefined || $scope.selectedId === null) {
                 return false;
             }
             if ($scope.selectedId.id === undefined) {

@@ -53,6 +53,12 @@
                 $scope.patchUrl = "api/itproject/" + projectId;
 
                 $scope.saveResponsible = function (orgUnitId) {
+                    if (orgUnitId === null && responsibleOrgUnitId === undefined) {
+                        return; // Special case where nothing is selected
+                    }
+                    if (orgUnitId === responsibleOrgUnitId) {
+                        return;
+                    }
                     if (orgUnitId != null) {
                         var msg = notify.addInfoMessage("Gemmer... ");
                         $http.post("api/itProjectOrgUnitUsage/?projectId=" + projectId + "&orgUnitId=" + orgUnitId + "&responsible")
