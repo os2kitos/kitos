@@ -21,15 +21,16 @@ class InterfaceCatalogHelper {
             .then(() => Select2.waitForDataAndSelect())
             .then(() => console.log("Interface bound to system"));;
     }
-    
+
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return this.interfacePage.waitForKendoGrid();
     }
 
-    public static gotoSpecificInterface(name : string) {
+    public static gotoSpecificInterface(name: string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
+            .then(() => this.waitForKendoGrid())
             .then(() => this.findSpecificInterfaceInNameColumn(name).click());
     }
 
