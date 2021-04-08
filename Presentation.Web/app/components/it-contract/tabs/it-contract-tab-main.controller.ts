@@ -134,19 +134,30 @@
                 }
 
                 $scope.saveProcurement = function (id) {
-                    var payload;
-                    // if empty the value has been cleared
-                    if (id == null) {
-                        contract = $scope.contract; 
-                        payload = { procurementPlanHalf: null, procurementPlanYear: null };
-                    } else {
-                        var result = $scope.procurementPlans[id];
-                        payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
-                    }
+                    if (id === null && contract.procurementPlanHalf !== null && contract.procurementPlanYear !== null) {
+                        contract = $scope.contract;
 
-                    $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
-                    $scope.contract.procurementPlanYear = payload.procurementPlanYear;
-                    patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                        var payload = { procurementPlanHalf: null, procurementPlanYear: null };
+                        $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
+                        $scope.contract.procurementPlanYear = payload.procurementPlanYear;
+                        patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    }
+                    else {
+                        if (id === null) {
+                            return;
+                        }
+
+                        var result = $scope.procurementPlans[id];
+                        if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
+                            return;
+                        }
+                        contract = $scope.contract;
+
+                        var payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
+                        $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
+                        $scope.contract.procurementPlanYear = payload.procurementPlanYear;
+                        patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    }
                 };
 
                 function patch(payload, url) {
