@@ -40,6 +40,12 @@
             var usageId = $stateParams.id;
 
             $scope.saveResponsible = function (orgUnitId) {
+                if (orgUnitId === null && responsibleOrgUnitId === undefined) {
+                    return; // Special case where nothing is selected
+                }
+                if (orgUnitId === responsibleOrgUnitId) {
+                    return;
+                }
                 var msg = notify.addInfoMessage("Gemmer... ");
                 if (orgUnitId != null) {
                     $http.post('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&orgUnitId=' + orgUnitId + '&responsible=true')
