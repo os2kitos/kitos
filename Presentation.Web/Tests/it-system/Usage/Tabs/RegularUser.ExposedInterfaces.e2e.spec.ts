@@ -42,7 +42,7 @@ describe("Regular user can",
                 SystemUsageHelper.openLocalSystem(itSystemWithInterfaceName)
                     .then(() => LocalItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
-                    .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
+                    .then(() => browser.wait(ec.presenceOf(getInterfaceName())))
                     .then(() => expect(getInterfaceName().getText()).toEqual(interfaceName));
             });
 
@@ -51,7 +51,7 @@ describe("Regular user can",
                 ItSystemHelper.openSystem(itSystemWithInterfaceName)
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
-                    .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
+                    .then(() => browser.wait(ec.presenceOf(getInterfaceName())))
                     .then(() => expect(getInterfaceName().getText()).toEqual(interfaceName));
             });
 
