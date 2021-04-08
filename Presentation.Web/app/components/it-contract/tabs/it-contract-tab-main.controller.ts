@@ -134,20 +134,30 @@
                 }
 
                 $scope.saveProcurement = function (id) {
-                    var payload;
-                    // if empty the value has been cleared
-                    if (id == null) {
-                        contract = $scope.contract; 
-                        payload = { procurementPlanHalf: null, procurementPlanYear: null };
-                    } else {
-                        var result = $scope.procurementPlans[id];
-                        payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
+                    if (id === null && contract.procurementPlanHalf !== null && contract.procurementPlanYear !== null) {
+                        updateProcurement(null, null);
                     }
+                    else {
+                        if (id === null) {
+                            return;
+                        }
 
+                        var result = $scope.procurementPlans[id];
+                        if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
+                            return;
+                        }
+                        updateProcurement(result.half, result.year);
+                    }
+                };
+
+                function updateProcurement(procurementPlanHalf, procurementPlanYear) {
+                    contract = $scope.contract;
+
+                    var payload = { procurementPlanHalf: procurementPlanHalf, procurementPlanYear: procurementPlanYear };
                     $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
-                };
+                }
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);

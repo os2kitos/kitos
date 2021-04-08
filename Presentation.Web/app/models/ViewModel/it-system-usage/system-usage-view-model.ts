@@ -34,7 +34,7 @@
         options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <UpdatedSelect2OptionViewModel<any>>{ id: DataOption.UNDECIDED, text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: DataOption.UNDECIDED, text: Kitos.Constants.Select2.EmptyField },
                 <UpdatedSelect2OptionViewModel<any>>{ id: DataOption.YES, text: "Ja" },
                 <UpdatedSelect2OptionViewModel<any>>{ id: DataOption.NO, text: "Nej" },
                 <UpdatedSelect2OptionViewModel<any>>{ id: DataOption.DONTKNOW, text: "Ved ikke" }
@@ -46,7 +46,7 @@
         options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <UpdatedSelect2OptionViewModel<any>>{ id: RiskLevel.UNDECIDED, text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: RiskLevel.UNDECIDED, text: Kitos.Constants.Select2.EmptyField },
                 <UpdatedSelect2OptionViewModel<any>>{ id: RiskLevel.LOW, text: "Lav risiko" },
                 <UpdatedSelect2OptionViewModel<any>>{ id: RiskLevel.MIDDLE, text: "Mellem risiko" },
                 <UpdatedSelect2OptionViewModel<any>>{ id: RiskLevel.HIGH, text: "Høj risiko" }
@@ -86,7 +86,7 @@
         options: UpdatedSelect2OptionViewModel<any>[];
         constructor() {
             this.options = [
-                <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.UNDECIDED, text: "\u00a0" },
+                <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.UNDECIDED, text: Kitos.Constants.Select2.EmptyField },
                 <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.ONPREMISE, text: "On-premise" },
                 <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.EXTERNAL, text: "Eksternt" }
             ];
