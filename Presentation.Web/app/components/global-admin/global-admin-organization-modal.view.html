@@ -4,14 +4,14 @@
 
 <form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
     <div class="modal-body">
-        <div class="form-group" ng-class="{ 'has-error': form.name.$touched && form.name.$invalid }">
+        <div class="form-group" ng-class="{ 'has-error': form.name.$invalid }">
             <label for="name" class="col-xs-3 control-label">
                 Organisationens navn
             </label>
             <div class="col-xs-8">
                 <input type="text" ng-model="org.name" id="name" name="name" class="form-control" ng-required="true" ng-maxlength="50" autocomplete="false"
                        ng-minlength="1" data-disabled-on-busy autofocus data-element-type="orgModalNameInput">
-                <div ng-messages="form.name.$error" ng-if="form.name.$touched" style="color:maroon" role="alert">
+                <div ng-messages="form.name.$error" ng-if="form.name.$invalid" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Organisationen skal have et navn.</div>
                     <div ng-message="minlength" style="margin:5px 0">Det valgte navn er for kort.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>

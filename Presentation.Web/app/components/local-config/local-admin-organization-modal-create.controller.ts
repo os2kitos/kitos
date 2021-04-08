@@ -2,13 +2,14 @@
     "use strict";
 
     export class CreateOrganizationController {
-        public title: string;
+        title: string;
 
-        public static $inject: string[] = [
+        static $inject: string[] = [
             "$rootScope", "$scope", "$http", "notify", "userService"
         ];
 
-        constructor(private $rootScope,
+        constructor(
+            private $rootScope,
             private $scope,
             private $http,
             private notify,
@@ -19,7 +20,6 @@
             $rootScope.page.title = "Ny organisation";
             this.title = "Opret organisation";
             this.org = {};
-            this.org.AccessModifier = "1";
             this.org.TypeId = 2; // set type to interessefællesskab by default
             this.org.Cvr = null;
 
@@ -30,18 +30,18 @@
             });
         }
 
-        public dismiss() {
+        dismiss() {
             this.$scope.$dismiss();
         }
 
-        public submit() {
+        submit() {
             var self = this;
             const payload = {
                 Id: this.currentUser.currentOrganizationId,
                 ObjectOwnerId: this.currentUser.id,
                 Name: this.org.Name,
                 TypeId: this.org.TypeId,
-                AccessModifier: this.org.AccessModifier,
+                AccessModifier: "1", //Public
                 Cvr: this.org.Cvr
             }
             this.$http.post("odata/Organizations", payload)
