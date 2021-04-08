@@ -1,9 +1,9 @@
 ﻿(function (ng, app) {
     'use strict';
 
-    app.controller("select2MultipleOptionController", ["$scope", "select2LoadingService", function ($scope, select2LoadingService) {
-        var availableOptions: { id, text, optionalObjectContext }[] = $scope.options;
-        var selectedOptions: { id, text, optionalObjectContext }[] = $scope.selected;
+    app.controller("select2MultipleOptionController", ["$scope", "entityMapper", "select2LoadingService", function ($scope, entityMapper, select2LoadingService) {
+        var availableOptions = $scope.options;
+        var selectedOptions = $scope.selected;
 
         var selectedNoLongerAvailable = _.differenceWith(selectedOptions, availableOptions, (selected, available) => {
             return selected.id === available.id;
