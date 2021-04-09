@@ -26,10 +26,10 @@
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
             $scope.numberOfUsersOptions = [
-                { id: 0, text: "<10" },
-                { id: 1, text: "10-50" },
-                { id: 2, text: "50-100" },
-                { id: 3, text: ">100" },
+                { id: "0", text: "<10" },
+                { id: "1", text: "10-50" },
+                { id: "2", text: "50-100" },
+                { id: "3", text: ">100" },
             ]
 
             $scope.datepickerOptions = {

@@ -17,7 +17,7 @@
         user: IUserViewModel,
         role: IRoleViewModel,
         newUser: Select2OptionViewModel<any>,
-        newRoleIdAsString: string,
+        newRole: Select2OptionViewModel<IRoleViewModel>,
         isEditing?: boolean,
         editUserOptions: (input: number) => any,
     }
