@@ -172,7 +172,7 @@
                         </td>
                         <td>
                             <input type="checkbox" name="Approved"
-                                   ng-click="patchPeriode('Approved', archive.Approved, archive.Id)" 
+                                   ng-change="patchPeriode('Approved', archive.Approved, archive.Id)" 
                                    data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1" 
                                    data-ng-model="archive.Approved"/>
 
