@@ -135,6 +135,7 @@
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
         hostedAt: HostedAt;
+        userCount: string;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -159,6 +160,7 @@
             this.DPIA = this.mapDataOption(itSystemUsage.dpia);
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
             this.hostedAt = this.mapHostedAtOption(itSystemUsage.hostedAt);
+            this.userCount = itSystemUsage.userCount.toString();
 
         }
 
