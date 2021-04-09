@@ -71,8 +71,7 @@ class DataProcessingRegistrationHelper {
 
     public static assignRole(role: string, user: string) {
         console.log("Assigning role: " + role + " to user: " + user);
-        return Select2Helper.searchFor(role, "s2id_add-role")
-            .then(() => Select2Helper.waitForDataAndSelect())
+        return Select2Helper.selectWithNoSearch(role, "s2id_add-role")
             .then(() => Select2Helper.searchFor(user, "s2id_add-user"))
             .then(() => Select2Helper.waitForDataAndSelect());
     }
@@ -90,8 +89,7 @@ class DataProcessingRegistrationHelper {
         return this.pageObject.getRoleRow(oldRoleName, oldUserName).then(row => {
             return this.pageObject.getRoleEditButton(oldRoleName, oldUserName)
                 .then(element => element.click())
-                .then(() => Select2Helper.searchForByParent(role, "s2id_edit-role", row))
-                .then(() => Select2Helper.waitForDataAndSelect())
+                .then(() => Select2Helper.selectNoSearchByParent(role, "s2id_edit-role", row))
                 .then(() => Select2Helper.searchForByParent(user, "s2id_edit-user", row))
                 .then(() => Select2Helper.waitForDataAndSelect())
                 .then(() => this.pageObject.getRoleSubmitEditButton().click());

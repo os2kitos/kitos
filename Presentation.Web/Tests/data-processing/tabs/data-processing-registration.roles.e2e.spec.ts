@@ -4,7 +4,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import DataProcessingRegistrationOverviewPageObject = require("../../PageObjects/Data-Processing/data-processing-registration.overview.po");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper")
 
-describe("Data processing agreement main detail tests", () => {
+describe("Data processing agreement role tab tests", () => {
 
     const loginHelper = new Login();
     const pageObject = new DataProcessingRegistrationOverviewPageObject();
@@ -34,7 +34,7 @@ describe("Data processing agreement main detail tests", () => {
     });
 
 
-    it("Creating and renaming data processing agreement",
+    it("Performing role assignment and removal",
         () => {
             var name = createName();
 
