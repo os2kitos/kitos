@@ -79,6 +79,9 @@
                         show: true
                     });
 
+                    // Update viewmodel of the system usage.
+                    itSystemUsage.rights = $scope.rights;
+
                     $scope.selectedUser = "";
 
                 }, function onError(result) {
@@ -88,20 +91,27 @@
         };
 
         $scope.deleteRight = function (right) {
-
+            var uniqueId = right.$$hashKey;
             var rId = right.roleId;
             var uId = right.userId;
 
             $http.delete("api/itSystemUsageRights/" + usageId + "?rId=" + rId + "&uId=" + uId + "&organizationId=" + user.currentOrganizationId)
                 .then(function onSuccess(result) {
-                    right.show = false;
                     notify.addSuccessMessage("Rollen er slettet!");
-                }, function onError(result) {
 
+                    $scope.rights = _.filter($scope.rights, (r) => checkForDeleted(r, uniqueId));
+
+                    itSystemUsage.rights = $scope.rights;
+
+                }, function onError(result) {
                     notify.addErrorMessage("Kunne ikke slette rollen!");
                 });
 
         };
+
+        function checkForDeleted(right, deletedUniqueId) {
+            return right.$$hashKey !== deletedUniqueId;
+        }
 
         $scope.updateRight = function (right) {
             if (!right.roleForSelect || !right.userForSelect) return;
