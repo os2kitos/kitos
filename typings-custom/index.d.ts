@@ -12,7 +12,6 @@
 /// <reference path="angular/index.d.ts" />
 /// <reference path="jasmine-expect/index.d.ts" />
 /// <reference path="jasmine/index.d.ts" />
-/// <reference path="lodash/index.d.ts" />
 /// <reference path="moment/index.d.ts" />
 /// <reference path="selenium-webdriver/index.d.ts" />
 /// <reference path="ui-select/index.d.ts" />
