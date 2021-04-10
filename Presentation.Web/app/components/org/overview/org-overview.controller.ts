@@ -13,19 +13,50 @@
                 templateUrl: 'app/components/org/overview/org-overview.view.html',
                 controller: 'org.OverviewCtrl',
                 resolve: {
+                    orgUnits: [
+                        '$http', 'user', function ($http, user) {
+                            return $http.get('api/organizationUnit?organization=' + user.currentOrganizationUnitId).then(function (result) {
+                                var options = []
+
+                                function visit(orgUnit, indentationLevel) {
+                                    var option = {
+                                        id: String(orgUnit.id),
+                                        text: orgUnit.name,
+                                        indentationLevel: indentationLevel
+                                    };
+
+                                    options.push(option);
+
+                                    _.each(orgUnit.children, function (child) {
+                                        return visit(child, indentationLevel + 1);
+                                    });
+
+                                }
+                                visit(result.data.response, 0);
+                                return options;
+                            });
+                        }
+                    ],
                 }
             });
         }
     ]);
 
     app.controller('org.OverviewCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', '$uibModal', 'user',
-        function($rootScope, $scope, $http, notify, $modal, user) {
+        '$rootScope', '$scope', '$http', 'notify', '$uibModal', 'user', "orgUnits",
+        function ($rootScope, $scope, $http, notify, $modal, user, orgUnits) {
+
+            $scope.orgUnits = orgUnits;
+
             $rootScope.page.title = 'Organisation - Overblik';
+
             function checkForDefaultUnit() {
                 if (!user.currentOrganizationUnitId) return;
 
-                $scope.orgUnitId = user.currentOrganizationUnitId;
+                var selectedDefaultOrganization = _.find($scope.orgUnits, (orgUnit) => orgUnit.id === String(user.currentOrganizationUnitId));
+                if (selectedDefaultOrganization !== undefined) {
+                    $scope.orgUnitId = user.currentOrganizationUnitId;
+                }
             }
             checkForDefaultUnit();
 
@@ -44,8 +75,9 @@
             /* load task usages */
             function loadUsages() {
                 if (!$scope.orgUnitId) return;
+                if (!$scope.orgUnitId.id) return;
 
-                var url = 'api/taskusage/?orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&organizationId=' + user.currentOrganizationId;
+                var url = 'api/taskusage/?orgUnitId=' + $scope.orgUnitId.id + '&onlyStarred=true' + '&organizationId=' + user.currentOrganizationId;
 
                 url += '&skip=' + $scope.pagination.skip;
                 url += '&take=' + $scope.pagination.take;

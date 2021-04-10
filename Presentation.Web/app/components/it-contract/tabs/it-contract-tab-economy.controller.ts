@@ -5,13 +5,31 @@
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-economy.view.html",
             controller: "contract.EditEconomyCtrl",
             resolve: {
-                orgUnits: ["$http", "userService", function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return $http.get("api/organizationunit/?organizationid=" + user.currentOrganizationId).then(function (result) {
-                            return result.data.response;
+                orgUnits: [
+                    '$http', 'contract', function ($http, contract) {
+                        return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
+                            var options = []
+
+                            function visit(orgUnit, indentationLevel) {
+                                var option = {
+                                    id: String(orgUnit.id),
+                                    text: orgUnit.name,
+                                    indentationLevel: indentationLevel,
+                                    ean: orgUnit.ean
+                                };
+
+                                options.push(option);
+
+                                _.each(orgUnit.children, function (child) {
+                                    return visit(child, indentationLevel + 1);
+                                });
+
+                            }
+                            visit(result.data.response, 0);
+                            return options;
                         });
-                    });
-                }],
+                    }
+                ],
                 externalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
                     return $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`).then(function (result) {
                         return result.data.response;
@@ -33,7 +51,7 @@
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
         "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
         function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
-
+            $scope.orgUnits = orgUnits;
             $scope.hasWriteAccess = hasWriteAccess;
 
             if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
@@ -125,7 +143,7 @@
                         $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
                             .then(function onSuccess(result) {
                                 stream.show = false;
-
+                                collection = _.remove(collection, (item) => item.id === stream.id);
                                 msg.toSuccessMessage("Rækken er slettet!");
                             }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
@@ -135,10 +153,8 @@
                     function updateEan() {
                         stream.ean = " - ";
 
-                        if (stream.organizationUnitId) {
-                            var orgUnit: { ean } = _.find(orgUnits, { id: parseInt(stream.organizationUnitId) });
-
-                            if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
+                        if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
+                            stream.ean = stream.organizationUnitId.ean;
                         }
                     };
                     stream.updateEan = updateEan;

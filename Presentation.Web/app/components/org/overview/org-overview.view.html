@@ -6,7 +6,11 @@
 
 <div class="col-xs-12">
     <div class="col-xs-3">
-        <div data-ng-model="orgUnitId" data-ng-change="loadUsages()" data-select-org-unit=""></div>
+        <select2-org-unit data-id="OrganizationChooser"
+                          data-options="orgUnits"
+                          data-ng-model="orgUnitId"
+                          data-function="loadUsages">
+        </select2-org-unit>
     </div>
     <div class="col-xs-1">
         KLE ID

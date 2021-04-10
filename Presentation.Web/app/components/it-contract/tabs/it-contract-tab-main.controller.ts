@@ -24,8 +24,25 @@
                     ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
-                            return $http.get('api/organizationunit/?organizationid=' + contract.organizationId).then(function (result) {
-                                return result.data.response;
+                            return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
+                                var options = []
+
+                                function visit(orgUnit, indentationLevel) {
+                                    var option = {
+                                        id: String(orgUnit.id),
+                                        text: orgUnit.name,
+                                        indentationLevel: indentationLevel
+                                    };
+
+                                    options.push(option);
+
+                                    _.each(orgUnit.children, function (child) {
+                                        return visit(child, indentationLevel + 1);
+                                    });
+
+                                }
+                                visit(result.data.response, 0);
+                                return options;
                             });
                         }
                     ],

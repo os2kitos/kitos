@@ -367,6 +367,7 @@
     <Content Include="app\shared\select2Option\select2MultipleOption.view.html" />
     <Content Include="app\shared\select2Option\select2Option.view.html" />
     <Content Include="app\shared\selectAccessModifier\selectAccess.view.html" />
+    <Content Include="app\shared\selectOrgUnit\select2OrgUnit.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
     <Content Include="app\shared\selectSimple\selectSimple.view.html" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
@@ -829,6 +830,7 @@
     <TypeScriptCompile Include="app\shared\select2Option\select2MultipleOption.directive.ts" />
     <TypeScriptCompile Include="app\shared\select2Option\select2Option.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccess.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectOrgUnit\select2OrgUnit.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
@@ -1062,7 +1064,6 @@
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
     <TypeScriptCompile Include="app\shared\searchBox\searchBox.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccessModifier.directive.ts" />
-    <TypeScriptCompile Include="app\shared\selectOrgUnit\selectOrgUnit.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
     <TypeScriptCompile Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.directive.ts" />
@@ -1155,7 +1156,6 @@
     <Content Include="app\shared\searchBox\searchBox.view.html" />
     <Content Include="app\shared\selectStatus2\selectStatus2.view.html" />
     <Content Include="app\shared\selectAccessModifier\selectAccessModifier.view.html" />
-    <Content Include="app\shared\selectOrgUnit\selectOrgUnit.view.html" />
     <Content Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.view.html" />
     <Content Include="app\shared\selectUser\selectUser.view.html" />
     <Content Include="app\shared\showStatus\showStatus.view.html" />
