@@ -110,7 +110,7 @@
                 for (var i = 0; i < 20; i++) {
                     var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
                     var year = currentDate.year();
-                    var obj = { id: i, text: half + " | " + year, half: half, year: year };
+                    var obj = { id: String(i), text: half + " | " + year, half: half, year: year };
                     $scope.procurementPlans.push(obj);
 
                     // add 6 months for next iter
@@ -127,7 +127,7 @@
                     // plan is not found, add missing plan to begining of list
                     // if not null
                     if (contract.procurementPlanHalf != null) {
-                        var plan = { id: $scope.procurementPlans.length, text: half + " | " + year, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                        var plan = { id: String($scope.procurementPlans.length), text: contract.procurementPlanHalf + " | " + contract.procurementPlanYear, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
                         $scope.procurementPlanId = plan; // select it
                     }
@@ -160,7 +160,7 @@
                             return;
                         }
 
-                        var result = $scope.procurementPlans[id];
+                        var result = _.find($scope.procurementPlans, (plan) => plan.id === id);
                         if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
                             return;
                         }
