@@ -8,14 +8,15 @@
                 orgUnits: [
                     '$http', 'contract', function ($http, contract) {
                         return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
-                            var options = []
 
-                            function visit(orgUnit, indentationLevel) {
+                            var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
+
+                            function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
                                 var option = {
                                     id: String(orgUnit.id),
                                     text: orgUnit.name,
                                     indentationLevel: indentationLevel,
-                                    ean: orgUnit.ean
+                                    optionalExtraObject: orgUnit.ean
                                 };
 
                                 options.push(option);
@@ -50,8 +51,9 @@
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
         "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
             $scope.orgUnits = orgUnits;
+            $scope.allowClear = true;
             $scope.hasWriteAccess = hasWriteAccess;
 
             if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
@@ -154,7 +156,7 @@
                         stream.ean = " - ";
 
                         if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
-                            stream.ean = stream.organizationUnitId.ean;
+                            stream.ean = stream.organizationUnitId.optionalExtraObject;
                         }
                     };
                     stream.updateEan = updateEan;

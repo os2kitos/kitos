@@ -503,9 +503,11 @@
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\broken-links-report\BrokenLinksReportDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\system-relation-api-DTOs.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization-unit.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YearMonthUndecidedIntervalOption.ts" />
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
+    <TypeScriptCompile Include="app\models\Api\user.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
@@ -1066,7 +1068,6 @@
     <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccessModifier.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
-    <TypeScriptCompile Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.directive.ts" />
     <TypeScriptCompile Include="app\shared\showErrors.directive.ts" />
     <TypeScriptCompile Include="app\shared\showStatus\showStatus.directive.ts" />
     <TypeScriptCompile Include="app\components\it-project\simpleComment.directive.ts" />
@@ -1156,7 +1157,6 @@
     <Content Include="app\shared\searchBox\searchBox.view.html" />
     <Content Include="app\shared\selectStatus2\selectStatus2.view.html" />
     <Content Include="app\shared\selectAccessModifier\selectAccessModifier.view.html" />
-    <Content Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.view.html" />
     <Content Include="app\shared\selectUser\selectUser.view.html" />
     <Content Include="app\shared\showStatus\showStatus.view.html" />
     <Content Include="app\components\global-admin\global-admin-global-admins.view.html" />

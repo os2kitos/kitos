@@ -15,10 +15,10 @@
                 resolve: {
                     orgUnits: [
                         '$http', 'user', function ($http, user) {
-                            return $http.get('api/organizationUnit?organization=' + user.currentOrganizationUnitId).then(function (result) {
-                                var options = []
+                            return $http.get('api/organizationUnit?organization=' + user.currentOrganizationId).then(function (result) {
+                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
 
-                                function visit(orgUnit, indentationLevel) {
+                                function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
                                     var option = {
                                         id: String(orgUnit.id),
                                         text: orgUnit.name,
@@ -43,10 +43,11 @@
     ]);
 
     app.controller('org.OverviewCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', '$uibModal', 'user', "orgUnits",
-        function ($rootScope, $scope, $http, notify, $modal, user, orgUnits) {
+        '$rootScope', '$scope', '$http', '$uibModal', 'user', "orgUnits",
+        function ($rootScope, $scope, $http, $modal, user, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[]) {
 
             $scope.orgUnits = orgUnits;
+            $scope.allowClear = false;
 
             $rootScope.page.title = 'Organisation - Overblik';
 

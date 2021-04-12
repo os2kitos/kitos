@@ -5,10 +5,10 @@
         "$scope",
         "select2LoadingService",
         ($scope: any, select2LoadingService: Kitos.Services.Select2LoadingService) => {
-            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => $scope.options, formatResults);
+            $scope.select2Config = select2LoadingService.select2LocalDataFormatted(() => $scope.options, formatResults, $scope.allowClear);
 
-            function formatResults(result): string {
-                function visit(text, indentationLevel) {
+            function formatResults(result: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<any>): string {
+                function visit(text: string, indentationLevel: number): string {
                     if (indentationLevel <= 0) {
                         return text;
                     }
@@ -34,7 +34,8 @@
                     function: "=",
                     autoSaveUrl: "@",
                     field: "@",
-                    disabled: "=ngDisabled"
+                    disabled: "=ngDisabled",
+                    allowClear: "="
                 },
                 controller: "select2OrgUnitController",
                 link: function (scope, element, attr, ctrl) {

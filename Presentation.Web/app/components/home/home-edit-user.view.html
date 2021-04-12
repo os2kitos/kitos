@@ -7,7 +7,14 @@
                 <!-- Default organizationunit -->
                 <div class="form-group">
                     <label class="control-label">Primær organisationsenhed</label>
-                    <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>
+                    <select2-org-unit data-id="OrganizationChooser"
+                                      data-placeholder="Vælg afdeling"
+                                      data-options="orgUnits"
+                                      data-ng-model="user.defaultOrganizationUnit"
+                                      data-function="updateDefaultOrgUnit"
+                                      data-allow-clear="allowClear">
+                    </select2-org-unit>
+                    <!--<div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>-->
                 </div>
                 <!-- User name -->
                 <div class="form-group">

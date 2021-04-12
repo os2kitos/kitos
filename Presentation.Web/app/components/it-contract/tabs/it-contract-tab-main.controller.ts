@@ -25,9 +25,9 @@
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
                             return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
-                                var options = []
+                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
 
-                                function visit(orgUnit, indentationLevel) {
+                                function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
                                     var option = {
                                         id: String(orgUnit.id),
                                         text: orgUnit.name,
@@ -72,8 +72,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams', '$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user : Kitos.Services.IUser, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers',
+            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user : Kitos.Services.IUser, autofocus, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -87,6 +87,7 @@
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
+                $scope.allowClear = true;
                 var today = new Date();
 
                 if (!contract.active) {
