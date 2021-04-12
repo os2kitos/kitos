@@ -9,6 +9,7 @@
         select2LocalData(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[]);
         select2LocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
         select2MultipleLocalDataNoSearch(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], allowClear?: boolean);
+        select2LocalDataFormatted(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], formatResults: (input: Models.ViewModel.Generic.ISelect2Model) => string, allowClear?: boolean);
     }
 
     export class Select2LoadingService implements ISelect2LoadingService {
@@ -23,6 +24,14 @@
             return {
                 data: () => ({ "results": dataFn() }),
                 allowClear: true
+            };
+        }
+
+        select2LocalDataFormatted(dataFn: () => Models.ViewModel.Generic.Select2OptionViewModel<any>[], formatResults: (input) => string, allowClear= true) {
+            return {
+                data: () => ({ "results": dataFn() }),
+                allowClear: allowClear,
+                formatResult: formatResults
             };
         }
 

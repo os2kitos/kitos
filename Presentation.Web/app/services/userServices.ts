@@ -167,6 +167,10 @@
             return this.reAuthorize();
         };
 
+        getFreshUser = () => {
+            return this.reAuthorize();
+        }
+
         reAuthorize = () => {
             var deferred = this.$q.defer();
             // loadUser(null) triggers a re-auth

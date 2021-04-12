@@ -40,15 +40,16 @@
                 <tr data-ng-repeat="stream in externEconomyStreams | filter:{'show':true}">
                     <!-- ORG UNIT -->
                     <td>
-                        <div class="extern-org-unit"
-                             data-ng-model="stream.organizationUnitId"
-                             data-select-org-unit=""
-                             data-extra-options="extraOptions"
-                             data-ng-disabled="!hasWriteAccess"
-                             data-ng-change="stream.updateEan()"
-                             data-field="organizationUnitId"
-                             data-autosave="{{stream.updateUrl}}"
-                             data-allow-clear="true"></div>
+                        <select2-org-unit data-id="stream.id"
+                                          data-placeholder="Vælg ansvarlig enhed"
+                                          data-options="orgUnits"
+                                          data-ng-model="stream.organizationUnitId"
+                                          data-function="stream.updateEan"
+                                          data-auto-save-url="{{ stream.updateUrl }}"
+                                          data-field="organizationUnitId"
+                                          data-ng-disabled="!hasWriteAccess"
+                                          data-allow-clear="allowClear">
+                        </select2-org-unit>
                     </td>
 
                     <!-- EAN # -->
@@ -175,14 +176,16 @@
                 <tr data-ng-repeat="stream in internEconomyStreams | filter:{'show':true}">
                     <!-- ORG UNIT -->
                     <td>
-                        <div class="intern-org-unit"
-                             data-ng-model="stream.organizationUnitId"
-                             data-select-org-unit=""
-                             data-extra-options="extraOptions"
-                             data-ng-disabled="!hasWriteAccess"
-                             data-ng-change="stream.updateEan()"
-                             data-field="organizationUnitId"
-                             data-autosave="{{stream.updateUrl}}" data-allow-clear="true"></div>
+                        <select2-org-unit data-id="stream.id"
+                                          data-placeholder="Vælg ansvarlig enhed"
+                                          data-options="orgUnits"
+                                          data-ng-model="stream.organizationUnitId"
+                                          data-function="stream.updateEan"
+                                          data-auto-save-url="{{ stream.updateUrl }}"
+                                          data-field="organizationUnitId"
+                                          data-ng-disabled="!hasWriteAccess"
+                                          data-allow-clear="allowClear">
+                        </select2-org-unit>
                     </td>
 
                     <!-- EAN #  -->
