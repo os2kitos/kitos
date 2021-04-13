@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.ItSystem;
+﻿using System;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
@@ -32,7 +33,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             {
                 Id = A<int>(),
                 OrganizationId = A<int>(),
-                ItSystem = system
+                ItSystem = system,
+                Active = A<bool>(),
+                ExpirationDate = DateTime.Now.AddDays(-1)
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -43,6 +46,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //System usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(systemUsage.OrganizationId, readModel.OrganizationId);
+            Assert.Equal(systemUsage.IsActive, readModel.IsActive);
 
             //System
             Assert.Equal(system.Name, readModel.Name);

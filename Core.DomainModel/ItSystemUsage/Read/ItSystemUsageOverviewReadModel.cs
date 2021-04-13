@@ -9,5 +9,6 @@
         public ItSystemUsage SourceEntity { get; set; }
         public string Name { get; set; }
         public bool ItSystemDisabled { get; set; }
+        public bool IsActive { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,34 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/itsystemusage/{systemUsageId}/sensitivityLevel/remove"), cookie, sensitiveDataLevel))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+            }
+        }
+
+        public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetActiveRequestAsync(int systemUsageId, int orgId, bool systemUsageActive)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var body = new
+            {
+                Active = systemUsageActive
+            };
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+            }
+        }
+
+        public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetExpirationDateRequestAsync(int systemUsageId, int orgId, DateTime systemUsageExpirationDate)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var body = new
+            {
+                ExpirationDate = systemUsageExpirationDate
+            };
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={orgId}"), cookie, body))
             {
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
                 return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
