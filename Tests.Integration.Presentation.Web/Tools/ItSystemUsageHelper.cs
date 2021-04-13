@@ -77,6 +77,34 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetVersionRequestAsync(int systemUsageId, int orgId, string version)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var body = new
+            {
+                Version = version
+            };
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+            }
+        }
+
+        public static async Task<ItSystemUsageSensitiveDataLevelDTO> SendSetLocalCallNameRequestAsync(int systemUsageId, int orgId, string localCallName)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var body = new
+            {
+                LocalCallName = localCallName
+            };
+            using (var okResponse = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationId={orgId}"), cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageSensitiveDataLevelDTO>();
+            }
+        }
+
         public static async Task<ItSystemUsageDTO> PatchSystemUsage(int usageSystemId, int orgId, object body)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

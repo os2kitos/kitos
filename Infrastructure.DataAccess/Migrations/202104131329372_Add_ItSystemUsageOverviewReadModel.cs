@@ -17,6 +17,9 @@
                         Name = c.String(nullable: false, maxLength: 100),
                         ItSystemDisabled = c.Boolean(nullable: false),
                         IsActive = c.Boolean(nullable: false),
+                        ItSystemParentName = c.String(),
+                        Version = c.String(),
+                        LocalCallName = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
