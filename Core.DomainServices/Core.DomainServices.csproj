@@ -139,6 +139,8 @@
     <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\IItSystemUsageOverviewReadModelRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\ItSystemUsageOverviewReadModelRepository.cs" />
     <Compile Include="SSO\StsBrugerInfo.cs" />
     <Compile Include="SSO\IStsBrugerInfoService.cs" />
     <Compile Include="Repositories\GDPR\ISensitivePersonalDataTypeRepository.cs" />

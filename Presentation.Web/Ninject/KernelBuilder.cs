@@ -189,6 +189,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOversightOptionsAssignmentService>().To<DataProcessingRegistrationOversightOptionsAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IContractDataProcessingRegistrationAssignmentService>().To<ContractDataProcessingRegistrationAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
+            kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -322,6 +323,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationReadModelRepository>().To<DataProcessingRegistrationReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

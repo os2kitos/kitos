@@ -376,6 +376,7 @@
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\OData\DataProcessingRegistrationRightsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemUsageOverviewReadModelsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
