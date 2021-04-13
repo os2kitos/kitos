@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
