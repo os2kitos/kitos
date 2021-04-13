@@ -4,7 +4,6 @@
     export interface IOverviewController {
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: any;
     }
 
     export interface IItSystemUsageOverview extends Models.ItSystemUsage.IItSystemUsageOverviewReadModel {
@@ -13,51 +12,29 @@
 
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
-        private orgUnitStorageKey = "it-system-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
 
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$http",
-            "$timeout",
             "$window",
-            "$state",
-            "$",
-            "_",
-            "moment",
-            "notify",
             "systemRoles",
             "user",
-            "gridStateService",
             "orgUnits",
-            "needsWidthFixService",
-            "exportGridToExcelService",
             "kendoGridLauncherFactory"
         ];
 
         constructor(
             $rootScope: IRootScope,
-            private readonly $scope: ng.IScope,
-            private readonly $http: ng.IHttpService,
-            private readonly $timeout: ng.ITimeoutService,
+            $scope : any,
             private readonly $window: ng.IWindowService,
-            private readonly $state: ng.ui.IStateService,
-            private readonly $: JQueryStatic,
-            private readonly _: ILoDashWithMixins,
-            private readonly moment: moment.MomentStatic,
-            private readonly notify,
             private readonly systemRoles: Array<any>,
             private readonly user,
-            private readonly gridStateService: Services.IGridStateFactory,
             private readonly orgUnits: Array<any>,
-            private readonly needsWidthFixService,
-            private readonly exportGridToExcelService,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory) {
             $rootScope.page.title = "IT System - Overblik";
-
+            
             //Build and launch kendo grid
             var launcher =
                 kendoGridLauncherFactory
@@ -85,8 +62,9 @@
                         title: "Exportér GPDR data til Excel",
                         color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                         position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
+                        implementation: Utility.KendoGrid.KentoToolbarImplementation.Link,
                         enabled: () => true,
-                        onClick: () => window.open(`api/v1/gdpr-report/csv/${this.user.currentOrganizationId}`)
+                        link: `api/v1/gdpr-report/csv/${this.user.currentOrganizationId}`
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>
                         builder

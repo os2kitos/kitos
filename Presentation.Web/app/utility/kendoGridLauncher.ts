@@ -241,11 +241,18 @@ module Kitos.Utility.KendoGrid {
         Right
     }
 
+    export enum KentoToolbarImplementation {
+        Button,
+        Link
+    }
+
     export interface IKendoToolbarEntry {
         title: string;
         id: string;
-        onClick: () => void;
+        onClick?: () => void;
+        link?: string;
         enabled: () => boolean;
+        implementation: KentoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
     }
@@ -512,15 +519,31 @@ module Kitos.Utility.KendoGrid {
             ];
 
             this._.forEach(this.customToolbarEntries, entry => {
-                toolbar.push({
-                    name: entry.id,
-                    text: entry.title,
-                    template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
-                });
-                this.$scope.kendoVm[entry.id] = {
-                    onClick: entry.onClick,
-                    enabled: entry.enabled()
-                };
+                switch (entry.implementation) {
+                    case KentoToolbarImplementation.Button:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            onClick: entry.onClick,
+                            enabled: entry.enabled()
+                        };
+                        break;
+                    case KentoToolbarImplementation.Link:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled()
+                        };
+                        break;
+                    default:
+                        throw "Invalid toolbar implementation type";
+                }
             });
 
             //Build the columns
