@@ -396,7 +396,7 @@
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
+                            var isActive = dataItem.IsActive;
                             return isActive.toString();
                         },
                         attributes: { "class": "text-center" },
@@ -908,30 +908,6 @@
             }
 
             return concatRoles;
-        }
-
-        private isContractActive(dataItem) {
-
-
-            if (!dataItem.Active) {
-                var today = this.moment().startOf('day');
-                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded).startOf('day') : today;
-                var endDate = dataItem
-                    .ExpirationDate
-                    ? this.moment(dataItem.ExpirationDate).startOf('day')
-                    : this.moment("9999-12-30").startOf('day');
-
-                if (dataItem.Terminated) {
-                    var terminationDate = this.moment(dataItem.Terminated);
-                    if (dataItem.TerminationDeadline) {
-                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
-                    }
-                    return today >= startDate && today <= terminationDate;
-                }
-                return today >= startDate && today <= endDate;
-            }
-            return dataItem.Active;
-
         }
 
         private orgUnitDropDownList = (args) => {
