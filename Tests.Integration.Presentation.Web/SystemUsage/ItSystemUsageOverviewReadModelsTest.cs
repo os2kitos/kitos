@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItSystemUsage.Read;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -51,12 +52,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemName = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var systemDisabled = A<bool>();
+            var systemUsageActive = A<bool>();
+            var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
+
+            // System Usage changes
+            await ItSystemUsageHelper.SendSetActiveRequestAsync(systemUsage.Id, organizationId, systemUsageActive);
+            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, systemUsageExpirationDate); //Only rely on the value of "Active" of system usage
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -68,10 +75,73 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Assert
             var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
-            Assert.Equal(systemName, readModel.Name);
+
+            // From System Usage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
+            Assert.Equal(systemUsageActive, readModel.IsActive);
+
+            // From System
+            Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
+        }
+
+        [Fact]
+        public async Task ReadModels_IsActive_Is_True_When_ExpirationDate_Is_Today()
+        {
+            //Act
+            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(DateTime.Now);
+
+            //Assert
+            Assert.True(readModel.IsActive);
+        }
+
+        [Fact]
+        public async Task ReadModels_IsActive_Is_True_When_ExpirationDate_Is_After_Today()
+        {
+            //Arrange
+            var expirationDate = DateTime.Now.AddDays(A<int>());
+
+            //Act
+            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(expirationDate);
+
+            //Assert
+            Assert.True(readModel.IsActive);
+        }
+
+        [Fact]
+        public async Task ReadModels_IsActive_Is_False_When_ExpirationDate_Is_Earlier_Than_Today()
+        {
+            //Arrange
+            var expirationDate = DateTime.Now.AddDays(-A<int>());
+
+            //Act
+            var readModel = await Test_For_IsActive_Based_On_ExpirationDate(expirationDate);
+
+            //Assert
+            Assert.False(readModel.IsActive);
+        }
+
+
+        private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
+        {
+            var systemName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, expirationDate);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            return readModel;
         }
 
         private static async Task WaitForReadModelQueueDepletion()

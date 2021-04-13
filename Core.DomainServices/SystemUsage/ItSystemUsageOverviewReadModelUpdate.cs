@@ -11,6 +11,7 @@ namespace Core.DomainServices.SystemUsage
             destination.OrganizationId = source.OrganizationId;
             destination.Name = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
+            destination.IsActive = source.IsActive;
         }
     }
 }

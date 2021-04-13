@@ -16,6 +16,7 @@
                         SourceEntityId = c.Int(nullable: false),
                         Name = c.String(nullable: false, maxLength: 100),
                         ItSystemDisabled = c.Boolean(nullable: false),
+                        IsActive = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
