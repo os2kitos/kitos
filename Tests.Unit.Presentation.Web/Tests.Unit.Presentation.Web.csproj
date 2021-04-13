@@ -15,7 +15,7 @@
     <RootNamespace>Tests.Unit.Presentation.Web</RootNamespace>
     <AssemblyName>Tests.Unit.Presentation.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -211,6 +211,7 @@
     <Compile Include="DomainServices\QueryByPartOfNameTest.cs" />
     <Compile Include="DomainServices\QueryByPublicAccessOrOrganizationIdTest.cs" />
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
+    <Compile Include="DomainServices\QueryUserByNameOrEmailTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
