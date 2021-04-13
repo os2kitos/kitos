@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -48,9 +50,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Arrange
             var systemName = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+            var systemDisabled = A<bool>();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            // System changes
+            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
 
             //Act 
             var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
@@ -61,6 +71,31 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
+            Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
+        }
+
+        private static async Task WaitForReadModelQueueDepletion()
+        {
+            await WaitForAsync(
+                () =>
+                {
+                    return Task.FromResult(
+                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
+                }, TimeSpan.FromSeconds(30));
+        }
+
+        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
+        {
+            bool conditionMet;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            do
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                conditionMet = await check();
+            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
+
+            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
         }
     }
 }
