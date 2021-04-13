@@ -1,0 +1,12 @@
+﻿namespace Core.DomainModel.ItSystemUsage.Read
+{
+    public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>, IHasName
+    {
+        public int OrganizationId { get; set; }
+        public Organization.Organization Organization { get; set; }
+        public int Id { get; set; }
+        public int SourceEntityId { get; set; }
+        public ItSystemUsage SourceEntity { get; set; }
+        public string Name { get; set; }
+    }
+}

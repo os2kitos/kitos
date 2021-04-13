@@ -15,6 +15,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
@@ -158,6 +159,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataProcessingOversightOption> LocalDataProcessingOversightOptions { get; set; }
         public DbSet<LocalDataProcessingDataResponsibleOption> LocalDataProcessingDataResponsibleOptions { get; set; }
         public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
+        public DbSet<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -251,6 +253,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingOversightOptionMap());
             modelBuilder.Configurations.Add(new DataProcessingDataResponsibleOptionMap());
             modelBuilder.Configurations.Add(new DataProcessingCountryOptionMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewReadModelMap());
         }
     }
 }

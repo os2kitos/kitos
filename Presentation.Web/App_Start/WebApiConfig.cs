@@ -451,6 +451,10 @@ namespace Presentation.Web
             BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);
             BindEntitySet<LocalDataProcessingRegistrationRole, LocalDataProcessingRegistrationRolesController>(builder);
+
+            //Remove parent from dpa to prevent expand
+            builder.StructuralTypes.First(t => t.ClrType == typeof(DataProcessingRegistrationReadModel)).RemoveProperty(typeof(DataProcessingRegistrationReadModel).GetProperty(nameof(DataProcessingRegistrationReadModel.SourceEntity)));
+            builder.StructuralTypes.First(t => t.ClrType == typeof(DataProcessingRegistrationReadModel)).RemoveProperty(typeof(DataProcessingRegistrationReadModel).GetProperty(nameof(DataProcessingRegistrationReadModel.Organization)));
         }
 
         private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class, IHasId
