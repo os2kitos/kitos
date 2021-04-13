@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -17,6 +18,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class ItSystemUsageHelper
     {
+        public static async Task<IEnumerable<ItSystemUsageOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
+        }
+
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> AddSensitiveDataLevel(int systemUsageId, SensitiveDataLevel sensitiveDataLevel)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

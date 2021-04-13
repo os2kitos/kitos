@@ -133,6 +133,7 @@
     <Compile Include="Security\AuthorizationTests.cs" />
     <Compile Include="Security\CSRFProtectionTest.cs" />
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
+    <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelsTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />

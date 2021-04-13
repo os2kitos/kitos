@@ -227,5 +227,18 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<HttpResponseMessage> SendSetDisabledRequestAsync(int systemId, bool isDisabled, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"odata/ItSystems({systemId})");
+            var body = new
+            {
+                Disabled = isDisabled
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
     }
 }
