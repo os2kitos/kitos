@@ -33,7 +33,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 OrganizationId = A<int>(),
                 Name = A<string>(),
                 Disabled = A<bool>(),
-                Parent = parentSystem
+                Parent = parentSystem,
+                Uuid = A<Guid>()
             };
             var systemUsage = new ItSystemUsage
             {
@@ -43,7 +44,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Active = A<bool>(),
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
-                LocalCallName = A<string>()
+                LocalCallName = A<string>(),
+                LocalSystemId = A<string>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -57,10 +59,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.IsActive, readModel.IsActive);
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
+            Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
 
             //System
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
+            Assert.Equal(system.Uuid, readModel.Uuid);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ItSystemParentName);

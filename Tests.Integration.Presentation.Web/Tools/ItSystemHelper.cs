@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -150,6 +151,23 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new
             {
                 parentId = parentSystemId
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendSetUuidRequestAsync(
+            int systemId,
+            int organizationId,
+            Guid uuid,
+            Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                Uuid = uuid
             };
 
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);

@@ -20,6 +20,8 @@
                         ItSystemParentName = c.String(),
                         Version = c.String(),
                         LocalCallName = c.String(),
+                        LocalSystemId = c.String(),
+                        Uuid = c.Guid(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)

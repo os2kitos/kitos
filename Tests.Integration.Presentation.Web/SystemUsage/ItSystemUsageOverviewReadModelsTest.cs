@@ -49,14 +49,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         public async Task ReadModels_Contain_Correct_Content()
         {
             //Arrange
-            var systemName = A<string>();
-            var systemParentName = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var systemName = A<string>();
             var systemDisabled = A<bool>();
+            var systemUuid = A<Guid>();
+
+            var systemParentName = A<string>();
+
             var systemUsageActive = A<bool>();
             var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
             var systemUsageVersion = A<string>();
             var systemUsageLocalCallName = A<string>();
+            var systemUsageLocalSystemId = A<string>();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
@@ -65,12 +70,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
+            await ItSystemHelper.SendSetUuidRequestAsync(system.Id, organizationId, systemUuid);
 
             // System Usage changes
-            await ItSystemUsageHelper.SendSetActiveRequestAsync(systemUsage.Id, organizationId, systemUsageActive);
-            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, systemUsageExpirationDate); //Only rely on the value of "Active" of system usage
-            await ItSystemUsageHelper.SendSetVersionRequestAsync(systemUsage.Id, organizationId, systemUsageVersion);
-            await ItSystemUsageHelper.SendSetLocalCallNameRequestAsync(systemUsage.Id, organizationId, systemUsageLocalCallName);
+            var body = new
+            {
+                Active = systemUsageActive,
+                ExpirationDate = systemUsageExpirationDate,
+                Version = systemUsageVersion,
+                LocalCallName = systemUsageLocalCallName,
+                LocalSystemId = systemUsageLocalSystemId
+            };
+            await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();

@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel.ItSystemUsage.Read
+﻿using System;
+
+namespace Core.DomainModel.ItSystemUsage.Read
 {
     public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>, IHasName
     {
@@ -13,5 +15,7 @@
         public string ItSystemParentName { get; set; }
         public string Version { get; set; }
         public string LocalCallName { get; set; }
+        public string LocalSystemId { get; set; }
+        public Guid Uuid { get; set; }
     }
 }
