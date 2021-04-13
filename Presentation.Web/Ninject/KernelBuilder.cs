@@ -397,8 +397,14 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
+            
+            //DPR
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleDataProcessingRegistrationReadModelUpdates>().ToSelf().InCommandScope(Mode);
+            
+            //Itsystemusage
+            kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
         }
     }
 }

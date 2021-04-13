@@ -7,7 +7,10 @@ namespace Core.DomainServices.SystemUsage
     {
         public void Apply(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
+            destination.SourceEntityId = source.Id;
+            destination.OrganizationId = source.OrganizationId;
             destination.Name = source.ItSystem.Name;
+            destination.ItSystemDisabled = source.ItSystem.Disabled;
         }
     }
 }

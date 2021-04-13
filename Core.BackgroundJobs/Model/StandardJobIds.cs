@@ -7,5 +7,7 @@
         public static readonly string PurgeOrphanedAdvice = $"{NamePrefix}purge-orphaned-advice";
         public static readonly string UpdateDataProcessingRegistrationReadModels = $"{NamePrefix}update-dpr-read-models";
         public static readonly string ScheduleDataProcessingRegistrationReadModelUpdates = $"{NamePrefix}schedule-dpr-read-model-updates";
+        public static readonly string ScheduleItSystemUsageOverviewReadModelUpdates = $"{NamePrefix}schedule-it-system-usage-overview-read-model-updates";
+        public static readonly string UpdateItSystemUsageOverviewReadModels = $"{NamePrefix}update-it-system-usage-overview-read-models";
     }
 }

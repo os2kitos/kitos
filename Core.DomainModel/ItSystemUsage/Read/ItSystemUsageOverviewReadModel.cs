@@ -8,5 +8,6 @@
         public int SourceEntityId { get; set; }
         public ItSystemUsage SourceEntity { get; set; }
         public string Name { get; set; }
+        public bool ItSystemDisabled { get; set; }
     }
 }

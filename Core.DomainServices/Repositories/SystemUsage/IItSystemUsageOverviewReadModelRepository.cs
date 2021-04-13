@@ -11,5 +11,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         void Delete(ItSystemUsageOverviewReadModel readModel);
         void DeleteBySourceId(int sourceId);
         Maybe<ItSystemUsageOverviewReadModel> GetBySourceId(int sourceId);
+        void Update(ItSystemUsageOverviewReadModel readModel);
     }
 }

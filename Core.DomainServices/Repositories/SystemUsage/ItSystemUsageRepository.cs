@@ -19,14 +19,19 @@ namespace Core.DomainServices.Repositories.SystemUsage
             _itSystemUsageRepository.Save();
         }
 
-        public ItSystemUsage GetSystemUsage(int systemId)
+        public ItSystemUsage GetSystemUsage(int systemUsageId)
         {
-            return _itSystemUsageRepository.AsQueryable().ById(systemId);
+            return _itSystemUsageRepository.AsQueryable().ById(systemUsageId);
         }
 
         public IQueryable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId)
         {
             return _itSystemUsageRepository.AsQueryable().ByOrganizationId(organizationId);
+        }
+
+        public IQueryable<ItSystemUsage> GetBySystemId(int systemId)
+        {
+            return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystemId == systemId);
         }
     }
 }

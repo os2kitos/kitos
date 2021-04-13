@@ -53,5 +53,10 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             return _repository.AsQueryable().FirstOrDefault(x => x.SourceEntityId == sourceId);
         }
+
+        public void Update(ItSystemUsageOverviewReadModel readModel)
+        {
+            _repository.Save();
+        }
     }
 }

@@ -104,6 +104,7 @@ namespace Core.ApplicationServices.SystemUsage
             usage.OrganizationId = newSystemUsage.OrganizationId;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
+            _domainEvents.Raise(new EntityCreatedEvent<ItSystemUsage>(usage));
 
             return usage;
         }

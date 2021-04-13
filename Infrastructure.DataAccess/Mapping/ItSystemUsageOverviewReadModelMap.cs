@@ -13,6 +13,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Name", 0);
 
+            Property(x => x.ItSystemDisabled)
+                .IsRequired()
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemDisabled", 0);
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)

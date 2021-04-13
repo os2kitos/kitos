@@ -23,11 +23,25 @@ namespace Presentation.Web.Hangfire
             using (new HangfireNinjectResolutionScope(_kernel))
             {
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                backgroundJobLauncher.LaunchScheduleDataProcessingRegistrationReadUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
-                backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
+                ProcessDataProcessingModule(backgroundJobLauncher, combinedTokenSource);
+                ProcessItSystemUsageModule(backgroundJobLauncher, combinedTokenSource);
             }
 
             CoolDown(combinedTokenSource);
+        }
+
+        private static void ProcessItSystemUsageModule(IBackgroundJobLauncher backgroundJobLauncher,
+            CancellationTokenSource combinedTokenSource)
+        {
+            backgroundJobLauncher.LaunchScheduleItSystemUsageOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
+            backgroundJobLauncher.LaunchUpdateItSystemUsageOverviewReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
+        }
+
+        private static void ProcessDataProcessingModule(IBackgroundJobLauncher backgroundJobLauncher,
+            CancellationTokenSource combinedTokenSource)
+        {
+            backgroundJobLauncher.LaunchScheduleDataProcessingRegistrationReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
+            backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
         private static void CoolDown(CancellationTokenSource combinedTokenSource)
