@@ -351,8 +351,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-                            return isActive.toString();
+                            return dataItem.IsActive.toString();
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
@@ -595,7 +594,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                             if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
                             }
-                            if (this.isContractActive(dataItem.MainContract.ItContract)) {
+                            if (dataItem.MainContract.ItContract.IsActive) {
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>`;
                             } else {
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file-o text-muted" aria-hidden="true"></span></a>`;
@@ -606,7 +605,7 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
                                 return "";
                             }
                             else {
-                                return this.isContractActive(dataItem.MainContract.ItContract) ? "True" : "";
+                                return dataItem.MainContract.ItContract.IsActive.toString();
                             }
                         },
                         attributes: { "class": "text-center" },
@@ -988,25 +987,6 @@ SensitiveDataLevels($select=SensitivityDataLevel)`;
             }
 
             return concatRoles;
-        }
-
-        private isContractActive(dataItem) {
-            if (!dataItem.Active) {
-                var today = moment();
-                var startDate = dataItem.Concluded ? moment(dataItem.Concluded, "YYYY-MM-DD").startOf('day') : moment().startOf('day');
-                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate, "YYYY-MM-DD").endOf('day') : this.moment("9999-12-30", "YYYY-MM-DD").endOf('day');
-                if (dataItem.Terminated) {
-                    var terminationDate = moment(dataItem.Terminated, "YYYY-MM-DD").endOf('day');
-                    if (dataItem.TerminationDeadline) {
-                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
-                    }
-                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                    return today.isBetween(startDate, terminationDate, null, '[]');
-                }
-                // indgået-dato <= dags dato <= udløbs-dato
-                return today.isBetween(startDate, endDate, null, '[]');
-            }
-            return dataItem.Active;
         }
 
         private orgUnitDropDownList = (args) => {
