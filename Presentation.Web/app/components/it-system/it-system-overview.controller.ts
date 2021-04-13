@@ -27,14 +27,14 @@
 
         constructor(
             $rootScope: IRootScope,
-            $scope : any,
+            $scope: any,
             private readonly $window: ng.IWindowService,
             private readonly systemRoles: Array<any>,
             private readonly user,
             private readonly orgUnits: Array<any>,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory) {
             $rootScope.page.title = "IT System - Overblik";
-            
+
             //Build and launch kendo grid
             var launcher =
                 kendoGridLauncherFactory
@@ -51,7 +51,7 @@
                     .withParameterMapping((options, type) => {
                         // get kendo to map parameters to an odata url
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
+                        //TODO: Missing param fix for boolean parameters - they dont work out of the box for filtering
                         return parameterMap;
                     })
                     .withResponseParser(response => {
@@ -68,6 +68,26 @@
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>
                         builder
+                            .withDataSourceName("IsActive")
+                            .withTitle("Gyldig/Ikke gyldig")
+                            .withId("isActive")
+                            .withStandardWidth(90)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                            .withFixedValueRange([
+                                {
+                                    textValue: "Gyldig",
+                                    remoteValue: true
+                                },
+                                {
+                                    textValue: "Ikke gyldig",
+                                    remoteValue: false
+                                }
+                            ],
+                                false)
+                            .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                            .withExcelOutput(dataItem => dataItem.IsActive ? "Ja" : "Nej"))
+                    .withColumn(builder =>
+                        builder
                             .withDataSourceName("Name")
                             .withTitle("IT System")
                             .withId("sysname")
@@ -77,8 +97,6 @@
                             .withExcelOutput(dataItem => dataItem.Name))
                     .withStandardSorting("Name");
 
-            //TODO: Add role selector
-           
             //Launch kendo grid
             launcher.launch();
         }

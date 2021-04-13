@@ -5,5 +5,6 @@
         SourceEntityId: number;
         Name: string;
         ItSystemDisabled: boolean;
+        IsActive: boolean;
     }
 }
