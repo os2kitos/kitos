@@ -47,8 +47,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //System
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
-
-
         }
     }
 }
