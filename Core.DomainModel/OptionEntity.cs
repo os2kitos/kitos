@@ -12,6 +12,7 @@ namespace Core.DomainModel
     /// </remarks>
     public abstract class OptionEntity<TReference> : Entity, IHasName
     {
+        public static int MaxNameLength = 100;
         /// <summary>
         /// Gets or sets the name.
         /// </summary>

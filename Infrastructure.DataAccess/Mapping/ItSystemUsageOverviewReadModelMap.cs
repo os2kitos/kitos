@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -42,6 +43,14 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ResponsibleOrganizationUnitName)
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName", 0);
+
+            Property(x => x.ItSystemBusinessTypeName)
+                .HasMaxLength(OptionEntity<ItSystem>.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName", 0);
+
+            Property(x => x.ItSystemBelongsToName)
+                .HasMaxLength(Organization.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName", 0);
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)

@@ -56,7 +56,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Disabled = A<bool>(),
                 Parent = parentSystem,
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                BelongsTo = new Organization
+                {
+                    Id = A<int>(),
+                    Name = A<string>()
+                },
+                BusinessType = new BusinessType
+                {
+                    Id = A<int>(),
+                    Name = A<string>()
+                }
             };
             var systemUsage = new ItSystemUsage
             {
@@ -108,6 +118,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(system.BelongsTo.Name, readModel.ItSystemBelongsToName);
+            Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);

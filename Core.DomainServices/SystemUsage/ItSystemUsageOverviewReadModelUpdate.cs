@@ -27,6 +27,8 @@ namespace Core.DomainServices.SystemUsage
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
             destination.ItSystemUuid = source.ItSystem.Uuid.ToString("D");
+            destination.ItSystemBusinessTypeName = source.ItSystem.BusinessType?.Name;
+            destination.ItSystemBelongsToName = source.ItSystem.BelongsTo?.Name;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);

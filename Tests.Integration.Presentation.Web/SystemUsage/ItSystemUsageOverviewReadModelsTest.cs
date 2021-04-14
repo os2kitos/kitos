@@ -79,6 +79,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId); // Using default organization as BelongsTo
+
+            var availableBusinessTypeOptions = (await ItSystemHelper.GetBusinessTypeOptionsAsync(organizationId)).ToList();
+            var businessType = availableBusinessTypeOptions[Math.Abs(A<int>()) % availableBusinessTypeOptions.Count];
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
 
             // System Usage changes
             var body = new
@@ -117,6 +122,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
+            Assert.Equal(organizationName, readModel.ItSystemBelongsToName);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
