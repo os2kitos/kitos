@@ -13,6 +13,11 @@ module Kitos.Utility.KendoGrid {
         FixedValueRange
     }
 
+    export enum KendoGridColumnDataSourceType {
+        Date,
+        Boolean
+    }
+
     export interface IGridViewAccess<TDataSource> {
         mainGrid: IKendoGrid<TDataSource>;
         mainGridOptions: IKendoGridOptions<TDataSource>;
@@ -24,7 +29,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IKendoParameter {
         textValue: string;
-        remoteValue : any;
+        remoteValue: any;
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -33,7 +38,8 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
+        withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -55,11 +61,18 @@ module Kitos.Utility.KendoGrid {
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
         private visible = true;
+        private dataSourceType: KendoGridColumnDataSourceType = null;
 
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
             this.valueRange = possibleValues;
             this.valueRangeMultiSelect = multiSelect;
+            return this;
+        }
+
+        withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource> {
+            if (dataSourceType == null) throw "dataSourceType must be defined";
+            this.dataSourceType = dataSourceType;
             return this;
         }
 
@@ -104,6 +117,9 @@ module Kitos.Utility.KendoGrid {
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource> {
             if (operation == null) throw "operation must be defined";
             this.filtering = operation;
+            if (this.filtering === KendoGridColumnFiltering.Date) {
+                return this.withDataSourceType(KendoGridColumnDataSourceType.Date);
+            }
             return this;
         }
 
@@ -138,12 +154,14 @@ module Kitos.Utility.KendoGrid {
         }
 
         private getSchemaMutation(): (map: any) => void {
-            if (this.filtering != null) {
-                switch (this.filtering) {
-                    case KendoGridColumnFiltering.Date:
+            if (this.dataSourceType != null) {
+                switch (this.dataSourceType) {
+                    case KendoGridColumnDataSourceType.Boolean:
+                        return map => map[this.dataSourceName] = { type: "boolean" };
+                    case KendoGridColumnDataSourceType.Date:
                         return map => map[this.dataSourceName] = { type: "date" };
                     default:
-                        break;
+                        throw `Unmapped data source type ${this.dataSourceType}`;
                 }
             }
             return _ => { }; //NOP
@@ -180,7 +198,7 @@ module Kitos.Utility.KendoGrid {
                                 "this.valueRange must be defined when using filtering option FixedValueRange");
                         }
                         const valueRange = this.valueRange; //capture the reference to use in lambda below
-                        
+
                         return {
                             cell: {
                                 template: (args) => {
@@ -190,7 +208,7 @@ module Kitos.Utility.KendoGrid {
                                                 remoteValue: value.remoteValue,
                                                 text: value.textValue
                                             };
-                                        } ),
+                                        }),
                                         dataTextField: "text",
                                         dataValueField: "remoteValue",
                                         valuePrimitive: true
