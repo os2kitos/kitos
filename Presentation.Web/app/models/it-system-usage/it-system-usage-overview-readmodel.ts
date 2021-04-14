@@ -9,5 +9,6 @@
         ItSystemUuid: string;
         LocalSystemId: string;
         Version: string;
+        LocalCallName: string;
     }
 }
