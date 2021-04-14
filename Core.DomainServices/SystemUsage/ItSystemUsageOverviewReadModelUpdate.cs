@@ -12,6 +12,18 @@ namespace Core.DomainServices.SystemUsage
             destination.Name = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.IsActive = source.IsActive;
+            destination.Version = source.Version;
+            destination.LocalCallName = source.LocalCallName;
+            destination.LocalSystemId = source.LocalSystemId;
+            destination.ItSystemUuid = source.ItSystem.Uuid;
+
+            PatchParentSystemName(source, destination);
+        }
+
+        private static void PatchParentSystemName(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ParentItSystemName = source.ItSystem.Parent?.Name;
+            destination.ParentItSystemId = source.ItSystem.Parent?.Id;
         }
     }
 }
