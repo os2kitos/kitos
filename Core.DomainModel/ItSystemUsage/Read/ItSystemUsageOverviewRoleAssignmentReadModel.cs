@@ -10,6 +10,8 @@
 
         public string UserFullName { get; set; }
 
+        public string Email { get; set; }
+
         public int ParentId { get; set; }
 
         public virtual ItSystemUsageOverviewReadModel Parent { get; set; }

@@ -45,6 +45,7 @@
                         RoleId = c.Int(nullable: false),
                         UserId = c.Int(nullable: false),
                         UserFullName = c.String(nullable: false, maxLength: 100),
+                        Email = c.String(maxLength: 100),
                         ParentId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
@@ -52,6 +53,7 @@
                 .Index(t => t.RoleId)
                 .Index(t => t.UserId)
                 .Index(t => t.UserFullName)
+                .Index(t => t.Email)
                 .Index(t => t.ParentId);
             
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
@@ -68,6 +70,7 @@
             DropForeignKey("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "Email" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserFullName" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "RoleId" });

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Users;
 
@@ -29,6 +24,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.RoleId)
                 .IsRequired()
                 .HasIndexAnnotation("IX_RoleId", 0);
+
+            Property(x => x.Email)
+                .HasMaxLength(UserConstraints.MaxEmailLength)
+                .HasIndexAnnotation("IX_Email", 0);
         }
     }
 }

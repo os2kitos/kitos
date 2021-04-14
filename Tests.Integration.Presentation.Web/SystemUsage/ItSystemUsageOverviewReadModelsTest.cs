@@ -124,6 +124,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.FullName, roleAssignment.UserFullName);
+            Assert.Equal(user.Email, roleAssignment.Email);
         }
 
         [Fact]

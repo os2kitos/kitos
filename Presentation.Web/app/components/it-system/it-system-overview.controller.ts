@@ -87,12 +87,32 @@
                         .withExcelOutput(dataItem => dataItem.IsActive ? "Ja" : "Nej"))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("LocalSystemId")
+                        .withTitle("Lokal System ID")
+                        .withId("localid")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ItSystemUuid")
                         .withTitle("UUID")
                         .withId("uuid")
                         .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ParentItSystemName")
+                        .withTitle("Overordnet IT System")
+                        .withId("parentsysname")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => dataItem.ParentItSystemName ? `<a data-ui-sref='it-system.edit.main({id: ${dataItem.ParentItSystemId}})'>${Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ItSystemDisabled)}</a>` : "")
                         .withSourceValueEchoExcelOutput()
                         .withInitialVisibility(false))
                 .withColumn(builder =>
@@ -104,6 +124,26 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => `<a data-ui-sref='it-system.usage.main({id: ${dataItem.SourceEntityId}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)}</a>`)
                         .withExcelOutput(dataItem => dataItem.Name))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Version")
+                        .withTitle("Version")
+                        .withId("version")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LocalCallName")
+                        .withTitle("Lokal kaldenavn")
+                        .withId("localname")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
                 .withStandardSorting("Name");
 
             //Launch kendo grid

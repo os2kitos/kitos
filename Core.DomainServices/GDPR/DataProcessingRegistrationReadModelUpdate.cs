@@ -138,7 +138,7 @@ namespace Core.DomainServices.GDPR
                     destination.RoleAssignments.Add(assignment);
                 }
 
-                var fullName = $"{incomingRight.User.Name ?? ""} {incomingRight.User.LastName ?? ""}";
+                var fullName = incomingRight.User.GetFullName();
                 assignment.UserFullName = fullName.TrimEnd().Substring(0, Math.Min(fullName.Length, 100));
             }
 

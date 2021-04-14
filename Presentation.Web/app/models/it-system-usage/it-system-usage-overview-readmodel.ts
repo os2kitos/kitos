@@ -7,5 +7,10 @@
         ItSystemDisabled: boolean;
         IsActive: boolean;
         ItSystemUuid: string;
+        LocalSystemId: string;
+        Version: string;
+        LocalCallName: string;
+        ParentItSystemId: number;
+        ParentItSystemName: string;
     }
 }

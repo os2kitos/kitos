@@ -33,7 +33,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             {
                 Id = A<int>(),
                 Name = A<string>(),
-                LastName = A<string>()
+                LastName = A<string>(),
+                Email = $"{A<string>()}@{A<string>()}.dk"
             };
             var right = new ItSystemRight
             {
@@ -97,8 +98,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assigned Roles
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
             Assert.Equal(user.Id, roleAssignment.UserId);
-            Assert.Equal($"{user.Name} {user.LastName}", roleAssignment.UserFullName);
+            Assert.Equal(user.GetFullName(), roleAssignment.UserFullName);
             Assert.Equal(right.RoleId, roleAssignment.RoleId);
+            Assert.Equal(user.Email, roleAssignment.Email);
         }
 
         [Fact]
