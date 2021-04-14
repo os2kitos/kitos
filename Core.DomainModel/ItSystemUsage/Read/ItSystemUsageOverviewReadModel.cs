@@ -10,5 +10,9 @@
         public string Name { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool IsActive { get; set; }
+        public string ParentItSystemName { get; set; }
+        public int? ParentItSystemId { get; set; }
+        public string Version { get; set; }
+        public string LocalCallName { get; set; }
     }
 }
