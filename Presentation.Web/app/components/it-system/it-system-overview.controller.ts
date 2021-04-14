@@ -87,6 +87,16 @@
                         .withExcelOutput(dataItem => dataItem.IsActive ? "Ja" : "Nej"))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("ItSystemUuid")
+                        .withTitle("UUID")
+                        .withId("uuid")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Name")
                         .withTitle("IT System")
                         .withId("sysname")
