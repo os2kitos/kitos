@@ -187,6 +187,39 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.ParentItSystemId);
         }
 
+        [Fact]
+        public async Task ReadModels_ItSystemParentName_Is_Updated_When_Parent_Name_Is_Updated()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var systemParentName = A<string>();
+            var newSystemParentName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItSystemHelper.SendSetNameRequestAsync(systemParent.Id, newSystemParentName, organizationId);
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(newSystemParentName, readModel.ParentItSystemName);
+            Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+        }
+
 
         private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
         {
