@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
@@ -66,6 +67,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
+            // Role assignment
+            var businessRoleDtos = await ItSystemUsageHelper.GetAvailableRolesAsync(organizationId);
+            var role = businessRoleDtos.First();
+            var availableUsers = await ItSystemUsageHelper.GetAvailableUsersAsync(organizationId);
+            var user = availableUsers.First();
+            using var assignRoleResponse = await ItSystemUsageHelper.SendAssignRoleRequestAsync(systemUsage.Id, organizationId, role.Id, user.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
+
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
@@ -107,6 +116,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+
+            // Role assignment
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            Console.Out.WriteLine("Found one role assignment as expected");
+
+            Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(user.Id, roleAssignment.UserId);
+            Assert.Equal(user.FullName, roleAssignment.UserFullName);
+            Assert.Equal(user.Email, roleAssignment.Email);
         }
 
         [Fact]
