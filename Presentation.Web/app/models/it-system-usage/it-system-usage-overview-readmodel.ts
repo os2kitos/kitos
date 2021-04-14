@@ -7,5 +7,6 @@
         ItSystemDisabled: boolean;
         IsActive: boolean;
         ItSystemUuid: string;
+        LocalSystemId: string;
     }
 }
