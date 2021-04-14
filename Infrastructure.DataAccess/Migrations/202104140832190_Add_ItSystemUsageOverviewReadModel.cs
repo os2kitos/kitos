@@ -21,6 +21,8 @@
                         ParentItSystemId = c.Int(),
                         Version = c.String(maxLength: 100),
                         LocalCallName = c.String(maxLength: 100),
+                        LocalSystemId = c.String(maxLength: 100),
+                        ItSystemUuid = c.Guid(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -31,10 +33,14 @@
                 .Index(t => t.ItSystemDisabled, name: "ItSystemUsageOverviewReadModel_Index_ItSystemDisabled")
                 .Index(t => t.ParentItSystemName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemParentName")
                 .Index(t => t.Version, name: "ItSystemUsageOverviewReadModel_Index_Version")
-                .Index(t => t.LocalCallName, name: "ItSystemUsageOverviewReadModel_Index_LocalCallName");
+                .Index(t => t.LocalCallName, name: "ItSystemUsageOverviewReadModel_Index_LocalCallName")
+                .Index(t => t.LocalSystemId, name: "ItSystemUsageOverviewReadModel_Index_LocalSystemId")
+                .Index(t => t.ItSystemUuid, name: "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
             
+            AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
+            CreateIndex("dbo.ItSystemUsage", "LocalSystemId", name: "ItSystemUsage_Index_LocalSystemId");
             CreateIndex("dbo.ItSystemUsage", "Version", name: "ItSystemUsage_Index_Version");
             CreateIndex("dbo.ItSystemUsage", "LocalCallName", name: "ItSystemUsage_Index_LocalCallName");
         }
@@ -43,6 +49,8 @@
         {
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "SourceEntityId", "dbo.ItSystemUsage");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalSystemId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalCallName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_Version");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemParentName");
@@ -52,8 +60,10 @@
             DropIndex("dbo.ItSystemUsageOverviewReadModels", new[] { "OrganizationId" });
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LocalCallName");
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_Version");
+            DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LocalSystemId");
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String());
+            AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String());
             DropTable("dbo.ItSystemUsageOverviewReadModels");
         }
     }

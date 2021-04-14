@@ -26,6 +26,13 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystemUsage.DefaultMaxLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalCallName", 0);
 
+            Property(x => x.LocalSystemId)
+                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalSystemId", 0);
+
+            Property(x => x.ItSystemUuid)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemUuid", 0);
+
             Property(x => x.ParentItSystemName)
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemParentName", 0);
