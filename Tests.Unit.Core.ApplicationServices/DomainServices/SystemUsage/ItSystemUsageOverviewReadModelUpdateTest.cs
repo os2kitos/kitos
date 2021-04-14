@@ -63,7 +63,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
 
             //Parent System
-            Assert.Equal(parentSystem.Name, readModel.ItSystemParentName);
+            Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
+            Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
         }
 
         [Fact]
@@ -118,7 +119,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _sut.Apply(systemUsage, readModel);
 
             //Assert
-            Assert.Equal("", readModel.ItSystemParentName);
+            Assert.Null(readModel.ParentItSystemName);
+            Assert.Null(readModel.ParentItSystemId);
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

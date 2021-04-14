@@ -20,14 +20,8 @@ namespace Core.DomainServices.SystemUsage
 
         private static void PatchParentSystemName(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            if(source.ItSystem.Parent is null)
-            {
-                destination.ItSystemParentName = "";
-            }
-            else
-            {
-                destination.ItSystemParentName = source.ItSystem.Parent.Name;
-            }
+            destination.ParentItSystemName = source.ItSystem.Parent?.Name;
+            destination.ParentItSystemId = source.ItSystem.Parent?.Id;
         }
     }
 }
