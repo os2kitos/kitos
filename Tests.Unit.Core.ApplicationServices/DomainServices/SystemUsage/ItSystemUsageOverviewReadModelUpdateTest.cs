@@ -64,7 +64,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //System
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
-            Assert.Equal(system.Uuid, readModel.Uuid);
+            Assert.Equal(system.Uuid, readModel.ItSystemUuid);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ItSystemParentName);

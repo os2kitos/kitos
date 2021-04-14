@@ -16,6 +16,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string Version { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }
-        public Guid Uuid { get; set; }
+        public Guid ItSystemUuid { get; set; }
     }
 }

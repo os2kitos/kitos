@@ -15,7 +15,7 @@ namespace Core.DomainServices.SystemUsage
             destination.Version = source.Version;
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
-            destination.Uuid = source.ItSystem.Uuid;
+            destination.ItSystemUuid = source.ItSystem.Uuid;
 
             PatchParentSystemName(source, destination);
         }

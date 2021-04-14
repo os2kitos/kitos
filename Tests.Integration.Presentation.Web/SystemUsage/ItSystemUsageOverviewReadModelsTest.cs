@@ -53,7 +53,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var systemName = A<string>();
             var systemDisabled = A<bool>();
-            var systemUuid = A<Guid>();
 
             var systemParentName = A<string>();
 
@@ -70,7 +69,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
-            await ItSystemHelper.SendSetUuidRequestAsync(system.Id, organizationId, systemUuid);
 
             // System Usage changes
             var body = new
@@ -104,6 +102,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From System
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
+            Assert.Equal(system.Uuid, readModel.ItSystemUuid);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ItSystemParentName);
