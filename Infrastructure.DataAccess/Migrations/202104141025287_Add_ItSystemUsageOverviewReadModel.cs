@@ -22,7 +22,7 @@
                         Version = c.String(maxLength: 100),
                         LocalCallName = c.String(maxLength: 100),
                         LocalSystemId = c.String(maxLength: 100),
-                        ItSystemUuid = c.Guid(nullable: false),
+                        ItSystemUuid = c.String(maxLength: 50),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)

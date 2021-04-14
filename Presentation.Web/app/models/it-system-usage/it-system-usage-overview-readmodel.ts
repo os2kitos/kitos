@@ -6,5 +6,6 @@
         Name: string;
         ItSystemDisabled: boolean;
         IsActive: boolean;
+        ItSystemUuid: string;
     }
 }
