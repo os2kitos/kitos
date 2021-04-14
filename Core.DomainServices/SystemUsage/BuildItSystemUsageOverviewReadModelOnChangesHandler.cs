@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.BackgroundJobs;
+﻿using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -51,6 +52,11 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityUpdatedEvent<ItSystem> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItSystem));
+        }
+
+        public void Handle(EntityUpdatedEvent<User> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_User));
         }
 
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)

@@ -14,6 +14,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
     public class ScheduleItSystemUsageOverviewReadModelUpdates : IAsyncBackgroundJob
     {
         private readonly IPendingReadModelUpdateRepository _updateRepository;
+        private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
         private readonly IItSystemUsageRepository _itSystemUsageRepository;
         private readonly ITransactionManager _transactionManager;
         public string Id => StandardJobIds.ScheduleItSystemUsageOverviewReadModelUpdates;
@@ -21,10 +22,12 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         public ScheduleItSystemUsageOverviewReadModelUpdates(
             IPendingReadModelUpdateRepository updateRepository,
+            IItSystemUsageOverviewReadModelRepository readModelRepository,
             IItSystemUsageRepository itSystemUsageRepository,
             ITransactionManager transactionManager)
         {
             _updateRepository = updateRepository;
+            _readModelRepository = readModelRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _transactionManager = transactionManager;
         }
@@ -35,6 +38,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var alreadyScheduledIds = new HashSet<int>();
 
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -56,6 +60,22 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
             return updatesExecuted;
         }
+
+        private int HandleUserUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage_User, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
 
         private int PerformUpdate(
             int updatesExecuted,

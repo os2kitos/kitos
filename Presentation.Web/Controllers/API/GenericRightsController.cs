@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Ninject;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
@@ -18,16 +19,19 @@ namespace Presentation.Web.Controllers.API
     {
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
+        private readonly IDomainEvents _domainEvents;
 
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
         protected GenericRightsController(
             IGenericRepository<TRight> rightRepository,
-            IGenericRepository<TObject> objectRepository)
+            IGenericRepository<TObject> objectRepository,
+            IDomainEvents domainEvents)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;
+            _domainEvents = domainEvents;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
@@ -96,6 +100,7 @@ namespace Presentation.Web.Controllers.API
 
                 var outputDTO = Map<TRight, RightOutputDTO>(right);
 
+                FireRootUpdatedEvent(right);
                 return Created(outputDTO);
             }
             catch (Exception e)
@@ -128,12 +133,18 @@ namespace Presentation.Web.Controllers.API
                 RightRepository.DeleteByKey(right.Id);
                 RightRepository.Save();
 
+                FireRootUpdatedEvent(right);
                 return Ok();
             }
             catch (Exception e)
             {
                 return LogError(e);
             }
+        }
+
+        private void FireRootUpdatedEvent(TRight right)
+        {
+            _domainEvents.Raise(new EntityUpdatedEvent<TObject>(_objectRepository.GetByKey(right.ObjectId)));
         }
     }
 }

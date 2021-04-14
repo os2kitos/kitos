@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -11,6 +12,7 @@ using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models;
+using Presentation.Web.Models.GDPR;
 using Presentation.Web.Models.ItSystemUsage;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
@@ -22,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<ItSystemUsageOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
         }
@@ -109,6 +111,37 @@ namespace Tests.Integration.Presentation.Web.Tools
                     return report;
                 }
             }
+        }
+
+        public static async Task<IEnumerable<BusinessRoleDTO>> GetAvailableRolesAsync(int orgId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId={orgId}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<BusinessRoleDTO>();
+        }
+
+        public static async Task<IEnumerable<UserDTO>> GetAvailableUsersAsync(int orgId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({orgId})/Organizations.GetUsers?$select=Id,Name,LastName,Email"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<UserDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignRoleRequestAsync(int systemUsageId, int orgId, int roleId, int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.PostWithCookieAsync(
+                TestEnvironment.CreateUrl($"api/itSystemUsageRights/{systemUsageId}?organizationId={orgId}"), cookie,
+                new 
+                {
+                    roleId = roleId,
+                    userId = userId
+                });
         }
     }
 }

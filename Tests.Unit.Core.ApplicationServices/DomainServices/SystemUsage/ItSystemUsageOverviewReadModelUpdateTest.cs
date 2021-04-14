@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainServices;
 using Core.DomainServices.SystemUsage;
+using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -11,17 +15,33 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     public class ItSystemUsageOverviewReadModelUpdateTest : WithAutoFixture
     {
 
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
-            _sut = new ItSystemUsageOverviewReadModelUpdate();
+            _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
+            _sut = new ItSystemUsageOverviewReadModelUpdate(
+                _roleAssignmentRepository.Object);
         }
 
         [Fact]
         public void Apply_Generates_Correct_Read_Model()
         {
             //Arrange
+            var user = new User
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                LastName = A<string>()
+            };
+            var right = new ItSystemRight
+            {
+                Id = A<int>(),
+                User = user,
+                UserId = user.Id,
+                RoleId = A<int>()
+            };
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
@@ -45,7 +65,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
                 LocalCallName = A<string>(),
-                LocalSystemId = A<string>()
+                LocalSystemId = A<string>(),
+                Rights = new List<ItSystemRight>
+                {
+                    right
+                }
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -69,6 +93,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
             Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
+
+            //Assigned Roles
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            Assert.Equal(user.Id, roleAssignment.UserId);
+            Assert.Equal($"{user.Name} {user.LastName}", roleAssignment.UserFullName);
+            Assert.Equal(right.RoleId, roleAssignment.RoleId);
         }
 
         [Fact]

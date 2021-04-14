@@ -58,5 +58,14 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             _repository.Save();
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByUserId(int userId)
+        {
+            //Gets all read models that have dependencies on the user
+            return _repository
+                .AsQueryable()
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
+                .Distinct();
+        }
     }
 }

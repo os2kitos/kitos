@@ -73,6 +73,7 @@
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -668,9 +669,9 @@
     <Compile Include="Migrations\202104071049413_Contract_Remove_DataHandler.designer.cs">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202104140832190_Add_ItSystemUsageOverviewReadModel.cs" />
-    <Compile Include="Migrations\202104140832190_Add_ItSystemUsageOverviewReadModel.designer.cs">
-      <DependentUpon>202104140832190_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    <Compile Include="Migrations\202104140900578_Add_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104140900578_Add_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104140900578_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1095,8 +1096,8 @@
     <EmbeddedResource Include="Migrations\202104071049413_Contract_Remove_DataHandler.resx">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104140832190_Add_ItSystemUsageOverviewReadModel.resx">
-      <DependentUpon>202104140832190_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202104140900578_Add_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104140900578_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
