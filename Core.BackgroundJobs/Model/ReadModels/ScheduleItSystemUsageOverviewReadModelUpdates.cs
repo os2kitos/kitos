@@ -39,6 +39,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleOrganizationUnitUpdated(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -72,6 +73,21 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
+        private int HandleOrganizationUnitUpdated(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _readModelRepository.GetByOrganizationUnitId(update.SourceId).Select(x => x.SourceEntityId);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 

@@ -14,7 +14,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_ItContract = 7,
         ItSystemUsage = 8,
         ItSystemUsage_ItSystem = 9,
-        ItSystemUsage_User = 10
+        ItSystemUsage_User = 10,
+        ItSystemUsage_OrganizationUnit = 11
     }
 
     public class PendingReadModelUpdate

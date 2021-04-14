@@ -21,6 +21,8 @@ namespace Core.DomainModel.Organization
     /// </summary>
     public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization
     {
+        public const int MaxNameLength = 100;
+
         public Organization()
         {
             ItProjects = new List<ItProject.ItProject>();

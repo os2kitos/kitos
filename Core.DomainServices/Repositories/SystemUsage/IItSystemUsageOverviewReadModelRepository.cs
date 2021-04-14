@@ -13,5 +13,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         Maybe<ItSystemUsageOverviewReadModel> GetBySourceId(int sourceId);
         void Update(ItSystemUsageOverviewReadModel readModel);
         IQueryable<ItSystemUsageOverviewReadModel> GetByUserId(int userId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationUnitId(int organizationUnitId);
     }
 }

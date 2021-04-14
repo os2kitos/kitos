@@ -2,6 +2,7 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -37,6 +38,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ParentItSystemName)
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemParentName", 0);
+
+            Property(x => x.ResponsibleOrganizationUnitName)
+                .HasMaxLength(Organization.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName", 0);
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)

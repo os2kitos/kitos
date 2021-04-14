@@ -67,5 +67,13 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
                 .Distinct();
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationUnitId(int organizationUnitId)
+        {
+            //Gets all read models that have dependencies on the organization unit
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId);
+        }
     }
 }

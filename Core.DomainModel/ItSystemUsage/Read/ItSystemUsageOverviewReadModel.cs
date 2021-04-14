@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
@@ -25,5 +26,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string LocalSystemId { get; set; }
         public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
         public string ItSystemUuid { get; set; }
+        public string ResponsibleOrganizationUnitName { get; set; }
+        public int? ResponsibleOrganizationUnitId { get; set; }
     }
 }

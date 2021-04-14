@@ -143,5 +143,29 @@ namespace Tests.Integration.Presentation.Web.Tools
                     userId = userId
                 });
         }
+        
+        public static async Task<HttpResponseMessage> SendSetResponsibleOrganizationUnitRequestAsync(int systemUsageId, int orgUnitId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.PostWithCookieAsync(
+                    TestEnvironment.CreateUrl($"api/itSystemUsageOrgUnitUsage/?usageId={systemUsageId}&orgUnitId={orgUnitId}&responsible=true"), 
+                    cookie,
+                    new { } // No body for this call
+                    );
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return response;
+        }
+
+        public static async Task<HttpResponseMessage> SendAddOrganizationUnitRequestAsync(int systemUsageId, int orgUnitId, int orgId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.PostWithCookieAsync(
+                    TestEnvironment.CreateUrl($"api/itSystemUsage/{systemUsageId}?organizationunit={orgUnitId}&organizationId={orgId}"),
+                    cookie,
+                    new { } // No body for this call
+                    );
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return response;
+        }
     }
 }

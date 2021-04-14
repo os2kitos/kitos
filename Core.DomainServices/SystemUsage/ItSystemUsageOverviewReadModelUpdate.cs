@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Model;
 
 namespace Core.DomainServices.SystemUsage
 {
-    public class ItSystemUsageOverviewReadModelUpdate : IReadModelUpdate<DomainModel.ItSystemUsage.ItSystemUsage, ItSystemUsageOverviewReadModel>
+    public class ItSystemUsageOverviewReadModelUpdate : IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>
     {
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
 
@@ -15,7 +16,7 @@ namespace Core.DomainServices.SystemUsage
             _roleAssignmentRepository = roleAssignmentRepository;
         }
 
-        public void Apply(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.SourceEntityId = source.Id;
             destination.OrganizationId = source.OrganizationId;
@@ -29,15 +30,22 @@ namespace Core.DomainServices.SystemUsage
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
+            PatchResponsibleOrganizationUnit(source, destination);
         }
 
-        private static void PatchParentSystemName(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
+            destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
+        }
+
+        private static void PatchParentSystemName(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ParentItSystemName = source.ItSystem.Parent?.Name;
             destination.ParentItSystemId = source.ItSystem.Parent?.Id;
         }
 
-        private void PatchRoleAssignments(DomainModel.ItSystemUsage.ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchRoleAssignments(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             static string CreateRoleKey(int roleId, int userId) => $"R:{roleId}U:{userId}";
 
