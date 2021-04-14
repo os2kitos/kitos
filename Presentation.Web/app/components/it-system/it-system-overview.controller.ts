@@ -114,6 +114,16 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => `<a data-ui-sref='it-system.usage.main({id: ${dataItem.SourceEntityId}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)}</a>`)
                         .withExcelOutput(dataItem => dataItem.Name))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Version")
+                        .withTitle("Version")
+                        .withId("version")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
                 .withStandardSorting("Name");
 
             //Launch kendo grid

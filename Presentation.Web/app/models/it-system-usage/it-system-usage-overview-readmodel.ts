@@ -8,5 +8,6 @@
         IsActive: boolean;
         ItSystemUuid: string;
         LocalSystemId: string;
+        Version: string;
     }
 }
