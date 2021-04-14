@@ -88,7 +88,7 @@
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
-                        .withTitle("Lokal system ID")
+                        .withTitle("Lokal System ID")
                         .withId("localid")
                         .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
@@ -119,6 +119,16 @@
                         .withDataSourceName("Version")
                         .withTitle("Version")
                         .withId("version")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LocalCallName")
+                        .withTitle("Lokal kaldenavn")
+                        .withId("localname")
                         .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
