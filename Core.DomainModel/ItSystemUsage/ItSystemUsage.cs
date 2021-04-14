@@ -24,6 +24,8 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
     {
+        public const int DefaultMaxLength = 100;
+
         public ItSystemUsage()
         {
             this.Contracts = new List<ItContractItSystemUsage>();

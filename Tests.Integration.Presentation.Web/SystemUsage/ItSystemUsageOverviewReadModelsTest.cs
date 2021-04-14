@@ -105,7 +105,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(system.Uuid, readModel.ItSystemUuid);
 
             // From Parent System
-            Assert.Equal(systemParentName, readModel.ItSystemParentName);
+            Assert.Equal(systemParentName, readModel.ParentItSystemName);
+            Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
         }
 
         [Fact]
@@ -145,7 +146,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         }
 
         [Fact]
-        public async Task ReadModels_ItSystemParentName_Is_Empty_When_No_Parent()
+        public async Task ReadModels_ItSystemParentName_Is_Null_When_No_Parent()
         {
             //Arrange
             var systemName = A<string>();
@@ -165,7 +166,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
 
-            Assert.Equal("", readModel.ItSystemParentName);
+            Assert.Null(readModel.ParentItSystemName);
+            Assert.Null(readModel.ParentItSystemId);
         }
 
 
