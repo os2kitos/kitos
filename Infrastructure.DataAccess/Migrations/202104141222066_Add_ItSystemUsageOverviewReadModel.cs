@@ -37,6 +37,25 @@
                 .Index(t => t.LocalSystemId, name: "ItSystemUsageOverviewReadModel_Index_LocalSystemId")
                 .Index(t => t.ItSystemUuid, name: "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
             
+            CreateTable(
+                "dbo.ItSystemUsageOverviewRoleAssignmentReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        RoleId = c.Int(nullable: false),
+                        UserId = c.Int(nullable: false),
+                        UserFullName = c.String(nullable: false, maxLength: 100),
+                        Email = c.String(maxLength: 100),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.RoleId)
+                .Index(t => t.UserId)
+                .Index(t => t.UserFullName)
+                .Index(t => t.Email)
+                .Index(t => t.ParentId);
+            
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
@@ -48,7 +67,13 @@
         public override void Down()
         {
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "SourceEntityId", "dbo.ItSystemUsage");
+            DropForeignKey("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "Email" });
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserFullName" });
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserId" });
+            DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "RoleId" });
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalSystemId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalCallName");
@@ -64,6 +89,7 @@
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String());
+            DropTable("dbo.ItSystemUsageOverviewRoleAssignmentReadModels");
             DropTable("dbo.ItSystemUsageOverviewReadModels");
         }
     }

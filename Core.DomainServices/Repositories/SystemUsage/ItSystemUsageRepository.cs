@@ -33,5 +33,10 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystemId == systemId);
         }
+
+        public IQueryable<ItSystemUsage> GetByParentSystemId(int systemId)
+        {
+            return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
+        }
     }
 }

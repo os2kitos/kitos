@@ -156,6 +156,23 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendSetNameRequestAsync(
+            int systemId,
+            string name,
+            int organizationId,
+            Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                name = name
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
 
         public static async Task<HttpResponseMessage> SendSetTaskRefOnSystemRequestAsync(
             int systemId,

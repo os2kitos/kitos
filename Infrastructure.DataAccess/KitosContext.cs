@@ -160,6 +160,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataProcessingDataResponsibleOption> LocalDataProcessingDataResponsibleOptions { get; set; }
         public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
         public DbSet<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewRoleAssignmentReadModel> ItSystemUsageOverviewRoleAssignmentReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -254,6 +255,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingDataResponsibleOptionMap());
             modelBuilder.Configurations.Add(new DataProcessingCountryOptionMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewRoleAssignmentReadModelMap());
         }
     }
 }

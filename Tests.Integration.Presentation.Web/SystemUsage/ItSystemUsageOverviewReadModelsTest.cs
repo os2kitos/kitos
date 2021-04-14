@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
@@ -66,6 +67,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
+            // Role assignment
+            var businessRoleDtos = await ItSystemUsageHelper.GetAvailableRolesAsync(organizationId);
+            var role = businessRoleDtos.First();
+            var availableUsers = await ItSystemUsageHelper.GetAvailableUsersAsync(organizationId);
+            var user = availableUsers.First();
+            using var assignRoleResponse = await ItSystemUsageHelper.SendAssignRoleRequestAsync(systemUsage.Id, organizationId, role.Id, user.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
+
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
             await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
@@ -107,6 +116,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+
+            // Role assignment
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            Console.Out.WriteLine("Found one role assignment as expected");
+
+            Assert.Equal(role.Id, roleAssignment.RoleId);
+            Assert.Equal(user.Id, roleAssignment.UserId);
+            Assert.Equal(user.FullName, roleAssignment.UserFullName);
+            Assert.Equal(user.Email, roleAssignment.Email);
         }
 
         [Fact]
@@ -168,6 +186,39 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             Assert.Null(readModel.ParentItSystemName);
             Assert.Null(readModel.ParentItSystemId);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItSystemParentName_Is_Updated_When_Parent_Name_Is_Updated()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var systemParentName = A<string>();
+            var newSystemParentName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItSystemHelper.SendSetNameRequestAsync(systemParent.Id, newSystemParentName, organizationId);
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(newSystemParentName, readModel.ParentItSystemName);
+            Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
         }
 
 
