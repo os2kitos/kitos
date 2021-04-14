@@ -1,5 +1,10 @@
 ﻿module Kitos.Models.ItSystemUsage {
 
+    export interface IAssignedSystemUsageRole {
+        RoleId: number;
+        UserFullName: string;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -12,5 +17,6 @@
         LocalCallName: string;
         ParentItSystemId: number;
         ParentItSystemName: string;
+        RoleAssignments: IAssignedSystemUsageRole[];
     }
 }

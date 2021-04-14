@@ -29,14 +29,25 @@
             $rootScope: IRootScope,
             $scope: any,
             private readonly $window: ng.IWindowService,
-            private readonly systemRoles: Array<any>,
+            private readonly systemRoles: Array<Models.IOptionEntity>,
             private readonly user,
             private readonly orgUnits: Array<any>,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory) {
             $rootScope.page.title = "IT System - Overblik";
 
+            //Helper functions
+            const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
+
+            const replaceRoleQuery = (filterUrl, roleName, roleId) => {
+                var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
+                return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
+            };
+
+            //Lookup maps
+            var roleIdToUserNamesMap = {};
+
             //Build and launch kendo grid
-            const launcher = kendoGridLauncherFactory
+            var launcher = kendoGridLauncherFactory
                 .create<Models.ItSystemUsage.IItSystemUsageOverviewReadModel>()
                 .withScope($scope)
                 .withGridBinding(this)
@@ -50,9 +61,33 @@
                 .withParameterMapping((options, type) => {
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
+                    if (parameterMap.$filter) {
+                        systemRoles.forEach(role => {
+                            parameterMap.$filter =
+                                replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
+                        });
+                    }
                     return parameterMap;
                 })
                 .withResponseParser(response => {
+                    //Reset all response state
+                    roleIdToUserNamesMap = {};
+
+                    //Build lookups/mutations
+                    response.forEach(systemUsage => {
+                        roleIdToUserNamesMap[systemUsage.Id] = {};
+
+                        //Update the role assignment map
+                        if (systemUsage.RoleAssignments) {
+                            systemUsage.RoleAssignments.forEach(assignment => {
+                                if (!roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId])
+                                    roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] = assignment.UserFullName;
+                                else {
+                                    roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] += `, ${assignment.UserFullName}`;
+                                }
+                            });
+                        }
+                    });
                     return response;
                 })
                 .withToolbarEntry({
@@ -112,7 +147,7 @@
                         .withId("parentsysname")
                         .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => dataItem.ParentItSystemName ? `<a data-ui-sref='it-system.edit.main({id: ${dataItem.ParentItSystemId}})'>${Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ItSystemDisabled)}</a>` : "")
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, false))) //TODO: Missing property from backend
                         .withSourceValueEchoExcelOutput()
                         .withInitialVisibility(false))
                 .withColumn(builder =>
@@ -122,7 +157,7 @@
                         .withId("sysname")
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => `<a data-ui-sref='it-system.usage.main({id: ${dataItem.SourceEntityId}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)}</a>`)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
                         .withExcelOutput(dataItem => dataItem.Name))
                 .withColumn(builder =>
                     builder
@@ -145,6 +180,20 @@
                         .withSourceValueEchoExcelOutput()
                         .withInitialVisibility(false))
                 .withStandardSorting("Name");
+
+            this.systemRoles.forEach(role =>
+                launcher = launcher.withColumn(builder =>
+                    builder
+                        .withDataSourceName(getRoleKey(role))
+                        .withTitle(role.Name)
+                        .withId(`systemUsage${getRoleKey(role)}`)
+                        .withStandardWidth(145)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                        .withInitialVisibility(false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.Id]))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.Id])))
+            );
 
             //Launch kendo grid
             launcher.launch();
