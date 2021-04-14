@@ -107,6 +107,16 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("ParentItSystemName")
+                        .withTitle("Overordnet IT System")
+                        .withId("parentsysname")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withRendering(dataItem => dataItem.ParentItSystemName ? `<a data-ui-sref='it-system.edit.main({id: ${dataItem.ParentItSystemId}})'>${Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ItSystemDisabled)}</a>` : "")
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("Name")
                         .withTitle("IT System")
                         .withId("sysname")
