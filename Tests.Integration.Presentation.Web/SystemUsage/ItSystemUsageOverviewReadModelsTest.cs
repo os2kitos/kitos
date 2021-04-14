@@ -49,21 +49,37 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         public async Task ReadModels_Contain_Correct_Content()
         {
             //Arrange
-            var systemName = A<string>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var systemName = A<string>();
             var systemDisabled = A<bool>();
+
+            var systemParentName = A<string>();
+
             var systemUsageActive = A<bool>();
             var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
+            var systemUsageVersion = A<string>();
+            var systemUsageLocalCallName = A<string>();
+            var systemUsageLocalSystemId = A<string>();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             // System changes
             await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
 
             // System Usage changes
-            await ItSystemUsageHelper.SendSetActiveRequestAsync(systemUsage.Id, organizationId, systemUsageActive);
-            await ItSystemUsageHelper.SendSetExpirationDateRequestAsync(systemUsage.Id, organizationId, systemUsageExpirationDate); //Only rely on the value of "Active" of system usage
+            var body = new
+            {
+                Active = systemUsageActive,
+                ExpirationDate = systemUsageExpirationDate,
+                Version = systemUsageVersion,
+                LocalCallName = systemUsageLocalCallName,
+                LocalSystemId = systemUsageLocalSystemId
+            };
+            await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -80,10 +96,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemUsage.Id, readModel.SourceEntityId);
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageActive, readModel.IsActive);
+            Assert.Equal(systemUsageVersion, readModel.Version);
+            Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
 
             // From System
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
+            Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+
+            // From Parent System
+            Assert.Equal(systemParentName, readModel.ParentItSystemName);
+            Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
         }
 
         [Fact]
@@ -120,6 +143,31 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             //Assert
             Assert.False(readModel.IsActive);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItSystemParentName_Is_Null_When_No_Parent()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Null(readModel.ParentItSystemName);
+            Assert.Null(readModel.ParentItSystemId);
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -154,6 +155,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
+
 
         public static async Task<HttpResponseMessage> SendSetTaskRefOnSystemRequestAsync(
             int systemId,
