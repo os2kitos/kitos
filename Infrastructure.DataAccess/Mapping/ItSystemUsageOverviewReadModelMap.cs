@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -16,6 +17,14 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ItSystemDisabled)
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemDisabled", 0);
+
+            Property(x => x.Version)
+                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Version", 0);
+
+            Property(x => x.LocalCallName)
+                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalCallName", 0);
 
             Property(x => x.ParentItSystemName)
                 .HasMaxLength(ItSystem.MaxNameLength)
