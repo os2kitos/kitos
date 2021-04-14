@@ -23,7 +23,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string Version { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }
-        public Guid ItSystemUuid { get; set; }
         public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
+        public string ItSystemUuid { get; set; }
     }
 }

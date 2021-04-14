@@ -111,7 +111,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From System
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
-            Assert.Equal(system.Uuid, readModel.ItSystemUuid);
+            Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
