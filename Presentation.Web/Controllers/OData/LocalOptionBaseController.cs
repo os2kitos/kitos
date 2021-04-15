@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     localOption.IsActive = true;
-                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
+                    DomainEvents.Raise(new EntityCreatedEvent<TLocalModelType>(localOption));
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.OData
                     entity.OrganizationId = organizationId;
 
                     Repository.Insert(entity);
-                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(entity));
+                    DomainEvents.Raise(new EntityCreatedEvent<TLocalModelType>(entity));
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -235,7 +235,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 localOption.IsActive = false;
-                DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
+                DomainEvents.Raise(new EntityDeletedEvent<TLocalModelType>(localOption));
 
                 Repository.Save();
             }
