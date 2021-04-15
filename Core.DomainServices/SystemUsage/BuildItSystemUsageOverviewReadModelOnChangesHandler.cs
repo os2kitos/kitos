@@ -3,6 +3,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -14,7 +15,10 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityCreatedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityUpdatedEvent<ItSystemUsage>>,
-    IDomainEventHandler<EntityUpdatedEvent<ItSystem>>
+    IDomainEventHandler<EntityUpdatedEvent<ItSystem>>,
+    IDomainEventHandler<EntityUpdatedEvent<User>>,
+    IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>,
+    IDomainEventHandler<EntityDeletedEvent<OrganizationUnit>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -57,6 +61,16 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityUpdatedEvent<User> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_User));
+        }
+
+        public void Handle(EntityUpdatedEvent<OrganizationUnit> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
+        }
+
+        public void Handle(EntityDeletedEvent<OrganizationUnit> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
         }
 
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)

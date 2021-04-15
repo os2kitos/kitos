@@ -51,6 +51,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         {
             //Arrange
             var organizationId = TestEnvironment.DefaultOrganizationId;
+            var organizationName = TestEnvironment.DefaultOrganizationName;
 
             var systemName = A<string>();
             var systemDisabled = A<bool>();
@@ -90,6 +91,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
 
+            // Responsible Organization Unit
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId); //Adding default organization as organization unit
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId); //Using default organization as responsible organization unit
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -125,6 +130,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.FullName, roleAssignment.UserFullName);
             Assert.Equal(user.Email, roleAssignment.Email);
+
+            // Responsible Organization Unit
+            Assert.Equal(organizationId, readModel.ResponsibleOrganizationUnitId);
         }
 
         [Fact]

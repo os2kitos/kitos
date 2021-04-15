@@ -23,6 +23,7 @@
                         LocalCallName = c.String(maxLength: 100),
                         LocalSystemId = c.String(maxLength: 100),
                         ItSystemUuid = c.String(maxLength: 50),
+                        ResponsibleOrganizationUnitId = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -35,7 +36,8 @@
                 .Index(t => t.Version, name: "ItSystemUsageOverviewReadModel_Index_Version")
                 .Index(t => t.LocalCallName, name: "ItSystemUsageOverviewReadModel_Index_LocalCallName")
                 .Index(t => t.LocalSystemId, name: "ItSystemUsageOverviewReadModel_Index_LocalSystemId")
-                .Index(t => t.ItSystemUuid, name: "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
+                .Index(t => t.ItSystemUuid, name: "ItSystemUsageOverviewReadModel_Index_ItSystemUuid")
+                .Index(t => t.ResponsibleOrganizationUnitId, name: "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewRoleAssignmentReadModels",
@@ -74,6 +76,7 @@
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserFullName" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "RoleId" });
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalSystemId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalCallName");

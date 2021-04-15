@@ -4,6 +4,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.SystemUsage;
 using Moq;
@@ -73,7 +74,24 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 }
             };
 
+            // Add ResponsibleOrganizationUnit
+            var organizationUnit = new OrganizationUnit
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsageOrgUnitUsage = new ItSystemUsageOrgUnitUsage
+            {
+                OrganizationUnit = organizationUnit,
+                OrganizationUnitId = organizationUnit.Id,
+                ItSystemUsage = systemUsage,
+                ItSystemUsageId = systemUsage.Id
+            };
+            systemUsage.ResponsibleUsage = systemUsageOrgUnitUsage;
+
+
             var readModel = new ItSystemUsageOverviewReadModel();
+
             //Act
             _sut.Apply(systemUsage, readModel);
 
@@ -101,6 +119,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), roleAssignment.UserFullName);
             Assert.Equal(right.RoleId, roleAssignment.RoleId);
             Assert.Equal(user.Email, roleAssignment.Email);
+
+            //Responsible Organization Unit
+            Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
         }
 
         [Fact]
