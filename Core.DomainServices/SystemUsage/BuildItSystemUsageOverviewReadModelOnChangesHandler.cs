@@ -3,6 +3,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
@@ -20,7 +21,9 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>,
     IDomainEventHandler<EntityDeletedEvent<OrganizationUnit>>,
     IDomainEventHandler<EntityUpdatedEvent<Organization>>,
-    IDomainEventHandler<EntityDeletedEvent<Organization>>
+    IDomainEventHandler<EntityDeletedEvent<Organization>>,
+    IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
+    IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -83,6 +86,17 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityDeletedEvent<Organization> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_Organization));
+        }
+
+        public void Handle(EntityUpdatedEvent<BusinessType> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType));
+        }
+
+        public void Handle(EntityUpdatedEvent<LocalBusinessType> domainEvent)
+        {
+            //Point to parent id since that's what the readmodel knows about
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType));
         }
 
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)

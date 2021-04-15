@@ -27,7 +27,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemUuid { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
         public string ResponsibleOrganizationUnitName { get; set; }
+        public int? ItSystemBusinessTypeId { get; set; }
         public string ItSystemBusinessTypeName { get; set; }
+        public int? ItSystemRightsHolderId { get; set; }
         public string ItSystemRightsHolderName { get; set; }
         public string ItSystemKLEIdsAsCsv { get; set; }
         public string ItSystemKLENamesAsCsv { get; set; }

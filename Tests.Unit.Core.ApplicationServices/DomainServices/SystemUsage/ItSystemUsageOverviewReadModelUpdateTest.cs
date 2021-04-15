@@ -136,7 +136,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
             Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
+            Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
 
             //Parent System

@@ -40,9 +40,10 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
         }
 
-        public IQueryable<ItSystemUsage> GetBySystemIds(List<int> systemIds)
+        public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
         {
-            return _itSystemUsageRepository.AsQueryable().Where(x => systemIds.Contains(x.ItSystemId));
+            var ids = systemIds.ToList();
+            return _itSystemUsageRepository.AsQueryable().Where(x => ids.Contains(x.ItSystemId));
         }
     }
 }
