@@ -57,7 +57,7 @@
                 .withStorageKey(this.storageKey)
                 .withFixedSourceUrl(
                     `/odata/Organizations(${user.currentOrganizationId
-                    })/ItSystemUsageOverviewReadModels`)
+                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments`)
                 .withParameterMapping((options, type) => {
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
