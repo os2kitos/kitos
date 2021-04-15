@@ -24,7 +24,10 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityDeletedEvent<Organization>>,
     IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
     IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>,
-    IDomainEventHandler<EntityUpdatedEvent<TaskRef>>
+    IDomainEventHandler<EntityUpdatedEvent<TaskRef>>,
+    IDomainEventHandler<EntityDeletedEvent<ExternalReference>>,
+    IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
+    IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -103,6 +106,22 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityUpdatedEvent<TaskRef> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_TaskRef));
+        }
+
+        public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
+
+        public void Handle(EntityCreatedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
+
+        public void Handle(EntityUpdatedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
+
+        private void HandleExternalReference(EntityLifeCycleEvent<ExternalReference> domainEvent)
+        {
+            //Schedule read model update for affected ItSystemUsage if ItSystemUsage was the target of the reference
+            var itSystemUsage = domainEvent.Entity.ItSystemUsage;
+            if (itSystemUsage != null)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(itSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
         }
 
 

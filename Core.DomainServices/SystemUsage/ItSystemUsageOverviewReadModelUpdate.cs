@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SystemUsage
 {
@@ -42,6 +43,19 @@ namespace Core.DomainServices.SystemUsage
             PatchItSystemBusinessType(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
+            PatchReference(source, destination);
+        }
+
+        private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.LocalOverviewReferenceTitle = source
+                .Reference
+                .FromNullable()
+                .Select(x => x.Title)
+                .Select(title => title.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)))
+                .GetValueOrDefault();
+            destination.LocalOverviewReferenceUrl = source.Reference?.URL;
+            destination.LocalOverviewReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
 
         private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

@@ -5,6 +5,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
 {
     public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>, IHasName
     {
+
+        public static int MaxReferenceTitleLenght = 100;
+
         public ItSystemUsageOverviewReadModel()
         {
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
@@ -33,5 +36,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemRightsHolderName { get; set; }
         public string ItSystemKLEIdsAsCsv { get; set; }
         public string ItSystemKLENamesAsCsv { get; set; }
+        public string LocalOverviewReferenceDocumentId { get; set; }
+        public string LocalOverviewReferenceUrl { get; set; }
+        public string LocalOverviewReferenceTitle { get; set; }
     }
 }
