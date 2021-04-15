@@ -40,8 +40,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemParentName", 0);
 
+            Property(x => x.ResponsibleOrganizationUnitId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId", 0);
+
             Property(x => x.ResponsibleOrganizationUnitName)
-                .HasMaxLength(Organization.MaxNameLength)
+                .HasMaxLength(OrganizationUnit.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName", 0);
 
             Property(x => x.ItSystemBusinessTypeName)

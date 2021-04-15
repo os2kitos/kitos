@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -139,8 +140,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(user.Email, roleAssignment.Email);
 
             // Responsible Organization Unit
-            Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
             Assert.Equal(organizationId, readModel.ResponsibleOrganizationUnitId);
+            Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
         }
 
         [Fact]
@@ -235,6 +236,78 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             Assert.Equal(newSystemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+        }
+
+        [Fact]
+        public async Task ReadModels_ResponsibleOrganizationUnit_Is_Updated_When_ResponsibleOrganizationUnit_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var orgUnitName1 = A<string>();
+            var orgUnitName2 = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var organizationUnit1 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
+            var organizationUnit2 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
+
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId);
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId);
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id); 
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id);
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(organizationUnit2.Id, readModel.ResponsibleOrganizationUnitId);
+            Assert.Equal(orgUnitName2, readModel.ResponsibleOrganizationUnitName);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItSystemRightsHolderName_Is_Updated_When_OrganizationName_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var organizationName1 = A<string>();
+            var organizationName2 = A<string>();
+            var defaultOrganizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, defaultOrganizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, defaultOrganizationId);
+
+            var organization1 = await OrganizationHelper.CreateOrganizationAsync(defaultOrganizationId, organizationName1, "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization1.Id, defaultOrganizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await OrganizationHelper.SendChangeOrganizationNameRequestAsync(organization1.Id, organizationName2, defaultOrganizationId);
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(defaultOrganizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(organizationName2, readModel.ItSystemRightsHolderName);
         }
 
 

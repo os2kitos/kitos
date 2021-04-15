@@ -6,7 +6,9 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Options;
 using Core.DomainServices.SystemUsage;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -16,14 +18,18 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     public class ItSystemUsageOverviewReadModelUpdateTest : WithAutoFixture
     {
 
+        private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeService;
+
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
+            _businessTypeService = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
-                _roleAssignmentRepository.Object);
+                _roleAssignmentRepository.Object,
+                _businessTypeService.Object);
         }
 
         [Fact]
@@ -98,6 +104,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ItSystemUsageId = systemUsage.Id
             };
             systemUsage.ResponsibleUsage = systemUsageOrgUnitUsage;
+
+            _businessTypeService.Setup(x => x.GetOption(system.OrganizationId, system.BusinessType.Id)).Returns(Maybe<(BusinessType, bool)>.Some((system.BusinessType, true)));
 
 
             var readModel = new ItSystemUsageOverviewReadModel();

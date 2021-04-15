@@ -266,6 +266,9 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -294,6 +297,9 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>()
                 .To<OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<ItSystem, BusinessType>>()
+               .To<OptionsService<ItSystem, BusinessType, LocalBusinessType>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

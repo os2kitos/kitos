@@ -74,5 +74,40 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<HttpResponseMessage> SendChangeOrganizationNameRequestAsync(int organizationId, string name, int owningOrganizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/organization/{organizationId}?organizationId={owningOrganizationId}");
+            var body = new
+            {
+                name = name
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<OrganizationUnit> SendCreateOrganizationUnitRequestAsync(int organizationId, string orgUnitName, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("api/organizationUnit/");
+            var body = new
+            {
+                name = orgUnitName,
+                organizationId = organizationId,
+                parentId = organizationId
+            };
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, body))
+            {
+                return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<OrganizationUnit>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteOrganizationUnitRequestAsync(int orgUnitId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/organizationUnit/{orgUnitId}?organizationId={organizationId}");
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
     }
 }

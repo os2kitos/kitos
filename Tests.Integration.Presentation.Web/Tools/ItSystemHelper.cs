@@ -299,7 +299,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 belongsToId = belongsToId
             };
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
     }
 }

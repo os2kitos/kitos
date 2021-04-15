@@ -1,19 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Model;
+using Core.DomainServices.Options;
 
 namespace Core.DomainServices.SystemUsage
 {
     public class ItSystemUsageOverviewReadModelUpdate : IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>
     {
+        private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
+
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
 
-        public ItSystemUsageOverviewReadModelUpdate(IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository)
+        public ItSystemUsageOverviewReadModelUpdate(
+            IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
+            IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
+            _businessTypeService = businessTypeService;
         }
 
         public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -27,7 +35,7 @@ namespace Core.DomainServices.SystemUsage
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
             destination.ItSystemUuid = source.ItSystem.Uuid.ToString("D");
-            destination.ItSystemBusinessTypeName = source.ItSystem.BusinessType?.Name;
+            destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
             destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
 
             PatchParentSystemName(source, destination);
@@ -37,8 +45,8 @@ namespace Core.DomainServices.SystemUsage
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
             destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
+            destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
         }
 
         private static void PatchParentSystemName(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -90,6 +98,25 @@ namespace Core.DomainServices.SystemUsage
                 destination.RoleAssignments.Remove(assignmentToBeRemoved);
                 _roleAssignmentRepository.Delete(assignmentToBeRemoved);
             });
+        }
+
+        private string GetNameOfItSystemOption<TOption>(
+            ItSystem parent,
+            TOption optionEntity,
+            IOptionsService<ItSystem, TOption> service)
+            where TOption : OptionEntity<ItSystem>
+        {
+            if (optionEntity != null)
+            {
+                var available = service
+                    .GetOption(parent.OrganizationId, optionEntity.Id)
+                    .Select(x => x.available)
+                    .GetValueOrFallback(false);
+
+                return $"{optionEntity.Name}{(available ? string.Empty : " (udgået)")}";
+            }
+
+            return null;
         }
 
     }
