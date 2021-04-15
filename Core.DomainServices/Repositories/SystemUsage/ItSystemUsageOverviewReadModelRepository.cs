@@ -75,5 +75,20 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId);
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByRightsHolderId(int organizationId)
+        {
+            //Gets all read models that have dependencies on the ItSystems RightsHolder organization
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ItSystemRightsHolderId == organizationId);
+        }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ItSystemBusinessTypeId == businessTypeId);
+        }
     }
 }

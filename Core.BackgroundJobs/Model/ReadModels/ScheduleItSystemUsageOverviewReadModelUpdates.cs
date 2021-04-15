@@ -45,6 +45,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOrganizationUnitUpdated(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleOrganizationUpdated(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleBusinessTypeUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -111,7 +112,26 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 var systemUsageIds = _itSystemUsageRepository.GetBySystemIds(systemIds).Select(x => x.Id);
 
-                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, systemUsageIds, update, transaction);
+                var readModelIds = _readModelRepository.GetByRightsHolderId(update.SourceId).Select(x => x.SourceEntityId);
+
+                var ids = systemUsageIds.Concat(readModelIds).Distinct();
+
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
+        private int HandleBusinessTypeUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                var ids = _readModelRepository.GetByBusinessTypeId(update.SourceId).Select(x => x.SourceEntityId);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
             return updatesExecuted;

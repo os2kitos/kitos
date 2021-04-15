@@ -35,12 +35,23 @@ namespace Core.DomainServices.SystemUsage
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
             destination.ItSystemUuid = source.ItSystem.Uuid.ToString("D");
-            destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
-            destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
-            PatchResponsibleOrganizationUnit(source, destination);
+            PatchResponsibleOrganizationUnit(source, destination); 
+            PatchItSystemBusinessType(source, destination);
+            PatchItSystemRightsHolder(source, destination);
+        }
+
+        private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItSystemBusinessTypeId = source.ItSystem.BusinessType?.Id;
+            destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
+        }
+        private void PatchItSystemRightsHolder(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItSystemRightsHolderId = source.ItSystem.BelongsTo?.Id;
+            destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
         }
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

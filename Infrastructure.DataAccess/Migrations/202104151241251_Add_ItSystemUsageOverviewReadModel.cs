@@ -25,7 +25,9 @@
                         ItSystemUuid = c.String(maxLength: 50),
                         ResponsibleOrganizationUnitId = c.Int(),
                         ResponsibleOrganizationUnitName = c.String(maxLength: 100),
+                        ItSystemBusinessTypeId = c.Int(),
                         ItSystemBusinessTypeName = c.String(maxLength: 150),
+                        ItSystemRightsHolderId = c.Int(),
                         ItSystemRightsHolderName = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.Id)
@@ -42,7 +44,9 @@
                 .Index(t => t.ItSystemUuid, name: "ItSystemUsageOverviewReadModel_Index_ItSystemUuid")
                 .Index(t => t.ResponsibleOrganizationUnitId, name: "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId")
                 .Index(t => t.ResponsibleOrganizationUnitName, name: "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName")
+                .Index(t => t.ItSystemBusinessTypeId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId")
                 .Index(t => t.ItSystemBusinessTypeName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName")
+                .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             
             CreateTable(
@@ -111,7 +115,9 @@
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "RoleId" });
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemUuid");

@@ -123,7 +123,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemName, readModel.Name);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
+            Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
 
             // From Parent System
@@ -308,6 +310,40 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             Assert.Equal(organizationName2, readModel.ItSystemRightsHolderName);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItSystemBusinessTypeName_Is_Updated_When_BusinessType_Has_Its_Name_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var businessTypeName1 = A<string>();
+            var businessTypeName2 = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var businessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName1, organizationId);
+
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await EntityOptionHelper.SendChangeBusinessTypeNameAsync(businessType.Id, businessTypeName2);
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(businessTypeName2, readModel.ItSystemBusinessTypeName);
         }
 
 
