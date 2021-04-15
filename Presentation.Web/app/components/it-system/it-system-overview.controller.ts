@@ -35,16 +35,29 @@
             needsWidthFixService: any) {
             $rootScope.page.title = "IT System - Overblik";
 
+            //Lookup maps
+            var roleIdToUserNamesMap = {};
+            var orgUnitIdToNameMap = {};
+            orgUnits.forEach(unit => orgUnitIdToNameMap[unit.Id] = unit.Name);
+
             //Helper functions
             const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
+
+            const getOrgUnitName = (id: number) => orgUnitIdToNameMap[id] || "";
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
             };
 
-            //Lookup maps
-            var roleIdToUserNamesMap = {};
+            const replaceOrderByProperty = (orderBy, fromProperty, toProperty) => {
+                if (orderBy) {
+                    //'(RespOrgUnit)(.*)'
+                    var pattern = new RegExp(`(${fromProperty})(.*)`, "i");
+                    return orderBy.replace(pattern, `${toProperty}$2`);
+                }
+                return orderBy;
+            };
 
             //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
@@ -67,6 +80,10 @@
                                 replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
                         });
                     }
+
+                    //In terms of ordering user will expect ordering by name on this column, so we shitch it around
+                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -207,6 +224,26 @@
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
                         .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ResponsibleOrganizationUnitId")
+                        .withTitle("Ansv. organisationsenhed")
+                        .withId("orgunit")
+                        .withStandardWidth(190)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            orgUnits.map((unit: any) => {
+                                return {
+                                    textValue: unit.Name,
+                                    remoteValue: unit.Id,
+                                    optionalContext: unit
+                                };
+                            }),
+                            false,
+                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                        .withRendering(dataItem => getOrgUnitName(dataItem.ResponsibleOrganizationUnitId))
+                        .withExcelOutput(dataItem => getOrgUnitName(dataItem.ResponsibleOrganizationUnitId)))
                 .withStandardSorting("Name");
 
             systemRoles.forEach(role =>
