@@ -155,7 +155,7 @@
                         title: "Opret Registrering",
                         color: Utility.KendoGrid.KendoToolbarButtonColor.Green,
                         position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
-                        implementation: Utility.KendoGrid.KentoToolbarImplementation.Button,
+                        implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
                         enabled: () => userAccessRights.canCreate,
                         onClick: () => $state.go("data-processing.overview.create-registration")
                     } as Utility.KendoGrid.IKendoToolbarEntry)

@@ -18,21 +18,21 @@
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "$window",
             "systemRoles",
             "user",
             "orgUnits",
-            "kendoGridLauncherFactory"
+            "kendoGridLauncherFactory",
+            "needsWidthFixService"
         ];
 
         constructor(
             $rootScope: IRootScope,
             $scope: any,
-            private readonly $window: ng.IWindowService,
-            private readonly systemRoles: Array<Models.IOptionEntity>,
-            private readonly user,
-            private readonly orgUnits: Array<any>,
-            kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory) {
+            systemRoles: Array<Models.IOptionEntity>,
+            user,
+            orgUnits: Array<Models.IOrganizationUnit>,
+            kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
+            needsWidthFixService: any) {
             $rootScope.page.title = "IT System - Overblik";
 
             //Helper functions
@@ -91,13 +91,41 @@
                     return response;
                 })
                 .withToolbarEntry({
+                    id: "roleSelector",
+                    title: "Vælg systemrolle...",
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                    implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                    enabled: () => true,
+                    dropDownConfiguration: {
+                        selectedOptionChanged: newItem => {
+                            // hide all roles column
+                            systemRoles.forEach(role => {
+                                this.mainGrid.hideColumn(getRoleKey(role));
+                            });
+
+                            //Only show the selected role
+                            var gridFieldName = getRoleKey(newItem.originalObject);
+                            this.mainGrid.showColumn(gridFieldName);
+                            needsWidthFixService.fixWidth();
+                        },
+                        availableOptions: systemRoles.map(role => {
+                            return {
+                                id: `${role.Id}`,
+                                text: role.Name,
+                                originalObject: role
+                            };
+                        })
+                    }
+                } as Utility.KendoGrid.IKendoToolbarEntry)
+                .withToolbarEntry({
                     id: "gdprExportAnchor",
                     title: "Exportér GPDR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
-                    implementation: Utility.KendoGrid.KentoToolbarImplementation.Link,
+                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
                     enabled: () => true,
-                    link: `api/v1/gdpr-report/csv/${this.user.currentOrganizationId}`
+                    link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withColumn(builder =>
                     builder
@@ -181,7 +209,7 @@
                         .withInitialVisibility(false))
                 .withStandardSorting("Name");
 
-            this.systemRoles.forEach(role =>
+            systemRoles.forEach(role =>
                 launcher = launcher.withColumn(builder =>
                     builder
                         .withDataSourceName(getRoleKey(role))
