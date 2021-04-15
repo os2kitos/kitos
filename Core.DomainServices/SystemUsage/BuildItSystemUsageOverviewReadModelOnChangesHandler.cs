@@ -23,7 +23,8 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<Organization>>,
     IDomainEventHandler<EntityDeletedEvent<Organization>>,
     IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
-    IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>
+    IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>,
+    IDomainEventHandler<EntityUpdatedEvent<TaskRef>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -98,6 +99,12 @@ namespace Core.DomainServices.SystemUsage
             //Point to parent id since that's what the readmodel knows about
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType));
         }
+
+        public void Handle(EntityUpdatedEvent<TaskRef> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_TaskRef));
+        }
+
 
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)
         {
