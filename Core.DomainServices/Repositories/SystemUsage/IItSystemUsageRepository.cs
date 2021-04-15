@@ -13,6 +13,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId);
         IQueryable<ItSystemUsage> GetBySystemId(int systemId);
         IQueryable<ItSystemUsage> GetByParentSystemId(int parentSystemId);
-        IQueryable<ItSystemUsage> GetBySystemIds(List<int> systemIds);
+        IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds);
     }
 }

@@ -110,11 +110,8 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var systemIds = _itSystemRepository.GetByRightsHolderId(update.SourceId).Select(x => x.Id).ToList();
 
                 var systemUsageIds = _itSystemUsageRepository.GetBySystemIds(systemIds).Select(x => x.Id);
-                var systemUsageIdsFromReadModel = _readModelRepository.GetByOrganizationId(update.SourceId).Select(x => x.SourceEntityId);
 
-                var ids = systemUsageIds.Concat(systemUsageIdsFromReadModel).Distinct();
-
-                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, systemUsageIds, update, transaction);
             }
 
             return updatesExecuted;
