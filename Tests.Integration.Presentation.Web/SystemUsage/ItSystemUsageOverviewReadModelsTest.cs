@@ -123,7 +123,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
-            Assert.Equal(organizationName, readModel.ItSystemBelongsToName);
+            Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
