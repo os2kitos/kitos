@@ -27,6 +27,8 @@
                         ResponsibleOrganizationUnitName = c.String(maxLength: 100),
                         ItSystemBusinessTypeName = c.String(maxLength: 150),
                         ItSystemRightsHolderName = c.String(maxLength: 100),
+                        ItSystemKLEIdsAsCsv = c.String(),
+                        ItSystemKLENamesAsCsv = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)

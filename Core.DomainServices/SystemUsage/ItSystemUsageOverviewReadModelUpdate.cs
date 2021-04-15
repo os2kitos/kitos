@@ -41,6 +41,13 @@ namespace Core.DomainServices.SystemUsage
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
             PatchResponsibleOrganizationUnit(source, destination);
+            PatchKLE(source, destination);
+        }
+
+        private static void PatchKLE(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItSystemKLEIdsAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey));
+            destination.ItSystemKLENamesAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description));
         }
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

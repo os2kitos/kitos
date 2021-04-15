@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -72,6 +73,15 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 {
                     Id = A<int>(),
                     Name = A<string>()
+                },
+                TaskRefs = new List<TaskRef>
+                {
+                    new TaskRef
+                    {
+                        Id = A<int>(),
+                        TaskKey = A<string>(),
+                        Description = A<string>()
+                    }
                 }
             };
             var systemUsage = new ItSystemUsage
@@ -143,6 +153,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Responsible Organization Unit
             Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
             Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
+
+            //KLE
+            Assert.Equal(system.TaskRefs.First().TaskKey, readModel.ItSystemKLEIdsAsCsv);
+            Assert.Equal(system.TaskRefs.First().Description, readModel.ItSystemKLENamesAsCsv);
         }
 
         [Fact]
