@@ -48,7 +48,6 @@
 
             const replaceOrderByProperty = (orderBy, fromProperty, toProperty) => {
                 if (orderBy) {
-                    //'(RespOrgUnit)(.*)'
                     var pattern = new RegExp(`(${fromProperty})(.*)`, "i");
                     return orderBy.replace(pattern, `${toProperty}$2`);
                 }
