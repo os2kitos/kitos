@@ -37,13 +37,9 @@
 
             //Lookup maps
             var roleIdToUserNamesMap = {};
-            var orgUnitIdToNameMap = {};
-            orgUnits.forEach(unit => orgUnitIdToNameMap[unit.Id] = unit.Name);
 
             //Helper functions
             const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
-
-            const getOrgUnitName = (id: number) => orgUnitIdToNameMap[id] || "";
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
@@ -226,7 +222,7 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("ResponsibleOrganizationUnitId")
+                        .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during soring (in the parameter mapper)
                         .withTitle("Ansv. organisationsenhed")
                         .withId("orgunit")
                         .withStandardWidth(190)
@@ -242,8 +238,8 @@
                             }),
                             false,
                             dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
-                        .withRendering(dataItem => getOrgUnitName(dataItem.ResponsibleOrganizationUnitId))
-                        .withExcelOutput(dataItem => getOrgUnitName(dataItem.ResponsibleOrganizationUnitId)))
+                        .withRendering(dataItem => dataItem.ResponsibleOrganizationUnitName)
+                        .withExcelOutput(dataItem => dataItem.ResponsibleOrganizationUnitName))
                 .withStandardSorting("Name");
 
             systemRoles.forEach(role =>
