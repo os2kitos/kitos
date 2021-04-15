@@ -59,6 +59,11 @@ namespace Core.DomainServices.Repositories.System
             _systemRepository.Save();
         }
 
+        public IQueryable<ItSystem> GetByRightsHolderId(int organizationId)
+        {
+            return _systemRepository.AsQueryable().Where(x => x.BelongsToId == organizationId);
+        }
+
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)
         {
             var idsOfSystemsInUse = _systemUsageRepository

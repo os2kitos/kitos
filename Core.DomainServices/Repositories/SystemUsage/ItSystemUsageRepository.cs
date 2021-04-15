@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 
@@ -37,6 +38,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
         public IQueryable<ItSystemUsage> GetByParentSystemId(int systemId)
         {
             return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
+        }
+
+        public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
+        {
+            var ids = systemIds.ToList();
+            return _itSystemUsageRepository.AsQueryable().Where(x => ids.Contains(x.ItSystemId));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -257,6 +258,47 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Disabled = isDisabled
             };
 
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<IEnumerable<OptionDTO>> GetBusinessTypeOptionsAsync(int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalBusinessTypes?organizationId={organizationId}"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendSetBusinessTypeRequestAsync(
+            int systemId,
+            int businessTypeId,
+            int organizationId,
+            Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                businessTypeId = businessTypeId
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendSetBelongsToRequestAsync(
+            int systemId,
+            int belongsToId,
+            int organizationId,
+            Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                belongsToId = belongsToId
+            };
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItSystemUsage.Read;
 using Infrastructure.Services.Types;
 
@@ -14,5 +15,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
         void Update(ItSystemUsageOverviewReadModel readModel);
         IQueryable<ItSystemUsageOverviewReadModel> GetByUserId(int userId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationUnitId(int organizationUnitId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByRightsHolderId(int organizationId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId);
     }
 }

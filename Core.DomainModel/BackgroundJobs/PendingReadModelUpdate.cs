@@ -15,7 +15,9 @@ namespace Core.DomainModel.BackgroundJobs
         ItSystemUsage = 8,
         ItSystemUsage_ItSystem = 9,
         ItSystemUsage_User = 10,
-        ItSystemUsage_OrganizationUnit = 11
+        ItSystemUsage_OrganizationUnit = 11,
+        ItSystemUsage_Organization = 12,
+        ItSystemUsage_BusinessType = 13
     }
 
     public class PendingReadModelUpdate

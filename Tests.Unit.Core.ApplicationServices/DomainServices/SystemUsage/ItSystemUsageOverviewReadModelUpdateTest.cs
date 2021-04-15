@@ -6,7 +6,9 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Options;
 using Core.DomainServices.SystemUsage;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -16,14 +18,18 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     public class ItSystemUsageOverviewReadModelUpdateTest : WithAutoFixture
     {
 
+        private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeService;
+
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
+            _businessTypeService = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
-                _roleAssignmentRepository.Object);
+                _roleAssignmentRepository.Object,
+                _businessTypeService.Object);
         }
 
         [Fact]
@@ -56,7 +62,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Disabled = A<bool>(),
                 Parent = parentSystem,
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                BelongsTo = new Organization
+                {
+                    Id = A<int>(),
+                    Name = A<string>()
+                },
+                BusinessType = new BusinessType
+                {
+                    Id = A<int>(),
+                    Name = A<string>()
+                }
             };
             var systemUsage = new ItSystemUsage
             {
@@ -89,6 +105,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
             systemUsage.ResponsibleUsage = systemUsageOrgUnitUsage;
 
+            _businessTypeService.Setup(x => x.GetOption(system.OrganizationId, system.BusinessType.Id)).Returns(Maybe<(BusinessType, bool)>.Some((system.BusinessType, true)));
+
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -108,6 +126,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Name, readModel.Name);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
+            Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
+            Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
+            Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
@@ -122,6 +144,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Responsible Organization Unit
             Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
+            Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
         }
 
         [Fact]

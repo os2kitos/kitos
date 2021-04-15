@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
@@ -27,5 +26,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
         public string ItSystemUuid { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
+        public string ResponsibleOrganizationUnitName { get; set; }
+        public int? ItSystemBusinessTypeId { get; set; }
+        public string ItSystemBusinessTypeName { get; set; }
+        public int? ItSystemRightsHolderId { get; set; }
+        public string ItSystemRightsHolderName { get; set; }
     }
 }
