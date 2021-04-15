@@ -280,7 +280,7 @@
                         options.push({
                             textValue: "",
                             remoteValue: "null"
-                        })
+                        });
 
                         return builder
                             .withDataSourceName("BasisForTransfer")
@@ -309,7 +309,7 @@
                         options.push({
                             textValue: "",
                             remoteValue: "null"
-                        })
+                        });
 
                         return builder
                             .withDataSourceName("DataResponsible")
@@ -404,7 +404,7 @@
                         options.push({
                             textValue: "",
                             remoteValue: "_empty_"
-                        })
+                        });
 
                         return builder
                             .withDataSourceName("OversightOptionNamesAsCsv")
