@@ -122,7 +122,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Responsible Organization Unit
             Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
-            Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
         }
 
         [Fact]

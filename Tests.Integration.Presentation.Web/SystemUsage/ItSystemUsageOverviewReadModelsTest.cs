@@ -132,7 +132,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(user.Email, roleAssignment.Email);
 
             // Responsible Organization Unit
-            Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
             Assert.Equal(organizationId, readModel.ResponsibleOrganizationUnitId);
         }
 

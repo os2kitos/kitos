@@ -17,7 +17,8 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityUpdatedEvent<ItSystem>>,
     IDomainEventHandler<EntityUpdatedEvent<User>>,
-    IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>
+    IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>,
+    IDomainEventHandler<EntityDeletedEvent<OrganizationUnit>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -63,6 +64,11 @@ namespace Core.DomainServices.SystemUsage
         }
 
         public void Handle(EntityUpdatedEvent<OrganizationUnit> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
+        }
+
+        public void Handle(EntityDeletedEvent<OrganizationUnit> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
         }
