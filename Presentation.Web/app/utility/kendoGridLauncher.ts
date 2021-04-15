@@ -259,9 +259,21 @@ module Kitos.Utility.KendoGrid {
         Right
     }
 
-    export enum KentoToolbarImplementation {
+    export enum KendoToolbarImplementation {
         Button,
-        Link
+        Link,
+        DropDownList
+    }
+
+    export interface IKendoToolbarDropDownEntry {
+        id: string;
+        text: string;
+        originalObject? : any;
+    }
+
+    export interface IKendoToolbarDropDownConfiguration {
+        selectedOptionChanged: (selectedOption: IKendoToolbarDropDownEntry) => void;
+        availableOptions: IKendoToolbarDropDownEntry[];
     }
 
     export interface IKendoToolbarEntry {
@@ -269,8 +281,9 @@ module Kitos.Utility.KendoGrid {
         id: string;
         onClick?: () => void;
         link?: string;
+        dropDownConfiguration?: IKendoToolbarDropDownConfiguration;
         enabled: () => boolean;
-        implementation: KentoToolbarImplementation,
+        implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
     }
@@ -538,7 +551,7 @@ module Kitos.Utility.KendoGrid {
 
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {
-                    case KentoToolbarImplementation.Button:
+                    case KendoToolbarImplementation.Button:
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
@@ -549,7 +562,7 @@ module Kitos.Utility.KendoGrid {
                             enabled: entry.enabled()
                         };
                         break;
-                    case KentoToolbarImplementation.Link:
+                    case KendoToolbarImplementation.Link:
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
@@ -559,8 +572,32 @@ module Kitos.Utility.KendoGrid {
                             enabled: entry.enabled()
                         };
                         break;
+                    case KendoToolbarImplementation.DropDownList:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<select data-element-type='${entry.id}DropDownList' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled(),
+                            getOptions: () => {
+                                return {
+                                    autoBind: false,
+                                    dataSource: entry.dropDownConfiguration.availableOptions,
+                                    dataTextField: "text",
+                                    dataValueField: "id",
+                                    optionLabel: entry.title,
+                                    change: e => {
+                                        var selectedId = e.sender.value();
+                                        const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                    }
+                                }
+                            }
+                        };
+                        break;
                     default:
-                        throw "Invalid toolbar implementation type";
+                        throw `Invalid toolbar implementation type:${entry.implementation}`;
                 }
             });
 
