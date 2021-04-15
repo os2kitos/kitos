@@ -30,7 +30,7 @@
             $scope: any,
             systemRoles: Array<Models.IOptionEntity>,
             user,
-            orgUnits: Array<any>,
+            orgUnits: Array<Models.IOrganizationUnit>,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             needsWidthFixService: any) {
             $rootScope.page.title = "IT System - Overblik";
