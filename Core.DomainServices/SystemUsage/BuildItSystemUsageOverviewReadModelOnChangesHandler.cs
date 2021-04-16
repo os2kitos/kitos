@@ -24,7 +24,7 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityDeletedEvent<Organization>>,
     IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
     IDomainEventHandler<EntityCreatedEvent<LocalBusinessType>>,
-    IDomainEventHandler<EntityDeletedEvent<LocalBusinessType>>
+    IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -99,7 +99,8 @@ namespace Core.DomainServices.SystemUsage
             //Point to parent id since that's what the readmodel knows about
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType));
         }
-        public void Handle(EntityDeletedEvent<LocalBusinessType> domainEvent)
+
+        public void Handle(EntityUpdatedEvent<LocalBusinessType> domainEvent)
         {
             //Point to parent id since that's what the readmodel knows about
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.OptionId, PendingReadModelUpdateSourceCategory.ItSystemUsage_BusinessType));

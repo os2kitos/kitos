@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     localOption.IsActive = true;
-                    DomainEvents.Raise(new EntityCreatedEvent<TLocalModelType>(localOption));
+                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -235,7 +235,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 localOption.IsActive = false;
-                DomainEvents.Raise(new EntityDeletedEvent<TLocalModelType>(localOption));
+                DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(localOption));
 
                 Repository.Save();
             }
