@@ -105,6 +105,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId); //Adding default organization as organization unit
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId); //Using default organization as responsible organization unit
 
+            //References
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), A<Display>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -153,6 +156,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // Responsible Organization Unit
             Assert.Equal(organizationId, readModel.ResponsibleOrganizationUnitId);
             Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
+
+            // Reference
+            Assert.Equal(reference.Title, readModel.LocalOverviewReferenceTitle);
+            Assert.Equal(reference.URL, readModel.LocalOverviewReferenceUrl);
+            Assert.Equal(reference.ExternalReferenceId, readModel.LocalOverviewReferenceDocumentId);
         }
 
         [Fact]

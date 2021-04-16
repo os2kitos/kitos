@@ -100,6 +100,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Rights = new List<ItSystemRight>
                 {
                     right
+                },
+                Reference = new ExternalReference
+                {
+                    Id = A<int>(),
+                    Title = A<string>(),
+                    ExternalReferenceId = A<string>(),
+                    URL = A<string>()
                 }
             };
 
@@ -165,6 +172,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var taskRef = Assert.Single(readModel.ItSystemTaskRefs);
             Assert.Equal(system.TaskRefs.First().TaskKey, taskRef.KLEId);
             Assert.Equal(system.TaskRefs.First().Description, taskRef.KLEName);
+
+            //Reference
+            Assert.Equal(systemUsage.Reference.Title, readModel.LocalOverviewReferenceTitle);
+            Assert.Equal(systemUsage.Reference.URL, readModel.LocalOverviewReferenceUrl);
+            Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalOverviewReferenceDocumentId);
         }
 
         [Fact]
