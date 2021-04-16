@@ -76,7 +76,7 @@
                         });
                     }
 
-                    //In terms of ordering user will expect ordering by name on this column, so we shitch it around
+                    //In terms of ordering user will expect ordering by name on this column, so we switch it around
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
 
                     return parameterMap;
@@ -221,7 +221,7 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during soring (in the parameter mapper)
+                        .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during sorting (in the parameter mapper)
                         .withTitle("Ansv. organisationsenhed")
                         .withId("orgunit")
                         .withStandardWidth(190)
