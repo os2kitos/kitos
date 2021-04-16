@@ -13,7 +13,7 @@
                 orgUnits: [
                     '$http', 'user', function ($http, user) {
                         return $http.get('api/organizationUnit?organization=' + user.currentOrganizationId).then(function (result) {
-                            var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
+                            var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = [];
 
                             function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
                                 var option = {

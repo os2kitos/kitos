@@ -25,7 +25,7 @@
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
                             return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
-                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
+                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = [];
 
                                 function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
                                     var option = {

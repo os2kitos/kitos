@@ -35,6 +35,9 @@
             needsWidthFixService: any) {
             $rootScope.page.title = "IT System - Overblik";
 
+            //Lookup maps
+            var roleIdToUserNamesMap = {};
+
             //Helper functions
             const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
 
@@ -43,8 +46,13 @@
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
             };
 
-            //Lookup maps
-            var roleIdToUserNamesMap = {};
+            const replaceOrderByProperty = (orderBy, fromProperty, toProperty) => {
+                if (orderBy) {
+                    var pattern = new RegExp(`(${fromProperty})(.*)`, "i");
+                    return orderBy.replace(pattern, `${toProperty}$2`);
+                }
+                return orderBy;
+            };
 
             //Build and launch kendo grid
             var launcher = kendoGridLauncherFactory
@@ -67,6 +75,10 @@
                                 replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
                         });
                     }
+
+                    //In terms of ordering user will expect ordering by name on this column, so we switch it around
+                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -207,6 +219,26 @@
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
                         .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during sorting (in the parameter mapper)
+                        .withTitle("Ansv. organisationsenhed")
+                        .withId("orgunit")
+                        .withStandardWidth(190)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            orgUnits.map((unit: any) => {
+                                return {
+                                    textValue: unit.Name,
+                                    remoteValue: unit.Id,
+                                    optionalContext: unit
+                                };
+                            }),
+                            false,
+                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                        .withRendering(dataItem => dataItem.ResponsibleOrganizationUnitName)
+                        .withExcelOutput(dataItem => dataItem.ResponsibleOrganizationUnitName))
                 .withStandardSorting("Name");
 
             systemRoles.forEach(role =>
