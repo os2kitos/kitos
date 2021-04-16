@@ -670,9 +670,9 @@
     <Compile Include="Migrations\202104071049413_Contract_Remove_DataHandler.designer.cs">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202104160733254_Add-ItSystemUsageOverviewReadModel.cs" />
-    <Compile Include="Migrations\202104160733254_Add-ItSystemUsageOverviewReadModel.designer.cs">
-      <DependentUpon>202104160733254_Add-ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    <Compile Include="Migrations\202104160820507_Add-ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104160820507_Add-ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104160820507_Add-ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1097,8 +1097,8 @@
     <EmbeddedResource Include="Migrations\202104071049413_Contract_Remove_DataHandler.resx">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104160733254_Add-ItSystemUsageOverviewReadModel.resx">
-      <DependentUpon>202104160733254_Add-ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202104160820507_Add-ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104160820507_Add-ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

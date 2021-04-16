@@ -61,10 +61,18 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName", 0);
 
+            Property(x => x.LocalOverviewReferenceTitle)
+                .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle", 0);
+
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
             Property(x => x.ItSystemKLENamesAsCsv).IsOptional();
+
+            Property(x => x.LocalOverviewReferenceTitle).IsOptional();
+            Property(x => x.LocalOverviewReferenceUrl).IsOptional();
+
 
 
             HasRequired(t => t.Organization)

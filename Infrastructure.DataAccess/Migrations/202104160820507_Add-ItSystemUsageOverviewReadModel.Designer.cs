@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202104160733254_Add-ItSystemUsageOverviewReadModel"; }
+            get { return "202104160820507_Add-ItSystemUsageOverviewReadModel"; }
         }
         
         string IMigrationMetadata.Source
