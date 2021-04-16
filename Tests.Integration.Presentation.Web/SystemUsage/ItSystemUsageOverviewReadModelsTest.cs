@@ -86,6 +86,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var businessType = availableBusinessTypeOptions[Math.Abs(A<int>()) % availableBusinessTypeOptions.Count];
             await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
 
+            var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
+            var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
+            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId);
+
             // System Usage changes
             var body = new
             {
@@ -127,6 +131,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
+            Assert.Equal(taskRef.TaskRef.TaskKey, readModel.ItSystemKLEIdsAsCsv);
+            Assert.Equal(taskRef.TaskRef.Description, readModel.ItSystemKLENamesAsCsv);
+            var readTaskRef = Assert.Single(readModel.ItSystemTaskRefs);
+            Assert.Equal(taskRef.TaskRef.TaskKey, readTaskRef.KLEId);
+            Assert.Equal(taskRef.TaskRef.Description, readTaskRef.KLEName);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);

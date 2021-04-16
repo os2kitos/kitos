@@ -4,11 +4,13 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.KLEDataBridge;
 using Serilog;
 
@@ -24,6 +26,7 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
         private readonly ILogger _logger;
+        private readonly IDomainEvents _domainEvents;
 
         public KLEStandardRepository(
             IKLEDataBridge kleDataBridge,
@@ -32,13 +35,15 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<TaskUsage> taskUsageRepository,
             IOperationClock clock,
-            ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
+            ILogger logger,
+            IDomainEvents domainEvents) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
             _systemUsageRepository = systemUsageRepository;
             _logger = logger;
+            _domainEvents = domainEvents;
         }
 
         private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper, IGenericRepository<TaskUsage> taskUsageRepository)
@@ -198,6 +203,7 @@ namespace Core.DomainServices.Repositories.KLE
             foreach (var itSystem in removedTaskRef.ItSystems)
             {
                 itSystem.TaskRefs.Remove(removedTaskRef);
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
             }
         }
 
@@ -255,6 +261,7 @@ namespace Core.DomainServices.Repositories.KLE
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
+                _domainEvents.Raise(new EntityUpdatedEvent<TaskRef>(update.Item1));
             }
         }
 

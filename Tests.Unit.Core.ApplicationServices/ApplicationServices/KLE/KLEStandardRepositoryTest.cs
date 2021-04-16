@@ -13,6 +13,7 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.KLEDataBridge;
 using Moq;
 using Serilog;
@@ -28,6 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private readonly Mock<IGenericRepository<ItSystemUsage>> _mockSystemUsageRepository;
         private readonly Mock<IGenericRepository<TaskUsage>> _mockTaskUsageRepository;
         private readonly Mock<IOperationClock> _mockClock;
+        private readonly Mock<IDomainEvents> _mockDomainEvent;
         private readonly GenericRepositoryTaskRefStub _stubTaskRefRepository;
         private readonly KLEStandardRepository _sut;
 
@@ -38,10 +40,11 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockLogger = new Mock<ILogger>();
             _mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            _mockDomainEvent = new Mock<IDomainEvents>();
             _stubTaskRefRepository = new GenericRepositoryTaskRefStub();
             _mockClock = new Mock<IOperationClock>();
             _mockClock.Setup(c => c.Now).Returns(DateTime.Now);
-            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockTaskUsageRepository.Object, _mockClock.Object, _mockLogger.Object);
+            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockTaskUsageRepository.Object, _mockClock.Object, _mockLogger.Object, _mockDomainEvent.Object);
         }
 
         [Theory]

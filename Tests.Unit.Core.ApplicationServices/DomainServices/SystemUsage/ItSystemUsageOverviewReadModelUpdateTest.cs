@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -21,14 +22,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeService;
 
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
             _businessTypeService = new Mock<IOptionsService<ItSystem, BusinessType>>();
+            _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
+                _taskRefRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -72,6 +76,15 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 {
                     Id = A<int>(),
                     Name = A<string>()
+                },
+                TaskRefs = new List<TaskRef>
+                {
+                    new TaskRef
+                    {
+                        Id = A<int>(),
+                        TaskKey = A<string>(),
+                        Description = A<string>()
+                    }
                 }
             };
             var systemUsage = new ItSystemUsage
@@ -145,6 +158,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Responsible Organization Unit
             Assert.Equal(organizationUnit.Id, readModel.ResponsibleOrganizationUnitId);
             Assert.Equal(organizationUnit.Name, readModel.ResponsibleOrganizationUnitName);
+
+            //KLE
+            Assert.Equal(system.TaskRefs.First().TaskKey, readModel.ItSystemKLEIdsAsCsv);
+            Assert.Equal(system.TaskRefs.First().Description, readModel.ItSystemKLENamesAsCsv);
+            var taskRef = Assert.Single(readModel.ItSystemTaskRefs);
+            Assert.Equal(system.TaskRefs.First().TaskKey, taskRef.KLEId);
+            Assert.Equal(system.TaskRefs.First().Description, taskRef.KLEName);
         }
 
         [Fact]

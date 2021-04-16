@@ -8,6 +8,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public ItSystemUsageOverviewReadModel()
         {
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
+            ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
         }
 
         public int OrganizationId { get; set; }
@@ -31,5 +32,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemBusinessTypeName { get; set; }
         public int? ItSystemRightsHolderId { get; set; }
         public string ItSystemRightsHolderName { get; set; }
+        public string ItSystemKLEIdsAsCsv { get; set; }
+        public string ItSystemKLENamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } // Adding TaskRefs as collection to enable easy sorting in the overview
     }
 }
