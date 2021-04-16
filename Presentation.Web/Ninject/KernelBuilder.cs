@@ -272,6 +272,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<BusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityCreatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<TaskRef>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)

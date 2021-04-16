@@ -9,6 +9,9 @@ namespace Core.DomainModel.Organization
     /// </summary>
     public class TaskRef : Entity, IHierarchy<TaskRef>
     {
+        public static int MaxTaskKeyLength = 15;
+        public static int MaxDescriptionLength = 150;
+
         public TaskRef()
         {
             this.Children = new List<TaskRef>();

@@ -61,6 +61,12 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName", 0);
 
+
+            //No index bc we don't know how long it might be
+            Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
+            Property(x => x.ItSystemKLENamesAsCsv).IsOptional();
+
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)
