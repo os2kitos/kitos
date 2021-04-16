@@ -22,7 +22,8 @@
             "user",
             "orgUnits",
             "kendoGridLauncherFactory",
-            "needsWidthFixService"
+            "needsWidthFixService",
+            "businessTypes"
         ];
 
         constructor(
@@ -32,7 +33,8 @@
             user,
             orgUnits: Array<Models.IOrganizationUnit>,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
-            needsWidthFixService: any) {
+            needsWidthFixService: any,
+            businessTypes: Array<Models.IOptionEntity>) {
             $rootScope.page.title = "IT System - Overblik";
 
             //Lookup maps
@@ -76,8 +78,9 @@
                         });
                     }
 
-                    //In terms of ordering user will expect ordering by name on this column, so we switch it around
+                    //In terms of ordering user will expect ordering by name on these columns, so we switch it around
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
+                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ItSystemBusinessTypeId", "ItSystemBusinessTypeName");
 
                     return parameterMap;
                 })
@@ -258,6 +261,24 @@
             launcher = launcher
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("ItSystemBusinessTypeId") //Using type id for better search performance and type id is used during sorting (in the parameter mapper)
+                        .withTitle("Forretningstype")
+                        .withId("busitype")
+                        .withStandardWidth(150)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            businessTypes.map((unit: any) => {
+                                return {
+                                    textValue: unit.Name,
+                                    remoteValue: unit.Id,
+                                };
+                            }),
+                            false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ItSystemBusinessTypeName))
+                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ItSystemBusinessTypeName)))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ItSystemRightsHolderName")
                         .withTitle("Rettighedshaver")
                         .withId("belongsto")
@@ -292,6 +313,13 @@
                             "$http", "user", "_",
                             ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
                                 .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                        ],
+                        businessTypes: [
+                            "localOptionServiceFactory",
+                            (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
+                                localOptionServiceFactory
+                                    .create(Services.LocalOptions.LocalOptionType.BusinessTypes)
+                                    .getAll()
                         ]
                     }
                 });

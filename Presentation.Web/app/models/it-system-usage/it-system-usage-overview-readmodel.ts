@@ -20,6 +20,8 @@
         RoleAssignments: IAssignedSystemUsageRole[];
         ResponsibleOrganizationUnitId: number | null;
         ResponsibleOrganizationUnitName: string | null;
-        ItSystemRightsHolderName : string | null;
+        ItSystemRightsHolderName: string | null;
+        ItSystemBusinessTypeId: number | null;
+        ItSystemBusinessTypeName: string | null;
     }
 }
