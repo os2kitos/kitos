@@ -36,6 +36,14 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _businessTypeService.Object);
         }
 
+        public static User defaultTestUser = new User
+        {
+            Id = 1,
+            Name = "test",
+            LastName = "tester",
+            Email = $"test@tester.dk"
+        };
+
         [Fact]
         public void Apply_Generates_Correct_Read_Model()
         {
@@ -107,7 +115,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     Title = A<string>(),
                     ExternalReferenceId = A<string>(),
                     URL = A<string>()
-                }
+                },
+                ObjectOwner = user,
+                LastChangedByUser = user,
+                LastChanged = A<DateTime>(),
+                Concluded = A<DateTime>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -141,6 +153,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
+            Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
+            Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
+            Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
+            Assert.Equal(systemUsage.Concluded, readModel.Concluded);
 
             //System
             Assert.Equal(system.Name, readModel.Name);
@@ -222,7 +238,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             {
                 Id = A<int>(),
                 OrganizationId = A<int>(),
-                ItSystem = system
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -248,7 +267,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 OrganizationId = A<int>(),
                 ItSystem = system,
                 Active = false,
-                ExpirationDate = DateTime.Now.AddDays(-1)
+                ExpirationDate = DateTime.Now.AddDays(-1),
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();

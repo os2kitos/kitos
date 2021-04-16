@@ -64,6 +64,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageVersion = A<string>();
             var systemUsageLocalCallName = A<string>();
             var systemUsageLocalSystemId = A<string>();
+            var concluded = A<DateTime>();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
@@ -97,7 +98,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 ExpirationDate = systemUsageExpirationDate,
                 Version = systemUsageVersion,
                 LocalCallName = systemUsageLocalCallName,
-                LocalSystemId = systemUsageLocalSystemId
+                LocalSystemId = systemUsageLocalSystemId,
+                Concluded = concluded
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
 
@@ -112,6 +114,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
 
+            //Get current system usage
+            var updatedSystemUsage = await ItSystemUsageHelper.GetItSystemUsageRequestAsync(systemUsage.Id);
+
             //Act 
             var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
 
@@ -125,6 +130,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemUsageActive, readModel.IsActive);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
+            Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
+            Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
+            Assert.Equal(concluded, readModel.Concluded);
+            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date);
 
             // From System
             Assert.Equal(systemName, readModel.Name);

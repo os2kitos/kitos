@@ -41,5 +41,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string LocalOverviewReferenceDocumentId { get; set; }
         public string LocalOverviewReferenceUrl { get; set; }
         public string LocalOverviewReferenceTitle { get; set; }
+
+        public string ObjectOwnerName { get; set; }
+        public string LastChangedByName { get; set; }
+        public DateTime LastChanged { get; set; } 
+        public DateTime? Concluded { get; set; }
     }
 }
