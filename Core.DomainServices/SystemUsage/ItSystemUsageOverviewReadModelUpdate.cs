@@ -51,12 +51,8 @@ namespace Core.DomainServices.SystemUsage
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.LocalOverviewReferenceTitle = source
-                .Reference
-                .FromNullable()
-                .Select(x => x.Title)
-                .Select(title => title.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)))
-                .GetValueOrDefault();
+            var title = source.Reference?.Title;
+            destination.LocalOverviewReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
             destination.LocalOverviewReferenceUrl = source.Reference?.URL;
             destination.LocalOverviewReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
