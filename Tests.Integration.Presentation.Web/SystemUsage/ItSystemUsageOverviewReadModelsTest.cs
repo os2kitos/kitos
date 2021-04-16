@@ -133,6 +133,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
             Assert.Equal(taskRef.TaskRef.TaskKey, readModel.ItSystemKLEIdsAsCsv);
             Assert.Equal(taskRef.TaskRef.Description, readModel.ItSystemKLENamesAsCsv);
+            var readTaskRef = Assert.Single(readModel.ItSystemTaskRefs);
+            Assert.Equal(taskRef.TaskRef.TaskKey, readTaskRef.KLEId);
+            Assert.Equal(taskRef.TaskRef.Description, readTaskRef.KLEName);
 
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);

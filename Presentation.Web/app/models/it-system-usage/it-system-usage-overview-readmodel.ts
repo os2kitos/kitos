@@ -12,11 +12,14 @@
         ItSystemDisabled: boolean;
         IsActive: boolean;
         ItSystemUuid: string;
-        LocalSystemId: string;
-        Version: string;
-        LocalCallName: string;
+        LocalSystemId: string | null;
+        Version: string | null;
+        LocalCallName: string | null;
         ParentItSystemId: number;
-        ParentItSystemName: string;
+        ParentItSystemName: string | null;
         RoleAssignments: IAssignedSystemUsageRole[];
+        ResponsibleOrganizationUnitId: number | null;
+        ResponsibleOrganizationUnitName: string | null;
+        ItSystemRightsHolderName : string | null;
     }
 }

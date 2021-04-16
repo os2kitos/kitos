@@ -22,14 +22,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeService;
 
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
             _businessTypeService = new Mock<IOptionsService<ItSystem, BusinessType>>();
+            _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
+                _taskRefRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -159,6 +162,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //KLE
             Assert.Equal(system.TaskRefs.First().TaskKey, readModel.ItSystemKLEIdsAsCsv);
             Assert.Equal(system.TaskRefs.First().Description, readModel.ItSystemKLENamesAsCsv);
+            var taskRef = Assert.Single(readModel.ItSystemTaskRefs);
+            Assert.Equal(system.TaskRefs.First().TaskKey, taskRef.KLEId);
+            Assert.Equal(system.TaskRefs.First().Description, taskRef.KLEName);
         }
 
         [Fact]

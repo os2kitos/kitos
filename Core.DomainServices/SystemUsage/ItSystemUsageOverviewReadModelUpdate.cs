@@ -15,13 +15,16 @@ namespace Core.DomainServices.SystemUsage
     {
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
 
-        private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository; 
+        private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
+            IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
+            _taskRefRepository = taskRefRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -69,10 +72,38 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
         }
 
-        private static void PatchKLE(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchKLE(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemKLEIdsAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey));
             destination.ItSystemKLENamesAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description));
+
+            static string CreateTaskRefKey(string KLEId, string KLEName) => $"I:{KLEId}N:{KLEName}";
+
+            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey, x.Description));
+
+            // Remove taskref which were removed
+            var taskRefsToBeRemoved =
+                destination.ItSystemTaskRefs
+                    .Where(x => incomingTaskRefs.ContainsKey(CreateTaskRefKey(x.KLEId, x.KLEName)) == false).ToList();
+
+            RemoveTaskRefs(destination, taskRefsToBeRemoved);
+
+            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId, x.KLEName));
+            foreach (var incomingTaskRef in source.ItSystem.TaskRefs.ToList())
+            {
+                if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey, incomingTaskRef.Description), out var taskRef))
+                {
+                    //Append the assignment if it is not already present
+                    taskRef = new ItSystemUsageOverviewTaskRefReadModel
+                    {
+                        Parent = destination,
+                        KLEId = incomingTaskRef.TaskKey,
+                        KLEName = incomingTaskRef.Description
+                    };
+                    destination.ItSystemTaskRefs.Add(taskRef);
+                }
+            }
+            _taskRefRepository.Save();
         }
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -129,6 +160,15 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.RoleAssignments.Remove(assignmentToBeRemoved);
                 _roleAssignmentRepository.Delete(assignmentToBeRemoved);
+            });
+        }
+
+        private void RemoveTaskRefs(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewTaskRefReadModel> taskRefsToBeRemoved)
+        {
+            taskRefsToBeRemoved.ForEach(taskRefToBeRemoved =>
+            {
+                destination.ItSystemTaskRefs.Remove(taskRefToBeRemoved);
+                _taskRefRepository.Delete(taskRefToBeRemoved);
             });
         }
 

@@ -15,7 +15,8 @@ module Kitos.Utility.KendoGrid {
 
     export enum KendoGridColumnDataSourceType {
         Date,
-        Boolean
+        Boolean,
+        Number
     }
 
     export interface IGridViewAccess<TDataSource> {
@@ -30,6 +31,7 @@ module Kitos.Utility.KendoGrid {
     export interface IKendoParameter {
         textValue: string;
         remoteValue: any;
+        optionalContext?: any;
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -39,7 +41,7 @@ module Kitos.Utility.KendoGrid {
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
@@ -56,6 +58,7 @@ module Kitos.Utility.KendoGrid {
         private filtering: KendoGridColumnFiltering = null;
         private valueRange: IKendoParameter[] = null;
         private valueRangeMultiSelect: boolean = false;
+        private valueRangeTemplate: (dataItem: any) => string = null;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
@@ -63,10 +66,11 @@ module Kitos.Utility.KendoGrid {
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
 
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean): IKendoGridColumnBuilder<TDataSource> {
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
             this.valueRange = possibleValues;
             this.valueRangeMultiSelect = multiSelect;
+            this.valueRangeTemplate = !!optionalTemplate ? optionalTemplate : null;
             return this;
         }
 
@@ -160,6 +164,8 @@ module Kitos.Utility.KendoGrid {
                         return map => map[this.dataSourceName] = { type: "boolean" };
                     case KendoGridColumnDataSourceType.Date:
                         return map => map[this.dataSourceName] = { type: "date" };
+                    case KendoGridColumnDataSourceType.Number:
+                        return map => map[this.dataSourceName] = { type: "number" };
                     default:
                         throw `Unmapped data source type ${this.dataSourceType}`;
                 }
@@ -206,12 +212,14 @@ module Kitos.Utility.KendoGrid {
                                         dataSource: valueRange.map(value => {
                                             return {
                                                 remoteValue: value.remoteValue,
-                                                text: value.textValue
+                                                text: value.textValue,
+                                                optionalContext: value.optionalContext
                                             };
                                         }),
                                         dataTextField: "text",
                                         dataValueField: "remoteValue",
-                                        valuePrimitive: true
+                                        valuePrimitive: true,
+                                        template: this.valueRangeTemplate
                                     });
                                 },
                                 showOperators: false,
@@ -268,7 +276,7 @@ module Kitos.Utility.KendoGrid {
     export interface IKendoToolbarDropDownEntry {
         id: string;
         text: string;
-        originalObject? : any;
+        originalObject?: any;
     }
 
     export interface IKendoToolbarDropDownConfiguration {
