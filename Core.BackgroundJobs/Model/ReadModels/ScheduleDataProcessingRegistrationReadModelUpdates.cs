@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.Contract;
@@ -146,12 +145,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 //Contract id is not stored in read model so search the source model
-                var contractName = _contractRepository.GetById(update.SourceId).Name;
-                var dataProcessingRegistrationReadModelIds = _readModelRepository.GetByContractName(contractName).Select(x => x.SourceEntityId);
                 var dataProcessingRegistrationIds = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id);
-                var ids = dataProcessingRegistrationReadModelIds.Concat(dataProcessingRegistrationIds).Distinct();
 
-                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, dataProcessingRegistrationIds, update, transaction);
             }
 
             return updatesExecuted;
