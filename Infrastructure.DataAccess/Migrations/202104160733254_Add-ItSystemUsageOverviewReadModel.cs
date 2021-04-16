@@ -3,10 +3,11 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Add_ItSystemUsageOverviewReadModel : DbMigration
+    public partial class AddItSystemUsageOverviewReadModel : DbMigration
     {
         public override void Up()
         {
+            DropIndex("dbo.TaskRef", "UX_TaskKey");
             CreateTable(
                 "dbo.ItSystemUsageOverviewReadModels",
                 c => new
@@ -52,6 +53,21 @@
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             
             CreateTable(
+                "dbo.ItSystemUsageOverviewTaskRefReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        KLEId = c.String(maxLength: 15),
+                        KLEName = c.String(maxLength: 150),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.KLEId, name: "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId")
+                .Index(t => t.KLEName, name: "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName")
+                .Index(t => t.ParentId);
+            
+            CreateTable(
                 "dbo.ItSystemUsageOverviewRoleAssignmentReadModels",
                 c => new
                     {
@@ -75,6 +91,8 @@
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
             AlterColumn("dbo.AgreementElementTypes", "Name", c => c.String(nullable: false, maxLength: 150));
             AlterColumn("dbo.GoalTypes", "Name", c => c.String(nullable: false, maxLength: 150));
+            AlterColumn("dbo.TaskRef", "TaskKey", c => c.String(maxLength: 15));
+            AlterColumn("dbo.TaskRef", "Description", c => c.String(maxLength: 150));
             AlterColumn("dbo.OrganizationUnitRoles", "Name", c => c.String(nullable: false, maxLength: 150));
             AlterColumn("dbo.ItProjectTypes", "Name", c => c.String(nullable: false, maxLength: 150));
             AlterColumn("dbo.ItProjectRoles", "Name", c => c.String(nullable: false, maxLength: 150));
@@ -104,6 +122,7 @@
             CreateIndex("dbo.ItSystemUsage", "LocalSystemId", name: "ItSystemUsage_Index_LocalSystemId");
             CreateIndex("dbo.ItSystemUsage", "Version", name: "ItSystemUsage_Index_Version");
             CreateIndex("dbo.ItSystemUsage", "LocalCallName", name: "ItSystemUsage_Index_LocalCallName");
+            CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }
         
         public override void Down()
@@ -111,11 +130,16 @@
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "SourceEntityId", "dbo.ItSystemUsage");
             DropForeignKey("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
+            DropForeignKey("dbo.ItSystemUsageOverviewTaskRefReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
+            DropIndex("dbo.TaskRef", "UX_TaskKey");
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "Email" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserFullName" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "RoleId" });
+            DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
+            DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
@@ -160,13 +184,17 @@
             AlterColumn("dbo.ItProjectRoles", "Name", c => c.String(nullable: false));
             AlterColumn("dbo.ItProjectTypes", "Name", c => c.String(nullable: false));
             AlterColumn("dbo.OrganizationUnitRoles", "Name", c => c.String(nullable: false));
+            AlterColumn("dbo.TaskRef", "Description", c => c.String());
+            AlterColumn("dbo.TaskRef", "TaskKey", c => c.String(maxLength: 50));
             AlterColumn("dbo.GoalTypes", "Name", c => c.String(nullable: false));
             AlterColumn("dbo.AgreementElementTypes", "Name", c => c.String(nullable: false));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String());
             DropTable("dbo.ItSystemUsageOverviewRoleAssignmentReadModels");
+            DropTable("dbo.ItSystemUsageOverviewTaskRefReadModels");
             DropTable("dbo.ItSystemUsageOverviewReadModels");
+            CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }
     }
 }
