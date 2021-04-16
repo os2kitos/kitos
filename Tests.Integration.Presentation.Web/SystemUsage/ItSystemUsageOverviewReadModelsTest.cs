@@ -133,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
             Assert.Equal(concluded, readModel.Concluded);
-            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date);
+            Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date); // Lastchanged seem to update a few seconds later than the actual updates. So the readmodel is not always up to date on the seconds level
 
             // From System
             Assert.Equal(systemName, readModel.Name);
