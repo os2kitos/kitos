@@ -149,7 +149,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 var systemIds = _itSystemRepository.GetByTaskRefId(update.SourceId).Select(x => x.Id).ToList();
 
-                var ids = _itSystemUsageRepository.GetBySystemIds(systemIds).Select(x => x.Id);
+                var ids = _itSystemUsageRepository.GetBySystemIds(systemIds).Select(x => x.Id).ToList();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
