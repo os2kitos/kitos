@@ -159,7 +159,7 @@
                         ],
                             false)
                         .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
-                        .withExcelOutput(dataItem => dataItem.IsActive ? "Ja" : "Nej"))
+                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig"))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
@@ -198,7 +198,7 @@
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
-                        .withExcelOutput(dataItem => dataItem.Name))
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Version")
@@ -237,8 +237,8 @@
                             }),
                             false,
                             dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
-                        .withRendering(dataItem => dataItem.ResponsibleOrganizationUnitName)
-                        .withExcelOutput(dataItem => dataItem.ResponsibleOrganizationUnitName))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
+                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
                 .withStandardSorting("Name");
 
             systemRoles.forEach(role =>
@@ -254,6 +254,17 @@
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.Id]))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.Id])))
             );
+
+            launcher = launcher
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ItSystemRightsHolderName")
+                        .withTitle("Rettighedshaver")
+                        .withId("belongsto")
+                        .withStandardWidth(210)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput());
 
             //Launch kendo grid
             launcher.launch();
