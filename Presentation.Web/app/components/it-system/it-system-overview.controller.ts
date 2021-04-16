@@ -82,6 +82,12 @@
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ItSystemBusinessTypeId", "ItSystemBusinessTypeName");
 
+                    if (parameterMap.$filter) {
+                        //Redirect KLE filtering searchable sub collections
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)");
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
+                    }
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -285,7 +291,7 @@
                         .withTitle("KLE ID")
                         .withId("taskkey")
                         .withStandardWidth(150)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains) //TODO: Switch to startswith once collection is ready
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.StartsWith)
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
