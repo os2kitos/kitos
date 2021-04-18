@@ -1,5 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -28,7 +30,9 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<TaskRef>>,
     IDomainEventHandler<EntityDeletedEvent<ExternalReference>>,
     IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
-    IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>
+    IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
+    IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
+    IDomainEventHandler<EntityDeletedEvent<ItContract>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -113,6 +117,16 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityUpdatedEvent<TaskRef> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_TaskRef));
+        }
+
+        public void Handle(EntityUpdatedEvent<ItContract> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
+        }
+
+        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
         }
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);

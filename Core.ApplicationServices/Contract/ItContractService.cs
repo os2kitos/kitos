@@ -94,6 +94,7 @@ namespace Core.ApplicationServices.Contract
                         return deleteByContractId.Error;
                     }
                     _domainEvents.Raise(new ContractDeleted(contract));
+                    _domainEvents.Raise(new EntityDeletedEvent<ItContract>(contract)); // Don't need the contract itself for the ItSystemUsageOverviewReadModel updates.
                     _repository.DeleteContract(contract);
 
                     transaction.Commit();

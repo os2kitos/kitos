@@ -90,5 +90,19 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.ItSystemBusinessTypeId == businessTypeId);
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.MainContractId == contractId);
+        }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByContractSupplierId(int contractSupplierId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.MainContractSupplierId == contractSupplierId);
+        }
     }
 }

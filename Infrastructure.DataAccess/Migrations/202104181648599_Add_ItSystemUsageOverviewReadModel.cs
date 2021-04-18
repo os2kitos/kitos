@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddItSystemUsageOverviewReadModel : DbMigration
+    public partial class Add_ItSystemUsageOverviewReadModel : DbMigration
     {
         public override void Up()
         {
@@ -39,6 +39,10 @@
                         LastChangedByName = c.String(maxLength: 100),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
+                        MainContractId = c.Int(),
+                        MainContractName = c.String(maxLength: 200),
+                        MainContractSupplierId = c.Int(),
+                        MainContractSupplierName = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -60,7 +64,9 @@
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
                 .Index(t => t.LocalOverviewReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle")
                 .Index(t => t.ObjectOwnerName, name: "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName")
-                .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
+                .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName")
+                .Index(t => t.MainContractName, name: "ItSystemUsageOverviewReadModel_Index_MainContractName")
+                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewTaskRefReadModels",
@@ -150,6 +156,8 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");

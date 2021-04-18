@@ -177,5 +177,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return response;
         }
+
+        public static async Task<HttpResponseMessage> SendSetMainContractRequestAsync(int systemUsageId, int contractId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.PostWithCookieAsync(
+                    TestEnvironment.CreateUrl($"api/ItContractItSystemUsage/?contractId={contractId}&usageId={systemUsageId}"),
+                    cookie,
+                    new { } // No body for this call
+                    );
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return response;
+        }
     }
 }

@@ -18,7 +18,8 @@ namespace Core.DomainModel.BackgroundJobs
         ItSystemUsage_OrganizationUnit = 11,
         ItSystemUsage_Organization = 12,
         ItSystemUsage_BusinessType = 13,
-        ItSystemUsage_TaskRef = 14
+        ItSystemUsage_TaskRef = 14,
+        ItSystemUsage_Contract = 15
     }
 
     public class PendingReadModelUpdate
