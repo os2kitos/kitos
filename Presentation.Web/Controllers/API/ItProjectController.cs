@@ -15,6 +15,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Extensions;
@@ -31,19 +32,22 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IDomainEvents _domainEvents;
 
         public ItProjectController(
             IGenericRepository<ItProject> repository,
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
+            IDomainEvents domainEvents)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _orgUnitRepository = orgUnitRepository;
+            _domainEvents = domainEvents;
         }
 
         /// <summary>
@@ -426,6 +430,7 @@ namespace Presentation.Web.Controllers.API
                 project.ItSystemUsages.Add(systemUsage);
 
                 Repository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Created(Map<ItSystemUsage, ItSystemUsageDTO>(systemUsage));
             }
@@ -459,6 +464,7 @@ namespace Presentation.Web.Controllers.API
 
                 project.ItSystemUsages.Remove(systemUsage);
                 Repository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Ok();
             }

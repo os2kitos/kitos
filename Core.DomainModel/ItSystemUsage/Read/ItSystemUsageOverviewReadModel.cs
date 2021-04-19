@@ -13,6 +13,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
+            ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
         }
 
         public int OrganizationId { get; set; }

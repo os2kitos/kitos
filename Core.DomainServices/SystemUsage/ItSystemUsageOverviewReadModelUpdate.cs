@@ -19,16 +19,19 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository; 
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
             IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
             IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
+            IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
+            _itProjectReadModelRepository = itProjectReadModelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -62,11 +65,37 @@ namespace Core.DomainServices.SystemUsage
             PatchItProjects(source, destination);
         }
 
-        private static void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
 
+            static string CreateItProjectKey(int Id, string Name) => $"I:{Id}N:{Name}";
 
+            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id, x.Name));
+
+            // Remove It Projects which were removed
+            var itProjectsToBeRemoved =
+                destination.ItProjects
+                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId, x.ItProjectName)) == false).ToList();
+
+            RemoveItProjects(destination, itProjectsToBeRemoved);
+
+            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId, x.ItProjectName));
+            foreach (var incomingItProject in source.ItProjects.ToList())
+            {
+                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id, incomingItProject.Name), out var itProject))
+                {
+                    //Append the sensitive data levels if it is not already present
+                    itProject = new ItSystemUsageOverviewItProjectReadModel
+                    {
+                        Parent = destination,
+                        ItProjectId = incomingItProject.Id,
+                        ItProjectName = incomingItProject.Name
+                    };
+                    destination.ItProjects.Add(itProject);
+                }
+            }
+            _itProjectReadModelRepository.Save();
         }
 
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -75,8 +104,8 @@ namespace Core.DomainServices.SystemUsage
 
             var incomingSensitiveDataLevels = source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).ToList();
 
-            // Remove taskref which were removed
-            var sensitiveDataLevelsToBeRemoved = destination.SensitiveDataLevels.Where(x => incomingSensitiveDataLevels.Contains(x.SensitivityDataLevel)).ToList();
+            // Remove sensitive data levels which were removed
+            var sensitiveDataLevelsToBeRemoved = destination.SensitiveDataLevels.Where(x => incomingSensitiveDataLevels.Contains(x.SensitivityDataLevel) == false).ToList();
 
             RemoveSensitiveDataLevels(destination, sensitiveDataLevelsToBeRemoved);
 
@@ -85,7 +114,7 @@ namespace Core.DomainServices.SystemUsage
             {
                 if (!existingSensitiveDataLevels.Contains(incomingSensitiveDataLevel))
                 {
-                    //Append the assignment if it is not already present
+                    //Append the sensitive data levels if it is not already present
                     var sensitiveDataLevel = new ItSystemUsageOverviewSensitiveDataLevelReadModel
                     {
                         Parent = destination,
@@ -146,7 +175,7 @@ namespace Core.DomainServices.SystemUsage
             {
                 if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey, incomingTaskRef.Description), out var taskRef))
                 {
-                    //Append the assignment if it is not already present
+                    //Append the taskref if it is not already present
                     taskRef = new ItSystemUsageOverviewTaskRefReadModel
                     {
                         Parent = destination,
@@ -230,6 +259,15 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.SensitiveDataLevels.Remove(sensitiveDataLevelToBeRemoved);
                 _sensitiveDataLevelRepository.Delete(sensitiveDataLevelToBeRemoved);
+            });
+        }
+
+        private void RemoveItProjects(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewItProjectReadModel> itProjectsToBeRemoved)
+        {
+            itProjectsToBeRemoved.ForEach(itProjectToBeRemoved =>
+            {
+                destination.ItProjects.Remove(itProjectToBeRemoved);
+                _itProjectReadModelRepository.Delete(itProjectToBeRemoved);
             });
         }
 
