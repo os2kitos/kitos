@@ -61,6 +61,13 @@ namespace Core.DomainServices.SystemUsage
             PatchItProjects(source, destination);
         }
 
+        private static void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
+
+
+        }
+
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.SensitiveDataLevelsAsCsv = string.Join(", ", source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.ToString()));
@@ -88,15 +95,6 @@ namespace Core.DomainServices.SystemUsage
             }
             _sensitiveDataLevelRepository.Save();
         }
-
-        private static void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
-        {
-            destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
-
-
-        }
-
-        
 
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {

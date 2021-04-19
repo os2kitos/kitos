@@ -11,6 +11,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -26,6 +27,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IReferenceService> _referenceService;
+        private readonly Mock<IDomainEvents> _domainEvents;
 
         public ItProjectServiceTest()
         {
@@ -35,13 +37,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _userRepository = new Mock<IUserRepository>();
             _transactionManager = new Mock<ITransactionManager>();
             _referenceService = new Mock<IReferenceService>();
+            _domainEvents = new Mock<IDomainEvents>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
                 _specificProjectRepo.Object,
                 _userRepository.Object,
                 _referenceService.Object,
-                _transactionManager.Object);
+                _transactionManager.Object,
+                _domainEvents.Object);
         }
 
         [Fact]
