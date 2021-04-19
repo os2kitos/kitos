@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
@@ -20,6 +21,7 @@ namespace Core.BackgroundJobs.Services
         private readonly ScheduleDataProcessingRegistrationReadModelUpdates _scheduleDataProcessingRegistrationReadModelUpdates;
         private readonly RebuildItSystemUsageOverviewReadModelsBatchJob _rebuildItSystemUsageOverviewReadModels;
         private readonly ScheduleItSystemUsageOverviewReadModelUpdates _scheduleItSystemUsageOverviewReadModelUpdates;
+        private readonly IRebuildReadModelsJobFactory _rebuildReadModelsJobFactory;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -28,7 +30,8 @@ namespace Core.BackgroundJobs.Services
             RebuildDataProcessingRegistrationReadModelsBatchJob rebuildDataProcessingRegistrationReadModels,
             ScheduleDataProcessingRegistrationReadModelUpdates scheduleDataProcessingRegistrationReadModelUpdates,
             RebuildItSystemUsageOverviewReadModelsBatchJob rebuildItSystemUsageOverviewReadModels,
-            ScheduleItSystemUsageOverviewReadModelUpdates scheduleItSystemUsageOverviewReadModelUpdates)
+            ScheduleItSystemUsageOverviewReadModelUpdates scheduleItSystemUsageOverviewReadModelUpdates,
+            IRebuildReadModelsJobFactory rebuildReadModelsJobFactory)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -36,6 +39,7 @@ namespace Core.BackgroundJobs.Services
             _scheduleDataProcessingRegistrationReadModelUpdates = scheduleDataProcessingRegistrationReadModelUpdates;
             _rebuildItSystemUsageOverviewReadModels = rebuildItSystemUsageOverviewReadModels;
             _scheduleItSystemUsageOverviewReadModelUpdates = scheduleItSystemUsageOverviewReadModelUpdates;
+            _rebuildReadModelsJobFactory = rebuildReadModelsJobFactory;
             _purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
         }
 
@@ -67,6 +71,12 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default)
         {
             await Launch(_rebuildItSystemUsageOverviewReadModels, token);
+        }
+
+        public async Task LaunchFullReadModelRebuild(ReadModelRebuildScope scope, CancellationToken token)
+        {
+            var job = _rebuildReadModelsJobFactory.CreateRebuildJob(scope);
+            await Launch(job, token);
         }
 
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
