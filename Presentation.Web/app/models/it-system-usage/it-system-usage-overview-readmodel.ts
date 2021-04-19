@@ -30,5 +30,8 @@
         ItSystemBusinessTypeId: number | null;
         ItSystemBusinessTypeName: string | null;
         ItSystemTaskRefs: IItSystemUsageOverviewTaskRefReadModel[];
+        LocalReferenceDocumentId: string | null;
+        LocalReferenceUrl: string | null;
+        LocalReferenceTitle: string | null;
     }
 }

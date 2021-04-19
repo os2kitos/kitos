@@ -308,6 +308,27 @@
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("LocalReferenceTitle")
+                        .withTitle("Lokal Reference")
+                        .withId("ReferenceId")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Left)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LocalReferenceDocumentId")
+                        .withTitle("Dokument ID / Sagsnr.")
+                        .withId("folderref")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ItSystemRightsHolderName")
                         .withTitle("Rettighedshaver")
                         .withId("belongsto")
@@ -315,7 +336,6 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput());
-
 
             //Launch kendo grid
             launcher.launch();
