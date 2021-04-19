@@ -343,6 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
@@ -411,6 +412,7 @@
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
     <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
