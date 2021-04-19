@@ -61,5 +61,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public string ItProjectNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
+
+        public ArchiveDutyTypes? ArchiveDuty { get; set; }
+        public bool? Registertype { get; set; }
+        public DateTime? ArchivePeriodEndDate { get; set; }
+
     }
 }

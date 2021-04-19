@@ -52,6 +52,8 @@ namespace Core.DomainServices.SystemUsage
             destination.LastChangedByName = GetUserFullName(source.LastChangedByUser);
             destination.LastChanged = source.LastChanged;
             destination.Concluded = source.Concluded;
+            destination.ArchiveDuty = source.ArchiveDuty;
+            destination.Registertype = source.Registertype;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
@@ -63,6 +65,28 @@ namespace Core.DomainServices.SystemUsage
             PatchMainContract(source, destination);
             PatchSensitiveDataLevels(source, destination);
             PatchItProjects(source, destination);
+            PatchArchivePeriodEndDate(source, destination);
+        }
+
+        private void PatchArchivePeriodEndDate(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            ArchivePeriod archivePeriodWithEarliestStartDate = null;
+            var today = DateTime.Now;
+            foreach (var archivePeriod in source.ArchivePeriods)
+            {
+                if(today >= archivePeriod.StartDate && today <= archivePeriod.EndDate)
+                {
+                    if(archivePeriodWithEarliestStartDate == null)
+                    {
+                        archivePeriodWithEarliestStartDate = archivePeriod;
+                    }
+                    else if(archivePeriodWithEarliestStartDate?.StartDate > archivePeriod.StartDate)
+                    {
+                        archivePeriodWithEarliestStartDate = archivePeriod;
+                    }
+                }
+            }
+            destination.ArchivePeriodEndDate = archivePeriodWithEarliestStartDate?.EndDate;
         }
 
         private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

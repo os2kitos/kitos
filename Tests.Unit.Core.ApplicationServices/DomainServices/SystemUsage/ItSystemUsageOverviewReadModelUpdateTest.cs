@@ -150,7 +150,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ItProjects = new List<ItProject> 
                 { 
                     project 
-                }
+                },
+                ArchiveDuty = A<ArchiveDutyTypes>(),
+                Registertype = A<bool>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -189,6 +191,19 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
             systemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { sensitiveDataLevel };
 
+            // Add ArchivePeriod
+            var archivePeriods = new List<ArchivePeriod>
+            {
+                new ArchivePeriod
+                {
+                    Id = A<int>(),
+                    ItSystemUsage = systemUsage,
+                    StartDate = DateTime.Now.AddDays(-1),
+                    EndDate = DateTime.Now.AddDays(1)
+                }
+            };
+            systemUsage.ArchivePeriods = archivePeriods;
+
             var readModel = new ItSystemUsageOverviewReadModel();
 
             //Act
@@ -208,6 +223,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
             Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
+            Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
+            Assert.Equal(systemUsage.Registertype, readModel.Registertype);
+            Assert.Equal(archivePeriods.First().EndDate, readModel.ArchivePeriodEndDate);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -320,6 +338,60 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             Assert.Null(readModel.ParentItSystemName);
             Assert.Null(readModel.ParentItSystemId);
+        }
+
+        [Fact]
+        public void Apply_Generates_ArchivePeriodEndDate_By_Earliest_StartDate_Of_Still_Valid_ArchivePeriod()
+        {
+            //Arrange
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>()
+            };
+            var earliestStartDate = DateTime.Now.AddYears(-1);
+            var endDateOfEarlistStartDate = DateTime.Now.AddDays(A<int>());
+            var archivePeriods = new List<ArchivePeriod>
+            {
+                new ArchivePeriod
+                {
+                    Id = A<int>(),
+                    ItSystemUsage = systemUsage,
+                    StartDate = DateTime.Now.AddDays(-1),
+                    EndDate = DateTime.Now.AddDays(1)
+                },
+                new ArchivePeriod
+                {
+                    Id = A<int>(),
+                    ItSystemUsage = systemUsage,
+                    StartDate = earliestStartDate,
+                    EndDate = endDateOfEarlistStartDate
+                },
+                new ArchivePeriod
+                {
+                    Id = A<int>(),
+                    ItSystemUsage = systemUsage,
+                    StartDate = DateTime.Now.AddDays(-30),
+                    EndDate = endDateOfEarlistStartDate.AddDays(A<int>())
+                },
+            };
+            systemUsage.ArchivePeriods = archivePeriods;
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Equal(endDateOfEarlistStartDate, readModel.ArchivePeriodEndDate);
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

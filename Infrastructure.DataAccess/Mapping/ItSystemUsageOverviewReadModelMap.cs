@@ -95,6 +95,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName", 0);
 
+            Property(x => x.ArchiveDuty)
+               .IsOptional()
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
+
+            Property(x => x.Registertype)
+                .IsOptional()
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Registertype", 0);
+
+
+
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
