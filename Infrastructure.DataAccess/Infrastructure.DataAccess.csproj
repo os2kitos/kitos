@@ -72,6 +72,7 @@
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
