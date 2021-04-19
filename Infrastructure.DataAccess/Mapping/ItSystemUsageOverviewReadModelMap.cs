@@ -66,9 +66,15 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle", 0);
 
+            Property(x => x.ObjectOwnerId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerId", 0);
+
             Property(x => x.ObjectOwnerName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerName", 0);
+
+            Property(x => x.LastChangedById)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedById", 0);
 
             Property(x => x.LastChangedByName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
