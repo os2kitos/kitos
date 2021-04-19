@@ -209,7 +209,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
             Assert.Equal(sensitiveDataLevel.SensitivityDataLevel, rmSensitiveDataLevel.SensitivityDataLevel);
-            Assert.Equal(sensitiveDataLevel.SensitivityDataLevel.ToString(), readModel.SensitiveDataLevelsAsCsv);
+            Assert.Equal(sensitiveDataLevel.SensitivityDataLevel.GetReadableName(), readModel.SensitiveDataLevelsAsCsv);
 
             //System
             Assert.Equal(system.Name, readModel.Name);
