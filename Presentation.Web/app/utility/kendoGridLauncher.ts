@@ -61,7 +61,7 @@ module Kitos.Utility.KendoGrid {
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
-        private standardWidth: number = 200;
+        private standardWidth: number = 150;
         private dataSourceName: string = null;
         private title: string = null;
         private filtering: KendoGridColumnFiltering = null;

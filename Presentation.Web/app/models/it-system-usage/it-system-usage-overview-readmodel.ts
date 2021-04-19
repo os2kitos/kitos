@@ -33,5 +33,9 @@
         LocalReferenceDocumentId: string | null;
         LocalReferenceUrl: string | null;
         LocalReferenceTitle: string | null;
+        ObjectOwnerName: string | null;
+        LastChangedByName: string | null;
+        LastChanged: Date | null;
+        Concluded: Date | null;
     }
 }

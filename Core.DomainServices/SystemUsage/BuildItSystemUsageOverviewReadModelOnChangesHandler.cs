@@ -55,7 +55,10 @@ namespace Core.DomainServices.SystemUsage
 
             BuildFromSource(model, domainEvent.Entity);
 
-            _readModelRepository.Add(model);
+            _readModelRepository.Add(model); //Add one immediately
+
+            //Schedule additional update to refresh once deferred updates are applied
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage));
         }
 
         public void Handle(EntityUpdatedEvent<ItSystemUsage> domainEvent)
