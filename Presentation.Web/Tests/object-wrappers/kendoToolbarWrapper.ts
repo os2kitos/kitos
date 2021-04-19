@@ -26,7 +26,6 @@ type InputFields =
 };
 
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder,
     referenceName: protractor.ElementFinder,
     referenceId: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
@@ -97,7 +96,6 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnHeaders = {
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),

@@ -1,6 +1,5 @@
 ﻿class Constants {
-    readonly kendoSystemNameHeader = "systemNameKendoHeader";
-    readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoSystemNameObjects = "sysnameKendoObject";
     readonly kendoReportNameObjects = "reportNameKendoObject";
     readonly kendoProjectNameObjects = "projectNameKendoObject";
     readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
