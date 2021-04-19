@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Infrastructure.Services.Types;
@@ -39,6 +40,12 @@ namespace Core.DomainServices.SystemUsage
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
             destination.ItSystemUuid = source.ItSystem.Uuid.ToString("D");
+            destination.ObjectOwnerId = source.ObjectOwnerId;
+            destination.ObjectOwnerName = GetUserFullName(source.ObjectOwner);
+            destination.LastChangedById = source.LastChangedByUserId;
+            destination.LastChangedByName = GetUserFullName(source.LastChangedByUser);
+            destination.LastChanged = source.LastChanged;
+            destination.Concluded = source.Concluded;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
@@ -142,8 +149,7 @@ namespace Core.DomainServices.SystemUsage
                     destination.RoleAssignments.Add(assignment);
                 }
 
-                var fullName = incomingRight.User.GetFullName();
-                assignment.UserFullName = fullName.TrimEnd().Substring(0, Math.Min(fullName.Length, 100));
+                assignment.UserFullName = GetUserFullName(incomingRight.User); 
                 assignment.Email = incomingRight.User.Email;
             }
 
@@ -185,6 +191,12 @@ namespace Core.DomainServices.SystemUsage
             }
 
             return null;
+        }
+
+        private static string GetUserFullName(User user)
+        {
+            var fullName = user?.GetFullName();
+            return fullName?.TrimEnd().Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));
         }
 
     }

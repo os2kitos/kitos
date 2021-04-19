@@ -12,7 +12,6 @@ using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models;
-using Presentation.Web.Models.GDPR;
 using Presentation.Web.Models.ItSystemUsage;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
@@ -27,6 +26,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,ItSystemTaskRefs&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
+        }
+
+        public static async Task<ItSystemUsageDTO> GetItSystemUsageRequestAsync(int systemUsageId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var okResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystemusage/{systemUsageId}"), cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+            }
         }
 
         public static async Task<ItSystemUsageSensitiveDataLevelDTO> AddSensitiveDataLevel(int systemUsageId, SensitiveDataLevel sensitiveDataLevel)
