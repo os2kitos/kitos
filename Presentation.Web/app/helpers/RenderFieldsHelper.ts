@@ -14,16 +14,12 @@
 
         static renderReference(referenceTitle: string, referenceUrl: string) {
             if (referenceTitle === null || _.isUndefined(referenceTitle)) {
-                if (Utility.Validation.isValidExternalReference(referenceUrl)) {
-                    return `<a target="_blank" style="float:left;" href="${referenceUrl}">${referenceUrl}</a>`;
-                } else {
-                    return RenderFieldsHelper.noValueFallback;
-                }
+                referenceTitle = referenceUrl;
             }
             if (Utility.Validation.isValidExternalReference(referenceUrl)) {
                 return `<a target="_blank" style="float:left;" href="${referenceUrl}">${referenceTitle}</a>`;
             }
-            return referenceTitle;
+            return referenceTitle || this.noValueFallback;
         }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {

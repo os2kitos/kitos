@@ -35,6 +35,12 @@ module Kitos.Utility.KendoGrid {
         optionalContext?: any;
     }
 
+    export enum KendoColumnAlignment {
+        Left,
+        Right,
+        Center
+    }
+
     export interface IKendoGridColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
@@ -50,11 +56,11 @@ module Kitos.Utility.KendoGrid {
         withContentOverflow(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
-
         private standardWidth: number = 200;
         private dataSourceName: string = null;
         private title: string = null;
@@ -69,6 +75,12 @@ module Kitos.Utility.KendoGrid {
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
         private contentOverflow : boolean | null = null;
+        private contentAlignment : KendoColumnAlignment | null = null;
+
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource> {
+            this.contentAlignment = alignment;
+            return this;
+        }
 
         withContentOverflow(): IKendoGridColumnBuilder<TDataSource> {
             this.contentOverflow = true;
@@ -263,8 +275,28 @@ module Kitos.Utility.KendoGrid {
             const attributes = {
                 "data-element-type": `${this.id}KendoObject`
             };
+
+            const classes : string[] = [];
             if (this.contentOverflow) {
-                attributes["class"] = "might-overflow";
+                classes.push("might-overflow");
+            }
+            if (this.contentAlignment != null) {
+                switch (this.contentAlignment) {
+                    case KendoColumnAlignment.Left:
+                        classes.push("text-left");
+                        break;
+                    case KendoColumnAlignment.Right:
+                        classes.push("text-right");
+                        break;
+                    case KendoColumnAlignment.Center:
+                        classes.push("text-center");
+                    break;
+                    default:
+                        throw `Unsupported alignment type:${this.contentAlignment}`;
+                }
+            }
+            if (classes.length > 0) {
+                attributes["class"] = classes.join(" ");
             }
             return {
                 field: this.dataSourceName,
