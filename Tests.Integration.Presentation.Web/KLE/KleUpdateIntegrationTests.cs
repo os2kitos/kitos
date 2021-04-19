@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -13,6 +14,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using ExpectedObjects;
 using Infrastructure.DataAccess;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -22,6 +24,9 @@ namespace Tests.Integration.Presentation.Web.KLE
 {
     public class KleUpdateIntegrationTests : WithAutoFixture
     {
+        private static readonly ConcurrentStack<int> TestKeys =
+            Enumerable.Range(0, 999999).FromNullable().Select(x => new ConcurrentStack<int>(x)).Value;
+
         [Theory]
         [InlineData(OrganizationRole.LocalAdmin)]
         [InlineData(OrganizationRole.User)]
@@ -105,22 +110,6 @@ namespace Tests.Integration.Presentation.Web.KLE
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-            }
-        }
-
-        [Fact]
-        public async Task GlobalAdmin_Can_Put_Kle_Update()
-        {
-            //Arrange
-            var url = TestEnvironment.CreateUrl($"api/v1/kle/update?organizationId={TestEnvironment.DefaultOrganizationId}");
-            var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            ResetKleHistory();
-
-            //Act
-            using (var response = await HttpApi.PutWithCookieAsync(url, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
 
@@ -611,7 +600,11 @@ namespace Tests.Integration.Presentation.Web.KLE
 
         private TaskRef CreateTaskRef(int? objectOwnerId, int organizationUnitId)
         {
-            return new TaskRef { TaskKey = A<string>(), ObjectOwnerId = objectOwnerId, LastChangedByUserId = objectOwnerId, OwnedByOrganizationUnitId = organizationUnitId };
+            if (TestKeys.TryPop(out var nextKey))
+            {
+                return new TaskRef { TaskKey = nextKey.ToString(), ObjectOwnerId = objectOwnerId, LastChangedByUserId = objectOwnerId, OwnedByOrganizationUnitId = organizationUnitId };
+            }
+            throw new InvalidOperationException("Unable to get more keys");
         }
 
         private static TaskUsage CreateTaskUsage(TaskRef taskRef1, int? objectOwnerId, int organizationUnitId)
