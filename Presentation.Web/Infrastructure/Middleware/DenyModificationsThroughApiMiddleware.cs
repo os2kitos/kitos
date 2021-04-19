@@ -18,7 +18,7 @@ namespace Presentation.Web.Infrastructure.Middleware
             var kernel = context.GetNinjectKernel();
             var logger = kernel.Get<ILogger>();
             var authenticationContext = kernel.Get<IAuthenticationContext>();
-            if (authenticationContext.Method == AuthenticationMethod.KitosToken && IsMutationAttempt(context))
+            if (IsKitosTokenAuthenticated(authenticationContext) && IsIllegalMutationAttempt(context))
             {
                 logger.Warning("User with id: {userID} attempted to mutate resource: {url} by method {method}",
                     authenticationContext.UserId, context.Request.Uri.ToString(), context.Request.Method);
@@ -31,9 +31,19 @@ namespace Presentation.Web.Infrastructure.Middleware
             }
         }
 
-        private static bool IsMutationAttempt(IOwinContext context)
+        private static bool IsKitosTokenAuthenticated(IAuthenticationContext authenticationContext)
         {
-            return context.Request.Method.IsMutation();
+            return authenticationContext.Method == AuthenticationMethod.KitosToken;
+        }
+
+        private static bool IsIllegalMutationAttempt(IOwinContext context)
+        {
+            return (context.Request.Method.IsMutation() && IsNotExternalApiUsage(context));
+        }
+
+        private static bool IsNotExternalApiUsage(IOwinContext context)
+        {
+            return !context.Request.Uri.AbsoluteUri.Contains("/api/v2");
         }
     }
 }

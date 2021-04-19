@@ -214,6 +214,9 @@
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.6.0\lib\net40\Swashbuckle.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Swashbuckle.Examples, Version=3.12.0.0, Culture=neutral, PublicKeyToken=aa1e9c5053bfbe95, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.Examples.3.12.0\lib\net40\Swashbuckle.Examples.dll</HintPath>
+    </Reference>
     <Reference Include="Swashbuckle.OData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2e252c86e553959, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Swashbuckle.OData.Core.1.0.0\lib\net452\Swashbuckle.OData.dll</HintPath>
@@ -343,6 +346,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
+    <Compile Include="Controllers\External\V2\GeneralController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
@@ -370,6 +376,12 @@
     <Content Include="app\shared\selectOrgUnit\select2OrgUnit.view.html" />
     <Content Include="app\shared\selectRole\selectRole.view.html" />
     <Content Include="app\shared\selectSimple\selectSimple.view.html" />
+    <Content Include="Content\bootstrap-responsive.css" />
+    <Content Include="Content\bootstrap-responsive.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\glyphicons-halflings-white.png" />
+    <Content Include="Content\images\glyphicons-halflings.png" />
     <Content Include="idp-metadata\sts-adgangstyring-prod.xml" />
     <Content Include="idp-metadata\sts-adgangstyring-test.xml" />
     <Content Include="Logout.ashx" />
@@ -404,6 +416,8 @@
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
+    <Compile Include="Models\External\ExternalIdentityNamePairDTO.cs" />
+    <Compile Include="Models\External\ExternalItSystemDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
@@ -1434,6 +1448,13 @@
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\appReport-bundle.min.js" />
+    <None Include="Scripts\jquery-1.8.3.intellisense.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery-1.8.3.js" />
+    <Content Include="Scripts\jquery-1.8.3.min.js" />
+    <Content Include="Scripts\knockout-2.2.1.debug.js" />
+    <Content Include="Scripts\knockout-2.2.1.js" />
     <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />

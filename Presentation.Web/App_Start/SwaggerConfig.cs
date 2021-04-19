@@ -30,6 +30,10 @@ namespace Presentation.Web
 
                 c.GroupActionsBy(apiDesc =>
                         {
+                            if (apiDesc.RelativePath.Contains(@"api/v2"))
+                            {
+                                return "API V2 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            } 
                             if (apiDesc.RelativePath.Contains("api"))
                             {
                                 return "API - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
