@@ -4,6 +4,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -63,7 +64,21 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.LocalReferenceTitle)
                 .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle", 0);
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle", 0);
+
+            Property(x => x.ObjectOwnerId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerId", 0);
+
+            Property(x => x.ObjectOwnerName)
+                .HasMaxLength(UserConstraints.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerName", 0);
+
+            Property(x => x.LastChangedById)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedById", 0);
+
+            Property(x => x.LastChangedByName)
+                .HasMaxLength(UserConstraints.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedByName", 0);
 
 
             //No index bc we don't know how long it might be
