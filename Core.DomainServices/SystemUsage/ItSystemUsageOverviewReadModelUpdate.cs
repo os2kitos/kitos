@@ -52,9 +52,9 @@ namespace Core.DomainServices.SystemUsage
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var title = source.Reference?.Title;
-            destination.LocalOverviewReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
-            destination.LocalOverviewReferenceUrl = source.Reference?.URL;
-            destination.LocalOverviewReferenceDocumentId = source.Reference?.ExternalReferenceId;
+            destination.LocalReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
+            destination.LocalReferenceUrl = source.Reference?.URL;
+            destination.LocalReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
 
         private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

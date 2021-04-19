@@ -174,9 +174,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.TaskRefs.First().Description, taskRef.KLEName);
 
             //Reference
-            Assert.Equal(systemUsage.Reference.Title, readModel.LocalOverviewReferenceTitle);
-            Assert.Equal(systemUsage.Reference.URL, readModel.LocalOverviewReferenceUrl);
-            Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalOverviewReferenceDocumentId);
+            Assert.Equal(systemUsage.Reference.Title, readModel.LocalReferenceTitle);
+            Assert.Equal(systemUsage.Reference.URL, readModel.LocalReferenceUrl);
+            Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
         }
 
         [Fact]
