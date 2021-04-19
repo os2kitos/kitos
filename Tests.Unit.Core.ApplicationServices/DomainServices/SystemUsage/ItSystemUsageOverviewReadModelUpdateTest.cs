@@ -116,7 +116,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     ExternalReferenceId = A<string>(),
                     URL = A<string>()
                 },
+                ObjectOwnerId = user.Id,
                 ObjectOwner = user,
+                LastChangedByUserId = user.Id,
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>()
@@ -153,7 +155,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
+            Assert.Equal(user.Id, readModel.ObjectOwnerId);
             Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
+            Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
             Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);

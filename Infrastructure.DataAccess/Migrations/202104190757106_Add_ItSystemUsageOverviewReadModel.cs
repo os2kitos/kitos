@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddItSystemUsageOverviewReadModel : DbMigration
+    public partial class Add_ItSystemUsageOverviewReadModel : DbMigration
     {
         public override void Up()
         {
@@ -35,7 +35,9 @@
                         LocalOverviewReferenceDocumentId = c.String(),
                         LocalOverviewReferenceUrl = c.String(),
                         LocalOverviewReferenceTitle = c.String(maxLength: 100),
+                        ObjectOwnerId = c.Int(),
                         ObjectOwnerName = c.String(maxLength: 100),
+                        LastChangedById = c.Int(),
                         LastChangedByName = c.String(maxLength: 100),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
