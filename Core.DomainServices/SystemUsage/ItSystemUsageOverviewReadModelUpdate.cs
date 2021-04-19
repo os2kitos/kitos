@@ -40,7 +40,9 @@ namespace Core.DomainServices.SystemUsage
             destination.LocalCallName = source.LocalCallName;
             destination.LocalSystemId = source.LocalSystemId;
             destination.ItSystemUuid = source.ItSystem.Uuid.ToString("D");
+            destination.ObjectOwnerId = source.ObjectOwnerId;
             destination.ObjectOwnerName = GetUserFullName(source.ObjectOwner);
+            destination.LastChangedById = source.LastChangedByUserId;
             destination.LastChangedByName = GetUserFullName(source.LastChangedByUser);
             destination.LastChanged = source.LastChanged;
             destination.Concluded = source.Concluded;
@@ -67,9 +69,9 @@ namespace Core.DomainServices.SystemUsage
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var title = source.Reference?.Title;
-            destination.LocalOverviewReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
-            destination.LocalOverviewReferenceUrl = source.Reference?.URL;
-            destination.LocalOverviewReferenceDocumentId = source.Reference?.ExternalReferenceId;
+            destination.LocalReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
+            destination.LocalReferenceUrl = source.Reference?.URL;
+            destination.LocalReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
 
         private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

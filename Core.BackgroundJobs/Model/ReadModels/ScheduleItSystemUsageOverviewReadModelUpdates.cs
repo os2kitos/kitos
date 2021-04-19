@@ -81,6 +81,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
+
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 

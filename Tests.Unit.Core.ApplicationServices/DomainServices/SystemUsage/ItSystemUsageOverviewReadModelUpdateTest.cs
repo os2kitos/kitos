@@ -128,7 +128,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     ExternalReferenceId = A<string>(),
                     URL = A<string>()
                 },
+                ObjectOwnerId = user.Id,
                 ObjectOwner = user,
+                LastChangedByUserId = user.Id,
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
@@ -177,7 +179,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Version, readModel.Version);
             Assert.Equal(systemUsage.LocalCallName, readModel.LocalCallName);
             Assert.Equal(systemUsage.LocalSystemId, readModel.LocalSystemId);
+            Assert.Equal(user.Id, readModel.ObjectOwnerId);
             Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
+            Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
             Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
@@ -214,9 +218,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.TaskRefs.First().Description, taskRef.KLEName);
 
             //Reference
-            Assert.Equal(systemUsage.Reference.Title, readModel.LocalOverviewReferenceTitle);
-            Assert.Equal(systemUsage.Reference.URL, readModel.LocalOverviewReferenceUrl);
-            Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalOverviewReferenceDocumentId);
+            Assert.Equal(systemUsage.Reference.Title, readModel.LocalReferenceTitle);
+            Assert.Equal(systemUsage.Reference.URL, readModel.LocalReferenceUrl);
+            Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
 
             //Main Contract
             Assert.Equal(contract.Id, readModel.MainContractId);

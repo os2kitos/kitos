@@ -32,10 +32,12 @@
                         ItSystemRightsHolderName = c.String(maxLength: 100),
                         ItSystemKLEIdsAsCsv = c.String(),
                         ItSystemKLENamesAsCsv = c.String(),
-                        LocalOverviewReferenceDocumentId = c.String(),
-                        LocalOverviewReferenceUrl = c.String(),
-                        LocalOverviewReferenceTitle = c.String(maxLength: 100),
+                        LocalReferenceDocumentId = c.String(),
+                        LocalReferenceUrl = c.String(),
+                        LocalReferenceTitle = c.String(maxLength: 100),
+                        ObjectOwnerId = c.Int(),
                         ObjectOwnerName = c.String(maxLength: 100),
+                        LastChangedById = c.Int(),
                         LastChangedByName = c.String(maxLength: 100),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
@@ -62,7 +64,7 @@
                 .Index(t => t.ItSystemBusinessTypeName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName")
                 .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
-                .Index(t => t.LocalOverviewReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle")
+                .Index(t => t.LocalReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle")
                 .Index(t => t.ObjectOwnerName, name: "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName")
                 .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName")
                 .Index(t => t.MainContractName, name: "ItSystemUsageOverviewReadModel_Index_MainContractName")
@@ -160,7 +162,7 @@
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName");
-            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
