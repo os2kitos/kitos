@@ -67,17 +67,29 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle", 0);
 
+            Property(x => x.ObjectOwnerId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerId", 0);
+
             Property(x => x.ObjectOwnerName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerName", 0);
+
+            Property(x => x.LastChangedById)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedById", 0);
 
             Property(x => x.LastChangedByName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedByName", 0);
 
+            Property(x => x.MainContractId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractId", 0);
+
             Property(x => x.MainContractName)
                 .HasMaxLength(ItContractConstraints.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractName", 0);
+
+            Property(x => x.MainContractSupplierId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierId", 0);
 
             Property(x => x.MainContractSupplierName)
                 .HasMaxLength(Organization.MaxNameLength)
