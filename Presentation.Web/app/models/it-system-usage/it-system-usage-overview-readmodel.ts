@@ -5,6 +5,12 @@
         UserFullName: string;
     }
 
+    export interface IItSystemUsageOverviewTaskRefReadModel {
+        Id: number;
+        KLEId: string;
+        KLEName: string;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -23,5 +29,6 @@
         ItSystemRightsHolderName: string | null;
         ItSystemBusinessTypeId: number | null;
         ItSystemBusinessTypeName: string | null;
+        ItSystemTaskRefs: IItSystemUsageOverviewTaskRefReadModel[];
     }
 }

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddItSystemUsageOverviewReadModel : DbMigration
+    public partial class Add_ItSystemUsageOverviewReadModel : DbMigration
     {
         public override void Up()
         {
@@ -32,9 +32,9 @@
                         ItSystemRightsHolderName = c.String(maxLength: 100),
                         ItSystemKLEIdsAsCsv = c.String(),
                         ItSystemKLENamesAsCsv = c.String(),
-                        LocalOverviewReferenceDocumentId = c.String(),
-                        LocalOverviewReferenceUrl = c.String(),
-                        LocalOverviewReferenceTitle = c.String(maxLength: 100),
+                        LocalReferenceDocumentId = c.String(),
+                        LocalReferenceUrl = c.String(),
+                        LocalReferenceTitle = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -54,7 +54,7 @@
                 .Index(t => t.ItSystemBusinessTypeName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName")
                 .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
-                .Index(t => t.LocalOverviewReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
+                .Index(t => t.LocalReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewTaskRefReadModels",

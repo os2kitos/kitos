@@ -8,6 +8,7 @@ module Kitos.Utility.KendoGrid {
     "use strict";
 
     export enum KendoGridColumnFiltering {
+        StartsWith,
         Contains,
         Date,
         FixedValueRange
@@ -46,12 +47,14 @@ module Kitos.Utility.KendoGrid {
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
+
         private standardWidth: number = 200;
         private dataSourceName: string = null;
         private title: string = null;
@@ -65,6 +68,12 @@ module Kitos.Utility.KendoGrid {
         private sortingEnabled = true;
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
+        private contentOverflow : boolean | null = null;
+
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource> {
+            this.contentOverflow = true;
+            return this;
+        }
 
         withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
@@ -188,6 +197,18 @@ module Kitos.Utility.KendoGrid {
                                 operator: "contains"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.StartsWith:
+                        return {
+                            cell: {
+                                template: (args) =>
+                                    args.element.kendoAutoComplete({
+                                        noDataTemplate: ""
+                                    }),
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith"
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
                     case KendoGridColumnFiltering.Date:
                         return {
                             operators: {
@@ -239,12 +260,16 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("id", this.id);
             this.checkRequiredField("rendering", this.rendering);
 
+            const attributes = {
+                "data-element-type": `${this.id}KendoObject`
+            };
+            if (this.contentOverflow) {
+                attributes["class"] = "might-overflow";
+            }
             return {
                 field: this.dataSourceName,
                 title: this.title,
-                attributes: {
-                    "data-element-type": `${this.id}KendoObject`
-                },
+                attributes: attributes,
                 width: this.standardWidth,
                 hidden: !this.visible,
                 persistId: this.id,

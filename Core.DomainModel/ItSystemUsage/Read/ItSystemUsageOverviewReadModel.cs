@@ -37,9 +37,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemRightsHolderName { get; set; }
         public string ItSystemKLEIdsAsCsv { get; set; }
         public string ItSystemKLENamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } // Adding TaskRefs as collection to enable easy sorting in the overview
-        public string LocalOverviewReferenceDocumentId { get; set; }
-        public string LocalOverviewReferenceUrl { get; set; }
-        public string LocalOverviewReferenceTitle { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } // Adding TaskRefs as collection to enable indexed search
+        public string LocalReferenceDocumentId { get; set; }
+        public string LocalReferenceUrl { get; set; }
+        public string LocalReferenceTitle { get; set; }
     }
 }

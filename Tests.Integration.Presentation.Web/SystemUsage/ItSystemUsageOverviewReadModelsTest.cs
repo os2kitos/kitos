@@ -158,9 +158,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(organizationName, readModel.ResponsibleOrganizationUnitName);
 
             // Reference
-            Assert.Equal(reference.Title, readModel.LocalOverviewReferenceTitle);
-            Assert.Equal(reference.URL, readModel.LocalOverviewReferenceUrl);
-            Assert.Equal(reference.ExternalReferenceId, readModel.LocalOverviewReferenceDocumentId);
+            Assert.Equal(reference.Title, readModel.LocalReferenceTitle);
+            Assert.Equal(reference.URL, readModel.LocalReferenceUrl);
+            Assert.Equal(reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
         }
 
         [Fact]

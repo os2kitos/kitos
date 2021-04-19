@@ -82,6 +82,12 @@
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ItSystemBusinessTypeId", "ItSystemBusinessTypeName");
 
+                    if (parameterMap.$filter) {
+                        //Redirect KLE filtering searchable sub collections
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)");
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
+                    }
+
                     return parameterMap;
                 })
                 .withResponseParser(response => {
@@ -253,6 +259,7 @@
                         .withStandardWidth(145)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                        .withContentOverflow()
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.Id]))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.Id])))
@@ -275,8 +282,30 @@
                                 };
                             }),
                             false)
+                        .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ItSystemBusinessTypeName))
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ItSystemBusinessTypeName)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ItSystemKLEIdsAsCsv") //Using csv for rendering and sorting and the collection for indexed search
+                        .withTitle("KLE ID")
+                        .withId("taskkey")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.StartsWith)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ItSystemKLENamesAsCsv") //Using csv for rendering and sorting and the collection for indexed search
+                        .withTitle("KLE navn")
+                        .withId("klename")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withContentOverflow()
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ItSystemRightsHolderName")
@@ -286,6 +315,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput());
+
 
             //Launch kendo grid
             launcher.launch();
