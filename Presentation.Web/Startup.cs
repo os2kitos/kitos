@@ -71,6 +71,18 @@ namespace Presentation.Web
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync(CancellationToken.None)),
                 cronExpression: Cron.Hourly(),
                 timeZone: TimeZoneInfo.Local);
+
+            new RecurringJobManager().AddOrUpdate(
+                recurringJobId: StandardJobIds.RebuildDataProcessingReadModels,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.DataProcessingRegistration, CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
+
+            new RecurringJobManager().AddOrUpdate(
+                recurringJobId: StandardJobIds.RebuildItSystemUsageReadModels,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchFullReadModelRebuild(ReadModelRebuildScope.ItSystemUsage, CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
         }
     }
 }
