@@ -26,7 +26,6 @@ type InputFields =
 };
 
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder,
     referenceName: protractor.ElementFinder,
     referenceId: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
@@ -35,7 +34,6 @@ type ColumnHeaders = {
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
-    systemRightsOwner: protractor.ElementFinder,
 };
 
 type ColumnObjects = {
@@ -97,7 +95,6 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnHeaders = {
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
@@ -106,7 +103,6 @@ class kendoToolbarWrapper {
             userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
-            systemRightsOwner: kendo.getColumnHeaderClickable(consts.kendoSystemRightsOwnerHeader)
 
         };
         return columns;
