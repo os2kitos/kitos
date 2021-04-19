@@ -111,15 +111,8 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var systemIds = _itSystemRepository.GetByRightsHolderId(update.SourceId).Select(x => x.Id).ToList();
 
-                var systemUsageIds = _itSystemUsageRepository.GetBySystemIds(systemIds).Select(x => x.Id);
-
-                var readModelIds = _readModelRepository.GetByRightsHolderId(update.SourceId).Select(x => x.SourceEntityId);
-
-                var mainContractSupplierIds = _readModelRepository.GetByContractSupplierId(update.SourceId).Select(x => x.SourceEntityId);
-
-                var ids = systemUsageIds.Concat(readModelIds).Concat(mainContractSupplierIds).Distinct();
+                var ids = _readModelRepository.GetByDependentOrganizationId(update.SourceId).Select(x => x.SourceEntityId);
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
