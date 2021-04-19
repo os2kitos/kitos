@@ -2,8 +2,7 @@
     readonly kendoSystemNameObjects = "sysnameKendoObject";
     readonly kendoReportNameObjects = "reportNameKendoObject";
     readonly kendoProjectNameObjects = "projectNameKendoObject";
-    readonly kendoSystemRightsOwnerHeader = "systemRightsOwnerHeader";
-    readonly kendoSystemRightsOwnerObject = "systemRightsOwnerObject";
+    readonly kendoSystemRightsOwnerObject = "belongstoKendoObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoDpaButtonCreate = "createDpaButton";
     readonly kendoContractNameHeader = "contractNameHeader";

@@ -29,7 +29,7 @@ describe("Regular user IT Systems tests", () => {
     it("Apply and delete filter buttons are disabled", () => {
         loginHelper.loginAsRegularUser()
             .then(() => pageObject.getPage())
-            .then(() => browser.wait(ec.visibilityOf(headerButtons.useFilter), waitUpTo.twentySeconds))
+            .then(() => browser.wait(ec.presenceOf(headerButtons.useFilter), waitUpTo.twentySeconds))
             .then(() => expect(headerButtonsHelper.isUseDisabled()).toEqual("true"))
             .then(() => expect(headerButtonsHelper.isDeleteDisabled()).toEqual("true"));
     });
@@ -38,14 +38,8 @@ describe("Regular user IT Systems tests", () => {
         loginHelper.loginAsRegularUser()
             .then(() => pageObject.getPage())
             .then(() => pageObject.waitForKendoGrid())
+            .then(() => browser.wait(ec.presenceOf(gridObjects.systemName.first()), waitUpTo.twentySeconds))
             .then(() => gridObjects.systemName.first().click())
             .then(() => expect(browser.getCurrentUrl()).toContain("system/usage"));
-    });
-
-    it("Show rights owner column data", () => {
-        loginHelper.loginAsRegularUser()
-            .then(() => pageObject.getPage())
-            .then(() => pageObject.waitForKendoGrid())
-            .then(() => expect(headerObjects.systemRightsOwner.isPresent()).toBe(true));
     });
 });
