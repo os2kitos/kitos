@@ -13,6 +13,7 @@ namespace Presentation.Web.Models
         public ItSystemUsageDTO(){
         }
         public int Id { get; set; }
+        public DateTime LastChanged { get; set; }
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
