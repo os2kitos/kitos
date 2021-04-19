@@ -35,6 +35,12 @@
                         LocalReferenceDocumentId = c.String(),
                         LocalReferenceUrl = c.String(),
                         LocalReferenceTitle = c.String(maxLength: 100),
+                        ObjectOwnerId = c.Int(),
+                        ObjectOwnerName = c.String(maxLength: 100),
+                        LastChangedById = c.Int(),
+                        LastChangedByName = c.String(maxLength: 100),
+                        LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -54,7 +60,9 @@
                 .Index(t => t.ItSystemBusinessTypeName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName")
                 .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
-                .Index(t => t.LocalReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
+                .Index(t => t.LocalReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle")
+                .Index(t => t.ObjectOwnerName, name: "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName")
+                .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewTaskRefReadModels",
@@ -144,7 +152,9 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
-            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
