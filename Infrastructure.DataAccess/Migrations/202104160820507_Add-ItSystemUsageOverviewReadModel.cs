@@ -32,6 +32,9 @@
                         ItSystemRightsHolderName = c.String(maxLength: 100),
                         ItSystemKLEIdsAsCsv = c.String(),
                         ItSystemKLENamesAsCsv = c.String(),
+                        LocalOverviewReferenceDocumentId = c.String(),
+                        LocalOverviewReferenceUrl = c.String(),
+                        LocalOverviewReferenceTitle = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -50,7 +53,8 @@
                 .Index(t => t.ItSystemBusinessTypeId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId")
                 .Index(t => t.ItSystemBusinessTypeName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName")
                 .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
-                .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
+                .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
+                .Index(t => t.LocalOverviewReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewTaskRefReadModels",
@@ -140,6 +144,7 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalOverviewReferenceTitle");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
