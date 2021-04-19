@@ -108,6 +108,19 @@
                 .Index(t => t.Email)
                 .Index(t => t.ParentId);
             
+            CreateTable(
+                "dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        SensitivityDataLevel = c.Int(nullable: false),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.SensitivityDataLevel, name: "ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel")
+                .Index(t => t.ParentId);
+            
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
@@ -150,10 +163,13 @@
         public override void Down()
         {
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "SourceEntityId", "dbo.ItSystemUsage");
+            DropForeignKey("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageOverviewTaskRefReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropIndex("dbo.TaskRef", "UX_TaskKey");
+            DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", "ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel");
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "Email" });
             DropIndex("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", new[] { "UserFullName" });
@@ -222,6 +238,7 @@
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String());
+            DropTable("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels");
             DropTable("dbo.ItSystemUsageOverviewRoleAssignmentReadModels");
             DropTable("dbo.ItSystemUsageOverviewTaskRefReadModels");
             DropTable("dbo.ItSystemUsageOverviewReadModels");
