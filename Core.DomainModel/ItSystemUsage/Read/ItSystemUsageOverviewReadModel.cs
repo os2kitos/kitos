@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         {
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
+            SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
         }
 
         public int OrganizationId { get; set; }
@@ -53,5 +54,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string MainContractName { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }
+
+        public string SensitiveDataLevelsAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
     }
 }
