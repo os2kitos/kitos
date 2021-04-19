@@ -61,7 +61,9 @@
                 .Index(t => t.ItSystemRightsHolderId, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId")
                 .Index(t => t.ItSystemRightsHolderName, name: "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName")
                 .Index(t => t.LocalReferenceTitle, name: "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle")
+                .Index(t => t.ObjectOwnerId, name: "ItSystemUsageOverviewReadModel_Index_ObjectOwnerId")
                 .Index(t => t.ObjectOwnerName, name: "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName")
+                .Index(t => t.LastChangedById, name: "ItSystemUsageOverviewReadModel_Index_LastChangedById")
                 .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
             
             CreateTable(
@@ -153,7 +155,9 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedById");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ObjectOwnerName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ObjectOwnerId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
