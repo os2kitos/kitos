@@ -62,6 +62,8 @@ namespace Core.DomainServices.SystemUsage
 
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
+            destination.SensitiveDataLevelsAsCsv = string.Join(", ", source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.ToString()));
+
             var incomingSensitiveDataLevels = source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).ToList();
 
             // Remove taskref which were removed

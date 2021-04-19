@@ -45,6 +45,7 @@
                         MainContractName = c.String(maxLength: 200),
                         MainContractSupplierId = c.Int(),
                         MainContractSupplierName = c.String(maxLength: 100),
+                        SensitiveDataLevelsAsCsv = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
