@@ -257,6 +257,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewRoleAssignmentReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewTaskRefReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewSensitiveDataLevelReadModelMap());
         }
     }
 }

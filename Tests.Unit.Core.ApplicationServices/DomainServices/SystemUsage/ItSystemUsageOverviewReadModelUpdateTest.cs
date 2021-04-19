@@ -6,6 +6,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -25,16 +26,19 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
             _businessTypeService = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
+            _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
+                _sensitiveDataLevelRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -140,9 +144,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
-                MainContract = new ItContractItSystemUsage{
-
-                },
                 ItProjects = new List<ItProject> 
                 { 
                     project 
@@ -176,6 +177,15 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
             systemUsage.MainContract = mainContract;
 
+            // Add SensitiveDataLevel
+            var sensitiveDataLevel = new ItSystemUsageSensitiveDataLevel
+            {
+                Id = A<int>(),
+                ItSystemUsage = systemUsage,
+                SensitivityDataLevel = A<SensitiveDataLevel>()
+            };
+            systemUsage.SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel> { sensitiveDataLevel };
+
             var readModel = new ItSystemUsageOverviewReadModel();
 
             //Act
@@ -195,6 +205,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
             Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
+
+            // Sensitive data levels
+            var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
+            Assert.Equal(sensitiveDataLevel.SensitivityDataLevel, rmSensitiveDataLevel.SensitivityDataLevel);
+            Assert.Equal(sensitiveDataLevel.SensitivityDataLevel.ToString(), readModel.SensitiveDataLevelsAsCsv);
 
             //System
             Assert.Equal(system.Name, readModel.Name);

@@ -8,7 +8,6 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
-using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SystemUsage
 {
@@ -18,14 +17,17 @@ namespace Core.DomainServices.SystemUsage
 
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository; 
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
             IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
+            IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
+            _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -55,7 +57,36 @@ namespace Core.DomainServices.SystemUsage
             PatchKLE(source, destination);
             PatchReference(source, destination);
             PatchMainContract(source, destination);
+            PatchSensitiveDataLevels(source, destination);
             PatchItProjects(source, destination);
+        }
+
+        private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.SensitiveDataLevelsAsCsv = string.Join(", ", source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.ToString()));
+
+            var incomingSensitiveDataLevels = source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).ToList();
+
+            // Remove taskref which were removed
+            var sensitiveDataLevelsToBeRemoved = destination.SensitiveDataLevels.Where(x => incomingSensitiveDataLevels.Contains(x.SensitivityDataLevel)).ToList();
+
+            RemoveSensitiveDataLevels(destination, sensitiveDataLevelsToBeRemoved);
+
+            var existingSensitiveDataLevels = destination.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).ToList();
+            foreach (var incomingSensitiveDataLevel in incomingSensitiveDataLevels)
+            {
+                if (!existingSensitiveDataLevels.Contains(incomingSensitiveDataLevel))
+                {
+                    //Append the assignment if it is not already present
+                    var sensitiveDataLevel = new ItSystemUsageOverviewSensitiveDataLevelReadModel
+                    {
+                        Parent = destination,
+                        SensitivityDataLevel = incomingSensitiveDataLevel
+                    };
+                    destination.SensitiveDataLevels.Add(sensitiveDataLevel);
+                }
+            }
+            _sensitiveDataLevelRepository.Save();
         }
 
         private static void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -64,6 +95,8 @@ namespace Core.DomainServices.SystemUsage
 
 
         }
+
+        
 
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
@@ -189,6 +222,15 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.ItSystemTaskRefs.Remove(taskRefToBeRemoved);
                 _taskRefRepository.Delete(taskRefToBeRemoved);
+            });
+        }
+
+        private void RemoveSensitiveDataLevels(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelsToBeRemoved)
+        {
+            sensitiveDataLevelsToBeRemoved.ForEach(sensitiveDataLevelToBeRemoved =>
+            {
+                destination.SensitiveDataLevels.Remove(sensitiveDataLevelToBeRemoved);
+                _sensitiveDataLevelRepository.Delete(sensitiveDataLevelToBeRemoved);
             });
         }
 

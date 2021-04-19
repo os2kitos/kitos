@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
@@ -104,6 +105,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 Concluded = concluded
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
+            var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
 
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId); //Adding default organization as organization unit
@@ -147,6 +149,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
             Assert.Equal(concluded, readModel.Concluded);
             Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date); // Lastchanged seem to update a few seconds later than the actual updates. So the readmodel is not always up to date on the seconds level
+
+            // Sensitive Data Level
+            var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
+            Assert.Equal(sensitiveDataLevel.DataSensitivityLevel, rmSensitiveDataLevel.SensitivityDataLevel);
+            Assert.Equal(sensitiveDataLevel.DataSensitivityLevel.ToString(), readModel.SensitiveDataLevelsAsCsv);
 
             // From System
             Assert.Equal(systemName, readModel.Name);
