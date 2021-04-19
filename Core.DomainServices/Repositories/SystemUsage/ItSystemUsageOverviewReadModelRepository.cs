@@ -76,12 +76,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId);
         }
 
-        public IQueryable<ItSystemUsageOverviewReadModel> GetByRightsHolderId(int organizationId)
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId)
         {
-            //Gets all read models that have dependencies on the ItSystems RightsHolder organization
+            //Gets all read models that have dependencies on the ItSystems RightsHolder organization or on the MainContracts Supplier
             return _repository
                 .AsQueryable()
-                .Where(x => x.ItSystemRightsHolderId == organizationId);
+                .Where(x => x.ItSystemRightsHolderId == organizationId || x.MainContractSupplierId == organizationId);
         }
 
         public IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId)
@@ -89,6 +89,13 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _repository
                 .AsQueryable()
                 .Where(x => x.ItSystemBusinessTypeId == businessTypeId);
+        }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.MainContractId == contractId);
         }
     }
 }

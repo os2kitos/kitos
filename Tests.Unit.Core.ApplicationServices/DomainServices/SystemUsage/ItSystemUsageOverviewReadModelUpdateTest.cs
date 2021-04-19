@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -48,6 +49,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         public void Apply_Generates_Correct_Read_Model()
         {
             //Arrange
+            var supplier = new Organization
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
             var user = new User
             {
                 Id = A<int>(),
@@ -61,6 +67,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 User = user,
                 UserId = user.Id,
                 RoleId = A<int>()
+            };
+            var contract = new ItContract
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                Supplier = supplier
             };
             var parentSystem = new ItSystem
             {
@@ -121,7 +133,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUserId = user.Id,
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
-                Concluded = A<DateTime>()
+                Concluded = A<DateTime>(),
+                MainContract = new ItContractItSystemUsage{
+
+                }
             };
 
             // Add ResponsibleOrganizationUnit
@@ -141,6 +156,15 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             _businessTypeService.Setup(x => x.GetOption(system.OrganizationId, system.BusinessType.Id)).Returns(Maybe<(BusinessType, bool)>.Some((system.BusinessType, true)));
 
+            // Add MainContract
+            var mainContract = new ItContractItSystemUsage
+            {
+                ItContractId = contract.Id,
+                ItContract = contract,
+                ItSystemUsageId = systemUsage.Id,
+                ItSystemUsage = systemUsage
+            };
+            systemUsage.MainContract = mainContract;
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -197,6 +221,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Reference.Title, readModel.LocalReferenceTitle);
             Assert.Equal(systemUsage.Reference.URL, readModel.LocalReferenceUrl);
             Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
+
+            //Main Contract
+            Assert.Equal(contract.Id, readModel.MainContractId);
+            Assert.Equal(contract.Name, readModel.MainContractName);
+            Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
+            Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
         }
 
         [Fact]

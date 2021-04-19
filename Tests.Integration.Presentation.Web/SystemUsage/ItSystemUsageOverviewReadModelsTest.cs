@@ -66,6 +66,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageLocalSystemId = A<string>();
             var concluded = A<DateTime>();
 
+            var contractName = A<string>();
+
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
@@ -109,6 +111,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             //References
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), A<Display>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
+
+            //Main Contract
+            var contract = await ItContractHelper.CreateContract(contractName, organizationId);
+            var contractUpdateBody = new
+            {
+                supplierId = organizationId
+            };
+            await ItContractHelper.PatchContract(contract.Id, organizationId, contractUpdateBody);
+            await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
+
+            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -170,6 +183,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(reference.Title, readModel.LocalReferenceTitle);
             Assert.Equal(reference.URL, readModel.LocalReferenceUrl);
             Assert.Equal(reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
+
+            // Main Contract
+            Assert.Equal(contract.Id, readModel.MainContractId);
+            Assert.Equal(contractName, readModel.MainContractName);
+            Assert.Equal(organizationId, readModel.MainContractSupplierId);
+            Assert.Equal(organizationName, readModel.MainContractSupplierName);
         }
 
         [Fact]
@@ -370,6 +389,50 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             Assert.Equal(businessTypeName2, readModel.ItSystemBusinessTypeName);
+        }
+
+        [Fact]
+        public async Task ReadModels_MainContractName_And_MainContractSupplierName_Is_Updated_When_MainContract_Is_Deleted()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var contractName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var contract = await ItContractHelper.CreateContract(contractName, organizationId);
+
+            var contractUpdateBody = new
+            {
+                supplierId = organizationId
+            };
+            await ItContractHelper.PatchContract(contract.Id, organizationId, contractUpdateBody);
+            await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
+
+            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItContractHelper.SendDeleteContractRequestAsync(contract.Id);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Null(readModel.MainContractId);
+            Assert.Null(readModel.MainContractName);
+            Assert.Null(readModel.MainContractSupplierId);
+            Assert.Null(readModel.MainContractSupplierName);
         }
 
 

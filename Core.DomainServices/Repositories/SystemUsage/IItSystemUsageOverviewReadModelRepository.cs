@@ -15,7 +15,8 @@ namespace Core.DomainServices.Repositories.SystemUsage
         void Update(ItSystemUsageOverviewReadModel readModel);
         IQueryable<ItSystemUsageOverviewReadModel> GetByUserId(int userId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationUnitId(int organizationUnitId);
-        IQueryable<ItSystemUsageOverviewReadModel> GetByRightsHolderId(int organizationId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId);
     }
 }

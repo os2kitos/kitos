@@ -54,6 +54,16 @@ namespace Core.DomainServices.SystemUsage
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
             PatchReference(source, destination);
+            PatchMainContract(source, destination);
+        }
+
+        private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.MainContractId = source.MainContract?.ItContractId;
+            destination.MainContractName = source.MainContract?.ItContract.Name;
+
+            destination.MainContractSupplierId = source.MainContract?.ItContract.Supplier?.Id;
+            destination.MainContractSupplierName = source.MainContract?.ItContract.Supplier?.Name;
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
