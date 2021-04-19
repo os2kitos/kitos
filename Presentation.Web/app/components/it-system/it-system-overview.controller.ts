@@ -154,7 +154,7 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
                         .withTitle("Gyldig/Ikke gyldig")
                         .withId("isActive")
-                        .withStandardWidth(90)
+                        .withStandardWidth(150)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange([
                             {
@@ -335,7 +335,48 @@
                         .withStandardWidth(210)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput());
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ObjectOwnerName")
+                        .withTitle("Taget i anvendelse af")
+                        .withId("ownername")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LastChangedByName")
+                        .withTitle("Sidst redigeret: Bruger")
+                        .withId("lastchangedname")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LastChanged")
+                        .withTitle("Sidste redigeret: Dato")
+                        .withId("changed")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withInitialVisibility(false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChanged)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("Concluded")
+                        .withTitle("Ibrugtagningsdato")
+                        .withId("concludedSystemFrom")
+                        .withStandardWidth(150)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Concluded))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Concluded)));
 
             //Launch kendo grid
             launcher.launch();

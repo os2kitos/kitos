@@ -260,7 +260,7 @@
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
                                         remoteValue: value
-                                    }
+                                    };
                                 }),
                                 false
                             )
@@ -279,7 +279,7 @@
                                 return {
                                     textValue: value.name,
                                     remoteValue: value.name
-                                }
+                                };
                             });
                         options.push({
                             textValue: "",
@@ -300,7 +300,7 @@
                             .withRendering(
                                 dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.BasisForTransfer))
                             .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer))
+                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.BasisForTransfer));
                     })
                     .withColumn(builder => {
                         var options = dataProcessingRegistrationOptions
@@ -309,7 +309,7 @@
                                 return {
                                     textValue: value.name,
                                     remoteValue: value.name
-                                }
+                                };
                             });
                         options.push({
                             textValue: "",
@@ -330,7 +330,7 @@
                             .withRendering(
                                 dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.DataResponsible))
                             .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible))
+                                dataItem => Helpers.ExcelExportHelper.renderString(dataItem.DataResponsible));
                     })
                     .withColumn(builder =>
                         builder
@@ -349,7 +349,7 @@
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
                                         remoteValue: value
-                                    }
+                                    };
                                 }),
                                 false
                             )
@@ -385,9 +385,10 @@
                                     Models.Api.Shared.YearMonthUndecidedIntervalOption.Undecided
                                 ].map(value => {
                                     return {
-                                        textValue: Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(value),
+                                        textValue: Models.ViewModel.Shared.YearMonthUndecidedIntervalOption.getText(
+                                            value),
                                         remoteValue: value
-                                    }
+                                    };
                                 }),
                                 false
                             )
@@ -405,7 +406,7 @@
                                 return {
                                     textValue: value.name,
                                     remoteValue: value.name
-                                }
+                                };
                             });
                         options.push({
                             textValue: "",
@@ -444,7 +445,7 @@
                                     return {
                                         textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
                                         remoteValue: value
-                                    }
+                                    };
                                 }),
                                 false
                             )
