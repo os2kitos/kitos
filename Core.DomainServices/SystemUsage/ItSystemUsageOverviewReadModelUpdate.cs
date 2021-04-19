@@ -55,6 +55,14 @@ namespace Core.DomainServices.SystemUsage
             PatchKLE(source, destination);
             PatchReference(source, destination);
             PatchMainContract(source, destination);
+            PatchItProjects(source, destination);
+        }
+
+        private static void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
+
+
         }
 
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

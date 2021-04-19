@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -74,6 +75,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Supplier = supplier
             };
+            var project = new ItProject
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
@@ -136,6 +142,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Concluded = A<DateTime>(),
                 MainContract = new ItContractItSystemUsage{
 
+                },
+                ItProjects = new List<ItProject> 
+                { 
+                    project 
                 }
             };
 
@@ -227,6 +237,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(contract.Name, readModel.MainContractName);
             Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
+
+            //Projects
+            Assert.Equal(project.Name, readModel.ItProjectNamesAsCsv);
         }
 
         [Fact]

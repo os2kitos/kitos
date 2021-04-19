@@ -46,12 +46,15 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ObjectOwnerName { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
-        public DateTime LastChanged { get; set; } 
+        public DateTime LastChanged { get; set; }
         public DateTime? Concluded { get; set; }
 
         public int? MainContractId { get; set; }
         public string MainContractName { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }
+
+        public string ItProjectNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
     }
 }
