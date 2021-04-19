@@ -21,6 +21,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
@@ -411,14 +412,17 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
-            
+
             //DPR
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleDataProcessingRegistrationReadModelUpdates>().ToSelf().InCommandScope(Mode);
-            
+
             //Itsystemusage
             kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
+
+            //Rebuilder
+            kernel.Bind<IRebuildReadModelsJobFactory>().To<RebuildReadModelsJobFactory>().InCommandScope(Mode);
         }
     }
 }
