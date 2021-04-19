@@ -5,6 +5,12 @@
         UserFullName: string;
     }
 
+    export interface IItSystemUsageOverviewTaskRefReadModel {
+        Id: number;
+        KLEId: string;
+        KLEName: string;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -20,6 +26,12 @@
         RoleAssignments: IAssignedSystemUsageRole[];
         ResponsibleOrganizationUnitId: number | null;
         ResponsibleOrganizationUnitName: string | null;
-        ItSystemRightsHolderName : string | null;
+        ItSystemRightsHolderName: string | null;
+        ItSystemBusinessTypeId: number | null;
+        ItSystemBusinessTypeName: string | null;
+        ItSystemTaskRefs: IItSystemUsageOverviewTaskRefReadModel[];
+        LocalReferenceDocumentId: string | null;
+        LocalReferenceUrl: string | null;
+        LocalReferenceTitle: string | null;
     }
 }

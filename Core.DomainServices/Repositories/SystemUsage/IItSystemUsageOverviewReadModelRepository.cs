@@ -17,7 +17,5 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsageOverviewReadModel> GetByOrganizationUnitId(int organizationUnitId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByRightsHolderId(int organizationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId);
-        IQueryable<ItSystemUsageOverviewReadModel> GetByObjectOwnerId(int objectOwnerId);
-        IQueryable<ItSystemUsageOverviewReadModel> GetByLastChangeById(int lastChangeById);
     }
 }

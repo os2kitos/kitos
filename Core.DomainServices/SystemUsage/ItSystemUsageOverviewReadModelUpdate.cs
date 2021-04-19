@@ -58,14 +58,10 @@ namespace Core.DomainServices.SystemUsage
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.LocalOverviewReferenceTitle = source
-                .Reference
-                .FromNullable()
-                .Select(x => x.Title)
-                .Select(title => title.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)))
-                .GetValueOrDefault();
-            destination.LocalOverviewReferenceUrl = source.Reference?.URL;
-            destination.LocalOverviewReferenceDocumentId = source.Reference?.ExternalReferenceId;
+            var title = source.Reference?.Title;
+            destination.LocalReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
+            destination.LocalReferenceUrl = source.Reference?.URL;
+            destination.LocalReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
 
         private void PatchItSystemBusinessType(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

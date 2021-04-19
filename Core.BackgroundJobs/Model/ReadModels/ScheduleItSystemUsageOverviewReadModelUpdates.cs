@@ -79,11 +79,8 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var fromRoleAssignmentsIds = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
-                var fromObjectOwnerIds = _readModelRepository.GetByObjectOwnerId(update.SourceId).Select(x => x.SourceEntityId);
-                var fromLastChangedByIds = _readModelRepository.GetByLastChangeById(update.SourceId).Select(x => x.SourceEntityId);
+                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
 
-                var ids = fromRoleAssignmentsIds.Concat(fromObjectOwnerIds).Concat(fromLastChangedByIds).Distinct();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 

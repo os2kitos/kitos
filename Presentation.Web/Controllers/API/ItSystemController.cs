@@ -217,6 +217,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Add(task);
                 }
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
                 Repository.Save();
                 return Ok();
             }
@@ -264,6 +265,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Remove(task);
                 }
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
                 Repository.Save();
                 return Ok();
             }

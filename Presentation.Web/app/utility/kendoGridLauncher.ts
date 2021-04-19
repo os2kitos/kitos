@@ -8,6 +8,7 @@ module Kitos.Utility.KendoGrid {
     "use strict";
 
     export enum KendoGridColumnFiltering {
+        StartsWith,
         Contains,
         Date,
         FixedValueRange
@@ -34,6 +35,12 @@ module Kitos.Utility.KendoGrid {
         optionalContext?: any;
     }
 
+    export enum KendoColumnAlignment {
+        Left,
+        Right,
+        Center
+    }
+
     export interface IKendoGridColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridColumnBuilder<TDataSource>;
@@ -46,8 +53,10 @@ module Kitos.Utility.KendoGrid {
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
@@ -65,6 +74,18 @@ module Kitos.Utility.KendoGrid {
         private sortingEnabled = true;
         private visible = true;
         private dataSourceType: KendoGridColumnDataSourceType = null;
+        private contentOverflow : boolean | null = null;
+        private contentAlignment : KendoColumnAlignment | null = null;
+
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource> {
+            this.contentAlignment = alignment;
+            return this;
+        }
+
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource> {
+            this.contentOverflow = true;
+            return this;
+        }
 
         withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
@@ -188,6 +209,18 @@ module Kitos.Utility.KendoGrid {
                                 operator: "contains"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.StartsWith:
+                        return {
+                            cell: {
+                                template: (args) =>
+                                    args.element.kendoAutoComplete({
+                                        noDataTemplate: ""
+                                    }),
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith"
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
                     case KendoGridColumnFiltering.Date:
                         return {
                             operators: {
@@ -239,12 +272,36 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("id", this.id);
             this.checkRequiredField("rendering", this.rendering);
 
+            const attributes = {
+                "data-element-type": `${this.id}KendoObject`
+            };
+
+            const classes : string[] = [];
+            if (this.contentOverflow) {
+                classes.push("might-overflow");
+            }
+            if (this.contentAlignment != null) {
+                switch (this.contentAlignment) {
+                    case KendoColumnAlignment.Left:
+                        classes.push("text-left");
+                        break;
+                    case KendoColumnAlignment.Right:
+                        classes.push("text-right");
+                        break;
+                    case KendoColumnAlignment.Center:
+                        classes.push("text-center");
+                    break;
+                    default:
+                        throw `Unsupported alignment type:${this.contentAlignment}`;
+                }
+            }
+            if (classes.length > 0) {
+                attributes["class"] = classes.join(" ");
+            }
             return {
                 field: this.dataSourceName,
                 title: this.title,
-                attributes: {
-                    "data-element-type": `${this.id}KendoObject`
-                },
+                attributes: attributes,
                 width: this.standardWidth,
                 hidden: !this.visible,
                 persistId: this.id,

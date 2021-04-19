@@ -64,7 +64,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             //Gets all read models that have dependencies on the user
             return _repository
                 .AsQueryable()
-                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId) || x.ObjectOwnerId == userId || x.LastChangedById == userId)
                 .Distinct();
         }
 
@@ -89,20 +89,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _repository
                 .AsQueryable()
                 .Where(x => x.ItSystemBusinessTypeId == businessTypeId);
-        }
-
-        public IQueryable<ItSystemUsageOverviewReadModel> GetByObjectOwnerId(int objectOwnerId)
-        {
-            return _repository
-               .AsQueryable()
-               .Where(x => x.ObjectOwnerId == objectOwnerId);
-        }
-
-        public IQueryable<ItSystemUsageOverviewReadModel> GetByLastChangeById(int lastChangeById)
-        {
-            return _repository
-               .AsQueryable()
-               .Where(x => x.LastChangedById == lastChangeById);
         }
     }
 }
