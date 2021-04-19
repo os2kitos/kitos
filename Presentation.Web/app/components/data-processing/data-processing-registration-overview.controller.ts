@@ -177,7 +177,6 @@
                             .withDataSourceName("MainReferenceTitle")
                             .withTitle("Reference")
                             .withId("dpReferenceId")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(
                                 dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.MainReferenceTitle,
@@ -190,7 +189,6 @@
                             .withDataSourceName("MainReferenceUserAssignedId")
                             .withTitle("Dokument ID / Sagsnr.")
                             .withId("dpReferenceUserAssignedId")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(
                                 dataItem => Helpers.RenderFieldsHelper.renderReferenceId(dataItem
@@ -204,7 +202,6 @@
                             .withDataSourceName("SystemNamesAsCsv")
                             .withTitle("IT Systemer")
                             .withId("dpSystemNamesAsCsv")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.SystemNamesAsCsv))
@@ -214,7 +211,6 @@
                             .withDataSourceName("ContractNamesAsCsv")
                             .withTitle("IT Kontrakter")
                             .withId("dpContractNamesAsCsv")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ContractNamesAsCsv))
@@ -225,7 +221,6 @@
                             .withDataSourceName("DataProcessorNamesAsCsv")
                             .withTitle("Databehandlere")
                             .withId("dpDataProcessorNamesAsCsv")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(
@@ -237,7 +232,6 @@
                             .withDataSourceName("SubDataProcessorNamesAsCsv")
                             .withTitle("Underdatabehandlere")
                             .withId("dpSubDataProcessorNamesAsCsv")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                             .withRendering(
@@ -249,7 +243,6 @@
                             .withDataSourceName(transferToInsecureThirdCountriesColumnName)
                             .withTitle("Overførsel til usikkert 3. land")
                             .withId("dpTransferToInsecureThirdCountries")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 [
@@ -290,7 +283,6 @@
                             .withDataSourceName("BasisForTransfer")
                             .withTitle("Overførselsgrundlag")
                             .withId("dpBasisForTransfer")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
@@ -337,7 +329,6 @@
                             .withDataSourceName(isAgreementConcludedColumnName)
                             .withTitle("Databehandleraftale er indgået")
                             .withId("agreementConcluded")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 [
@@ -374,7 +365,6 @@
                             .withDataSourceName(oversightIntervalColumnName)
                             .withTitle("Tilsynsinterval")
                             .withId("oversightInterval")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 [
@@ -417,7 +407,6 @@
                             .withDataSourceName("OversightOptionNamesAsCsv")
                             .withTitle("Tilsynsmuligheder")
                             .withId("dpOversightOptionNamesAsCsv")
-                            .withStandardWidth(150)
                             .withContentOverflow()
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
@@ -434,7 +423,6 @@
                             .withDataSourceName(isOversightCompletedColumnName)
                             .withTitle("Gennemført tilsyn")
                             .withId("isOversightCompleted")
-                            .withStandardWidth(150)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                             .withFixedValueRange(
                                 [
@@ -473,7 +461,6 @@
                         .withDataSourceName(getRoleKey(role))
                         .withTitle(role.name)
                         .withId(`dpa${getRoleKey(role)}`)
-                        .withStandardWidth(150)
                         .withContentOverflow()
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
