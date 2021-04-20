@@ -304,8 +304,8 @@
                         .withId("ReferenceId")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Left)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlWithOptionalTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalReferenceDocumentId")
@@ -493,7 +493,27 @@
                         .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate)));
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("RiskSupervisionDocumentationName")
+                        .withTitle("Risikovurdering")
+                        .withId("riskSupervisionDocumentationUrlName")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.RiskSupervisionDocumentationUrl, dataItem.RiskSupervisionDocumentationName)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("LinkToDirectoryName")
+                        .withTitle("Fortegnelse")
+                        .withId("LinkToDirectoryUrlName")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)));
 
             //Launch kendo grid
             launcher.launch();

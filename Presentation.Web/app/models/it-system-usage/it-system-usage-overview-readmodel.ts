@@ -44,6 +44,10 @@
         ItProjectNamesAsCsv: string | null;
         ArchiveDuty: string | null;
         IsHoldingDocument: boolean;
-        ActiveArchivePeriodEndDate : Date | null;
+        ActiveArchivePeriodEndDate: Date | null;
+        RiskSupervisionDocumentationName: string | null;
+        RiskSupervisionDocumentationUrl: string | null;
+        LinkToDirectoryName: string | null;
+        LinkToDirectoryUrl: string | null;
     }
 }
