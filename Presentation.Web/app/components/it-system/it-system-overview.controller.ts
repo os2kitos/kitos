@@ -442,7 +442,27 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.Concluded))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Concluded)));
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.Concluded)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ArchiveDuty")
+                        .withTitle("Arkiveringspligt")
+                        .withId("ArchiveDuty")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange([
+                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Undecided,
+                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.B,
+                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.K,
+                            Models.ViewModel.ItSystemUsage.ArchiveDutyViewModel.archiveDuties.Unknown
+                        ].map(value => {
+                            return {
+                                textValue: value.text,
+                                remoteValue: value.textValue
+                            }
+                        })
+                            , false)
+                        .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty)));
 
             //Launch kendo grid
             launcher.launch();
