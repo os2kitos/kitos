@@ -411,6 +411,7 @@
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\HierachyNodeDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
@@ -511,8 +512,11 @@
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\Api\user.ts" />
+    <TypeScriptCompile Include="app\models\generic\BusinessRoleDTO.ts" />
+    <TypeScriptCompile Include="app\models\generic\HierarchyNodeDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-options.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-readmodel.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />

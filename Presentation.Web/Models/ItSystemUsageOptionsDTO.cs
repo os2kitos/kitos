@@ -6,5 +6,6 @@ namespace Presentation.Web.Models
     {
         public IEnumerable<NamedEntityDTO> BusinessTypes { get; set; }
         public IEnumerable<BusinessRoleDTO> SystemRoles { get; set; }
+        public IEnumerable<HierachyNodeDTO> OrganizationUnits { get; set; }
     }
 }

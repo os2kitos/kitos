@@ -3,10 +3,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 using Presentation.Web.Infrastructure.Attributes;
@@ -20,13 +21,16 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
         private readonly IOptionsService<ItSystemRight, ItSystemRole> _rolesService;
+        private readonly IGenericRepository<OrganizationUnit> _orgUnitsRepository;
 
         public ItSystemUsageOptionsController(
             IOptionsService<ItSystem, BusinessType> businessTypeService,
-            IOptionsService<ItSystemRight, ItSystemRole> rolesService)
+            IOptionsService<ItSystemRight, ItSystemRole> rolesService,
+            IGenericRepository<OrganizationUnit> orgUnitsRepository)
         {
             _businessTypeService = businessTypeService;
             _rolesService = rolesService;
+            _orgUnitsRepository = orgUnitsRepository;
         }
 
         [HttpGet]
@@ -40,9 +44,13 @@ namespace Presentation.Web.Controllers.API
             return Ok(new ItSystemUsageOptionsDTO
             {
                 BusinessTypes = ToDTOs<BusinessType, ItSystem>(_businessTypeService.GetAvailableOptionsDetails(organizationId)),
-                SystemRoles = _rolesService.GetAvailableOptionsDetails(organizationId).Select(ToDto).ToList()
-
-                //TODO: Consider adding the org units as well here!
+                SystemRoles = _rolesService.GetAvailableOptionsDetails(organizationId).Select(ToDto).ToList(),
+                OrganizationUnits = _orgUnitsRepository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .AsEnumerable()
+                    .Select(orgUnit => new HierachyNodeDTO(orgUnit.Id, orgUnit.Name, orgUnit.ParentId))
+                    .ToList()
             });
         }
 
