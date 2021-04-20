@@ -65,6 +65,7 @@ namespace Core.ApplicationServices.Project
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
+            _domainEvents.Raise(new EntityCreatedEvent<ItProject>(project));
             return project;
         }
 

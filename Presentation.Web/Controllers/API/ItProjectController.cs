@@ -32,22 +32,19 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IDomainEvents _domainEvents;
 
         public ItProjectController(
             IGenericRepository<ItProject> repository,
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IDomainEvents domainEvents)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _orgUnitRepository = orgUnitRepository;
-            _domainEvents = domainEvents;
         }
 
         /// <summary>
@@ -430,7 +427,7 @@ namespace Presentation.Web.Controllers.API
                 project.ItSystemUsages.Add(systemUsage);
 
                 Repository.Save();
-                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
+                base.DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Created(Map<ItSystemUsage, ItSystemUsageDTO>(systemUsage));
             }
@@ -464,7 +461,7 @@ namespace Presentation.Web.Controllers.API
 
                 project.ItSystemUsages.Remove(systemUsage);
                 Repository.Save();
-                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
+                base.DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Ok();
             }
