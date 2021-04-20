@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -43,7 +42,7 @@ namespace Presentation.Web.Controllers.API
             }
             return Ok(new ItSystemUsageOptionsDTO
             {
-                BusinessTypes = ToDTOs<BusinessType, ItSystem>(_businessTypeService.GetAvailableOptionsDetails(organizationId)),
+                BusinessTypes = _businessTypeService.GetAvailableOptionsDetails(organizationId).Select(ToDTO<BusinessType, ItSystem>).ToList(),
                 SystemRoles = _rolesService.GetAvailableOptionsDetails(organizationId).Select(ToDto).ToList(),
                 OrganizationUnits = _orgUnitsRepository
                     .AsQueryable()
@@ -57,11 +56,6 @@ namespace Presentation.Web.Controllers.API
         private static BusinessRoleDTO ToDto(OptionDescriptor<ItSystemRole> availableRole)
         {
             return new BusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description);
-        }
-
-        private static IEnumerable<NamedEntityDTO> ToDTOs<T, TOwner>(IEnumerable<OptionDescriptor<T>> options) where T : OptionEntity<TOwner>
-        {
-            return options.Select(ToDTO<T, TOwner>).ToList();
         }
 
         private static NamedEntityDTO ToDTO<T, TOwner>(OptionDescriptor<T> option) where T : OptionEntity<TOwner>
