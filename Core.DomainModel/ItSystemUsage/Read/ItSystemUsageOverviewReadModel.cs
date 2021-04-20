@@ -15,6 +15,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
             ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
             ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
+            DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
         }
 
 
@@ -98,5 +99,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string LinkToDirectoryName { get; set; }
         public string LinkToDirectoryUrl { get; set; }
+
+        public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
+        public string DataProcessingRegistrationNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
     }
 }

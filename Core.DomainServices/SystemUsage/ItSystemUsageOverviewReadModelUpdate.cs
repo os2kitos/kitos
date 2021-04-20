@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
@@ -22,6 +23,7 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
@@ -29,6 +31,7 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
             IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
@@ -36,6 +39,7 @@ namespace Core.DomainServices.SystemUsage
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _itProjectReadModelRepository = itProjectReadModelRepository;
             _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
+            _dataProcessingRegistrationReadModelRepository = dataProcessingRegistrationReadModelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -73,6 +77,47 @@ namespace Core.DomainServices.SystemUsage
             PatchItProjects(source, destination);
             PatchArchivePeriods(source, destination);
             PatchRiskSupervisionDocumentation(source, destination);
+            PatchDataProcessingRegistrations(source, destination);
+        }
+
+        private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.DataProcessingRegistrationNamesAsCsv = string.Join(", ", source.AssociatedDataProcessingRegistrations.Select(x => x.Name));
+            var isAgreementConcludedList = source.AssociatedDataProcessingRegistrations
+                .Select(x => x.IsAgreementConcluded)
+                .Where(x => x.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED) != YesNoIrrelevantOption.UNDECIDED)
+                .ToList();
+
+            destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
+
+            static string CreateDataProcessingRegistrationKey(int Id, string Name, YesNoIrrelevantOption? IsAgreementConcluded) => $"I:{Id}N:{Name}C:{IsAgreementConcluded}";
+
+            var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id, x.Name, x.IsAgreementConcluded));
+
+            // Remove DataProcessingRegistrations which were removed
+            var dataProcessingRegistrationsToBeRemoved =
+                destination.DataProcessingRegistrations
+                    .Where(x => incomingDataProcessingRegistrations.ContainsKey(CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded)) == false).ToList();
+
+            RemoveDataProcessingRegistrations(destination, dataProcessingRegistrationsToBeRemoved);
+
+            var existingDataProcessingRegistrations = destination.DataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded));
+            foreach (var incomingDataProcessingRegistration in source.AssociatedDataProcessingRegistrations.ToList())
+            {
+                if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id, incomingDataProcessingRegistration.Name, incomingDataProcessingRegistration.IsAgreementConcluded), out var dataProcessingRegistration))
+                {
+                    //Append the sensitive data levels if it is not already present
+                    dataProcessingRegistration = new ItSystemUsageOverviewDataProcessingRegistrationReadModel
+                    {
+                        Parent = destination,
+                        DataProcessingRegistrationId = incomingDataProcessingRegistration.Id,
+                        DataProcessingRegistrationName = incomingDataProcessingRegistration.Name,
+                        IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded
+                    };
+                    destination.DataProcessingRegistrations.Add(dataProcessingRegistration);
+                }
+            }
+            _dataProcessingRegistrationReadModelRepository.Save();
         }
 
         private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -332,6 +377,15 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.ArchivePeriods.Remove(archivePeriodToBeRemoved);
                 _archivePeriodReadModelRepository.Delete(archivePeriodToBeRemoved);
+            });
+        }
+        
+        private void RemoveDataProcessingRegistrations(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationsToBeRemoved)
+        {
+            dataProcessingRegistrationsToBeRemoved.ForEach(dataProcessingRegistrationToBeRemoved =>
+            {
+                destination.DataProcessingRegistrations.Remove(dataProcessingRegistrationToBeRemoved);
+                _dataProcessingRegistrationReadModelRepository.Delete(dataProcessingRegistrationToBeRemoved);
             });
         }
 

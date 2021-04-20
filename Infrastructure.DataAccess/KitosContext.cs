@@ -165,6 +165,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewSensitiveDataLevelReadModel> ItSystemUsageOverviewSensitiveDataLevelReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewItProjectReadModel> ItSystemUsageOverviewItProjectReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewDataProcessingRegistrationReadModel> ItSystemUsageOverviewDataProcessingRegistrationReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -264,6 +265,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewSensitiveDataLevelReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItProjectReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewArchivePeriodReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
         }
     }
 }
