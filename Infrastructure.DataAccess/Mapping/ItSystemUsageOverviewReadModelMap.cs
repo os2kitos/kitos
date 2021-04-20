@@ -103,6 +103,8 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LocalReferenceTitle).IsOptional();
             Property(x => x.LocalReferenceUrl).IsOptional();
 
+            Property(x => x.SensitiveDataLevelsAsCsv).IsOptional();
+
 
 
             HasRequired(t => t.Organization)

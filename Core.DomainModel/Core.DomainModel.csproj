@@ -93,6 +93,7 @@
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRoleAssignmentReadModel.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewSensitiveDataLevelReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewTaskRefReadModel.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
