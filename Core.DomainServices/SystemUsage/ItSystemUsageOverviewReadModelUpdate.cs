@@ -89,7 +89,7 @@ namespace Core.DomainServices.SystemUsage
             {
                 if (!existingArchivePeriods.TryGetValue(CreateArchivePeriodKey(incomingArchivePeriod.StartDate, incomingArchivePeriod.EndDate), out var archivePeriod))
                 {
-                    //Append the sensitive data levels if it is not already present
+                    //Append the ArchivePeriod if it is not already present
                     archivePeriod = new ItSystemUsageOverviewArchivePeriodReadModel
                     {
                         Parent = destination,
