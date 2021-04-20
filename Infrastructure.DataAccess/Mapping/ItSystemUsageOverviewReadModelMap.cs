@@ -105,6 +105,8 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.SensitiveDataLevelsAsCsv).IsOptional();
 
+            Property(x => x.ItProjectNamesAsCsv).IsOptional();
+
 
 
             HasRequired(t => t.Organization)

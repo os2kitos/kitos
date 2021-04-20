@@ -13,6 +13,7 @@ using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Project
@@ -25,6 +26,7 @@ namespace Core.ApplicationServices.Project
         private readonly IUserRepository _userRepository;
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
+        private readonly IDomainEvents _domainEvents;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -32,7 +34,8 @@ namespace Core.ApplicationServices.Project
             IItProjectRepository itProjectRepository,
             IUserRepository userRepository,
             IReferenceService referenceService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IDomainEvents domainEvents)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -40,6 +43,7 @@ namespace Core.ApplicationServices.Project
             _userRepository = userRepository;
             _referenceService = referenceService;
             _transactionManager = transactionManager;
+            _domainEvents = domainEvents;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
@@ -61,6 +65,7 @@ namespace Core.ApplicationServices.Project
 
             _projectRepository.Insert(project);
             _projectRepository.Save();
+            _domainEvents.Raise(new EntityCreatedEvent<ItProject>(project));
             return project;
         }
 
@@ -86,6 +91,7 @@ namespace Core.ApplicationServices.Project
                     return deleteByProjectId.Error;
                 }
                 project.Handover?.Participants?.Clear();
+                _domainEvents.Raise(new EntityDeletedEvent<ItProject>(project));
                 _projectRepository.DeleteWithReferencePreload(project);
                 _projectRepository.Save();
                 transaction.Commit();
