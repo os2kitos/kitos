@@ -117,6 +117,11 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.ItProjectNamesAsCsv).IsOptional();
 
+            Property(x => x.RiskSupervisionDocumentationName).IsOptional();
+            Property(x => x.RiskSupervisionDocumentationUrl).IsOptional();
+            Property(x => x.LinkToDirectoryName).IsOptional();
+            Property(x => x.LinkToDirectoryUrl).IsOptional();
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)

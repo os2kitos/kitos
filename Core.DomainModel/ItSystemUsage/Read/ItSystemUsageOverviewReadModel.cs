@@ -93,5 +93,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public bool? Registertype { get; set; }
 
         public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; }
+
+        public string RiskSupervisionDocumentationName { get; set; }
+        public string RiskSupervisionDocumentationUrl { get; set; }
+        public string LinkToDirectoryName { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
     }
 }
