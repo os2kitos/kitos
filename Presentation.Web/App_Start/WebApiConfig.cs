@@ -444,6 +444,8 @@ namespace Presentation.Web
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).RemoveProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.SourceEntity)));
             builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).RemoveProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.Organization)));
 
+            //Add ActiveArchivePeriodEndDate to result form odata
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).AddProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.ActiveArchivePeriodEndDate)));
         }
 
         private static void BindDataProcessingRegistrationModule(ODataConventionModelBuilder builder)

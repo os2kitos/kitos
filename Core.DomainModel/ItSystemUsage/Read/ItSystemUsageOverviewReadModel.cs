@@ -14,6 +14,32 @@ namespace Core.DomainModel.ItSystemUsage.Read
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
             ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
+            ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
+        }
+
+
+        public DateTime? ActiveArchivePeriodEndDate
+        {
+            get
+            {
+                ItSystemUsageOverviewArchivePeriodReadModel archivePeriodWithEarliestStartDate = null;
+                var today = DateTime.Now;
+                foreach (var archivePeriod in ArchivePeriods)
+                {
+                    if (today >= archivePeriod.StartDate && today <= archivePeriod.EndDate)
+                    {
+                        if (archivePeriodWithEarliestStartDate == null)
+                        {
+                            archivePeriodWithEarliestStartDate = archivePeriod;
+                        }
+                        else if (archivePeriodWithEarliestStartDate?.StartDate > archivePeriod.StartDate)
+                        {
+                            archivePeriodWithEarliestStartDate = archivePeriod;
+                        }
+                    }
+                }
+                return archivePeriodWithEarliestStartDate?.EndDate;
+            }
         }
 
         public int OrganizationId { get; set; }
@@ -64,7 +90,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool? Registertype { get; set; }
-        public DateTime? ArchivePeriodEndDate { get; set; }
 
+        public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; }
     }
 }

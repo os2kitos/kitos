@@ -47,6 +47,8 @@
                         MainContractSupplierName = c.String(maxLength: 100),
                         SensitiveDataLevelsAsCsv = c.String(),
                         ItProjectNamesAsCsv = c.String(),
+                        ArchiveDuty = c.Int(),
+                        Registertype = c.Boolean(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -74,7 +76,22 @@
                 .Index(t => t.MainContractId, name: "ItSystemUsageOverviewReadModel_Index_MainContractId")
                 .Index(t => t.MainContractName, name: "ItSystemUsageOverviewReadModel_Index_MainContractName")
                 .Index(t => t.MainContractSupplierId, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId")
-                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
+                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
+                .Index(t => t.ArchiveDuty, name: "ItSystemUsageOverviewReadModel_Index_ArchiveDuty")
+                .Index(t => t.Registertype, name: "ItSystemUsageOverviewReadModel_Index_Registertype");
+            
+            CreateTable(
+                "dbo.ItSystemUsageOverviewArchivePeriodReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        StartDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        EndDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.ParentId);
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewItProjectReadModels",
@@ -183,6 +200,7 @@
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageOverviewTaskRefReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewItProjectReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
+            DropForeignKey("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropIndex("dbo.TaskRef", "UX_TaskKey");
             DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", "ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel");
@@ -195,6 +213,9 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_Registertype");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ArchiveDuty");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractName");
@@ -259,6 +280,7 @@
             DropTable("dbo.ItSystemUsageOverviewRoleAssignmentReadModels");
             DropTable("dbo.ItSystemUsageOverviewTaskRefReadModels");
             DropTable("dbo.ItSystemUsageOverviewItProjectReadModels");
+            DropTable("dbo.ItSystemUsageOverviewArchivePeriodReadModels");
             DropTable("dbo.ItSystemUsageOverviewReadModels");
             CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }

@@ -28,6 +28,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -37,11 +38,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
+            _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
                 _sensitiveDataLevelRepository.Object,
                 _itProjectReadModelRepository.Object,
+                _archivePeriodReadModelRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -225,7 +228,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.Registertype);
-            Assert.Equal(archivePeriods.First().EndDate, readModel.ArchivePeriodEndDate);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -279,6 +281,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var rmProject = Assert.Single(readModel.ItProjects);
             Assert.Equal(project.Id, rmProject.ItProjectId);
             Assert.Equal(project.Name, rmProject.ItProjectName);
+
+            //ArchivePeriods
+            var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
+            Assert.Equal(archivePeriods.First().StartDate, rmArchivePeriod.StartDate);
+            Assert.Equal(archivePeriods.First().EndDate, rmArchivePeriod.EndDate);
+            Assert.Equal(archivePeriods.First().EndDate, readModel.ActiveArchivePeriodEndDate);
         }
 
         [Fact]
@@ -391,7 +399,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _sut.Apply(systemUsage, readModel);
 
             //Assert
-            Assert.Equal(endDateOfEarlistStartDate, readModel.ArchivePeriodEndDate);
+            Assert.Equal(endDateOfEarlistStartDate, readModel.ActiveArchivePeriodEndDate);
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

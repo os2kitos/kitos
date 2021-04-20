@@ -20,18 +20,21 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
             IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
             IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
             IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _itProjectReadModelRepository = itProjectReadModelRepository;
+            _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -70,23 +73,33 @@ namespace Core.DomainServices.SystemUsage
 
         private void PatchArchivePeriodEndDate(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            ArchivePeriod archivePeriodWithEarliestStartDate = null;
-            var today = DateTime.Now;
-            foreach (var archivePeriod in source.ArchivePeriods)
+            static string CreateArchivePeriodKey(DateTime startDate, DateTime endDate) => $"S:{startDate}E:{endDate}";
+
+            var incomingArchivePeriods = source.ArchivePeriods.ToDictionary(x => CreateArchivePeriodKey(x.StartDate, x.EndDate));
+
+            // Remove ArchivePeriods which were removed
+            var archivePeriodsToBeRemoved =
+                destination.ArchivePeriods
+                    .Where(x => incomingArchivePeriods.ContainsKey(CreateArchivePeriodKey(x.StartDate, x.EndDate)) == false).ToList();
+
+            RemoveArchivePeriods(destination, archivePeriodsToBeRemoved);
+
+            var existingArchivePeriods = destination.ArchivePeriods.ToDictionary(x => CreateArchivePeriodKey(x.StartDate, x.EndDate));
+            foreach (var incomingArchivePeriod in source.ArchivePeriods.ToList())
             {
-                if(today >= archivePeriod.StartDate && today <= archivePeriod.EndDate)
+                if (!existingArchivePeriods.TryGetValue(CreateArchivePeriodKey(incomingArchivePeriod.StartDate, incomingArchivePeriod.EndDate), out var archivePeriod))
                 {
-                    if(archivePeriodWithEarliestStartDate == null)
+                    //Append the sensitive data levels if it is not already present
+                    archivePeriod = new ItSystemUsageOverviewArchivePeriodReadModel
                     {
-                        archivePeriodWithEarliestStartDate = archivePeriod;
-                    }
-                    else if(archivePeriodWithEarliestStartDate?.StartDate > archivePeriod.StartDate)
-                    {
-                        archivePeriodWithEarliestStartDate = archivePeriod;
-                    }
+                        Parent = destination,
+                        StartDate = incomingArchivePeriod.StartDate,
+                        EndDate = incomingArchivePeriod.EndDate
+                    };
+                    destination.ArchivePeriods.Add(archivePeriod);
                 }
             }
-            destination.ArchivePeriodEndDate = archivePeriodWithEarliestStartDate?.EndDate;
+            _archivePeriodReadModelRepository.Save();
         }
 
         private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -292,6 +305,15 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.ItProjects.Remove(itProjectToBeRemoved);
                 _itProjectReadModelRepository.Delete(itProjectToBeRemoved);
+            });
+        }
+
+        private void RemoveArchivePeriods(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodsToBeRemoved)
+        {
+            archivePeriodsToBeRemoved.ForEach(archivePeriodToBeRemoved =>
+            {
+                destination.ArchivePeriods.Remove(archivePeriodToBeRemoved);
+                _archivePeriodReadModelRepository.Delete(archivePeriodToBeRemoved);
             });
         }
 
