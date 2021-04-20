@@ -344,7 +344,7 @@
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("MainContractIsActive")
+                        .withDataSourceName("HasMainContract")
                         .withTitle("Kontrakt")
                         .withId("contract")
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)

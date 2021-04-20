@@ -91,6 +91,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName", 0);
 
+            Property(x => x.HasMainContract)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HasMainContract", 0);
+
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
@@ -102,8 +105,6 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.SensitiveDataLevelsAsCsv).IsOptional();
 
             Property(x => x.ItProjectNamesAsCsv).IsOptional();
-
-
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)

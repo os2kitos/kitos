@@ -132,6 +132,7 @@ namespace Core.DomainServices.SystemUsage
             destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
             destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
             destination.MainContractIsActive = source.MainContract?.ItContract?.IsActive;
+            destination.HasMainContract = source.MainContract?.ItContract != null;
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

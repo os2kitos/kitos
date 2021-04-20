@@ -45,6 +45,7 @@
                         MainContractSupplierId = c.Int(),
                         MainContractSupplierName = c.String(maxLength: 100),
                         MainContractIsActive = c.Boolean(),
+                        HasMainContract = c.Boolean(nullable: false),
                         SensitiveDataLevelsAsCsv = c.String(),
                         ItProjectNamesAsCsv = c.String(),
                     })
@@ -73,7 +74,8 @@
                 .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName")
                 .Index(t => t.MainContractId, name: "ItSystemUsageOverviewReadModel_Index_MainContractId")
                 .Index(t => t.MainContractSupplierId, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId")
-                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
+                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
+                .Index(t => t.HasMainContract, name: "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewItProjectReadModels",
@@ -194,6 +196,7 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractId");
