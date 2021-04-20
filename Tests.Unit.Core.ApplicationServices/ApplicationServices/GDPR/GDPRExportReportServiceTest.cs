@@ -190,6 +190,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private void AssertGdprExportReportExtracted(ItSystemUsage usage, GDPRExportReport gdprExportReport)
         {
+            Assert.Equal(usage.ItSystem.Uuid.ToString("D"), gdprExportReport.SystemUuid);
             Assert.Equal(usage.ItSystem.Name, gdprExportReport.SystemName);
             Assert.Equal(usage.isBusinessCritical, gdprExportReport.BusinessCritical);
             Assert.Equal(usage.DPIA, gdprExportReport.DPIA);

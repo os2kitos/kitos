@@ -50,6 +50,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
         {
             return new GDPRExportReport
             {
+                SystemUuid = input.ItSystem.Uuid.ToString("D"),
                 BusinessCritical = input.isBusinessCritical,
                 DataProcessingAgreementConcluded = input.HasDataProcessingAgreement(),
                 DPIA = input.DPIA,
