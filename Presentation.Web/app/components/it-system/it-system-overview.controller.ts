@@ -483,7 +483,17 @@
                         ]
                             , false)
                         .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
-                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej"));
+                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej"))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("ActiveArchivePeriodEndDate")
+                        .withTitle("Journalperiode slutdato")
+                        .withId("ArchivePeriodsEndDate")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                        .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
+                        .withInitialVisibility(false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate)));
 
             //Launch kendo grid
             launcher.launch();

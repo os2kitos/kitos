@@ -43,6 +43,7 @@
         SensitiveDataLevelsAsCsv: string | null;
         ItProjectNamesAsCsv: string | null;
         ArchiveDuty: string | null;
-        IsHoldingDocument : boolean;
+        IsHoldingDocument: boolean;
+        ActiveArchivePeriodEndDate : Date | null;
     }
 }
