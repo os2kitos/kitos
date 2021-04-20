@@ -98,8 +98,7 @@ namespace Infrastructure.DataAccess.Mapping
                .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
 
-            Property(x => x.Registertype)
-                .IsOptional()
+            Property(x => x.IsHoldingDocument)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Registertype", 0);
 
 

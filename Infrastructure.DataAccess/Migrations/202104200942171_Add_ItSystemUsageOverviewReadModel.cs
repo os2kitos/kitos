@@ -49,7 +49,7 @@
                         SensitiveDataLevelsAsCsv = c.String(),
                         ItProjectNamesAsCsv = c.String(),
                         ArchiveDuty = c.Int(),
-                        Registertype = c.Boolean(),
+                        IsHoldingDocument = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -79,7 +79,7 @@
                 .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
                 .Index(t => t.HasMainContract, name: "ItSystemUsageOverviewReadModel_Index_HasMainContract")
                 .Index(t => t.ArchiveDuty, name: "ItSystemUsageOverviewReadModel_Index_ArchiveDuty")
-                .Index(t => t.Registertype, name: "ItSystemUsageOverviewReadModel_Index_Registertype");
+                .Index(t => t.IsHoldingDocument, name: "ItSystemUsageOverviewReadModel_Index_Registertype");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewArchivePeriodReadModels",
