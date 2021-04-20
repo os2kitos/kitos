@@ -84,6 +84,7 @@ using Core.DomainServices.Contract;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
+using Core.DomainModel.ItProject;
 
 namespace Presentation.Web.Ninject
 {
@@ -279,6 +280,8 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
