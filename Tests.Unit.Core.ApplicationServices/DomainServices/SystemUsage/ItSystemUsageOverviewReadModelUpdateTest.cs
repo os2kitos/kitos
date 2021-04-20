@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -26,6 +27,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>> _roleAssignmentRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>> _taskRefRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -34,10 +36,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _taskRefRepository = new Mock<IGenericRepository<ItSystemUsageOverviewTaskRefReadModel>>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>>();
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
+            _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
                 _sensitiveDataLevelRepository.Object,
+                _itProjectReadModelRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -77,6 +81,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 Name = A<string>(),
                 Supplier = supplier
+            };
+            var project = new ItProject
+            {
+                Id = A<int>(),
+                Name = A<string>()
             };
             var parentSystem = new ItSystem
             {
@@ -137,7 +146,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUserId = user.Id,
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
-                Concluded = A<DateTime>()
+                Concluded = A<DateTime>(),
+                ItProjects = new List<ItProject> 
+                { 
+                    project 
+                }
             };
 
             // Add ResponsibleOrganizationUnit
@@ -242,6 +255,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(contract.Name, readModel.MainContractName);
             Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
+
+            //Projects
+            Assert.Equal(project.Name, readModel.ItProjectNamesAsCsv);
+            var rmProject = Assert.Single(readModel.ItProjects);
+            Assert.Equal(project.Id, rmProject.ItProjectId);
+            Assert.Equal(project.Name, rmProject.ItProjectName);
         }
 
         [Fact]
