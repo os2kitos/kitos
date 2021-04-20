@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -57,6 +58,8 @@ namespace Core.DomainServices.SystemUsage
             destination.Concluded = source.Concluded;
             destination.ArchiveDuty = source.ArchiveDuty;
             destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
+            destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
+            destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
@@ -69,6 +72,21 @@ namespace Core.DomainServices.SystemUsage
             PatchSensitiveDataLevels(source, destination);
             PatchItProjects(source, destination);
             PatchArchivePeriods(source, destination);
+            PatchRiskSupervisionDocumentation(source, destination);
+        }
+
+        private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            if(source.riskAssessment == DataOptions.YES)
+            {
+                destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
+                destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
+            }
+            else
+            {
+                destination.RiskSupervisionDocumentationName = null;
+                destination.RiskSupervisionDocumentationUrl = null;
+            }
         }
 
         private void PatchArchivePeriods(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

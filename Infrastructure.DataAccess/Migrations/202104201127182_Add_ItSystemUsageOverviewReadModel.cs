@@ -50,6 +50,10 @@
                         ItProjectNamesAsCsv = c.String(),
                         ArchiveDuty = c.Int(),
                         IsHoldingDocument = c.Boolean(nullable: false),
+                        RiskSupervisionDocumentationName = c.String(maxLength: 150),
+                        RiskSupervisionDocumentationUrl = c.String(),
+                        LinkToDirectoryName = c.String(maxLength: 150),
+                        LinkToDirectoryUrl = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -79,7 +83,9 @@
                 .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
                 .Index(t => t.HasMainContract, name: "ItSystemUsageOverviewReadModel_Index_HasMainContract")
                 .Index(t => t.ArchiveDuty, name: "ItSystemUsageOverviewReadModel_Index_ArchiveDuty")
-                .Index(t => t.IsHoldingDocument, name: "ItSystemUsageOverviewReadModel_Index_IsHoldingDocument");
+                .Index(t => t.IsHoldingDocument, name: "ItSystemUsageOverviewReadModel_Index_IsHoldingDocument")
+                .Index(t => t.RiskSupervisionDocumentationName, name: "ItSystemUsage_Index_RiskSupervisionDocumentationName")
+                .Index(t => t.LinkToDirectoryName, name: "ItSystemUsage_Index_LinkToDirectoryName");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewArchivePeriodReadModels",
@@ -161,6 +167,8 @@
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
+            AlterColumn("dbo.ItSystemUsage", "LinkToDirectoryUrlName", c => c.String(maxLength: 150));
+            AlterColumn("dbo.ItSystemUsage", "RiskSupervisionDocumentationUrlName", c => c.String(maxLength: 150));
             AlterColumn("dbo.AgreementElementTypes", "Name", c => c.String(nullable: false, maxLength: 150));
             AlterColumn("dbo.GoalTypes", "Name", c => c.String(nullable: false, maxLength: 150));
             AlterColumn("dbo.TaskRef", "TaskKey", c => c.String(maxLength: 15));
@@ -194,6 +202,8 @@
             CreateIndex("dbo.ItSystemUsage", "LocalSystemId", name: "ItSystemUsage_Index_LocalSystemId");
             CreateIndex("dbo.ItSystemUsage", "Version", name: "ItSystemUsage_Index_Version");
             CreateIndex("dbo.ItSystemUsage", "LocalCallName", name: "ItSystemUsage_Index_LocalCallName");
+            CreateIndex("dbo.ItSystemUsage", "LinkToDirectoryUrlName", name: "ItSystemUsage_Index_LinkToDirectoryUrlName");
+            CreateIndex("dbo.ItSystemUsage", "RiskSupervisionDocumentationUrlName", name: "ItSystemUsage_Index_RiskSupervisionDocumentationUrlName");
             CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }
         
@@ -223,6 +233,8 @@
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate");
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsage_Index_LinkToDirectoryName");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsage_Index_RiskSupervisionDocumentationName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_IsHoldingDocument");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ArchiveDuty");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
@@ -249,6 +261,8 @@
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_Name");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", new[] { "SourceEntityId" });
             DropIndex("dbo.ItSystemUsageOverviewReadModels", new[] { "OrganizationId" });
+            DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_RiskSupervisionDocumentationUrlName");
+            DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LinkToDirectoryUrlName");
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LocalCallName");
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_Version");
             DropIndex("dbo.ItSystemUsage", "ItSystemUsage_Index_LocalSystemId");
@@ -282,6 +296,8 @@
             AlterColumn("dbo.TaskRef", "TaskKey", c => c.String(maxLength: 50));
             AlterColumn("dbo.GoalTypes", "Name", c => c.String(nullable: false));
             AlterColumn("dbo.AgreementElementTypes", "Name", c => c.String(nullable: false));
+            AlterColumn("dbo.ItSystemUsage", "RiskSupervisionDocumentationUrlName", c => c.String());
+            AlterColumn("dbo.ItSystemUsage", "LinkToDirectoryUrlName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String());
             AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String());
