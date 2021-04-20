@@ -13,6 +13,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
             RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
             ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
             SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
+            ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
         }
 
         public int OrganizationId { get; set; }
@@ -47,7 +48,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ObjectOwnerName { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
-        public DateTime LastChanged { get; set; } 
+        public DateTime LastChanged { get; set; }
         public DateTime? Concluded { get; set; }
 
         public int? MainContractId { get; set; }
@@ -57,5 +58,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public string SensitiveDataLevelsAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
+
+        public string ItProjectNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
     }
 }

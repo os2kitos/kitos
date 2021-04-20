@@ -46,6 +46,7 @@
                         MainContractSupplierName = c.String(maxLength: 100),
                         MainContractIsActive = c.Boolean(),
                         SensitiveDataLevelsAsCsv = c.String(),
+                        ItProjectNamesAsCsv = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
@@ -73,6 +74,19 @@
                 .Index(t => t.MainContractId, name: "ItSystemUsageOverviewReadModel_Index_MainContractId")
                 .Index(t => t.MainContractSupplierId, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId")
                 .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
+            
+            CreateTable(
+                "dbo.ItSystemUsageOverviewItProjectReadModels",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        ItProjectId = c.Int(nullable: false),
+                        ItProjectName = c.String(),
+                        ParentId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.ParentId);
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewTaskRefReadModels",
@@ -167,6 +181,7 @@
             DropForeignKey("dbo.ItSystemUsageOverviewRoleAssignmentReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropForeignKey("dbo.ItSystemUsageOverviewReadModels", "OrganizationId", "dbo.Organization");
             DropForeignKey("dbo.ItSystemUsageOverviewTaskRefReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
+            DropForeignKey("dbo.ItSystemUsageOverviewItProjectReadModels", "ParentId", "dbo.ItSystemUsageOverviewReadModels");
             DropIndex("dbo.TaskRef", "UX_TaskKey");
             DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels", "ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel");
@@ -178,6 +193,7 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
+            DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractId");
@@ -240,6 +256,7 @@
             DropTable("dbo.ItSystemUsageOverviewSensitiveDataLevelReadModels");
             DropTable("dbo.ItSystemUsageOverviewRoleAssignmentReadModels");
             DropTable("dbo.ItSystemUsageOverviewTaskRefReadModels");
+            DropTable("dbo.ItSystemUsageOverviewItProjectReadModels");
             DropTable("dbo.ItSystemUsageOverviewReadModels");
             CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }

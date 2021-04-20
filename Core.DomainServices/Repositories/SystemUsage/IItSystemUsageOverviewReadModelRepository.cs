@@ -18,5 +18,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByBusinessTypeId(int businessTypeId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId);
     }
 }

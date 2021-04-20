@@ -97,5 +97,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.MainContractId == contractId);
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.ItProjects.Select(y => y.ItProjectId).Contains(projectId));
+        }
     }
 }

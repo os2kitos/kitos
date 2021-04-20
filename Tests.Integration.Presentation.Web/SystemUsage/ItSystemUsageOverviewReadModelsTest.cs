@@ -69,6 +69,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var contractName = A<string>();
 
+            var projectName = A<string>();
+
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
@@ -124,6 +126,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
 
             await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id);
+
+            // Project
+            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -195,6 +201,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(contract.Id, readModel.MainContractId);
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
+
+            // Project
+            Assert.Equal(projectName, readModel.ItProjectNamesAsCsv);
+            var rmProject = Assert.Single(readModel.ItProjects);
+            Assert.Equal(project.Id, rmProject.ItProjectId);
+            Assert.Equal(projectName, rmProject.ItProjectName);
         }
 
         [Fact]
@@ -438,6 +450,79 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItProjects_Is_Updated_When_ItProject_Is_Deleted()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var projectName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
+            
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItProjectHelper.SendDeleteProjectAsync(project.Id);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal("", readModel.ItProjectNamesAsCsv);
+            Assert.Empty(readModel.ItProjects);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItProjects_Is_Updated_When_ItProject_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var projectName = A<string>();
+            var newProjectName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var project = await ItProjectHelper.CreateProject(projectName, organizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
+
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await ItProjectHelper.SendChangeNameRequestAsync(project.Id, newProjectName, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(newProjectName, readModel.ItProjectNamesAsCsv);
+            var rmProject = Assert.Single(readModel.ItProjects);
+            Assert.Equal(project.Id, rmProject.ItProjectId);
+            Assert.Equal(newProjectName, rmProject.ItProjectName);
         }
 
 
