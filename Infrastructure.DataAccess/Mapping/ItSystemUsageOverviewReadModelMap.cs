@@ -101,6 +101,14 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.IsHoldingDocument)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
 
+            Property(x => x.RiskSupervisionDocumentationName)
+                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_RiskSupervisionDocumentationName", 0);
+
+            Property(x => x.LinkToDirectoryName)
+                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryName", 0);
+
 
 
             //No index bc we don't know how long it might be
@@ -114,9 +122,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.ItProjectNamesAsCsv).IsOptional();
 
-            Property(x => x.RiskSupervisionDocumentationName).IsOptional();
             Property(x => x.RiskSupervisionDocumentationUrl).IsOptional();
-            Property(x => x.LinkToDirectoryName).IsOptional();
             Property(x => x.LinkToDirectoryUrl).IsOptional();
 
             HasRequired(t => t.Organization)
