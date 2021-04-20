@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
@@ -67,6 +68,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageLocalSystemId = A<string>();
             var concluded = A<DateTime>();
             var archiveDuty = A<ArchiveDutyTypes>();
+            var riskAssessment = A<DataOptions>();
+            var linkToDirectoryUrl = A<string>();
+            var linkToDirectoryUrlName = A<string>();
+            var riskSupervisionDocumentationUrl = A<string>();
+            var riskSupervisionDocumentationUrlName = A<string>();
 
             var contractName = A<string>();
 
@@ -106,7 +112,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 LocalCallName = systemUsageLocalCallName,
                 LocalSystemId = systemUsageLocalSystemId,
                 Concluded = concluded,
-                ArchiveDuty = archiveDuty
+                ArchiveDuty = archiveDuty,
+                RiskAssessment = riskAssessment,
+                linkToDirectoryUrl = linkToDirectoryUrl,
+                linkToDirectoryUrlName = linkToDirectoryUrlName,
+                riskSupervisionDocumentationUrl = riskSupervisionDocumentationUrl,
+                riskSupervisionDocumentationUrlName = riskSupervisionDocumentationUrlName
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
@@ -166,6 +177,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date); // Lastchanged seem to update a few seconds later than the actual updates. So the readmodel is not always up to date on the seconds level
             Assert.Equal(archiveDuty, readModel.ArchiveDuty);
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
+            Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
+            Assert.Equal(linkToDirectoryUrl, readModel.LinkToDirectoryUrl);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(riskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
+                Assert.Equal(riskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
+            }
+            else
+            {
+                Assert.Null(readModel.RiskSupervisionDocumentationName);
+                Assert.Null(readModel.RiskSupervisionDocumentationUrl);
+            }
 
             // Sensitive Data Level
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -155,7 +156,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     project 
                 },
                 ArchiveDuty = A<ArchiveDutyTypes>(),
-                Registertype = A<bool>()
+                Registertype = A<bool>(),
+                riskAssessment = DataOptions.YES,
+                RiskSupervisionDocumentationUrlName = A<string>(),
+                RiskSupervisionDocumentationUrl = A<string>(),
+                LinkToDirectoryUrlName = A<string>(),
+                LinkToDirectoryUrl = A<string>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -228,6 +234,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
+            Assert.Equal(systemUsage.RiskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
+            Assert.Equal(systemUsage.RiskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
+            Assert.Equal(systemUsage.LinkToDirectoryUrlName, readModel.LinkToDirectoryName);
+            Assert.Equal(systemUsage.LinkToDirectoryUrl, readModel.LinkToDirectoryUrl);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -401,6 +411,39 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Assert
             Assert.Equal(endDateOfEarlistStartDate, readModel.ActiveArchivePeriodEndDate);
+        }
+
+        [Fact]
+        public void Apply_Generates_RiskSupervisionDocumentation_As_Null_If_RiskAssessment_Is_Not_Yes()
+        {
+            //Arrange
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>(),
+                riskAssessment = DataOptions.DONTKNOW,
+                RiskSupervisionDocumentationUrlName = A<string>(),
+                RiskSupervisionDocumentationUrl = A<string>()
+            };
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Null(readModel.RiskSupervisionDocumentationName);
+            Assert.Null(readModel.RiskSupervisionDocumentationUrl);
+
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

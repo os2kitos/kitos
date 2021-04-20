@@ -103,8 +103,6 @@ namespace Infrastructure.DataAccess.Mapping
 
 
 
-
-
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
             Property(x => x.ItSystemKLENamesAsCsv).IsOptional();

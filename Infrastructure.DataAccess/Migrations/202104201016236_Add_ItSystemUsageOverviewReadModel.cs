@@ -50,6 +50,10 @@
                         ItProjectNamesAsCsv = c.String(),
                         ArchiveDuty = c.Int(),
                         IsHoldingDocument = c.Boolean(nullable: false),
+                        RiskSupervisionDocumentationName = c.String(),
+                        RiskSupervisionDocumentationUrl = c.String(),
+                        LinkToDirectoryName = c.String(),
+                        LinkToDirectoryUrl = c.String(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId)
