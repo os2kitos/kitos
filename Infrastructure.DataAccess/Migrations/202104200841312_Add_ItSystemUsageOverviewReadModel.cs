@@ -91,6 +91,8 @@
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.StartDate, name: "ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate")
+                .Index(t => t.EndDate, name: "ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate")
                 .Index(t => t.ParentId);
             
             CreateTable(
@@ -99,11 +101,13 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         ItProjectId = c.Int(nullable: false),
-                        ItProjectName = c.String(),
+                        ItProjectName = c.String(nullable: false, maxLength: 150),
                         ParentId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.ItProjectId, name: "ItSystemUsageOverviewItProjectReadModel_index_ItProjectId")
+                .Index(t => t.ItProjectName, name: "ItSystemUsageOverviewItProjectReadModel_index_ItProjectName")
                 .Index(t => t.ParentId);
             
             CreateTable(
@@ -213,7 +217,11 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", "ItSystemUsageOverviewItProjectReadModel_index_ItProjectName");
+            DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", "ItSystemUsageOverviewItProjectReadModel_index_ItProjectId");
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate");
+            DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_Registertype");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ArchiveDuty");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");

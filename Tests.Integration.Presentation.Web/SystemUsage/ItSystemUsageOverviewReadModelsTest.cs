@@ -131,6 +131,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var project = await ItProjectHelper.CreateProject(projectName, organizationId);
             await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
 
+            // ArchivePeriods
+            var archivePeriodStartDate = DateTime.Now.AddDays(-1);
+            var archivePeriodEndDate = DateTime.Now.AddDays(1);
+            var archivePeriod = await ItSystemUsageHelper.SendAddArchivePeriodRequestAsync(systemUsage.Id, archivePeriodStartDate, archivePeriodEndDate, organizationId);
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -208,6 +213,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmProject = Assert.Single(readModel.ItProjects);
             Assert.Equal(project.Id, rmProject.ItProjectId);
             Assert.Equal(projectName, rmProject.ItProjectName);
+
+            // ArchivePeriods
+            Assert.Equal(archivePeriodEndDate, readModel.ActiveArchivePeriodEndDate);
+            var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
+            Assert.Equal(archivePeriodStartDate, rmArchivePeriod.StartDate);
+            Assert.Equal(archivePeriodEndDate, rmArchivePeriod.EndDate);
         }
 
         [Fact]

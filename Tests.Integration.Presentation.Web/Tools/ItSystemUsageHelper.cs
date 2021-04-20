@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
@@ -23,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<ItSystemUsageOverviewReadModel>> QueryReadModelByNameContent(int organizationId, string nameContent, int top, int skip, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,ItSystemTaskRefs,SensitiveDataLevels,ItProjects&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,ItSystemTaskRefs,SensitiveDataLevels,ItProjects,ArchivePeriods&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
         }
@@ -188,6 +189,21 @@ namespace Tests.Integration.Presentation.Web.Tools
                     );
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return response;
+        }
+
+        public static async Task<ArchivePeriod> SendAddArchivePeriodRequestAsync(int systemUsageId, DateTime startDate, DateTime endDate, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/ArchivePeriods?organizationId={organizationId}");
+            var body = new
+            {
+                ItSystemUsageId = systemUsageId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ArchivePeriod>();
         }
     }
 }
