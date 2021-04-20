@@ -79,7 +79,7 @@
                 .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
                 .Index(t => t.HasMainContract, name: "ItSystemUsageOverviewReadModel_Index_HasMainContract")
                 .Index(t => t.ArchiveDuty, name: "ItSystemUsageOverviewReadModel_Index_ArchiveDuty")
-                .Index(t => t.IsHoldingDocument, name: "ItSystemUsageOverviewReadModel_Index_Registertype");
+                .Index(t => t.IsHoldingDocument, name: "ItSystemUsageOverviewReadModel_Index_IsHoldingDocument");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewArchivePeriodReadModels",
@@ -223,7 +223,7 @@
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", new[] { "ParentId" });
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate");
             DropIndex("dbo.ItSystemUsageOverviewArchivePeriodReadModels", "ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate");
-            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_Registertype");
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_IsHoldingDocument");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_ArchiveDuty");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
