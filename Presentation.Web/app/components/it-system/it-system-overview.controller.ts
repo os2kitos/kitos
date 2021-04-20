@@ -462,7 +462,28 @@
                         })
                             , false)
                         .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
-                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty)));
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("IsHoldingDocument")
+                        .withTitle("Er dokumentbærende")
+                        .withId("Registertype")
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange([
+                            {
+                                textValue: "Ja",
+                                remoteValue: true
+                            },
+                            {
+                                textValue: "Nej",
+                                remoteValue: false
+                            }
+                        ]
+                            , false)
+                        .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
+                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej"));
 
             //Launch kendo grid
             launcher.launch();
