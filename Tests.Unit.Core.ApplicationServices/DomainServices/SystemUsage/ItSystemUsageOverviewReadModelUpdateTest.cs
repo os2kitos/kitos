@@ -227,7 +227,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
-            Assert.Equal(systemUsage.Registertype, readModel.Registertype);
+            Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

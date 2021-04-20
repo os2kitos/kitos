@@ -90,7 +90,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewItProjectReadModel> ItProjects { get; set; } // Adding ItProjects as collection to enable indexed search
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-        public bool? Registertype { get; set; }
+        public bool IsHoldingDocument { get; set; }
 
         public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; }
 

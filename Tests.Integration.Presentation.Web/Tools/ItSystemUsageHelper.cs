@@ -205,5 +205,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<ArchivePeriod>();
         }
+
+        public static async Task<HttpResponseMessage> SetIsHoldingDocumentRequestAsync(int systemUsageId, bool isDocumentHolding, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})");
+            var body = new
+            {
+                Registertype = isDocumentHolding
+            };
+            using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            return response;
+        }
     }
 }

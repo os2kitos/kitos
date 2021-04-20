@@ -56,7 +56,7 @@ namespace Core.DomainServices.SystemUsage
             destination.LastChanged = source.LastChanged;
             destination.Concluded = source.Concluded;
             destination.ArchiveDuty = source.ArchiveDuty;
-            destination.Registertype = source.Registertype;
+            destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
@@ -68,10 +68,10 @@ namespace Core.DomainServices.SystemUsage
             PatchMainContract(source, destination);
             PatchSensitiveDataLevels(source, destination);
             PatchItProjects(source, destination);
-            PatchArchivePeriodEndDate(source, destination);
+            PatchArchivePeriods(source, destination);
         }
 
-        private void PatchArchivePeriodEndDate(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchArchivePeriods(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             static string CreateArchivePeriodKey(DateTime startDate, DateTime endDate) => $"S:{startDate}E:{endDate}";
 
