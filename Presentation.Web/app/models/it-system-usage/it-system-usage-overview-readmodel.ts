@@ -37,6 +37,7 @@
         LastChangedByName: string | null;
         LastChanged: Date | null;
         Concluded: Date | null;
-        MainContractSupplierName : string | null;
+        MainContractSupplierName: string | null;
+        SensitiveDataLevelsAsCsv : string | null;
     }
 }

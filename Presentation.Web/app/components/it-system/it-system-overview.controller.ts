@@ -61,7 +61,7 @@
                 .withGridBinding(this)
                 .withUser(user)
                 .withEntityTypeName("IT System")
-                .withExcelOutputName("IT Systeme Overblik")
+                .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
                 .withFixedSourceUrl(
                     `/odata/Organizations(${user.currentOrganizationId
@@ -81,9 +81,10 @@
                     parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ItSystemBusinessTypeId", "ItSystemBusinessTypeName");
 
                     if (parameterMap.$filter) {
-                        //Redirect KLE filtering searchable sub collections
+                        //Redirect consolidated field search towards optimized search targets
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)");
                     }
 
                     return parameterMap;
@@ -313,6 +314,33 @@
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
+
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("SensitiveDataLevelsAsCsv")
+                        .withTitle("Datatype")
+                        .withId("dataLevel")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange
+                        (
+                            [
+                                Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.none,
+                                Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.personal,
+                                Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.sensitive,
+                                Models.ViewModel.ItSystemUsage.SensitiveDataLevelViewModel.levels.legal
+                            ]
+                                .map(option => {
+                                    return {
+                                        textValue: option.text,
+                                        remoteValue: option.value
+                                    };
+                                }
+                                ),
+                            false)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("MainContractSupplierName")
@@ -320,6 +348,7 @@
                         .withId("supplier")
                         .withStandardWidth(175)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
@@ -329,6 +358,7 @@
                         .withId("belongsto")
                         .withStandardWidth(210)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
