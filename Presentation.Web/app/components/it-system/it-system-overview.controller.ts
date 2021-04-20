@@ -265,7 +265,7 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                        overviewOptions.businessTypes.map((unit: any) => {
+                            overviewOptions.businessTypes.map((unit: any) => {
                                 return {
                                     textValue: unit.name,
                                     remoteValue: unit.id,
@@ -311,6 +311,15 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("MainContractSupplierName")
+                        .withTitle("Leverandør")
+                        .withId("supplier")
+                        .withStandardWidth(175)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>

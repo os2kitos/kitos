@@ -37,5 +37,6 @@
         LastChangedByName: string | null;
         LastChanged: Date | null;
         Concluded: Date | null;
+        MainContractSupplierName : string | null;
     }
 }
