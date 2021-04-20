@@ -40,6 +40,7 @@
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;
         HasMainContract : boolean;
-        SensitiveDataLevelsAsCsv : string | null;
+        SensitiveDataLevelsAsCsv: string | null;
+        ItProjectNamesAsCsv : string | null;
     }
 }

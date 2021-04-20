@@ -83,11 +83,13 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         ItProjectId = c.Int(nullable: false),
-                        ItProjectName = c.String(),
+                        ItProjectName = c.String(nullable: false, maxLength: 150),
                         ParentId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.ItSystemUsageOverviewReadModels", t => t.ParentId, cascadeDelete: true)
+                .Index(t => t.ItProjectId, name: "ItSystemUsageOverviewItProjectReadModel_index_ItProjectId")
+                .Index(t => t.ItProjectName, name: "ItSystemUsageOverviewItProjectReadModel_index_ItProjectName")
                 .Index(t => t.ParentId);
             
             CreateTable(
@@ -196,6 +198,8 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", "ItSystemUsageOverviewItProjectReadModel_index_ItProjectName");
+            DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", "ItSystemUsageOverviewItProjectReadModel_index_ItProjectId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
