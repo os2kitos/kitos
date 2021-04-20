@@ -99,7 +99,7 @@ namespace Infrastructure.DataAccess.Mapping
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
 
             Property(x => x.IsHoldingDocument)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Registertype", 0);
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
 
 
 
