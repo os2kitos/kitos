@@ -378,10 +378,9 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        overviewOptions: [ //TODO: To service and wrap in type
-                            "$http", "user",
-                            ($http, user) => $http.get(`/api/v1/itsystem-usage/options/overview?organizationId=${user.currentOrganizationId}`)
-                                .then(result => result.data.response)
+                        overviewOptions: [
+                            "itSystemUsageOptionsService",
+                            (itSystemUsageOptionsService: Services.ItSystemUsage.IItSystemUsageOptionsService) => itSystemUsageOptionsService.getOptions()
                         ]
                     }
                 });
