@@ -15,6 +15,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Extensions;
@@ -426,6 +427,7 @@ namespace Presentation.Web.Controllers.API
                 project.ItSystemUsages.Add(systemUsage);
 
                 Repository.Save();
+                base.DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Created(Map<ItSystemUsage, ItSystemUsageDTO>(systemUsage));
             }
@@ -459,6 +461,7 @@ namespace Presentation.Web.Controllers.API
 
                 project.ItSystemUsages.Remove(systemUsage);
                 Repository.Save();
+                base.DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
 
                 return Ok();
             }
