@@ -304,8 +304,8 @@
                         .withId("ReferenceId")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Left)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlWithOptionalTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalReferenceDocumentId")
@@ -502,7 +502,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.RiskSupervisionDocumentationUrl, dataItem.RiskSupervisionDocumentationName)))
                 .withColumn(builder =>
                     builder
@@ -512,7 +512,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)));
 
             //Launch kendo grid
