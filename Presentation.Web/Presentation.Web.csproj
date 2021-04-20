@@ -347,8 +347,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
+    <Compile Include="Models\External\ExternalItInterfaceDTO.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
+    <Compile Include="Models\External\ExternalDeactivationReasonDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralController.cs" />
-    <Compile Include="Controllers\External\V2\RightsHolderController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
