@@ -5,6 +5,7 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
 {
     public class GDPRExportReport
     {
+        public string SystemUuid { get; set; }
         public string SystemName { get; set; }
         public bool NoData { get; set; }
         public bool PersonalData { get; set; }

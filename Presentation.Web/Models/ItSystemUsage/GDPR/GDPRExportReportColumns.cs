@@ -4,6 +4,7 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
 {
     public class GDPRExportReportColumns
     {
+        public static CsvColumnIdentity SystemUuid = new CsvColumnIdentity(nameof(SystemUuid), "UUID");
         public static CsvColumnIdentity SystemName = new CsvColumnIdentity(nameof(SystemName), "Navn");
         public static CsvColumnIdentity NoData = new CsvColumnIdentity(nameof(NoData), "Ingen persondata");
         public static CsvColumnIdentity PersonalData = new CsvColumnIdentity(nameof(PersonalData), "Almindelige persondata");

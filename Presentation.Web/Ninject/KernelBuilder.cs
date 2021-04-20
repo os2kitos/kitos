@@ -315,6 +315,9 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<ItSystem, BusinessType>>()
                .To<OptionsService<ItSystem, BusinessType, LocalBusinessType>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
+                .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

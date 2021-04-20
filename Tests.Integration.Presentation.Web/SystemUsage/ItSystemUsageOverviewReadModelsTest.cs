@@ -204,9 +204,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             // Main Contract
             Assert.Equal(contract.Id, readModel.MainContractId);
-            Assert.Equal(contractName, readModel.MainContractName);
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
+            Assert.True(readModel.MainContractIsActive);
+            Assert.True(readModel.HasMainContract);
 
             // Project
             Assert.Equal(projectName, readModel.ItProjectNamesAsCsv);
@@ -332,7 +333,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId);
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId);
-            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id); 
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -460,9 +461,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             Assert.Null(readModel.MainContractId);
-            Assert.Null(readModel.MainContractName);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
+            Assert.Null(readModel.MainContractIsActive);
+            Assert.False(readModel.HasMainContract);
         }
 
         [Fact]
@@ -478,7 +480,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var project = await ItProjectHelper.CreateProject(projectName, organizationId);
             await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
-            
+
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
