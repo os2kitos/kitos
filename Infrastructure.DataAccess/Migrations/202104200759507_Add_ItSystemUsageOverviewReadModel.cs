@@ -42,9 +42,10 @@
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         Concluded = c.DateTime(precision: 7, storeType: "datetime2"),
                         MainContractId = c.Int(),
-                        MainContractName = c.String(maxLength: 200),
                         MainContractSupplierId = c.Int(),
                         MainContractSupplierName = c.String(maxLength: 100),
+                        MainContractIsActive = c.Boolean(),
+                        HasMainContract = c.Boolean(nullable: false),
                         SensitiveDataLevelsAsCsv = c.String(),
                         ItProjectNamesAsCsv = c.String(),
                     })
@@ -72,9 +73,9 @@
                 .Index(t => t.LastChangedById, name: "ItSystemUsageOverviewReadModel_Index_LastChangedById")
                 .Index(t => t.LastChangedByName, name: "ItSystemUsageOverviewReadModel_Index_LastChangedByName")
                 .Index(t => t.MainContractId, name: "ItSystemUsageOverviewReadModel_Index_MainContractId")
-                .Index(t => t.MainContractName, name: "ItSystemUsageOverviewReadModel_Index_MainContractName")
                 .Index(t => t.MainContractSupplierId, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId")
-                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
+                .Index(t => t.MainContractSupplierName, name: "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName")
+                .Index(t => t.HasMainContract, name: "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             
             CreateTable(
                 "dbo.ItSystemUsageOverviewItProjectReadModels",
@@ -195,9 +196,9 @@
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
             DropIndex("dbo.ItSystemUsageOverviewTaskRefReadModels", "ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
             DropIndex("dbo.ItSystemUsageOverviewItProjectReadModels", new[] { "ParentId" });
+            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_HasMainContract");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
-            DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_MainContractId");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedByName");
             DropIndex("dbo.ItSystemUsageOverviewReadModels", "ItSystemUsageOverviewReadModel_Index_LastChangedById");
