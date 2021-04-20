@@ -4,7 +4,7 @@
 
         private static readonly noValueFallback = "";
 
-        static renderInternalReference(detailsType : string, detailsState : string, stateId : number, value : string) {
+        static renderInternalReference(detailsType: string, detailsState: string, stateId: number, value: string) {
             if (!!value) {
                 return `<a data-element-type="${detailsType}" data-ui-sref="${detailsState}({id: ${stateId}})">${value}</a>`;
             } else {
@@ -12,18 +12,22 @@
             }
         }
 
+        static renderUrlWithTitle(title: string | null | undefined, url: string) {
+            if (title === null || _.isUndefined(title)) {
+                title = url;
+            }
+            if (Utility.Validation.isValidExternalReference(url)) {
+                return `<a target="_blank" style="float:left;" href="${url}">${title}</a>`;
+            }
+            return title || this.noValueFallback;
+        }
+
         static renderReference(referenceTitle: string, referenceUrl: string) {
-            if (referenceTitle === null || _.isUndefined(referenceTitle)) {
-                referenceTitle = referenceUrl;
-            }
-            if (Utility.Validation.isValidExternalReference(referenceUrl)) {
-                return `<a target="_blank" style="float:left;" href="${referenceUrl}">${referenceTitle}</a>`;
-            }
-            return referenceTitle || this.noValueFallback;
+            return RenderFieldsHelper.renderUrlWithTitle(referenceTitle, referenceUrl);
         }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
-            
+
             if (reference === null || _.isUndefined(reference)) {
                 return RenderFieldsHelper.noValueFallback;
             }

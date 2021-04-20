@@ -320,8 +320,8 @@
                         .withId("ReferenceId")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Left)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderReference(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlWithOptionalTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalReferenceDocumentId")
@@ -518,7 +518,7 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.RiskSupervisionDocumentationUrl, dataItem.RiskSupervisionDocumentationName)))
                 .withColumn(builder =>
                     builder
@@ -539,12 +539,13 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
                             [
-                                Models.Api.Shared.YesNoUndecidedOption.Yes,
-                                Models.Api.Shared.YesNoUndecidedOption.No,
-                                Models.Api.Shared.YesNoUndecidedOption.Undecided
+                                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                                Models.Api.Shared.YesNoIrrelevantOption.NO,
+                                Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT,
+                                Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
                             ].map(value => {
                                 return {
-                                    textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                    textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
                                     remoteValue: value
                                 };
                             }),
@@ -564,6 +565,7 @@
                         .withContentOverflow()
                         .withSourceValueEchoRendering() //TODO: Add the links here by iterating over the collection!
                         .withSourceValueEchoExcelOutput());
+
 
             //Launch kendo grid
             launcher.launch();

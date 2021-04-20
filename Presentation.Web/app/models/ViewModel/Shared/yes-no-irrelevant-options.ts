@@ -60,7 +60,7 @@
                         ? ViewModel.Generic.select2BlankOptionTextValue
                         : YesNoIrrelevantOptions.getText(optionType),
                     optionalObjectContext: optionType
-                }
+                };
             });
         }
     }
