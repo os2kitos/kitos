@@ -166,6 +166,7 @@
                         ],
                             false)
                         .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig"))
                 .withColumn(builder =>
                     builder
@@ -341,6 +342,39 @@
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("MainContractIsActive")
+                        .withTitle("Kontrakt")
+                        .withId("contract")
+                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange
+                        (
+                            [
+                                {
+                                    textValue: "Har kontrakt",
+                                    remoteValue: true
+                                },
+                                {
+                                    textValue: "Ingen kontrakt",
+                                    remoteValue: false
+                                }
+                            ]
+                            ,
+                            false)
+                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                        .withRendering(dataItem => {
+
+                            if (dataItem.MainContractIsActive == null) {
+                                return "";
+                            }
+                            const decorationClass = dataItem.MainContractIsActive
+                                ? "fa-file text-success"
+                                : "fa-file-o text-muted";
+                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
+                        })
+                        .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : ""))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("MainContractSupplierName")

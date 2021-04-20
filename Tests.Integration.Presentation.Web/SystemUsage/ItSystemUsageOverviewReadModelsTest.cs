@@ -193,7 +193,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             // Main Contract
             Assert.Equal(contract.Id, readModel.MainContractId);
-            Assert.Equal(contractName, readModel.MainContractName);
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
         }
@@ -437,7 +436,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             Assert.Null(readModel.MainContractId);
-            Assert.Null(readModel.MainContractName);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
         }

@@ -239,9 +239,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Main Contract
             Assert.Equal(contract.Id, readModel.MainContractId);
-            Assert.Equal(contract.Name, readModel.MainContractName);
             Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
             Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
+            Assert.Equal(contract.IsActive, readModel.MainContractIsActive.GetValueOrDefault(false));
         }
 
         [Fact]

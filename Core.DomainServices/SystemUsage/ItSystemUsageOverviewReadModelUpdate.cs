@@ -94,10 +94,9 @@ namespace Core.DomainServices.SystemUsage
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.MainContractId = source.MainContract?.ItContractId;
-            destination.MainContractName = source.MainContract?.ItContract.Name;
-
-            destination.MainContractSupplierId = source.MainContract?.ItContract.Supplier?.Id;
-            destination.MainContractSupplierName = source.MainContract?.ItContract.Supplier?.Name;
+            destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
+            destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
+            destination.MainContractIsActive = source.MainContract?.ItContract?.IsActive;
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

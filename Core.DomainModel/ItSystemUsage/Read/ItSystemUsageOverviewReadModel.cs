@@ -51,9 +51,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public DateTime? Concluded { get; set; }
 
         public int? MainContractId { get; set; }
-        public string MainContractName { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }
+        public bool? MainContractIsActive { get; set; }
 
         public string SensitiveDataLevelsAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
