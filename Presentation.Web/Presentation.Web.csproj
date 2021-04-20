@@ -343,6 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
@@ -410,7 +411,9 @@
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\HierachyNodeDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
     <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
@@ -509,8 +512,11 @@
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\Api\user.ts" />
+    <TypeScriptCompile Include="app\models\generic\BusinessRoleDTO.ts" />
+    <TypeScriptCompile Include="app\models\generic\HierarchyNodeDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-options.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-readmodel.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
@@ -558,6 +564,7 @@
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />

@@ -18,30 +18,28 @@
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
-            "systemRoles",
             "user",
-            "orgUnits",
             "kendoGridLauncherFactory",
             "needsWidthFixService",
-            "businessTypes"
+            "overviewOptions",
+            "_"
         ];
 
         constructor(
             $rootScope: IRootScope,
             $scope: any,
-            systemRoles: Array<Models.IOptionEntity>,
             user,
-            orgUnits: Array<Models.IOrganizationUnit>,
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             needsWidthFixService: any,
-            businessTypes: Array<Models.IOptionEntity>) {
+            overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
+            _) {
             $rootScope.page.title = "IT System - Overblik";
-
+            const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             //Lookup maps
             var roleIdToUserNamesMap = {};
 
             //Helper functions
-            const getRoleKey = (role: Models.IOptionEntity) => `role${role.Id}`;
+            const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
@@ -72,9 +70,9 @@
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
                     if (parameterMap.$filter) {
-                        systemRoles.forEach(role => {
+                        overviewOptions.systemRoles.forEach(role => {
                             parameterMap.$filter =
-                                replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.Id);
+                                replaceRoleQuery(parameterMap.$filter, getRoleKey(role), role.id);
                         });
                     }
 
@@ -121,7 +119,7 @@
                     dropDownConfiguration: {
                         selectedOptionChanged: newItem => {
                             // hide all roles column
-                            systemRoles.forEach(role => {
+                            overviewOptions.systemRoles.forEach(role => {
                                 this.mainGrid.hideColumn(getRoleKey(role));
                             });
 
@@ -130,10 +128,10 @@
                             this.mainGrid.showColumn(gridFieldName);
                             needsWidthFixService.fixWidth();
                         },
-                        availableOptions: systemRoles.map(role => {
+                        availableOptions: overviewOptions.systemRoles.map(role => {
                             return {
-                                id: `${role.Id}`,
-                                text: role.Name,
+                                id: `${role.id}`,
+                                text: role.name,
                                 originalObject: role
                             };
                         })
@@ -231,31 +229,31 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            orgUnits.map((unit: any) => {
+                            orgUnits.map((unit) => {
                                 return {
-                                    textValue: unit.Name,
-                                    remoteValue: unit.Id,
+                                    textValue: unit.name,
+                                    remoteValue: unit.id,
                                     optionalContext: unit
                                 };
                             }),
                             false,
-                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.Name)
+                            dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.name)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
                 .withStandardSorting("Name");
 
-            systemRoles.forEach(role =>
+            overviewOptions.systemRoles.forEach(role =>
                 launcher = launcher.withColumn(builder =>
                     builder
                         .withDataSourceName(getRoleKey(role))
-                        .withTitle(role.Name)
+                        .withTitle(role.name)
                         .withId(`systemUsage${getRoleKey(role)}`)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
                         .withContentOverflow()
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.Id]))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.Id])))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.id]))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.id])))
             );
 
             launcher = launcher
@@ -267,10 +265,10 @@
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Number)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
                         .withFixedValueRange(
-                            businessTypes.map((unit: any) => {
+                        overviewOptions.businessTypes.map((unit: any) => {
                                 return {
-                                    textValue: unit.Name,
-                                    remoteValue: unit.Id,
+                                    textValue: unit.name,
+                                    remoteValue: unit.id,
                                 };
                             }),
                             false)
@@ -377,24 +375,12 @@
                     controller: OverviewController,
                     controllerAs: "systemOverviewVm",
                     resolve: {
-                        systemRoles: [
-                            "localOptionServiceFactory", (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory.create(Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll()
-                        ],
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        orgUnits: [
-                            "$http", "user", "_",
-                            ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
-                                .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                        ],
-                        businessTypes: [
-                            "localOptionServiceFactory",
-                            (localOptionServiceFactory: Services.LocalOptions.ILocalOptionServiceFactory) =>
-                                localOptionServiceFactory
-                                    .create(Services.LocalOptions.LocalOptionType.BusinessTypes)
-                                    .getAll()
+                        overviewOptions: [
+                            "itSystemUsageOptionsService",
+                            (itSystemUsageOptionsService: Services.ItSystemUsage.IItSystemUsageOptionsService) => itSystemUsageOptionsService.getOptions()
                         ]
                     }
                 });
