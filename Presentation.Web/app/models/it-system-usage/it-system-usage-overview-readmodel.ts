@@ -42,6 +42,7 @@
         HasMainContract : boolean;
         SensitiveDataLevelsAsCsv: string | null;
         ItProjectNamesAsCsv: string | null;
-        ArchiveDuty : string | null;
+        ArchiveDuty: string | null;
+        IsHoldingDocument : boolean;
     }
 }
