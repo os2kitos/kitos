@@ -28,6 +28,7 @@ namespace Presentation.Web.Models.ItSystemUsage.GDPR
             csvResponseBuilder =
                 csvResponseBuilder
                     .WithFileName(CreateFileName())
+                    .WithColumn(GDPRExportReportColumns.SystemUuid, x => x.SystemUuid)
                     .WithColumn(GDPRExportReportColumns.SystemName, x => x.SystemName)
                     .WithColumn(GDPRExportReportColumns.NoData, x => MapBoolean(x.NoData))
                     .WithColumn(GDPRExportReportColumns.PersonalData, x => MapBoolean(x.PersonalData))
