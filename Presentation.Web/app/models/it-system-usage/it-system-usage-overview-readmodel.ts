@@ -11,6 +11,12 @@
         KLEName: string;
     }
 
+    export interface IItSystemUsageOverviewDataProcessingRegistrationReadModel {
+        DataProcessingRegistrationId: number;
+        DataProcessingRegistrationName: string;
+        IsAgreementConcluded: Models.Api.Shared.YesNoIrrelevantOption | null;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -39,7 +45,7 @@
         Concluded: Date | null;
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;
-        HasMainContract : boolean;
+        HasMainContract: boolean;
         SensitiveDataLevelsAsCsv: string | null;
         ItProjectNamesAsCsv: string | null;
         ArchiveDuty: string | null;
@@ -49,5 +55,8 @@
         RiskSupervisionDocumentationUrl: string | null;
         LinkToDirectoryName: string | null;
         LinkToDirectoryUrl: string | null;
+        DataProcessingRegistrationsConcludedAsCsv: string | null;
+        DataProcessingRegistrationNamesAsCsv: string | null;
+        DataProcessingRegistrations: IItSystemUsageOverviewDataProcessingRegistrationReadModel[];
     }
 }

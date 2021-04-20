@@ -65,7 +65,7 @@
                 .withStorageKey(this.storageKey)
                 .withFixedSourceUrl(
                     `/odata/Organizations(${user.currentOrganizationId
-                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments`)
+                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,DataProcessingRegistrations`)
                 .withParameterMapping((options, type) => {
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
@@ -86,6 +86,22 @@
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)");
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)");
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
+
+                        //TODO: Handle the "undecided" case (undecided should be replaced by undecided or null)
+                        //const replaceOptionQuery = (filterUrl: string, optionName: string, emptyOptionKey: number): string => {
+                        //    if (filterUrl.indexOf(optionName) === -1) {
+                        //        return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
+                        //    }
+
+                        //    var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
+                        //    var key = extractOptionKey(filterUrl, optionName);
+                        //    if (key === emptyOptionKey) {
+                        //        return filterUrl.replace(pattern, `$1(${optionName} eq '${key}' or ${optionName} eq null)$3`);
+                        //    }
+                        //    return filterUrl;
+                        //};
                     }
 
                     return parameterMap;
@@ -513,7 +529,41 @@
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)));
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)))
+
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("DataProcessingRegistrationsConcludedAsCsv")
+                        .withTitle("Databehandleraftale er indgået")
+                        .withId("dataProcessingAgreementConcluded")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            [
+                                Models.Api.Shared.YesNoUndecidedOption.Yes,
+                                Models.Api.Shared.YesNoUndecidedOption.No,
+                                Models.Api.Shared.YesNoUndecidedOption.Undecided
+                            ].map(value => {
+                                return {
+                                    textValue: Models.ViewModel.Shared.YesNoUndecidedOptions.getText(value),
+                                    remoteValue: value
+                                };
+                            }),
+                            false
+                        )
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering() //TODO: Add the links here by iterating over the results and creating the list with links!
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("DataProcessingRegistrationNamesAsCsv")
+                        .withTitle("Databehandling")
+                        .withId("dataProcessingRegistrations")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering() //TODO: Add the links here by iterating over the collection!
+                        .withSourceValueEchoExcelOutput());
 
             //Launch kendo grid
             launcher.launch();
