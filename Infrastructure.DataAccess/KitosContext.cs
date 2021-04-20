@@ -161,6 +161,10 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
         public DbSet<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewRoleAssignmentReadModel> ItSystemUsageOverviewRoleAssignmentReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewTaskRefReadModel> ItSystemUsageOverviewTaskRefReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewSensitiveDataLevelReadModel> ItSystemUsageOverviewSensitiveDataLevelReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewItProjectReadModel> ItSystemUsageOverviewItProjectReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -259,6 +263,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewTaskRefReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewSensitiveDataLevelReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItProjectReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewArchivePeriodReadModelMap());
         }
     }
 }

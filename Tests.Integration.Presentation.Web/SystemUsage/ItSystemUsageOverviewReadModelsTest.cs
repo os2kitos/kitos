@@ -66,6 +66,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageLocalCallName = A<string>();
             var systemUsageLocalSystemId = A<string>();
             var concluded = A<DateTime>();
+            var archiveDuty = A<ArchiveDutyTypes>();
 
             var contractName = A<string>();
 
@@ -104,10 +105,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 Version = systemUsageVersion,
                 LocalCallName = systemUsageLocalCallName,
                 LocalSystemId = systemUsageLocalSystemId,
-                Concluded = concluded
+                Concluded = concluded,
+                ArchiveDuty = archiveDuty
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
+            var isHoldingDocument = A<bool>();
+            await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
 
             // Responsible Organization Unit
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId); //Adding default organization as organization unit
@@ -130,6 +134,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // Project
             var project = await ItProjectHelper.CreateProject(projectName, organizationId);
             await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
+
+            // ArchivePeriods
+            var archivePeriodStartDate = DateTime.Now.AddDays(-1);
+            var archivePeriodEndDate = DateTime.Now.AddDays(1);
+            var archivePeriod = await ItSystemUsageHelper.SendAddArchivePeriodRequestAsync(systemUsage.Id, archivePeriodStartDate, archivePeriodEndDate, organizationId);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -155,6 +164,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(updatedSystemUsage.ObjectOwnerFullName, readModel.LastChangedByName); // Same user was used to create and change the systemUsage
             Assert.Equal(concluded, readModel.Concluded);
             Assert.Equal(updatedSystemUsage.LastChanged.Date, readModel.LastChanged.Date); // Lastchanged seem to update a few seconds later than the actual updates. So the readmodel is not always up to date on the seconds level
+            Assert.Equal(archiveDuty, readModel.ArchiveDuty);
+            Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
 
             // Sensitive Data Level
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -209,6 +220,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmProject = Assert.Single(readModel.ItProjects);
             Assert.Equal(project.Id, rmProject.ItProjectId);
             Assert.Equal(projectName, rmProject.ItProjectName);
+
+            // ArchivePeriods
+            Assert.Equal(archivePeriodEndDate, readModel.ActiveArchivePeriodEndDate);
+            var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
+            Assert.Equal(archivePeriodStartDate, rmArchivePeriod.StartDate);
+            Assert.Equal(archivePeriodEndDate, rmArchivePeriod.EndDate);
         }
 
         [Fact]

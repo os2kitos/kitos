@@ -94,6 +94,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.HasMainContract)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HasMainContract", 0);
 
+            Property(x => x.ArchiveDuty)
+               .IsOptional()
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
+
+            Property(x => x.IsHoldingDocument)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
+
+
+
+
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();

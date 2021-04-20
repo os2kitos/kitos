@@ -5,6 +5,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
@@ -26,6 +27,25 @@ namespace Presentation.Web.Controllers.OData
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<ArchivePeriod, ItSystemUsage>(ap => _itSystemUsageService.GetById(ap.ItSystemUsageId), base.GetCrudAuthorization());
+        }
+
+        protected override void RaiseCreatedDomainEvent(ArchivePeriod entity)
+        {
+            var itSystemUsage = _itSystemUsageService.GetById(entity.ItSystemUsageId);
+            if(itSystemUsage != null)
+            {
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
+            }
+        }
+
+        protected override void RaiseUpdatedDomainEvent(ArchivePeriod entity)
+        {
+            DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(entity.ItSystemUsage));
+        }
+
+        protected override void RaiseDeletedDomainEvent(ArchivePeriod entity)
+        {
+            DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(entity.ItSystemUsage));
         }
 
         [RequireTopOnOdataThroughKitosToken]
