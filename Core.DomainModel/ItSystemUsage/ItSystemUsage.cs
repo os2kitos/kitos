@@ -24,6 +24,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
     {
+        public const int LocalSystemIdMaxLength = 200;
         public const int DefaultMaxLength = 100;
         public const int LinkNameMaxLength = 150;
 
