@@ -13,7 +13,7 @@
         }
 
         static renderUrlWithTitle(title: string | null | undefined, url: string) {
-            if (title === null || _.isUndefined(title)) {
+            if (title === null || _.isUndefined(title) || title.trim() === "") {
                 title = url;
             }
             if (Utility.Validation.isValidExternalReference(url)) {
