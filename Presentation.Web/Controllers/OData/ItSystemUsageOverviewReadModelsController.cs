@@ -19,21 +19,14 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [RequireTopOnOdataThroughKitosToken]
         [ODataRoute("Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
-        public IHttpActionResult Get([FromODataUri] int organizationId)
+        public IHttpActionResult Get([FromODataUri] int organizationId, int? responsibleOrganizationUnitId = null)
         {
+            var byOrganizationId = responsibleOrganizationUnitId == null
+                ? _readModelsService.GetByOrganizationId(organizationId)
+                : _readModelsService.GetByOrganizationAndResponsibleOrganizationUnitId(organizationId,
+                    responsibleOrganizationUnitId.Value);
             return
-                _readModelsService
-                    .GetByOrganizationId(organizationId)
-                    .Match(onSuccess: Ok, onFailure: FromOperationError);
-        }
-
-        [ODataRoute("Organizations({organizationId})/OrganizationUnits({organizationUnitId})/ItSystemUsageOverviewReadModels")]
-        [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetByOrgUnit(int organizationId, int organizationUnitId)
-        {
-            return
-                _readModelsService
-                    .GetByOrganizationAndResponsibleOrganizationUnitId(organizationId, organizationUnitId)
+                byOrganizationId
                     .Match(onSuccess: Ok, onFailure: FromOperationError);
         }
     }

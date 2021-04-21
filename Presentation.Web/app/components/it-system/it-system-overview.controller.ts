@@ -12,7 +12,7 @@
 
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
-
+        private selectedOrgUnitId: number | null = null;
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
         static $inject: Array<string> = [
@@ -64,9 +64,15 @@
                 .withEntityTypeName("IT System")
                 .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
-                .withFixedSourceUrl(
-                    `/odata/Organizations(${user.currentOrganizationId
-                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,DataProcessingRegistrations`)
+                .withUrlFactory(_ => {
+                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations";
+                    const baseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
+                    var additionalQuery = "";
+                    if (this.selectedOrgUnitId != null) {
+                        additionalQuery = `&responsibleOrganizationUnitId=${this.selectedOrgUnitId}`;
+                    }
+                    return `${baseUrl}${additionalQuery}`;
+                })
                 .withParameterMapping((options, type) => {
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
