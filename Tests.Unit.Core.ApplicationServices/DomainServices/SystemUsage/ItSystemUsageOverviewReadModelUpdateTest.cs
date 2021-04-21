@@ -177,7 +177,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
                 {
                     dataProcessingRegistration
-                }
+                },
+                GeneralPurpose = A<string>(),
+                HostedAt = A<HostedAt>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -254,6 +256,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.RiskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
             Assert.Equal(systemUsage.LinkToDirectoryUrlName, readModel.LinkToDirectoryName);
             Assert.Equal(systemUsage.LinkToDirectoryUrl, readModel.LinkToDirectoryUrl);
+            Assert.Equal(systemUsage.GeneralPurpose, readModel.GeneralPurpose);
+            Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

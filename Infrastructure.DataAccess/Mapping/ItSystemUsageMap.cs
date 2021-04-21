@@ -95,6 +95,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryUrlName", 0);
 
+            Property(x => x.GeneralPurpose)
+                .HasMaxLength(ItSystemUsage.GeneralPurposeMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_GeneralPurpose", 0);
+
         }
     }
 }

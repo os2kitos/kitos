@@ -27,6 +27,8 @@ namespace Core.DomainModel.ItSystemUsage
         public const int LocalSystemIdMaxLength = 200;
         public const int DefaultMaxLength = 100;
         public const int LinkNameMaxLength = 150;
+        public const int GeneralPurposeMaxLength = 3000;
+        
 
         public ItSystemUsage()
         {
