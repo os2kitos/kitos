@@ -23,7 +23,7 @@
                         ParentItSystemDisabled = c.Boolean(),
                         Version = c.String(maxLength: 100),
                         LocalCallName = c.String(maxLength: 100),
-                        LocalSystemId = c.String(maxLength: 100),
+                        LocalSystemId = c.String(maxLength: 200),
                         ItSystemUuid = c.String(maxLength: 50),
                         ResponsibleOrganizationUnitId = c.Int(),
                         ResponsibleOrganizationUnitName = c.String(maxLength: 100),
@@ -183,7 +183,7 @@
                 .Index(t => t.SensitivityDataLevel, name: "ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel")
                 .Index(t => t.ParentId);
             
-            AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 100));
+            AlterColumn("dbo.ItSystemUsage", "LocalSystemId", c => c.String(maxLength: 200));
             AlterColumn("dbo.ItSystemUsage", "Version", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LocalCallName", c => c.String(maxLength: 100));
             AlterColumn("dbo.ItSystemUsage", "LinkToDirectoryUrlName", c => c.String(maxLength: 150));

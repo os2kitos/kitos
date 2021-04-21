@@ -84,7 +84,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("ItSystemUsage_Index_LocalCallName", 0);
 
             Property(x => x.LocalSystemId)
-                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasMaxLength(ItSystemUsage.LocalSystemIdMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LocalSystemId", 0);
 
             Property(x => x.RiskSupervisionDocumentationUrlName)

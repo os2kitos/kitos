@@ -51,7 +51,7 @@ namespace Presentation.Web.Hangfire
             {
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 secondsPassed++;
-            } while (secondsPassed < 5 && combinedTokenSource.IsCancellationRequested == false);
+            } while (secondsPassed < 3 && combinedTokenSource.IsCancellationRequested == false);
         }
     }
 }
