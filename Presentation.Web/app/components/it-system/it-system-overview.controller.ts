@@ -39,6 +39,7 @@
             var roleIdToUserNamesMap = {};
 
             //Helper functions
+            const agreementConcludedIsDefined = (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) => registration.IsAgreementConcluded !== null && registration.IsAgreementConcluded !== Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED]
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
@@ -65,7 +66,7 @@
                 .withStorageKey(this.storageKey)
                 .withFixedSourceUrl(
                     `/odata/Organizations(${user.currentOrganizationId
-                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments`)
+                    })/ItSystemUsageOverviewReadModels?$expand=RoleAssignments,DataProcessingRegistrations`)
                 .withParameterMapping((options, type) => {
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
@@ -86,6 +87,11 @@
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)");
+                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
+
+                        //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)");
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
                     }
 
                     return parameterMap;
@@ -193,8 +199,8 @@
                         .withTitle("Overordnet IT System")
                         .withId("parentsysname")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, false))) //TODO: Missing property from backend
-                        .withSourceValueEchoExcelOutput()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ParentItSystemDisabled)))
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ParentItSystemDisabled))
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
@@ -204,7 +210,7 @@
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
-                        .withSourceValueEchoExcelOutput())
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Version")
@@ -512,8 +518,58 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)));
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)))
+
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("DataProcessingRegistrationsConcludedAsCsv")
+                        .withTitle("Databehandleraftale er indgået")
+                        .withId("dataProcessingAgreementConcluded")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange(
+                            [
+                                Models.Api.Shared.YesNoIrrelevantOption.YES,
+                                Models.Api.Shared.YesNoIrrelevantOption.NO,
+                                Models.Api.Shared.YesNoIrrelevantOption.IRRELEVANT,
+                                Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED
+                            ].map(value => {
+                                return {
+                                    textValue: Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(value),
+                                    remoteValue: value
+                                };
+                            }),
+                            false
+                        )
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .filter(registration => agreementConcludedIsDefined(registration))
+                            .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded])))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .filter(registration => agreementConcludedIsDefined(registration))
+                            .map(registration => Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded]))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("DataProcessingRegistrationNamesAsCsv")
+                        .withTitle("Databehandling")
+                        .withId("dataProcessingRegistrations")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, registration.DataProcessingRegistrationName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .map(registration => registration.DataProcessingRegistrationName)
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")));
+
 
             //Launch kendo grid
             launcher.launch();

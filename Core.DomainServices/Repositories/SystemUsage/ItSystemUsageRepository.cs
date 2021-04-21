@@ -45,5 +45,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
             var ids = systemIds.ToList();
             return _itSystemUsageRepository.AsQueryable().Where(x => ids.Contains(x.ItSystemId));
         }
+
+        public IQueryable<ItSystemUsage> GetByDataProcessingAgreement(int dprId)
+        {
+            return _itSystemUsageRepository
+                .AsQueryable()
+                .Where(x => x.AssociatedDataProcessingRegistrations.Select(r => r.Id).Contains(dprId));
+        }
     }
 }
