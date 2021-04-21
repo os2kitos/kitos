@@ -24,7 +24,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IDataProcessingRegistrationRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private const int BatchSize = 100;
+        private const int BatchSize = 250;
         public string Id => StandardJobIds.UpdateDataProcessingRegistrationReadModels;
 
         public RebuildDataProcessingRegistrationReadModelsBatchJob(
@@ -48,12 +48,12 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration, BatchSize).ToList())
                 {
                     if (token.IsCancellationRequested)
                         break;
 
+                    using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId);
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
@@ -75,9 +75,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     }
                     completedUpdates++;
                     _pendingReadModelUpdateRepository.Delete(pendingReadModelUpdate);
+                    transaction.Commit();
                     _logger.Debug("Finished rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                 }
-                transaction.Commit();
             }
             catch (Exception e)
             {
