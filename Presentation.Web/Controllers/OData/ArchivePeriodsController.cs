@@ -45,7 +45,11 @@ namespace Presentation.Web.Controllers.OData
 
         protected override void RaiseDeletedDomainEvent(ArchivePeriod entity)
         {
-            DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(entity.ItSystemUsage));
+            var itSystemUsage = _itSystemUsageService.GetById(entity.ItSystemUsageId);
+            if (itSystemUsage != null)
+            {
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(entity.ItSystemUsage));
+            }
         }
 
         [RequireTopOnOdataThroughKitosToken]

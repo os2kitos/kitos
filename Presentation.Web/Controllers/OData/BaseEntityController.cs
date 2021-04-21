@@ -186,8 +186,8 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                Repository.DeleteByKey(key);
                 RaiseDeletedDomainEvent(entity);
+                Repository.DeleteByKey(key);
                 Repository.Save();
             }
             catch (Exception e)
