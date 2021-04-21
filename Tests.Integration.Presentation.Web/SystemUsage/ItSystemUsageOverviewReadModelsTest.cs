@@ -61,6 +61,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemDisabled = A<bool>();
 
             var systemParentName = A<string>();
+            var systemParentDisabled = A<bool>();
 
             var systemUsageActive = A<bool>();
             var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
@@ -105,6 +106,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
             var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
             await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId);
+
+            // Parent system 
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled);
 
             // System Usage changes
             var body = new
@@ -223,6 +227,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+            Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
 
             // Role assignment
             var roleAssignment = Assert.Single(readModel.RoleAssignments);

@@ -20,6 +20,7 @@
                         IsActive = c.Boolean(nullable: false),
                         ParentItSystemName = c.String(maxLength: 100),
                         ParentItSystemId = c.Int(),
+                        ParentItSystemDisabled = c.Boolean(),
                         Version = c.String(maxLength: 100),
                         LocalCallName = c.String(maxLength: 100),
                         LocalSystemId = c.String(maxLength: 100),
