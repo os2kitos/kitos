@@ -14,6 +14,11 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2/rightsholder")]
     public partial class RightsHolderController: ExternalBaseController
     {
+        /// <summary>
+        /// Creates a new IT-System based on given input values
+        /// </summary>
+        /// <param name="itSystemRequestDTO">A collection of specific IT-System values</param>
+        /// <returns>Location header is set to uri for newly created IT-System</returns>
         [HttpPost]
         [Route("it-systems")]
         [SwaggerResponseRemoveDefaults]
@@ -28,6 +33,12 @@ namespace Presentation.Web.Controllers.External.V2
             return Created(new Uri(Request.RequestUri + "/" + itSystemRequestDTO.Uuid));
         }
 
+        /// <summary>
+        /// Returns active IT-Systems
+        /// </summary>
+        /// <param name="page">Page index to be returned (zero based)</param>
+        /// <param name="pageSize">Page size</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemResponseDTO>))]
@@ -39,6 +50,11 @@ namespace Presentation.Web.Controllers.External.V2
             return Ok(new List<ItSystemResponseDTO>());
         }
 
+        /// <summary>
+        /// Returns requested IT-System
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
@@ -51,6 +67,11 @@ namespace Presentation.Web.Controllers.External.V2
             return Ok(new ItSystemResponseDTO());
         }
 
+        /// <summary>
+        /// Sets individual IT-System values
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <returns>The updated IT-System</returns>
         [HttpPatch]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
@@ -58,11 +79,17 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchItSystem(Guid uuid)
+        public HttpResponseMessage PatchItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
         {
             return Ok(new ItSystemResponseDTO());
         }
 
+        /// <summary>
+        /// Deactivates an IT-System
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <param name="deactivationReasonDTO">Reason for deactivation</param>
+        /// <returns>No content</returns>
         [HttpDelete]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
@@ -74,6 +101,5 @@ namespace Presentation.Web.Controllers.External.V2
         {
             return NoContent();
         }
-
     }
 }
