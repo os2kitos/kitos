@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External;
+using Presentation.Web.Models.External.V2;
 using Swashbuckle.Examples;
 using Swashbuckle.Swagger.Annotations;
 
@@ -23,44 +21,44 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage PostItInterface([FromBody] ExternalItInterfaceDTO itInterfaceDTO)
+        public HttpResponseMessage PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
         {
             return Created(new Uri(Request.RequestUri + "/" + itInterfaceDTO.Uuid));
         }
 
         [HttpGet]
         [Route("it-interfaces")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ExternalItInterfaceDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetItInterface(int? page = 0, int? pageSize = 100)
         {
-            return Ok(new List<ExternalItInterfaceDTO>());
+            return Ok(new List<ItInterfaceResponseDTO>());
         }
 
         [HttpGet]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalItInterfaceDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItInterface(Guid uuid)
         {
-            return Ok(new ExternalItInterfaceDTO());
+            return Ok(new ItInterfaceResponseDTO());
         }
 
         [HttpPatch]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalItInterfaceDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PutItInterface(Guid uuid)
+        public HttpResponseMessage PatchItInterface(Guid uuid)
         {
-            return Ok(new ExternalItInterfaceDTO());
+            return Ok(new ItInterfaceResponseDTO());
         }
 
         [HttpDelete]
@@ -70,7 +68,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PutItInterface(Guid uuid, [FromBody] ExternalDeactivationReasonDTO deactivationReasonDTO)
+        public HttpResponseMessage DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
             return NoContent();
         }

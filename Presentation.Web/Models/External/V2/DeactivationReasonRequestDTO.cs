@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.External
+namespace Presentation.Web.Models.External.V2
 {
-    public class ExternalDeactivationReasonDTO
+    public class DeactivationReasonRequestDTO
     {
         [Required]
         public string DeactivationReason { get; set; }

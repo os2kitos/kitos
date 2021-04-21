@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.External
+namespace Presentation.Web.Models.External.V2
 {
-    public class ExternalItSystemDTO
+    public class ItSystemRequestDTO
     {
         [Required]
         public Guid Uuid { get; set; }

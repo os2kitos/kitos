@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Presentation.Web.Models.External
+namespace Presentation.Web.Models.External.V2
 {
-    public class ExternalIdentityNamePairDTO
+    public class IdentityNamePairResponseDTO
     {
         public Guid Uuid { get; set; }
         public string Name { get; set; }
 
-        public ExternalIdentityNamePairDTO(Guid uuid, string name)
+        public IdentityNamePairResponseDTO(Guid uuid, string name)
         {
             Uuid = uuid;
             Name = name;

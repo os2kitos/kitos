@@ -19,7 +19,7 @@ namespace Presentation.Web.Swagger
 
         private static bool IsExternalEndpointDocs(string path)
         {
-            return path.Contains(@"/api/v2/");
+            return path.Contains(@"/api/v2");
         }
 
         private static void NukeWriteOperationDocs(KeyValuePair<string, PathItem> swaggerDocPath)
