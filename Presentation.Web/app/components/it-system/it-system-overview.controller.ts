@@ -12,7 +12,6 @@
 
     export class OverviewController implements IOverviewController {
         private storageKey = "it-system-overview-options";
-        private selectedOrgUnitId: number | null = null;
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
         static $inject: Array<string> = [
@@ -64,16 +63,20 @@
                 .withEntityTypeName("IT System")
                 .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
-                .withUrlFactory(_ => {
+                .withUrlFactory(options => {
                     const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations";
                     const baseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
-                    if (this.selectedOrgUnitId != null) {
-                        additionalQuery = `&responsibleOrganizationUnitId=${this.selectedOrgUnitId}`;
+                    const selectedOrgId: number | null = options.currentOrgUnit;
+                    if (selectedOrgId !== null) {
+                        additionalQuery = `&responsibleOrganizationUnitId=${selectedOrgId}`;
                     }
                     return `${baseUrl}${additionalQuery}`;
                 })
                 .withParameterMapping((options, type) => {
+                    //Defaults
+                    var activeOrgUnit: number | null = null;
+
                     // get kendo to map parameters to an odata url
                     var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
                     if (parameterMap.$filter) {
@@ -89,16 +92,39 @@
 
                     if (parameterMap.$filter) {
                         //Redirect consolidated field search towards optimized search targets
-                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)");
-                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
-                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)");
-                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)");
-                        parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
+                        parameterMap.$filter = parameterMap.$filter
+                            .replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)")
+                            .replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)")
+                            .replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)")
+                            .replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)")
+                            .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
-                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)");
-                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
+                        parameterMap.$filter = parameterMap.$filter
+                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
+                            .replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
+
+                        // Org unit is stripped from the odata query and passed on to the url factory!
+                        const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
+                        if (captureOrgUnit.test(parameterMap.$filter) === true) {
+                            activeOrgUnit = parseInt(captureOrgUnit.exec(parameterMap.$filter)[1]);
+                        }
+                        parameterMap.$filter = parameterMap.$filter.replace(captureOrgUnit, ""); //Org unit id is handled by the url factory since it is not a regular odata query
+
+                        //Cleanup broken queries due to stripping
+                        parameterMap.$filter = parameterMap.$filter
+                            .replace("and  and", "and") //in the middle of other criteria
+                            .replace(/\( and /, "(") //First criteria removed
+                            .replace(/ and \)/, ")"); // Last criteria removed
+
+                        //Cleanup filter if invalid
+                        if (parameterMap.$filter === "") {
+                            delete parameterMap.$filter;
+                        }
                     }
+
+                    //Making sure orgunit is set
+                    (options as any).currentOrgUnit = activeOrgUnit;
 
                     return parameterMap;
                 })
