@@ -12,6 +12,7 @@ using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using System.Threading;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
@@ -224,7 +225,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 {
                     return Task.FromResult(
                         DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(30));
+                }, TimeSpan.FromSeconds(120));
         }
 
         [Fact]
@@ -267,7 +268,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             stopwatch.Start();
             do
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                Thread.Sleep(TimeSpan.FromMilliseconds(500));
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 

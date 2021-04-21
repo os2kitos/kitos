@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
@@ -661,7 +662,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 {
                     return Task.FromResult(
                         DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(30));
+                }, TimeSpan.FromSeconds(120));
         }
 
         private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
@@ -671,7 +672,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             stopwatch.Start();
             do
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                Thread.Sleep(TimeSpan.FromMilliseconds(500));
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 
