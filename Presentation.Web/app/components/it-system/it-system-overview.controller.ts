@@ -39,6 +39,7 @@
             var roleIdToUserNamesMap = {};
 
             //Helper functions
+            const agreementConcludedIsDefined = (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) => registration.IsAgreementConcluded !== null && registration.IsAgreementConcluded !== Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED]
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
 
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
@@ -86,22 +87,11 @@
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)");
                         parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)");
-                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)");
                         parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
 
-                        //TODO: Handle the "undecided" case (undecided should be replaced by undecided or null)
-                        //const replaceOptionQuery = (filterUrl: string, optionName: string, emptyOptionKey: number): string => {
-                        //    if (filterUrl.indexOf(optionName) === -1) {
-                        //        return filterUrl; // optionName not found in filter so return original filter. Can be updated to .includes() instead of .indexOf() in later typescript versions
-                        //    }
-
-                        //    var pattern = new RegExp(`(.+)?(${optionName} eq '\\d')( and .+'\\)|\\)|)`, "i");
-                        //    var key = extractOptionKey(filterUrl, optionName);
-                        //    if (key === emptyOptionKey) {
-                        //        return filterUrl.replace(pattern, `$1(${optionName} eq '${key}' or ${optionName} eq null)$3`);
-                        //    }
-                        //    return filterUrl;
-                        //};
+                        //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)");
+                        parameterMap.$filter = parameterMap.$filter.replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
                     }
 
                     return parameterMap;
@@ -209,8 +199,8 @@
                         .withTitle("Overordnet IT System")
                         .withId("parentsysname")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, false))) //TODO: Missing property from backend
-                        .withSourceValueEchoExcelOutput()
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-parent-system-rendering`, "it-system.edit.main", dataItem.ParentItSystemId, Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ParentItSystemDisabled)))
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.ParentItSystemName, dataItem.ParentItSystemDisabled))
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
@@ -220,7 +210,7 @@
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
-                        .withSourceValueEchoExcelOutput())
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Version")
@@ -553,8 +543,16 @@
                         )
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering() //TODO: Add the links here by iterating over the results and creating the list with links!
-                        .withSourceValueEchoExcelOutput())
+                        .withRendering(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .filter(registration => agreementConcludedIsDefined(registration))
+                            .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded])))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .filter(registration => agreementConcludedIsDefined(registration))
+                            .map(registration => Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded]))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DataProcessingRegistrationNamesAsCsv")
@@ -563,8 +561,14 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
-                        .withSourceValueEchoRendering() //TODO: Add the links here by iterating over the collection!
-                        .withSourceValueEchoExcelOutput());
+                        .withRendering(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, registration.DataProcessingRegistrationName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .DataProcessingRegistrations
+                            .map(registration => registration.DataProcessingRegistrationName)
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")));
 
 
             //Launch kendo grid

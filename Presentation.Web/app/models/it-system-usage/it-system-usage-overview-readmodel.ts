@@ -14,7 +14,7 @@
     export interface IItSystemUsageOverviewDataProcessingRegistrationReadModel {
         DataProcessingRegistrationId: number;
         DataProcessingRegistrationName: string;
-        IsAgreementConcluded: Models.Api.Shared.YesNoIrrelevantOption | null;
+        IsAgreementConcluded: string | null;
     }
 
     export interface IItSystemUsageOverviewReadModel {
@@ -29,6 +29,7 @@
         LocalCallName: string | null;
         ParentItSystemId: number;
         ParentItSystemName: string | null;
+        ParentItSystemDisabled : boolean | null;
         RoleAssignments: IAssignedSystemUsageRole[];
         ResponsibleOrganizationUnitId: number | null;
         ResponsibleOrganizationUnitName: string | null;
