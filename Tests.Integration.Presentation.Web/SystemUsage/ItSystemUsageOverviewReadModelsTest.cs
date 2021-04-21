@@ -660,7 +660,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 () =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
+                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Where(x => x.Category >= PendingReadModelUpdateSourceCategory.ItSystemUsage || x.Category <= PendingReadModelUpdateSourceCategory.ItSystemUsage_DataProcessingRegistration).Any()));
                 }, TimeSpan.FromSeconds(30));
         }
 

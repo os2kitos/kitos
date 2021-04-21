@@ -223,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 () =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
+                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Where(x => x.Category >= PendingReadModelUpdateSourceCategory.DataProcessingRegistration || x.Category <= PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract).Any()));
                 }, TimeSpan.FromSeconds(30));
         }
 
