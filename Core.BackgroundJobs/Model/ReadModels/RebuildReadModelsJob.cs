@@ -17,9 +17,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
         public string Id { get; }
 
         public RebuildReadModelsJob(
-            string id, 
-            Func<IEnumerable<int>> getIds, 
-            PendingReadModelUpdateSourceCategory sourceCategory, 
+            string id,
+            Func<IEnumerable<int>> getIds,
+            PendingReadModelUpdateSourceCategory sourceCategory,
             IPendingReadModelUpdateRepository pendingReadModelUpdateRepository)
         {
             _getIds = getIds;
@@ -30,10 +30,23 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
-            var candidateIds = _getIds()
-                .Select(MapReadModelUpdate);
-            _pendingReadModelUpdateRepository.AddMany(candidateIds);
-            return Task.FromResult(Result<string, OperationError>.Success("Ok"));
+            var modelUpdates = _getIds()
+                .ToList()
+                .Select(MapReadModelUpdate)
+                .ToList();
+
+            int currentBatchCount;
+            const int maxBatchSize = 250;
+            var total = 0;
+            do
+            {
+                //EF does not deal well with too large outstanding transactions, so push it in batches
+                var batch = modelUpdates.Skip(total).Take(maxBatchSize).ToList();
+                _pendingReadModelUpdateRepository.AddMany(batch);
+                currentBatchCount = batch.Count;
+                total += currentBatchCount;
+            } while (currentBatchCount == maxBatchSize && token.IsCancellationRequested == false);
+            return Task.FromResult(Result<string, OperationError>.Success($"Ok - inserted {total} updates"));
         }
 
         private PendingReadModelUpdate MapReadModelUpdate(int id)

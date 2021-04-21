@@ -305,7 +305,10 @@ namespace Core.DomainServices.SystemUsage
         {
             static string CreateRoleKey(int roleId, int userId) => $"R:{roleId}U:{userId}";
 
-            var incomingRights = source.Rights.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
+            //ItSystemusage allows duplicates of role assignments so we group them and only show one of them
+            var incomingRights = source
+                .Rights.GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .ToDictionary(x => x.Key, x => x.First());
 
             //Remove rights which were removed
             var assignmentsToBeRemoved =
@@ -411,8 +414,8 @@ namespace Core.DomainServices.SystemUsage
 
         private static string GetUserFullName(User user)
         {
-            var fullName = user?.GetFullName();
-            return fullName?.TrimEnd().Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));
+            var fullName = user?.GetFullName()?.TrimEnd();
+            return fullName?.Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));
         }
 
     }

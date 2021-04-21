@@ -24,7 +24,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
         private readonly IItSystemUsageRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private const int BatchSize = 500;
+        private const int BatchSize = 100;
         public string Id => StandardJobIds.UpdateItSystemUsageOverviewReadModels;
 
         public RebuildItSystemUsageOverviewReadModelsBatchJob(
@@ -48,12 +48,13 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
                 foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList())
                 {
                     if (token.IsCancellationRequested)
                         break;
 
-                    using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetSystemUsage(pendingReadModelUpdate.SourceId).FromNullable();
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
@@ -75,9 +76,10 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     }
                     completedUpdates++;
                     _pendingReadModelUpdateRepository.Delete(pendingReadModelUpdate);
-                    transaction.Commit();
                     _logger.Debug("Finished rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                 }
+
+                transaction.Commit();
             }
             catch (Exception e)
             {
