@@ -105,7 +105,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
-                Name = A<string>()
+                Name = A<string>(),
+                Disabled = A<bool>()
             };
             var system = new ItSystem
             {
@@ -271,6 +272,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
             Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
+            Assert.Equal(parentSystem.Disabled, readModel.ParentItSystemDisabled);
 
             //Assigned Roles
             var roleAssignment = Assert.Single(readModel.RoleAssignments);

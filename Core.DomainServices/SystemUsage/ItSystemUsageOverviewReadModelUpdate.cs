@@ -298,6 +298,7 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.ParentItSystemName = source.ItSystem.Parent?.Name;
             destination.ParentItSystemId = source.ItSystem.Parent?.Id;
+            destination.ParentItSystemDisabled = source.ItSystem.Parent?.Disabled;
         }
 
         private void PatchRoleAssignments(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
