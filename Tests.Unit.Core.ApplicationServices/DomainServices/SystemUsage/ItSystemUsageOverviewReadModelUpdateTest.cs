@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -10,6 +11,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.SystemUsage;
@@ -30,6 +32,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel>> _sensitiveDataLevelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -40,12 +43,14 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _roleAssignmentRepository = new Mock<IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel>>();
             _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
+            _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
                 _sensitiveDataLevelRepository.Object,
                 _itProjectReadModelRepository.Object,
                 _archivePeriodReadModelRepository.Object,
+                _dataProcessingReadModelRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -91,10 +96,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 Name = A<string>()
             };
+            var dataProcessingRegistration = new DataProcessingRegistration()
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = A<YesNoIrrelevantOption>()
+            };
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
-                Name = A<string>()
+                Name = A<string>(),
+                Disabled = A<bool>()
             };
             var system = new ItSystem
             {
@@ -161,7 +173,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 RiskSupervisionDocumentationUrlName = A<string>(),
                 RiskSupervisionDocumentationUrl = A<string>(),
                 LinkToDirectoryUrlName = A<string>(),
-                LinkToDirectoryUrl = A<string>()
+                LinkToDirectoryUrl = A<string>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
+                {
+                    dataProcessingRegistration
+                }
             };
 
             // Add ResponsibleOrganizationUnit
@@ -256,6 +272,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
             Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
+            Assert.Equal(parentSystem.Disabled, readModel.ParentItSystemDisabled);
 
             //Assigned Roles
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
@@ -298,6 +315,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(archivePeriods.First().StartDate, rmArchivePeriod.StartDate);
             Assert.Equal(archivePeriods.First().EndDate, rmArchivePeriod.EndDate);
             Assert.Equal(archivePeriods.First().EndDate, readModel.ActiveArchivePeriodEndDate);
+
+            //DataProcessingRegistrations
+            Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
+            Assert.Equal(dataProcessingRegistration.IsAgreementConcluded.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED).GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
+            var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
+            Assert.Equal(dataProcessingRegistration.Name, rmDataProcessingRegistration.DataProcessingRegistrationName);
+            Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
         }
 
         [Fact]
@@ -346,7 +370,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ItSystem = system,
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
-                LastChanged = A<DateTime>()
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -374,7 +399,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ItSystem = system,
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
-                LastChanged = A<DateTime>()
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
             var earliestStartDate = DateTime.Now.AddYears(-1);
             var endDateOfEarlistStartDate = DateTime.Now.AddDays(A<int>());
@@ -432,7 +458,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChanged = A<DateTime>(),
                 riskAssessment = DataOptions.DONTKNOW,
                 RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>()
+                RiskSupervisionDocumentationUrl = A<string>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();
@@ -443,7 +470,78 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             Assert.Null(readModel.RiskSupervisionDocumentationName);
             Assert.Null(readModel.RiskSupervisionDocumentationUrl);
+        }
 
+        [Fact]
+        public void Apply_Generates_DataProcessingRegistrationCsv_Correctly_With_Multiple_DataProcessingRegistrations()
+        {
+            //Arrange
+            var dpr1 = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = YesNoIrrelevantOption.YES
+            };
+            var dpr2 = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = YesNoIrrelevantOption.NO
+            };
+            var dpr3 = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = YesNoIrrelevantOption.IRRELEVANT
+            };
+            var dpr4 = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = YesNoIrrelevantOption.UNDECIDED
+            };
+            var dpr5 = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                IsAgreementConcluded = YesNoIrrelevantOption.UNDECIDED
+            };
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>(),
+                riskAssessment = DataOptions.DONTKNOW,
+                RiskSupervisionDocumentationUrlName = A<string>(),
+                RiskSupervisionDocumentationUrl = A<string>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
+                {
+                    dpr1,
+                    dpr2,
+                    dpr3,
+                    dpr4,
+                    dpr5
+                }
+            };
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Equal($"{dpr1.Name}, {dpr2.Name}, {dpr3.Name}, {dpr4.Name}, {dpr5.Name}", readModel.DataProcessingRegistrationNamesAsCsv);
+            Assert.Equal($"{dpr1.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}, " +
+                $"{dpr2.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}, " +
+                $"{dpr3.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}", readModel.DataProcessingRegistrationsConcludedAsCsv);
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
@@ -462,7 +560,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 ObjectOwner = defaultTestUser,
                 LastChangedByUser = defaultTestUser,
-                LastChanged = A<DateTime>()
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
 
             var readModel = new ItSystemUsageOverviewReadModel();

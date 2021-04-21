@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -60,6 +61,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemDisabled = A<bool>();
 
             var systemParentName = A<string>();
+            var systemParentDisabled = A<bool>();
 
             var systemUsageActive = A<bool>();
             var systemUsageExpirationDate = DateTime.Now.AddDays(-1);
@@ -77,6 +79,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var contractName = A<string>();
 
             var projectName = A<string>();
+
+            var dataProcessingRegistrationName = A<string>();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
@@ -102,6 +106,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
             var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
             await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId);
+
+            // Parent system 
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled);
 
             // System Usage changes
             var body = new
@@ -150,6 +157,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var archivePeriodStartDate = DateTime.Now.AddDays(-1);
             var archivePeriodEndDate = DateTime.Now.AddDays(1);
             var archivePeriod = await ItSystemUsageHelper.SendAddArchivePeriodRequestAsync(systemUsage.Id, archivePeriodStartDate, archivePeriodEndDate, organizationId);
+
+
+            // DataProcessingRegistrations
+            var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
+            var dataProcessingRegistration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dataProcessingRegistrationName);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
+            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -213,6 +227,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From Parent System
             Assert.Equal(systemParentName, readModel.ParentItSystemName);
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
+            Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
 
             // Role assignment
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
@@ -250,6 +265,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
             Assert.Equal(archivePeriodStartDate, rmArchivePeriod.StartDate);
             Assert.Equal(archivePeriodEndDate, rmArchivePeriod.EndDate);
+
+            // DataProcessingRegistration
+            Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
+            Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
+            var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
         }
 
         [Fact]
@@ -568,6 +588,48 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmProject = Assert.Single(readModel.ItProjects);
             Assert.Equal(project.Id, rmProject.ItProjectId);
             Assert.Equal(newProjectName, rmProject.ItProjectName);
+        }
+
+        [Fact]
+        public async Task ReadModels_DataProcessingRegistrations_Is_Updated_When_DataProcessingRegistration_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var dataProcessingRegistrationName = A<string>();
+            var newDataProcessingRegistrationName = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var dataProcessingRegistration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dataProcessingRegistrationName);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, A<YesNoIrrelevantOption>());
+            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(dataProcessingRegistration.Id, newDataProcessingRegistrationName);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(newDataProcessingRegistrationName, readModel.DataProcessingRegistrationNamesAsCsv);
+            Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
+            var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
+            Assert.Equal(dataProcessingRegistration.Id, rmDataProcessingRegistration.DataProcessingRegistrationId);
+            Assert.Equal(newDataProcessingRegistrationName, rmDataProcessingRegistration.DataProcessingRegistrationName);
+            Assert.Equal(yesNoIrrelevantOption, rmDataProcessingRegistration.IsAgreementConcluded);
         }
 
 
