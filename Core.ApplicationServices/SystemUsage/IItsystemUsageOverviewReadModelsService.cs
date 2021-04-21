@@ -7,6 +7,7 @@ namespace Core.ApplicationServices.SystemUsage
     public interface IItsystemUsageOverviewReadModelsService
     {
         Result<IQueryable<ItSystemUsageOverviewReadModel>, OperationError> GetByOrganizationId(int organizationId);
+        Result<IQueryable<ItSystemUsageOverviewReadModel>, OperationError> GetByOrganizationAndResponsibleOrganizationUnitId(int organizationId, int responsibleOrganizationUnit);
 
     }
 }

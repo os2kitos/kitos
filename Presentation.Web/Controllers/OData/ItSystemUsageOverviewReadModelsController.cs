@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    [ODataRoutePrefix("Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
     public class ItSystemUsageOverviewReadModelsController : BaseOdataController
     {
         private readonly IItsystemUsageOverviewReadModelsService _readModelsService;
@@ -19,12 +18,15 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [RequireTopOnOdataThroughKitosToken]
-        [ODataRoute]
-        public IHttpActionResult Get([FromODataUri] int organizationId)
+        [ODataRoute("Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
+        public IHttpActionResult Get([FromODataUri] int organizationId, int? responsibleOrganizationUnitId = null)
         {
+            var byOrganizationId = responsibleOrganizationUnitId == null
+                ? _readModelsService.GetByOrganizationId(organizationId)
+                : _readModelsService.GetByOrganizationAndResponsibleOrganizationUnitId(organizationId,
+                    responsibleOrganizationUnitId.Value);
             return
-                _readModelsService
-                    .GetByOrganizationId(organizationId)
+                byOrganizationId
                     .Match(onSuccess: Ok, onFailure: FromOperationError);
         }
     }
