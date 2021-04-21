@@ -125,6 +125,9 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.RiskSupervisionDocumentationUrl).IsOptional();
             Property(x => x.LinkToDirectoryUrl).IsOptional();
 
+            Property(x => x.DataProcessingRegistrationsConcludedAsCsv).IsOptional();
+            Property(x => x.DataProcessingRegistrationNamesAsCsv).IsOptional();
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)

@@ -104,5 +104,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.ItProjects.Select(y => y.ItProjectId).Contains(projectId));
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.DataProcessingRegistrations.Select(y => y.DataProcessingRegistrationId).Contains(dataProcessingRegistrationId));
+        }
     }
 }
