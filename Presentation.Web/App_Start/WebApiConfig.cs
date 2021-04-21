@@ -25,6 +25,7 @@ using Microsoft.OData.UriParser;
 using System.Collections.Generic;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItSystemUsage.Read;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -220,29 +221,13 @@ namespace Presentation.Web
             var userGetByMailFunction = builder.Function("GetUserByEmail").ReturnsFromEntitySet<User>(userEntitySetName);
             userGetByMailFunction.Parameter<string>("email").Required();
 
-            var usages = BindEntitySet<ItSystemUsage, ItSystemUsagesController>(builder);
-            usages.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-            usages.HasRequiredBinding(u => u.ItSystem, entitySetItSystems);
-
-            var itSystemRights = BindEntitySet<ItSystemRight, ItSystemRightsController>(builder);
-            itSystemRights.HasRequiredBinding(u => u.Role, "ItSystemRoles");
-
-            BindEntitySet<ItSystemRole, ItSystemRolesController>(builder);
-
-            var systemOrgUnitUsages = builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages"); // no controller yet
-            systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
-
-            var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
-            contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
-            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage)).AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActive)));
+            BindItSystemUsage(builder, entitySetOrganizations, entitySetItSystems);
 
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
             contracts.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
             contracts.HasRequiredBinding(o => o.Supplier, entitySetOrganizations);
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
             contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
-
-            // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
 
             BindEntitySet<InterfaceType, InterfaceTypesController>(builder);
 
@@ -433,6 +418,36 @@ namespace Presentation.Web
             return builder.GetEdmModel();
         }
 
+        private static void BindItSystemUsage(ODataConventionModelBuilder builder, string entitySetOrganizations, string entitySetItSystems)
+        {
+            var usages = BindEntitySet<ItSystemUsage, ItSystemUsagesController>(builder);
+            usages.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+            usages.HasRequiredBinding(u => u.ItSystem, entitySetItSystems);
+
+            var itSystemRights = BindEntitySet<ItSystemRight, ItSystemRightsController>(builder);
+            itSystemRights.HasRequiredBinding(u => u.Role, "ItSystemRoles");
+
+            BindEntitySet<ItSystemRole, ItSystemRolesController>(builder);
+
+            var systemOrgUnitUsages =
+                builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages"); // no controller yet
+            systemOrgUnitUsages.EntityType.HasKey(x => x.ItSystemUsageId).HasKey(x => x.OrganizationUnitId);
+
+            var contractItSystemUsages =
+                builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
+            contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage))
+                .AddProperty(typeof(ItSystemUsage).GetProperty(nameof(ItSystemUsage.IsActive)));
+
+            //read models
+            BindEntitySet<ItSystemUsageOverviewReadModel, ItSystemUsageOverviewReadModelsController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).RemoveProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.SourceEntity)));
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).RemoveProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.Organization)));
+
+            //Add ActiveArchivePeriodEndDate to result form odata
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsageOverviewReadModel)).AddProperty(typeof(ItSystemUsageOverviewReadModel).GetProperty(nameof(ItSystemUsageOverviewReadModel.ActiveArchivePeriodEndDate)));
+        }
+
         private static void BindDataProcessingRegistrationModule(ODataConventionModelBuilder builder)
         {
             //Read model to provide slim search options
@@ -451,6 +466,10 @@ namespace Presentation.Web
             BindEntitySet<LocalDataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOptionsController>(builder);
             BindEntitySet<LocalDataProcessingCountryOption, LocalDataProcessingCountryOptionsController>(builder);
             BindEntitySet<LocalDataProcessingRegistrationRole, LocalDataProcessingRegistrationRolesController>(builder);
+
+            //Remove parent from dpa to prevent expand
+            builder.StructuralTypes.First(t => t.ClrType == typeof(DataProcessingRegistrationReadModel)).RemoveProperty(typeof(DataProcessingRegistrationReadModel).GetProperty(nameof(DataProcessingRegistrationReadModel.SourceEntity)));
+            builder.StructuralTypes.First(t => t.ClrType == typeof(DataProcessingRegistrationReadModel)).RemoveProperty(typeof(DataProcessingRegistrationReadModel).GetProperty(nameof(DataProcessingRegistrationReadModel.Organization)));
         }
 
         private static EntitySetConfiguration<TEntitySet> BindEntitySet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class, IHasId

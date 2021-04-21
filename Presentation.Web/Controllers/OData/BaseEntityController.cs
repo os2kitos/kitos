@@ -99,7 +99,7 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 entity = Repository.Insert(entity);
-                DomainEvents.Raise(new EntityCreatedEvent<T>(entity));
+                RaiseCreatedDomainEvent(entity);
                 Repository.Save();
             }
             catch (Exception e)
@@ -108,6 +108,11 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return Created(entity);
+        }
+
+        protected virtual void RaiseCreatedDomainEvent(T entity)
+        {
+            DomainEvents.Raise(new EntityCreatedEvent<T>(entity));
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]
@@ -147,7 +152,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 // patch the entity
                 delta.Patch(entity);
-                DomainEvents.Raise(new EntityUpdatedEvent<T>(entity));
+                RaiseUpdatedDomainEvent(entity);
                 Repository.Save();
             }
             catch (Exception e)
@@ -159,6 +164,11 @@ namespace Presentation.Web.Controllers.OData
             // if you want the updated entity returned,
             // else you'll just get 204 (No Content) returned
             return Updated(entity);
+        }
+
+        protected virtual void RaiseUpdatedDomainEvent(T entity)
+        {
+            DomainEvents.Raise(new EntityUpdatedEvent<T>(entity));
         }
 
         public virtual IHttpActionResult Delete(int key)
@@ -176,8 +186,8 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                RaiseDeletedDomainEvent(entity);
                 Repository.DeleteByKey(key);
-                DomainEvents.Raise(new EntityDeletedEvent<T>(entity));
                 Repository.Save();
             }
             catch (Exception e)
@@ -186,6 +196,11 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        protected virtual void RaiseDeletedDomainEvent(T entity)
+        {
+            DomainEvents.Raise(new EntityDeletedEvent<T>(entity));
         }
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()

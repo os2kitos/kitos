@@ -3,7 +3,6 @@
         Name: string;
         IsObligatory: boolean;
         IsLocallyAvailable: boolean;
-        //IsSuggestion: boolean;
         HasWriteAccess: boolean;
         Description: string;
         IsEnabled: boolean;

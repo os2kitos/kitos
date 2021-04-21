@@ -194,6 +194,8 @@
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandlerTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelUpdateTest.cs" />
     <Compile Include="Infrastructure\DomainEventsTest.cs" />
     <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />

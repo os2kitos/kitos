@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 
@@ -57,6 +58,23 @@ namespace Core.DomainServices.Repositories.System
         {
             _systemRepository.DeleteWithReferencePreload(itSystem);
             _systemRepository.Save();
+        }
+
+        public IQueryable<ItSystem> GetByRightsHolderId(int organizationId)
+        {
+            return _systemRepository.AsQueryable().Where(x => x.BelongsToId == organizationId);
+        }
+
+        public IQueryable<ItSystem> GetByTaskRefId(int taskRefId)
+        {
+            var systemTaskRefIds = _systemRepository
+                .AsQueryable()
+                .SelectMany(x => x.TaskRefs.Select(y => new { systemId = x.Id, taskRefId = y.Id}))
+                .Where(x => x.taskRefId == taskRefId)
+                .Select(x => x.systemId)
+                .ToList();
+            
+            return _systemRepository.AsQueryable().Where(x => systemTaskRefIds.Contains(x.Id));
         }
 
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)

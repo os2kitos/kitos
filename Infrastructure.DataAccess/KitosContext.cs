@@ -15,6 +15,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
@@ -158,6 +159,13 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalDataProcessingOversightOption> LocalDataProcessingOversightOptions { get; set; }
         public DbSet<LocalDataProcessingDataResponsibleOption> LocalDataProcessingDataResponsibleOptions { get; set; }
         public DbSet<LocalDataProcessingCountryOption> LocalDataProcessingCountryOptions { get; set; }
+        public DbSet<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewRoleAssignmentReadModel> ItSystemUsageOverviewRoleAssignmentReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewTaskRefReadModel> ItSystemUsageOverviewTaskRefReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewSensitiveDataLevelReadModel> ItSystemUsageOverviewSensitiveDataLevelReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewItProjectReadModel> ItSystemUsageOverviewItProjectReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewDataProcessingRegistrationReadModel> ItSystemUsageOverviewDataProcessingRegistrationReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -251,6 +259,13 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingOversightOptionMap());
             modelBuilder.Configurations.Add(new DataProcessingDataResponsibleOptionMap());
             modelBuilder.Configurations.Add(new DataProcessingCountryOptionMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewRoleAssignmentReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewTaskRefReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewSensitiveDataLevelReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewItProjectReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewArchivePeriodReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
         }
     }
 }

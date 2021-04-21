@@ -217,6 +217,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Add(task);
                 }
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
                 Repository.Save();
                 return Ok();
             }
@@ -247,7 +248,7 @@ namespace Presentation.Web.Controllers.API
                     tasks =
                         system.TaskRefs.Where(
                             x =>
-                                (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) &&
+                                (x.Id == taskId || x.ParentId == taskId || x.Parent?.ParentId == taskId) &&
                                 !x.Children.Any())
                             .ToList();
                 }
@@ -264,6 +265,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     system.TaskRefs.Remove(task);
                 }
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
                 Repository.Save();
                 return Ok();
             }

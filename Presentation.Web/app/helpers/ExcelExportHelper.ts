@@ -17,14 +17,18 @@
             white: <IStatusColor>{ danish: "Hvid", english: "White" }
         }
 
-        static renderReference(referenceTitle: string, referenceUrl: string) {
-            if (Utility.Validation.isValidExternalReference(referenceUrl)) {
-                return referenceUrl;
+        static renderUrlWithOptionalTitle(title: string | null | undefined, url: string) {
+            if (Utility.Validation.isValidExternalReference(url)) {
+                return url;
             }
-            if (referenceTitle === null || _.isUndefined(referenceTitle)) {
+            if (title === null || _.isUndefined(title)) {
                 return ExcelExportHelper.noValueFallback;
             }
-            return referenceTitle;
+            return title;
+        }
+
+        static renderReference(referenceTitle: string, referenceUrl: string) {
+            return ExcelExportHelper.renderUrlWithOptionalTitle(referenceTitle, referenceUrl);
         }
 
         static renderReferenceUrl(reference: Models.Reference.IOdataReference) {
@@ -133,7 +137,7 @@
         static renderUserRoles(rights: any[], projectRoles) {
             let result = "";
             _.each(rights,
-                (right, index, ) => {
+                (right, index,) => {
                     if (!_.find(projectRoles, (option: any) => (option.Id === parseInt(right.Role.Id, 10)))) {
                         result += `${right.Role.Name} (udgået)`;
                     } else {
@@ -150,6 +154,6 @@
 
         static renderString(value: string) {
             return value || ExcelExportHelper.noValueFallback;
-        } 
+        }
     }
 }

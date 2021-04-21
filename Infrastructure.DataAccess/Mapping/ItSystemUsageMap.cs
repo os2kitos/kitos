@@ -74,6 +74,27 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(t => t.SensitiveDataLevels)
                 .WithRequired(t => t.ItSystemUsage)
                 .WillCascadeOnDelete(true);
+
+            Property(x => x.Version)
+                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_Version", 0);
+
+            Property(x => x.LocalCallName)
+                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_LocalCallName", 0);
+
+            Property(x => x.LocalSystemId)
+                .HasMaxLength(ItSystemUsage.LocalSystemIdMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_LocalSystemId", 0);
+
+            Property(x => x.RiskSupervisionDocumentationUrlName)
+                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_RiskSupervisionDocumentationUrlName", 0);
+
+            Property(x => x.LinkToDirectoryUrlName)
+                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
+                .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryUrlName", 0);
+
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
             Property(x => x.Name)
-                .HasMaxLength(100)
+                .HasMaxLength(Organization.MaxNameLength)
                 // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
                 .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute()));
             Property(t => t.Cvr)

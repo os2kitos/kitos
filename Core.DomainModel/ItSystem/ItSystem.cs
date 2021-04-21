@@ -13,6 +13,8 @@ namespace Core.DomainModel.ItSystem
     /// </summary>
     public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus
     {
+        public const int MaxNameLength = 100;
+
         public ItSystem()
         {
             ArchivePeriods = new List<ArchivePeriod>();

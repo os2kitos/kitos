@@ -383,6 +383,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var result = PatchQuery(item, obj);
+                DomainEvents.Raise(new EntityUpdatedEvent<TModel>(result));
                 return Ok(Map(result));
             }
             catch (SecurityException e)
