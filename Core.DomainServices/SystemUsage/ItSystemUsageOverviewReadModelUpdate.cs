@@ -18,7 +18,7 @@ namespace Core.DomainServices.SystemUsage
     {
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
 
-        private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository; 
+        private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
@@ -67,7 +67,7 @@ namespace Core.DomainServices.SystemUsage
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
-            PatchResponsibleOrganizationUnit(source, destination); 
+            PatchResponsibleOrganizationUnit(source, destination);
             PatchItSystemBusinessType(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
@@ -122,7 +122,7 @@ namespace Core.DomainServices.SystemUsage
 
         private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            if(source.riskAssessment == DataOptions.YES)
+            if (source.riskAssessment == DataOptions.YES)
             {
                 destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
                 destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
@@ -138,7 +138,10 @@ namespace Core.DomainServices.SystemUsage
         {
             static string CreateArchivePeriodKey(DateTime startDate, DateTime endDate) => $"S:{startDate}E:{endDate}";
 
-            var incomingArchivePeriods = source.ArchivePeriods.ToDictionary(x => CreateArchivePeriodKey(x.StartDate, x.EndDate));
+            var incomingArchivePeriods = source
+                .ArchivePeriods
+                .GroupBy(x => CreateArchivePeriodKey(x.StartDate, x.EndDate))
+                .ToDictionary(x => x.Key, x => x.First());
 
             // Remove ArchivePeriods which were removed
             var archivePeriodsToBeRemoved =
@@ -332,7 +335,7 @@ namespace Core.DomainServices.SystemUsage
                     destination.RoleAssignments.Add(assignment);
                 }
 
-                assignment.UserFullName = GetUserFullName(incomingRight.User); 
+                assignment.UserFullName = GetUserFullName(incomingRight.User);
                 assignment.Email = incomingRight.User.Email;
             }
 
@@ -383,7 +386,7 @@ namespace Core.DomainServices.SystemUsage
                 _archivePeriodReadModelRepository.Delete(archivePeriodToBeRemoved);
             });
         }
-        
+
         private void RemoveDataProcessingRegistrations(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationsToBeRemoved)
         {
             dataProcessingRegistrationsToBeRemoved.ForEach(dataProcessingRegistrationToBeRemoved =>
