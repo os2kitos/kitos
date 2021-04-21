@@ -248,7 +248,7 @@ namespace Presentation.Web.Controllers.API
                     tasks =
                         system.TaskRefs.Where(
                             x =>
-                                (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) &&
+                                (x.Id == taskId || x.ParentId == taskId || x.Parent?.ParentId == taskId) &&
                                 !x.Children.Any())
                             .ToList();
                 }

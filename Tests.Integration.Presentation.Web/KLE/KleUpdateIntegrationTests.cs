@@ -129,6 +129,12 @@ namespace Tests.Integration.Presentation.Web.KLE
 
                 //Do a depth first removal to get around fk constraints
                 var toBeRemoved = FlattenTreeDepthFirst(root).ToList();
+
+                // Remove task refs with ItSystem FKs
+                var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Count() > 0).ToList();
+                taskRefsWithItSystem.ForEach(taskRefWithItSystem => repository.DeleteWithReferencePreload(taskRefWithItSystem));
+
+                // Remove task refs without FKs
                 repository.RemoveRange(toBeRemoved);
                 repository.Save();
             });
