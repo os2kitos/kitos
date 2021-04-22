@@ -1,13 +1,21 @@
 ﻿module Kitos.Services.System {
     "use strict";
 
+    export interface IKendoGridAdditionalExcelColumn {
+        title: string;
+        persistId: string;
+        width: number;
+        template: (dataItem: any) => string;
+        placeAfterPersistId? : string;
+    }
+
     export class ExportGridToExcelService {
         private exportFlag = false;
         static $inject = ["needsWidthFixService"];
 
-        constructor(private needsWidthFixService: NeedsWidthFix) {}
+        constructor(private needsWidthFixService: NeedsWidthFix) { }
 
-        public getExcel (e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>){
+        public getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, additionalColumns? : IKendoGridAdditionalExcelColumn[]) {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {
@@ -35,24 +43,70 @@
 
                 // render templates
                 var sheet = e.workbook.sheets[0];
-                //TODO: Add temp column definitions? and then remove them again later?
+                if (additionalColumns && additionalColumns.length > 0) {
+                    //take copy and modify that one - otherwise the source grid is modified
+                    columns = [...columns];
 
+                    const addedColumns = [];
+                    //Extend the grid with excel-only columns
+                    for (let column of additionalColumns) {
+                        //TODO: Add compute "insert at id"
+                        const additionalColumn = {
+                            title: column.title,
+                            persistId: column.persistId,
+                            field: column.persistId,
+                            excelTemplate: column.template,
+                            width: column.width
+                        };
+
+                        //Add to grid columns
+                        columns.push(additionalColumn);
+
+                        //Add sheet column //TODO: At correct index
+                        sheet.columns.push({ width: column.width, autoWidth: false });
+
+                        //Track added columns for extending the sheet
+                        addedColumns.push(additionalColumns);
+                    }
+
+                    for (let ri = 0; ri < sheet.rows.length; ri++) {
+                        for (let column of additionalColumns) {
+                            const isHeaderRow = ri === 0;
+                            if (isHeaderRow) {
+                                sheet.rows[ri].cells.push({
+                                    background: '#7a7a7a',
+                                    color: '#fff',
+                                    value: column.title,
+                                    colSpan: 1,
+                                    rowSpan: 1
+                                });
+                            } else {
+                                sheet.rows[ri].cells.push({
+                                    value: "",
+                                });
+                            }
+                        }
+                    }
+                }
+                
                 // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
+                for (let rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    const row = sheet.rows[rowIndex];
 
                     // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
+                    const dataItem = e.data[rowIndex - 1];
 
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                    for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                         if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
+                        const cell = row.cells[columnIndex];
 
-                        var template = this.getTemplateMethod(columns[columnIndex]);
+                        const template = this.getTemplateMethod(columns[columnIndex]);
 
                         cell.value = template(dataItem);
                     }
                 }
+
+                //TODO: Cleanup after rendering?
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(kendoGrid.element, false);
