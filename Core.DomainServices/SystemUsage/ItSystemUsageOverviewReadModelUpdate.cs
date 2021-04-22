@@ -64,7 +64,6 @@ namespace Core.DomainServices.SystemUsage
             destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
-            destination.GeneralPurpose = source.GeneralPurpose;
             destination.HostedAt = source.HostedAt;
 
             PatchParentSystemName(source, destination);
@@ -80,9 +79,16 @@ namespace Core.DomainServices.SystemUsage
             PatchArchivePeriods(source, destination);
             PatchRiskSupervisionDocumentation(source, destination);
             PatchDataProcessingRegistrations(source, destination);
+            PatchGeneralPurposeRegistrations(source, destination);
         }
 
-        private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            var generalPurpose = source.GeneralPurpose?.TrimEnd();
+            destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.LongProperyMaxLength));
+        }
+
+            private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.DataProcessingRegistrationNamesAsCsv = string.Join(", ", source.AssociatedDataProcessingRegistrations.Select(x => x.Name));
             var isAgreementConcludedList = source.AssociatedDataProcessingRegistrations

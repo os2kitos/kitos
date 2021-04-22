@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202104211535095_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel"; }
+            get { return "202104220731071_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel"; }
         }
         
         string IMigrationMetadata.Source

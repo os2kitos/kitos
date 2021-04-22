@@ -526,11 +526,13 @@
     <TypeScriptCompile Include="app\models\generic\ValueWithOptionalRemarkDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageHostedAtDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\it-system-usage\system-usage-hostedat-view-model.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />

@@ -552,7 +552,34 @@
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)))
-
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("HostedAt")
+                        .withTitle("IT systemet driftes")
+                        .withId("HostedAt")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                        .withFixedValueRange([
+                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.UNDECIDED,
+                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.ONPREMISE,
+                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.EXTERNAL
+                        ].map(value => {
+                            return {
+                                textValue: value.text,
+                                remoteValue: value.textValue
+                            }
+                        })
+                            , false)
+                        .withRendering(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt)))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("GeneralPurpose")
+                        .withTitle("Systemets overordnede formål")
+                        .withId("GeneralPurpose")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DataProcessingRegistrationsConcludedAsCsv")

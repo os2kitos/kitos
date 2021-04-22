@@ -84,7 +84,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("ItSystemUsage_Index_LocalCallName", 0);
 
             Property(x => x.LocalSystemId)
-                .HasMaxLength(ItSystemUsage.LocalSystemIdMaxLength)
+                .HasMaxLength(ItSystemUsage.LongProperyMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LocalSystemId", 0);
 
             Property(x => x.RiskSupervisionDocumentationUrlName)
@@ -94,11 +94,6 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LinkToDirectoryUrlName)
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryUrlName", 0);
-
-            Property(x => x.GeneralPurpose)
-                .HasMaxLength(ItSystemUsage.GeneralPurposeMaxLength)
-                .HasIndexAnnotation("ItSystemUsage_Index_GeneralPurpose", 0);
-
         }
     }
 }
