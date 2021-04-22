@@ -30,10 +30,11 @@ module Kitos.Utility.KendoGrid {
     }
 
     export interface IKendoGridExcelOnlyColumn<TDataSource> {
-        id: string,
-        title: string,
-        width: number,
+        id: string;
+        title: string;
+        width: number;
         template: (dataItem: TDataSource) => string;
+        dependOnColumnId: string | null;
     }
 
     export interface IKendoParameter {
@@ -51,9 +52,9 @@ module Kitos.Utility.KendoGrid {
     export interface IKendoGridExcelOnlyColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
-        //TODO: dependonPersistId (places column next to the defined one)
         build(): IKendoGridExcelOnlyColumn<TDataSource>;
     }
 
@@ -80,6 +81,7 @@ module Kitos.Utility.KendoGrid {
         private standardWidth: number = 150;
         private title: string = null;
         private id: string = null;
+        private dependOnColumnId: string = null;
         private excelOutput: (source: TDataSource) => string = null;
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
@@ -106,6 +108,12 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
+        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (columnId == null) throw "columnId must be defined";
+            this.dependOnColumnId = columnId;
+            return this;
+        }
+
         private checkRequiredField(name: string, value: any) {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
@@ -121,7 +129,8 @@ module Kitos.Utility.KendoGrid {
                 title: this.title,
                 width: this.standardWidth,
                 id: this.id,
-                template: (dataItem => this.excelOutput(dataItem))
+                template: (dataItem => this.excelOutput(dataItem)),
+                dependOnColumnId: this.dependOnColumnId
             } as IKendoGridExcelOnlyColumn<TDataSource>;
         }
     }
@@ -621,8 +630,8 @@ module Kitos.Utility.KendoGrid {
                         title: column.title,
                         persistId: column.id,
                         width: column.width,
-                        template: (dataItem: any) => column.template(dataItem)
-                        //TODO: Placeafterid to be added!
+                        template: (dataItem: any) => column.template(dataItem),
+                        dependOnColumnPersistId: column.dependOnColumnId
                     });
                 });
 

@@ -310,6 +310,7 @@
                         builder
                             .withId(`systemUsage${getRoleKey(role)}_emails`)
                             .withTitle(`${role.name} Email"`)
+                            .dependOnColumnWithId(`systemUsage${getRoleKey(role)}`)
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToEmailMap[dataItem.Id][role.id]))
                     )
             );
