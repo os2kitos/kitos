@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess;
@@ -52,10 +53,10 @@ namespace Tools.Test.Database.Model.Tasks
                 ItSystemId = itSystem.Id,
                 OrganizationId = organization.Id,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
-            itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage()
+            itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage
             {
                 ItSystemUsage = itSystemUsage,
                 ItSystemUsageId = itSystemUsage.Id,
@@ -64,6 +65,11 @@ namespace Tools.Test.Database.Model.Tasks
             };
 
             context.ItSystemUsages.Add(itSystemUsage);
+            context.SaveChanges();
+
+            var pendingReadModelUpdate = PendingReadModelUpdate.Create(itSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage);
+
+            context.PendingReadModelUpdates.Add(pendingReadModelUpdate);
             context.SaveChanges();
 
             return true;

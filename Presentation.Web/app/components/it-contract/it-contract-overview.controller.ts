@@ -231,7 +231,7 @@
         }
 
         private activate() {
-
+            var self = this;
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
@@ -249,12 +249,12 @@
                                 var urlParameters =
                                     `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,DataProcessingRegistrations($select=IsAgreementConcluded)`;
                                 // if orgunit is set then the org unit filter is active
-                                var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+                                var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` +
+                                    return `/odata/Organizations(${self.user.currentOrganizationId})/ItContracts` +
                                         urlParameters;
                                 } else {
-                                    return `/odata/Organizations(${this.user
+                                    return `/odata/Organizations(${self.user
                                         .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` +
                                         urlParameters;
                                 }
@@ -266,11 +266,11 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
-                                this._.forEach(this.itContractRoles,
-                                    role => parameterMap.$filter = this
+                                self._.forEach(self.itContractRoles,
+                                    role => parameterMap.$filter = self
                                         .fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
-                                parameterMap.$filter = this
+                                parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
                             }
 
@@ -302,25 +302,25 @@
                         },
                         parse: response => {
                             // iterrate each contract
-                            this._.forEach(response.value,
+                            self._.forEach(response.value,
                                 contract => {
                                     // HACK to add economy data to result
-                                    var ecoData = <Array<any>>this._
-                                        .filter(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
-                                    contract.Acquisition = this._.sumBy(ecoData, "Acquisition");
-                                    contract.Operation = this._.sumBy(ecoData, "Operation");
-                                    contract.Other = this._.sumBy(ecoData, "Other");
+                                    var ecoData = <Array<any>>self._
+                                        .filter(self.ecoStreamData, { "ExternPaymentForId": contract.Id });
+                                    contract.Acquisition = self._.sumBy(ecoData, "Acquisition");
+                                    contract.Operation = self._.sumBy(ecoData, "Operation");
+                                    contract.Other = self._.sumBy(ecoData, "Other");
 
-                                    var earliestAuditDate = this._
-                                        .first(this._.sortBy(ecoData, ["AuditDate"], ["desc"]));
+                                    var earliestAuditDate = self._
+                                        .first(self._.sortBy(ecoData, ["AuditDate"], ["desc"]));
                                     if (earliestAuditDate && earliestAuditDate.AuditDate) {
                                         contract.AuditDate = earliestAuditDate.AuditDate;
                                     }
 
-                                    var totalWhiteStatuses = this._.filter(ecoData, { AuditStatus: "White" }).length;
-                                    var totalRedStatuses = this._.filter(ecoData, { AuditStatus: "Red" }).length;
-                                    var totalYellowStatuses = this._.filter(ecoData, { AuditStatus: "Yellow" }).length;
-                                    var totalGreenStatuses = this._.filter(ecoData, { AuditStatus: "Green" }).length;
+                                    var totalWhiteStatuses = self._.filter(ecoData, { AuditStatus: "White" }).length;
+                                    var totalRedStatuses = self._.filter(ecoData, { AuditStatus: "Red" }).length;
+                                    var totalYellowStatuses = self._.filter(ecoData, { AuditStatus: "Yellow" }).length;
+                                    var totalGreenStatuses = self._.filter(ecoData, { AuditStatus: "Green" }).length;
 
                                     contract.status = {
                                         max: totalWhiteStatuses +
@@ -336,7 +336,7 @@
                                     // HACK to flattens the Rights on usage so they can be displayed as single columns
                                     contract.roles = [];
                                     // iterrate each right
-                                    this._.forEach(contract.Rights,
+                                    self._.forEach(contract.Rights,
                                         right => {
                                             // init an role array to hold users assigned to this role
                                             if (!contract.roles[right.RoleId])
@@ -390,7 +390,7 @@
                             "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
-                        template: kendo.template(this.$("#role-selector").html())
+                        template: kendo.template(self.$("#role-selector").html())
                     }
                 ],
                 excel: {
@@ -414,13 +414,13 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions,
-                columnResize: this.saveGridOptions,
-                columnHide: this.saveGridOptions,
-                columnShow: this.saveGridOptions,
-                columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
-                page: this.onPaging,
+                dataBound: self.saveGridOptions,
+                columnResize: self.saveGridOptions,
+                columnHide: self.saveGridOptions,
+                columnShow: self.saveGridOptions,
+                columnReorder: self.saveGridOptions,
+                excelExport: self.exportToExcel,
+                page: self.onPaging,
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 150,
@@ -434,7 +434,7 @@
                         excelTemplate: dataItem => {
                             var isActive = false;
                             if (dataItem) {
-                                isActive = this.isContractActive(dataItem);
+                                isActive = dataItem.IsActive;
                             }
                             return isActive.toString();
                         },
@@ -498,7 +498,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.orgUnitDropDownList
+                                template: self.orgUnitDropDownList
                             }
                         }
                     },
@@ -508,7 +508,7 @@
                         template: dataItem => {
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
-                                const system = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem;
+                                const system = self._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem;
                                 value = Helpers.SystemNameFormat.apply(system.Name, system.Disabled);
                             }
 
@@ -641,7 +641,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.OperationRemunerationBegun).format("DD-MM-YYYY");
+                            return self.moment(dataItem.OperationRemunerationBegun).format("DD-MM-YYYY");
                         },
                         hidden: true,
                         filterable: {
@@ -687,7 +687,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.AuditDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.AuditDate).format("DD-MM-YYYY");
                         },
                         sortable: false,
                         filterable: false
@@ -749,7 +749,7 @@
                         if (dataItem.roles[role.Id] === undefined)
                             return roles;
 
-                        roles = this.concatRoles(dataItem.roles[role.Id]);
+                        roles = self.concatRoles(dataItem.roles[role.Id]);
 
                         var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
@@ -761,7 +761,7 @@
                         if (!dataItem || dataItem.roles[role.Id] === undefined)
                             return roles;
 
-                        return this.concatRoles(dataItem.roles[role.Id]);
+                        return self.concatRoles(dataItem.roles[role.Id]);
                     },
                     width: 200,
                     hidden: !(role.Name === "Kontraktejer"), // hardcoded role name :(
@@ -781,25 +781,6 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
-        }
-
-        private isContractActive(dataItem) {
-
-            if (!dataItem.Active) {
-                var today = this.moment().startOf('day');
-                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded).startOf('day') : today;
-                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
-
-                if (dataItem.Terminated) {
-                    var terminationDate = this.moment(dataItem.Terminated);
-                    if (dataItem.TerminationDeadline) {
-                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
-                    }
-                    return today >= startDate && today <= terminationDate;
-                }
-                return today >= startDate && today <= endDate;
-            }
-            return dataItem.Active;
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractOverview>) => {

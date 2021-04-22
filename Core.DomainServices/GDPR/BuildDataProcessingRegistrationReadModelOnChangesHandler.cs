@@ -9,11 +9,12 @@ using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
 
-namespace Core.DomainServices.Model.EventHandlers
+namespace Core.DomainServices.GDPR
 {
     public class BuildDataProcessingRegistrationReadModelOnChangesHandler :
         IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,

@@ -21,6 +21,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
@@ -81,6 +82,9 @@ using Presentation.Web.Properties;
 using Serilog;
 using Core.DomainServices.Contract;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainServices.SystemUsage;
+using Core.DomainModel.ItProject;
 
 namespace Presentation.Web.Ninject
 {
@@ -189,6 +193,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOversightOptionsAssignmentService>().To<DataProcessingRegistrationOversightOptionsAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IContractDataProcessingRegistrationAssignmentService>().To<ContractDataProcessingRegistrationAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel>>().To<DataProcessingRegistrationReadModelUpdate>().InCommandScope(Mode);
+            kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
+            kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -254,6 +260,30 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+
+            //Itsystem overview updates
+            RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<BusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<LocalBusinessType>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<TaskRef>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -282,6 +312,12 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>()
                 .To<OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<ItSystem, BusinessType>>()
+               .To<OptionsService<ItSystem, BusinessType, LocalBusinessType>>().InCommandScope(Mode);
+
+            kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
+                .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
@@ -322,6 +358,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationReadModelRepository>().To<DataProcessingRegistrationReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IPendingReadModelUpdateRepository>().To<PendingReadModelUpdateRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
@@ -385,8 +422,17 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
+
+            //DPR
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleDataProcessingRegistrationReadModelUpdates>().ToSelf().InCommandScope(Mode);
+
+            //Itsystemusage
+            kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
+
+            //Rebuilder
+            kernel.Bind<IRebuildReadModelsJobFactory>().To<RebuildReadModelsJobFactory>().InCommandScope(Mode);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 
@@ -19,14 +20,37 @@ namespace Core.DomainServices.Repositories.SystemUsage
             _itSystemUsageRepository.Save();
         }
 
-        public ItSystemUsage GetSystemUsage(int systemId)
+        public ItSystemUsage GetSystemUsage(int systemUsageId)
         {
-            return _itSystemUsageRepository.AsQueryable().ById(systemId);
+            return _itSystemUsageRepository.AsQueryable().ById(systemUsageId);
         }
 
         public IQueryable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId)
         {
             return _itSystemUsageRepository.AsQueryable().ByOrganizationId(organizationId);
+        }
+
+        public IQueryable<ItSystemUsage> GetBySystemId(int systemId)
+        {
+            return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystemId == systemId);
+        }
+
+        public IQueryable<ItSystemUsage> GetByParentSystemId(int systemId)
+        {
+            return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
+        }
+
+        public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
+        {
+            var ids = systemIds.ToList();
+            return _itSystemUsageRepository.AsQueryable().Where(x => ids.Contains(x.ItSystemId));
+        }
+
+        public IQueryable<ItSystemUsage> GetByDataProcessingAgreement(int dprId)
+        {
+            return _itSystemUsageRepository
+                .AsQueryable()
+                .Where(x => x.AssociatedDataProcessingRegistrations.Select(r => r.Id).Contains(dprId));
         }
     }
 }

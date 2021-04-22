@@ -50,6 +50,21 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/itproject/{id}?organizationId={defaultOrganizationId}"), cookie);
         }
 
+        public static async Task<HttpResponseMessage> SendChangeNameRequestAsync(int projectId, string newName, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/itproject/{projectId}?organizationId={organizationId}");
+            var body = new
+            {
+                name = newName
+            };
+            using (var updatedResponse = await HttpApi.PatchWithCookieAsync(url, cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, updatedResponse.StatusCode);
+                return updatedResponse;
+            }
+        }
+
         public static async Task<ItSystemUsageDTO> AddSystemBinding(int projectId, int usageId, int organizationId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

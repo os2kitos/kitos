@@ -11,6 +11,7 @@ namespace Core.DomainModel.Organization
     /// </summary>
     public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization
     {
+        public const int MaxNameLength = 100;
         public OrganizationUnit()
         {
             TaskUsages = new List<TaskUsage>();

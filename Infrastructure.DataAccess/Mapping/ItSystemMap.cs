@@ -12,7 +12,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(x => x.OrganizationId)
                 .HasUniqueIndexAnnotation("UX_NamePerOrg", 0);
             this.Property(x => x.Name)
-                .HasMaxLength(100) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
+                .HasMaxLength(ItSystem.MaxNameLength) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_NamePerOrg", 1);
 

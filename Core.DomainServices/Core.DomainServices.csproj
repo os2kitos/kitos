@@ -82,10 +82,12 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
-    <Compile Include="Model\EventHandlers\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
-    <Compile Include="Model\EventHandlers\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />
+    <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
+    <Compile Include="SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandler.cs" />
+    <Compile Include="GDPR\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
@@ -139,6 +141,8 @@
     <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\IItSystemUsageOverviewReadModelRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\ItSystemUsageOverviewReadModelRepository.cs" />
     <Compile Include="SSO\StsBrugerInfo.cs" />
     <Compile Include="SSO\IStsBrugerInfoService.cs" />
     <Compile Include="Repositories\GDPR\ISensitivePersonalDataTypeRepository.cs" />

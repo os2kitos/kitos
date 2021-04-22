@@ -2,6 +2,7 @@
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -11,13 +12,16 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<ItContractItSystemUsage> _repository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
+        private readonly IDomainEvents _domainEvent;
 
         public ItContractItSystemUsageController(
             IGenericRepository<ItContractItSystemUsage> repository,
-            IGenericRepository<ItSystemUsage> usageRepository)
+            IGenericRepository<ItSystemUsage> usageRepository,
+            IDomainEvents domainEvent)
         {
             _repository = repository;
             _usageRepository = usageRepository;
+            _domainEvent = domainEvent;
         }
 
         public HttpResponseMessage PostMainContract(int contractId, int usageId)
@@ -33,6 +37,7 @@ namespace Presentation.Web.Controllers.API
             }
 
             item.ItSystemUsage.MainContract = item;
+            _domainEvent.Raise(new EntityUpdatedEvent<ItSystemUsage>(item.ItSystemUsage));
             _repository.Save();
             return Ok();
         }
@@ -53,6 +58,7 @@ namespace Presentation.Web.Controllers.API
             var forceLoad = usage.MainContract;
             usage.MainContract = null;
 
+            _domainEvent.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
             _usageRepository.Save();
             return Ok();
         }

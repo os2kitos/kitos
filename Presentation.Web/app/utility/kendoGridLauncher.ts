@@ -8,9 +8,16 @@ module Kitos.Utility.KendoGrid {
     "use strict";
 
     export enum KendoGridColumnFiltering {
+        StartsWith,
         Contains,
         Date,
         FixedValueRange
+    }
+
+    export enum KendoGridColumnDataSourceType {
+        Date,
+        Boolean,
+        Number
     }
 
     export interface IGridViewAccess<TDataSource> {
@@ -24,7 +31,14 @@ module Kitos.Utility.KendoGrid {
 
     export interface IKendoParameter {
         textValue: string;
-        remoteValue : any;
+        remoteValue: any;
+        optionalContext?: any;
+    }
+
+    export enum KendoColumnAlignment {
+        Left,
+        Right,
+        Center
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -33,33 +47,57 @@ module Kitos.Utility.KendoGrid {
         withTitle(title: string): IKendoGridColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridColumnBuilder<TDataSource>;
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource>;
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource>;
+        withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource>;
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource>;
         withoutSorting(): IKendoGridColumnBuilder<TDataSource>;
         withInitialVisibility(visible: boolean): IKendoGridColumnBuilder<TDataSource>;
         withRendering(renderUi: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoRendering(): IKendoGridColumnBuilder<TDataSource>;
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     class KendoGridColumnBuilder<TDataSource> implements IKendoGridColumnBuilder<TDataSource> {
-        private standardWidth: number = 200;
+        private standardWidth: number = 150;
         private dataSourceName: string = null;
         private title: string = null;
         private filtering: KendoGridColumnFiltering = null;
         private valueRange: IKendoParameter[] = null;
         private valueRangeMultiSelect: boolean = false;
+        private valueRangeTemplate: (dataItem: any) => string = null;
         private id: string = null;
         private rendering: (source: TDataSource) => string = null;
         private excelOutput: (source: TDataSource) => string = null;
         private sortingEnabled = true;
         private visible = true;
+        private dataSourceType: KendoGridColumnDataSourceType = null;
+        private contentOverflow : boolean | null = null;
+        private contentAlignment : KendoColumnAlignment | null = null;
 
-        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect : boolean): IKendoGridColumnBuilder<TDataSource> {
+        withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource> {
+            this.contentAlignment = alignment;
+            return this;
+        }
+
+        withContentOverflow(): IKendoGridColumnBuilder<TDataSource> {
+            this.contentOverflow = true;
+            return this;
+        }
+
+        withFixedValueRange(possibleValues: IKendoParameter[], multiSelect: boolean, optionalTemplate?: (dataItem: any) => string): IKendoGridColumnBuilder<TDataSource> {
             if (possibleValues == null) throw "possibleValues must be defined";
             this.valueRange = possibleValues;
             this.valueRangeMultiSelect = multiSelect;
+            this.valueRangeTemplate = !!optionalTemplate ? optionalTemplate : null;
+            return this;
+        }
+
+        withDataSourceType(dataSourceType: KendoGridColumnDataSourceType): IKendoGridColumnBuilder<TDataSource> {
+            if (dataSourceType == null) throw "dataSourceType must be defined";
+            this.dataSourceType = dataSourceType;
             return this;
         }
 
@@ -104,6 +142,9 @@ module Kitos.Utility.KendoGrid {
         withFilteringOperation(operation: KendoGridColumnFiltering): IKendoGridColumnBuilder<TDataSource> {
             if (operation == null) throw "operation must be defined";
             this.filtering = operation;
+            if (this.filtering === KendoGridColumnFiltering.Date) {
+                return this.withDataSourceType(KendoGridColumnDataSourceType.Date);
+            }
             return this;
         }
 
@@ -138,12 +179,16 @@ module Kitos.Utility.KendoGrid {
         }
 
         private getSchemaMutation(): (map: any) => void {
-            if (this.filtering != null) {
-                switch (this.filtering) {
-                    case KendoGridColumnFiltering.Date:
+            if (this.dataSourceType != null) {
+                switch (this.dataSourceType) {
+                    case KendoGridColumnDataSourceType.Boolean:
+                        return map => map[this.dataSourceName] = { type: "boolean" };
+                    case KendoGridColumnDataSourceType.Date:
                         return map => map[this.dataSourceName] = { type: "date" };
+                    case KendoGridColumnDataSourceType.Number:
+                        return map => map[this.dataSourceName] = { type: "number" };
                     default:
-                        break;
+                        throw `Unmapped data source type ${this.dataSourceType}`;
                 }
             }
             return _ => { }; //NOP
@@ -164,6 +209,18 @@ module Kitos.Utility.KendoGrid {
                                 operator: "contains"
                             }
                         } as any as kendo.ui.GridColumnFilterable;
+                    case KendoGridColumnFiltering.StartsWith:
+                        return {
+                            cell: {
+                                template: (args) =>
+                                    args.element.kendoAutoComplete({
+                                        noDataTemplate: ""
+                                    }),
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "startswith"
+                            }
+                        } as any as kendo.ui.GridColumnFilterable;
                     case KendoGridColumnFiltering.Date:
                         return {
                             operators: {
@@ -180,7 +237,7 @@ module Kitos.Utility.KendoGrid {
                                 "this.valueRange must be defined when using filtering option FixedValueRange");
                         }
                         const valueRange = this.valueRange; //capture the reference to use in lambda below
-                        
+
                         return {
                             cell: {
                                 template: (args) => {
@@ -188,12 +245,14 @@ module Kitos.Utility.KendoGrid {
                                         dataSource: valueRange.map(value => {
                                             return {
                                                 remoteValue: value.remoteValue,
-                                                text: value.textValue
+                                                text: value.textValue,
+                                                optionalContext: value.optionalContext
                                             };
-                                        } ),
+                                        }),
                                         dataTextField: "text",
                                         dataValueField: "remoteValue",
-                                        valuePrimitive: true
+                                        valuePrimitive: true,
+                                        template: this.valueRangeTemplate
                                     });
                                 },
                                 showOperators: false,
@@ -213,12 +272,36 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("id", this.id);
             this.checkRequiredField("rendering", this.rendering);
 
+            const attributes = {
+                "data-element-type": `${this.id}KendoObject`
+            };
+
+            const classes : string[] = [];
+            if (this.contentOverflow) {
+                classes.push("might-overflow");
+            }
+            if (this.contentAlignment != null) {
+                switch (this.contentAlignment) {
+                    case KendoColumnAlignment.Left:
+                        classes.push("text-left");
+                        break;
+                    case KendoColumnAlignment.Right:
+                        classes.push("text-right");
+                        break;
+                    case KendoColumnAlignment.Center:
+                        classes.push("text-center");
+                    break;
+                    default:
+                        throw `Unsupported alignment type:${this.contentAlignment}`;
+                }
+            }
+            if (classes.length > 0) {
+                attributes["class"] = classes.join(" ");
+            }
             return {
                 field: this.dataSourceName,
                 title: this.title,
-                attributes: {
-                    "data-element-type": `${this.id}KendoObject`
-                },
+                attributes: attributes,
                 width: this.standardWidth,
                 hidden: !this.visible,
                 persistId: this.id,
@@ -241,11 +324,31 @@ module Kitos.Utility.KendoGrid {
         Right
     }
 
+    export enum KendoToolbarImplementation {
+        Button,
+        Link,
+        DropDownList
+    }
+
+    export interface IKendoToolbarDropDownEntry {
+        id: string;
+        text: string;
+        originalObject?: any;
+    }
+
+    export interface IKendoToolbarDropDownConfiguration {
+        selectedOptionChanged: (selectedOption: IKendoToolbarDropDownEntry) => void;
+        availableOptions: IKendoToolbarDropDownEntry[];
+    }
+
     export interface IKendoToolbarEntry {
         title: string;
         id: string;
-        onClick: () => void;
+        onClick?: () => void;
+        link?: string;
+        dropDownConfiguration?: IKendoToolbarDropDownConfiguration;
         enabled: () => boolean;
+        implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
     }
@@ -489,38 +592,78 @@ module Kitos.Utility.KendoGrid {
                     name: "clearFilter",
                     text: "Nulstil",
                     template:
-                        "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
+                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
                 },
                 {
                     name: "saveFilter",
                     text: "Gem filter",
                     template:
-                        '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
+                        '<button data-element-type="saveFilterButton" type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="kendoVm.standardToolbar.saveGridProfile()">#: text #</button>'
                 },
                 {
                     name: "useFilter",
                     text: "Anvend filter",
                     template:
-                        '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
+                        '<button data-element-type="useFilterButton" type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="kendoVm.standardToolbar.loadGridProfile()" data-ng-disabled="!kendoVm.standardToolbar.doesGridProfileExist()">#: text #</button>'
                 },
                 {
                     name: "deleteFilter",
                     text: "Slet filter",
                     template:
-                        "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
+                        "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
                 }
             ];
 
             this._.forEach(this.customToolbarEntries, entry => {
-                toolbar.push({
-                    name: entry.id,
-                    text: entry.title,
-                    template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
-                });
-                this.$scope.kendoVm[entry.id] = {
-                    onClick: entry.onClick,
-                    enabled: entry.enabled()
-                };
+                switch (entry.implementation) {
+                    case KendoToolbarImplementation.Button:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            onClick: entry.onClick,
+                            enabled: entry.enabled()
+                        };
+                        break;
+                    case KendoToolbarImplementation.Link:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled()
+                        };
+                        break;
+                    case KendoToolbarImplementation.DropDownList:
+                        toolbar.push({
+                            name: entry.id,
+                            text: entry.title,
+                            template: `<select data-element-type='${entry.id}DropDownList' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                        });
+                        this.$scope.kendoVm[entry.id] = {
+                            enabled: entry.enabled(),
+                            getOptions: () => {
+                                return {
+                                    autoBind: false,
+                                    dataSource: entry.dropDownConfiguration.availableOptions,
+                                    dataTextField: "text",
+                                    dataValueField: "id",
+                                    optionLabel: entry.title,
+                                    change: e => {
+                                        var selectedId = e.sender.value();
+                                        const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                                        entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                    }
+                                }
+                            }
+                        };
+                        break;
+                    default:
+                        throw `Invalid toolbar implementation type:${entry.implementation}`;
+                }
             });
 
             //Build the columns

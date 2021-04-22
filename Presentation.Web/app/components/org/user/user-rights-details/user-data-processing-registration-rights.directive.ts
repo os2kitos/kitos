@@ -42,11 +42,11 @@
                 },
                 noRecords: true,
                 messages: {
-                    noRecords: "Ingen Databehandler roller tilknyttet"
+                    noRecords: "Ingen Databehandlingsroller"
                 },
                 columns: [
                     {
-                        field: "Object.Name", title: "Databehandlerregistrering", width: 150,
+                        field: "Object.Name", title: "Databehandling", width: 150,
                         persistId: "dataProcessingRegistrationName", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Object.Name,
                         excelTemplate: (dataItem) => dataItem.Object.Name,

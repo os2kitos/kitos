@@ -7,7 +7,7 @@ namespace Core.DomainModel.GDPR.Read
     /// <summary>
     /// A READ optimized perspective of the data processing registration model
     /// </summary>
-    public class DataProcessingRegistrationReadModel : IOwnedByOrganization, IReadModel<DataProcessingRegistration>
+    public class DataProcessingRegistrationReadModel : IOwnedByOrganization, IReadModel<DataProcessingRegistration>, IHasName
     {
         public DataProcessingRegistrationReadModel()
         {

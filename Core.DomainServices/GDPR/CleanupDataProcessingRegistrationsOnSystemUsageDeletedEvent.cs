@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DomainEvents;
 
-namespace Core.DomainServices.Model.EventHandlers
+namespace Core.DomainServices.GDPR
 {
     public class CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent : IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>
     {

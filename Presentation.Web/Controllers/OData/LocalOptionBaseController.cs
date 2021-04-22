@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.OData
                     entity.OrganizationId = organizationId;
 
                     Repository.Insert(entity);
-                    DomainEvents.Raise(new EntityUpdatedEvent<TLocalModelType>(entity));
+                    DomainEvents.Raise(new EntityCreatedEvent<TLocalModelType>(entity));
                     Repository.Save();
                 }
                 catch (Exception e)
