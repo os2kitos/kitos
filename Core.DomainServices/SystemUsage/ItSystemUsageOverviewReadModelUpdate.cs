@@ -64,7 +64,7 @@ namespace Core.DomainServices.SystemUsage
             destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
-            destination.HostedAt = source.HostedAt;
+            destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);

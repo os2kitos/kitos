@@ -548,6 +548,36 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 $"{dpr3.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}", readModel.DataProcessingRegistrationsConcludedAsCsv);
         }
 
+        [Fact]
+        public void Apply_Generates_HostedAt_As_UNDECIDED_If_HostedAt_Is_Null()
+        {
+            //Arrange
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>(),
+                HostedAt = null
+            };
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Equal(HostedAt.UNDECIDED, readModel.HostedAt);
+        }
+
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
         {
             var system = new ItSystem

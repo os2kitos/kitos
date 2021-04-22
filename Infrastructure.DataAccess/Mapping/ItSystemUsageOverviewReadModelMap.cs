@@ -114,7 +114,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_GeneralPurpose", 0);
 
             Property(x => x.HostedAt)
-               .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
 
 

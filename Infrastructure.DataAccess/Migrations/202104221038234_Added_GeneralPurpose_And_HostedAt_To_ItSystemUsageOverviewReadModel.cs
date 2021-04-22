@@ -10,7 +10,7 @@
             RenameIndex(table: "dbo.ItSystemUsageOverviewReadModels", name: "ItSystemUsage_Index_RiskSupervisionDocumentationName", newName: "ItSystemUsageOverviewReadModel_Index_RiskSupervisionDocumentationName");
             RenameIndex(table: "dbo.ItSystemUsageOverviewReadModels", name: "ItSystemUsage_Index_LinkToDirectoryName", newName: "ItSystemUsageOverviewReadModel_Index_LinkToDirectoryName");
             AddColumn("dbo.ItSystemUsageOverviewReadModels", "GeneralPurpose", c => c.String(maxLength: 200));
-            AddColumn("dbo.ItSystemUsageOverviewReadModels", "HostedAt", c => c.Int());
+            AddColumn("dbo.ItSystemUsageOverviewReadModels", "HostedAt", c => c.Int(nullable: false));
             CreateIndex("dbo.ItSystemUsageOverviewReadModels", "GeneralPurpose", name: "ItSystemUsageOverviewReadModel_Index_GeneralPurpose");
             CreateIndex("dbo.ItSystemUsageOverviewReadModels", "HostedAt", name: "ItSystemUsageOverviewReadModel_Index_HostedAt");
         }

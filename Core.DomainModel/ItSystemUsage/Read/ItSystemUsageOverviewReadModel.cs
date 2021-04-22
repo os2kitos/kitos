@@ -107,6 +107,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
 
         public string GeneralPurpose { get; set; }
-        public HostedAt? HostedAt { get; set; }
+        public HostedAt HostedAt { get; set; }
     }
 }
