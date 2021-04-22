@@ -60,9 +60,9 @@
                     }, {});
 
                     //Make sure insertion order is correct for the columns that depend on one another
-                    const additionalColumnsOrgOrder = [...additionalColumns];
+                    const additionalColumnsCopy = [...additionalColumns];
                     additionalColumns = [];
-                    for (let column of additionalColumnsOrgOrder) {
+                    for (let column of additionalColumnsCopy) {
                         if (columnInsertedByDependency[column.persistId] !== true) {
                             additionalColumns.push(column);
 
@@ -118,12 +118,12 @@
                     }
 
                     //Reorder columns and sheet columns
-                    var orgColumns = [...columns];
-                    var orgSheetColumns = [...sheet.columns];
+                    var columnsCopy = [...columns];
+                    var sheetColumnsCopy = [...sheet.columns];
                     for (let i = 0; i < columns.length; i++) {
                         //Swap the indices
-                        columns[initialIndexToTargetIndex[i]] = orgColumns[i];
-                        sheet.columns[initialIndexToTargetIndex[i]] = orgSheetColumns[i];
+                        columns[initialIndexToTargetIndex[i]] = columnsCopy[i];
+                        sheet.columns[initialIndexToTargetIndex[i]] = sheetColumnsCopy[i];
                     }
 
                     for (let ri = 0; ri < sheet.rows.length; ri++) {
@@ -145,9 +145,9 @@
                         }
 
                         //Reorder according to dependency grapth
-                        let orgCells = [...sheet.rows[ri].cells];
+                        let rowCellsCopy = [...sheet.rows[ri].cells];
                         for (let i = 0; i < sheet.rows[ri].cells.length; i++) {
-                            sheet.rows[ri].cells[initialIndexToTargetIndex[i]] = orgCells[i];
+                            sheet.rows[ri].cells[initialIndexToTargetIndex[i]] = rowCellsCopy[i];
                         }
                     }
                 }
