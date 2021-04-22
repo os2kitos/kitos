@@ -31,7 +31,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalCallName", 0);
 
             Property(x => x.LocalSystemId)
-                .HasMaxLength(ItSystemUsage.LocalSystemIdMaxLength)
+                .HasMaxLength(ItSystemUsage.LongProperyMaxLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalSystemId", 0);
 
             Property(x => x.ItSystemUuid)
@@ -103,11 +103,18 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.RiskSupervisionDocumentationName)
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
-                .HasIndexAnnotation("ItSystemUsage_Index_RiskSupervisionDocumentationName", 0);
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_RiskSupervisionDocumentationName", 0);
 
             Property(x => x.LinkToDirectoryName)
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
-                .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryName", 0);
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LinkToDirectoryName", 0);
+
+            Property(x => x.GeneralPurpose)
+                .HasMaxLength(ItSystemUsage.LongProperyMaxLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_GeneralPurpose", 0);
+
+            Property(x => x.HostedAt)
+               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
 
 
 

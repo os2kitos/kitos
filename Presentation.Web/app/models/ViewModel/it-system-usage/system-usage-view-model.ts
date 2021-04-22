@@ -83,13 +83,19 @@
     }
 
     export class HostedAtOptions {
-        options: UpdatedSelect2OptionViewModel<any>[];
-        constructor() {
-            this.options = [
-                <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.UNDECIDED, text: Kitos.Constants.Select2.EmptyField },
-                <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.ONPREMISE, text: "On-premise" },
-                <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.EXTERNAL, text: "Eksternt" }
-            ];
+        static readonly options = [
+            <UpdatedSelect2OptionViewModel<string>>{ id: HostedAt.UNDECIDED, optionalObjectContext: "UNDECIDED", text: Kitos.Constants.Select2.EmptyField },
+            <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.ONPREMISE, optionalObjectContext: "ONPREMISE", text: "On-premise" },
+            <UpdatedSelect2OptionViewModel<any>>{ id: HostedAt.EXTERNAL, optionalObjectContext: "EXTERNAL", text: "Eksternt" }
+        ]
+
+        static getoptionalObjectContextToTextMap() {
+            return _.reduce(this.options,
+                (acc: any, current) => {
+                    acc[current.optionalObjectContext] = current.text;
+                    return acc;
+                },
+                <any>{});
         }
     }
 

@@ -76,6 +76,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var linkToDirectoryUrlName = A<string>();
             var riskSupervisionDocumentationUrl = A<string>();
             var riskSupervisionDocumentationUrlName = A<string>();
+            var generalPurpose = A<string>();
+            var hostedAt = A<HostedAt>();
 
             var contractName = A<string>();
 
@@ -125,7 +127,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 linkToDirectoryUrl = linkToDirectoryUrl,
                 linkToDirectoryUrlName = linkToDirectoryUrlName,
                 riskSupervisionDocumentationUrl = riskSupervisionDocumentationUrl,
-                riskSupervisionDocumentationUrlName = riskSupervisionDocumentationUrlName
+                riskSupervisionDocumentationUrlName = riskSupervisionDocumentationUrlName,
+                GeneralPurpose = generalPurpose,
+                HostedAt = hostedAt
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
@@ -194,6 +198,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(isHoldingDocument, readModel.IsHoldingDocument);
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
             Assert.Equal(linkToDirectoryUrl, readModel.LinkToDirectoryUrl);
+            Assert.Equal(generalPurpose, readModel.GeneralPurpose);
+            Assert.Equal(hostedAt, readModel.HostedAt);
 
             if (riskAssessment == DataOptions.YES)
             {

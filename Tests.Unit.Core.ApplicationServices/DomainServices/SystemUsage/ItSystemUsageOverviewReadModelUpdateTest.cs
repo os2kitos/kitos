@@ -177,7 +177,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
                 {
                     dataProcessingRegistration
-                }
+                },
+                GeneralPurpose = A<string>(),
+                HostedAt = A<HostedAt>()
             };
 
             // Add ResponsibleOrganizationUnit
@@ -254,6 +256,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.RiskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
             Assert.Equal(systemUsage.LinkToDirectoryUrlName, readModel.LinkToDirectoryName);
             Assert.Equal(systemUsage.LinkToDirectoryUrl, readModel.LinkToDirectoryUrl);
+            Assert.Equal(systemUsage.GeneralPurpose, readModel.GeneralPurpose);
+            Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -542,6 +546,36 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal($"{dpr1.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}, " +
                 $"{dpr2.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}, " +
                 $"{dpr3.IsAgreementConcluded.GetValueOrDefault().GetReadableName()}", readModel.DataProcessingRegistrationsConcludedAsCsv);
+        }
+
+        [Fact]
+        public void Apply_Generates_HostedAt_As_UNDECIDED_If_HostedAt_Is_Null()
+        {
+            //Arrange
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = system,
+                ObjectOwner = defaultTestUser,
+                LastChangedByUser = defaultTestUser,
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>(),
+                HostedAt = null
+            };
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Equal(HostedAt.UNDECIDED, readModel.HostedAt);
         }
 
         private ItSystemUsageOverviewReadModel Test_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

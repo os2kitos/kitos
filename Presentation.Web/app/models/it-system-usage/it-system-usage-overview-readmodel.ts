@@ -59,5 +59,7 @@
         DataProcessingRegistrationsConcludedAsCsv: string | null;
         DataProcessingRegistrationNamesAsCsv: string | null;
         DataProcessingRegistrations: IItSystemUsageOverviewDataProcessingRegistrationReadModel[];
+        GeneralPurpose: string | null;
+        HostedAt: number | null;
     }
 }

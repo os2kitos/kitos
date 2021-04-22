@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
@@ -104,5 +105,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
         public string DataProcessingRegistrationNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
+
+        public string GeneralPurpose { get; set; }
+        public HostedAt HostedAt { get; set; }
     }
 }
