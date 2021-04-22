@@ -3,6 +3,7 @@ using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
 using Presentation.Web.Extensions;
+using Presentation.Web.Helpers;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
@@ -43,7 +44,7 @@ namespace Presentation.Web.Infrastructure.Middleware
 
         private static bool IsNotExternalApiUsage(IOwinContext context)
         {
-            return !context.Request.Uri.AbsoluteUri.Contains("/api/v2");
+            return !context.Request.Uri.AbsoluteUri.IsExternalApiPath();
         }
     }
 }

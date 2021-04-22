@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
@@ -12,7 +11,7 @@ namespace Presentation.Web.Controllers.External.V2
 {
     [PublicApi]
     [RoutePrefix("api/v2/rightsholder")]
-    public partial class RightsHolderController: ExternalBaseController
+    public class RightsHolderItSystemsController: ExternalBaseController
     {
         /// <summary>
         /// Creates a new IT-System based on given input values
@@ -28,9 +27,9 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage PostItSystem([FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        public IHttpActionResult PostItSystem([FromBody] ItSystemRequestDTO itSystemRequestDTO)
         {
-            return Created(new Uri(Request.RequestUri + "/" + itSystemRequestDTO.Uuid));
+            return Created(Request.RequestUri + "/" + itSystemRequestDTO.Uuid, new ItSystemResponseDTO());
         }
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public HttpResponseMessage GetItSystems(int? page = 0, int? pageSize = 100)
+        public IHttpActionResult GetItSystems(int? page = 0, int? pageSize = 100)
         {
             return Ok(new List<ItSystemResponseDTO>());
         }
@@ -62,24 +61,24 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetItSystem(Guid uuid)
+        public IHttpActionResult GetItSystem(Guid uuid)
         {
             return Ok(new ItSystemResponseDTO());
         }
 
         /// <summary>
-        /// Sets individual IT-System values
+        /// Sets IT-System values
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>The updated IT-System</returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
         {
             return Ok(new ItSystemResponseDTO());
         }
@@ -97,9 +96,8 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public void DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
-            return NoContent();
         }
     }
 }

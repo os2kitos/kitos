@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Swashbuckle.Examples;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    public partial class RightsHolderController
+    [PublicApi]
+    [RoutePrefix("api/v2/rightsholder")]
+    public class RightsHolderItInterfaceController: ExternalBaseController
     {
         /// <summary>
         /// Creates a new IT-Interface based on given input values
@@ -25,9 +27,9 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
+        public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
         {
-            return Created(new Uri(Request.RequestUri + "/" + itInterfaceDTO.Uuid));
+            return Created(Request.RequestUri + "/" + itInterfaceDTO.Uuid, new ItInterfaceResponseDTO());
         }
 
         /// <summary>
@@ -42,7 +44,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public HttpResponseMessage GetItInterface(int? page = 0, int? pageSize = 100)
+        public IHttpActionResult GetItInterface(int? page = 0, int? pageSize = 100)
         {
             return Ok(new List<ItInterfaceResponseDTO>());
         }
@@ -59,24 +61,24 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetItInterface(Guid uuid)
+        public IHttpActionResult GetItInterface(Guid uuid)
         {
             return Ok(new ItInterfaceResponseDTO());
         }
 
         /// <summary>
-        /// Sets individual IT-Interface values
+        /// Sets IT-Interface values
         /// </summary>
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>The updated IT-Interface</returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
+        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
         {
             return Ok(new ItInterfaceResponseDTO());
         }
@@ -94,9 +96,8 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public void DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
-            return NoContent();
         }
     }
 }

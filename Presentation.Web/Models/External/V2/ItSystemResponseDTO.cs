@@ -38,7 +38,7 @@ namespace Presentation.Web.Models.External.V2
         /// <summary>
         /// List of KLE number representations as name and UUID pairs
         /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> KLERepresentations { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> KLE { get; set; }
 
         /// <summary>
         /// Active status

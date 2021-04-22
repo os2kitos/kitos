@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using Presentation.Web;
+using Presentation.Web.Helpers;
 using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
@@ -30,7 +31,7 @@ namespace Presentation.Web
 
                 c.GroupActionsBy(apiDesc =>
                         {
-                            if (apiDesc.RelativePath.Contains(@"api/v2"))
+                            if (apiDesc.RelativePath.IsExternalApiPath())
                             {
                                 return "API V2 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
                             } 

@@ -39,9 +39,10 @@ namespace Presentation.Web.Models.External.V2
         /// </summary>
         public string UrlReference { get; set; }
 
-        // TODO: Did we decide to include these?
-        //public bool Deactivated { get; set; }
-        //public string DeactivationReason { get; set; }
+        /// <summary>
+        /// Active status
+        /// </summary>
+        public bool Deactivated { get; set; }
         
         /// <summary>
         /// Date of creation
