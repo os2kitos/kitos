@@ -3943,10 +3943,10 @@ timers-ext@^0.1.5:
     es5-ext "~0.10.46"
     next-tick "1"
 
-tinymce@4.4.3:
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.4.3.tgz#63df0fb3ff90aedab506b7c451034bb5ea192cb1"
-  integrity sha1-Y98Ps/+Qrtq1BrfEUQNLteoZLLE=
+tinymce@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.6.0.tgz#b5eda4888e1a607ddd545619cfaa137d59de14b4"
+  integrity sha512-f8LsyT80j8hD4wrL8Sac0DWDG5k10cDyykL/qkJ6kexn1KMt7w1ByrGlUm53XCYDqtavBA5snTU7odioMwSXSQ==
 
 tmp@0.0.30:
   version "0.0.30"
