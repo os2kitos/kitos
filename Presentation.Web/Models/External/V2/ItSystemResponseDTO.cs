@@ -13,7 +13,7 @@ namespace Presentation.Web.Models.External.V2
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
-        public Guid? ParentUuid { get; set; }
+        public Guid? ParentSystemUuid { get; set; }
         
         /// <summary>
         /// Name of IT-System
@@ -34,11 +34,6 @@ namespace Presentation.Web.Models.External.V2
         /// Url reference for further information
         /// </summary>
         public string UrlReference { get; set; }
-
-        /// <summary>
-        /// UUID for IT-System business type
-        /// </summary>
-        public Guid? BusinessTypeUuid { get; set; }
 
         /// <summary>
         /// List of KLE number representations as name and UUID pairs
