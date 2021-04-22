@@ -3,6 +3,7 @@
     export interface IAssignedSystemUsageRole {
         RoleId: number;
         UserFullName: string;
+        Email : string;
     }
 
     export interface IItSystemUsageOverviewTaskRefReadModel {

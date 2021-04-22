@@ -36,6 +36,7 @@
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             //Lookup maps
             var roleIdToUserNamesMap = {};
+            var roleIdToEmailMap = {};
 
             //Helper functions
             const agreementConcludedIsDefined = (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) => registration.IsAgreementConcluded !== null && registration.IsAgreementConcluded !== Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED]
@@ -131,18 +132,27 @@
                 .withResponseParser(response => {
                     //Reset all response state
                     roleIdToUserNamesMap = {};
+                    roleIdToEmailMap = {};
 
                     //Build lookups/mutations
                     response.forEach(systemUsage => {
                         roleIdToUserNamesMap[systemUsage.Id] = {};
+                        roleIdToEmailMap[systemUsage.Id] = {};
 
                         //Update the role assignment map
                         if (systemUsage.RoleAssignments) {
                             systemUsage.RoleAssignments.forEach(assignment => {
+                                //Patch names
                                 if (!roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId])
                                     roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] = assignment.UserFullName;
                                 else {
                                     roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] += `, ${assignment.UserFullName}`;
+                                }
+                                //Patch emails
+                                if (!roleIdToEmailMap[systemUsage.Id][assignment.RoleId])
+                                    roleIdToEmailMap[systemUsage.Id][assignment.RoleId] = assignment.Email;
+                                else {
+                                    roleIdToEmailMap[systemUsage.Id][assignment.RoleId] += `, ${assignment.Email}`;
                                 }
                             });
                         }
@@ -284,17 +294,25 @@
                 .withStandardSorting("Name");
 
             overviewOptions.systemRoles.forEach(role =>
-                launcher = launcher.withColumn(builder =>
-                    builder
-                        .withDataSourceName(getRoleKey(role))
-                        .withTitle(role.name)
-                        .withId(`systemUsage${getRoleKey(role)}`)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
-                        .withContentOverflow()
-                        .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.id]))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.id])))
+                launcher = launcher
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName(getRoleKey(role))
+                            .withTitle(role.name)
+                            .withId(`systemUsage${getRoleKey(role)}`)
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                            .withContentOverflow()
+                            .withInitialVisibility(false)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.id]))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.id])))
+                    .withExcelOnlyColumn(builder =>
+                        builder
+                            .withId(`systemUsage${getRoleKey(role)}_emails`)
+                            .withTitle(`${role.name} Email"`)
+                            .dependOnColumnWithId(`systemUsage${getRoleKey(role)}`)
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToEmailMap[dataItem.Id][role.id]))
+                    )
             );
 
             launcher = launcher
