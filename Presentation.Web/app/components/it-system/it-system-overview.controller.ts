@@ -558,16 +558,13 @@
                         .withTitle("IT systemet driftes")
                         .withId("HostedAt")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange([
-                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.UNDECIDED,
-                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.ONPREMISE,
-                            Models.ViewModel.ItSystemUsage.HostedAtViewModel.hostedAtOptions.EXTERNAL
-                        ].map(value => {
-                            return {
-                                textValue: value.text,
-                                remoteValue: value.textValue
-                            }
-                        })
+                        .withFixedValueRange(
+                            Models.ViewModel.ItSystemUsage.HostedAtOptions.options.map(value => {
+                                return {
+                                    textValue: value.text,
+                                    remoteValue: value.id
+                                }
+                            })
                             , false)
                         .withRendering(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt))
                         .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt)))

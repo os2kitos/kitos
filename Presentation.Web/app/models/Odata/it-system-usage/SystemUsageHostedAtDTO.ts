@@ -2,13 +2,13 @@
 
     export interface IItSystemUsageHostedAtDTO {
         //Odata maps enums to string https://github.com/OData/WebApi/issues/364
-        HostedAt: string;
+        HostedAt: number;
     }
 
     export class HostedAtMapper {
-        static map(input: string) {
+        static map(input: number) {
             if (input != null) {
-                return Models.ViewModel.ItSystemUsage.HostedAtViewModel.getTextValueToTextMap()[input];
+                return Models.ViewModel.ItSystemUsage.HostedAtOptions.getoptionalObjectContextToTextMap()[input];
             } else {
                 return "";
             }

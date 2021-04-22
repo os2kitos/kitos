@@ -60,6 +60,6 @@
         DataProcessingRegistrationNamesAsCsv: string | null;
         DataProcessingRegistrations: IItSystemUsageOverviewDataProcessingRegistrationReadModel[];
         GeneralPurpose: string | null;
-        HostedAt: string | null;
+        HostedAt: number | null;
     }
 }
