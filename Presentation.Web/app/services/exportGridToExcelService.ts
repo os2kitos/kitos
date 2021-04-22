@@ -35,6 +35,7 @@
 
                 // render templates
                 var sheet = e.workbook.sheets[0];
+                //TODO: Add temp column definitions? and then remove them again later?
 
                 // skip header row
                 for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
