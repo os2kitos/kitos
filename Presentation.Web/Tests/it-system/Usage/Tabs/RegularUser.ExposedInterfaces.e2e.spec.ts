@@ -5,6 +5,7 @@ import ItSystemHelper = require("../../../Helpers/SystemCatalogHelper");
 import SystemUsageHelper = require("../../../Helpers/SystemUsageHelper");
 import LocalItSystemNavigation = require("../../../Helpers/SideNavigation/LocalItSystemNavigation");
 import ItSystemNavigation = require("../../../Helpers/SideNavigation/ItSystemNavigation");
+import WaitTimers = require("../../../Utility/WaitTimers");
 
 describe("Regular user can",
     () => {
@@ -14,6 +15,7 @@ describe("Regular user can",
         var itSystemWithInterfaceName = createItSystemInterfaceName();
         var itSystemName = createItSystemName();
         var interfaceName = createInterfaceName();
+        var waitUpTo = new WaitTimers();
         var ec = protractor.ExpectedConditions;
 
         beforeAll(() => {
@@ -42,7 +44,7 @@ describe("Regular user can",
                 SystemUsageHelper.openLocalSystem(itSystemWithInterfaceName)
                     .then(() => LocalItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
-                    .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
+                    .then(() => browser.wait(ec.presenceOf(getInterfaceName()), waitUpTo.twentySeconds))
                     .then(() => expect(getInterfaceName().getText()).toEqual(interfaceName));
             });
 
@@ -51,7 +53,7 @@ describe("Regular user can",
                 ItSystemHelper.openSystem(itSystemWithInterfaceName)
                     .then(() => ItSystemNavigation.exposedInterfacesPage())
                     .then(() => console.log("Checking for interface"))
-                    .then(() => browser.wait(ec.visibilityOf(getInterfaceName())))
+                    .then(() => browser.wait(ec.presenceOf(getInterfaceName()), waitUpTo.twentySeconds))
                     .then(() => expect(getInterfaceName().getText()).toEqual(interfaceName));
             });
 

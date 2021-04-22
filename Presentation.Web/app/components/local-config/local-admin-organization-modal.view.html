@@ -4,25 +4,14 @@
 
 <form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
     <div class="modal-body">
-        <div class="form-group">
-            <label for="access" class="col-xs-3 control-label">
-                Synlighed
-            </label>
-            <div class="col-xs-8">
-                <select data-ui-select2="" data-ng-model="ctrl.org.AccessModifier" class="form-control input-sm" data-ng-required="true">
-                    <!--<option value="0">Lokal</option>-->
-                    <option value="1">Offentlig</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group" ng-class="{ 'has-error': form.name.$touched && form.name.$invalid }">
+        <div class="form-group" ng-class="{ 'has-error': form.name.$invalid }">
             <label for="name" class="col-xs-3 control-label">
                 Organisationens navn
             </label>
             <div class="col-xs-8">
                 <input type="text" data-ng-model="ctrl.org.Name" id="name" name="name" class="form-control" ng-required="true" ng-maxlength="50" autocomplete="false"
                        ng-minlength="1" data-disabled-on-busy autofocus>
-                <div ng-messages="form.name.$error" ng-if="form.name.$touched" style="color:maroon" role="alert">
+                <div ng-messages="form.name.$error" ng-if="form.name.$invalid" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Organisationen skal have et navn.</div>
                     <div ng-message="minlength" style="margin:5px 0">Det valgte navn er for kort.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Det valgte navn er for lang.</div>
@@ -40,10 +29,10 @@
         <div class="form-group">
             <div class="col-xs-8 col-xs-offset-3">
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.TypeId" value="2"> Interessefællesskab
+                    <input type="radio" data-ng-model="ctrl.org.TypeId" ng-value="2"> Interessefællesskab
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" data-ng-model="ctrl.org.TypeId" value="3"> Virksomhed
+                    <input type="radio" data-ng-model="ctrl.org.TypeId" ng-value="3"> Virksomhed
                 </label>
             </div>
         </div>

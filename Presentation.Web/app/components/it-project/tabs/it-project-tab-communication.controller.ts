@@ -21,7 +21,7 @@
                             //get the role names
                             return $http.get("odata/ItProjectRoles?%24format=json&%24top=100&%24orderby=priority+desc&%24count=true")
                                 .then(function (roleResult) {
-                                    var roles: { Name }[] = roleResult.data.value;
+                                    var roles: { Id: number, Name: string }[] = roleResult.data.value;
 
                                     //the resulting map
                                     var users = {};
@@ -30,7 +30,7 @@
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
 
-                                        var role: { Name } = _.find(roles, { Id: right.roleId });
+                                        var role: { Name: string } = _.find(roles, { Id: right.roleId });
 
                                         var roleNames = user.roleNames || [];
                                         roleNames.push(role.Name);
@@ -48,10 +48,10 @@
     }]);
 
     app.controller("project.EditCommunicationCtrl",
-        ["$scope", "$http", "notify", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user",
-            function ($scope, $http, notify, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
+        ["$scope", "$http", "notify", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user", "entityMapper", 
+            function ($scope, $http, notify, $timeout, $state, $stateParams, comms, usersWithRoles, user, entityMapper) {
             $scope.comms = comms;
-            $scope.usersWithRoles = _.values(usersWithRoles);
+            $scope.usersWithRoles = entityMapper.mapApiResponseToSelect2ViewModel(usersWithRoles);
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
@@ -73,7 +73,17 @@
                     $scope.comm.dueDate = null;
                 }
 
-                $http.post(`api/communication?organizationId=${user.currentOrganizationId}`, $scope.comm).finally(reload);
+                var payload = {
+                    dueDate: $scope.comm.dueDate,
+                    itProjectId: $scope.comm.itProjectId,
+                    responsibleUserId: $scope.comm.responsibleUserId.id,
+                    media: $scope.comm.media,
+                    message: $scope.comm.message,
+                    purpose: $scope.comm.purpose,
+                    targetAudiance: $scope.comm.targetAudiance
+                }
+
+                $http.post(`api/communication?organizationId=${user.currentOrganizationId}`, payload).finally(reload);
             };
 
             $scope.delete = function (id) {

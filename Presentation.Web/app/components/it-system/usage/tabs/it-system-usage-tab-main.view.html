@@ -25,7 +25,7 @@
                 </div>
                 <!-- Category of data -->
                 <div class="form-group" ng-if="shouldShowCategories">
-                    <select-option data-id="categories"
+                    <select2-option data-id="categories"
                                    data-label="Klassifikation af data i systemet"
                                    data-placeholder="Vælg kategori"
                                    data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
@@ -34,7 +34,7 @@
                                    data-options="systemCategories"
                                    data-auto-save-url="{{autoSaveUrl}}"
                                    data-field="itSystemCategoriesId">
-                    </select-option>
+                    </select2-option>
                 </div>
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">
@@ -50,19 +50,14 @@
             <!-- 2nd column -->
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label for="numberOfUsers" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
-                    <select id="numberOfUsers"
-                            class="form-control input-sm"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="usage.userCount"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-field="userCount"
-                            data-autosave="{{autoSaveUrl}}">
-                        <option value="0">&lt;10</option>
-                        <option value="1">10-50</option>
-                        <option value="2">50-100</option>
-                        <option value="3">&gt;100</option>
-                    </select>
+                    <select-simple data-id="numberOfUsers"
+                                   data-label="Hvor mange brugere benytter systemet i jeres kommune?"
+                                   data-options="numberOfUsersOptions"
+                                   data-ng-model="usageViewModel.userCount"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-auto-save-url="{{autoSaveUrl}}"
+                                   data-field="userCount">
+                    </select-simple>
                 </div>
                 <!-- version -->
                 <div class="form-group">

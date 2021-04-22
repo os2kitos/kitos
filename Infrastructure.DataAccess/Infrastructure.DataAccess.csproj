@@ -663,6 +663,10 @@
     <Compile Include="Migrations\202012140756598_Added_latest_oversight_date.designer.cs">
       <DependentUpon>202012140756598_Added_latest_oversight_date.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104071049413_Contract_Remove_DataHandler.cs" />
+    <Compile Include="Migrations\202104071049413_Contract_Remove_DataHandler.designer.cs">
+      <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1082,6 +1086,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202012140756598_Added_latest_oversight_date.resx">
       <DependentUpon>202012140756598_Added_latest_oversight_date.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104071049413_Contract_Remove_DataHandler.resx">
+      <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -16,16 +16,13 @@
             <div class="col-xs-12">
                 <div class="form-group">
                     <label class="control-label">Vælg ansvarlig organisationsenhed iblandt nedenstående</label>
-                    <select id="responsible-org"
-                            class="form-control input-sm"
-                            data-ui-select2="allowClearOption"
-                            data-placeholder="Vælg ansvarlig organisationsenhed"
-                            data-ng-disabled="!hasWriteAccess"
-                            data-ng-model="responsibleOrgUnitId"
-                            data-ng-change="saveResponsible()">
-                        <option value=""></option>
-                        <option data-ng-repeat="orgUnit in selectedOrgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
-                    </select>
+                    <select-simple data-id="responsible-org"
+                                   data-placeholder="Vælg ansvarlig organisationsenhed"
+                                   data-options="selectedOrgUnits"
+                                   data-ng-model="responsibleOrgUnit"
+                                   data-function="saveResponsible"
+                                   data-ng-disabled="!hasWriteAccess">
+                    </select-simple>
                 </div>
             </div>
         </div>

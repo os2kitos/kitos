@@ -1,6 +1,6 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     app.config([
-        '$stateProvider', function($stateProvider) {
+        '$stateProvider', function ($stateProvider) {
             $stateProvider.state('global-admin.local-users', {
                 url: '/local-admins',
                 templateUrl: 'app/components/global-admin/global-admin-local-admins.view.html',
@@ -8,7 +8,7 @@
                 authRoles: ['GlobalAdmin'],
                 resolve: {
                     adminRights: [
-                        '$http', function($http) {
+                        '$http', function ($http) {
                             return $http.get('api/OrganizationRight/?roleName=LocalAdmin&roleWithName').then(function (result) {
                                 return result.data.response;
                             });
@@ -25,7 +25,7 @@
     ]);
 
     app.controller('globalAdmin.localAdminsCtrl', [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'adminRights', 'user','userService',
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'adminRights', 'user', 'userService',
         function ($rootScope, $scope, $http, $state, notify, adminRights, user: Kitos.Services.IUser, userService: Kitos.Services.IUserService) {
             $rootScope.page.title = 'Lokal administratorer';
             $scope.adminRights = adminRights;
@@ -51,47 +51,49 @@
                     organizationId: oId
                 };
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/OrganizationRight/" + oId, data, { handleBusy: true }).success(function (result) {
-                    msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
-                    if (uId == user.id) {
-                        // Reload user
-                        userService.reAuthorize();
-                    }
-                    reload();
-                }).error(function() {
-                    msg.toErrorMessage("Kunne ikke gøre " + user.text + " til lokal administrator for " + orgName);
-                });
+                $http.post("api/OrganizationRight/" + oId, data, { handleBusy: true })
+                    .then(function onSuccess(result) {
+                        msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
+                        if (uId == user.id) {
+                            // Reload user
+                            userService.reAuthorize();
+                        }
+                        reload();
+                    }, function onError(result) {
+                        msg.toErrorMessage("Kunne ikke gøre " + user.text + " til lokal administrator for " + orgName);
+                    });
             }
 
             function reload() {
                 $state.go('.', null, { reload: true });
             }
 
-            $scope.$watch("newUser", function(newVal, oldVal) {
+            $scope.$watch("newUser", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
 
                 newLocalAdmin();
             });
 
-            $scope.$watch("newOrg", function(newVal, oldVal) {
+            $scope.$watch("newOrg", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
 
                 newLocalAdmin();
             });
 
-            $scope.deleteLocalAdmin = function(right) {
+            $scope.deleteLocalAdmin = function (right) {
                 var oId = right.organizationId;
                 var rId = right.role;
                 var uId = right.userId;
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
+                $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId)
+                    .then(function onSuccess(result) {
                     msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
                     if (uId == user.id) {
                         // Reload user
                         userService.reAuthorize();
                     }
                     reload();
-                }).error(function(deleteResult) {
+                    }, function onError(result) {
 
                     msg.toErrorMessage("Kunne ikke fjerne " + right.userName + " som lokal administrator");
                 });
@@ -114,24 +116,24 @@
                     placeholder: ' ',
                     formatResult: format,
                     ajax: {
-                        data: function(term, page) {
+                        data: function (term, page) {
                             return { query: term };
                         },
                         quietMillis: 500,
-                        transport: function(queryParams) {
+                        transport: function (queryParams) {
                             var extraParams = paramAry ? '&' + paramAry.join('&') : '';
                             var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                            res.abort = function() {
+                            res.abort = function () {
                                 return null;
                             };
 
                             return res;
                         },
 
-                        results: function(data, page) {
+                        results: function (data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj: {id: any; name: any; cvr: any}) {
+                            _.each(data.data.response, function (obj: { id: any; name: any; cvr: any }) {
                                 results.push({
                                     id: obj.id,
                                     text: obj.name ? obj.name : 'Unavngiven',

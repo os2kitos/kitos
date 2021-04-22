@@ -7,15 +7,15 @@
             <!-- ArchiveDuty -->
             <div class="form-group">
                 <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
-                <select class="form-control input-sm" id="archiveDuty"
-                        ui-select2="{minimumResultsForSearch: -1}"
-                        data-ng-model="usage.archiveDuty"
-                        data-autosave="api/itSystemUsage/{{usageId}}"
-                        data-field="ArchiveDuty"
-                        data-ng-disabled="!hasWriteAccess">
-                    <option hidden selected value />
-                    <option ng-repeat="option in archiveDutyOptions" value="{{option.value}}" ng-bind-html="option.name" />
-                </select>
+                <select-simple data-id="archiveDuty"
+                               data-label="Arkiveringspligt"
+                               data-options="archiveDutyOptions"
+                               data-ng-model="usage.archiveDuty"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="ArchiveDuty">
+                </select-simple>
+
                 <!-- ArchiveDuty recommendation -->
                 <span class="help-block small" ng-if="usage.itSystem.archiveDuty && usage.itSystem.archiveDuty > 0">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -27,29 +27,29 @@
             </div>
             <!-- ArchivedType -->
             <div class="form-group">
-                <select-option data-id="archive"
+                <select2-option data-id="archive"
                                data-label="Arkivtype"
                                data-placeholder="Vælg arkivering"
                                data-selected-text="{{ usage.archiveTypeName }}"
-                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                data-ng-model="usage.archiveTypeId"
                                data-options="archiveTypes"
                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                data-field="archiveTypeId">
-                </select-option>
+                </select2-option>
             </div>
             <!-- ArchiveLocation -->
             <div class="form-group">
-                <select-option data-id="archiveLocation"
+                <select2-option data-id="archiveLocation"
                                data-label="Arkiveringssted"
                                data-placeholder="Vælg arkiveringssted"
                                data-selected-text="{{ usage.archiveLocationName }}"
-                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                data-ng-model="usage.archiveLocationId"
                                data-options="archiveLocations"
                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                data-field="archiveLocationId">
-                </select-option>
+                </select2-option>
             </div>
             <!-- Supplier -->
             <div class="form-group">
@@ -59,30 +59,30 @@
                        data-ng-model="systemUsage.supplier"
                        ng-click="patchSupplier('SupplierId', systemUsage.supplier)"
                        data-field="SupplierId"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1">
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
             </div>
         </div>
         <!-- 2nd column -->
         <div class="col-xs-6">
             <!-- ArchiveTestLocation -->
             <div class="form-group">
-                <select-option data-id="archiveTestLocation"
+                <select2-option data-id="archiveTestLocation"
                                data-label="Arkiveringsteststed"
                                data-placeholder="Vælg arkiveringssted"
                                data-selected-text="{{ usage.archiveTestLocationName }}"
                                data-ng-model="usage.archiveTestLocationId"
                                data-options="archiveTestLocations"
-                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                               data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                data-field="archiveTestLocationId">
-                </select-option>
+                </select2-option>
             </div>
             <!-- ArchiveNotes -->
             <div class="form-group">
                 <label for="ArchiveNotes" class="control-label small">Arkiveringsbemærkninger</label>
                 <textarea id="ArchiveNotes" class="form-control input-sm"
                        rows="5"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                        data-ng-model="systemUsage.ArchiveNotes"
                        ng-blur="patch('ArchiveNotes', systemUsage.ArchiveNotes)"
                        data-field="ArchiveNotes"/>
@@ -93,14 +93,14 @@
                        ng-change="patch('ArchiveFreq', systemUsage.ArchiveFreq)"
                        data-field="ArchiveFreq"
                        data-ng-model="systemUsage.ArchiveFreq"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"/>
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"/>
             </div>
             <!-- Registertype -->
             <div form action="">
                 <input type="checkbox" id="Registertype"
                        data-ng-model="systemUsage.Registertype"
-                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
-                       ng-click="patch('Registertype', systemUsage.Registertype)"/>
+                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
+                       ng-change="patch('Registertype', systemUsage.Registertype)"/>
                 <label for="Registertype" style="padding-left: 0px;">
                     <p class="control-label small">Dokumentbærende</p>
                 </label>
@@ -108,27 +108,27 @@
         </div>
     </div>
         <!-- ArchiveFromSystem -->
-    <div class="col-xs-12" ng-hide="archivePeriods.length < 1 && !usage.archiveDuty || usage.archiveDuty < 1">
+    <div class="col-xs-12" ng-hide="archivePeriods.length < 1 && !usage.archiveDuty || usage.archiveDuty.id < 1">
         <div class="form-group">
             <label class="control-label small">Er der arkiveret fra systemet?</label><br>
             <input type="radio" id="ArchiveFromSystemYes"
                    data-ng-model="systemUsage.ArchiveFromSystem"
                    ng-value="true"
-                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                    ng-click="patch('ArchiveFromSystem', true)"
                    data-field="ArchiveFromSystem">
             <label class="control-label small" for="ArchiveFromSystemYes">Ja</label>
             <input type="radio" id="ArchiveFromSystemNo"
                    data-ng-model="systemUsage.ArchiveFromSystem"
                    ng-value="false"
-                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                    ng-click="patch('ArchiveFromSystem', false)"
                    data-field="ArchiveFromSystem">
             <label class="control-label small" for="ArchiveFromSystemNo">Nej</label>
         </div>
     </div>
         <!-- Journal Period -->
-        <div id="JournalPeriod" class="h4" ng-hide="archivePeriods.length < 1 && !usage.archiveDuty || usage.archiveDuty < 1">
+        <div id="JournalPeriod" class="h4" ng-hide="archivePeriods.length < 1 && !usage.archiveDuty || usage.archiveDuty.id < 1">
             <label for="JournalPeriod">	&nbsp;	&nbsp;Journalperiode </label>
             <form role="form" name="archiveForm">
                 <table class="table">
@@ -147,7 +147,7 @@
                             <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                    data-ng-model="archive.StartDate"
                                    ng-change="patchDatePeriode('StartDate', archive.StartDate, archive.Id)"
                                    data-field="startDate">
@@ -156,7 +156,7 @@
                             <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                    data-ng-model="archive.EndDate"
                                    ng-change="patchDatePeriode('EndDate', archive.EndDate, archive.Id)"
                                    data-field="endDate">
@@ -167,13 +167,13 @@
                                           data-ng-model="archive.UniqueArchiveId"
                                           ng-blur="patchPeriode('UniqueArchiveId', archive.UniqueArchiveId, archive.Id)"
                                           data-field="uniqueArchiveId"
-                                          data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"></textarea>
+                                          data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"></textarea>
                             </div>
                         </td>
                         <td>
                             <input type="checkbox" name="Approved"
-                                   ng-click="patchPeriode('Approved', archive.Approved, archive.Id)" 
-                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1" 
+                                   ng-change="patchPeriode('Approved', archive.Approved, archive.Id)" 
+                                   data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1" 
                                    data-ng-model="archive.Approved"/>
 
                         </td>
@@ -181,13 +181,13 @@
                             <button class="btn btn-danger btn-sm delete-archive"
                                     data-confirmed-click="delete(archive.Id)"
                                     data-confirm-click="Er du sikker på at du vil slette?"
-                                    data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1">
+                                    data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </td>
                     </tr>
                     </tbody>
-                    <tfoot data-ng-hide="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1">
+                    <tfoot data-ng-hide="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1">
                     <tr>
                         <td>
                             <div class="form-group" data-show-errors>
@@ -197,7 +197,7 @@
                                        required
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                        data-ng-model="archivePeriod.startDate">
                             </div>
                         </td>
@@ -209,7 +209,7 @@
                                        required
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1"
+                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1"
                                        data-ng-model="archivePeriod.endDate">
                             </div>
                         </td>
@@ -221,7 +221,7 @@
                         <td>
                                 <input type="checkbox"
                                        name="Approved" 
-                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty < 1" 
+                                       data-ng-disabled="!hasWriteAccess || !usage.archiveDuty || usage.archiveDuty.id < 1" 
                                        data-ng-model="archivePeriod.approved"/>
                           
                         </td>

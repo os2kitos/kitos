@@ -9,13 +9,13 @@ class Select2Helper {
     private static readonly selectResult = "select2-result-label";
     private static readonly disabledSelect2Class = "container-disabled";
 
-    public static waitForDataAndSelect() {
+    static waitForDataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
         return browser.wait(this.ec.visibilityOf(element(by.className(Select2Helper.selectResult))), this.waitUpTo.twentySeconds)
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(protractor.Key.ENTER));
     }
 
-    public static searchFor(name: string, elementId: string) {
+    static searchFor(name: string, elementId: string) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId}`);
         return element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
             .click()
@@ -23,7 +23,7 @@ class Select2Helper {
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
     }
 
-    public static searchForByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
+    static searchForByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId} under parent: ${parent.getTagName().toString()}`);
         parent.element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
             .click()
@@ -31,13 +31,21 @@ class Select2Helper {
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
     }
 
-    public static select(name: string, elementId: string) {
+    static selectNoSearchByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
+        console.log(`selectNoSearchByParent: ${name}, in element with id: ${elementId} under parent: ${parent.getTagName().toString()}`);
+        parent.element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
+            .click()
+            .then(() => this.findResult(name).first().click())
+            .then(() => console.log(`Selected ${name}`));
+    }
+
+    static select(name: string, elementId: string) {
         return this.searchFor(name, elementId)
             .then(() => this.waitForDataAndSelect())
             .then(() => console.log(`Found and selected ${name}`));
     }
 
-    public static selectWithNoSearch(name: string, elementId: string) {
+    static selectWithNoSearch(name: string, elementId: string) {
         return element(by.id(elementId))
             .element(by.className(Select2Helper.selectChoice))
             .click()
@@ -45,7 +53,7 @@ class Select2Helper {
             .then(() => console.log(`Selected ${name}`));
     }
 
-    public static getData(elementId: string) {
+    static getData(elementId: string) {
         console.log(`Finding value in ${elementId}`);
         return element(by.xpath(`//div[@id  = "${elementId}"]/child::*//span[@class = "select2-chosen"]`));
     }
@@ -62,7 +70,7 @@ class Select2Helper {
             });
     }
 
-    public static assertIsEnabled(findElement: () => protractor.ElementFinder, expectedState: boolean) {
+    static assertIsEnabled(findElement: () => protractor.ElementFinder, expectedState: boolean) {
         if (expectedState) {
             expect(findElement().getAttribute("class")).not.toContain(Select2Helper.disabledSelect2Class);
         } else {

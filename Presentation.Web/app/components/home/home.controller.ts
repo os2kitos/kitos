@@ -102,11 +102,10 @@
                 var payload = { value: text.value };
 
                 $http({ method: 'PATCH', url: 'api/text/' + text.id + '?organizationId=' + 1, data: payload, ignoreLoadingBar: true })
-                    .success(function () {
+                    .then(function onSuccess(result) {
                         msg.toSuccessMessage("Feltet er opdateret.");
-                    })
-                    .error(function (result, status) {
-                        if (status === 409) {
+                    }, function onError(result) {
+                        if (result.status === 409) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien allerede findes i KITOS!");
                         } else {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");

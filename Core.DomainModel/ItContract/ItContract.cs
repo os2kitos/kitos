@@ -72,10 +72,6 @@ namespace Core.DomainModel.ItContract
 
         public virtual ExternalReference Reference { get; set; }
 
-        public int? DataHandlerId { get; set; }
-        public virtual ItContract DataHandler { get; set; }
-
-
         #region Master
 
         /// <summary>

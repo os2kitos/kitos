@@ -30,7 +30,7 @@
 
                         <!-- Type -->
                         <div class="form-group">
-                            <select-option data-id="contract-type"
+                            <select2-option data-id="contract-type"
                                            data-label="Kontrakttype"
                                            data-placeholder="Vælg kontrakttype"
                                            data-selected-text="{{ contract.contractTypeName }}"
@@ -39,12 +39,12 @@
                                            data-options="contractTypes"
                                            data-auto-save-url="{{ autoSaveUrl }}"
                                            data-field="contractTypeId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                         <!-- Contract template -->
                         <div class="form-group">
-                            <select-option data-id="contract-template"
+                            <select2-option data-id="contract-template"
                                            data-label="Kontraktskabelon"
                                            data-placeholder="Vælg kontraktskabelon"
                                            data-selected-text="{{ contract.contractTemplateName }}"
@@ -53,7 +53,7 @@
                                            data-options="contractTemplates"
                                            data-auto-save-url="{{ autoSaveUrl }}"
                                            data-field="contractTemplateId">
-                            </select-option>
+                            </select2-option>
                         </div>
                     </div>
 
@@ -69,7 +69,7 @@
 
                         <!-- Purchase form -->
                         <div class="form-group">
-                            <select-option data-id="contract-purchaseform"
+                            <select2-option data-id="contract-purchaseform"
                                            data-label="Indkøbsform"
                                            data-placeholder="Vælg indkøbsform"
                                            data-selected-text="{{ contract.purchaseFormName }}"
@@ -78,12 +78,12 @@
                                            data-options="purchaseForms"
                                            data-auto-save-url="{{ autoSaveUrl }}"
                                            data-field="purchaseFormId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                         <!-- Procurement strategy -->
                         <div class="form-group">
-                            <select-option data-id="contract-strat"
+                            <select2-option data-id="contract-strat"
                                            data-label="Udbudsstrategi"
                                            data-placeholder="Vælg udbudsstrategi"
                                            data-selected-text="{{ contract.procurementStrategyName }}"
@@ -92,21 +92,19 @@
                                            data-options="procurementStrategies"
                                            data-auto-save-url="{{ autoSaveUrl }}"
                                            data-field="procurementStrategyId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                         <!-- Procurement plan -->
                         <div class="form-group">
-                            <label for="contract-plan" class="control-label small">Udbudsplan</label>
-                            <select id="contract-plan" class="form-control input-sm"
-                                    data-ui-select2="procurementPlanOption"
-                                    data-placeholder="Vælg udbudsplan"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.procurementPlan"
-                                    data-ng-change="saveProcurement()">
-                                <option value=""></option>
-                                <option data-ng-repeat="procurementPlan in procurementPlans" value="{{procurementPlan.id}}">{{procurementPlan.half + ' | ' + procurementPlan.year}}</option>
-                            </select>
+                            <select-simple data-id="contract-plan"
+                                           data-label="Udbudsplan"
+                                           data-placeholder="Vælg udbudsplan"
+                                           data-options="procurementPlans"
+                                           data-ng-model="procurementPlanId"
+                                           data-function="saveProcurement"
+                                           data-ng-disabled="!hasWriteAccess">
+                            </select-simple>
                         </div>
 
                     </div>
@@ -178,15 +176,16 @@
                     <div class="col-xs-6">
                         <!-- Responsible org unit -->
                         <div class="form-group">
-                            <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
-                            <div id="contract-orgunit"
-                                 data-ng-model="contract.responsibleOrganizationUnitId"
-                                 data-ng-disabled="!hasWriteAccess"
-                                 data-select-org-unit=""
-                                 data-allow-clear="true"
-                                 data-autosave="{{ autoSaveUrl }}"
-                                 data-field="responsibleOrganizationUnitId">
-                            </div>
+                            <select2-org-unit  data-id="contract-orgunit"
+                                               data-label="Ansvarlig enhed"
+                                               data-placeholder="Vælg ansvarlig enhed"
+                                               data-options="orgUnits"
+                                               data-ng-model="contract.responsibleOrganizationUnitId"
+                                               data-auto-save-url="{{ autoSaveUrl }}"
+                                               data-field="responsibleOrganizationUnitId"
+                                               data-ng-disabled="!hasWriteAccess"
+                                               data-allow-clear="allowClear">
+                            </select2-org-unit>
                         </div>
 
                         <div class="form-group">

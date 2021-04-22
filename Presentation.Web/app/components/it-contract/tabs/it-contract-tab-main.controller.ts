@@ -24,8 +24,25 @@
                     ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
-                            return $http.get('api/organizationunit/?organizationid=' + contract.organizationId).then(function (result) {
-                                return result.data.response;
+                            return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
+                                var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
+
+                                function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
+                                    var option = {
+                                        id: String(orgUnit.id),
+                                        text: orgUnit.name,
+                                        indentationLevel: indentationLevel
+                                    };
+
+                                    options.push(option);
+
+                                    _.each(orgUnit.children, function (child) {
+                                        return visit(child, indentationLevel + 1);
+                                    });
+
+                                }
+                                visit(result.data.response, 0);
+                                return options;
                             });
                         }
                     ],
@@ -55,8 +72,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams', '$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user : Kitos.Services.IUser, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers',
+            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user : Kitos.Services.IUser, autofocus, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -70,6 +87,7 @@
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
+                $scope.allowClear = true;
                 var today = new Date();
 
                 if (!contract.active) {
@@ -92,7 +110,7 @@
                 for (var i = 0; i < 20; i++) {
                     var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
                     var year = currentDate.year();
-                    var obj = { id: i, half: half, year: year };
+                    var obj = { id: String(i), text: half + " | " + year, half: half, year: year };
                     $scope.procurementPlans.push(obj);
 
                     // add 6 months for next iter
@@ -104,14 +122,14 @@
                 });
                 if (foundPlan) {
                     // plan is found in the list, replace it to get object equality
-                    $scope.contract.procurementPlan = foundPlan.id;
+                    $scope.procurementPlanId = foundPlan;
                 } else {
                     // plan is not found, add missing plan to begining of list
                     // if not null
                     if (contract.procurementPlanHalf != null) {
-                        var plan = { id: $scope.procurementPlans.length, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                        var plan = { id: String($scope.procurementPlans.length), text: contract.procurementPlanHalf + " | " + contract.procurementPlanYear, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
-                        $scope.contract.procurementPlan = plan.id; // select it
+                        $scope.procurementPlanId = plan; // select it
                     }
                 }
                 $scope.patchDate = (field, value) => {
@@ -133,37 +151,38 @@
                     }
                 }
 
-                $scope.saveProcurement = function () {
-                    var payload;
-                    // if empty the value has been cleared
-                    if ($scope.contract.procurementPlan === '') {
-                        contract = $scope.contract; 
-                        payload = { procurementPlanHalf: null, procurementPlanYear: null };
-                    } else {
-                        var id = $scope.contract.procurementPlan;
-                        var result = $scope.procurementPlans[id];
-                        payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
+                $scope.saveProcurement = function (id) {
+                    if (id === null && contract.procurementPlanHalf !== null && contract.procurementPlanYear !== null) {
+                        updateProcurement(null, null);
                     }
+                    else {
+                        if (id === null) {
+                            return;
+                        }
 
+                        var result = _.find($scope.procurementPlans, (plan) => plan.id === id);
+                        if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
+                            return;
+                        }
+                        updateProcurement(result.half, result.year);
+                    }
+                };
+
+                function updateProcurement(procurementPlanHalf, procurementPlanYear) {
+                    contract = $scope.contract;
+
+                    var payload = { procurementPlanHalf: procurementPlanHalf, procurementPlanYear: procurementPlanYear };
                     $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
-                };
-
-                $scope.procurementPlanOption = {
-                    allowClear: true,
-                    initSelection: function (element, callback) {
-                        callback({ id: 1, text: 'Text' });
-                    }
-                };
+                }
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: 'PATCH', url: url, data: payload })
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }

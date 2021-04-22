@@ -46,19 +46,12 @@
                 <!-- edit -->
                 <tr data-ng-show="right.edit">
                     <td>
-                        <select class="form-control input-sm"
-                                name="selectRole"
-                                data-ui-select2=""
-                                data-ng-model="right.roleForSelect">
-                            <option data-ng-if="!projectRolesVm.checkIfRoleIsAvailable(right.role.Id)"
-                                    disabled="disabled"
-                                    value="{{right.role.Id}}">
-                                {{right.role.Name}} (Inaktiv rolle)
-                            <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles"
-                                    value="{{projectRole.Id}}">
-                                {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
-                            </option>
-                        </select>
+                        <select-role data-id="edit-right-role"
+                                     name="selectRole"
+                                     data-roles="projectRolesVm.activeItProjectRoles"
+                                     data-ng-model="right.roleForSelect"
+                                     data-pre-selected-role="right.role">
+                        </select-role>
                     </td>
                     <td colspan="2" class="relative-position">
                         <input data-select-user="foo" data-org-id="{{projectRolesVm.orgId}}" data-user-model="right.userForSelect" />
@@ -73,17 +66,12 @@
             <tbody data-ng-hide="!projectEditVm.hasWriteAccess">
                 <tr>
                     <td>
-                        <select id="add-right-role"
-                                name="selectRole"
-                                class="form-control input-sm"
-                                data-ui-select2=""
-                                data-ng-model="projectRolesVm.newRole"
-                                data-placeholder="Vælg en projektrolle"
-                                data-ng-change="projectRolesVm.submitRight()">
-                            <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.Id}}">
-                                {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
-                            </option>
-                        </select>
+                        <select-role data-id="add-right-role"
+                                     name="selectRole"
+                                     data-roles="projectRolesVm.activeItProjectRoles"
+                                     data-ng-model="projectRolesVm.newRole"
+                                     data-placeholder="Vælg en projektrolle">
+                        </select-role>
                     </td>
                     <td colspan="2" class="form-group">
                         <input id="add-right-user"

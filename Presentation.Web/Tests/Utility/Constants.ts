@@ -18,6 +18,8 @@
     readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
+    readonly kendoInterfaceNameHeader = "interfaceNameHeader";
+    readonly kendoInterfaceNameObjects = "interfaceNameObject";
     readonly kendoDpaNameObjects = "dpaNameKendoObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";

@@ -18,7 +18,7 @@
         removeUsage(dataItem): void;
         allowToggleUsage: boolean;
         toggleActiveSystemsMasterFilter(): void;
-        toggleActiveSystemsMasterFilterBtnText : string;
+        toggleActiveSystemsMasterFilterBtnText: string;
     }
 
     export interface ISelect2Scope extends ng.IScope {
@@ -39,7 +39,7 @@
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
         public allowToggleUsage = false;
         private showInactiveSystems: boolean;
-        public toggleActiveSystemsMasterFilterBtnText : string;
+        public toggleActiveSystemsMasterFilterBtnText: string;
 
         public static $inject:
             Array<string> = [
@@ -152,7 +152,7 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, (system: { id; name;}) => {
+                        _.each(data.data.response, (system: { id; name; }) => {
                             results.push({
                                 //the id of the system is the id, that is selected
                                 id: system.id,
@@ -229,7 +229,7 @@
                             if (hadExisting) {
                                 parameterMap.$filter = `(${parameterMap.$filter})`;
                             }
-                            
+
 
                             return parameterMap;
                         }
@@ -310,7 +310,7 @@
                     {
                         name: "toggleActiveSystemsMasterFilter",
                         text: "-",
-                        template: 
+                        template:
                             "<button type='button' class='k-button k-button-icontext' title='Skift mellem aktive eller deaktiverede systemer' data-ng-click='systemCatalogVm.toggleActiveSystemsMasterFilter()'>{{systemCatalogVm.toggleActiveSystemsMasterFilterBtnText}}</button>"
                     }
 
@@ -355,8 +355,7 @@
                                 (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${
-                                    dataItem.Id
+                                return `<div class="text-center"><button ng-disabled="!systemCatalogVm.allowToggleUsage" type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id
                                     })"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
@@ -418,7 +417,7 @@
                         width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name,dataItem.Disabled)}</a>`;
+                            return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.Disabled)}</a>`;
                         },
                         attributes: {
                             "data-element-type": "catalogNameObject"
@@ -571,7 +570,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter, 
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -616,8 +615,7 @@
                         width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var reference = dataItem.Reference;
-                            return Helpers.RenderFieldsHelper.renderReferenceUrl(reference);
+                            return Helpers.RenderFieldsHelper.renderReferenceUrl(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderReferenceUrl(dataItem.Reference);
@@ -638,7 +636,7 @@
                         width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            return Helpers.RenderFieldsHelper.renderReferenceId(dataItem.Reference);
+                            return Helpers.RenderFieldsHelper.renderExternalReferenceId(dataItem.Reference);
                         },
                         excelTemplate: dataItem => {
                             return Helpers.ExcelExportHelper.renderExternalReferenceId(dataItem.Reference);
@@ -737,14 +735,14 @@
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);
                         self.$http.post("api/itsystem", payload)
-                            .success(function (result: any) {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt system er oprettet!");
-                                var systemId = result.response.id;
+                                var systemId = result.data.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
                                     self.$state.go("it-system.edit.main", { id: systemId });
                                 }
-                            }).error(function () {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
@@ -757,15 +755,15 @@
 
                         var msg = self.notify.addInfoMessage("Opretter system...", false);
                         self.$http.post("api/itsystem", payload)
-                            .success(function (result: any) {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt system er oprettet!");
-                                var systemId = result.response.id;
+                                var systemId = result.data.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
                                     self.$state.reload();
                                 }
 
-                            }).error(function () {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
@@ -896,22 +894,22 @@
         }
 
         public onNewTargetSystemSelected = () => {
+            var self = this;
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
                 this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
-                    .success(dto => {
-                        this.migrationReportDTO = dto.response;
+                    .then(function onSuccess(result) {
+                        self.migrationReportDTO = result.data.response;
 
-                        this.modalMigrationConsequence.setOptions({
+                        self.modalMigrationConsequence.setOptions({
                             close: (_) => true,
                             resizable: false,
                             title: `Flytning af it-system `,
                         });
-                        this.modalMigration.close();
-                        this.modalMigrationConsequence.center().open();
-                    })
-                    .error(() => {
-                        this.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
+                        self.modalMigration.close();
+                        self.modalMigrationConsequence.center().open();
+                    }, function onError(result) {
+                            self.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
                     });
             }
         }
@@ -930,8 +928,7 @@
 
         private showUsagesAsNumberOrNothing(dataItem): string {
             if (dataItem.Usages.length > 0) {
-                return `<a class="col-xs-7 text-center" data-element-type="usagesLinkText" data-ng-click="systemCatalogVm.showUsageDetails(${
-                    dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
+                return `<a class="col-xs-7 text-center" data-element-type="usagesLinkText" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
                     }</a>`;
             }
             else {
@@ -940,15 +937,15 @@
         };
 
         public performMigration = () => {
+            var self = this;
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
                 this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
-                    .success(() => {
-                        this.modalMigrationConsequence.close();
-                        this.mainGrid.dataSource.fetch();
-                        this.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
-                    })
-                    .error(() => {
-                        this.notify.addErrorMessage("Flytning af system anvendelse fejlede");
+                    .then(function onSuccess(result) {
+                        self.modalMigrationConsequence.close();
+                        self.mainGrid.dataSource.fetch();
+                        self.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
+                    }, function onError(result) {
+                            self.notify.addErrorMessage("Flytning af system anvendelse fejlede");
                     });
             }
         }
@@ -1017,21 +1014,29 @@
 
         // adds system to usage within the current context
         private addUsage(dataItem) {
+            var self = this;
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
-                organizationId: this.user.currentOrganizationId
+                organizationId: self.user.currentOrganizationId
             })
-                .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
-                .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));
+                .then(function onSuccess(result) {
+                    self.notify.addSuccessMessage("Systemet er taget i anvendelse")
+                }, function onError(result) {
+                        self.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!")
+                });
         }
 
         // removes system from usage within the current context
         private deleteUsage(systemId) {
+            var self = this;
             var url = `api/itSystemUsage?itSystemId=${systemId}&organizationId=${this.user.currentOrganizationId}`;
 
             return this.$http.delete(url)
-                .success(() => this.notify.addSuccessMessage("Anvendelse af systemet er fjernet"))
-                .error(() => this.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!"));
+                .then(function onSuccess(result) {
+                    self.notify.addSuccessMessage("Anvendelse af systemet er fjernet")
+                }, function onError(result) {
+                        self.notify.addErrorMessage("Anvendelse af systemet kunne ikke fjernes!")
+                });
         }
 
         private accessModFilter = (args) => {

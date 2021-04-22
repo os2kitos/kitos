@@ -19,7 +19,7 @@
                                 <tr data-ng-repeat="ht in handoverTrials">
                                     <td>
                                         <div class="form-group">
-                                            <select-option data-id="contract-handover-trial"
+                                            <select2-option data-id="contract-handover-trial"
                                                            data-placeholder="Vælg overtagelsesprøve"
                                                            data-selected-text="{{ ht.handoverTrialTypeName }}"
                                                            data-ng-disabled="!hasWriteAccess"
@@ -27,7 +27,7 @@
                                                            data-options="handoverTrialTypes"
                                                            data-auto-save-url="api/handoverTrial/{{ ht.id }}"
                                                            data-field="handoverTrialTypeId">
-                                            </select-option>
+                                            </select2-option>
                                         </div>
                                     </td>
                                     <td>
@@ -64,11 +64,11 @@
                                 <tr>
                                     <td>
                                         <div class="form-group">
-                                            <select-option data-id="handover-trial"
+                                            <select2-option data-id="handover-trial"
                                                            data-placeholder="Vælg overtagelsesprøve"
-                                                           data-ng-model="handoverTrial.handoverTrialTypeId"
+                                                           data-ng-model="handoverTrialType"
                                                            data-options="handoverTrialTypes">
-                                            </select-option>
+                                            </select2-option>
                                         </div>
                                     </td>
                                     <td>
@@ -92,9 +92,9 @@
                                     <td>
                                         <button id="handover-trial-add"
                                                 class="btn btn-success btn-sm"
-                                                ng-disabled="!(handoverTrial.handoverTrialTypeId != undefined)"
+                                                ng-disabled="!(handoverTrialType.id != undefined)"
                                                 data-ng-click="saveTrial(handoverTrial)">
-                                            Gem {{handoverTrial.handoverTrialTypeId}}
+                                            Gem
                                         </button>
                                     </td>
                                 </tr>
@@ -228,7 +228,7 @@
                             <div class="col-xs-1">
                                 <input type="checkbox" id="idl" class=""
                                        data-ng-checked="durationOngoing"
-                                       data-ng-click="saveOngoingStatus()"
+                                       data-ng-change="saveOngoingStatus()"
                                        data-ng-model="durationOngoing"
                                        data-ng-disabled="!hasWriteAccess" />
                             </div>
@@ -238,7 +238,7 @@
                         </div>
 
                         <div class="form-group">
-                            <select-option data-id="agreement-option-extend"
+                            <select2-option data-id="agreement-option-extend"
                                            data-label="Option forlæng"
                                            data-placeholder="Vælg forlængelse"
                                            data-selected-text="{{ contract.optionExtendName }}"
@@ -247,7 +247,7 @@
                                            data-options="optionExtensions"
                                            data-auto-save-url="{{ autosaveUrl }}"
                                            data-field="optionExtendId">
-                            </select-option>
+                            </select2-option>
                         </div>
                         <div class="form-group">
                             <label for="agreement-option-extend-multiplier" class="control-label small">Antal brugte optioner</label>
@@ -291,7 +291,7 @@
                         </div>
 
                         <div class="form-group">
-                            <select-option data-id="agreement-notice"
+                            <select2-option data-id="agreement-notice"
                                            data-label="Opsigelsesfrist (måneder)"
                                            data-placeholder="Vælg opsigelsesfrist"
                                            data-selected-text="{{ contract.terminationDeadlineName }}"
@@ -300,41 +300,31 @@
                                            data-options="terminationDeadlines"
                                            data-auto-save-url="{{ autosaveUrl }}"
                                            data-field="terminationDeadlineId">
-                            </select-option>
+                            </select2-option>
                         </div>
 
                         <div class="form-group">
-                            <label for="agreement-running" class="control-label small">Løbende</label>
-                            <select id="agreement-running"
-                                    class="form-control input-sm"
-                                    data-ui-select2="{ allowClear: true }"
-                                    data-placeholder="Vælg varighed"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.running"
-                                    data-autosave="{{autosaveUrl}}"
-                                    data-field="running">
-                                <option value=""></option>
-                                <option value="calendarYear">Kalenderår</option>
-                                <option value="quater">Kvartal</option>
-                                <option value="month">Måned</option>
-                            </select>
+                            <select-simple data-id="agreement-running"
+                                           data-label="Løbende"
+                                           data-options="deadlineOptions"
+                                           data-placeholder="Vælg varighed"
+                                           data-ng-model="contract.running"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-field="running">
+                            </select-simple>
                         </div>
 
                         <div class="form-group">
-                            <label for="agreement-by-ending" class="control-label small">Inden udgangen af</label>
-                            <select id="agreement-by-ending"
-                                    class="form-control input-sm"
-                                    data-ui-select2="{ allowClear: true }"
-                                    data-placeholder="Vælg varighed"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    data-ng-model="contract.byEnding"
-                                    data-autosave="{{autosaveUrl}}"
-                                    data-field="byEnding">
-                                <option value=""></option>
-                                <option value="calendarYear">Kalenderår</option>
-                                <option value="quater">Kvartal</option>
-                                <option value="month">Måned</option>
-                            </select>
+                            <select-simple data-id="agreement-by-ending"
+                                           data-label="Inden udgangen af"
+                                           data-options="deadlineOptions"
+                                           data-placeholder="Vælg varighed"
+                                           data-ng-model="contract.byEnding"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-auto-save-url="{{ autosaveUrl }}"
+                                           data-field="byEnding">
+                            </select-simple>
                         </div>
                     </div>
                 </div>

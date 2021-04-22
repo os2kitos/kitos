@@ -20,7 +20,7 @@
                                 return result.data.response.id;
                             return null;
                         }
-                    );
+                        );
                 }],
                 orgUnitsTree: ['$http', 'itSystemUsage', function ($http, itSystemUsage) {
                     return $http.get('api/organizationunit/?organization=' + itSystemUsage.organizationId)
@@ -32,54 +32,56 @@
         });
     }]);
 
-    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user',
-        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user) {
+    app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user', "entityMapper", 
+        function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user, entityMapper) {
             $scope.orgUnitsTree = orgUnitsTree;
-            $scope.selectedOrgUnits = selectedOrgUnits;
-            $scope.responsibleOrgUnitId = responsibleOrgUnitId;
+            $scope.selectedOrgUnits = entityMapper.mapApiResponseToSelect2ViewModel(selectedOrgUnits);
+            $scope.responsibleOrgUnit = _.find($scope.selectedOrgUnits, (orgUnit) => orgUnit.id === responsibleOrgUnitId);
             var usageId = $stateParams.id;
 
-            $scope.saveResponsible = function () {
-                var orgUnitId = $scope.responsibleOrgUnitId;
+            $scope.saveResponsible = function (orgUnitId) {
+                if (orgUnitId === null && responsibleOrgUnitId === undefined) {
+                    return; // Special case where nothing is selected
+                }
+                if (orgUnitId === responsibleOrgUnitId) {
+                    return;
+                }
                 var msg = notify.addInfoMessage("Gemmer... ");
-                if ($scope.responsibleOrgUnitId) {
+                if (orgUnitId != null) {
                     $http.post('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&orgUnitId=' + orgUnitId + '&responsible=true')
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 } else {
                     $http.delete('api/itSystemUsageOrgUnitUsage/?usageId=' + usageId + '&responsible=true')
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 }
             };
 
-            $scope.save = function(obj) {
+            $scope.save = function (obj) {
                 var msg = notify.addInfoMessage("Gemmer... ");
                 if (obj.selected) {
                     $http.post('api/itSystemUsage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
-                        .success(function() {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
-                            $scope.selectedOrgUnits.push(obj);
-                        })
-                        .error(function() {
+                            $scope.selectedOrgUnits.push({ id: obj.id, text: obj.name });
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 } else {
                     $http.delete('api/itSystemUsage/' + usageId + '?organizationunit=' + obj.id + '&organizationId=' + user.currentOrganizationId)
-                        .success(function() {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Gemt!");
 
                             var indexOf;
                             // find the index of the orgunit
-                            var found = _.filter($scope.selectedOrgUnits, function(element: { id }, index) {
+                            var found = _.filter($scope.selectedOrgUnits, function (element: { id }, index) {
                                 var equal = element.id == obj.id;
                                 // set outer scope indexOf, to be used later
                                 if (equal) indexOf = index;
@@ -91,8 +93,7 @@
                             // if responsible is the orgunit being removed unselect it from the dropdown
                             if (obj.id == $scope.responsibleOrgUnitId)
                                 $scope.responsibleOrgUnitId = '';
-                        })
-                        .error(function() {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                         });
                 }

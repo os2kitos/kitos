@@ -16,7 +16,7 @@
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
         roles: Array<any>;
         Rights: Array<any>;
-        OriginalEntity : any;
+        OriginalEntity: any;
     }
 
     export class OverviewController implements IOverviewController {
@@ -71,7 +71,7 @@
             private needsWidthFixService,
             private exportGridToExcelService,
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
-            private authorizationServiceFactory : Services.Authorization.IAuthorizationServiceFactory) {
+            private authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -117,17 +117,16 @@
                         var msg = self.notify.addInfoMessage('Opretter system...', false);
 
                         self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
-                                let projectId = result.response.id;
+                                let projectId = result.data.response.id;
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
-                                     // add users default org unit to the new project
-                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                    // add users default org unit to the new project
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${self.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.go("it-project.edit.main", { id: projectId });
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
                             });
                     };
@@ -144,17 +143,16 @@
                         var msg = self.notify.addInfoMessage('Opretter projekt...', false);
 
                         self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
-                            .success((result: any) => {
+                            .then(function onSuccess(result: any) {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
-                                let projectId = result.response.id;
+                                let projectId = result.data.response.id;
                                 $modalInstance.close(projectId);
                                 if (orgUnitId) {
                                     // add users default org unit to the new project
-                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${self.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.reload();
-                            })
-                            .error(() => {
+                            }, function onError(result) {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
                             });
                     };
@@ -238,9 +236,10 @@
 
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                return regexp.test(Url.toLowerCase());
+            return regexp.test(Url.toLowerCase());
         };
         private activate() {
+            var self = this;
             this.canCreate = this.userAccessRights.canCreate;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -252,12 +251,12 @@
                                 var urlParameters =
                                     `?$expand=ItProjectStatuses,Reference,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc;$top=1)`;
                                 // if orgunit is set then the org unit filter is active
-                                var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
+                                var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItProjects` +
+                                    return `/odata/Organizations(${self.user.currentOrganizationId})/ItProjects` +
                                         urlParameters;
                                 } else {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId
+                                    return `/odata/Organizations(${self.user.currentOrganizationId
                                         })/OrganizationUnits(${orgUnitId})/ItProjects` +
                                         urlParameters;
                                 }
@@ -269,10 +268,10 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
-                                this._.forEach(this.projectRoles,
+                                self._.forEach(self.projectRoles,
                                     role => {
                                         parameterMap.$filter =
-                                            this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
+                                            self.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
                                     });
                             }
 
@@ -303,13 +302,13 @@
 
                             // iterrate each project
                             let projectIds = [];
-                            this._.forEach(response.value,
+                            self._.forEach(response.value,
                                 project => {
                                     projectIds.push(project.Id);
-                                    this.projectIdToAccessLookup[project.Id] = { project: project }
+                                    self.projectIdToAccessLookup[project.Id] = { project: project }
                                     project.roles = [];
                                     // iterrate each right
-                                    this._.forEach(project.Rights,
+                                    self._.forEach(project.Rights,
                                         right => {
                                             // init an role array to hold users assigned to this role
                                             if (!project.roles[right.RoleId])
@@ -344,11 +343,11 @@
 
                             //Lazy load access rights in a batch
                             if (projectIds.length > 0) {
-                                this.authorizationServiceFactory
+                                self.authorizationServiceFactory
                                     .createProjectAuthorization()
                                     .getAuthorizationForItems(projectIds)
                                     .then(accessRights => {
-                                        this._.forEach(accessRights, rights => this.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
+                                        self._.forEach(accessRights, rights => self.projectIdToAccessLookup[rights.id].project.hasWriteAccess = rights.canEdit);
                                     });
                             }
 
@@ -388,7 +387,7 @@
                             "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='projectOverviewVm.clearGridProfile()' data-ng-disabled='!projectOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
-                        template: kendo.template(this.$("#role-selector").html())
+                        template: kendo.template(self.$("#role-selector").html())
                     }
                 ],
                 excel: {
@@ -416,13 +415,13 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions,
-                columnResize: this.saveGridOptions,
-                columnHide: this.saveGridOptions,
-                columnShow: this.saveGridOptions,
-                columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
-                page: this.onPaging,
+                dataBound: self.saveGridOptions,
+                columnResize: self.saveGridOptions,
+                columnHide: self.saveGridOptions,
+                columnShow: self.saveGridOptions,
+                columnReorder: self.saveGridOptions,
+                excelExport: self.exportToExcel,
+                page: self.onPaging,
                 columns: [
                     {
                         field: "ItProjectId",
@@ -491,7 +490,7 @@
                         filterable: {
                             cell: {
                                 showOperators: false,
-                                template: this.orgUnitDropDownList
+                                template: self.orgUnitDropDownList
                             }
                         }
                     },
@@ -561,9 +560,9 @@
                         persistId: "phasename", // DON'T YOU DARE RENAME!
                         template: dataItem =>
                             dataItem.CurrentPhaseObj
-                            ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj
-                            .Name}</a>`
-                            : "",
+                                ? `<a data-ui-sref="it-project.edit.phases({id:${dataItem.Id}})">${dataItem.CurrentPhaseObj
+                                    .Name}</a>`
+                                : "",
                         excelTemplate: dataItem =>
                             dataItem && dataItem.CurrentPhaseObj && dataItem.CurrentPhaseObj.Name || "",
                         sortable: false,
@@ -582,7 +581,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
                             if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
@@ -606,7 +605,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
                         },
                         excelTemplate: dataItem => {
                             if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {
@@ -765,8 +764,8 @@
                         width: 150,
                         persistId: "assignments", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: dataItem => this._.filter(dataItem.ItProjectStatuses,
-                            n => this._.includes(n["@odata.type"], "Assignment")).length.toString(),
+                        template: dataItem => self._.filter(dataItem.ItProjectStatuses,
+                            n => self._.includes(n["@odata.type"], "Assignment")).length.toString(),
                         filterable: false,
                         sortable: false
                     },
@@ -827,9 +826,9 @@
                         hidden: true,
                         template: dataItem => {
                             var total = 0;
-                            this._.forEach(dataItem.EconomyYears,
+                            self._.forEach(dataItem.EconomyYears,
                                 eco => {
-                                    total += this.economyCalc.getTotalBudget(eco);
+                                    total += self.economyCalc.getTotalBudget(eco);
                                 });
                             return (-total).toString();
                         },
@@ -841,9 +840,8 @@
                         title: "Prioritet: Projekt",
                         width: 120,
                         persistId: "priority", // DON'T YOU DARE RENAME!
-                        template: (dataItem) =>
-                        {
-                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                        template: (dataItem) => {
+                            dataItem.OriginalEntity = self.projectIdToAccessLookup[dataItem.Id].project;
                             return `<select data-ng-model="dataItem.Priority" data-autosave="api/itproject/{{dataItem.Id}}" data-field="priority" data-ng-disabled="dataItem.IsPriorityLocked || !dataItem.OriginalEntity.hasWriteAccess">
                                                     <option value="None">-- Vælg --</option>
                                                     <option value="High">Høj</option>
@@ -871,9 +869,8 @@
                         title: "Prioritet: Portefølje",
                         width: 150,
                         persistId: "prioritypf", // DON'T YOU DARE RENAME!
-                        template: (dataItem) =>
-                        {
-                            dataItem.OriginalEntity = this.projectIdToAccessLookup[dataItem.Id].project;
+                        template: (dataItem) => {
+                            dataItem.OriginalEntity = self.projectIdToAccessLookup[dataItem.Id].project;
                             return `<div class="btn-group btn-group-sm" data-toggle="buttons">
                                                     <label class="btn btn-star" data-ng-class="{ 'unstarred': !dataItem.IsPriorityLocked, 'disabled': !dataItem.OriginalEntity.hasWriteAccess }" data-ng-click="projectOverviewVm.toggleLock(dataItem)">
                                                         <input type="checkbox" data-ng-model="dataItem.IsPriorityLocked" data-autosave="api/itproject/{{dataItem.Id}}" data-field="IsPriorityLocked" data-ng-disabled="!dataItem.OriginalEntity.hasWriteAccess">
@@ -905,12 +902,19 @@
                     },
                     {
                         // filtering doesn't allow to sort on an array of values, it needs a single value for each row...
-                        field: "Rights.Role", title: `${this.user.fullName}`, width: 150,
+                        field: "Rights.Role", title: `${self.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => { return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                        template: (dataItem) => {
+                            const rightsInProject = self.getCurrentUserRights(dataItem);
+                            var result = "";
+                            rightsInProject.forEach(right => {
+                                result = (result === "" ? result : (result + ", ")) + right.Role.Name + (self.checkIfRoleIsAvailable(right.Role.Id) ? "(udgået)" : "");
+                            });
+                            return result;
                         },
                         excelTemplate: dataItem => {
-                            return Helpers.ExcelExportHelper.renderUserRoles(dataItem.Rights,this.projectRoles);
+                            const rightsInProject = self.getCurrentUserRights(dataItem);
+                            return Helpers.ExcelExportHelper.renderUserRoles(rightsInProject, self.projectRoles);
                         },
                         attributes: { "class": "might-overflow" },
                         hidden: true,
@@ -974,6 +978,13 @@
             this.mainGridOptions = mainGridOptions;
         }
 
+        private getCurrentUserRights(project: IItProjectOverview) {
+            var self = this;
+            return _.filter(project.Rights, right => {
+                return right.User.Id == self.user.id;
+            });
+        }
+
         private orgUnitDropDownList = args => {
             var self = this;
 
@@ -1011,7 +1022,7 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                          if (selectedIndex > 0) {
+                if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {
@@ -1077,7 +1088,7 @@
 
             return concatRoles;
         }
-        
+
     }
 
     angular
@@ -1092,7 +1103,7 @@
                     resolve: {
                         projectRoles: [
                             "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
+                                localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItProjectRoles).getAll()
                         ],
                         user: [
                             "userService", userService => userService.getUser()
@@ -1103,8 +1114,8 @@
                         ],
                         userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
-                            .createProjectAuthorization()
-                            .getOverviewAuthorization()
+                                .createProjectAuthorization()
+                                .getOverviewAuthorization()
                         ],
                     }
                 });

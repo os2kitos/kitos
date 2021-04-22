@@ -45,6 +45,7 @@
             private user,
             public statusUpdates,
             public moment) {
+            var self = this;
 
             this.project.updateUrl = `api/itproject/${project.id}`;
 
@@ -80,7 +81,10 @@
 
             /* STATUS PROJECT */
 
-            this.methodOptions = [{ label: 'Samlet', val: true }, { label: 'Tid, kvalitet og ressourcer', val: false }];
+            this.methodOptions = [{ text: 'Samlet', id: 0, val: true }, { text: 'Tid, kvalitet og ressourcer', id: 1, val: false }];
+
+            // pre select 'Samlet'
+            this.showCombinedChart = this.methodOptions[0];
 
             this.allStatusUpdates = statusUpdates;
 
@@ -91,15 +95,13 @@
 
             this.combinedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return s.IsCombined; });
             this.splittedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return !s.IsCombined; });
-        }
 
-
-
-        private onSelectStatusMethod(showCombined) {
-            if (showCombined) {
-                this.currentStatusUpdate = (this.combinedStatusUpdates.length > 0) ? this.combinedStatusUpdates[0] : null;
-            } else {
-                this.currentStatusUpdate = (this.splittedStatusUpdates.length > 0) ? this.splittedStatusUpdates[0] : null;
+            $scope.onSelectStatusMethod = function(showCombined) {
+                if (showCombined === 0) {
+                    self.currentStatusUpdate = (self.combinedStatusUpdates.length > 0) ? self.combinedStatusUpdates[0] : null;
+                } else {
+                    self.currentStatusUpdate = (self.splittedStatusUpdates.length > 0) ? self.splittedStatusUpdates[0] : null;
+                }
             }
         }
 
@@ -110,6 +112,7 @@
         };
 
         private loadStatues = () => {
+            var self = this;
             var url = `api/itProjectStatus/${this.project.id}?project=true`;
 
             url += `&skip=${this.pagination.skip}`;
@@ -128,20 +131,19 @@
 
             this.milestonesActivities = [];
             this.$http.get(url)
-                .success((result, status, headers) => {
-                    var paginationHeader = JSON.parse(headers("X-Pagination"));
-                    this.totalCount = paginationHeader.TotalCount;
+                .then(function onSuccess(result) {
+                    var paginationHeader = JSON.parse(result.headers("X-Pagination"));
+                    self.totalCount = paginationHeader.TotalCount;
 
-                    _.each(result.response, (value) => {
-                        this.addStatus(value, null);
+                    _.each(result.data.response, (value) => {
+                        self.addStatus(value, null);
                     });
 
-                })
-                .error((data, status) => {
+                }, function onError(result) {
                     // only display error when an actual error
                     // 404 just says that there are no statuses
-                    if (status != 404) {
-                        this.notify.addErrorMessage("Kunne ikke hente projekter!");
+                    if (result.status != 404) {
+                        self.notify.addErrorMessage("Kunne ikke hente projekter!");
                     }
                 });
         };
@@ -181,12 +183,13 @@
 
             activity.delete = () => {
                 var msg = this.notify.addInfoMessage("Sletter...");
-                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId).success(() => {
-                    activity.show = false;
-                    msg.toSuccessMessage("Slettet!");
-                }).error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke slette!");
-                });
+                this.$http.delete(activity.updateUrl + "?organizationId=" + this.user.currentOrganizationId)
+                    .then(function onSuccess(result) {
+                        activity.show = false;
+                        msg.toSuccessMessage("Slettet!");
+                    }, function onError(result) {
+                        msg.toErrorMessage("Fejl! Kunne ikke slette!");
+                    });
             };
 
             if (!skipAdding)
@@ -212,26 +215,26 @@
                         usersWithRoles: [
                             "$http", "$stateParams",
                             ($http, $stateParams) => $http.get(`api/itprojectright/${$stateParams.id}`)
-                            .then(rightResult => {
-                                var rights = rightResult.data.response;
+                                .then(rightResult => {
+                                    var rights = rightResult.data.response;
 
-                                //get the role names
-                                //the resulting map
-                                var users = {};
-                                _.each(rights, (right: { userId; user; roleName; }) => {
+                                    //get the role names
+                                    //the resulting map
+                                    var users = {};
+                                    _.each(rights, (right: { userId; user; roleName; }) => {
 
-                                    //use the user from the map if possible
-                                    var user = users[right.userId] || right.user;
+                                        //use the user from the map if possible
+                                        var user = users[right.userId] || right.user;
 
-                                    var roleNames = user.roleNames || [];
-                                    roleNames.push(right.roleName);
-                                    user.roleNames = roleNames;
+                                        var roleNames = user.roleNames || [];
+                                        roleNames.push(right.roleName);
+                                        user.roleNames = roleNames;
 
-                                    users[right.userId] = user;
-                                });
+                                        users[right.userId] = user;
+                                    });
 
-                                return users;
-                            })
+                                    return users;
+                                })
                         ],
                         statusUpdates: [
                             "$http", "$stateParams",

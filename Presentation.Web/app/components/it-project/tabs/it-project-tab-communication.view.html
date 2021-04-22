@@ -65,14 +65,12 @@
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <select class="form-control input-sm responsible"
-                                                data-ui-select2=""
-                                                data-field="responsibleUserId"
-                                                data-autosave="api/communication/{{c.id}}"
-                                                data-ng-model="c.responsibleUserId"
-                                                data-ng-disabled="!projectEditVm.hasWriteAccess">
-                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
-                                        </select>
+                                        <select-simple data-options="usersWithRoles"
+                                                       data-ng-model="c.responsibleUserId"
+                                                       data-field="responsibleUserId"
+                                                       data-autosave="api/communication/{{c.id}}"
+                                                       data-ng-disabled="!projectEditVm.hasWriteAccess">
+                                        </select-simple>
                                     </div>
                                 </td>
                                 <td>
@@ -122,14 +120,13 @@
                                 </td>
                                 <td>
                                     <div class="form-group" data-show-errors>
-                                        <select id="responsible"
-                                                name="responsible"
-                                                class="form-control input-sm"
-                                                required
-                                                data-ui-select2=""
-                                                data-ng-model="comm.responsibleUserId">
-                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
-                                        </select>
+                                        <select-simple data-id="responsible"
+                                                       data-ng-required="true"                                                
+                                                       name="responsible"
+                                                       data-options="usersWithRoles"
+                                                       data-ng-model="comm.responsibleUserId"
+                                                       data-ng-disabled="!projectEditVm.hasWriteAccess">
+                                        </select-simple>
                                     </div>
                                 </td>
                                 <td>

@@ -97,12 +97,13 @@
         }
 
         public onDelete = (e: JQueryEventObject) => {
+            var self = this;
             e.preventDefault();
             this.$confirm({ text: 'Ønsker du at slette rapporten?', title: 'Slet rapport', ok: 'Ja', cancel: 'Nej' })
                 .then(() => {
-                    var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-                    this.mainGrid.dataSource.remove(dataItem);
-                    this.mainGrid.dataSource.sync();
+                    var dataItem = self.mainGrid.dataItem(self.$(e.currentTarget).closest("tr"));
+                    self.mainGrid.dataSource.remove(dataItem);
+                    self.mainGrid.dataSource.sync();
                 });
         }
 

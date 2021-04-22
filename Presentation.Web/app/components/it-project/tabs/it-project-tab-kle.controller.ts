@@ -1,6 +1,6 @@
-﻿(function (ng, app) {
+﻿((ng, app) => {
     app.config([
-        "$stateProvider", function ($stateProvider) {
+        "$stateProvider", $stateProvider => {
             $stateProvider.state("it-project.edit.kle", {
                 url: "/kle",
                 templateUrl: "app/components/it-project/tabs/it-project-tab-kle.view.html",
@@ -10,9 +10,7 @@
                     project: [
                         "$http", "$stateParams", function ($http, $stateParams) {
                             return $http.get("api/itproject/" + $stateParams.id)
-                                .then(function (result) {
-                                    return result.data.response;
-                                });
+                                .then(result => result.data.response);
                         }
                     ]
                 }
@@ -23,7 +21,7 @@
     app.controller("project.EditKleCtrl",
         [
             "$scope", "$http", "$state", "$stateParams", "notify", "user",
-            function ($scope, $http, $state, $stateParams, notify, user) {
+            ($scope, $http, $state, $stateParams, notify, user) => {
                 var projectId = $stateParams.id;
                 var baseUrl = "api/itProject/" + projectId;
 
@@ -63,12 +61,12 @@
                     }
 
                     $http.get(url)
-                        .success(function(result, status, headers) {
-                            $scope.tasklist = result.response;
+                        .then(function onSuccess(result) {
+                            $scope.tasklist = result.data.response;
 
-                            var paginationHeader = JSON.parse(headers("X-Pagination"));
+                            var paginationHeader = JSON.parse(result.headers("X-Pagination"));
                             $scope.totalCount = paginationHeader.TotalCount;
-                        }).error(function() {
+                        }, function onError(result) {
                             notify.addErrorMessage("Kunne ikke hente opgaver!");
                         });
                 }
@@ -87,7 +85,7 @@
                         });
                 }
 
-                $scope.save = function (task) {
+                $scope.save = task => {
                     var msg = notify.addInfoMessage("Opdaterer ...", false);
 
                     if (!task.isSelected) {
@@ -107,23 +105,23 @@
                     }
                 };
 
-                $scope.selectAllTasks = function () {
-                    _.each($scope.tasklist, function (task: { isSelected }) {
+                $scope.selectAllTasks = () => {
+                    _.each($scope.tasklist, (task: { isSelected }) => {
                         if (!task.isSelected) {
                             add(task);
                         }
                     });
                 };
 
-                $scope.removeAllTasks = function () {
-                    _.each($scope.tasklist, function (task: { isSelected }) {
+                $scope.removeAllTasks = () => {
+                    _.each($scope.tasklist, (task: { isSelected }) => {
                         if (task.isSelected) {
                             remove(task);
                         }
                     });
                 };
 
-                $scope.selectTaskGroup = function () {
+                $scope.selectTaskGroup = () => {
                     var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Opretter tilknytning...", false);
@@ -136,7 +134,7 @@
                         });
                 };
 
-                $scope.removeTaskGroup = function () {
+                $scope.removeTaskGroup = () => {
                     var url = baseUrl + "?taskId=" + $scope.selectedTaskGroup + "&organizationId=" + user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Fjerner tilknytning...", false);

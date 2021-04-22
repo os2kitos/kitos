@@ -5,13 +5,32 @@
             templateUrl: "app/components/it-contract/tabs/it-contract-tab-economy.view.html",
             controller: "contract.EditEconomyCtrl",
             resolve: {
-                orgUnits: ["$http", "userService", function ($http, userService) {
-                    return userService.getUser().then(function (user) {
-                        return $http.get("api/organizationunit/?organizationid=" + user.currentOrganizationId).then(function (result) {
-                            return result.data.response;
+                orgUnits: [
+                    '$http', 'contract', function ($http, contract) {
+                        return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
+
+                            var options: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[] = []
+
+                            function visit(orgUnit: Kitos.Models.Api.Organization.OrganizationUnit, indentationLevel: number) {
+                                var option = {
+                                    id: String(orgUnit.id),
+                                    text: orgUnit.name,
+                                    indentationLevel: indentationLevel,
+                                    optionalExtraObject: orgUnit.ean
+                                };
+
+                                options.push(option);
+
+                                _.each(orgUnit.children, function (child) {
+                                    return visit(child, indentationLevel + 1);
+                                });
+
+                            }
+                            visit(result.data.response, 0);
+                            return options;
                         });
-                    });
-                }],
+                    }
+                ],
                 externalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
                     return $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`).then(function (result) {
                         return result.data.response;
@@ -31,9 +50,10 @@
     }]);
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
-        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_","hasWriteAccess",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
-
+        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_", "hasWriteAccess",
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], user, externalEconomyStreams, internalEconomyStreams, _, hasWriteAccess) {
+            $scope.orgUnits = orgUnits;
+            $scope.allowClear = true;
             $scope.hasWriteAccess = hasWriteAccess;
 
             if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
@@ -122,22 +142,21 @@
                     stream.delete = function () {
                         var msg = notify.addInfoMessage("Sletter række...");
 
-                        $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function () {
-                            stream.show = false;
-
-                            msg.toSuccessMessage("Rækken er slettet!");
-                        }).error(function () {
-                            msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
-                        }).finally(reload);
+                        $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId)
+                            .then(function onSuccess(result) {
+                                stream.show = false;
+                                collection = _.remove(collection, (item) => item.id === stream.id);
+                                msg.toSuccessMessage("Rækken er slettet!");
+                            }, function onError(result) {
+                                msg.toErrorMessage("Fejl! Kunne ikke slette rækken!");
+                            }).finally(reload);
                     };
 
                     function updateEan() {
                         stream.ean = " - ";
 
-                        if (stream.organizationUnitId) {
-                            var orgUnit: { ean } = _.find(orgUnits, { id: parseInt(stream.organizationUnitId) });
-
-                            if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
+                        if (stream.organizationUnitId !== null && stream.organizationUnitId !== undefined) {
+                            stream.ean = stream.organizationUnitId.optionalExtraObject;
                         }
                     };
                     stream.updateEan = updateEan;
@@ -152,11 +171,12 @@
                     stream[organizationId] = user.currentOrganizationId;
 
                     var msg = notify.addInfoMessage("Tilføjer ny række...");
-                    $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream).success(function (result) {
-                        msg.toSuccessMessage("Rækken er tilføjet!");
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
-                    }).finally(reload);
+                    $http.post(`api/EconomyStream/?contractId=${contract.id}`, stream)
+                        .then(function onSuccess(result) {
+                            msg.toSuccessMessage("Rækken er tilføjet!");
+                        }, function onError(result) {
+                            msg.toErrorMessage("Fejl! Kunne ikke tilføje række");
+                        }).finally(reload);
                 }
 
                 $scope.newExtern = function () {
@@ -185,10 +205,9 @@
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);
                     $http({ method: 'PATCH', url: url, data: payload })
-                        .success(function () {
+                        .then(function onSuccess(result) {
                             msg.toSuccessMessage("Feltet er opdateret.");
-                        })
-                        .error(function () {
+                        }, function onError(result) {
                             msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                         });
                 }
