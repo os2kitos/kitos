@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -7,6 +8,7 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -24,7 +26,10 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
         private readonly IItSystemUsageRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private const int BatchSize = 250;
+        private readonly IGenericRepository<ItSystemUsageOverviewReadModel> _lowLevelReadModelRepository;
+        private readonly IGenericRepository<PendingReadModelUpdate> _lowLevelPendingReadModelRepository;
+        private readonly IDatabaseControl _databaseControl;
+        private const int BatchSize = 25;
         public string Id => StandardJobIds.UpdateItSystemUsageOverviewReadModels;
 
         public RebuildItSystemUsageOverviewReadModelsBatchJob(
@@ -33,7 +38,10 @@ namespace Core.BackgroundJobs.Model.ReadModels
             IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel> updater,
             IItSystemUsageOverviewReadModelRepository readModelRepository,
             IItSystemUsageRepository sourceRepository,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IGenericRepository<ItSystemUsageOverviewReadModel> lowLevelReadModelRepository, //NOTE: Using the primitive repositories on purpose since we want to reduce the amount of calls to SaveChanges as much as possible
+            IGenericRepository<PendingReadModelUpdate> lowLevelPendingReadModelRepository,
+            IDatabaseControl databaseControl)
         {
             _logger = logger;
             _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
@@ -41,6 +49,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
             _readModelRepository = readModelRepository;
             _sourceRepository = sourceRepository;
             _transactionManager = transactionManager;
+            _lowLevelReadModelRepository = lowLevelReadModelRepository;
+            _lowLevelPendingReadModelRepository = lowLevelPendingReadModelRepository;
+            _databaseControl = databaseControl;
         }
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
@@ -48,11 +59,11 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
-                foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList())
+                var pendingReadModelUpdates = _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList();
+                foreach (var pendingReadModelUpdate in pendingReadModelUpdates)
                 {
                     if (token.IsCancellationRequested)
                         break;
-
                     using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetSystemUsage(pendingReadModelUpdate.SourceId).FromNullable();
@@ -69,13 +80,14 @@ namespace Core.BackgroundJobs.Model.ReadModels
                         if (readModelResult.HasValue)
                         {
                             _logger.Information("Deleting orphaned read model with id {id}.", readModelResult.Value.Id);
-                            _readModelRepository.Delete(readModelResult.Value);
+                            _lowLevelReadModelRepository.Delete(readModelResult.Value);
                         }
 
                     }
                     completedUpdates++;
-                    _pendingReadModelUpdateRepository.Delete(pendingReadModelUpdate);
-                    transaction.Commit(); 
+                    _lowLevelPendingReadModelRepository.Delete(pendingReadModelUpdate);
+                    _databaseControl.SaveChanges();
+                    transaction.Commit();
                     _logger.Debug("Finished rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                 }
             }
@@ -91,13 +103,9 @@ namespace Core.BackgroundJobs.Model.ReadModels
         {
             var readModel = readModelResult.GetValueOrFallback(new ItSystemUsageOverviewReadModel());
             _updater.Apply(sourceValue, readModel);
-            if (readModelResult.HasValue)
+            if (readModelResult.HasValue == false) //Add it to the tracking graph
             {
-                _readModelRepository.Update(readModel);
-            }
-            else
-            {
-                _readModelRepository.Add(readModel);
+                _lowLevelReadModelRepository.Insert(readModel);
             }
         }
     }

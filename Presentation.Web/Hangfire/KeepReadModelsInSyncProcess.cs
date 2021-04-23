@@ -27,7 +27,7 @@ namespace Presentation.Web.Hangfire
                 ProcessItSystemUsageModule(backgroundJobLauncher, combinedTokenSource);
             }
 
-            CoolDown(combinedTokenSource);
+            CoolDown();
         }
 
         private static void ProcessItSystemUsageModule(IBackgroundJobLauncher backgroundJobLauncher,
@@ -44,14 +44,9 @@ namespace Presentation.Web.Hangfire
             backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
-        private static void CoolDown(CancellationTokenSource combinedTokenSource)
+        private static void CoolDown()
         {
-            var secondsPassed = 0;
-            do
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(1));
-                secondsPassed++;
-            } while (secondsPassed < 3 && combinedTokenSource.IsCancellationRequested == false);
+            Thread.Sleep(TimeSpan.FromSeconds(1));
         }
     }
 }
