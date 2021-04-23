@@ -17,6 +17,7 @@
     export interface IKendoGridOptions<TDataSource> extends kendo.ui.GridOptions {
         toolbar?: IKendoGridToolbarItem[];
         columns?: IKendoGridColumn<TDataSource>[];
+        excelOnlyColumns?: Kitos.Services.System.IKendoGridAdditionalExcelColumn[];
         detailTemplate?: ((dataItem: TDataSource) => string)|string;
     }
 
