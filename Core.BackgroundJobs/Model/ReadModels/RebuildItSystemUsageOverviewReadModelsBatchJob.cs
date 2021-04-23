@@ -24,7 +24,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
         private readonly IItSystemUsageRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private const int BatchSize = 100;
+        private const int BatchSize = 250;
         public string Id => StandardJobIds.UpdateItSystemUsageOverviewReadModels;
 
         public RebuildItSystemUsageOverviewReadModelsBatchJob(
@@ -48,7 +48,6 @@ namespace Core.BackgroundJobs.Model.ReadModels
             var completedUpdates = 0;
             try
             {
-
                 foreach (var pendingReadModelUpdate in _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList())
                 {
                     if (token.IsCancellationRequested)
@@ -76,7 +75,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     }
                     completedUpdates++;
                     _pendingReadModelUpdateRepository.Delete(pendingReadModelUpdate);
-                    transaction.Commit();
+                    transaction.Commit(); 
                     _logger.Debug("Finished rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                 }
             }
