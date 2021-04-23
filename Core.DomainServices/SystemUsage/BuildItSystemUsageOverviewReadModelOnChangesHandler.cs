@@ -5,6 +5,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.LocalOptions;
@@ -38,7 +39,13 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<ItProject>>,
     IDomainEventHandler<EntityDeletedEvent<ItProject>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
-    IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>
+    IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
+    IDomainEventHandler<EntityCreatedEvent<SystemRelation>>,
+    IDomainEventHandler<EntityUpdatedEvent<SystemRelation>>,
+    IDomainEventHandler<EntityDeletedEvent<SystemRelation>>,
+    IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
+    IDomainEventHandler<EntityDeletedEvent<ItInterface>>,
+    IDomainEventHandler<ExposingSystemChanged>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -158,6 +165,33 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_DataProcessingRegistration));
         }
 
+        public void Handle(EntityUpdatedEvent<ItInterface> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
+        }
+
+        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
+        }
+
+        public void Handle(ExposingSystemChanged domainEvent)
+        {
+            //Schedule read model update based on ItSystem if the system was the previous exposer of an interface
+            var oldSystem = domainEvent.PreviousSystem;
+            if(oldSystem.HasValue)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(oldSystem.Value, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItSystem));
+            }
+
+            //Schedule read model update based on ItSystem for the new system exposer of an interface
+            var newSystem = domainEvent.NewSystem;
+            if(newSystem.HasValue)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(newSystem.Value, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItSystem));
+            }
+        }
+
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
 
         public void Handle(EntityCreatedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
@@ -171,6 +205,29 @@ namespace Core.DomainServices.SystemUsage
             if (itSystemUsage != null)
             {
                 _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(itSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
+        }
+
+        public void Handle(EntityDeletedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
+
+        public void Handle(EntityCreatedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
+
+        public void Handle(EntityUpdatedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
+
+        private void HandleSystemRelation(EntityLifeCycleEvent<SystemRelation> domainEvent)
+        {
+            //Schedule read model update for fromSystemUsage 
+            var fromSystemUsage = domainEvent.Entity.FromSystemUsage;
+            if (fromSystemUsage != null)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(fromSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
+
+            //Schedule read model update for toSystemUsage 
+            var toSystemUsage = domainEvent.Entity.ToSystemUsage;
+            if (toSystemUsage != null)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(toSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
             }
         }
 

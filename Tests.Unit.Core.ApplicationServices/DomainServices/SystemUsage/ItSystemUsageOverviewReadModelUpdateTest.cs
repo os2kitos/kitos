@@ -33,6 +33,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>> _itProjectReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>> _itSystemUsageReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -44,6 +46,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _itProjectReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItProjectReadModel>>();
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
+            _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
+            _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
@@ -51,6 +55,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _itProjectReadModelRepository.Object,
                 _archivePeriodReadModelRepository.Object,
                 _dataProcessingReadModelRepository.Object,
+                _interfacesReadModelRepository.Object,
+                _itSystemUsageReadModelRepository.Object,
                 _businessTypeService.Object);
         }
 
@@ -66,6 +72,44 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         public void Apply_Generates_Correct_Read_Model()
         {
             //Arrange
+            var outgoingRelationItSystem = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var outgoingRelationInterface = new ItInterface
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var outgoingRelationItSystemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = outgoingRelationItSystem
+            };
+            var outgoingRelation = new SystemRelation(outgoingRelationItSystemUsage)
+            {
+                Id = A<int>(),
+                RelationInterface = outgoingRelationInterface
+            };
+
+            var incomingRelationItSystem = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var incomingRelationItSystemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = incomingRelationItSystem
+            };
+            var incomingRelation = new SystemRelation(incomingRelationItSystemUsage)
+            {
+                Id = A<int>()
+            };
+
             var supplier = new Organization
             {
                 Id = A<int>(),
@@ -179,7 +223,15 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     dataProcessingRegistration
                 },
                 GeneralPurpose = A<string>(),
-                HostedAt = A<HostedAt>()
+                HostedAt = A<HostedAt>(),
+                UsageRelations = new List<SystemRelation>
+                {
+                    outgoingRelation
+                },
+                UsedByRelations = new List<SystemRelation>
+                {
+                    incomingRelation
+                }
             };
 
             // Add ResponsibleOrganizationUnit
@@ -326,6 +378,18 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
             Assert.Equal(dataProcessingRegistration.Name, rmDataProcessingRegistration.DataProcessingRegistrationName);
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
+
+            //Outgoing Relations
+            Assert.Equal(outgoingRelationInterface.Name, readModel.AppliedInterfacesNamesAsCsv);
+            var rmAppliedInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(outgoingRelationInterface.Id, rmAppliedInterface.InterfaceId);
+            Assert.Equal(outgoingRelationInterface.Name, rmAppliedInterface.InterfaceName);
+
+            //Incoming Relations
+            Assert.Equal(incomingRelationItSystem.Name, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            var rmIncomingRelatedSystemUsage = Assert.Single(readModel.IncomingRelatedItSystemUsages);
+            Assert.Equal(incomingRelationItSystemUsage.Id, rmIncomingRelatedSystemUsage.ItSystemUsageId);
+            Assert.Equal(incomingRelationItSystem.Name, rmIncomingRelatedSystemUsage.ItSystemUsageName);
         }
 
         [Fact]

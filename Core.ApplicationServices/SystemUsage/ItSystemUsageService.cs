@@ -194,6 +194,7 @@ namespace Core.ApplicationServices.SystemUsage
                                     onSuccess: createdRelation =>
                                     {
                                         _usageRepository.Save();
+                                        _domainEvents.Raise(new EntityCreatedEvent<SystemRelation>(createdRelation));
                                         return createdRelation;
                                     },
                                     onFailure: error => error
@@ -238,10 +239,11 @@ namespace Core.ApplicationServices.SystemUsage
                                 .ModifyUsageRelation(relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
-                                    onSuccess: createdRelation =>
+                                    onSuccess: modifiedRelation =>
                                     {
                                         _usageRepository.Save();
-                                        return createdRelation;
+                                        _domainEvents.Raise(new EntityUpdatedEvent<SystemRelation>(modifiedRelation));
+                                        return modifiedRelation;
                                     },
                                     onFailure: error => error
                                 );
@@ -346,6 +348,7 @@ namespace Core.ApplicationServices.SystemUsage
                                         _relationRepository.DeleteWithReferencePreload(removedRelation);
                                         _relationRepository.Save();
                                         _usageRepository.Save();
+                                        _domainEvents.Raise(new EntityDeletedEvent<SystemRelation>(removedRelation));
                                         transaction.Commit();
                                         return removedRelation;
                                     },

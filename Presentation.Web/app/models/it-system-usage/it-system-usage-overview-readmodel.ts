@@ -18,6 +18,16 @@
         IsAgreementConcluded: string | null;
     }
 
+    export interface IItSystemUsageOverviewInterfaceReadModel {
+        InterfaceId: number;
+        InterfaceName: string;
+    }
+
+    export interface IItSystemUsageOverviewItSystemUsageReadModel {
+        ItSystemUsageId: number;
+        ItSystemUsageName: string;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -62,5 +72,9 @@
         DataProcessingRegistrations: IItSystemUsageOverviewDataProcessingRegistrationReadModel[];
         GeneralPurpose: string | null;
         HostedAt: number | null;
+        AppliedInterfacesNamesAsCsv: string | null;
+        AppliedInterfaces: IItSystemUsageOverviewInterfaceReadModel[];
+        IncomingRelatedItSystemUsagesNamesAsCsv: string | null;
+        IncomingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
     }
 }

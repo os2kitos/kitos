@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -170,6 +171,34 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
             await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
 
+            // AppliedInterfaces + IncomingSystemUsages
+            var relationSystemName = A<string>();
+            var relationInterfaceName = A<string>();
+            var relationInterfaceId = A<string>();
+
+            var relationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(relationSystemName, organizationId, AccessModifier.Public);
+            var relationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(relationSystem.Id, organizationId);
+
+            var relationInterfaceDTO = InterfaceHelper.CreateInterfaceDto(relationInterfaceName, relationInterfaceId, organizationId, AccessModifier.Public);
+            var relationInterface = await InterfaceHelper.CreateInterface(relationInterfaceDTO);
+            await InterfaceExhibitHelper.CreateExhibit(relationSystem.Id, relationInterface.Id);
+
+            var incomingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = relationSystemUsage.Id,
+                ToUsageId = systemUsage.Id
+            };
+            await SystemRelationHelper.PostRelationAsync(incomingRelationDTO);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = relationSystemUsage.Id,
+                InterfaceId = relationInterface.Id
+            };
+            await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+
+
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -277,6 +306,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(dataProcessingRegistration.Name, readModel.DataProcessingRegistrationNamesAsCsv);
             Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
             var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
+
+            // AppliedInterfaces + IncomingSystemUsages
+            Assert.Equal(relationInterfaceName, readModel.AppliedInterfacesNamesAsCsv);
+            var rmAppliedInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(relationInterface.Id, rmAppliedInterface.InterfaceId);
+            Assert.Equal(relationInterfaceName, rmAppliedInterface.InterfaceName);
+
+            Assert.Equal(relationSystemName, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            var rmIncomingRelatedItSystemUsage = Assert.Single(readModel.IncomingRelatedItSystemUsages);
+            Assert.Equal(relationSystemUsage.Id, rmIncomingRelatedItSystemUsage.ItSystemUsageId);
+            Assert.Equal(relationSystemName, rmIncomingRelatedItSystemUsage.ItSystemUsageName);
         }
 
         [Fact]

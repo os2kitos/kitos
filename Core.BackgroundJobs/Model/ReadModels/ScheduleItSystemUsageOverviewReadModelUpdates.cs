@@ -50,6 +50,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted = HandleContractUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleProjectUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleDataProcessingRegistrationUpdates(token, updatesExecuted, alreadyScheduledIds);
+            updatesExecuted = HandleInterfaceUpdates(token, updatesExecuted, alreadyScheduledIds);
 
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {updatesExecuted} updates"));
         }
@@ -203,6 +204,23 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var currentUsageIds = _itSystemUsageRepository.GetByDataProcessingAgreement(update.SourceId).Select(x => x.Id);
 
                 var ids = existingReadModelUsageIds.Concat(currentUsageIds).Distinct().ToList();
+
+                updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
+            }
+
+            return updatesExecuted;
+        }
+
+        private int HandleInterfaceUpdates(CancellationToken token, int updatesExecuted, HashSet<int> alreadyScheduledIds)
+        {
+            foreach (var update in _updateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface, BatchSize).ToList())
+            {
+                if (token.IsCancellationRequested)
+                    break;
+
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+                var ids = _readModelRepository.GetByItInterfaceId(update.SourceId).Select(x => x.SourceEntityId);
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }

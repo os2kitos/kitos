@@ -111,5 +111,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.DataProcessingRegistrations.Select(y => y.DataProcessingRegistrationId).Contains(dataProcessingRegistrationId));
         }
+
+        public IQueryable<ItSystemUsageOverviewReadModel> GetByItInterfaceId(int interfaceId)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(x => x.AppliedInterfaces.Select(y => y.InterfaceId).Contains(interfaceId));
+        }
     }
 }

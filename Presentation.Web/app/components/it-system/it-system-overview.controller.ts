@@ -65,7 +65,7 @@
                 .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
-                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations";
+                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations,AppliedInterfaces,IncomingRelatedItSystemUsages";
                     const baseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
                     const selectedOrgId: number | null = options.currentOrgUnit;
@@ -98,7 +98,9 @@
                             .replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)")
                             .replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)")
                             .replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)")
-                            .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)");
+                            .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)")
+                            .replace(/(\w+\()AppliedInterfacesNamesAsCsv(.*\))/, "AppliedInterfaces/any(c: $1c/InterfaceName$2)")
+                            .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/, "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
                         parameterMap.$filter = parameterMap.$filter
@@ -642,7 +644,40 @@
                         .withExcelOutput(dataItem => dataItem
                             .DataProcessingRegistrations
                             .map(registration => registration.DataProcessingRegistrationName)
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("AppliedInterfacesNamesAsCsv")
+                        .withTitle("Anvendte snitflader")
+                        .withId("appliedInterfaces")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .AppliedInterfaces
+                            .map(appliedInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.interface-edit.main", appliedInterface.InterfaceId, appliedInterface.InterfaceName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .AppliedInterfaces
+                            .map(appliedInterface => appliedInterface.InterfaceName)
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("IncomingRelatedItSystemUsagesNamesAsCsv")
+                        .withTitle("Systemer der anvender systemet")
+                        .withId("incomingRelatedItSystemUsages")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .IncomingRelatedItSystemUsages
+                            .map(incomingRelatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.usage.main", incomingRelatedItSystemUsage.ItSystemUsageId, incomingRelatedItSystemUsage.ItSystemUsageName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withExcelOutput(dataItem => dataItem
+                            .IncomingRelatedItSystemUsages
+                            .map(incomingRelatedItSystemUsage => incomingRelatedItSystemUsage.ItSystemUsageName)
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")));
+
 
 
             //Launch kendo grid

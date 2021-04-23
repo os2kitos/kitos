@@ -74,7 +74,9 @@
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewArchivePeriodReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewItSystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
@@ -682,6 +684,10 @@
     <Compile Include="Migrations\202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1110,6 +1116,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
