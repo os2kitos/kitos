@@ -62,6 +62,7 @@
     <Compile Include="Configuration\KitosUrl.cs" />
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
+    <Compile Include="DataAccess\IDatabaseControl.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
     <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />

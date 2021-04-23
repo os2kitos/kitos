@@ -174,7 +174,6 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
-
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)
         {
             _readModelUpdate.Apply(itSystemUsage, model);

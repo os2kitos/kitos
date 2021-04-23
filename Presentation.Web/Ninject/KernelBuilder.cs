@@ -341,6 +341,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItSystemRepository>().To<ItSystemRepository>().InCommandScope(Mode);
             kernel.Bind<IItContractRepository>().To<ItContractRepository>().InCommandScope(Mode);
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InCommandScope(Mode);
+            kernel.Bind<IDatabaseControl>().To<EntityFrameworkContextDatabaseControl>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InCommandScope(Mode);
             kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InCommandScope(Mode);
             kernel.Bind<IInterfaceRepository>().To<InterfaceRepository>().InCommandScope(Mode);

@@ -125,7 +125,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.DataProcessingRegistrations.Add(dataProcessingRegistration);
                 }
             }
-            _dataProcessingRegistrationReadModelRepository.Save();
         }
 
         private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -173,7 +172,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ArchivePeriods.Add(archivePeriod);
                 }
             }
-            _archivePeriodReadModelRepository.Save();
         }
 
         private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -206,7 +204,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ItProjects.Add(itProject);
                 }
             }
-            _itProjectReadModelRepository.Save();
         }
 
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -234,7 +231,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.SensitiveDataLevels.Add(sensitiveDataLevel);
                 }
             }
-            _sensitiveDataLevelRepository.Save();
         }
 
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -296,7 +292,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ItSystemTaskRefs.Add(taskRef);
                 }
             }
-            _taskRefRepository.Save();
         }
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -346,8 +341,6 @@ namespace Core.DomainServices.SystemUsage
                 assignment.UserFullName = GetUserFullName(incomingRight.User);
                 assignment.Email = incomingRight.User.Email;
             }
-
-            _roleAssignmentRepository.Save();
         }
 
         private void RemoveAssignments(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewRoleAssignmentReadModel> assignmentsToBeRemoved)

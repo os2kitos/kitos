@@ -141,8 +141,6 @@ namespace Core.DomainServices.GDPR
                 var fullName = incomingRight.User.GetFullName().TrimEnd();
                 assignment.UserFullName = fullName.Substring(0, Math.Min(fullName.Length, 100));
             }
-
-            _roleAssignmentRepository.Save();
         }
 
         private void PatchOversightInterval(DataProcessingRegistration source,
