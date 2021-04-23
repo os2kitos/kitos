@@ -8,6 +8,7 @@ namespace Presentation.Web.Models.External.V2
         /// UUID
         /// </summary>
         public Guid Uuid { get; set; }
+
         /// <summary>
         /// Name
         /// </summary>

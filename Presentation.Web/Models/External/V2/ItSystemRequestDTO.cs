@@ -33,7 +33,7 @@ namespace Presentation.Web.Models.External.V2
         /// <summary>
         /// Former name of IT-System (if any)
         /// </summary>
-        public string? FormerName { get; set; }
+        public string FormerName { get; set; }
 
         /// <summary>
         /// Description
