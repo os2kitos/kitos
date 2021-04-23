@@ -13,11 +13,19 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System.Threading;
+using Xunit.Abstractions;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
     public class DataProcessingRegistrationReadModelsTest : WithAutoFixture
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public DataProcessingRegistrationReadModelsTest(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public async Task Can_Query_And_Page_ReadModels()
         {
@@ -73,12 +81,11 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, role.Id);
             var user = availableUsers.First();
-            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
-                oversightInterval);
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id, oversightInterval);
 
-            await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id,
-                oversightCompleted);
+            await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id, oversightCompleted);
 
+            _testOutputHelper.WriteLine($"Attempting to assign user {user.Id}:{user.Email} as role {role.Id}:{role.Name} in dpr {registration.Id}:{registration.Name}");
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
