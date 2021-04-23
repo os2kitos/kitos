@@ -157,8 +157,12 @@ namespace Core.DomainServices.SystemUsage
 
             RemoveArchivePeriods(destination, archivePeriodsToBeRemoved);
 
-            var existingArchivePeriods = destination.ArchivePeriods.ToDictionary(x => CreateArchivePeriodKey(x.StartDate, x.EndDate));
-            foreach (var incomingArchivePeriod in source.ArchivePeriods.ToList())
+            var existingArchivePeriods = destination
+                .ArchivePeriods
+                .GroupBy(x => CreateArchivePeriodKey(x.StartDate, x.EndDate))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingArchivePeriod in incomingArchivePeriods.Values.ToList())
             {
                 if (!existingArchivePeriods.TryGetValue(CreateArchivePeriodKey(incomingArchivePeriod.StartDate, incomingArchivePeriod.EndDate), out var archivePeriod))
                 {
@@ -313,7 +317,8 @@ namespace Core.DomainServices.SystemUsage
 
             //ItSystemusage allows duplicates of role assignments so we group them and only show one of them
             var incomingRights = source
-                .Rights.GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .Rights
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
                 .ToDictionary(x => x.Key, x => x.First());
 
             //Remove rights which were removed
@@ -323,8 +328,12 @@ namespace Core.DomainServices.SystemUsage
 
             RemoveAssignments(destination, assignmentsToBeRemoved);
 
-            var existingAssignments = destination.RoleAssignments.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
-            foreach (var incomingRight in source.Rights.ToList())
+            var existingAssignments = destination
+                .RoleAssignments
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingRight in incomingRights.Values)
             {
                 if (!existingAssignments.TryGetValue(CreateRoleKey(incomingRight.RoleId, incomingRight.UserId), out var assignment))
                 {

@@ -36,7 +36,7 @@ namespace Core.DomainServices.GDPR
             PatchReference(source, destination);
             PatchRoleAssignments(source, destination);
             PatchSystems(source, destination);
-            PatchOversightInterval(source,destination);
+            PatchOversightInterval(source, destination);
             PatchDataProcessors(source, destination);
             PatchIsAgreementConcluded(source, destination);
             PatchTransferToInsecureThirdCountries(source, destination);
@@ -57,7 +57,7 @@ namespace Core.DomainServices.GDPR
         }
         private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.OversightOptionNamesAsCsv = string.Join(", ", 
+            destination.OversightOptionNamesAsCsv = string.Join(", ",
                 source.OversightOptions.Select(x => GetNameOfOption(source, x, _oversightOptionService)));
         }
 
@@ -114,7 +114,10 @@ namespace Core.DomainServices.GDPR
         {
             static string CreateRoleKey(int roleId, int userId) => $"R:{roleId}U:{userId}";
 
-            var incomingRights = source.Rights.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
+            var incomingRights = source
+                .Rights
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .ToDictionary(x => x.Key, x => x.First());
 
             //Remove rights which were removed
             var assignmentsToBeRemoved =
@@ -123,8 +126,12 @@ namespace Core.DomainServices.GDPR
 
             RemoveAssignments(destination, assignmentsToBeRemoved);
 
-            var existingAssignments = destination.RoleAssignments.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
-            foreach (var incomingRight in source.Rights.ToList())
+            var existingAssignments = destination
+                .RoleAssignments
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingRight in incomingRights.Values)
             {
                 if (!existingAssignments.TryGetValue(CreateRoleKey(incomingRight.RoleId, incomingRight.UserId), out var assignment))
                 {
@@ -184,7 +191,7 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.LatestOversightDate = source.LatestOversightDate;   
+            destination.LatestOversightDate = source.LatestOversightDate;
         }
     }
 }
