@@ -343,6 +343,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
+    <Compile Include="Helpers\StringHelpers.cs" />
+    <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
+    <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
+    <Compile Include="Models\External\V2\ItInterfaceResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItInterfaceRequestDTO.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
+    <Compile Include="Models\External\V2\DeactivationReasonRequestDTO.cs" />
+    <Compile Include="Controllers\External\V2\GeneralController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
@@ -406,6 +418,9 @@
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
+    <Compile Include="Models\External\V2\IdentityNamePairResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItSystemRequestDTO.cs" />
+    <Compile Include="Models\External\V2\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />

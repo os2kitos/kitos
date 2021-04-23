@@ -18,6 +18,7 @@ using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -34,6 +35,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItContractRepository> _itContractRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IItSystemUsageService> _itSystemUsageService;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public ItSystemUsageMigrationServiceTest()
         {
@@ -45,13 +47,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _itSystemUsageService = new Mock<IItSystemUsageService>();
 
+            _domainEventsMock = new Mock<IDomainEvents>();
             _sut = new ItSystemUsageMigrationService(
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 Mock.Of<ILogger>(),
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
-                _itSystemUsageService.Object);
+                _itSystemUsageService.Object,
+                _domainEventsMock.Object);
         }
 
         [Theory]
@@ -672,6 +676,9 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Verify that transaction is committed
             transaction.Verify(x => x.Commit(), Times.Once);
+
+            //Verify that updated domain event was indeed fired
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<ItSystemUsage>>(x => x.Entity == systemUsage)));
         }
 
         private Mock<IDatabaseTransaction> ExpectBeginTransaction()
@@ -787,8 +794,8 @@ namespace Tests.Unit.Presentation.Web.Services
                     relation.AssociatedContractId,
                     relation.UsageFrequencyId))
                 .Returns(
-                    shouldSucceed 
-                    ? Result<SystemRelation, OperationError>.Success(newRelation) 
+                    shouldSucceed
+                    ? Result<SystemRelation, OperationError>.Success(newRelation)
                     : Result<SystemRelation, OperationError>.Failure(new OperationError(OperationFailure.UnknownError)));
 
 

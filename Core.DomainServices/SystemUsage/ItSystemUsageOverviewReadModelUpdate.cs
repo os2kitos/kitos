@@ -132,7 +132,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.IncomingRelatedItSystemUsages.Add(relatedItSystemUsage);
                 }
             }
-            _itSystemUsageReadModelRepository.Save();
         }
 
         private void PatchAppliedInterfaces(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -174,7 +173,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.AppliedInterfaces.Add(appliedInterface);
                 }
             }
-            _appliedInterfaceReadModelRepository.Save();
         }
 
         private void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -220,7 +218,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.DataProcessingRegistrations.Add(dataProcessingRegistration);
                 }
             }
-            _dataProcessingRegistrationReadModelRepository.Save();
         }
 
         private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -253,8 +250,12 @@ namespace Core.DomainServices.SystemUsage
 
             RemoveArchivePeriods(destination, archivePeriodsToBeRemoved);
 
-            var existingArchivePeriods = destination.ArchivePeriods.ToDictionary(x => CreateArchivePeriodKey(x.StartDate, x.EndDate));
-            foreach (var incomingArchivePeriod in source.ArchivePeriods.ToList())
+            var existingArchivePeriods = destination
+                .ArchivePeriods
+                .GroupBy(x => CreateArchivePeriodKey(x.StartDate, x.EndDate))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingArchivePeriod in incomingArchivePeriods.Values.ToList())
             {
                 if (!existingArchivePeriods.TryGetValue(CreateArchivePeriodKey(incomingArchivePeriod.StartDate, incomingArchivePeriod.EndDate), out var archivePeriod))
                 {
@@ -268,7 +269,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ArchivePeriods.Add(archivePeriod);
                 }
             }
-            _archivePeriodReadModelRepository.Save();
         }
 
         private void PatchItProjects(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -301,7 +301,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ItProjects.Add(itProject);
                 }
             }
-            _itProjectReadModelRepository.Save();
         }
 
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -329,7 +328,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.SensitiveDataLevels.Add(sensitiveDataLevel);
                 }
             }
-            _sensitiveDataLevelRepository.Save();
         }
 
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -391,7 +389,6 @@ namespace Core.DomainServices.SystemUsage
                     destination.ItSystemTaskRefs.Add(taskRef);
                 }
             }
-            _taskRefRepository.Save();
         }
 
         private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -413,7 +410,8 @@ namespace Core.DomainServices.SystemUsage
 
             //ItSystemusage allows duplicates of role assignments so we group them and only show one of them
             var incomingRights = source
-                .Rights.GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .Rights
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
                 .ToDictionary(x => x.Key, x => x.First());
 
             //Remove rights which were removed
@@ -423,8 +421,12 @@ namespace Core.DomainServices.SystemUsage
 
             RemoveAssignments(destination, assignmentsToBeRemoved);
 
-            var existingAssignments = destination.RoleAssignments.ToDictionary(x => CreateRoleKey(x.RoleId, x.UserId));
-            foreach (var incomingRight in source.Rights.ToList())
+            var existingAssignments = destination
+                .RoleAssignments
+                .GroupBy(x => CreateRoleKey(x.RoleId, x.UserId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingRight in incomingRights.Values)
             {
                 if (!existingAssignments.TryGetValue(CreateRoleKey(incomingRight.RoleId, incomingRight.UserId), out var assignment))
                 {
@@ -441,8 +443,6 @@ namespace Core.DomainServices.SystemUsage
                 assignment.UserFullName = GetUserFullName(incomingRight.User);
                 assignment.Email = incomingRight.User.Email;
             }
-
-            _roleAssignmentRepository.Save();
         }
 
         private void RemoveAssignments(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewRoleAssignmentReadModel> assignmentsToBeRemoved)

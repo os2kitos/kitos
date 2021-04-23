@@ -1,4 +1,5 @@
-﻿using System.Web.Http.Description;
+﻿using System.Collections.Generic;
+using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 
 namespace Presentation.Web.Swagger
@@ -9,12 +10,25 @@ namespace Presentation.Web.Swagger
         {
             foreach (var swaggerDocPath in swaggerDoc.paths)
             {
-                var pathItem = swaggerDocPath.Value;
-                pathItem.delete = null;
-                pathItem.post = null;
-                pathItem.patch = null;
-                pathItem.put = null;
+                if (IsExternalEndpointDocs(swaggerDocPath.Key))
+                    continue;
+
+                NukeWriteOperationDocs(swaggerDocPath);
             }
+        }
+
+        private static bool IsExternalEndpointDocs(string path)
+        {
+            return path.Contains(@"/api/v2");
+        }
+
+        private static void NukeWriteOperationDocs(KeyValuePair<string, PathItem> swaggerDocPath)
+        {
+            var pathItem = swaggerDocPath.Value;
+            pathItem.delete = null;
+            pathItem.post = null;
+            pathItem.patch = null;
+            pathItem.put = null;
         }
     }
 }

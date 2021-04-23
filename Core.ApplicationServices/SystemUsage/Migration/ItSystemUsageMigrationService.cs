@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IItSystemRepository _systemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IDomainEvents _domainEvents;
 
 
         public ItSystemUsageMigrationService(
@@ -35,7 +37,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             ILogger logger,
             IItSystemRepository systemRepository,
             IItSystemUsageRepository systemUsageRepository,
-            IItSystemUsageService itSystemUsageService)
+            IItSystemUsageService itSystemUsageService,
+            IDomainEvents domainEvents)
         {
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
@@ -43,6 +46,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
             _itSystemUsageService = itSystemUsageService;
+            _domainEvents = domainEvents;
         }
 
         public Result<IReadOnlyList<ItSystem>, OperationFailure> GetUnusedItSystemsByOrganization(
@@ -73,7 +77,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             //Refine, order and take the amount requested
             var result = unusedSystems
                 .ByPartOfName(nameContent)
-                .Where(x=>x.Disabled == false)
+                .Where(x => x.Disabled == false)
                 .OrderBy(x => x.Name)
                 .Take(numberOfItSystems)
                 .ToList()
@@ -154,6 +158,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     }
                     var migration = migrationConsequences.Value;
                     var systemUsage = migration.SystemUsage;
+                    var oldSystem = migration.FromItSystem;
+                    var newSystem = migration.ToItSystem;
 
                     //If modification of the target usage is not allowed, bail out
                     if (!_authorizationContext.AllowModify(systemUsage))
@@ -189,6 +195,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     systemUsage.ItSystemId = toSystemId;
                     _systemUsageRepository.Update(systemUsage);
 
+                    //Raise events for all affected roots
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem));
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem));
                     transaction.Commit();
                     return systemUsage;
                 }

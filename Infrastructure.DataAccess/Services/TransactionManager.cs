@@ -1,9 +1,10 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Infrastructure.Services.DataAccess;
 
 namespace Infrastructure.DataAccess.Services
 {
-    public class TransactionManager : ITransactionManager
+    public class TransactionManager : ITransactionManager, IDisposable
     {
         private readonly KitosContext _context;
 
@@ -20,6 +21,11 @@ namespace Infrastructure.DataAccess.Services
                 return new WithinAmbienTransaction();
             }
             return new DatabaseTransaction(_context.Database.BeginTransaction());
+        }
+
+        public void Dispose()
+        {
+            _context?.Dispose();
         }
     }
 }
