@@ -29,10 +29,13 @@ namespace Core.BackgroundJobs.Model.ReadModels
             _primitiveRepository = primitiveRepository;
         }
 
-        public async Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
+        public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             foreach (var category in Enum.GetValues(typeof(PendingReadModelUpdateSourceCategory)).Cast<PendingReadModelUpdateSourceCategory>().ToList())
             {
+                if (token.IsCancellationRequested)
+                    break;
+
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 var idsInQueue = new HashSet<int>();
 
@@ -59,7 +62,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 }
             }
 
-            return "Ok";
+            return Task.FromResult(Result<string, OperationError>.Success("Ok"));
         }
     }
 }
