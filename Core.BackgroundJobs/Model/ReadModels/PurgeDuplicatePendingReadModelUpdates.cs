@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Infrastructure.Services.DataAccess;
 
@@ -31,6 +32,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
+            var deleted = 0;
             foreach (var category in Enum.GetValues(typeof(PendingReadModelUpdateSourceCategory)).Cast<PendingReadModelUpdateSourceCategory>().ToList())
             {
                 if (token.IsCancellationRequested)
@@ -42,7 +44,11 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var updates = _pendingReadModelUpdateRepository
                     .GetMany(category, int.MaxValue)
                     .OrderBy(x => x.CreatedAt) //The oldest will be served first
-                    .Select(x => new { Id = x.Id, SourceId = x.SourceId })
+                    .Select(x => new
+                    {
+                        Id = x.Id,
+                        SourceId = x.SourceId
+                    })
                     .ToList();
 
                 var idsToDelete =
@@ -56,13 +62,17 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 if (idsToDelete.Any())
                 {
-                    idsToDelete.ForEach(id => _primitiveRepository.DeleteByKey(id));
+                    //Using optimized collection deletion. DeleteByKey first fetches the object from db and then marks as deleted. That is very slow since it will cause a lot of round-trips to the database in stead of one for select and one for delete
+                    var objectsToDelete = _primitiveRepository.AsQueryable().ByIds(idsToDelete).ToList();
+                    _primitiveRepository.RemoveRange(objectsToDelete);
+
                     _primitiveRepository.Save();
                     transaction.Commit();
+                    deleted += idsToDelete.Count;
                 }
             }
 
-            return Task.FromResult(Result<string, OperationError>.Success("Ok"));
+            return Task.FromResult(Result<string, OperationError>.Success($"Deleted {deleted} duplicated"));
         }
     }
 }

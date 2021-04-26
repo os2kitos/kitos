@@ -115,7 +115,10 @@ namespace Infrastructure.DataAccess
         public void DeleteByKey(params object[] key)
         {
             var entityToDelete = _dbSet.Find(key);
-            _dbSet.Remove(entityToDelete);
+            if (entityToDelete != null)
+            {
+                _dbSet.Remove(entityToDelete);
+            }
         }
 
         public void DeleteByKeyWithReferencePreload(params object[] key)

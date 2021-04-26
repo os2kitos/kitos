@@ -24,36 +24,31 @@ namespace Presentation.Web.Hangfire
             using (new HangfireNinjectResolutionScope(_kernel))
             {
                 var backgroundJobLauncher = _kernel.GetRequiredService<IBackgroundJobLauncher>();
-                ProcessDataProcessingModule(backgroundJobLauncher, combinedTokenSource);
-                ProcessItSystemUsageModule(backgroundJobLauncher, combinedTokenSource);
+                PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource);
+                ScheduleUpdatesCausedByDependencyChanges(backgroundJobLauncher, combinedTokenSource);
+                ProcessPendingUpdates(backgroundJobLauncher, combinedTokenSource);
             }
 
             CoolDown();
         }
 
-        private static void ProcessItSystemUsageModule(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)
+        private static void ProcessPendingUpdates(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)
         {
-
-            PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource).Wait(CancellationToken.None); //Make sure we dont have duplicates in queue before processing the dependency change effects
-            backgroundJobLauncher.LaunchScheduleItSystemUsageOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
-            
-            PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource).Wait(CancellationToken.None); //Make sure we dont have duplicates in queue after processing the dependency change effects
+            backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
             backgroundJobLauncher.LaunchUpdateItSystemUsageOverviewReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
-        private static Task PurgeDuplicateUpdates(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)
+        private static void PurgeDuplicateUpdates(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)
         {
-            return backgroundJobLauncher.LaunchPurgeDuplicatedReadModelUpdates(combinedTokenSource.Token);
+            //Ensures that duplicated update requests are filtered out before dependency and read model processing
+            backgroundJobLauncher.LaunchPurgeDuplicatedReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
-        private static void ProcessDataProcessingModule(IBackgroundJobLauncher backgroundJobLauncher,
+        private static void ScheduleUpdatesCausedByDependencyChanges(IBackgroundJobLauncher backgroundJobLauncher,
             CancellationTokenSource combinedTokenSource)
         {
-            PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource).Wait(CancellationToken.None); //Make sure we dont have duplicates in queue before processing the dependency change effects
             backgroundJobLauncher.LaunchScheduleDataProcessingRegistrationReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
-
-            PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource).Wait(CancellationToken.None); //Make sure we dont have duplicates in queue after processing the dependency change effects
-            backgroundJobLauncher.LaunchUpdateDataProcessingRegistrationReadModels(combinedTokenSource.Token).Wait(CancellationToken.None);
+            backgroundJobLauncher.LaunchScheduleItSystemUsageOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
         private static void CoolDown()
