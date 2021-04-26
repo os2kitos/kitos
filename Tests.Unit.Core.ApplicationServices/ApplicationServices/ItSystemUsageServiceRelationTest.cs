@@ -84,8 +84,9 @@ namespace Tests.Unit.Core.ApplicationServices
             // Arrange
             var fromSystemUsage = new ItSystemUsage { Id = FromSystemUsageId };
             var toSystemUsage = new ItSystemUsage { Id = ToSystemUsageId };
-            var systemRelation = new SystemRelation(fromSystemUsage) { Id = FromSystemRelationId };
+            var systemRelation = new SystemRelation(fromSystemUsage) { Id = FromSystemRelationId, ToSystemUsage = toSystemUsage };
             fromSystemUsage.UsageRelations = new List<SystemRelation> { systemRelation };
+            _mockSystemRelationRepository.Setup(r => r.GetByKey(FromSystemRelationId)).Returns(systemRelation);
             _mockSystemUsageRepository.Setup(r => r.GetByKey(FromSystemUsageId)).Returns(fromSystemUsage);
             _mockSystemUsageRepository.Setup(r => r.GetByKey(ToSystemUsageId)).Returns(toSystemUsage);
             _mockAuthorizationContext.Setup(c => c.AllowModify(fromSystemUsage)).Returns(allowModifications);
@@ -204,7 +205,7 @@ namespace Tests.Unit.Core.ApplicationServices
             return systemUsages;
         }
 
-        private static void SetupSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
+        private void SetupSystemRelation(int systemRelationId, Mock<ItSystemUsage> sourceSystemUsage, Mock<ItSystemUsage> targetSystemUsage)
         {
             var usageSystemRelation = new SystemRelation(sourceSystemUsage.Object)
             {
@@ -225,6 +226,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var mockTargetItSystem = new Mock<ItSystem>();
             mockTargetItSystem.SetupGet(s => s.ItInterfaceExhibits).Returns(itInterfaceExhibits);
             targetSystemUsage.SetupGet(u => u.ItSystem).Returns(mockTargetItSystem.Object);
+            _mockSystemRelationRepository.Setup(r => r.GetByKey(usageSystemRelation.Id)).Returns(usageSystemRelation);
         }
 
         private void SetupSystemUsageRepository(IReadOnlyDictionary<int, ItSystemUsage> systemUsages)

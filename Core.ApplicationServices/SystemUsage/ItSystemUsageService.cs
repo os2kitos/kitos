@@ -219,7 +219,12 @@ namespace Core.ApplicationServices.SystemUsage
                 new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, toInterfaceId, toFrequencyId, toContractId),
                 new SystemRelationOperationEntities());
 
-            var originalToSystemUsage = _relationRepository.GetByKey(relationId).ToSystemUsage;
+            var originalToSystemUsage = _relationRepository.GetByKey(relationId)?.ToSystemUsage;
+
+            if(originalToSystemUsage == null)
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.NotFound);
+            }
 
             return
                 LoadFromSystemUsage(operationContext)
