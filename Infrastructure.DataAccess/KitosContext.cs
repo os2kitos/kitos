@@ -266,6 +266,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItProjectReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewArchivePeriodReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
+            modelBuilder.Configurations.Add(new PendingReadModelUpdateMap());
         }
     }
 }
