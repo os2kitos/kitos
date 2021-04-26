@@ -40,9 +40,6 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityDeletedEvent<ItProject>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
     IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
-    IDomainEventHandler<EntityCreatedEvent<SystemRelation>>,
-    IDomainEventHandler<EntityUpdatedEvent<SystemRelation>>,
-    IDomainEventHandler<EntityDeletedEvent<SystemRelation>>,
     IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
     IDomainEventHandler<EntityDeletedEvent<ItInterface>>,
     IDomainEventHandler<ExposingSystemChanged>
@@ -207,30 +204,6 @@ namespace Core.DomainServices.SystemUsage
                 _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(itSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
             }
         }
-
-        public void Handle(EntityDeletedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
-
-        public void Handle(EntityCreatedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
-
-        public void Handle(EntityUpdatedEvent<SystemRelation> domainEvent) => HandleSystemRelation(domainEvent);
-
-        private void HandleSystemRelation(EntityLifeCycleEvent<SystemRelation> domainEvent)
-        {
-            //Schedule read model update for fromSystemUsage 
-            var fromSystemUsage = domainEvent.Entity.FromSystemUsage;
-            if (fromSystemUsage != null)
-            {
-                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(fromSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
-            }
-
-            //Schedule read model update for toSystemUsage 
-            var toSystemUsage = domainEvent.Entity.ToSystemUsage;
-            if (toSystemUsage != null)
-            {
-                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(toSystemUsage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
-            }
-        }
-
 
         private void BuildFromSource(ItSystemUsageOverviewReadModel model, ItSystemUsage itSystemUsage)
         {

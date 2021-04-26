@@ -194,7 +194,8 @@ namespace Core.ApplicationServices.SystemUsage
                                     onSuccess: createdRelation =>
                                     {
                                         _usageRepository.Save();
-                                        _domainEvents.Raise(new EntityCreatedEvent<SystemRelation>(createdRelation));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         return createdRelation;
                                     },
                                     onFailure: error => error
@@ -241,8 +242,14 @@ namespace Core.ApplicationServices.SystemUsage
                                 (
                                     onSuccess: modifiedRelation =>
                                     {
+                                        if(modifiedRelation.ToSystemUsageId != toSystemUsageId)
+                                        {
+                                            // ToSystemUsage has been changed to another ItSystemUsage so we also add a domain event on the old ToSystemUsage
+                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(modifiedRelation.ToSystemUsage)); 
+                                        }
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         _usageRepository.Save();
-                                        _domainEvents.Raise(new EntityUpdatedEvent<SystemRelation>(modifiedRelation));
                                         return modifiedRelation;
                                     },
                                     onFailure: error => error
@@ -348,7 +355,8 @@ namespace Core.ApplicationServices.SystemUsage
                                         _relationRepository.DeleteWithReferencePreload(removedRelation);
                                         _relationRepository.Save();
                                         _usageRepository.Save();
-                                        _domainEvents.Raise(new EntityDeletedEvent<SystemRelation>(removedRelation));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(removedRelation.FromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(removedRelation.ToSystemUsage));
                                         transaction.Commit();
                                         return removedRelation;
                                     },

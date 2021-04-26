@@ -679,6 +679,107 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(yesNoIrrelevantOption, rmDataProcessingRegistration.IsAgreementConcluded);
         }
 
+        [Fact]
+        public async Task ReadModels_AppliedInterfacesNamesAsCsv_Is_Updated_When_Interface_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var relationSystemName = A<string>();
+            var relationInterfaceName = A<string>();
+            var newRelationInterfaceName = A<string>();
+            var relationInterfaceId = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var relationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(relationSystemName, organizationId, AccessModifier.Public);
+            var relationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(relationSystem.Id, organizationId);
+
+            var relationInterfaceDTO = InterfaceHelper.CreateInterfaceDto(relationInterfaceName, relationInterfaceId, organizationId, AccessModifier.Public);
+            var relationInterface = await InterfaceHelper.CreateInterface(relationInterfaceDTO);
+            await InterfaceExhibitHelper.CreateExhibit(relationSystem.Id, relationInterface.Id);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = relationSystemUsage.Id,
+                InterfaceId = relationInterface.Id
+            };
+            await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await InterfaceHelper.SendChangeNameRequestAsync(relationInterface.Id, newRelationInterfaceName, organizationId);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(newRelationInterfaceName, readModel.AppliedInterfacesNamesAsCsv);
+            var rmInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(relationInterface.Id, rmInterface.InterfaceId);
+            Assert.Equal(newRelationInterfaceName, rmInterface.InterfaceName);
+        }
+
+        [Fact]
+        public async Task ReadModels_AppliedInterfacesNamesAsCsv_Is_Updated_When_SystemRelation_Is_Deleted()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var relationSystemName = A<string>();
+            var relationInterfaceName = A<string>();
+            var relationInterfaceId = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var relationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(relationSystemName, organizationId, AccessModifier.Public);
+            var relationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(relationSystem.Id, organizationId);
+
+            var relationInterfaceDTO = InterfaceHelper.CreateInterfaceDto(relationInterfaceName, relationInterfaceId, organizationId, AccessModifier.Public);
+            var relationInterface = await InterfaceHelper.CreateInterface(relationInterfaceDTO);
+            await InterfaceExhibitHelper.CreateExhibit(relationSystem.Id, relationInterface.Id);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = relationSystemUsage.Id,
+                InterfaceId = relationInterface.Id
+            };
+            var relation = await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            await SystemRelationHelper.SendDeleteRelationRequestAsync(systemUsage.Id, relation.Id);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal("", readModel.AppliedInterfacesNamesAsCsv);
+            Assert.Empty(readModel.AppliedInterfaces);
+        }
+
 
         private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
         {
