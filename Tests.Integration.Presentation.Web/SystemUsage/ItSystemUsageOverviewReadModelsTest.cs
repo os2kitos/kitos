@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -171,7 +172,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
             await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
 
-            // AppliedInterfaces + IncomingSystemUsages
+            // DependsOnInterfaces + IncomingSystemUsages
             var relationSystemName = A<string>();
             var relationInterfaceName = A<string>();
             var relationInterfaceId = A<string>();
@@ -307,11 +308,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(yesNoIrrelevantOption.GetReadableName(), readModel.DataProcessingRegistrationsConcludedAsCsv);
             var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
 
-            // AppliedInterfaces + IncomingSystemUsages
+            // DependsOnInterfaces + IncomingSystemUsages
             Assert.Equal(relationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
-            var rmAppliedInterface = Assert.Single(readModel.DependsOnInterfaces);
-            Assert.Equal(relationInterface.Id, rmAppliedInterface.InterfaceId);
-            Assert.Equal(relationInterfaceName, rmAppliedInterface.InterfaceName);
+            var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
+            Assert.Equal(relationInterface.Id, rmDependsOnInterface.InterfaceId);
+            Assert.Equal(relationInterfaceName, rmDependsOnInterface.InterfaceName);
 
             Assert.Equal(relationSystemName, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
             var rmIncomingRelatedItSystemUsage = Assert.Single(readModel.IncomingRelatedItSystemUsages);
@@ -680,7 +681,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         }
 
         [Fact]
-        public async Task ReadModels_AppliedInterfacesNamesAsCsv_Is_Updated_When_Interface_Is_Changed()
+        public async Task ReadModels_DependsOnInterfacesNamesAsCsv_Is_Updated_When_Interface_Is_Changed()
         {
             //Arrange
             var systemName = A<string>();
@@ -719,20 +720,33 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
 
             //Assert
-            var readModel = Assert.Single(readModels);
+            var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            var mainSystemReadModel = Assert.Single(mainSystemReadModels);
             Console.Out.WriteLine("Read model found");
 
-            Assert.Equal(newRelationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
-            var rmInterface = Assert.Single(readModel.DependsOnInterfaces);
+            Assert.Equal(newRelationInterfaceName, mainSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.IncomingRelatedItSystemUsages);
+            var rmInterface = Assert.Single(mainSystemReadModel.DependsOnInterfaces);
             Assert.Equal(relationInterface.Id, rmInterface.InterfaceId);
             Assert.Equal(newRelationInterfaceName, rmInterface.InterfaceName);
+
+
+            var relationSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, relationSystemName, 1, 0)).ToList();
+            var relationSystemReadModel = Assert.Single(relationSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(systemName, relationSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(relationSystemReadModel.DependsOnInterfaces);
+            var rmIncomingSystemUsage = Assert.Single(relationSystemReadModel.IncomingRelatedItSystemUsages);
+            Assert.Equal(systemUsage.Id, rmIncomingSystemUsage.ItSystemUsageId);
+            Assert.Equal(systemName, rmIncomingSystemUsage.ItSystemUsageName);
         }
 
         [Fact]
-        public async Task ReadModels_AppliedInterfacesNamesAsCsv_Is_Updated_When_SystemRelation_Is_Deleted()
+        public async Task ReadModels_DependsOnInterfacesNamesAsCsv_Is_Updated_When_SystemRelation_Is_Deleted()
         {
             //Arrange
             var systemName = A<string>();
@@ -770,14 +784,115 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
-            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
 
             //Assert
-            var readModel = Assert.Single(readModels);
+            var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            var mainSystemReadModel = Assert.Single(mainSystemReadModels);
             Console.Out.WriteLine("Read model found");
 
-            Assert.Equal("", readModel.DependsOnInterfacesNamesAsCsv);
-            Assert.Empty(readModel.DependsOnInterfaces);
+            Assert.Equal("", mainSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.DependsOnInterfaces); 
+            Assert.Equal("", mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.IncomingRelatedItSystemUsages);
+
+
+            var relationSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, relationSystemName, 1, 0)).ToList();
+            var relationSystemReadModel = Assert.Single(relationSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal("", relationSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(relationSystemReadModel.IncomingRelatedItSystemUsages); 
+            Assert.Equal("", relationSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(relationSystemReadModel.DependsOnInterfaces);
+        }
+
+        [Fact]
+        public async Task ReadModels_DependsOnInterfacesNamesAsCsv_Is_Updated_When_SystemRelation_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var relationSystemName = A<string>();
+            var newRelationSystemName = A<string>();
+            var relationInterfaceName = A<string>();
+            var relationInterfaceId = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var relationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(relationSystemName, organizationId, AccessModifier.Public);
+            var relationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(relationSystem.Id, organizationId);
+
+            var newRelationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(newRelationSystemName, organizationId, AccessModifier.Public);
+            var newRelationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newRelationSystem.Id, organizationId);
+
+            var relationInterfaceDTO = InterfaceHelper.CreateInterfaceDto(relationInterfaceName, relationInterfaceId, organizationId, AccessModifier.Public);
+            var relationInterface = await InterfaceHelper.CreateInterface(relationInterfaceDTO);
+            await InterfaceExhibitHelper.CreateExhibit(relationSystem.Id, relationInterface.Id);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = relationSystemUsage.Id,
+                InterfaceId = relationInterface.Id
+            };
+            var relation = await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            var newRelationAsNamedEntity = new NamedEntityWithEnabledStatusDTO(newRelationSystemUsage.Id, newRelationSystemName, false);
+            var newOutgoingRelationDTO = new SystemRelationDTO(
+                relation.Id, 
+                relation.Uuid, 
+                relation.FromUsage, 
+                newRelationAsNamedEntity, 
+                null, //Interface is not exposed by new system so it needs to be reset
+                relation.Contract, 
+                relation.FrequencyType, 
+                relation.Description, 
+                relation.Reference);
+
+            await SystemRelationHelper.SendPatchRelationRequestAsync(newOutgoingRelationDTO);
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Assert
+            var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            var mainSystemReadModel = Assert.Single(mainSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal("", mainSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.DependsOnInterfaces);
+            Assert.Equal("", mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.IncomingRelatedItSystemUsages);
+
+
+            var relationSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, relationSystemName, 1, 0)).ToList();
+            var relationSystemReadModel = Assert.Single(relationSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal("", relationSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(relationSystemReadModel.IncomingRelatedItSystemUsages);
+            Assert.Equal("", relationSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(relationSystemReadModel.DependsOnInterfaces);
+
+
+            var newRelationSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, newRelationSystemName, 1, 0)).ToList();
+            var newRelationSystemReadModel = Assert.Single(newRelationSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(systemName, newRelationSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            var rmSystemUsage = Assert.Single(newRelationSystemReadModel.IncomingRelatedItSystemUsages);
+            Assert.Equal(systemUsage.Id, rmSystemUsage.ItSystemUsageId);
+            Assert.Equal(systemName, rmSystemUsage.ItSystemUsageName);
+            Assert.Equal("", newRelationSystemReadModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(newRelationSystemReadModel.DependsOnInterfaces);
         }
 
 

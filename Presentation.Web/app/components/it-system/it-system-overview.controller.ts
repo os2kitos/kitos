@@ -647,19 +647,19 @@
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("AppliedInterfacesNamesAsCsv")
+                        .withDataSourceName("DependsOnInterfacesNamesAsCsv")
                         .withTitle("Anvendte snitflader")
-                        .withId("appliedInterfaces")
+                        .withId("dependsOnInterfaces")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withRendering(dataItem => dataItem
-                            .AppliedInterfaces
-                            .map(appliedInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.interface-edit.main", appliedInterface.InterfaceId, appliedInterface.InterfaceName))
+                            .DependsOnInterfaces
+                            .map(dependsOnInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.interface-edit.main", dependsOnInterface.InterfaceId, dependsOnInterface.InterfaceName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
                         .withExcelOutput(dataItem => dataItem
-                            .AppliedInterfaces
-                            .map(appliedInterface => appliedInterface.InterfaceName)
+                            .DependsOnInterfaces
+                            .map(dependsOnInterface => dependsOnInterface.InterfaceName)
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
                 .withColumn(builder =>
                     builder

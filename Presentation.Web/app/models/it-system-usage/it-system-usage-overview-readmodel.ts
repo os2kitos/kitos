@@ -72,8 +72,8 @@
         DataProcessingRegistrations: IItSystemUsageOverviewDataProcessingRegistrationReadModel[];
         GeneralPurpose: string | null;
         HostedAt: number | null;
-        AppliedInterfacesNamesAsCsv: string | null;
-        AppliedInterfaces: IItSystemUsageOverviewInterfaceReadModel[];
+        DependsOnInterfacesNamesAsCsv: string | null;
+        DependsOnInterfaces: IItSystemUsageOverviewInterfaceReadModel[];
         IncomingRelatedItSystemUsagesNamesAsCsv: string | null;
         IncomingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
     }

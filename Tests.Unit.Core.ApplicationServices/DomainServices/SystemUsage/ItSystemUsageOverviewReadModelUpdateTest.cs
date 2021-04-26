@@ -381,9 +381,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Outgoing Relations
             Assert.Equal(outgoingRelationInterface.Name, readModel.DependsOnInterfacesNamesAsCsv);
-            var rmAppliedInterface = Assert.Single(readModel.DependsOnInterfaces);
-            Assert.Equal(outgoingRelationInterface.Id, rmAppliedInterface.InterfaceId);
-            Assert.Equal(outgoingRelationInterface.Name, rmAppliedInterface.InterfaceName);
+            var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
+            Assert.Equal(outgoingRelationInterface.Id, rmDependsOnInterface.InterfaceId);
+            Assert.Equal(outgoingRelationInterface.Name, rmDependsOnInterface.InterfaceName);
 
             //Incoming Relations
             Assert.Equal(incomingRelationItSystem.Name, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
