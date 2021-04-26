@@ -82,13 +82,13 @@ namespace Core.DomainServices.SystemUsage
             PatchGeneralPurposeRegistrations(source, destination);
         }
 
-        private void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var generalPurpose = source.GeneralPurpose?.TrimEnd();
             destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.LongProperyMaxLength));
         }
 
-            private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.DataProcessingRegistrationNamesAsCsv = string.Join(", ", source.AssociatedDataProcessingRegistrations.Select(x => x.Name));
             var isAgreementConcludedList = source.AssociatedDataProcessingRegistrations
@@ -98,36 +98,38 @@ namespace Core.DomainServices.SystemUsage
 
             destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
 
-            static string CreateDataProcessingRegistrationKey(int Id, string Name, YesNoIrrelevantOption? IsAgreementConcluded) => $"I:{Id}N:{Name}C:{IsAgreementConcluded}";
+            static string CreateDataProcessingRegistrationKey(int Id) => $"I:{Id}";
 
-            var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id, x.Name, x.IsAgreementConcluded));
+            var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id));
 
             // Remove DataProcessingRegistrations which were removed
             var dataProcessingRegistrationsToBeRemoved =
                 destination.DataProcessingRegistrations
-                    .Where(x => incomingDataProcessingRegistrations.ContainsKey(CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded)) == false).ToList();
+                    .Where(x => incomingDataProcessingRegistrations.ContainsKey(CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId)) == false).ToList();
 
             RemoveDataProcessingRegistrations(destination, dataProcessingRegistrationsToBeRemoved);
 
-            var existingDataProcessingRegistrations = destination.DataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded));
+            var existingDataProcessingRegistrations = destination.DataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId));
             foreach (var incomingDataProcessingRegistration in source.AssociatedDataProcessingRegistrations.ToList())
             {
-                if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id, incomingDataProcessingRegistration.Name, incomingDataProcessingRegistration.IsAgreementConcluded), out var dataProcessingRegistration))
+                if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id), out var dataProcessingRegistration))
                 {
                     //Append the sensitive data levels if it is not already present
                     dataProcessingRegistration = new ItSystemUsageOverviewDataProcessingRegistrationReadModel
                     {
                         Parent = destination,
-                        DataProcessingRegistrationId = incomingDataProcessingRegistration.Id,
-                        DataProcessingRegistrationName = incomingDataProcessingRegistration.Name,
-                        IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded
+
                     };
                     destination.DataProcessingRegistrations.Add(dataProcessingRegistration);
                 }
+
+                dataProcessingRegistration.DataProcessingRegistrationId = incomingDataProcessingRegistration.Id;
+                dataProcessingRegistration.DataProcessingRegistrationName = incomingDataProcessingRegistration.Name;
+                dataProcessingRegistration.IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded;
             }
         }
 
-        private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             if (source.riskAssessment == DataOptions.YES)
             {
@@ -169,12 +171,13 @@ namespace Core.DomainServices.SystemUsage
                     //Append the ArchivePeriod if it is not already present
                     archivePeriod = new ItSystemUsageOverviewArchivePeriodReadModel
                     {
-                        Parent = destination,
-                        StartDate = incomingArchivePeriod.StartDate,
-                        EndDate = incomingArchivePeriod.EndDate
+                        Parent = destination
                     };
                     destination.ArchivePeriods.Add(archivePeriod);
                 }
+
+                archivePeriod.StartDate = incomingArchivePeriod.StartDate;
+                archivePeriod.EndDate = incomingArchivePeriod.EndDate;
             }
         }
 
@@ -182,31 +185,32 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
 
-            static string CreateItProjectKey(int Id, string Name) => $"I:{Id}N:{Name}";
+            static string CreateItProjectKey(int id) => $"I:{id}";
 
-            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id, x.Name));
+            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id));
 
             // Remove It Projects which were removed
             var itProjectsToBeRemoved =
                 destination.ItProjects
-                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId, x.ItProjectName)) == false).ToList();
+                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId)) == false).ToList();
 
             RemoveItProjects(destination, itProjectsToBeRemoved);
 
-            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId, x.ItProjectName));
+            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId));
             foreach (var incomingItProject in source.ItProjects.ToList())
             {
-                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id, incomingItProject.Name), out var itProject))
+                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id), out var itProject))
                 {
                     //Append the sensitive data levels if it is not already present
                     itProject = new ItSystemUsageOverviewItProjectReadModel
                     {
-                        Parent = destination,
-                        ItProjectId = incomingItProject.Id,
-                        ItProjectName = incomingItProject.Name
+                        Parent = destination
                     };
                     destination.ItProjects.Add(itProject);
                 }
+
+                itProject.ItProjectId = incomingItProject.Id;
+                itProject.ItProjectName = incomingItProject.Name;
             }
         }
 
@@ -289,12 +293,13 @@ namespace Core.DomainServices.SystemUsage
                     //Append the taskref if it is not already present
                     taskRef = new ItSystemUsageOverviewTaskRefReadModel
                     {
-                        Parent = destination,
-                        KLEId = incomingTaskRef.TaskKey,
-                        KLEName = incomingTaskRef.Description
+                        Parent = destination
                     };
                     destination.ItSystemTaskRefs.Add(taskRef);
                 }
+
+                taskRef.KLEId = incomingTaskRef.TaskKey;
+                taskRef.KLEName = incomingTaskRef.Description;
             }
         }
 
