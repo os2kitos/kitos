@@ -380,8 +380,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
 
             //Outgoing Relations
-            Assert.Equal(outgoingRelationInterface.Name, readModel.AppliedInterfacesNamesAsCsv);
-            var rmAppliedInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(outgoingRelationInterface.Name, readModel.DependsOnInterfacesNamesAsCsv);
+            var rmAppliedInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(outgoingRelationInterface.Id, rmAppliedInterface.InterfaceId);
             Assert.Equal(outgoingRelationInterface.Name, rmAppliedInterface.InterfaceName);
 

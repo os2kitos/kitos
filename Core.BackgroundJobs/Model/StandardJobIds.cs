@@ -11,5 +11,6 @@
         public static readonly string UpdateItSystemUsageOverviewReadModels = $"{NamePrefix}update-it-system-usage-overview-read-models";
         public static readonly string RebuildDataProcessingReadModels = $"{NamePrefix}rebuild-dpr-read-models";
         public static readonly string RebuildItSystemUsageReadModels = $"{NamePrefix}rebuild-it-system-usage-read-models";
+        public static readonly string PurgeDuplicatePendingReadModelUpdates = $"{NamePrefix}purge-duplicate-read-model-updates";
     }
 }

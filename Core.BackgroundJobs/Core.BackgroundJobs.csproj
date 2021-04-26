@@ -72,6 +72,7 @@
     <Compile Include="Model\Advice\PurgeOrphanedAdviceBackgroundJob.cs" />
     <Compile Include="Model\ExternalLinks\CheckExternalLinksBackgroundJob.cs" />
     <Compile Include="Model\IAsyncBackgroundJob.cs" />
+    <Compile Include="Model\ReadModels\PurgeDuplicatePendingReadModelUpdates.cs" />
     <Compile Include="Model\ReadModels\RebuildDataProcessingRegistrationReadModelsBatchJob.cs" />
     <Compile Include="Model\ReadModels\RebuildItSystemUsageOverviewReadModelsBatchJob.cs" />
     <Compile Include="Model\ReadModels\RebuildReadModelsJob.cs" />

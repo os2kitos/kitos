@@ -308,8 +308,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var rmDataProcessingRegistration = Assert.Single(readModel.DataProcessingRegistrations);
 
             // AppliedInterfaces + IncomingSystemUsages
-            Assert.Equal(relationInterfaceName, readModel.AppliedInterfacesNamesAsCsv);
-            var rmAppliedInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(relationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
+            var rmAppliedInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(relationInterface.Id, rmAppliedInterface.InterfaceId);
             Assert.Equal(relationInterfaceName, rmAppliedInterface.InterfaceName);
 
@@ -725,8 +725,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
 
-            Assert.Equal(newRelationInterfaceName, readModel.AppliedInterfacesNamesAsCsv);
-            var rmInterface = Assert.Single(readModel.AppliedInterfaces);
+            Assert.Equal(newRelationInterfaceName, readModel.DependsOnInterfacesNamesAsCsv);
+            var rmInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(relationInterface.Id, rmInterface.InterfaceId);
             Assert.Equal(newRelationInterfaceName, rmInterface.InterfaceName);
         }
@@ -776,8 +776,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
 
-            Assert.Equal("", readModel.AppliedInterfacesNamesAsCsv);
-            Assert.Empty(readModel.AppliedInterfaces);
+            Assert.Equal("", readModel.DependsOnInterfacesNamesAsCsv);
+            Assert.Empty(readModel.DependsOnInterfaces);
         }
 
 

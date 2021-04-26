@@ -10,7 +10,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             HasKey(x => x.Id);
             HasRequired(x => x.Parent)
-                .WithMany(x => x.AppliedInterfaces)
+                .WithMany(x => x.DependsOnInterfaces)
                 .HasForeignKey(x => x.ParentId)
                 .WillCascadeOnDelete(true);
 

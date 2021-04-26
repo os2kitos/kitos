@@ -37,7 +37,7 @@
                 .Index(t => t.ItSystemUsageName, name: "ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageName")
                 .Index(t => t.ParentId);
             
-            AddColumn("dbo.ItSystemUsageOverviewReadModels", "AppliedInterfacesNamesAsCsv", c => c.String());
+            AddColumn("dbo.ItSystemUsageOverviewReadModels", "DependsOnInterfacesNamesAsCsv", c => c.String());
             AddColumn("dbo.ItSystemUsageOverviewReadModels", "IncomingRelatedItSystemUsagesNamesAsCsv", c => c.String());
         }
         
@@ -52,7 +52,7 @@
             DropIndex("dbo.ItSystemUsageOverviewInterfaceReadModels", "ItSystemUsageOverviewInterfaceReadModel_index_InterfaceName");
             DropIndex("dbo.ItSystemUsageOverviewInterfaceReadModels", "ItSystemUsageOverviewInterfaceReadModel_index_InterfaceId");
             DropColumn("dbo.ItSystemUsageOverviewReadModels", "IncomingRelatedItSystemUsagesNamesAsCsv");
-            DropColumn("dbo.ItSystemUsageOverviewReadModels", "AppliedInterfacesNamesAsCsv");
+            DropColumn("dbo.ItSystemUsageOverviewReadModels", "DependsOnInterfacesNamesAsCsv");
             DropTable("dbo.ItSystemUsageOverviewItSystemUsageReadModels");
             DropTable("dbo.ItSystemUsageOverviewInterfaceReadModels");
         }

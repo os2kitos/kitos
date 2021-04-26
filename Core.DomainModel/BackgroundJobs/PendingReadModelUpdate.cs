@@ -25,7 +25,7 @@ namespace Core.DomainModel.BackgroundJobs
         ItSystemUsage_ItInterface = 18
     }
 
-    public class PendingReadModelUpdate
+    public class PendingReadModelUpdate : IHasId
     {
         protected PendingReadModelUpdate()
         {

@@ -41,8 +41,7 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
     IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
     IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
-    IDomainEventHandler<EntityDeletedEvent<ItInterface>>,
-    IDomainEventHandler<ExposingSystemChanged>
+    IDomainEventHandler<EntityDeletedEvent<ItInterface>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -170,23 +169,6 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
-        }
-
-        public void Handle(ExposingSystemChanged domainEvent)
-        {
-            //Schedule read model update based on ItSystem if the system was the previous exposer of an interface
-            var oldSystem = domainEvent.PreviousSystem;
-            if(oldSystem.HasValue)
-            {
-                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(oldSystem.Value, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItSystem));
-            }
-
-            //Schedule read model update based on ItSystem for the new system exposer of an interface
-            var newSystem = domainEvent.NewSystem;
-            if(newSystem.HasValue)
-            {
-                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(newSystem.Value, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItSystem));
-            }
         }
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);

@@ -219,6 +219,8 @@ namespace Core.ApplicationServices.SystemUsage
                 new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, toInterfaceId, toFrequencyId, toContractId),
                 new SystemRelationOperationEntities());
 
+            var originalToSystemUsage = _relationRepository.GetByKey(relationId).ToSystemUsage;
+
             return
                 LoadFromSystemUsage(operationContext)
                     .Select(LoadToSystemUsage)
@@ -242,10 +244,9 @@ namespace Core.ApplicationServices.SystemUsage
                                 (
                                     onSuccess: modifiedRelation =>
                                     {
-                                        if(modifiedRelation.ToSystemUsageId != toSystemUsageId)
+                                        if(originalToSystemUsage.Id != toSystemUsageId)
                                         {
-                                            // ToSystemUsage has been changed to another ItSystemUsage so we also add a domain event on the old ToSystemUsage
-                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(modifiedRelation.ToSystemUsage)); 
+                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage)); 
                                         }
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
@@ -352,11 +353,13 @@ namespace Core.ApplicationServices.SystemUsage
                                 (
                                     onSuccess: removedRelation =>
                                     {
+                                        var fromSystemUsage = removedRelation.FromSystemUsage;
+                                        var toSystemUsage = removedRelation.ToSystemUsage;
                                         _relationRepository.DeleteWithReferencePreload(removedRelation);
                                         _relationRepository.Save();
                                         _usageRepository.Save();
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(removedRelation.FromSystemUsage));
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(removedRelation.ToSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         transaction.Commit();
                                         return removedRelation;
                                     },

@@ -24,7 +24,7 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
-        private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _appliedInterfaceReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> _itSystemUsageReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
@@ -34,7 +34,7 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
-            IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> appliedInterfaceReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> itSystemUsageReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
@@ -44,7 +44,7 @@ namespace Core.DomainServices.SystemUsage
             _itProjectReadModelRepository = itProjectReadModelRepository;
             _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
             _dataProcessingRegistrationReadModelRepository = dataProcessingRegistrationReadModelRepository;
-            _appliedInterfaceReadModelRepository = appliedInterfaceReadModelRepository;
+            _dependsOnInterfaceReadModelRepository = dependsOnInterfaceReadModelRepository;
             _itSystemUsageReadModelRepository = itSystemUsageReadModelRepository;
             _businessTypeService = businessTypeService;
         }
@@ -86,7 +86,7 @@ namespace Core.DomainServices.SystemUsage
             PatchRiskSupervisionDocumentation(source, destination);
             PatchDataProcessingRegistrations(source, destination);
             PatchGeneralPurposeRegistrations(source, destination);
-            PatchAppliedInterfaces(source, destination);
+            PatchDependsOnInterfaces(source, destination);
             PatchRelatedItSystemUsages(source, destination);
         }
 
@@ -101,87 +101,97 @@ namespace Core.DomainServices.SystemUsage
                 .Select(x => x.ItSystem)
                 .Select(x => x.Name));
 
-            static string CreateRelatedItSystemUsageKey(int Id, string Name) => $"I:{Id}N:{Name}";
+            static string CreateRelatedItSystemUsageKey(int Id) => $"I:{Id}";
 
             var incomingRelatedItSystemUsages = source
                 .UsedByRelations
                 .Where(x => x.FromSystemUsage != null)
                 .Select(x => x.FromSystemUsage)
                 .Where(x => x.ItSystem != null)
-                .ToDictionary(x => CreateRelatedItSystemUsageKey(x.Id, x.ItSystem.Name));
+                .GroupBy(x => CreateRelatedItSystemUsageKey(x.Id))
+                .ToDictionary(x => x.Key, x => x.First());
 
             // Remove RelatedItSystemUsages which were removed
             var relatedItSystemUsagesToBeRemoved =
                 destination.IncomingRelatedItSystemUsages
-                    .Where(x => incomingRelatedItSystemUsages.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId, x.ItSystemUsageName)) == false).ToList();
+                    .Where(x => incomingRelatedItSystemUsages.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId)) == false).ToList();
 
             RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved);
 
-            var existingRelatedItSystemUsages = destination.IncomingRelatedItSystemUsages.ToDictionary(x => CreateRelatedItSystemUsageKey(x.ItSystemUsageId, x.ItSystemUsageName));
+            var existingRelatedItSystemUsages = destination
+                .IncomingRelatedItSystemUsages
+                .GroupBy(x => CreateRelatedItSystemUsageKey(x.ItSystemUsageId))
+                .ToDictionary(x => x.Key, x => x.First());
+
             foreach (var incomingRelatedItSystemUsage in source.UsedByRelations.Where(x => x.FromSystemUsage != null).Select(x => x.FromSystemUsage).Where(x => x.ItSystem != null).ToList())
             {
-                if (!existingRelatedItSystemUsages.TryGetValue(CreateRelatedItSystemUsageKey(incomingRelatedItSystemUsage.Id, incomingRelatedItSystemUsage.ItSystem.Name), out var relatedItSystemUsage))
+                if (!existingRelatedItSystemUsages.TryGetValue(CreateRelatedItSystemUsageKey(incomingRelatedItSystemUsage.Id), out var relatedItSystemUsage))
                 {
                     //Append the RelatedItSystemUsage if it is not already present
                     relatedItSystemUsage = new ItSystemUsageOverviewItSystemUsageReadModel
                     {
-                        Parent = destination,
-                        ItSystemUsageId = incomingRelatedItSystemUsage.Id,
-                        ItSystemUsageName = incomingRelatedItSystemUsage.ItSystem?.Name
+                        Parent = destination
                     };
                     destination.IncomingRelatedItSystemUsages.Add(relatedItSystemUsage);
                 }
+                relatedItSystemUsage.ItSystemUsageId = incomingRelatedItSystemUsage.Id;
+                relatedItSystemUsage.ItSystemUsageName = incomingRelatedItSystemUsage.ItSystem?.Name;
             }
         }
 
-        private void PatchAppliedInterfaces(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchDependsOnInterfaces(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.AppliedInterfacesNamesAsCsv = string.Join(", ", 
+            destination.DependsOnInterfacesNamesAsCsv = string.Join(", ", 
                 source
                 .UsageRelations
                 .Where(x => x.RelationInterface != null)
                 .Select(x => x.RelationInterface)
                 .Select(x => x.Name));
 
-            static string CreateAppliedInterfaceKey(int Id, string Name) => $"I:{Id}N:{Name}";
+            static string CreateDependsOnInterfaceKey(int Id) => $"I:{Id}";
 
-            var incomingAppliedInterfaces = source
+            var incomingDependsOnInterfaces = source
                 .UsageRelations
                 .Where(x => x.RelationInterface != null)
                 .Select(x => x.RelationInterface)
-                .ToDictionary(x => CreateAppliedInterfaceKey(x.Id, x.Name));
+                .GroupBy(x => CreateDependsOnInterfaceKey(x.Id))
+                .ToDictionary(x => x.Key, x => x.First());
 
-            // Remove AppliedInterfaces which were removed
-            var appliedInterfacesToBeRemoved =
-                destination.AppliedInterfaces
-                    .Where(x => incomingAppliedInterfaces.ContainsKey(CreateAppliedInterfaceKey(x.InterfaceId, x.InterfaceName)) == false).ToList();
+            // Remove DependsOnInterfaces which were removed
+            var dependsOnInterfacesToBeRemoved =
+                destination.DependsOnInterfaces
+                    .Where(x => incomingDependsOnInterfaces.ContainsKey(CreateDependsOnInterfaceKey(x.InterfaceId)) == false).ToList();
 
-            RemoveAppliedInterfaces(destination, appliedInterfacesToBeRemoved);
+            RemoveDependsOnInterfaces(destination, dependsOnInterfacesToBeRemoved);
 
-            var existingAppliedInterfaces = destination.AppliedInterfaces.ToDictionary(x => CreateAppliedInterfaceKey(x.InterfaceId, x.InterfaceName));
-            foreach (var incomingAppliedInterface in source.UsageRelations.Where(x => x.RelationInterface != null).Select(x => x.RelationInterface).ToList())
+            var existingDependsOnInterfaces = destination
+                .DependsOnInterfaces
+                .GroupBy(x => CreateDependsOnInterfaceKey(x.InterfaceId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingDependsOnInterface in source.UsageRelations.Where(x => x.RelationInterface != null).Select(x => x.RelationInterface).ToList())
             {
-                if (!existingAppliedInterfaces.TryGetValue(CreateAppliedInterfaceKey(incomingAppliedInterface.Id, incomingAppliedInterface.Name), out var appliedInterface))
+                if (!existingDependsOnInterfaces.TryGetValue(CreateDependsOnInterfaceKey(incomingDependsOnInterface.Id), out var dependsOnInterface))
                 {
-                    //Append the AppliedInterface if it is not already present
-                    appliedInterface = new ItSystemUsageOverviewInterfaceReadModel
+                    //Append the DependsOnInterface if it is not already present
+                    dependsOnInterface = new ItSystemUsageOverviewInterfaceReadModel
                     {
-                        Parent = destination,
-                        InterfaceId = incomingAppliedInterface.Id,
-                        InterfaceName = incomingAppliedInterface.Name
+                        Parent = destination
                     };
-                    destination.AppliedInterfaces.Add(appliedInterface);
+                    destination.DependsOnInterfaces.Add(dependsOnInterface);
                 }
+                dependsOnInterface.InterfaceId = incomingDependsOnInterface.Id;
+                dependsOnInterface.InterfaceName = incomingDependsOnInterface.Name;
             }
         }
 
-        private void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var generalPurpose = source.GeneralPurpose?.TrimEnd();
             destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.LongProperyMaxLength));
         }
 
-            private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.DataProcessingRegistrationNamesAsCsv = string.Join(", ", source.AssociatedDataProcessingRegistrations.Select(x => x.Name));
             var isAgreementConcludedList = source.AssociatedDataProcessingRegistrations
@@ -191,36 +201,38 @@ namespace Core.DomainServices.SystemUsage
 
             destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
 
-            static string CreateDataProcessingRegistrationKey(int Id, string Name, YesNoIrrelevantOption? IsAgreementConcluded) => $"I:{Id}N:{Name}C:{IsAgreementConcluded}";
+            static string CreateDataProcessingRegistrationKey(int Id) => $"I:{Id}";
 
-            var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id, x.Name, x.IsAgreementConcluded));
+            var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id));
 
             // Remove DataProcessingRegistrations which were removed
             var dataProcessingRegistrationsToBeRemoved =
                 destination.DataProcessingRegistrations
-                    .Where(x => incomingDataProcessingRegistrations.ContainsKey(CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded)) == false).ToList();
+                    .Where(x => incomingDataProcessingRegistrations.ContainsKey(CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId)) == false).ToList();
 
             RemoveDataProcessingRegistrations(destination, dataProcessingRegistrationsToBeRemoved);
 
-            var existingDataProcessingRegistrations = destination.DataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId, x.DataProcessingRegistrationName, x.IsAgreementConcluded));
+            var existingDataProcessingRegistrations = destination.DataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.DataProcessingRegistrationId));
             foreach (var incomingDataProcessingRegistration in source.AssociatedDataProcessingRegistrations.ToList())
             {
-                if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id, incomingDataProcessingRegistration.Name, incomingDataProcessingRegistration.IsAgreementConcluded), out var dataProcessingRegistration))
+                if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id), out var dataProcessingRegistration))
                 {
                     //Append the DataProcessingRegistration if it is not already present
                     dataProcessingRegistration = new ItSystemUsageOverviewDataProcessingRegistrationReadModel
                     {
                         Parent = destination,
-                        DataProcessingRegistrationId = incomingDataProcessingRegistration.Id,
-                        DataProcessingRegistrationName = incomingDataProcessingRegistration.Name,
-                        IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded
+
                     };
                     destination.DataProcessingRegistrations.Add(dataProcessingRegistration);
                 }
+
+                dataProcessingRegistration.DataProcessingRegistrationId = incomingDataProcessingRegistration.Id;
+                dataProcessingRegistration.DataProcessingRegistrationName = incomingDataProcessingRegistration.Name;
+                dataProcessingRegistration.IsAgreementConcluded = incomingDataProcessingRegistration.IsAgreementConcluded;
             }
         }
 
-        private void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             if (source.riskAssessment == DataOptions.YES)
             {
@@ -262,12 +274,13 @@ namespace Core.DomainServices.SystemUsage
                     //Append the ArchivePeriod if it is not already present
                     archivePeriod = new ItSystemUsageOverviewArchivePeriodReadModel
                     {
-                        Parent = destination,
-                        StartDate = incomingArchivePeriod.StartDate,
-                        EndDate = incomingArchivePeriod.EndDate
+                        Parent = destination
                     };
                     destination.ArchivePeriods.Add(archivePeriod);
                 }
+
+                archivePeriod.StartDate = incomingArchivePeriod.StartDate;
+                archivePeriod.EndDate = incomingArchivePeriod.EndDate;
             }
         }
 
@@ -275,31 +288,32 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.ItProjectNamesAsCsv = string.Join(", ", source.ItProjects.Select(x => x.Name));
 
-            static string CreateItProjectKey(int Id, string Name) => $"I:{Id}N:{Name}";
+            static string CreateItProjectKey(int id) => $"I:{id}";
 
-            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id, x.Name));
+            var incomingItProjects = source.ItProjects.ToDictionary(x => CreateItProjectKey(x.Id));
 
             // Remove It Projects which were removed
             var itProjectsToBeRemoved =
                 destination.ItProjects
-                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId, x.ItProjectName)) == false).ToList();
+                    .Where(x => incomingItProjects.ContainsKey(CreateItProjectKey(x.ItProjectId)) == false).ToList();
 
             RemoveItProjects(destination, itProjectsToBeRemoved);
 
-            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId, x.ItProjectName));
+            var existingItProjects = destination.ItProjects.ToDictionary(x => CreateItProjectKey(x.ItProjectId));
             foreach (var incomingItProject in source.ItProjects.ToList())
             {
-                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id, incomingItProject.Name), out var itProject))
+                if (!existingItProjects.TryGetValue(CreateItProjectKey(incomingItProject.Id), out var itProject))
                 {
                     //Append the sensitive data levels if it is not already present
                     itProject = new ItSystemUsageOverviewItProjectReadModel
                     {
-                        Parent = destination,
-                        ItProjectId = incomingItProject.Id,
-                        ItProjectName = incomingItProject.Name
+                        Parent = destination
                     };
                     destination.ItProjects.Add(itProject);
                 }
+
+                itProject.ItProjectId = incomingItProject.Id;
+                itProject.ItProjectName = incomingItProject.Name;
             }
         }
 
@@ -363,35 +377,36 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemKLEIdsAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey));
             destination.ItSystemKLENamesAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description));
 
-            static string CreateTaskRefKey(string KLEId, string KLEName) => $"I:{KLEId}N:{KLEName}";
+            static string CreateTaskRefKey(string KLEId) => $"I:{KLEId}";
 
-            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey, x.Description));
+            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey));
 
             // Remove taskref which were removed
             var taskRefsToBeRemoved =
                 destination.ItSystemTaskRefs
-                    .Where(x => incomingTaskRefs.ContainsKey(CreateTaskRefKey(x.KLEId, x.KLEName)) == false).ToList();
+                    .Where(x => incomingTaskRefs.ContainsKey(CreateTaskRefKey(x.KLEId)) == false).ToList();
 
             RemoveTaskRefs(destination, taskRefsToBeRemoved);
 
-            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId, x.KLEName));
+            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId));
             foreach (var incomingTaskRef in source.ItSystem.TaskRefs.ToList())
             {
-                if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey, incomingTaskRef.Description), out var taskRef))
+                if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey), out var taskRef))
                 {
                     //Append the taskref if it is not already present
                     taskRef = new ItSystemUsageOverviewTaskRefReadModel
                     {
-                        Parent = destination,
-                        KLEId = incomingTaskRef.TaskKey,
-                        KLEName = incomingTaskRef.Description
+                        Parent = destination
                     };
                     destination.ItSystemTaskRefs.Add(taskRef);
                 }
+
+                taskRef.KLEId = incomingTaskRef.TaskKey;
+                taskRef.KLEName = incomingTaskRef.Description;
             }
         }
 
-        private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
             destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
@@ -499,12 +514,12 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private void RemoveAppliedInterfaces(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewInterfaceReadModel> appliedInterfacesToBeRemoved)
+        private void RemoveDependsOnInterfaces(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfacesToBeRemoved)
         {
-            appliedInterfacesToBeRemoved.ForEach(appliedInterfaceToBeRemoved =>
+            dependsOnInterfacesToBeRemoved.ForEach(dependsOnInterfaceToBeRemoved =>
             {
-                destination.AppliedInterfaces.Remove(appliedInterfaceToBeRemoved);
-                _appliedInterfaceReadModelRepository.Delete(appliedInterfaceToBeRemoved);
+                destination.DependsOnInterfaces.Remove(dependsOnInterfaceToBeRemoved);
+                _dependsOnInterfaceReadModelRepository.Delete(dependsOnInterfaceToBeRemoved);
             });
         }
 
@@ -517,7 +532,7 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private string GetNameOfItSystemOption<TOption>(
+        private static string GetNameOfItSystemOption<TOption>(
             ItSystem parent,
             TOption optionEntity,
             IOptionsService<ItSystem, TOption> service)

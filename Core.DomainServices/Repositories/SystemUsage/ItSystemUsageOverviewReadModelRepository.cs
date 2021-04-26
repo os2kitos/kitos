@@ -116,7 +116,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             return _repository
                 .AsQueryable()
-                .Where(x => x.AppliedInterfaces.Select(y => y.InterfaceId).Contains(interfaceId));
+                .Where(x => x.DependsOnInterfaces.Select(y => y.InterfaceId).Contains(interfaceId));
         }
     }
 }

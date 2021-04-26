@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_Relation_Data_To_ItSystemUsageOverviewReadModel : IMigrationMetadata
+    public sealed partial class Add_Indexes_To_PendingReadModelUpdate : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Relation_Data_To_ItSystemUsageOverviewReadModel));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Indexes_To_PendingReadModelUpdate));
         
         string IMigrationMetadata.Id
         {
-            get { return "202104231135267_Add_Relation_Data_To_ItSystemUsageOverviewReadModel"; }
+            get { return "202104260317275_Add_Indexes_To_PendingReadModelUpdate"; }
         }
         
         string IMigrationMetadata.Source

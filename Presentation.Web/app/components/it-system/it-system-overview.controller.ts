@@ -65,7 +65,7 @@
                 .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
-                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations,AppliedInterfaces,IncomingRelatedItSystemUsages";
+                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages";
                     const baseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
                     const selectedOrgId: number | null = options.currentOrgUnit;
@@ -99,7 +99,7 @@
                             .replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)")
                             .replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)")
                             .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)")
-                            .replace(/(\w+\()AppliedInterfacesNamesAsCsv(.*\))/, "AppliedInterfaces/any(c: $1c/InterfaceName$2)")
+                            .replace(/(\w+\()DependsOnInterfacesNamesAsCsv(.*\))/, "DependsOnInterfaces/any(c: $1c/InterfaceName$2)")
                             .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/, "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it

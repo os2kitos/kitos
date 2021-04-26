@@ -151,6 +151,14 @@ namespace Core.ApplicationServices.Interface
                 if (changed)
                 {
                     _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
+                    if (oldSystem.HasValue)
+                    {
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem.Value));
+                    }
+                    if (newSystem.HasValue)
+                    {
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem.Value));
+                    }
 
                     _repository.Save();
                     transaction.Commit();
