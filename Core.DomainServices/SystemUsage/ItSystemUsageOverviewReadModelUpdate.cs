@@ -274,21 +274,21 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemKLEIdsAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey));
             destination.ItSystemKLENamesAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description));
 
-            static string CreateTaskRefKey(string KLEId, string KLEName) => $"I:{KLEId}N:{KLEName}";
+            static string CreateTaskRefKey(string KLEId) => $"I:{KLEId}";
 
-            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey, x.Description));
+            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey));
 
             // Remove taskref which were removed
             var taskRefsToBeRemoved =
                 destination.ItSystemTaskRefs
-                    .Where(x => incomingTaskRefs.ContainsKey(CreateTaskRefKey(x.KLEId, x.KLEName)) == false).ToList();
+                    .Where(x => incomingTaskRefs.ContainsKey(CreateTaskRefKey(x.KLEId)) == false).ToList();
 
             RemoveTaskRefs(destination, taskRefsToBeRemoved);
 
-            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId, x.KLEName));
+            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId));
             foreach (var incomingTaskRef in source.ItSystem.TaskRefs.ToList())
             {
-                if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey, incomingTaskRef.Description), out var taskRef))
+                if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey), out var taskRef))
                 {
                     //Append the taskref if it is not already present
                     taskRef = new ItSystemUsageOverviewTaskRefReadModel
@@ -303,7 +303,7 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
-        private void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchResponsibleOrganizationUnit(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ResponsibleOrganizationUnitId = source.ResponsibleUsage?.OrganizationUnit?.Id;
             destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
@@ -411,7 +411,7 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private string GetNameOfItSystemOption<TOption>(
+        private static string GetNameOfItSystemOption<TOption>(
             ItSystem parent,
             TOption optionEntity,
             IOptionsService<ItSystem, TOption> service)
