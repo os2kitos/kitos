@@ -39,7 +39,12 @@ namespace Core.BackgroundJobs.Model.ReadModels
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var updatesExecuted = 0;
-            var alreadyScheduledIds = new HashSet<int>();
+            var idsOfItSystemUsagesAlreadyInQueueForReadModelUpdate = _updateRepository
+                .GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, int.MaxValue)
+                .Select(x => x.SourceId)
+                .ToList();
+
+            var alreadyScheduledIds = new HashSet<int>(idsOfItSystemUsagesAlreadyInQueueForReadModelUpdate);
 
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
@@ -214,17 +219,18 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private int PerformUpdate(
             int updatesExecuted,
             HashSet<int> alreadyScheduledIds,
-            IEnumerable<int> itSystemUsageIds,
-            PendingReadModelUpdate update,
+            IEnumerable<int> idsOfAffectedUsages,
+            PendingReadModelUpdate sourceUpdate,
             IDatabaseTransaction transaction)
         {
-            var updates = itSystemUsageIds
+            var updates = idsOfAffectedUsages
                 .Where(id => alreadyScheduledIds.Contains(id) == false)
                 .ToList()
                 .Select(id => PendingReadModelUpdate.Create(id, PendingReadModelUpdateSourceCategory.ItSystemUsage))
                 .ToList();
 
-            updatesExecuted = CompleteUpdate(updatesExecuted, updates, update, transaction);
+            updatesExecuted = CompleteUpdate(updatesExecuted, updates, sourceUpdate, transaction);
+            updates.ForEach(completedUpdate => alreadyScheduledIds.Add(completedUpdate.SourceId));
             return updatesExecuted;
         }
 
