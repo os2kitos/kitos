@@ -5,6 +5,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.LocalOptions;
@@ -38,7 +39,9 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityUpdatedEvent<ItProject>>,
     IDomainEventHandler<EntityDeletedEvent<ItProject>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
-    IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>
+    IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
+    IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
+    IDomainEventHandler<EntityDeletedEvent<ItInterface>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -156,6 +159,16 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityDeletedEvent<DataProcessingRegistration> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_DataProcessingRegistration));
+        }
+
+        public void Handle(EntityUpdatedEvent<ItInterface> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
+        }
+
+        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
         }
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);

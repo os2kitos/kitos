@@ -93,7 +93,9 @@
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewArchivePeriodReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewDataProcessingRegistrationReadModel.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewInterfaceReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItProjectReadModel.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItSystemUsageReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRoleAssignmentReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewSensitiveDataLevelReadModel.cs" />

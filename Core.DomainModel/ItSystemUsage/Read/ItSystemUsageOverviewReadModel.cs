@@ -17,6 +17,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
             ItProjects = new List<ItSystemUsageOverviewItProjectReadModel>();
             ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
             DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
+            DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
+            IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewItSystemUsageReadModel>();
         }
 
 
@@ -108,5 +110,11 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public string GeneralPurpose { get; set; }
         public HostedAt HostedAt { get; set; }
+
+        public string DependsOnInterfacesNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; }
+
+        public string IncomingRelatedItSystemUsagesNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewItSystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
     }
 }
