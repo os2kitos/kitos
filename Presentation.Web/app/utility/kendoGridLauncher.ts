@@ -423,6 +423,7 @@ module Kitos.Utility.KendoGrid {
         link?: string;
         dropDownConfiguration?: IKendoToolbarDropDownConfiguration;
         enabled: () => boolean;
+        show: () => boolean;
         implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
@@ -719,11 +720,12 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             onClick: entry.onClick,
-                            enabled: entry.enabled()
+                            enabled: entry.enabled(),
+                            show: entry.show(),
                         };
                         break;
                     case KendoToolbarImplementation.Link:

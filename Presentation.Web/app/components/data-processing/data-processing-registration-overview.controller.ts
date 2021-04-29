@@ -157,6 +157,7 @@
                         position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                         implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
                         enabled: () => userAccessRights.canCreate,
+                        show: () => true,
                         onClick: () => $state.go("data-processing.overview.create-registration")
                     } as Utility.KendoGrid.IKendoToolbarEntry)
                     .withColumn(builder =>

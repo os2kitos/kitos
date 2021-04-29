@@ -65,8 +65,11 @@
                 .withExcelOutputName("IT Systemer Overblik")
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
-                    const commonQuery = "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages";
-                    const baseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
+                    const commonQuery =
+                        "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages";
+                    const baseUrl =
+                        `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${
+                            commonQuery}`;
                     var additionalQuery = "";
                     const selectedOrgId: number | null = options.currentOrgUnit;
                     if (selectedOrgId !== null) {
@@ -88,8 +91,12 @@
                     }
 
                     //In terms of ordering user will expect ordering by name on these columns, so we switch it around
-                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ResponsibleOrganizationUnitId", "ResponsibleOrganizationUnitName");
-                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby, "ItSystemBusinessTypeId", "ItSystemBusinessTypeName");
+                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby,
+                        "ResponsibleOrganizationUnitId",
+                        "ResponsibleOrganizationUnitName");
+                    parameterMap.$orderby = replaceOrderByProperty(parameterMap.$orderby,
+                        "ItSystemBusinessTypeId",
+                        "ItSystemBusinessTypeName");
 
                     if (parameterMap.$filter) {
                         //Redirect consolidated field search towards optimized search targets
@@ -97,22 +104,34 @@
                             .replace(/(\w+\()ItSystemKLEIdsAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEId$2)")
                             .replace(/(\w+\()ItSystemKLENamesAsCsv(.*\))/, "ItSystemTaskRefs/any(c: $1c/KLEName$2)")
                             .replace(/(\w+\()ItProjectNamesAsCsv(.*\))/, "ItProjects/any(c: $1c/ItProjectName$2)")
-                            .replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"), "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)")
-                            .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/, "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)")
-                            .replace(/(\w+\()DependsOnInterfacesNamesAsCsv(.*\))/, "DependsOnInterfaces/any(c: $1c/InterfaceName$2)")
-                            .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/, "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
+                            .replace(new RegExp(`SensitiveDataLevelsAsCsv eq ('\\w+')`, "i"),
+                                "SensitiveDataLevels/any(c: c/SensitivityDataLevel eq $1)")
+                            .replace(/(\w+\()DataProcessingRegistrationNamesAsCsv(.*\))/,
+                                "DataProcessingRegistrations/any(c: $1c/DataProcessingRegistrationName$2)")
+                            .replace(/(\w+\()DependsOnInterfacesNamesAsCsv(.*\))/,
+                                "DependsOnInterfaces/any(c: $1c/InterfaceName$2)")
+                            .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/,
+                                "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
                         parameterMap.$filter = parameterMap.$filter
-                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
-                            .replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
+                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"),
+                                "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
+                            .replace(
+                                new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models
+                                    .Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`,
+                                    "i"),
+                                `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared
+                                .YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
 
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
                         if (captureOrgUnit.test(parameterMap.$filter) === true) {
                             activeOrgUnit = parseInt(captureOrgUnit.exec(parameterMap.$filter)[1]);
                         }
-                        parameterMap.$filter = parameterMap.$filter.replace(captureOrgUnit, ""); //Org unit id is handled by the url factory since it is not a regular odata query
+                        parameterMap.$filter =
+                            parameterMap.$filter.replace(captureOrgUnit,
+                                ""); //Org unit id is handled by the url factory since it is not a regular odata query
 
                         //Cleanup broken queries due to stripping
                         parameterMap.$filter = parameterMap.$filter
@@ -148,7 +167,8 @@
                                 if (!roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId])
                                     roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] = assignment.UserFullName;
                                 else {
-                                    roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] += `, ${assignment.UserFullName}`;
+                                    roleIdToUserNamesMap[systemUsage.Id][assignment.RoleId] += `, ${assignment
+                                        .UserFullName}`;
                                 }
                                 //Patch emails
                                 if (!roleIdToEmailMap[systemUsage.Id][assignment.RoleId])
@@ -160,7 +180,16 @@
                         }
                     });
                     return response;
-                })
+                }).withToolbarEntry({
+                    id: "filterOrg",
+                    title: "Gem filter for organisation",
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                    enabled: () => false,
+                    onClick: () => {},
+                    show: () => user.isLocalAdmin,
+                } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
@@ -196,6 +225,7 @@
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
                     enabled: () => true,
+                    show: () => true,
                     link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withColumn(builder =>
@@ -205,7 +235,7 @@
                         .withTitle("Gyldig/Ikke gyldig")
                         .withId("isActive")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange([
+                        .withFixedValueRange([ 
                             {
                                 textValue: "Gyldig",
                                 remoteValue: true
