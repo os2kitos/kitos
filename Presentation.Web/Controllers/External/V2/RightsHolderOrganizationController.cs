@@ -17,12 +17,12 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns>A list of organizations formatted as uuid and name pairs</returns>
         [HttpGet]
         [Route("organizations")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetAccessibleOrganizations()
         {
-            return Ok(new List<IdentityNamePairResponseDTO>());
+            return Ok(new List<OrganizationResponseDTO>());
         }
     }
 }

@@ -420,6 +420,7 @@
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\External\V2\IdentityNamePairResponseDTO.cs" />
     <Compile Include="Models\External\V2\ItSystemRequestDTO.cs" />
+    <Compile Include="Models\External\V2\OrganizationResponseDTO.cs" />
     <Compile Include="Models\External\V2\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
