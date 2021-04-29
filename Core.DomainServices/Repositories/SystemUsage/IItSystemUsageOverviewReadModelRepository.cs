@@ -20,5 +20,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsageOverviewReadModel> GetByContractId(int contractId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByProjectId(int projectId);
         IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId);
+        IQueryable<ItSystemUsageOverviewReadModel> GetByItInterfaceId(int interfaceId);
     }
 }

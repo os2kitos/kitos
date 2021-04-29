@@ -135,6 +135,9 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.DataProcessingRegistrationsConcludedAsCsv).IsOptional();
             Property(x => x.DataProcessingRegistrationNamesAsCsv).IsOptional();
 
+            Property(x => x.DependsOnInterfacesNamesAsCsv).IsOptional();
+            Property(x => x.IncomingRelatedItSystemUsagesNamesAsCsv).IsOptional();
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)

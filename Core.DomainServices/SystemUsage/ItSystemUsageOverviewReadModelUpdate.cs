@@ -24,6 +24,8 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewItProjectReadModel> _itProjectReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> _itSystemUsageReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
@@ -32,6 +34,8 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewItProjectReadModel> itProjectReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> itSystemUsageReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
@@ -40,6 +44,8 @@ namespace Core.DomainServices.SystemUsage
             _itProjectReadModelRepository = itProjectReadModelRepository;
             _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
             _dataProcessingRegistrationReadModelRepository = dataProcessingRegistrationReadModelRepository;
+            _dependsOnInterfaceReadModelRepository = dependsOnInterfaceReadModelRepository;
+            _itSystemUsageReadModelRepository = itSystemUsageReadModelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -80,6 +86,103 @@ namespace Core.DomainServices.SystemUsage
             PatchRiskSupervisionDocumentation(source, destination);
             PatchDataProcessingRegistrations(source, destination);
             PatchGeneralPurposeRegistrations(source, destination);
+            PatchDependsOnInterfaces(source, destination);
+            PatchRelatedItSystemUsages(source, destination);
+        }
+
+        private void PatchRelatedItSystemUsages(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.IncomingRelatedItSystemUsagesNamesAsCsv = string.Join(", ", 
+                source
+                .UsedByRelations
+                .Where(x => x.FromSystemUsage != null)
+                .Select(x => x.FromSystemUsage)
+                .Where(x => x.ItSystem != null)
+                .Select(x => x.ItSystem)
+                .Select(x => x.Name));
+
+            static string CreateRelatedItSystemUsageKey(int Id) => $"I:{Id}";
+
+            var incomingRelatedItSystemUsages = source
+                .UsedByRelations
+                .Where(x => x.FromSystemUsage != null)
+                .Select(x => x.FromSystemUsage)
+                .Where(x => x.ItSystem != null)
+                .GroupBy(x => CreateRelatedItSystemUsageKey(x.Id))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            // Remove RelatedItSystemUsages which were removed
+            var relatedItSystemUsagesToBeRemoved =
+                destination.IncomingRelatedItSystemUsages
+                    .Where(x => incomingRelatedItSystemUsages.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId)) == false).ToList();
+
+            RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved);
+
+            var existingRelatedItSystemUsages = destination
+                .IncomingRelatedItSystemUsages
+                .GroupBy(x => CreateRelatedItSystemUsageKey(x.ItSystemUsageId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingRelatedItSystemUsage in source.UsedByRelations.Where(x => x.FromSystemUsage != null).Select(x => x.FromSystemUsage).Where(x => x.ItSystem != null).ToList())
+            {
+                if (!existingRelatedItSystemUsages.TryGetValue(CreateRelatedItSystemUsageKey(incomingRelatedItSystemUsage.Id), out var relatedItSystemUsage))
+                {
+                    //Append the RelatedItSystemUsage if it is not already present
+                    relatedItSystemUsage = new ItSystemUsageOverviewItSystemUsageReadModel
+                    {
+                        Parent = destination
+                    };
+                    destination.IncomingRelatedItSystemUsages.Add(relatedItSystemUsage);
+                }
+                relatedItSystemUsage.ItSystemUsageId = incomingRelatedItSystemUsage.Id;
+                relatedItSystemUsage.ItSystemUsageName = incomingRelatedItSystemUsage.ItSystem?.Name;
+            }
+        }
+
+        private void PatchDependsOnInterfaces(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.DependsOnInterfacesNamesAsCsv = string.Join(", ", 
+                source
+                .UsageRelations
+                .Where(x => x.RelationInterface != null)
+                .Select(x => x.RelationInterface)
+                .Select(x => x.Name));
+
+            static string CreateDependsOnInterfaceKey(int Id) => $"I:{Id}";
+
+            var incomingDependsOnInterfaces = source
+                .UsageRelations
+                .Where(x => x.RelationInterface != null)
+                .Select(x => x.RelationInterface)
+                .GroupBy(x => CreateDependsOnInterfaceKey(x.Id))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            // Remove DependsOnInterfaces which were removed
+            var dependsOnInterfacesToBeRemoved =
+                destination.DependsOnInterfaces
+                    .Where(x => incomingDependsOnInterfaces.ContainsKey(CreateDependsOnInterfaceKey(x.InterfaceId)) == false).ToList();
+
+            RemoveDependsOnInterfaces(destination, dependsOnInterfacesToBeRemoved);
+
+            var existingDependsOnInterfaces = destination
+                .DependsOnInterfaces
+                .GroupBy(x => CreateDependsOnInterfaceKey(x.InterfaceId))
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var incomingDependsOnInterface in source.UsageRelations.Where(x => x.RelationInterface != null).Select(x => x.RelationInterface).ToList())
+            {
+                if (!existingDependsOnInterfaces.TryGetValue(CreateDependsOnInterfaceKey(incomingDependsOnInterface.Id), out var dependsOnInterface))
+                {
+                    //Append the DependsOnInterface if it is not already present
+                    dependsOnInterface = new ItSystemUsageOverviewInterfaceReadModel
+                    {
+                        Parent = destination
+                    };
+                    destination.DependsOnInterfaces.Add(dependsOnInterface);
+                }
+                dependsOnInterface.InterfaceId = incomingDependsOnInterface.Id;
+                dependsOnInterface.InterfaceName = incomingDependsOnInterface.Name;
+            }
         }
 
         private static void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -114,7 +217,7 @@ namespace Core.DomainServices.SystemUsage
             {
                 if (!existingDataProcessingRegistrations.TryGetValue(CreateDataProcessingRegistrationKey(incomingDataProcessingRegistration.Id), out var dataProcessingRegistration))
                 {
-                    //Append the sensitive data levels if it is not already present
+                    //Append the DataProcessingRegistration if it is not already present
                     dataProcessingRegistration = new ItSystemUsageOverviewDataProcessingRegistrationReadModel
                     {
                         Parent = destination,
@@ -408,6 +511,24 @@ namespace Core.DomainServices.SystemUsage
             {
                 destination.DataProcessingRegistrations.Remove(dataProcessingRegistrationToBeRemoved);
                 _dataProcessingRegistrationReadModelRepository.Delete(dataProcessingRegistrationToBeRemoved);
+            });
+        }
+
+        private void RemoveDependsOnInterfaces(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfacesToBeRemoved)
+        {
+            dependsOnInterfacesToBeRemoved.ForEach(dependsOnInterfaceToBeRemoved =>
+            {
+                destination.DependsOnInterfaces.Remove(dependsOnInterfaceToBeRemoved);
+                _dependsOnInterfaceReadModelRepository.Delete(dependsOnInterfaceToBeRemoved);
+            });
+        }
+
+        private void RemoveRelatedItSystemUsages(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewItSystemUsageReadModel> relatedItSystemUsagesToBeRemoved)
+        {
+            relatedItSystemUsagesToBeRemoved.ForEach(relatedItSystemUsageToBeRemoved =>
+            {
+                destination.IncomingRelatedItSystemUsages.Remove(relatedItSystemUsageToBeRemoved);
+                _itSystemUsageReadModelRepository.Delete(relatedItSystemUsageToBeRemoved);
             });
         }
 

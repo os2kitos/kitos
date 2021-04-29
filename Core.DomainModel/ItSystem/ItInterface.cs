@@ -9,6 +9,7 @@ namespace Core.DomainModel.ItSystem
 {
     public class ItInterface : ItSystemBase
     {
+        public static int MaxNameLength = 100;
         public ItInterface()
         {
             DataRows = new List<DataRow>();
