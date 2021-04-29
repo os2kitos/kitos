@@ -4,6 +4,7 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
+        gridStateService: Services.IGridStateFactory;
     }
 
     export interface IItSystemUsageOverview extends Models.ItSystemUsage.IItSystemUsageOverviewReadModel {
@@ -14,6 +15,8 @@
         private storageKey = "it-system-overview-options";
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
+        gridStateService: Services.IGridStateFactory;
+        
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -21,7 +24,8 @@
             "kendoGridLauncherFactory",
             "needsWidthFixService",
             "overviewOptions",
-            "_"
+            "_",
+            "gridStateService"
         ];
 
         constructor(
@@ -31,17 +35,17 @@
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
-            _) {
+            _,
+            gridStateService: Services.IGridStateFactory) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             //Lookup maps
             var roleIdToUserNamesMap = {};
             var roleIdToEmailMap = {};
-
             //Helper functions
             const agreementConcludedIsDefined = (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) => registration.IsAgreementConcluded !== null && registration.IsAgreementConcluded !== Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED]
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
-
+            var gridState = gridStateService.getService(this.storageKey, user.id);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -186,9 +190,9 @@
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => false,
-                    onClick: () => {},
-                    show: () => user.isLocalAdmin,
+                    enabled: () => true,
+                    onClick: () => { gridState.saveGridProfileForOrg(this.mainGrid);  },
+                    show: () => { if (user.isLocalAdmin) { return true }},
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withToolbarEntry({
                     id: "roleSelector",

@@ -15,6 +15,7 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
+        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -53,6 +54,7 @@
                 loadGridOptions: loadGridOptions,
                 saveGridProfile: saveGridProfile,
                 loadGridProfile: loadGridProfile,
+                saveGridProfileForOrg: saveGridProfileForOrg,
                 doesGridProfileExist: doesGridProfileExist,
                 removeProfile: removeProfile,
                 removeLocal: removeLocal,
@@ -215,6 +217,16 @@
 
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
+
+            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>): void {
+                var options = grid.getOptions();
+                var pickedOptions: IGridSavedState = {};
+                pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);
+                var jsonString = JSONfn.stringify(pickedOptions);
+                console.log(jsonString);
+            }
+
+
 
             function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {
                 removeSession();
