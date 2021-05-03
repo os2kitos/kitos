@@ -146,6 +146,14 @@
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
             function getStoredOptions(): IGridSavedState {
+
+                // load options from org storage
+                var orgOptions;
+                var orgStorageItem = $window.localStorage.getItem("testOrg");
+                if (orgStorageItem) {
+                    orgOptions = JSONfn.parse(orgStorageItem, true);
+                }
+
                 // load options from local storage
                 var localOptions;
                 var localStorageItem = $window.localStorage.getItem(storageKey);
@@ -169,11 +177,16 @@
 
                 var options: IGridSavedState;
 
+
                 if (sessionOptions) {
                     // if session options are set then use them
                     // note the order the options are merged in (below) is important!
                     options = <IGridSavedState> _.merge({}, localOptions, sessionOptions);
-                } else {
+                }
+                else if (orgOptions) {
+                    options = <IGridSavedState>_.merge({}, localOptions, orgOptions);
+                }
+                else {
                     // else use the profile options
                     // this should only happen the first time the page loads
                     // or when the session optinos are deleted
@@ -222,11 +235,19 @@
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);
+
+                // save column state - dont use the kendo function for it as it breaks more than it fixes...
+                pickedOptions.columnState = {};
+                for (var i = 0; i < options.columns.length; i++) {
+                    var column = options.columns[i];
+                    pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
+                }
+
+
                 var jsonString = JSONfn.stringify(pickedOptions);
                 console.log(jsonString);
+                $window.localStorage.setItem("testOrg", jsonString);
             }
-
-
 
             function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {
                 removeSession();

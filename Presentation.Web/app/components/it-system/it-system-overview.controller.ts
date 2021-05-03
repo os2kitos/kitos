@@ -43,7 +43,11 @@
             var roleIdToUserNamesMap = {};
             var roleIdToEmailMap = {};
             //Helper functions
-            const agreementConcludedIsDefined = (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) => registration.IsAgreementConcluded !== null && registration.IsAgreementConcluded !== Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED]
+            const agreementConcludedIsDefined =
+                (registration: Models.ItSystemUsage.IItSystemUsageOverviewDataProcessingRegistrationReadModel) =>
+                    registration.IsAgreementConcluded !== null &&
+                    registration.IsAgreementConcluded !==
+                    Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
             var gridState = gridStateService.getService(this.storageKey, user.id);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
@@ -191,7 +195,13 @@
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
                     enabled: () => true,
-                    onClick: () => { gridState.saveGridProfileForOrg(this.mainGrid);  },
+                    onClick: () => {
+                        if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
+                            gridState.saveGridProfileForOrg(this.mainGrid);
+                            
+                        }
+                        
+                    },
                     show: () => { if (user.isLocalAdmin) { return true }},
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withToolbarEntry({
