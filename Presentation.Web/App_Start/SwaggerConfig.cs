@@ -22,11 +22,11 @@ namespace Presentation.Web
                 {
                     c.SingleApiVersion("1.0.0", "OS2Kitos API")
                         .Description(
-                            "<br>Denne dokumentation udstiller de forskellige kald der kan laves til api'et i kitos til brug for applikationsudvikling.<br><br>" +
+                            "<br>Denne dokumentation udstiller Kitos API'et til brug for applikationsudvikling.<br><br>" +
                             "Den første udgave af API'et (V1) blev udviklet til understøttelse af projektets brugerflade og vil med tiden blive erstattet " +
                             "af et selvstændigt API (V2) udviklet til brug for integration med udefrakommende systemer. Arbejdet med V2 er påbegyndt og " +
                             "resultatet heraf opdateres løbende på denne side. I første omgang vil V2 omfatte supplerende data fra it-system- og " +
-                            "snitfladekataloget. V2 vil kommer til at omfatte tilsvarende funktionalitet som V1. Du vil i en periode kunne anvende både V1 og V2. " +
+                            "snitfladekataloget. V2 kommer til at omfatte tilsvarende funktionalitet som V1. Du vil i en periode kunne anvende både V1 og V2. " +
                             "Bemærk dog, at overflødiggjorte V1 endpoints vil blive udfaset efter en rum tid. KITOS sekretariatet vil i god tid " +
                             "forinden varsle udfasning af overflødige endpoints.<br><br>" +
                             "Særligt for V1 gælder der følgende:<br>" +
