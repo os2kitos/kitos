@@ -14,7 +14,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-interface-catalog-options";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationName);
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 

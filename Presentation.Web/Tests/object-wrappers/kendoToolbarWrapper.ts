@@ -14,7 +14,8 @@ type HeaderButtons = {
     editReference: protractor.ElementFinder,
     deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
-    createReference: protractor.ElementFinder
+    createReference: protractor.ElementFinder,
+    saveFilterToOrg: protractor.ElementFinder
 };
 
 type InputFields =
@@ -74,7 +75,8 @@ class kendoToolbarWrapper {
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
-            deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton))
+            deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton)),
+            saveFilterToOrg: element(byDataElementType(consts.filterOrgButton))
 
         };
         return buttons;

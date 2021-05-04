@@ -9,7 +9,7 @@
     export class OrganizationController implements IOverviewController {
 
         private storageKey = "local-org-overview-options";
-        private gridState = this.gridStateService.getService(this.storageKey,this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationName);
         public mainGrid: Kitos.IKendoGrid<Models.IOrganization>;
         public mainGridOptions: kendo.ui.GridOptions;
 

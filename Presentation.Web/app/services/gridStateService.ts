@@ -7,7 +7,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string, userId: number) => IGridStateService;
+        getService: (storageKey: string, userId: number, userOrg: string) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -43,13 +43,13 @@
 
         return factory;
 
-        function getService(storageKey: string, userId: number): IGridStateService {
+        function getService(storageKey: string, userId: number, userOrg: string): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
             storageKey = userId+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-           // var orgStorageKey = user.currentOrganizationName;
+            var orgStorageKey = userOrg;
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -244,9 +244,7 @@
                     pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
                 }
 
-
                 var jsonString = JSONfn.stringify(pickedOptions);
-                console.log(jsonString);
                 $window.localStorage.setItem(orgStorageKey, jsonString);
             }
 

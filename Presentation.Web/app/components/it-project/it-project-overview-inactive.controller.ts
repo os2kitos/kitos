@@ -21,7 +21,7 @@
     export class OverviewInactiveController implements IOverviewInactiveController {
         private storageKey = "it-project-overview-inactive-options";
         private orgUnitStorageKey = "it-project-overview-inactive-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationName);
         public mainGrid: IKendoGrid<IItProjectInactiveOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 

@@ -59,7 +59,7 @@
     readonly refTitle = "STRONGMINDS";
     readonly migrationOrgNameToMove = "MigrationMoveOrgName";
 
-    //interfaceInoputConstants
+    //interface Input Constants
     readonly interfaceNameInput = "InterfaceNameInput";
     readonly interfaceIdInput = "InterfaceIdInput";
     readonly interfaceVersionInput = "InterfaceVersionInput";
@@ -195,6 +195,8 @@
     readonly gdprDPIAdeleteDateId = "DPIAdeleteDate";
     readonly gdprLatestRiskAssesmentDateDateId = "latestRiskAssesmentDate";
     readonly gdprDataProcessingRegistrationView = "gdprDataProcessingRegistrationView";
+
+    readonly filterOrgButton = "filterOrgButton";
 
     //Local admin
 
