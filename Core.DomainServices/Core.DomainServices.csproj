@@ -82,6 +82,8 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
+    <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />

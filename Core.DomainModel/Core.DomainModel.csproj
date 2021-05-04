@@ -106,6 +106,7 @@
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
+    <Compile Include="KendoOrganizationalConfiguration.cs" />
     <Compile Include="KLE\KLEChange.cs" />
     <Compile Include="KLE\KLEChangeType.cs" />
     <Compile Include="KLE\KLEMostRecent.cs" />

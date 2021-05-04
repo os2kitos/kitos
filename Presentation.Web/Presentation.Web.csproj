@@ -343,6 +343,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
