@@ -589,11 +589,6 @@ module Kitos.Utility.KendoGrid {
             this.notify.addSuccessMessage("Filtre og sortering gemt");
         }
 
-        saveGridProfileToOrg() {
-            this.gridState.saveGridProfileForOrg(this.gridBinding.mainGrid);
-            this.notify.addSuccessMessage("Filtre og sortering gemt til organisation");
-        }
-
         loadGridProfile() {
             this.gridState.loadGridProfile(this.gridBinding.mainGrid);
             this.gridBinding.mainGrid.dataSource.read();
@@ -688,8 +683,7 @@ module Kitos.Utility.KendoGrid {
                     saveGridProfile: () => this.saveGridProfile(),
                     loadGridProfile: () => this.loadGridProfile(),
                     clearGridProfile: () => this.clearGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist(),
-                    saveGridProfileToOrg: () => this.saveGridProfileToOrg()
+                    doesGridProfileExist: () => this.doesGridProfileExist()
                 }
             };
 

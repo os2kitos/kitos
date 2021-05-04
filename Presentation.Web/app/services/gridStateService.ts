@@ -27,7 +27,7 @@
         "$timeout",
         "$",
         "JSONfn",
-        "_"
+        "_",
     ];
 
     function gridStateService(
@@ -35,7 +35,7 @@
         $timeout: ng.ITimeoutService,
         $: JQueryStatic,
         JSONfn: JSONfn.JSONfnStatic,
-        _: _.LoDashStatic
+        _: _.LoDashStatic,
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
             getService: getService
@@ -49,6 +49,7 @@
 
             storageKey = userId+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
+           // var orgStorageKey = user.currentOrganizationName;
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -149,7 +150,7 @@
 
                 // load options from org storage
                 var orgOptions;
-                var orgStorageItem = $window.localStorage.getItem("testOrg");
+                var orgStorageItem = $window.localStorage.getItem(orgStorageKey); //
                 if (orgStorageItem) {
                     orgOptions = JSONfn.parse(orgStorageItem, true);
                 }
@@ -175,23 +176,23 @@
                     sessionOptions = JSONfn.parse(sessionStorageItem, true);
                 }
 
-                var options: IGridSavedState;
+                var options: IGridSavedState = {};
 
 
                 if (sessionOptions) {
                     // if session options are set then use them
                     // note the order the options are merged in (below) is important!
-                    options = <IGridSavedState> _.merge({}, localOptions, sessionOptions);
+                    options = <IGridSavedState>_.merge(options, localOptions, sessionOptions);
                 }
-                else if (orgOptions) {
-                    options = <IGridSavedState>_.merge({}, localOptions, orgOptions);
-                }
-                else {
+                else if (profileOptions) {
                     // else use the profile options
                     // this should only happen the first time the page loads
                     // or when the session optinos are deleted
                     // note the order the options are merged in (below) is important!
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
+                }
+                else if (orgOptions) {
+                    options = <IGridSavedState>_.merge(options, localOptions, orgOptions);
                 }
                 return options;
             }
@@ -246,7 +247,7 @@
 
                 var jsonString = JSONfn.stringify(pickedOptions);
                 console.log(jsonString);
-                $window.localStorage.setItem("testOrg", jsonString);
+                $window.localStorage.setItem(orgStorageKey, jsonString);
             }
 
             function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {

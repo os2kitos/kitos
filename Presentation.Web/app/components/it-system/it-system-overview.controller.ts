@@ -4,7 +4,6 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        gridStateService: Services.IGridStateFactory;
     }
 
     export interface IItSystemUsageOverview extends Models.ItSystemUsage.IItSystemUsageOverviewReadModel {
@@ -15,8 +14,7 @@
         private storageKey = "it-system-overview-options";
         mainGrid: IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: IKendoGridOptions<IItSystemUsageOverview>;
-        gridStateService: Services.IGridStateFactory;
-        
+
         static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -25,7 +23,8 @@
             "needsWidthFixService",
             "overviewOptions",
             "_",
-            "gridStateService"
+            "gridStateService",
+            "notify"
         ];
 
         constructor(
@@ -36,7 +35,8 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            gridStateService: Services.IGridStateFactory) {
+            gridStateService: Services.IGridStateFactory,
+            notify) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             //Lookup maps
@@ -198,7 +198,7 @@
                     onClick: () => {
                         if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
                             gridState.saveGridProfileForOrg(this.mainGrid);
-                            
+                            notify.addSuccessMessage("Filtre og sortering gemt gemt din organisation");
                         }
                         
                     },
@@ -726,6 +726,7 @@
 
             //Launch kendo grid
             launcher.launch();
+            
         }
     }
 
