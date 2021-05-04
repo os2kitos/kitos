@@ -14,7 +14,6 @@ namespace Core.DomainModel.Advice
         itInterface = 3,
         dataProcessingRegistration = 4
     }
-
     public enum Scheduling
     {
        Immediate = 0,
@@ -22,11 +21,9 @@ namespace Core.DomainModel.Advice
        Day = 2,
        Week = 3,
        Month = 4,
-       Year = 5,
-       Quarter = 6,
-       Semiannual = 7
+       Year = 5
+
     }
-    
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>

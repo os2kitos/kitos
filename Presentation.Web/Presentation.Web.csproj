@@ -345,7 +345,6 @@
   <ItemGroup>
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
-    <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
