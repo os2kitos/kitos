@@ -7,6 +7,7 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public KendoOrganizationalConfigurationMap()
         {
+            
             Property(x => x.OverviewType)
                 .IsRequired();
 

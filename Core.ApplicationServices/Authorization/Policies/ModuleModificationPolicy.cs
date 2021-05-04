@@ -33,6 +33,12 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
+            if (target is KendoOrganizationalConfiguration)
+            {
+                // Global admin are not allowed to modify KendoOrganizationalConfigurations
+                return IsLocalAdmin(target);
+            }
+
             if (target is ItInterface)
             {
                 return IsGlobalAdmin();
@@ -91,6 +97,12 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowCreation(int organizationId, Type target)
         {
+            if (MatchType<KendoOrganizationalConfiguration>(target))
+            {
+                // Global admin are not allowed to create KendoOrganizationalConfigurations
+                return IsLocalAdmin(organizationId);
+            }
+
             if (IsGlobalAdmin())
             {
                 return true;

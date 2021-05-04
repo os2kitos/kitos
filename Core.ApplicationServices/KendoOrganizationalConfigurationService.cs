@@ -1,34 +1,60 @@
-﻿using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.Result;
-using Core.DomainServices;
+using Core.DomainServices.Repositories.Kendo;
 
 namespace Core.ApplicationServices
 {
     public class KendoOrganizationalConfigurationService : IKendoOrganizationalConfigurationService
     {
-        private readonly IGenericRepository<KendoOrganizationalConfiguration> _kendoOrganizationRepository;
-        public KendoOrganizationalConfigurationService(IGenericRepository<KendoOrganizationalConfiguration> kendoOrganizationRepository)
+        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IKendoOrganizationalConfigurationRepository _kendoOrganizationRepository;
+        public KendoOrganizationalConfigurationService(
+            IAuthorizationContext authorizationContext, 
+            IKendoOrganizationalConfigurationRepository kendoOrganizationRepository)
         {
+            _authorizationContext = authorizationContext;
             _kendoOrganizationRepository = kendoOrganizationRepository;
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationFailure> Add(KendoOrganizationalConfiguration newKendoOrganizationalConfiguration)
+        public Result<KendoOrganizationalConfiguration, OperationError> Get(int organizationId, OverviewType overviewType)
         {
-            var created = _kendoOrganizationRepository.Insert(newKendoOrganizationalConfiguration);
-            _kendoOrganizationRepository.Save();
-            return created;
+            var config = _kendoOrganizationRepository.Get(organizationId, overviewType);
+            if (config.HasValue)
+            { 
+                return config.Value;
+            }
+            return Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationFailure> Modify(KendoOrganizationalConfiguration modifiedKendoOrganizationalConfiguration)
+        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string configuration)
         {
-            _kendoOrganizationRepository.Update(modifiedKendoOrganizationalConfiguration);
-            _kendoOrganizationRepository.Save();
-            return modifiedKendoOrganizationalConfiguration;
-        }
+            var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
-        public Result<string, OperationFailure> Get(int organizationId, OverviewType overviewType)
-        {
-            throw new global::System.NotImplementedException();
+            if (currentConfig.HasValue)
+            {
+                var modifiedConfig = currentConfig.Value;
+                if (!_authorizationContext.AllowModify(modifiedConfig))
+                    return new OperationError(OperationFailure.Forbidden);
+
+                modifiedConfig.Configuration = configuration;
+                _kendoOrganizationRepository.Update(modifiedConfig);
+                return modifiedConfig;
+            }
+            else
+            {
+                if (!_authorizationContext.AllowCreate<KendoOrganizationalConfiguration>(organizationId))
+                    return new OperationError(OperationFailure.Forbidden);
+
+                var createdConfig = new KendoOrganizationalConfiguration
+                {
+                    OrganizationId = organizationId,
+                    OverviewType = overviewType,
+                    Configuration = configuration
+                };
+                var created = _kendoOrganizationRepository.Add(createdConfig);
+                return created;
+            }
         }
     }
 }
