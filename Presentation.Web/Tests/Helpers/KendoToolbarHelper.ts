@@ -14,6 +14,7 @@ class HeaderButtons {
     public isUseDisabled(): webdriver.promise.Promise<String> {
         return this.kendoToolbarWrapper.headerButtons().useFilter.getAttribute("disabled");
     }
+
 }
 
 export = KendoToolbarHelper;

@@ -20,7 +20,7 @@
     export class OverviewPlanController implements IOverviewPlanController {
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
