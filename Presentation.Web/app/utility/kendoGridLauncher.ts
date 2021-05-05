@@ -516,6 +516,9 @@ module Kitos.Utility.KendoGrid {
 
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource> {
             if (!entry) throw "entry must be defined";
+            if (entry.show == null) { //Default to true.
+                entry.show = true;
+            }
             this.customToolbarEntries.push(entry);
             return this;
         }
