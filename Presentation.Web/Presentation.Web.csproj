@@ -425,8 +425,10 @@
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\CreateDataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\DataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\HierachyNodeDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />

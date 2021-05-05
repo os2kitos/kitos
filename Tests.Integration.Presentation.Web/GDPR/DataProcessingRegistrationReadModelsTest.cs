@@ -70,7 +70,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
             var oversightInterval = A<YearMonthIntervalOption>();
             var oversightCompleted = A<YesNoUndecidedOption>();
-            var latestOversightDate = A<DateTime>();
+            var oversightDate = A<DateTime>();
+            var oversightRemark = A<string>();
 
             Console.Out.WriteLine($"Testing in the context of DPR with name:{name}");
 
@@ -126,7 +127,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(registration.Id, isAgreementConcluded);
 
             //Latest oversight date
-            await DataProcessingRegistrationHelper.SendChangeLatestOversightDateRequestAsync(registration.Id, latestOversightDate);
+            await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registration.Id, oversightDate, oversightRemark);
 
             //References
             await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
@@ -168,7 +169,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
             Assert.Equal(contractName, readModel.ContractNamesAsCsv);
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
-            Assert.Equal(latestOversightDate, readModel.LatestOversightDate);
+            Assert.Equal(oversightDate, readModel.LatestOversightDate);
 
             Console.Out.WriteLine("Flat values asserted");
             Console.Out.WriteLine("Asserting role assignments");

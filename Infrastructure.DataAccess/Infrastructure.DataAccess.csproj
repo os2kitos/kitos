@@ -64,6 +64,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRightMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRoleAssignmentReadModelMap.cs" />
@@ -693,6 +694,10 @@
     <Compile Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates.cs" />
+    <Compile Include="Migrations\202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates.designer.cs">
+      <DependentUpon>202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1128,6 +1133,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates.resx">
+      <DependentUpon>202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

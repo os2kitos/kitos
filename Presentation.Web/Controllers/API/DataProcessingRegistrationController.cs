@@ -660,18 +660,50 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPatch]
-        [Route("{id}/latest-oversight-date")]
+        [Route("{id}/oversight-date/assign")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchLatestOversightDate(int id, [FromBody] SingleValueDTO<DateTime?> latestDate)
+        public HttpResponseMessage AssignOversightDate(int id, [FromBody] CreateDataProcessingRegistrationOversightDateDTO createOversightDateDTO)
         {
-            if (latestDate == null)
-                return BadRequest(nameof(latestDate) + " must be provided");
+            if (createOversightDateDTO == null)
+                return BadRequest(nameof(createOversightDateDTO) + " must be provided");
 
             return _dataProcessingRegistrationApplicationService
-                .UpdateLatestOversightDate(id, latestDate.Value)
+                .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark)
+                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-date/modify")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage ModifyOversightDate(int id, [FromBody] DataProcessingRegistrationOversightDateDTO oversightDateDTO)
+        {
+            if (oversightDateDTO == null)
+                return BadRequest(nameof(oversightDateDTO) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .ModifyOversightDate(id, oversightDateDTO.Id, oversightDateDTO.OversightDate, oversightDateDTO.OversightRemark)
+                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{id}/oversight-date/remove")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage RemoveOversightDate(int id, [FromBody] SingleValueDTO<int> oversightDateId)
+        {
+            if (oversightDateId == null)
+                return BadRequest(nameof(oversightDateId) + " must be provided");
+
+            return _dataProcessingRegistrationApplicationService
+                .RemoveOversightDate(id, oversightDateId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -865,15 +897,23 @@ namespace Presentation.Web.Controllers.API
                             .ToArray(),
                     Remark = value.OversightOptionRemark
                 },
-                OversightCompleted = new ValueWithOptionalDateAndRemark<YesNoUndecidedOption?>()
+                OversightCompleted = new ValueWithOptionalRemarkDTO<YesNoUndecidedOption?>()
                 {
                     Value = value.IsOversightCompleted,
-                    OptionalDateValue = value.LatestOversightDate,
                     Remark = value.OversightCompletedRemark
                 },
                 AssociatedContracts = value
                     .AssociatedContracts
                     .Select(contract => new NamedEntityDTO(contract.Id, contract.Name))
+                    .ToArray(),
+                OversightDates = value
+                    .OversightDates
+                    .Select(oversightDate => new DataProcessingRegistrationOversightDateDTO 
+                    { 
+                        Id = oversightDate.Id,
+                        OversightDate = oversightDate.OversightDate,
+                        OversightRemark = oversightDate.OversightRemark
+                    })
                     .ToArray()
             };
         }
@@ -917,5 +957,14 @@ namespace Presentation.Web.Controllers.API
             return new OptionWithDescriptionDTO(option.Option.Id, option.Option.Name, option.Description);
         }
 
+        private static DataProcessingRegistrationOversightDateDTO ToDTO(DataProcessingRegistrationOversightDate oversightDate)
+        {
+            return new DataProcessingRegistrationOversightDateDTO
+            {
+                Id = oversightDate.Id,
+                OversightDate = oversightDate.OversightDate,
+                OversightRemark = oversightDate.OversightRemark
+            };
+        }
     }
 }
