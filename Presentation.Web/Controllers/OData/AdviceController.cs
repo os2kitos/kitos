@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -66,7 +67,7 @@ namespace Presentation.Web.Controllers.OData
                     }
                     else
                     {
-                        RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(createdResponse.Entity.Id), CronStringHelper.CronPerInterval(advice.Scheduling.Value, advice.AlarmDate.Value));
+                        BackgroundJob.Schedule(() => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
                     }
                 }
                 catch (Exception e)
@@ -88,8 +89,7 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     var advice = delta.GetInstance();
-
-                    RecurringJob.AddOrUpdate(advice.JobId, () => _adviceService.SendAdvice(key), CronStringHelper.CronPerInterval(advice.Scheduling.Value, advice.AlarmDate.Value));
+                    BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
                 }
                 catch (Exception e)
                 {
@@ -99,6 +99,11 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return response;
+        }
+
+        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        {
+            RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
 
         [EnableQuery]
@@ -124,17 +129,8 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                RecurringJob.RemoveIfExists("Advice: " + key);
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
+                DeleteJobFromHangfire(key, entity);
+                DeleteFromRepository(key);
             }
             catch (Exception e)
             {
@@ -143,6 +139,33 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        private void DeleteFromRepository(int key)
+        {
+            Repository.DeleteByKey(key);
+            Repository.Save();
+        }
+
+        private static void DeleteJobFromHangfire(int key, Advice entity)
+        {
+            DeletePostponedRecurringJob(entity.JobId);
+            RecurringJob.RemoveIfExists("Advice: " + key);
+        }
+
+        private static void DeletePostponedRecurringJob(string textId)
+        {
+            var monitor = JobStorage.Current.GetMonitoringApi();
+            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
+                Where(x => x.Value.Job.Method.Name == "CreateDelayedRecurringJob");
+            foreach (var j in jobsScheduled)
+            {
+                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
+                if (t.Contains(textId))
+                {
+                    BackgroundJob.Delete(j.Key);
+                }
+            }
         }
     }
 }
