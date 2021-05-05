@@ -39,6 +39,7 @@
             notify) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
+            const itSystemUsageOverviewType = Models.ItSystem.OverviewType.ItSystemUsage;
             //Lookup maps
             var roleIdToUserNamesMap = {};
             var roleIdToEmailMap = {};
@@ -49,7 +50,7 @@
                     registration.IsAgreementConcluded !==
                     Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
-            var gridState = gridStateService.getService(this.storageKey, user);
+            var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -71,6 +72,7 @@
                 .withUser(user)
                 .withEntityTypeName("IT System")
                 .withExcelOutputName("IT Systemer Overblik")
+                .withOverviewType(itSystemUsageOverviewType)
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
                     const commonQuery =
@@ -197,11 +199,11 @@
                     enabled: () => true,
                     onClick: () => {
                         if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
-                            gridState.saveGridProfileForOrg(this.mainGrid);
+                            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
                         }
                         
                     },
-                    show: () => { if (user.isLocalAdmin) { return true }},
+                    show: user.isLocalAdmin,
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withToolbarEntry({
                     id: "roleSelector",
@@ -238,7 +240,6 @@
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
                     enabled: () => true,
-                    show: () => true,
                     link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withColumn(builder =>
