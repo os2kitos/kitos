@@ -564,7 +564,7 @@ module Kitos.Utility.KendoGrid {
                 throw "Storage key must be defined";
             }
             this.storageKey = newKey;
-            this.gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationName);
+            this.gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationId);
             return this;
         }
 

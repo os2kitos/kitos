@@ -1,4 +1,5 @@
 ﻿module Kitos.Services {
+    import OverviewType = Models.ItSystem.OverviewType;
     "use strict";
 
     interface IGridSavedState {
@@ -7,7 +8,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string, userId: number, userOrg: string) => IGridStateService;
+        getService: (storageKey: string, userId: number, orgId: number) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -15,7 +16,7 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
-        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>) => void;
+        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>, notify: any) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -28,6 +29,7 @@
         "$",
         "JSONfn",
         "_",
+        "KendoFilterService"
     ];
 
     function gridStateService(
@@ -36,6 +38,7 @@
         $: JQueryStatic,
         JSONfn: JSONfn.JSONfnStatic,
         _: _.LoDashStatic,
+        KendoFilterService: KendoFilterService
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
             getService: getService
@@ -43,13 +46,14 @@
 
         return factory;
 
-        function getService(storageKey: string, userId: number, userOrg: string): IGridStateService {
+        function getService(storageKey: string, userId: number, orgId: number): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
             storageKey = userId+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageKey = userOrg;
+            var orgStorageKey = orgId + "-OrgProfile";
+            getOrgFilterOptions();
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -62,6 +66,24 @@
                 removeSession: removeSession
             };
             return service;
+
+            function getOrgFilterOptions() {
+
+                //If org filter options has already been loaded skip this api call
+                var dataExist = $window.sessionStorage.getItem(orgStorageKey);
+                if (dataExist) {
+                    return;
+                }
+
+                KendoFilterService.GetSystemFilterOptionFromOrg(orgId, OverviewType.ItSystemUsage).then((gridData) => {
+                    if (gridData.status === 200) {
+                        const orgStorageItem = gridData.data.response.configuration; //configuration = "{"dataSource":{"sort":[{"field":"Name","dir":"asc"}],"pageSize":100},"columnState":{"klename":{"index":0,"width":150,"hidden":false},"isActive":{"index":1,"width":150,"hidden":false},"localid":{"index":2,"width":150,"hidden":true},"uuid":{"index":3,"width"...
+                        if (orgStorageItem) {
+                            $window.sessionStorage.setItem(orgStorageKey, orgStorageItem);
+                        }
+                    }
+                });
+            } 
 
             // saves grid state to localStorage
             function saveGridOptions(grid: Kitos.IKendoGrid<any>) {
@@ -147,10 +169,10 @@
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
             function getStoredOptions(): IGridSavedState {
-
+                getOrgFilterOptions();
                 // load options from org storage
                 var orgOptions;
-                var orgStorageItem = $window.localStorage.getItem(orgStorageKey); //
+                var orgStorageItem = $window.sessionStorage.getItem(orgStorageKey);
                 if (orgStorageItem) {
                     orgOptions = JSONfn.parse(orgStorageItem, true);
                 }
@@ -232,7 +254,7 @@
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>): void {
+            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, notify: any): void {
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);
@@ -245,7 +267,15 @@
                 }
 
                 var jsonString = JSONfn.stringify(pickedOptions);
-                $window.localStorage.setItem(orgStorageKey, jsonString);
+
+                KendoFilterService.PostSystemFilterOptionFromOrg(orgId, OverviewType.ItSystemUsage, jsonString)
+                    .then((res) => {
+                        if (res.status === 200) {
+                            notify.addSuccessMessage("Filtre og sortering gemt gemt din organisation");
+                        } else {
+                            notify.addErrorMessage("Der opstod en fejl i forsøg på at gemme det nye filter");
+                        }
+                    });
             }
 
             function loadGridProfile(grid: Kitos.IKendoGrid<any>): void {
@@ -263,6 +293,7 @@
 
             function removeSession(): void {
                 $window.sessionStorage.removeItem(storageKey);
+                $window.sessionStorage.removeItem(orgStorageKey);
             }
 
             function removeLocal(): void {

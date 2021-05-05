@@ -18,7 +18,7 @@
         public mainGridOptions: kendo.ui.GridOptions;
         private canCreate: boolean;
         private storageKey = "report-overview-options";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationName);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user.id, this.user.currentOrganizationId);
         public categoryTypeValues;
 
         static $inject: Array<string> = [

@@ -535,6 +535,7 @@
     <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-options.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-readmodel.ts" />
+    <TypeScriptCompile Include="app\models\it-system\KendoOrganizationalConfigurationDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
@@ -583,6 +584,7 @@
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
+    <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
