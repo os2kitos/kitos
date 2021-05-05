@@ -49,7 +49,7 @@
                     registration.IsAgreementConcluded !==
                     Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
-            var gridState = gridStateService.getService(this.storageKey, user.id, user.currentOrganizationId);
+            var gridState = gridStateService.getService(this.storageKey, user);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -197,7 +197,7 @@
                     enabled: () => true,
                     onClick: () => {
                         if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
-                            gridState.saveGridProfileForOrg(this.mainGrid,notify);
+                            gridState.saveGridProfileForOrg(this.mainGrid);
                         }
                         
                     },

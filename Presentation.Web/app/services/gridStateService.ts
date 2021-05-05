@@ -8,7 +8,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string, userId: number, orgId: number) => IGridStateService;
+        getService: (storageKey: string, user: any) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -16,7 +16,7 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
-        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>, notify: any) => void;
+        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -29,7 +29,8 @@
         "$",
         "JSONfn",
         "_",
-        "KendoFilterService"
+        "KendoFilterService",
+        "notify"
     ];
 
     function gridStateService(
@@ -38,21 +39,22 @@
         $: JQueryStatic,
         JSONfn: JSONfn.JSONfnStatic,
         _: _.LoDashStatic,
-        KendoFilterService: KendoFilterService
+        KendoFilterService: KendoFilterService,
+        notify
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
             getService: getService
         };
 
         return factory;
-
-        function getService(storageKey: string, userId: number, orgId: number): IGridStateService {
+        //userId: number, orgId: number
+        function getService(storageKey: string, user: any): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
-            storageKey = userId+"-"+storageKey;
+            storageKey = user.id+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageKey = orgId + "-OrgProfile";
+            var orgStorageKey = user.currentOrganizationId + "-OrgProfile";
             getOrgFilterOptions();
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
@@ -75,7 +77,7 @@
                     return;
                 }
 
-                KendoFilterService.GetSystemFilterOptionFromOrg(orgId, OverviewType.ItSystemUsage).then((gridData) => {
+                KendoFilterService.GetSystemFilterOptionFromOrg(user.currentOrganizationId, OverviewType.ItSystemUsage).then((gridData) => {
                     if (gridData.status === 200) {
                         const orgStorageItem = gridData.data.response.configuration; //configuration = "{"dataSource":{"sort":[{"field":"Name","dir":"asc"}],"pageSize":100},"columnState":{"klename":{"index":0,"width":150,"hidden":false},"isActive":{"index":1,"width":150,"hidden":false},"localid":{"index":2,"width":150,"hidden":true},"uuid":{"index":3,"width"...
                         if (orgStorageItem) {
@@ -169,7 +171,6 @@
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
             function getStoredOptions(): IGridSavedState {
-                getOrgFilterOptions();
                 // load options from org storage
                 var orgOptions;
                 var orgStorageItem = $window.sessionStorage.getItem(orgStorageKey);
@@ -254,7 +255,7 @@
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, notify: any): void {
+            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>): void {
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);
@@ -268,7 +269,7 @@
 
                 var jsonString = JSONfn.stringify(pickedOptions);
 
-                KendoFilterService.PostSystemFilterOptionFromOrg(orgId, OverviewType.ItSystemUsage, jsonString)
+                KendoFilterService.PostSystemFilterOptionFromOrg(user.currentOrganizationId, OverviewType.ItSystemUsage, jsonString)
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt gemt din organisation");
