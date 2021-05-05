@@ -7,7 +7,7 @@
     }
 
     export interface IGridStateFactory {
-        getService: (storageKey: string, user: any, overviewType?: Models.ItSystem.OverviewType) => IGridStateService;
+        getService: (storageKey: string, user: any, overviewType?: Models.Generic.OverviewType) => IGridStateService;
     }
 
     export interface IGridStateService {
@@ -15,7 +15,7 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
-        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>, overviewType: Models.ItSystem.OverviewType) => void;
+        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
@@ -47,7 +47,7 @@
 
         return factory;
         //userId: number, orgId: number
-        function getService(storageKey: string, user: any, overviewType?: Models.ItSystem.OverviewType): IGridStateService {
+        function getService(storageKey: string, user: any, overviewType?: Models.Generic.OverviewType): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
 
@@ -68,7 +68,7 @@
             };
             return service;
 
-            function getOrgFilterOptions(overviewType: Models.ItSystem.OverviewType) {
+            function getOrgFilterOptions(overviewType: Models.Generic.OverviewType) {
                 // Organizational configuration not yet activated for overview
                 if (overviewType === null || overviewType === undefined) {
                     return;
@@ -266,7 +266,7 @@
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, overviewType: Models.ItSystem.OverviewType): void {
+            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): void {
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);

@@ -1,4 +1,4 @@
-﻿module Kitos.Models.ItSystem {
+﻿module Kitos.Models.Generic {
     export enum OverviewType {
         ItSystemUsage = 0
     }

@@ -8,13 +8,13 @@
         constructor(private $http: IHttpServiceWithCustomConfig) {
         }
 
-        GetSystemFilterOptionFromOrg = (orgId: number, overviewType: Models.ItSystem.OverviewType) => {
+        GetSystemFilterOptionFromOrg = (orgId: number, overviewType: Models.Generic.OverviewType) => {
             return this.$http
-                .get<API.Models.IApiWrapper<Models.ItSystem.IKendoOrganizationalConfigurationDTO>>(
+                .get<API.Models.IApiWrapper<Models.Generic.IKendoOrganizationalConfigurationDTO>>(
                     `api/v1/kendo-organizational-configuration?organizationId=${orgId}&overviewType=${overviewType}`);
         }
 
-        PostSystemFilterOptionFromOrg = (orgId: number, overviewType: Models.ItSystem.OverviewType, configuration: string) => {
+        PostSystemFilterOptionFromOrg = (orgId: number, overviewType: Models.Generic.OverviewType, configuration: string) => {
 
             var payload = {
                 OverviewType: overviewType,

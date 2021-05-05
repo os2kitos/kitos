@@ -39,7 +39,7 @@
             notify) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
-            const itSystemUsageOverviewType = Models.ItSystem.OverviewType.ItSystemUsage;
+            const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
             //Lookup maps
             var roleIdToUserNamesMap = {};
             var roleIdToEmailMap = {};

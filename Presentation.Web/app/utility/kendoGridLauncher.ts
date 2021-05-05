@@ -451,7 +451,7 @@ module Kitos.Utility.KendoGrid {
         withExcelOnlyColumn(build: ExcelOnlyColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
-        withOverviewType(overviewType: Models.ItSystem.OverviewType): IKendoGridLauncher<TDataSource>;
+        withOverviewType(overviewType: Models.Generic.OverviewType): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -469,7 +469,7 @@ module Kitos.Utility.KendoGrid {
         private excelOnlyColumns: ExcelOnlyColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
-        private overviewType: Models.ItSystem.OverviewType = null;
+        private overviewType: Models.Generic.OverviewType = null;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -570,7 +570,7 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        withOverviewType(overviewType: Models.ItSystem.OverviewType): IKendoGridLauncher<TDataSource> {
+        withOverviewType(overviewType: Models.Generic.OverviewType): IKendoGridLauncher<TDataSource> {
             this.overviewType = overviewType;
             return this;
         }
