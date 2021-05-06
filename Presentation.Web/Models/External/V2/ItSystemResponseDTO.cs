@@ -51,9 +51,9 @@ namespace Presentation.Web.Models.External.V2
         public IdentityNamePairResponseDTO BusinessType { get; set; }
 
         /// <summary>
-        /// Name and UUID pair for IT-System rightsholder
+        /// Organizational information for IT-System rightsholder
         /// </summary>
-        public IdentityNamePairResponseDTO RightsHolder { get; set; }
+        public OrganizationResponseDTO RightsHolder { get; set; }
 
         /// <summary>
         /// List of IT-Interfaces exposed by this IT-System

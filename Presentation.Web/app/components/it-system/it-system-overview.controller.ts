@@ -124,15 +124,10 @@
                                 "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
+                        const dprUndecidedQuery = `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null) or (DataProcessingRegistrations/any() eq false)`;
                         parameterMap.$filter = parameterMap.$filter
-                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"),
-                                "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
-                            .replace(
-                                new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models
-                                    .Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`,
-                                    "i"),
-                                `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared
-                                .YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null)`);
+                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
+                            .replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), dprUndecidedQuery);
 
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
