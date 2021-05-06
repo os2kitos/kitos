@@ -193,7 +193,7 @@
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
                     enabled: () => true,
                     onClick: () => {
-                        if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
+                        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
                             gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
                         }
                         

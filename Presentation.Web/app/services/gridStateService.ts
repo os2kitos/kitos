@@ -53,7 +53,7 @@
 
             storageKey = user.id+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageKey = user.currentOrganizationId + "-OrgProfile";
+            var orgStorageKey = storageKey + "-OrgProfile";
             getOrgFilterOptions(overviewType);
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
