@@ -220,7 +220,7 @@ namespace Presentation.Web.Controllers.API
             return CrudAuthorization.AllowRead(entity);
         }
 
-        protected virtual bool AllowModify(IEntity entity)
+        protected bool AllowModify(IEntity entity)
         {
             return CrudAuthorization.AllowModify(entity);
         }

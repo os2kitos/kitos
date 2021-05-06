@@ -46,7 +46,7 @@
         };
 
         return factory;
-        //userId: number, orgId: number
+
         function getService(storageKey: string, user: any, overviewType?: Models.Generic.OverviewType): IGridStateService {
             if (!storageKey)
                 throw new Error("Missing parameter: storageKey");
