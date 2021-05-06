@@ -56,6 +56,21 @@ namespace Presentation.Web.Controllers.API
                 .Match(value => Ok(ToDTO(value)), FromOperationError);
         }
 
+        [HttpDelete]
+        [Route]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage DeleteConfiguration([FromUri] int organizationId, [FromUri] OverviewType overviewType)
+        {
+            if (organizationId == null || overviewType == null)
+                return BadRequest("Please provide both organizationId and overviewType");
+
+            return _kendoOrganizationalConfigurationService
+                .Delete(organizationId, overviewType)
+                .Match(_ => Ok(), FromOperationError);
+        }
+
         private KendoOrganizationalConfigurationDTO ToDTO(KendoOrganizationalConfiguration value)
         {
             return new KendoOrganizationalConfigurationDTO
