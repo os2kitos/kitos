@@ -113,13 +113,14 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
                 OverviewType = overviewType
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
+            _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(true);
 
             //Act
-            var getResult = _sut.Delete(orgId, overviewType);
+            var deleteResult = _sut.Delete(orgId, overviewType);
 
             //Assert
-            Assert.True(getResult.Ok);
-            Assert.Equal(kendoConfig, getResult.Value);
+            Assert.True(deleteResult.Ok);
+            Assert.Equal(kendoConfig, deleteResult.Value);
         }
 
         [Fact]
@@ -189,6 +190,31 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
         }
 
         [Fact]
+        public void Delete_Fails_If_Not_Allowed_To_Delete()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var overviewType = A<OverviewType>();
+            var config = A<string>();
+            var kendoConfig = new KendoOrganizationalConfiguration
+            {
+                Configuration = A<string>(),
+                OrganizationId = orgId,
+                OverviewType = overviewType
+            };
+            _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
+            _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(false);
+
+            //Act
+            var deleteResult = _sut.Delete(orgId, overviewType);
+
+            //Assert
+            Assert.True(deleteResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, deleteResult.Error.FailureType);
+            _repository.Verify(x => x.Delete(It.IsAny<KendoOrganizationalConfiguration>()), Times.Never);
+        }
+
+        [Fact]
         public void Delete_Fails_If_None_Found()
         {
             //Arrange
@@ -197,11 +223,11 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
 
             //Act
-            var getResult = _sut.Delete(orgId, overviewType);
+            var deleteResult = _sut.Delete(orgId, overviewType);
 
             //Assert
-            Assert.True(getResult.Failed);
-            Assert.Equal(OperationFailure.NotFound, getResult.Error.FailureType);
+            Assert.True(deleteResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, deleteResult.Error.FailureType);
         }
 
     }
