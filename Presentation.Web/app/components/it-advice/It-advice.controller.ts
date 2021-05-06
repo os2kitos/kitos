@@ -48,7 +48,7 @@
 
                 {
                     field: "AlarmDate",
-                    title: "Start dato",
+                    title: "Fra dato",
                     template: x => {
                         if (x.AlarmDate != null) {
                             return kendo.toString(new Date(x.AlarmDate), "d");
@@ -59,7 +59,7 @@
                 },
                 {
                     field: "StopDate",
-                    title: "Slut dato",
+                    title: "Til dato",
                     template: x => {
                         if (x.StopDate != null) {
                             return kendo.toString(new Date(x.StopDate), "d");
