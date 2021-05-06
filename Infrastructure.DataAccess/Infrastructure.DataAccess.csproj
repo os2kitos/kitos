@@ -81,6 +81,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
+    <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
@@ -693,6 +694,10 @@
     <Compile Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.cs" />
+    <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.designer.cs">
+      <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1128,6 +1133,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.resx">
+      <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
