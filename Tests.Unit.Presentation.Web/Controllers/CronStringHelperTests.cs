@@ -21,7 +21,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         [InlineData(Scheduling.Quarter, 2000, 1, 1, "0 8 1 */3 *")]
         [InlineData(Scheduling.Quarter, 1999, 11, 29, "0 8 29 */3 *")]
         [InlineData(Scheduling.Semiannual, 2000, 1, 1, "0 8 1 */6 *")]
-        [InlineData(Scheduling.Year, 2000, 1, 1, "0 8 1 */12 *")]
+        [InlineData(Scheduling.Year, 2000, 1, 1, "0 8 1 1 *")]
         public void CronPerInterval_GivenIntervalAndTime_ReturnsCorrectCronString(Scheduling schedule, int year, int month, int day, string expected)
         {
             var dateToTest = new DateTime(year, month, day);

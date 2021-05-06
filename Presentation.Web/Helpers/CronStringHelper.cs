@@ -25,7 +25,7 @@ namespace Presentation.Web.Helpers
                 case Scheduling.Month: return $"0 8 {zeroTime.Day} * *";
                 case Scheduling.Quarter: return $"0 8 {zeroTime.Day} */3 *";
                 case Scheduling.Semiannual: return $"0 8 {zeroTime.Day} */6 *";
-                case Scheduling.Year: return $"0 8 {zeroTime.Day} */12 *";
+                case Scheduling.Year: return $"0 8 {zeroTime.Day} {zeroTime.Month} *";
                 case Scheduling.Immediate: // Fallthrough intended
                 default:
                     throw new ArgumentOutOfRangeException(nameof(interval), interval, null);
