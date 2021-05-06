@@ -20,22 +20,19 @@ describe("Local admin IT Systems tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Save filter to org button is enabled and visible for local admin" +
-        "", () => {
+    it("Save filter to org button is enabled and visible for local admin", () => {
         loginHelper.loginAsLocalAdmin()
             .then(() => pageObject.getPage())
             .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(true));
         });
 
-    it("Save filter to org button is not visible for regular user" +
-        "", () => {
+    it("Save filter to org button is not visible for regular user", () => {
         loginHelper.loginAsRegularUser()
                 .then(() => pageObject.getPage())
             .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
     });
 
-    it("Save filter to org button is not visible for global admin" +
-        "", () => {
+    it("Save filter to org button is not visible for global admin", () => {
             loginHelper.loginAsGlobalAdmin()
                 .then(() => pageObject.getPage())
                 .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
