@@ -23,8 +23,7 @@
             "needsWidthFixService",
             "overviewOptions",
             "_",
-            "gridStateService",
-            "notify"
+            "gridStateService"
         ];
 
         constructor(
@@ -35,8 +34,8 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            gridStateService: Services.IGridStateFactory,
-            notify) {
+            gridStateService: Services.IGridStateFactory
+            ) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
@@ -197,6 +196,20 @@
                             gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
                         }
                         
+                    },
+                    show: user.isLocalAdmin,
+                } as Utility.KendoGrid.IKendoToolbarEntry)
+                .withToolbarEntry({
+                    id: "removeFilterOrg",
+                    title: "Slet filter for organisation",
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                    enabled: () => true,
+                    onClick: () => {
+                        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
+                            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
+                        }
                     },
                     show: user.isLocalAdmin,
                 } as Utility.KendoGrid.IKendoToolbarEntry)

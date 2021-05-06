@@ -25,6 +25,12 @@ namespace Core.DomainServices.Repositories.Kendo
             return _repository.AsQueryable().Where(x => x.OrganizationId == organizationId && x.OverviewType == overviewType).SingleOrDefault();
         }
 
+        public void Delete(KendoOrganizationalConfiguration configToDelete)
+        {
+            _repository.Delete(configToDelete);
+            _repository.Save();
+        }
+
         public void Update(KendoOrganizationalConfiguration modifiedConfig)
         {
             _repository.Update(modifiedConfig);

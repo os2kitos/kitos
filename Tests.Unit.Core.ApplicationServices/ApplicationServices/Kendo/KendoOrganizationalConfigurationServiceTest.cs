@@ -101,6 +101,28 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
         }
 
         [Fact]
+        public void Can_Delete()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var overviewType = A<OverviewType>();
+            var kendoConfig = new KendoOrganizationalConfiguration
+            {
+                Configuration = A<string>(),
+                OrganizationId = orgId,
+                OverviewType = overviewType
+            };
+            _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
+
+            //Act
+            var getResult = _sut.Delete(orgId, overviewType);
+
+            //Assert
+            Assert.True(getResult.Ok);
+            Assert.Equal(kendoConfig, getResult.Value);
+        }
+
+        [Fact]
         public void Add_Fails_If_Not_Allowed_To_Create()
         {
             //Arrange
@@ -160,6 +182,22 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
 
             //Act
             var getResult = _sut.Get(orgId, overviewType);
+
+            //Assert
+            Assert.True(getResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, getResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void Delete_Fails_If_None_Found()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var overviewType = A<OverviewType>();
+            _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
+
+            //Act
+            var getResult = _sut.Delete(orgId, overviewType);
 
             //Assert
             Assert.True(getResult.Failed);
