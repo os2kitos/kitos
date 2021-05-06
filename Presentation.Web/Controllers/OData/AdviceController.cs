@@ -49,33 +49,36 @@ namespace Presentation.Web.Controllers.OData
 
                 try
                 {
-                    _repository.Update(advice);
-                    _repository.Save();
+                    UpdateRepository(advice);
+                    ScheduleAdvice(advice, createdResponse, name);
                 }
                 catch (Exception e)
                 {
                     Logger.ErrorException("Failed to add advice", e);
                     return InternalServerError(e);
                 }
-
-                try
-                {
-                    if (advice.Scheduling == Scheduling.Immediate)
-                    {
-                        BackgroundJob.Enqueue(() => _adviceService.SendAdvice(createdResponse.Entity.Id));
-                    }
-                    else
-                    {
-                        BackgroundJob.Schedule(() => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorException("Failed to schedule advice", e);
-                    return InternalServerError(e);
-                }
             }
             return response;
+        }
+
+        private void ScheduleAdvice(Advice advice, CreatedODataResult<Advice> createdResponse, string name)
+        {
+            if (advice.Scheduling == Scheduling.Immediate)
+            {
+                BackgroundJob.Enqueue(() => _adviceService.SendAdvice(createdResponse.Entity.Id));
+            }
+            else
+            {
+                BackgroundJob.Schedule(
+                    () => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value,
+                        advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+            }
+        }
+
+        private void UpdateRepository(Advice advice)
+        {
+            _repository.Update(advice);
+            _repository.Save();
         }
 
         [EnableQuery]
