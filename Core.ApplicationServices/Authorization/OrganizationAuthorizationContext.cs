@@ -168,6 +168,13 @@ namespace Core.ApplicationServices.Authorization
 
         public bool AllowModify(IEntity entity)
         {
+            if (entity is KendoOrganizationalConfiguration)
+            {
+                // Global admin are not allowed to modify KendoOrganizationalConfigurations
+                var kendoConfig = entity as KendoOrganizationalConfiguration;
+                return IsLocalAdmin(kendoConfig.OrganizationId);
+            }
+
             var result = false;
 
             if (IsGlobalAdmin())

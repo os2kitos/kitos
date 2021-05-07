@@ -423,6 +423,7 @@ module Kitos.Utility.KendoGrid {
         link?: string;
         dropDownConfiguration?: IKendoToolbarDropDownConfiguration;
         enabled: () => boolean;
+        show?: boolean;
         implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
@@ -450,6 +451,7 @@ module Kitos.Utility.KendoGrid {
         withExcelOnlyColumn(build: ExcelOnlyColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource>;
         withResponseParser(parser: ResponseParser<TDataSource>): IKendoGridLauncher<TDataSource>;
         withParameterMapping(mapping: ParameterMapper): IKendoGridLauncher<TDataSource>;
+        withOverviewType(overviewType: Models.Generic.OverviewType): IKendoGridLauncher<TDataSource>;
     }
 
     export class KendoGridLauncher<TDataSource> implements IKendoGridLauncher<TDataSource>{
@@ -467,6 +469,7 @@ module Kitos.Utility.KendoGrid {
         private excelOnlyColumns: ExcelOnlyColumnConstruction<TDataSource>[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
+        private overviewType: Models.Generic.OverviewType = null;
 
         constructor(
             private readonly gridStateService: Services.IGridStateFactory,
@@ -513,6 +516,9 @@ module Kitos.Utility.KendoGrid {
 
         withToolbarEntry(entry: IKendoToolbarEntry): IKendoGridLauncher<TDataSource> {
             if (!entry) throw "entry must be defined";
+            if (entry.show == null) { //Default to true.
+                entry.show = true;
+            }
             this.customToolbarEntries.push(entry);
             return this;
         }
@@ -563,7 +569,12 @@ module Kitos.Utility.KendoGrid {
                 throw "Storage key must be defined";
             }
             this.storageKey = newKey;
-            this.gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+            this.gridState = this.gridStateService.getService(this.storageKey, this.user, this.overviewType);
+            return this;
+        }
+
+        withOverviewType(overviewType: Models.Generic.OverviewType): IKendoGridLauncher<TDataSource> {
+            this.overviewType = overviewType;
             return this;
         }
 
@@ -682,7 +693,7 @@ module Kitos.Utility.KendoGrid {
                     saveGridProfile: () => this.saveGridProfile(),
                     loadGridProfile: () => this.loadGridProfile(),
                     clearGridProfile: () => this.clearGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist(),
+                    doesGridProfileExist: () => this.doesGridProfileExist()
                 }
             };
 
@@ -719,11 +730,12 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             onClick: entry.onClick,
-                            enabled: entry.enabled()
+                            enabled: entry.enabled(),
+                            show: entry.show
                         };
                         break;
                     case KendoToolbarImplementation.Link:

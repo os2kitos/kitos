@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class ChangedLatestOversightDate_To_List_Of_OversightDates : IMigrationMetadata
+    public sealed partial class Remove_LatestOversightDate_From_DPR : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedLatestOversightDate_To_List_Of_OversightDates));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Remove_LatestOversightDate_From_DPR));
         
         string IMigrationMetadata.Id
         {
-            get { return "202105051126009_Changed-LatestOversightDate_To_List_Of_OversightDates"; }
+            get { return "202105070648575_Remove_LatestOversightDate_From_DPR"; }
         }
         
         string IMigrationMetadata.Source

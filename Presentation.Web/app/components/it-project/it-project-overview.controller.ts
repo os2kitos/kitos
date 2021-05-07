@@ -22,7 +22,7 @@
     export class OverviewController implements IOverviewController {
         private storageKey = "it-project-overview-options";
         private orgUnitStorageKey = "it-project-overview-orgunit";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user);
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;

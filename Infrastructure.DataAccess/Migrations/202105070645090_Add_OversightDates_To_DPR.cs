@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ChangedLatestOversightDate_To_List_Of_OversightDates : DbMigration
+    public partial class Add_OversightDates_To_DPR : DbMigration
     {
         public override void Up()
         {
@@ -20,12 +20,10 @@
                 .ForeignKey("dbo.DataProcessingRegistrations", t => t.ParentId, cascadeDelete: true)
                 .Index(t => t.ParentId);
             
-            DropColumn("dbo.DataProcessingRegistrations", "LatestOversightDate");
         }
         
         public override void Down()
         {
-            AddColumn("dbo.DataProcessingRegistrations", "LatestOversightDate", c => c.DateTime(precision: 7, storeType: "datetime2"));
             DropForeignKey("dbo.DataProcessingRegistrationOversightDates", "ParentId", "dbo.DataProcessingRegistrations");
             DropIndex("dbo.DataProcessingRegistrationOversightDates", new[] { "ParentId" });
             DropTable("dbo.DataProcessingRegistrationOversightDates");
