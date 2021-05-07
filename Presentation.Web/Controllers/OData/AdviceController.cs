@@ -46,6 +46,7 @@ namespace Presentation.Web.Controllers.OData
 
                 advice = createdResponse.Entity;
                 advice.JobId = name;
+                advice.IsActive = true;
 
                 try
                 {
