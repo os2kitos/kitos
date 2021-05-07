@@ -2,7 +2,8 @@
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+    using Infrastructure.DataAccess.Tools;
+
     public partial class Add_OversightDates_To_DPR : DbMigration
     {
         public override void Up()
@@ -19,7 +20,8 @@
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.DataProcessingRegistrations", t => t.ParentId, cascadeDelete: true)
                 .Index(t => t.ParentId);
-            
+
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migration_DPR_LatestOversightDate.sql"));
         }
         
         public override void Down()
