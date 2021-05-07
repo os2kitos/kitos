@@ -161,7 +161,6 @@
 
             $scope.newAdvice = function (action, id) {
 
-                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
 
                 if (modalOpen === false) {
@@ -170,8 +169,9 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", ($scope, $modalInstance, roles, $window, type, action, object, currentUser: Kitos.Services.IUser) => {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser",($scope, $modalInstance, roles, $window, type, action, object, currentUser: Kitos.Services.IUser) => {
 
+                            $scope.hasWriteAccess = hasWriteAccess;
                             $scope.showRoleFields = true;
                             modalOpen = true;
 
@@ -184,7 +184,8 @@
 
                             if (action === 'POST') {
                                 $scope.hideSend = false;
-                                $scope.externalCC = currentUser.email;
+                                /*$scope.externalCC = currentUser.email;*/
+                                $scope.advisType = "clear";
                                 $scope.emailBody = "<a href='" + $window.location.href.replace("advice", "main") + "'>" + "Link til " + type + "</a>";
                             }
 
@@ -462,11 +463,7 @@
                             ],
                             advicename: [() => {
                                 return $scope.advicename;
-                            }
-                            ],
-                            hasWriteAccess: [function () {
-                                return $scope.hasWriteAccess;
-                            }]
+                            }],
                         }
                     });
                 }

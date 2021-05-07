@@ -11,9 +11,9 @@
             <div class="col-md-6">
                 <!--Modtager(e)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label">Til</label>
+                    <label for="contract-note" class="control-label">Til modtager via rolle</label>
                     <select-multiple-recievers data-id="agreement-elements"
-                                               placeholder="Vælg modtagere"
+                                               placeholder="Vælg rolle(r)"
                                                data-ng-model="selectedRecievers"
                                                data-roles="recieverRoles"
                                                data-field="elemId"
@@ -21,25 +21,15 @@
                     </select-multiple-recievers>
                 </div>
 
-                <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <a ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
-                    <div ng-show="collapsed">
-                        <input id="toExternal" type="email" name="toExternal" data-ng-disabled="hasWriteAccess" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
+                <div class="form-group">
+                    <label for="contract-note" class="control-label">Til modtager via email</label>
+                    <input id="toExternal" type="email" name="toExternal" data-ng-disabled="!hasWriteAccess" placeholder="Skriv email" class="form-control" data-ng-model="externalTo">
 
-                    </div>
-                </div>
-
-                <div class="form-group" data-ng-hide="{{showRoleFields}}">
-                    <a ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="collapsed">Tilføj Email adresse manuelt</div><div ng-show="!collapsed">Minimer</div></a>
-                    <div ng-show="!collapsed">
-                        <input id="toExternal" type="email" name="toExternal" data-ng-disabled="hasWriteAccess" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
-
-                    </div>
                 </div>
 
                 <!--CC('ere)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label small">CC</label>
+                    <label for="contract-note" class="control-label">CC modtager via rolle</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                data-placeholder="Vælg CC"
                                                data-ng-model="selectedCC"
@@ -50,30 +40,37 @@
                     </select-multiple-recievers>
                 </div>
                 <div class="form-group">
-                    <a ng-model="CCcollapsed" ng-click="CCcollapsed = !CCcollapsed"><div ng-show="CCcollapsed">Tilføj Email adresse manuelt</div><div ng-show="!CCcollapsed">Minimer</div></a>
-                    <div ng-show="!CCcollapsed">
-                        <input id="cc" type="text" placeholder="separer flere adresser med ," class="form-control" data-ng-disabled="hasWriteAccess" data-ng-model="externalCC">
+                    <div>
+                        <label for="contract-note" class="control-label">CC modtager via email</label>
+                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!hasWriteAccess" data-ng-model="externalCC">
                     </div>
                 </div>
 
-                <div class="form-group has-feedback" data-show-errors>
-                    <!--Emne-->
-                    <label class="control-label" for="name">Emne <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="hasWriteAccess">
-                </div>
             </div>
 
             <div class="col-md-6">
-                <div class="form-group has-feedback" data-show-errors>
-                    <!--Navn-->
-                    <label class="control-label" for="name">Navn</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="hasWriteAccess">
-                </div>
 
                 <div class="form-group">
+                    <label for="advisType" class="control-label">Type af afsendelse </label>
+                    <select class="form-control" data-id="advisType" data-ng-disabled="!hasWriteAccess"
+                            data-ng-model="advisType">
+                        <option value="clear" selected> </option>
+                        <option value="once">Straks</option>
+                        <option value="Day">Gentagelse</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group has-feedback" ng-show="advisType == 'Day'">
+                    <!--Navn-->
+                    <label class="control-label" for="name">Navn</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!hasWriteAccess">
+                </div>
+
+                <div class="form-group" ng-show="advisType == 'Day'">
                     <label for="contract-supplier" class="control-label">Gentagemønster </label>
-                    <select class="form-control" data-id="sensitive" data-ng-disabled="hasWriteAccess"
-                            data-ng-model="repitionPattern">
+                    <select class="form-control" data-id="sensitive" data-ng-disabled="!hasWriteAccess"
+                            data-ng-model="repitionPattern" >
                         <option value="Hour">Time</option>
                         <option value="Day">Dag</option>
                         <option value="Week">Uge</option>
@@ -85,24 +82,30 @@
                 </div>
 
                 <!--Dato-->
-                <div class="form-group">
+                <div class="form-group" ng-show="advisType == 'Day'">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="hasWriteAccess">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!hasWriteAccess">
                     <span>{{startDateErrMessage}}</span>
                 </div>
 
                 <!--Dato-->
-                <div class="form-group">
+                <div class="form-group" ng-show="advisType == 'Day'">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="hasWriteAccess">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!hasWriteAccess">
                     <span>{{stopDateErrMessage}}</span>
                     <span>{{errMessage}}</span>
                 </div>
 
             </div>
-
+            <div class="col-md-12">
+                <div class="form-group has-feedback" data-show-errors>
+                    <!--Emne-->
+                    <label class="control-label" for="name">Emne <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="!hasWriteAccess">
+                </div>
+            </div>
         </div>
         <!--Email body-->
         <div class="form-group">
