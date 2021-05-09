@@ -4,6 +4,7 @@
         data-placeholder="{{ placeholder }}"
         data-ng-model="selectedIds"
         data-field="{{ field }}"
+        data-ng-disabled="isDisabled"
         multiple>
     <option data-ng-repeat="option in roles() | filter: $select.search" value="{{ option.Name }}">{{option.Name}} </option>
 </select>

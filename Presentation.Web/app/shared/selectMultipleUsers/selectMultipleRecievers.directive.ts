@@ -13,7 +13,7 @@
                     selectedIds: "=ngModel",
                     selectedTexts: "&",
                     field: "@",
-                    disabled: "&ngDisabled"
+                    isDisabled: "="
                 }
             };
         }

@@ -16,7 +16,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [InternalApi]
+    //[InternalApi]
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
@@ -169,6 +169,28 @@ namespace Presentation.Web.Controllers.OData
                     BackgroundJob.Delete(j.Key);
                 }
             }
+        }
+
+        [HttpPatch]
+        [EnableQuery]
+        [ODataRoute("DeactivateAdvice")]
+        public IHttpActionResult DeactivateAdvice([FromODataUri] int key)
+        {
+            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
+            if (entity == null) return NotFound();
+
+            try
+            {
+                DeleteJobFromHangfire(key, entity);
+                entity.IsActive = false;
+                UpdateRepository(entity);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorException("Failed to delete advice", e);
+                return InternalServerError(e);
+            }
+            return Updated(entity);
         }
     }
 }
