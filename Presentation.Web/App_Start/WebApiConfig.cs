@@ -383,10 +383,13 @@ namespace Presentation.Web
             var config = BindEntitySet<Config, ConfigsController>(builder);
             config.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-
             var getAdvicesByOrg = builder.Function("GetAdvicesByOrganizationId");
             getAdvicesByOrg.Parameter<int>("organizationId").Required();
             getAdvicesByOrg.ReturnsCollectionFromEntitySet<Advice>("Advice");
+
+            var deactivateAdvice = builder.Function("DeactivateAdvice");
+            deactivateAdvice.Parameter<int>("key").Required();
+            deactivateAdvice.Returns<IHttpActionResult>();
 
             BindEntitySet<Advice, AdviceController>(builder);
 

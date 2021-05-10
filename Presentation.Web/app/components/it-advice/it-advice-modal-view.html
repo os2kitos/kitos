@@ -16,7 +16,7 @@
                                              placeholder="Vælg rolle(r)"
                                              options="recieverRoles"
                                              selected="selectedReceivers"
-                                             ng-disabled="!hasWriteAccess">
+                                             ng-disabled="!isEditable()">
                     </select2-multiple-option>
                 </div>
                 <!--id: "@",
@@ -35,13 +35,13 @@
                                                data-ng-model="selectedRecievers"
                                                data-roles="recieverRoles"
                                                data-field="elemId"
-                                               data-ng-disabled="!hasWriteAccess">
+                                               data-ng-disabled="!isEditable()">
                     </select-multiple-recievers>
                 </div>-->
 
                 <div class="form-group">
                     <label for="contract-note" class="control-label">Til modtager via email</label>
-                    <input id="toExternal" type="email" name="toExternal" data-ng-disabled="!hasWriteAccess" placeholder="Skriv email" class="form-control" data-ng-model="externalTo">
+                    <input id="toExternal" type="email" name="toExternal" data-ng-disabled="!isEditable()" placeholder="Skriv email" class="form-control" data-ng-model="externalTo">
 
                 </div>
 
@@ -54,13 +54,14 @@
                                                data-roles="recieverRoles"
                                                data-users="recieverUsers"
                                                data-field="elemId"
-                                               data-ng-disabled="!hasWriteAccess">
+                                               data-ng-disabled="!isEditable()">
                     </select-multiple-recievers>
                 </div>
+
                 <div class="form-group">
                     <div>
                         <label for="contract-note" class="control-label">CC modtager via email</label>
-                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!hasWriteAccess" data-ng-model="externalCC">
+                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalCC">
                     </div>
                 </div>
 
@@ -82,12 +83,12 @@
                 <div class="form-group has-feedback" ng-show="advisType == 'Day'">
                     <!--Navn-->
                     <label class="control-label" for="name">Navn</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!hasWriteAccess">
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!isEditable()">
                 </div>
 
                 <div class="form-group" ng-show="advisType == 'Day'">
                     <label for="contract-supplier" class="control-label">Gentagemønster </label>
-                    <select class="form-control" data-id="sensitive" data-ng-disabled="!hasWriteAccess"
+                    <select class="form-control" data-id="sensitive" data-ng-disabled="!isEditable()"
                             data-ng-model="repitionPattern" >
                         <option value="Hour">Time</option>
                         <option value="Day">Dag</option>
@@ -103,7 +104,7 @@
                 <div class="form-group" ng-show="advisType == 'Day'">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!hasWriteAccess">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!isEditable()">
                     <span>{{startDateErrMessage}}</span>
                 </div>
 
@@ -111,35 +112,32 @@
                 <div class="form-group" ng-show="advisType == 'Day'">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!hasWriteAccess">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!isEditable()">
                     <span>{{stopDateErrMessage}}</span>
                     <span>{{errMessage}}</span>
                 </div>
-
             </div>
             <div class="col-md-12">
                 <div class="form-group has-feedback" data-show-errors>
                     <!--Emne-->
                     <label class="control-label" for="name">Emne <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="!hasWriteAccess">
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="!isEditable()">
                 </div>
             </div>
         </div>
         <!--Email body-->
         <div class="form-group">
-            <label for="contract-note" class="control-label">Email body</label>
-            <textarea ui-tinymce="tinymceOptions" data-ng-model="emailBody"></textarea>
-
+            <label for="contract-note" class="control-label">Email tekst</label>
+            <textarea ui-tinymce="tinymceOptions" data-ng-model="emailBody" data-ng-disabled="!isEditable()"></textarea>
         </div>
     </div>
 
-        <div class="modal-footer">
-            <!--Send Advis-->
-
-                <button type="submit" class="pull-left btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && !hasWriteAccess)">Send</button>
-
-                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-            <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && repitionPattern && stopDate &&  startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && !hasWriteAccess)">Gem</button>
-            <input type="hidden" ng-model="hiddenForjob"/>
-        </div>
+    <div class="modal-footer">
+        <!--Send Advis-->
+        <button type="submit" class="pull-left btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && !isEditable())">Send</button>
+        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && repitionPattern && stopDate && startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && isEditable())">Gem</button>
+        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable()">Deaktiver</button>
+        <input type="hidden" ng-model="hiddenForjob"/>
+    </div>
 </form>
