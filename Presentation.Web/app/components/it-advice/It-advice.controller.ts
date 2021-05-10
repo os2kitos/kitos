@@ -197,16 +197,16 @@
                                                 $scope.repitionPattern = response.data.Scheduling;
                                                 $scope.startDate = response.data.AlarmDate;
                                                 $scope.stopDate = response.data.StopDate;
-                                                $scope.selectedRecievers = [];
                                                 $scope.hiddenForjob = response.data.JobId;
                                                 $scope.isActive = response.data.IsActive;
+                                                $scope.selectedRecievers = [];
                                                 $scope.selectedCC = [];
                                                 const ccs = [];
                                                 for (let i = 0; i < response.data.Reciepients.length; i++) {
                                                     let recpientType = response.data.Reciepients[i].RecpientType;
                                                     let recieverType = response.data.Reciepients[i].RecieverType;
                                                     if (recpientType === "ROLE" && recieverType === "RECIEVER") {
-                                                        $scope.selectedRecievers.push(response.data.Reciepients[i].Name);
+                                                        $scope.selectedRecievers.push(response.data.Reciepients[i].name);
                                                     } else if (recpientType === "ROLE" && recieverType === "CC") {
                                                         $scope.selectedCC.push(response.data.Reciepients[i].Name);
                                                     } else if (recpientType === "USER" && recieverType === "RECIEVER") {

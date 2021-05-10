@@ -11,13 +11,12 @@
             <div class="col-md-6">
                 <!--Modtager(e)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label">Til</label>
-                    <select-multiple-recievers data-id="agreement-elements"
+                    <label for="to-receivers" class="control-label">Til</label>
+                    <select-multiple-recievers id="to-receivers"
                                                placeholder="Vælg modtagere"
-                                               data-ng-model="selectedRecievers"
-                                               data-roles="recieverRoles"
-                                               data-field="elemId"
-                                               isDisabled="!isEditable()">
+                                               ng-model="selectedRecievers"
+                                               roles="recieverRoles"
+                                               field="elemId">
                     </select-multiple-recievers>
                 </div>
 
@@ -33,14 +32,13 @@
 
                 <!--CC('ere)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label small">CC</label>
-                    <select-multiple-recievers data-id="agreement-elements"
+                    <label for="cc-receivers" class="control-label small">CC</label>
+                    <select-multiple-recievers id="cc-receivers"
                                                data-placeholder="Vælg CC"
-                                               data-ng-model="selectedCC"
-                                               data-roles="recieverRoles"
-                                               data-users="recieverUsers"
-                                               data-field="elemId"
-                                               isDisabled="!isEditable()">
+                                               ng-model="selectedCC"
+                                               roles="recieverRoles"
+                                               users="recieverUsers"
+                                               field="elemId">
                     </select-multiple-recievers>
                 </div>
 
@@ -50,7 +48,7 @@
                         <div ng-show="!CCcollapsed">Skjul CC modtagere</div>
                     </a>
                     <div ng-show="!CCcollapsed">
-                        <input id="cc" type="text" placeholder="adskil flere adresser med ," class="form-control" data-ng-model="externalCC" data-ng-disabled="!isEditable()" >
+                        <input id="cc" type="text" placeholder="Adskil flere adresser med ," class="form-control" data-ng-model="externalCC" data-ng-disabled="!isEditable()" >
                     </div>
                 </div>
 
