@@ -16,7 +16,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    //[InternalApi]
+    [InternalApi]
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;

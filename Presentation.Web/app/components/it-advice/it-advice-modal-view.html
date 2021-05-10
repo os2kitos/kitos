@@ -11,33 +11,15 @@
             <div class="col-md-6">
                 <!--Modtager(e)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <select2-multiple-option id="agreement-elements"
+                    <select2-multiple-option id="role-receivers"
                                              label="Til modtager via rolle"
                                              placeholder="Vælg rolle(r)"
-                                             options="recieverRoles"
-                                             selected="selectedReceivers"
+                                             options="receiverRoles"
+                                             selected="preSelectedReceivers"
+                                             ng-model="selectedReceivers"
                                              ng-disabled="!isEditable()">
                     </select2-multiple-option>
                 </div>
-                <!--id: "@",
-                label: "@",
-                placeholder: "@",
-                options: "=",
-                selectedIds: "=ngModel",
-                selected: "=",
-                disabled: "=ngDisabled",
-                required: "@"-->
-
-                <!--<div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label">Til modtager via rolle</label>
-                    <select-multiple-recievers data-id="agreement-elements"
-                                               placeholder="Vælg rolle(r)"
-                                               data-ng-model="selectedRecievers"
-                                               data-roles="recieverRoles"
-                                               data-field="elemId"
-                                               data-ng-disabled="!isEditable()">
-                    </select-multiple-recievers>
-                </div>-->
 
                 <div class="form-group">
                     <label for="contract-note" class="control-label">Til modtager via email</label>
@@ -47,15 +29,14 @@
 
                 <!--CC('ere)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <label for="contract-note" class="control-label">CC modtager via rolle</label>
-                    <select-multiple-recievers data-id="agreement-elements"
-                                               data-placeholder="Vælg rolle(r)"
-                                               data-ng-model="selectedCC"
-                                               data-roles="recieverRoles"
-                                               data-users="recieverUsers"
-                                               data-field="elemId"
-                                               data-ng-disabled="!isEditable()">
-                    </select-multiple-recievers>
+                    <select2-multiple-option id="role-ccs"
+                                             label="CC modtager via rolle"
+                                             placeholder="Vælg rolle(r)"
+                                             options="receiverRoles"
+                                             selected="preSelectedCCs"
+                                             ng-model="selectedCCs"
+                                             ng-disabled="!isEditable()">
+                    </select2-multiple-option>
                 </div>
 
                 <div class="form-group">
@@ -134,9 +115,8 @@
 
     <div class="modal-footer">
         <!--Send Advis-->
-        <button type="submit" class="pull-left btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && !isEditable())">Send</button>
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && repitionPattern && stopDate && startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && isEditable())">Gem</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((externalTo || selectedReceivers.length > 0) && subject && repitionPattern && stopDate && startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && isEditable())">Gem</button>
         <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable()">Deaktiver</button>
         <input type="hidden" ng-model="hiddenForjob"/>
     </div>
