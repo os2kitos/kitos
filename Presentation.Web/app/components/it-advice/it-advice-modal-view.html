@@ -56,18 +56,18 @@
                             data-ng-model="advisType">
                         <option value="clear" selected> </option>
                         <option value="once">Straks</option>
-                        <option value="Day">Gentagelse</option>
+                        <option value="repeat">Gentagelse</option>
                     </select>
                 </div>
 
 
-                <div class="form-group has-feedback" ng-show="advisType == 'Day'">
+                <div class="form-group has-feedback" ng-show="advisType == 'repeat'">
                     <!--Navn-->
                     <label class="control-label" for="name">Navn</label>
                     <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!isEditable()">
                 </div>
 
-                <div class="form-group" ng-show="advisType == 'Day'">
+                <div class="form-group" ng-show="advisType == 'repeat'">
                     <label for="contract-supplier" class="control-label">Gentagemønster </label>
                     <select class="form-control" data-id="sensitive" data-ng-disabled="!isEditable()"
                             data-ng-model="repitionPattern" >
@@ -82,7 +82,7 @@
                 </div>
 
                 <!--Dato-->
-                <div class="form-group" ng-show="advisType == 'Day'">
+                <div class="form-group" ng-show="advisType == 'repeat'">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!isEditable()">
@@ -90,7 +90,7 @@
                 </div>
 
                 <!--Dato-->
-                <div class="form-group" ng-show="advisType == 'Day'">
+                <div class="form-group" ng-show="advisType == 'repeat'">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!isEditable()">
