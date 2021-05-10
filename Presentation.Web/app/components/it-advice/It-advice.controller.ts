@@ -172,6 +172,7 @@
                                 $scope.hasWriteAccess = hasWriteAccess;
                                 $scope.selectedReceivers = [];
                                 $scope.selectedCCs = [];
+                                $scope.advisType = "";
 
                                 var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                                 if (select2Roles) {
@@ -180,6 +181,7 @@
                                     $scope.showRoleFields = false;
                                 }
                                 if (action === "POST") {
+                                    $scope.advisName = "Opret advis";
                                     $scope.hideSend = false;
                                     $scope.externalCC = currentUser.email;
                                     $scope.isActive = true;
@@ -189,6 +191,7 @@
                                 }
                                 if (action === "PATCH") {
                                     $scope.hideSend = true;
+                                    $scope.advisName = "Redigere advis";
                                     if (id != undefined) {
                                         $scope.name = adviceData.Name;
                                         $scope.subject = adviceData.Subject;
