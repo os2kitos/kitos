@@ -65,31 +65,69 @@
                                       ng-disabled="!vm.hasWriteAccess" />
                     </div>
                 </div>
-                <div class="well">
-                    <!--Oversight Completed  -->
-                    <div class="form-group">
-                        <label for="oversightCompleted" class="control-label small">Gennemført tilsyn</label>
-                        <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
-                    </div>
-                    <!-- Latest Oversight -->
-                    <div class="form-group" ng-if="vm.shouldShowLatestOversightCompletedDate">
-                        <div class="form-group">
-                            <label for="latestOversightCompletedDate" class="control-label small">Dato for seneste tilsyn</label>
-                            <date-picker id="latestOversightCompletedDate"
-                                         ng-model="vm.latestOversightCompletedDate"
-                                         ng-disabled="!vm.hasWriteAccess" />
-                        </div>
-                    </div>
-                    <!-- Oversight Completed Remark -->
-                    <div class="form-group">
-                        <label for="oversightCompletedRemark " class="control-label small">Bemærkninger</label>
-                        <remark-field id="oversightCompletedRemark"
-                                      rows="2"
-                                      ng-model="vm.oversightCompletedRemark"
-                                      ng-disabled="!vm.hasWriteAccess" />
-                    </div>
-                </div>
             </div>
+        </div>
+        <div id="OversightCompleted" class="h4">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="col-xs-3">Gennemført tilsyn</th>
+                        <th class="col-xs-7">Bemærkninger</th>
+                        <th class="col-xs-1"></th>
+                        <th></th> <!-- Empty field to help with styling -->
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <single-select-select2 id="oversightCompleted" ng-model="vm.isOversightCompleted" ng-disabled="!vm.hasWriteAccess" />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group" data-show-errors>
+                                <remark-field id="oversightCompletedRemark"
+                                                rows="1"
+                                                ng-model="vm.oversightCompletedRemark"
+                                                ng-disabled="!vm.hasWriteAccess" />
+                            </div>
+                        </td>
+                        <td>
+                            <button id="create-oversight-date" class="btn btn-success btn-sm" data-ng-click="createOversightDate()">Opret tilsyn</button>
+                        </td>
+                        <td>
+                            <!-- Empty field to help with styling -->
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="OversightDates" class="h4">
+            <table class="table" ng-hide="vm.oversightDates.length < 1">
+                <thead>
+                    <tr>
+                        <th class="col-xs-3">Dato for seneste tilsyn</th>
+                        <th class="col-xs-7">Bemærkninger</th>
+                        <th class="col-xs-1"></th>
+                        <th></th> <!-- Empty field to help with styling -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="oversightDate in vm.oversightDates">
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            <button id="edit-oversight-date" class="btn btn-default btn-sm" data-ng-click="deleteOversightDate(oversightDate.Id)">Ret tilsyn</button>
+                            <button id="delete-oversight-date" class="btn btn-danger btn-sm" data-ng-click="deleteOversightDate(oversightDate.Id)">Slet tilsyn</button>
+                        </td>
+                        <td>
+                            <!-- Empty field to help with styling -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
