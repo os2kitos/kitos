@@ -183,7 +183,6 @@
                                 if (action === "POST") {
                                     $scope.advisName = "Opret advis";
                                     $scope.hideSend = false;
-                                    $scope.externalCC = currentUser.email;
                                     $scope.isActive = true;
                                     $scope.emailBody =
                                         `<a href='${$window.location.href.replace("advice", "main")}'>Link til ${type
