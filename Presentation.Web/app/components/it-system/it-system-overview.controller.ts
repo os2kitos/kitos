@@ -184,35 +184,41 @@
                         }
                     });
                     return response;
-                }).withToolbarEntry({
-                    id: "filterOrg",
-                    title: "Gem filter for organisation",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => true,
-                    onClick: () => {
-                        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
-                            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
-                        }
+                })
+
+                // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
+
+                //.withToolbarEntry({
+                //    id: "filterOrg",
+                //    title: "Gem filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
+                //            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
+                //        }
                         
-                    },
-                    show: user.isLocalAdmin,
-                } as Utility.KendoGrid.IKendoToolbarEntry)
-                .withToolbarEntry({
-                    id: "removeFilterOrg",
-                    title: "Slet filter for organisation",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => true,
-                    onClick: () => {
-                        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
-                            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
-                        }
-                    },
-                    show: user.isLocalAdmin,
-                } as Utility.KendoGrid.IKendoToolbarEntry)
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
+                //.withToolbarEntry({
+                //    id: "removeFilterOrg",
+                //    title: "Slet filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
+                //            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
+                //        }
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
+
+
                 .withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
