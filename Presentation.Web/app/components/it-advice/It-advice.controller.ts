@@ -17,9 +17,14 @@
                             dataType: "json"
                         },
                     },
+                    sort: {
+                        field: "AlarmDate",
+                        dir: "asc"
+                    },
                     pageSize: 10,
                     serverPaging: true,
                     serverFiltering: true,
+                    serverSorting: true
                 },
                 selectable: true,
                 change: onChange,
