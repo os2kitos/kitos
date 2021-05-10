@@ -169,14 +169,15 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser",($scope, $modalInstance, roles, $window, type, action, object, currentUser: Kitos.Services.IUser) => {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper", ($scope, $modalInstance, roles, $window, type, action, object, currentUser: Kitos.Services.IUser, entityMapper: Kitos.Services.LocalOptions.IEntityMapper) => {
 
+                            var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                             $scope.hasWriteAccess = hasWriteAccess;
                             $scope.showRoleFields = true;
                             modalOpen = true;
 
-                            if (roles) {
-                                $scope.recieverRoles = roles;
+                            if (select2Roles) {
+                                $scope.recieverRoles = select2Roles;
                             } else {
                                 $scope.showRoleFields = false;
                                 $scope.collapsed = false;
@@ -184,7 +185,6 @@
 
                             if (action === 'POST') {
                                 $scope.hideSend = false;
-                                /*$scope.externalCC = currentUser.email;*/
                                 $scope.advisType = "clear";
                                 $scope.emailBody = "<a href='" + $window.location.href.replace("advice", "main") + "'>" + "Link til " + type + "</a>";
                             }
@@ -212,7 +212,11 @@
 
                                         for (var i = 0; i < response.data.Reciepients.length; i++) {
                                             if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
-                                                $scope.selectedRecievers.push(response.data.Reciepients[i].Name);
+                                                var nameOfRoleReceiver = response.data.Reciepients[i].Name;
+                                                var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
+                                                if (selectedReceiver === undefined) {
+                                                    $scope.selectedReceivers.push(selectedReceiver);
+                                                }
                                             } else if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'CC') {
                                                 $scope.selectedCC.push(response.data.Reciepients[i].Name);
                                             } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {

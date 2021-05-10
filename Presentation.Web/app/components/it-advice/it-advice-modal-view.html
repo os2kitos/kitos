@@ -11,6 +11,24 @@
             <div class="col-md-6">
                 <!--Modtager(e)-->
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
+                    <select2-multiple-option id="agreement-elements"
+                                             label="Til modtager via rolle"
+                                             placeholder="Vælg rolle(r)"
+                                             options="recieverRoles"
+                                             selected="selectedReceivers"
+                                             ng-disabled="!hasWriteAccess">
+                    </select2-multiple-option>
+                </div>
+                <!--id: "@",
+                label: "@",
+                placeholder: "@",
+                options: "=",
+                selectedIds: "=ngModel",
+                selected: "=",
+                disabled: "=ngDisabled",
+                required: "@"-->
+
+                <!--<div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label">Til modtager via rolle</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                placeholder="Vælg rolle(r)"
@@ -19,7 +37,7 @@
                                                data-field="elemId"
                                                data-ng-disabled="!hasWriteAccess">
                     </select-multiple-recievers>
-                </div>
+                </div>-->
 
                 <div class="form-group">
                     <label for="contract-note" class="control-label">Til modtager via email</label>
@@ -31,7 +49,7 @@
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label">CC modtager via rolle</label>
                     <select-multiple-recievers data-id="agreement-elements"
-                                               data-placeholder="Vælg CC"
+                                               data-placeholder="Vælg rolle(r)"
                                                data-ng-model="selectedCC"
                                                data-roles="recieverRoles"
                                                data-users="recieverUsers"
