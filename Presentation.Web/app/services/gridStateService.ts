@@ -287,7 +287,7 @@
                 KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, jsonString)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Filtre og sortering gemt gemt din organisation");
+                            notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
                         }
                     })
                     .catch((res) => {
@@ -299,13 +299,13 @@
                 KendoFilterService.DeleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Gemte organisations filtre er slettet");
+                            notify.addSuccessMessage("Organisationens gemte filtre og sorteringer er slettet");
                             removeSession();
                             $state.go(".", null, { reload: true });
                         }
                     })
                     .catch((res) => {
-                        notify.addErrorMessage("Der opstod en fejl i forsøget på at slette det nye filter");
+                        notify.addErrorMessage("Der opstod en fejl i forsøget på at slette det gemte filter");
                     });
             }
 
