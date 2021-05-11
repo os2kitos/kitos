@@ -881,6 +881,7 @@
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\AdviceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingRegistrationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\GetDateHelper.ts" />
@@ -906,6 +907,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\LocalAdmin.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Tabs\Advice.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
@@ -933,6 +935,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Tabs\ItSystemAdvice.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
