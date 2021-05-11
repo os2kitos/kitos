@@ -1164,7 +1164,7 @@
     <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
