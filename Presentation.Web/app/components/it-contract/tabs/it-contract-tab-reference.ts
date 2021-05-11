@@ -92,13 +92,10 @@
                                 }' data-confirm-click="Er du sikker på at du vil slette?" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(${
                                 dataItem.id})'><i class='fa fa-trash-o' aria-hidden='true'></i></button>`;
                             
-
-                            if (Kitos.Utility.Validation.isValidExternalReference(dataItem.url)) {
-                                if (dataItem.id === contract.referenceId) {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
-                                } else {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
-                                }
+                            if (dataItem.id === contract.referenceId) {
+                                HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
+                            } else {
+                                HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
                             }
 
                             return HTML;

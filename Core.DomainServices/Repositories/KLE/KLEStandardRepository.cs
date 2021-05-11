@@ -4,11 +4,13 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.KLEDataBridge;
 using Serilog;
 
@@ -24,6 +26,7 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
         private readonly ILogger _logger;
+        private readonly IDomainEvents _domainEvents;
 
         public KLEStandardRepository(
             IKLEDataBridge kleDataBridge,
@@ -32,13 +35,15 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<TaskUsage> taskUsageRepository,
             IOperationClock clock,
-            ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
+            ILogger logger,
+            IDomainEvents domainEvents) : this(new KLEParentHelper(), new KLEConverterHelper(clock), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
             _systemUsageRepository = systemUsageRepository;
             _logger = logger;
+            _domainEvents = domainEvents;
         }
 
         private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper, IGenericRepository<TaskUsage> taskUsageRepository)
@@ -186,7 +191,7 @@ namespace Core.DomainServices.Repositories.KLE
         private void RemoveProjectTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itProject in removedTaskRef.ItProjects)
+            foreach (var itProject in removedTaskRef.ItProjects.ToList())
             {
                 itProject.TaskRefs.Remove(removedTaskRef);
             }
@@ -195,16 +200,17 @@ namespace Core.DomainServices.Repositories.KLE
         private void RemoveSystemTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itSystem in removedTaskRef.ItSystems)
+            foreach (var itSystem in removedTaskRef.ItSystems.ToList())
             {
                 itSystem.TaskRefs.Remove(removedTaskRef);
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
             }
         }
 
         private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut)
+            foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut.ToList())
             {
                 itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
             }
@@ -213,7 +219,7 @@ namespace Core.DomainServices.Repositories.KLE
         private void RemoveSystemUsageTaskRefs(List<KLEChange> kleChanges)
         {
             var systemUsages = _systemUsageRepository.GetWithReferencePreload(s => s.TaskRefs);
-            foreach (var systemUsage in systemUsages)
+            foreach (var systemUsage in systemUsages.ToList())
             {
                 foreach (var taskRef in systemUsage.TaskRefs.ToList().Where(t => kleChanges.Exists(c => c.TaskKey == t.TaskKey)))
                 {
@@ -248,13 +254,14 @@ namespace Core.DomainServices.Repositories.KLE
             int ownedByOrgnizationUnitId)
         {
             var updates = BuildChangeSet(changes, KLEChangeType.Renamed);
-            foreach (var update in updates)
+            foreach (var update in updates.ToList())
             {
                 update.Item1.Description = update.Item2.UpdatedDescription;
                 update.Item1.Uuid = update.Item2.Uuid;
                 update.Item1.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 update.Item1.ActiveFrom = update.Item2.ActiveFrom;
                 update.Item1.ActiveTo = update.Item2.ActiveTo;
+                _domainEvents.Raise(new EntityUpdatedEvent<TaskRef>(update.Item1));
             }
         }
 
@@ -305,7 +312,7 @@ namespace Core.DomainServices.Repositories.KLE
         {
             var updates = BuildChangeSet(changes, KLEChangeType.Added);
 
-            foreach (var update in updates)
+            foreach (var update in updates.ToList())
             {
                 var existingTaskRef = update.Item1;
                 if (_kleParentHelper.TryDeduceParentTaskKey(update.Item2.TaskKey, out var parentTaskKey))
@@ -328,7 +335,8 @@ namespace Core.DomainServices.Repositories.KLE
                 .AsQueryable()
                 .Where(taskRef => taskKeys.Contains(taskRef.TaskKey))
                 .AsEnumerable()
-                .Select(taskRef => new Tuple<TaskRef, KLEChange>(taskRef, kleChanges[taskRef.TaskKey]));
+                .Select(taskRef => new Tuple<TaskRef, KLEChange>(taskRef, kleChanges[taskRef.TaskKey]))
+                .ToList();
             return updates;
         }
 

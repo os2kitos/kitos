@@ -8,6 +8,10 @@ namespace Infrastructure.Services.BackgroundJobs
         Task LaunchAdviceCleanupAsync(CancellationToken token = default);
         Task LaunchLinkCheckAsync(CancellationToken token = default);
         Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default);
-        Task LaunchScheduleDataProcessingRegistrationReadUpdates(CancellationToken token = default);
+        Task LaunchScheduleDataProcessingRegistrationReadModelUpdates(CancellationToken token = default);
+        Task LaunchScheduleItSystemUsageOverviewReadModelUpdates(CancellationToken token = default);
+        Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default);
+        Task LaunchFullReadModelRebuild(ReadModelRebuildScope scope, CancellationToken token);
+        Task LaunchPurgeDuplicatedReadModelUpdates(CancellationToken token);
     }
 }

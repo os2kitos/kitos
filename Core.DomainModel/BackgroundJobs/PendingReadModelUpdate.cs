@@ -11,10 +11,21 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_BasisForTransfer = 4,
         DataProcessingRegistration_DataResponsible = 5,
         DataProcessingRegistration_OversightOption = 6,
-        DataProcessingRegistration_ItContract = 7
+        DataProcessingRegistration_ItContract = 7,
+        ItSystemUsage = 8,
+        ItSystemUsage_ItSystem = 9,
+        ItSystemUsage_User = 10,
+        ItSystemUsage_OrganizationUnit = 11,
+        ItSystemUsage_Organization = 12,
+        ItSystemUsage_BusinessType = 13,
+        ItSystemUsage_TaskRef = 14,
+        ItSystemUsage_Contract = 15,
+        ItSystemUsage_Project = 16,
+        ItSystemUsage_DataProcessingRegistration = 17,
+        ItSystemUsage_ItInterface = 18
     }
 
-    public class PendingReadModelUpdate
+    public class PendingReadModelUpdate : IHasId
     {
         protected PendingReadModelUpdate()
         {

@@ -4,12 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.BackgroundJobs.Model.ReadModels
@@ -22,8 +19,6 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IPendingReadModelUpdateRepository _updateRepository;
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IItContractRepository _contractRepository;
         private readonly ITransactionManager _transactionManager;
         public string Id => StandardJobIds.ScheduleDataProcessingRegistrationReadModelUpdates;
         private const int BatchSize = 250;
@@ -32,22 +27,23 @@ namespace Core.BackgroundJobs.Model.ReadModels
             IPendingReadModelUpdateRepository updateRepository,
             IDataProcessingRegistrationReadModelRepository readModelRepository,
             IDataProcessingRegistrationRepository dataProcessingRegistrationRepository,
-            IOrganizationRepository organizationRepository,
-            IItContractRepository contractRepository,
             ITransactionManager transactionManager)
         {
             _updateRepository = updateRepository;
             _readModelRepository = readModelRepository;
             _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
-            _organizationRepository = organizationRepository;
-            _contractRepository = contractRepository;
             _transactionManager = transactionManager;
         }
 
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var updatesExecuted = 0;
-            var alreadyScheduledIds = new HashSet<int>();
+            var idsOfDprsAlreadyInQueueForUpdate = _updateRepository
+                .GetMany(PendingReadModelUpdateSourceCategory.DataProcessingRegistration, int.MaxValue)
+                .Select(x => x.SourceId)
+                .ToList();
+
+            var alreadyScheduledIds = new HashSet<int>(idsOfDprsAlreadyInQueueForUpdate);
 
             updatesExecuted = HandleUserUpdates(token, updatesExecuted, alreadyScheduledIds);
             updatesExecuted = HandleSystemUpdates(token, updatesExecuted, alreadyScheduledIds);
@@ -97,7 +93,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x=>x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -162,7 +158,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x=>x.SourceEntityId);
+                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -172,22 +168,22 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private int PerformUpdate(
             int updatesExecuted,
             HashSet<int> alreadyScheduledIds,
-            IQueryable<int> dataProcessingRegistrationIds,
-            PendingReadModelUpdate update,
+            IQueryable<int> idsOfAffectedDprs,
+            PendingReadModelUpdate sourceUpdate,
             IDatabaseTransaction transaction)
         {
-            var updates = dataProcessingRegistrationIds
+            var updates = idsOfAffectedDprs
                 .Where(id => alreadyScheduledIds.Contains(id) == false)
                 .ToList()
                 .Select(id => PendingReadModelUpdate.Create(id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
                 .ToList();
 
-            updatesExecuted = CompleteUpdate(updatesExecuted, updates, update, transaction);
+            updatesExecuted = CompleteUpdate(updatesExecuted, updates, sourceUpdate, transaction);
+            updates.ForEach(completedUpdate => alreadyScheduledIds.Add(completedUpdate.SourceId));
             return updatesExecuted;
         }
 
-        private int CompleteUpdate(int updatesExecuted, List<PendingReadModelUpdate> updates, PendingReadModelUpdate userUpdate,
-            IDatabaseTransaction transaction)
+        private int CompleteUpdate(int updatesExecuted, List<PendingReadModelUpdate> updates, PendingReadModelUpdate userUpdate, IDatabaseTransaction transaction)
         {
             updates.ForEach(update => _updateRepository.Add(update));
             _updateRepository.Delete(userUpdate);

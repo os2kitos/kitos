@@ -4,6 +4,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -23,6 +24,11 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
     {
+        public const int LongProperyMaxLength = 200;
+        public const int DefaultMaxLength = 100;
+        public const int LinkNameMaxLength = 150;
+        
+
         public ItSystemUsage()
         {
             this.Contracts = new List<ItContractItSystemUsage>();
@@ -399,6 +405,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// DPAs using this system
         /// </summary>
         public virtual ICollection<DataProcessingRegistration> AssociatedDataProcessingRegistrations { get; set; }
+        /// <summary>
+        /// OverviewReadModels
+        /// </summary>
+        public virtual ICollection<ItSystemUsageOverviewReadModel> OverviewReadModels { get; set; }
 
         public bool HasDataProcessingAgreement() =>
             AssociatedDataProcessingRegistrations?.Any(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true;

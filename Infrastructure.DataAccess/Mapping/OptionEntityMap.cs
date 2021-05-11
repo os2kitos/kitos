@@ -8,6 +8,7 @@ namespace Infrastructure.DataAccess.Mapping
         protected OptionEntityMap()
         {
             this.Property(t => t.Name)
+                .HasMaxLength(OptionEntity<TReference>.MaxNameLength)
                 .IsRequired();
         }
     }

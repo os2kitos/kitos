@@ -14,7 +14,8 @@ type HeaderButtons = {
     editReference: protractor.ElementFinder,
     deleteReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder,
-    createReference: protractor.ElementFinder
+    createReference: protractor.ElementFinder,
+    saveFilterToOrg: protractor.ElementFinder
 };
 
 type InputFields =
@@ -26,7 +27,6 @@ type InputFields =
 };
 
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder,
     referenceName: protractor.ElementFinder,
     referenceId: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
@@ -35,7 +35,6 @@ type ColumnHeaders = {
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
-    systemRightsOwner: protractor.ElementFinder,
 };
 
 type ColumnObjects = {
@@ -76,7 +75,8 @@ class kendoToolbarWrapper {
             systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
             createDpa: element(byDataElementType(consts.kendoDpaButtonCreate)),
             createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
-            deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton))
+            deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton)),
+            saveFilterToOrg: element(byDataElementType(consts.filterOrgButton))
 
         };
         return buttons;
@@ -97,7 +97,6 @@ class kendoToolbarWrapper {
         var kendo = new kendoHelper();
 
         var columns: ColumnHeaders = {
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
@@ -106,7 +105,6 @@ class kendoToolbarWrapper {
             userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
-            systemRightsOwner: kendo.getColumnHeaderClickable(consts.kendoSystemRightsOwnerHeader)
 
         };
         return columns;

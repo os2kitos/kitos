@@ -21,7 +21,7 @@
     export class OrganizationUserController implements IOverviewController {
 
         private storageKey = "org-overview";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user);
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
@@ -238,7 +238,7 @@
                     <uib-tab index="1" heading="Projekt roller"><user-project-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-project-roles></uib-tab>
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
-                    <uib-tab index="4" heading="Databehandlerregisteringer roller"><user-data-processing-registration-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-data-processing-registration-roles></uib-tab>
+                    <uib-tab index="4" heading="Databehandlingsroller"><user-data-processing-registration-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-data-processing-registration-roles></uib-tab>
                 </uib-tabset>`,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.BackgroundJobs;
 
@@ -18,7 +19,15 @@ namespace Core.DomainServices.Repositories.BackgroundJobs
             if (newItem == null)
                 throw new ArgumentNullException(nameof(newItem));
 
-            _repository.Insert(newItem);
+            AddMany(new[] { newItem });
+        }
+
+        public void AddMany(IEnumerable<PendingReadModelUpdate> newItems)
+        {
+            foreach (var pendingReadModelUpdate in newItems)
+            {
+                _repository.Insert(pendingReadModelUpdate);
+            }
             _repository.Save();
         }
 

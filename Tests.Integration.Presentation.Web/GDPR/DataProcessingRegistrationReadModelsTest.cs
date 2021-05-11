@@ -12,11 +12,20 @@ using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using System.Threading;
+using Xunit.Abstractions;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
     public class DataProcessingRegistrationReadModelsTest : WithAutoFixture
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public DataProcessingRegistrationReadModelsTest(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public async Task Can_Query_And_Page_ReadModels()
         {
@@ -68,16 +77,15 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var dataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, dpName, "22334455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
             var subDataProcessor = await OrganizationHelper.CreateOrganizationAsync(organizationId, subDpName, "22314455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id, oversightInterval);
+
+            await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id, oversightCompleted);
+
             var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
             var role = businessRoleDtos.First();
             var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, role.Id);
             var user = availableUsers.First();
-            await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(registration.Id,
-                oversightInterval);
-
-            await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registration.Id,
-                oversightCompleted);
-
+            _testOutputHelper.WriteLine($"Attempting to assign user {user.Id}:{user.Email} as role {role.Id}:{role.Name} in dpr {registration.Id}:{registration.Name}");
             using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, role.Id, user.Id);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -224,7 +232,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
                 {
                     return Task.FromResult(
                         DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
-                }, TimeSpan.FromSeconds(30));
+                }, TimeSpan.FromSeconds(120));
         }
 
         [Fact]
@@ -267,7 +275,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             stopwatch.Start();
             do
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                Thread.Sleep(TimeSpan.FromMilliseconds(500));
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 

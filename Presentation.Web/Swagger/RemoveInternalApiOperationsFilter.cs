@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger;
 
@@ -35,11 +33,6 @@ namespace Presentation.Web.Swagger
         private static bool IsControllerInternal(ApiDescription apiDescription)
         {
             return apiDescription.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<InternalApiAttribute>().Any();
-        }
-
-        private static bool IsMutation(HttpActionDescriptor actionDescriptor)
-        {
-            return actionDescriptor.SupportedHttpMethods.Any(x => x.Method.IsMutation());
         }
     }
 }

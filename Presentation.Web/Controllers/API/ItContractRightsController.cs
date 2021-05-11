@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -9,8 +10,9 @@ namespace Presentation.Web.Controllers.API
     {
         public ItContractRightController(
             IGenericRepository<ItContractRight> rightRepository, 
-            IGenericRepository<ItContract> objectRepository) 
-            : base(rightRepository, objectRepository)
+            IGenericRepository<ItContract> objectRepository,
+            IDomainEvents domainEvents) 
+            : base(rightRepository, objectRepository, domainEvents)
         {
         }
     }

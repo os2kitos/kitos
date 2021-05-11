@@ -104,6 +104,7 @@ namespace Core.ApplicationServices.SystemUsage
             usage.OrganizationId = newSystemUsage.OrganizationId;
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
+            _domainEvents.Raise(new EntityCreatedEvent<ItSystemUsage>(usage));
 
             return usage;
         }
@@ -193,6 +194,8 @@ namespace Core.ApplicationServices.SystemUsage
                                     onSuccess: createdRelation =>
                                     {
                                         _usageRepository.Save();
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         return createdRelation;
                                     },
                                     onFailure: error => error
@@ -216,6 +219,13 @@ namespace Core.ApplicationServices.SystemUsage
                 new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, toInterfaceId, toFrequencyId, toContractId),
                 new SystemRelationOperationEntities());
 
+            var originalToSystemUsage = _relationRepository.GetByKey(relationId)?.ToSystemUsage;
+
+            if(originalToSystemUsage == null)
+            {
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.NotFound);
+            }
+
             return
                 LoadFromSystemUsage(operationContext)
                     .Select(LoadToSystemUsage)
@@ -237,10 +247,16 @@ namespace Core.ApplicationServices.SystemUsage
                                 .ModifyUsageRelation(relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
-                                    onSuccess: createdRelation =>
+                                    onSuccess: modifiedRelation =>
                                     {
+                                        if(originalToSystemUsage.Id != toSystemUsageId)
+                                        {
+                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage)); 
+                                        }
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         _usageRepository.Save();
-                                        return createdRelation;
+                                        return modifiedRelation;
                                     },
                                     onFailure: error => error
                                 );
@@ -342,9 +358,13 @@ namespace Core.ApplicationServices.SystemUsage
                                 (
                                     onSuccess: removedRelation =>
                                     {
+                                        var fromSystemUsage = removedRelation.FromSystemUsage;
+                                        var toSystemUsage = removedRelation.ToSystemUsage;
                                         _relationRepository.DeleteWithReferencePreload(removedRelation);
                                         _relationRepository.Save();
                                         _usageRepository.Save();
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                         transaction.Commit();
                                         return removedRelation;
                                     },
@@ -467,6 +487,7 @@ namespace Core.ApplicationServices.SystemUsage
                     onSuccess: addedSensitivityLevel =>
                     {
                         _usageRepository.Save();
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
                         return addedSensitivityLevel;
                     },
                     onFailure: error => error);
@@ -492,6 +513,7 @@ namespace Core.ApplicationServices.SystemUsage
                         _sensitiveDataLevelRepository.DeleteWithReferencePreload(removedSensitivityLevel);
                         _sensitiveDataLevelRepository.Save();
                         _usageRepository.Save();
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
                         return removedSensitivityLevel;
                     },
                     onFailure: error =>

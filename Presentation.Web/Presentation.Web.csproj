@@ -343,6 +343,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
+    <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
+    <Compile Include="Helpers\StringHelpers.cs" />
+    <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
+    <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
+    <Compile Include="Models\External\V2\ItInterfaceResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItInterfaceRequestDTO.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
+    <Compile Include="Models\External\V2\DeactivationReasonRequestDTO.cs" />
+    <Compile Include="Controllers\External\V2\GeneralController.cs" />
+    <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\DataProcessingRegistrationController.cs" />
@@ -376,6 +391,7 @@
     <Content Include="Login.ashx" />
     <Compile Include="Controllers\API\SystemRelationController.cs" />
     <Compile Include="Controllers\OData\DataProcessingRegistrationRightsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemUsageOverviewReadModelsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingRegistrationRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingCountryOptionsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataProcessingDataResponsibleOptionsController.cs" />
@@ -404,12 +420,18 @@
     <Compile Include="Models\Csv\CsvColumnDefinition.cs" />
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
+    <Compile Include="Models\External\V2\IdentityNamePairResponseDTO.cs" />
+    <Compile Include="Models\External\V2\ItSystemRequestDTO.cs" />
+    <Compile Include="Models\External\V2\OrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\HierachyNodeDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
     <Compile Include="Models\ItSystemUsage\ItSystemUsageSensitiveDataLevelDTO.cs" />
@@ -508,8 +530,13 @@
     <TypeScriptCompile Include="app\models\Api\shared\YesNoUndecidedOption.ts" />
     <TypeScriptCompile Include="app\models\Api\Shared\YesNoIrrelevantOption.ts" />
     <TypeScriptCompile Include="app\models\Api\user.ts" />
+    <TypeScriptCompile Include="app\models\generic\BusinessRoleDTO.ts" />
+    <TypeScriptCompile Include="app\models\generic\HierarchyNodeDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contractDTO.ts" />
     <TypeScriptCompile Include="app\models\data-processing\IDataProcessingRegistrationRight.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-options.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-overview-readmodel.ts" />
+    <TypeScriptCompile Include="app\models\generic\KendoOrganizationalConfigurationDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\data-processing\data-processing-registration.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registration-readmodel.ts" />
     <TypeScriptCompile Include="app\models\data-processing\data-processing-registrationDTO.ts" />
@@ -518,6 +545,7 @@
     <TypeScriptCompile Include="app\models\generic\ValueWithOptionalRemarkDTO.ts" />
     <TypeScriptCompile Include="app\models\localOptions\IEditedLocalOptionEntity.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageArchiveDutyDTO.ts" />
+    <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageHostedAtDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system\SystemArchiveDutyDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
@@ -556,6 +584,8 @@
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
+    <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
+    <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
     <TypeScriptCompile Include="app\services\localOptionService.ts" />
     <TypeScriptCompile Include="app\services\brokenLinkReportService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
@@ -874,6 +904,7 @@
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\LocalAdmin.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />

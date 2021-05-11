@@ -116,6 +116,8 @@
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="IKendoOrganizationalConfigurationService.cs" />
+    <Compile Include="KendoOrganizationalConfigurationService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationOptions.cs" />
     <Compile Include="Model\Shared\ChangedValue.cs" />
@@ -157,7 +159,9 @@
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
     <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
     <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
+    <Compile Include="SystemUsage\IItsystemUsageOverviewReadModelsService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
+    <Compile Include="SystemUsage\ItsystemUsageOverviewReadModelsService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />

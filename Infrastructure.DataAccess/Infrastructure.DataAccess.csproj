@@ -72,6 +72,17 @@
     <Compile Include="Mapping\DataProcessingDataResponsibleOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingOversightOptionMap.cs" />
     <Compile Include="Mapping\DataProcessingBasisForTransferOptionMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewArchivePeriodReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewItSystemUsageReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
+    <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
+    <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
@@ -667,9 +678,30 @@
     <Compile Include="Migrations\202104071049413_Contract_Remove_DataHandler.designer.cs">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104210633352_Add_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104210633352_Add_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104210633352_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104260317275_Add_Indexes_To_PendingReadModelUpdate.cs" />
+    <Compile Include="Migrations\202104260317275_Add_Indexes_To_PendingReadModelUpdate.designer.cs">
+      <DependentUpon>202104260317275_Add_Indexes_To_PendingReadModelUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.cs" />
+    <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.designer.cs">
+      <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
+    <Compile Include="Services\EntityFrameworkContextDatabaseControl.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
     <Compile Include="Services\WithinAmbienTransaction.cs" />
     <Compile Include="Services\TransactionManager.cs" />
@@ -1089,6 +1121,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202104071049413_Contract_Remove_DataHandler.resx">
       <DependentUpon>202104071049413_Contract_Remove_DataHandler.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104210633352_Add_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104210633352_Add_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104221038234_Added_GeneralPurpose_And_HostedAt_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104260317275_Add_Indexes_To_PendingReadModelUpdate.resx">
+      <DependentUpon>202104260317275_Add_Indexes_To_PendingReadModelUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202104260811112_Add_Relation_Data_To_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.resx">
+      <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

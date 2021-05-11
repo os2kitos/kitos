@@ -38,11 +38,7 @@
         cvrNumber: string,
     }
 
-    export interface IDataProcessingRoleDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
-        note: string,
-        hasWriteAccess: boolean,
-        expired:boolean;
-    }
+    export interface IDataProcessingRoleDTO extends Models.Generic.Roles.BusinessRoleDTO{ }
 
     export interface ISimpleUserDTO extends Models.Generic.NamedEntity.NamedEntityDTO {
         email: string,

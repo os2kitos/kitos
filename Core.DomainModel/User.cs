@@ -17,6 +17,10 @@ namespace Core.DomainModel
     /// </summary>
     public class User : Entity, IIsPartOfOrganization, IHasName
     {
+        public string GetFullName()
+        {
+            return $"{Name} {LastName}";
+        }
         public User()
         {
             PasswordResetRequests = new List<PasswordResetRequest>();

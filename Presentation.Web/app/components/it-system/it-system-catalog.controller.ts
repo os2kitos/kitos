@@ -27,7 +27,7 @@
 
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
-        private gridState = this.gridStateService.getService(this.storageKey, this.user.id);
+        private gridState = this.gridStateService.getService(this.storageKey, this.user);
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
@@ -705,6 +705,15 @@
                         attributes: { "class": "might-overflow" },
                         hidden: true
                     }
+                ],
+                excelOnlyColumns: [
+                    {
+                        persistId: "numberOfUsages",
+                        title: "Antal anvendere",
+                        width: 95,
+                        template: dataItem => dataItem.Usages.length.toString(),
+                        dependOnColumnPersistId: "usages"
+                    }
                 ]
             };
             function customFilter(args) {
@@ -997,7 +1006,7 @@
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.mainGridOptions.excelOnlyColumns);
         }
 
         // adds usage at selected system within current context

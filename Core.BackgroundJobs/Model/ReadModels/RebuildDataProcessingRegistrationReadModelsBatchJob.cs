@@ -24,7 +24,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IDataProcessingRegistrationRepository _sourceRepository;
         private readonly ITransactionManager _transactionManager;
-        private const int BatchSize = 500;
+        private const int BatchSize = 25;
         public string Id => StandardJobIds.UpdateDataProcessingRegistrationReadModels;
 
         public RebuildDataProcessingRegistrationReadModelsBatchJob(

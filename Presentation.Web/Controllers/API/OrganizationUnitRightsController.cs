@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -16,9 +17,10 @@ namespace Presentation.Web.Controllers.API
 
         public OrganizationUnitRightController(
             IGenericRepository<OrganizationUnitRight> rightRepository,
-            IGenericRepository<OrganizationUnit> objectRepository, 
+            IGenericRepository<OrganizationUnit> objectRepository,
+            IDomainEvents domainEvents,
             IOrgUnitService orgUnitService)
-            : base(rightRepository, objectRepository)
+            : base(rightRepository, objectRepository, domainEvents)
         {
             _orgUnitService = orgUnitService;
         }

@@ -56,11 +56,13 @@
   <ItemGroup>
     <Compile Include="BackgroundJobs\IBackgroundJobLauncher.cs" />
     <Compile Include="BackgroundJobs\IBackgroundJobScheduler.cs" />
+    <Compile Include="BackgroundJobs\ReadModelRebuildScope.cs" />
     <Compile Include="Caching\AspNetObjectCache.cs" />
     <Compile Include="Caching\IObjectCache.cs" />
     <Compile Include="Configuration\KitosUrl.cs" />
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
+    <Compile Include="DataAccess\IDatabaseControl.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
     <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
