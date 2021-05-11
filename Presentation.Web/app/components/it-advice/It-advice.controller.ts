@@ -172,7 +172,7 @@
                                 $scope.hasWriteAccess = hasWriteAccess;
                                 $scope.selectedReceivers = [];
                                 $scope.selectedCCs = [];
-                                $scope.advisType = "";
+                                $scope.adviceTypeData = null;
 
                                 var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                                 if (select2Roles) {

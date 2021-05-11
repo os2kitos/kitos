@@ -52,14 +52,12 @@
 
                 <div class="form-group">
                     <label for="advisType" class="control-label">Type af afsendelse </label>
-                    <select class="form-control" data-id="advisType" data-ng-disabled="!hasWriteAccess"
-                            data-ng-model="advisType">
-                        <option value="clear" selected> </option>
-                        <option value="once">Straks</option>
-                        <option value="repeat">Gentagelse</option>
-                    </select>
+                <select class="form-control" name="advisType" id="advisType" ng-model="adviceTypeData" <!--data-ng-disabled="!isEditable()"-->>
+                    <option value=""> </option> 
+                    <option value="once">Straks</option>
+                    <option value="repeat">Gentagelse</option>
+                </select>
                 </div>
-
 
                 <div class="form-group has-feedback" ng-show="advisType == 'repeat'">
                     <!--Navn-->
@@ -67,10 +65,10 @@
                     <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!isEditable()">
                 </div>
 
-                <div class="form-group" ng-show="advisType == 'repeat'">
+                <div class="form-group" ng-show="adviceTypeData == 'repeat'">
                     <label for="contract-supplier" class="control-label">Gentagemønster </label>
                     <select class="form-control" data-id="sensitive" data-ng-disabled="!isEditable()"
-                            data-ng-model="repitionPattern" >
+                            data-ng-model="repitionPattern">
                         <option value="Hour">Time</option>
                         <option value="Day">Dag</option>
                         <option value="Week">Uge</option>
@@ -82,7 +80,7 @@
                 </div>
 
                 <!--Dato-->
-                <div class="form-group" ng-show="advisType == 'repeat'">
+                <div class="form-group" ng-show="adviceTypeData == 'repeat'">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!isEditable()">
@@ -90,7 +88,7 @@
                 </div>
 
                 <!--Dato-->
-                <div class="form-group" ng-show="advisType == 'repeat'">
+                <div class="form-group" ng-show="adviceTypeData == 'repeat'">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!isEditable()">
