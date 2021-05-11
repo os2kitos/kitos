@@ -86,12 +86,10 @@
                 },
                 {
                     template: (dataItem) => {
-                                var isActive = dataItem.isActive || dataItem.Scheduling === "Immediate";
                         var canDelete = dataItem.AdviceSent.length === 0;
                         if (hasWriteAccess) {
-                                    return `<button class="btn-link" ng-disabled="${isActive
-                                        }" data-ng-click="newAdvice('PATCH',${dataItem.Id
-                                        })"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
+                                    <i class="glyphicon glyphicon-pencil"></i></button>
                                     <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${
                                         dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
                         } else {
