@@ -11,6 +11,7 @@ Content:
 */
 
 BEGIN
+    /* Past advice patch */
     DECLARE @MigrationContext TABLE
     (
         AdviceId int,
@@ -24,19 +25,18 @@ BEGIN
         FROM [kitos].[dbo].[Advice]
         WHERE IsActive=1 AND StopDate<=GETUTCDATE()
 
-    /* Past advice patch */
     UPDATE [kitos].[dbo].[Advice]
         SET IsActive=0
-    WHERE IsActive=1 AND StopDate<=GETUTCDATE()
-
-    /* Future advice patch */
-    UPDATE [kitos].[dbo].[Advice]
-        SET IsActive=1
-    WHERE IsActive=0 AND StopDate>GETUTCDATE()
+    FROM @MigrationContext WHERE Id=AdviceId
 
     DELETE FROM [kitos_HangfireDB].[Hangfire].[Set]
     WHERE EXISTS 
 		(SELECT * 
 		 FROM @MigrationContext 
 		 WHERE JobId LIKE Value)
+
+    /* Future advice patch */
+    UPDATE [kitos].[dbo].[Advice]
+        SET IsActive=1
+    WHERE IsActive=0 AND StopDate>GETUTCDATE()
 END
