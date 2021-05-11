@@ -17,9 +17,14 @@
                             dataType: "json"
                         },
                     },
+                    sort: {
+                        field: "AlarmDate",
+                        dir: "asc"
+                    },
                     pageSize: 10,
                     serverPaging: true,
                     serverFiltering: true,
+                    serverSorting: true
                 },
                 selectable: true,
                 change: onChange,
@@ -90,8 +95,7 @@
                         if (hasWriteAccess) {
                                     return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
                                     <i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${
-                                        dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
+                                    <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
                         } else {
                                     return "Ingen rettigheder";
                         }
@@ -163,20 +167,25 @@
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
                         backdrop: "static",
                         controller: [
-                            "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "hasWriteAccess",
-                            ($scope, roles, $window, type, action, object, currentUser: Kitos.Services.IUser, hasWriteAccess: boolean) => {
+                            "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper", "adviceData",
+                            ($scope, roles, $window, type, action, object, currentUser: Kitos.Services.IUser, entityMapper: Kitos.Services.LocalOptions.IEntityMapper, adviceData) => {
                             $scope.showRoleFields = true;
                                 $scope.collapsed = true;
                                 $scope.CCcollapsed = true;
                                 $scope.hasWriteAccess = hasWriteAccess;
-                            if (roles) {
-                                $scope.recieverRoles = roles;
+                                $scope.selectedReceivers = [];
+                                $scope.selectedCCs = [];
+                                $scope.adviceTypeData = null;
+
+                                var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
+                                if (select2Roles) {
+                                    $scope.receiverRoles = select2Roles;
                             } else {
                                 $scope.showRoleFields = false;
                             }
                                 if (action === "POST") {
+                                    $scope.advisName = "Opret advis";
                                 $scope.hideSend = false;
-                                $scope.externalCC = currentUser.email;
                                     $scope.isActive = true;
                                     $scope.emailBody =
                                         `<a href='${$window.location.href.replace("advice", "main")}'>Link til ${type
@@ -184,40 +193,43 @@
                             }
                                 if (action === "PATCH") {
                                 $scope.hideSend = true;
+                                    $scope.advisName = "Redigere advis";
                                 if (id != undefined) {
-                                    $http({
-                                            method: "GET",
-                                            url: `Odata/advice?key=${id}&$expand=Reciepients`
-                                    }).then(function successCallback(response) {
-                                        $scope.name = response.data.Name;
-                                        $scope.subject = response.data.Subject;
-                                        $scope.emailBody = response.data.Body;
-                                        $scope.repitionPattern = response.data.Scheduling;
-                                        $scope.startDate = response.data.AlarmDate;
-                                        $scope.stopDate = response.data.StopDate;
-                                                $scope.hiddenForjob = response.data.JobId;
-                                                $scope.isActive = response.data.IsActive;
-                                        $scope.selectedRecievers = [];
-                                        $scope.selectedCC = [];
+                                        $scope.name = adviceData.Name;
+                                        $scope.subject = adviceData.Subject;
+                                        $scope.emailBody = adviceData.Body;
+                                        $scope.repitionPattern = adviceData.Scheduling;
+                                        $scope.startDate = adviceData.AlarmDate;
+                                        $scope.stopDate = adviceData.StopDate;
+                                        $scope.hiddenForjob = adviceData.JobId;
+                                        $scope.isActive = adviceData.IsActive;
+                                        $scope.preSelectedReceivers = [];
+                                        $scope.preSelectedCCs = [];
+
                                                 const ccs = [];
-                                                for (let i = 0; i < response.data.Reciepients.length; i++) {
-                                                    let recpientType = response.data.Reciepients[i].RecpientType;
-                                                    let recieverType = response.data.Reciepients[i].RecieverType;
+                                        for (let i = 0; i < adviceData.Reciepients.length; i++) {
+                                            let recpientType = adviceData.Reciepients[i].RecpientType;
+                                            let recieverType = adviceData.Reciepients[i].RecieverType;
                                                     if (recpientType === "ROLE" && recieverType === "RECIEVER") {
-                                                        $scope.selectedRecievers.push(response.data.Reciepients[i].name);
+                                                var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
+                                                var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
+                                                if (selectedReceiver !== undefined) {
+                                                    $scope.preSelectedReceivers.push(selectedReceiver);
+                                                }
                                                     } else if (recpientType === "ROLE" && recieverType === "CC") {
-                                                $scope.selectedCC.push(response.data.Reciepients[i].Name);
+                                                var nameOfRoleCC = adviceData.Reciepients[i].Name;
+                                                var selectedCC = _.find(select2Roles, x => x.text === nameOfRoleCC);
+                                                if (selectedCC !== undefined) {
+                                                    $scope.preSelectedCCs.push(selectedCC);
+                                                }
                                                     } else if (recpientType === "USER" && recieverType === "RECIEVER") {
-                                                $scope.externalTo = response.data.Reciepients[i].Name;
+                                                $scope.externalTo = adviceData.Reciepients[i].Name;
                                                     } else if (recpientType === "USER" &&
                                                         recieverType === "CC") {
-                                                ccs.push(response.data.Reciepients[i].Name);
+                                                ccs.push(adviceData.Reciepients[i].Name);
                                             }
                                         }
                                                 $scope.externalCC = ccs.join(", ");
-                                            },
-                                            function errorCallback(response) {
-                                    });
                                 }
                             }
 
@@ -394,24 +406,23 @@
                                     const writtenEmail = $scope.externalTo;
                                     const writtenCCEmail = $scope.externalCC;
 
-                                if ($scope.selectedRecievers != undefined) {
-                                    for (var i = 0; i < $scope.selectedRecievers.length; i++) {
+                                    if ($scope.selectedReceivers != undefined) {
+                                        for (var i = 0; i < $scope.selectedReceivers.length; i++) {
                                         payload.Reciepients.push(
                                             {
-                                                Name: $scope.selectedRecievers[i],
+                                                    Name: $scope.selectedReceivers[i].text,
                                                 RecpientType: "ROLE",
-                                                RecieverType: "RECIEVER",
-                                                adviceId: undefined
+                                                    RecieverType: "RECIEVER"
                                             }
                                         );
                                     }
                                 }
 
-                                if ($scope.selectedCC != undefined) {
-                                    for (var i = 0; i < $scope.selectedCC.length; i++) {
+                                    if ($scope.selectedCCs != undefined) {
+                                        for (var i = 0; i < $scope.selectedCCs.length; i++) {
                                         payload.Reciepients.push(
                                             {
-                                                Name: $scope.selectedCC[i],
+                                                    Name: $scope.selectedCCs[i].text,
                                                 RecieverType: "CC",
                                                 RecpientType: "ROLE"
                                             }
@@ -481,13 +492,21 @@
                             advicename: [
                                 () => {
                                 return $scope.advicename;
+                                }],
+                            adviceData: ["$http", ($http: ng.IHttpService) => {
+                                if (action === "PATCH") {
+                                    return $http.get(`Odata/advice?key=${id}&$expand=Reciepients`)
+                                        .then((res) => {
+                                            if (res.status === 200) {
+                                                return res.data;
+                            }
+                                            return null;
+                                        })
+                                        .catch(_ => null);
+                                }
+                                return null;
                             }
                             ],
-                            hasWriteAccess: [
-                                () => {
-                                return $scope.hasWriteAccess;
-                        }
-                            ]
                         }
                     });
                     modalInstance.result.then(angular.noop, angular.noop);
