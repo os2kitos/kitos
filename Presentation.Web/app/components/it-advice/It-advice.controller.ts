@@ -14,15 +14,20 @@
                             read: {
                                 url: `/Odata/advice?$filter=type eq '${type}' and RelationId eq ${object.id
                                     }&$expand=Reciepients, Advicesent`,
-                                dataType: "json"
-                            },
+                            dataType: "json"
                         },
-                        pageSize: 10,
-                        serverPaging: true,
-                        serverFiltering: true,
                     },
-                    selectable: true,
-                    change: onChange,
+                    sort: {
+                        field: "AlarmDate",
+                        dir: "asc"
+                    },
+                    pageSize: 10,
+                    serverPaging: true,
+                    serverFiltering: true,
+                    serverSorting: true
+                },
+                selectable: true,
+                change: onChange,
                     columns: [
                         {
                             field: "Name",
