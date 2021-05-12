@@ -29,11 +29,13 @@ BEGIN
         SET IsActive=0
     FROM @MigrationContext WHERE Id=AdviceId
 
-    DELETE FROM [kitos_HangfireDB].[Hangfire].[Set]
-    WHERE EXISTS 
-		(SELECT * 
-		 FROM @MigrationContext 
-		 WHERE JobId LIKE Value)
+    /* Note: Check to see if database and table exists so that script succeeds on fresh install */
+    IF DB_ID('kitos_HangfireDB') IS NOT NULL AND OBJECT_ID('Set', 'U') IS NOT NULL
+        DELETE FROM [kitos_HangfireDB].[Hangfire].[Set]
+        WHERE EXISTS 
+		    (SELECT * 
+		     FROM @MigrationContext 
+		     WHERE JobId LIKE Value)
 
     /* Future advice patch */
     UPDATE [kitos].[dbo].[Advice]
