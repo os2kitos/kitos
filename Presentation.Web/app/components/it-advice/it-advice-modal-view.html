@@ -50,17 +50,17 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="advisType" class="control-label">Type af afsendelse </label>
-                <select class="form-control" name="advisType" id="advisType" ng-model="adviceTypeData" data-element-type="advisTypeDropdown">
-                    <option value=""> </option> 
-                    <option value="once">Straks</option>
-                    <option value="repeat">Gentagelse</option>
-                </select>
+                    <select class="form-control" name="advisType" id="advisType" ng-model="adviceTypeData" data-element-type="advisTypeDropdown">
+                        <option value=""> </option>
+                        <option value="once">Straks</option>
+                        <option value="repeat">Gentagelse</option>
+                    </select>
                 </div>
 
                 <div class="form-group has-feedback" ng-show="advisType == 'repeat'">
                     <!--Navn-->
                     <label class="control-label" for="name">Navn</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!isEditable()" >
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name" data-ng-disabled="!isEditable()">
                 </div>
 
                 <div class="form-group" ng-show="adviceTypeData == 'repeat'">
@@ -114,6 +114,6 @@
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
         <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="!((externalTo || selectedReceivers.length > 0) && subject && repitionPattern && stopDate && startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && isEditable())">Gem</button>
         <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable()">Deaktiver</button>
-        <input type="hidden" ng-model="hiddenForjob"/>
+        <input type="hidden" ng-model="hiddenForjob" />
     </div>
 </form>
