@@ -521,6 +521,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />

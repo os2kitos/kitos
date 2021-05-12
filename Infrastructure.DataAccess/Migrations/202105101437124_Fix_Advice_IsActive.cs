@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("FixAdviceIsActive.sql"));
+           // SqlResource(SqlMigrationScriptRepository.GetResourceName("FixAdviceIsActive.sql"));
         }
         
         public override void Down()

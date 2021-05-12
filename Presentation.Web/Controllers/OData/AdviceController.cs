@@ -64,11 +64,11 @@ namespace Presentation.Web.Controllers.OData
 
         private void ScheduleAdvice(Advice advice, CreatedODataResult<Advice> createdResponse, string name)
         {
-            if (advice.Scheduling == Scheduling.Immediate)
+            if (advice.AdviceType == AdviceType.Immediate)
             {
                 BackgroundJob.Enqueue(() => _adviceService.SendAdvice(createdResponse.Entity.Id));
             }
-            else
+            else if(advice.AdviceType == AdviceType.Repeat)
             {
                 BackgroundJob.Schedule(
                     () => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value,
