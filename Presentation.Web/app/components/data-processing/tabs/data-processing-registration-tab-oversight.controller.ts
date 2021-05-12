@@ -51,7 +51,7 @@
         createOversightDate() {
             this.modal.open({
                 windowClass: "modal fade in",
-                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-create-modal.html",
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-modal.html",
                 controller: Kitos.DataProcessing.Registration.Edit.Oversight.Modal.OversightModalController,
                 controllerAs: "modalvm",
                 resolve: {
@@ -70,7 +70,7 @@
         updateOversightDate(oversightId: number, oversightDate: string, oversightRemark: string) {
             this.modal.open({
                 windowClass: "modal fade in",
-                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-create-modal.html",
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-modal.html",
                 controller: Kitos.DataProcessing.Registration.Edit.Oversight.Modal.OversightModalController,
                 controllerAs: "modalvm",
                 resolve: {
