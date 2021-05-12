@@ -92,6 +92,35 @@ namespace Presentation.Web.Controllers.OData
                 try
                 {
                     var advice = delta.GetInstance();
+
+                    var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
+                    if (advice.Scheduling == Scheduling.Immediate)
+                    {
+                        if (changedPropertyNames.All(IsImmediateEditableProperty))
+                        {
+                            throw new ArgumentException(
+                                "For immediate advices editing is only allowed for name and subject");
+                        }
+                    } 
+                    if (advice.Scheduling != Scheduling.Immediate) 
+                    {
+                        if (changedPropertyNames.All(IsRecurringEditableProperty))
+                        {
+                            throw new ArgumentException(
+                                "For recurring advices editing is only allowed for name, subject and stop date");
+                        }
+
+                        if (changedPropertyNames.Contains("StopDate"))
+                        {
+                            if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
+                            {
+                                throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
+                            }
+                        }
+                    }
+
+                    DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
+
                     BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
                 }
                 catch (Exception e)
@@ -107,6 +136,16 @@ namespace Presentation.Web.Controllers.OData
         public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
         {
             RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
+        }
+
+        private static bool IsImmediateEditableProperty(string name)
+        {
+            return name.Equals("Name") || name.Equals("Subject");
+        }
+
+        private static bool IsRecurringEditableProperty(string name)
+        {
+            return IsImmediateEditableProperty(name) || name.Equals("StopDate");
         }
 
         [EnableQuery]
@@ -152,11 +191,11 @@ namespace Presentation.Web.Controllers.OData
 
         private static void DeleteJobFromHangfire(int key, Advice entity)
         {
-            DeletePostponedRecurringJob(entity.JobId);
+            DeletePostponedRecurringJobFromHangfire(entity.JobId);
             RecurringJob.RemoveIfExists("Advice: " + key);
         }
 
-        private static void DeletePostponedRecurringJob(string textId)
+        private static void DeletePostponedRecurringJobFromHangfire(string jobIdText)
         {
             var monitor = JobStorage.Current.GetMonitoringApi();
             var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
@@ -164,7 +203,7 @@ namespace Presentation.Web.Controllers.OData
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(textId))
+                if (t.Contains(jobIdText))
                 {
                     BackgroundJob.Delete(j.Key);
                 }
