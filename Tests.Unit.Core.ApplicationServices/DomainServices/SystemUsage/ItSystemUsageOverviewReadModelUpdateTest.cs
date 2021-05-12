@@ -317,7 +317,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(sensitiveDataLevel.SensitivityDataLevel.GetReadableName(), readModel.SensitiveDataLevelsAsCsv);
 
             //System
-            Assert.Equal(system.Name, readModel.Name);
+            Assert.Equal(system.Name, readModel.SystemName);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
