@@ -71,8 +71,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th class="col-xs-3">Gennemført tilsyn</th>
-                        <th class="col-xs-7">Bemærkninger</th>
+                        <th class="col-xs-2">Gennemført tilsyn</th>
+                        <th class="col-xs-8">Bemærkninger</th>
                         <th class="col-xs-1"></th>
                         <th></th> <!-- Empty field to help with styling -->
                     </tr>
@@ -85,7 +85,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="form-group" data-show-errors>
+                            <div class="form-group">
                                 <remark-field id="oversightCompletedRemark"
                                                 rows="1"
                                                 ng-model="vm.oversightCompletedRemark"
@@ -93,7 +93,7 @@
                             </div>
                         </td>
                         <td>
-                            <button id="create-oversight-date" class="btn btn-success btn-sm" data-ng-click="createOversightDate()">Opret tilsyn</button>
+                            <button id="create-oversight-date" class="btn btn-success btn-sm" ng-click="vm.createOversightDate()" ng-if="vm.shouldShowLatestOversightCompletedDate">Opret tilsyn</button>
                         </td>
                         <td>
                             <!-- Empty field to help with styling -->
@@ -106,24 +106,33 @@
             <table class="table" ng-hide="vm.oversightDates.length < 1">
                 <thead>
                     <tr>
-                        <th class="col-xs-3">Dato for seneste tilsyn</th>
-                        <th class="col-xs-7">Bemærkninger</th>
+                        <th class="col-xs-2">Dato for seneste tilsyn</th>
+                        <th class="col-xs-8">Bemærkninger</th>
                         <th class="col-xs-1"></th>
-                        <th></th> <!-- Empty field to help with styling -->
+                        <th class="col-xs-1"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="oversightDate in vm.oversightDates">
                         <td>
+                            <input type="text" class="form-control input-sm"
+                                   ng-disabled="true"
+                                   ng-model="oversightDate.oversightDate">
                         </td>
                         <td>
+                            <div class="form-group">
+                                <textarea class="form-control input-sm"
+                                    rows="1"
+                                    ng-disabled="true"
+                                    ng-model="oversightDate.oversightRemark">
+                                </textarea>
+                            </div>
                         </td>
                         <td>
-                            <button id="edit-oversight-date" class="btn btn-default btn-sm" data-ng-click="deleteOversightDate(oversightDate.Id)">Ret tilsyn</button>
-                            <button id="delete-oversight-date" class="btn btn-danger btn-sm" data-ng-click="deleteOversightDate(oversightDate.Id)">Slet tilsyn</button>
+                            <button id="edit-oversight-date" class="btn btn-default btn-sm" data-ng-click="vm.updateOversightDate(oversightDate.id, oversightDate.oversightDate, oversightDate.oversightRemark)">Ret tilsyn</button>
                         </td>
                         <td>
-                            <!-- Empty field to help with styling -->
+                            <button id="delete-oversight-date" class="btn btn-danger btn-sm" data-ng-click="vm.deleteOversightDate(oversightDate.id)">Slet tilsyn</button>
                         </td>
                     </tr>
                 </tbody>

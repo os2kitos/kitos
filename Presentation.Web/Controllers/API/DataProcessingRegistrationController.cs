@@ -704,7 +704,7 @@ namespace Presentation.Web.Controllers.API
 
             return _dataProcessingRegistrationApplicationService
                 .RemoveOversightDate(id, oversightDateId.Value)
-                .Match(_ => Ok(), FromOperationError);
+                .Match(dataProcessingRegistrationOversightDate => Ok(ToDTO(dataProcessingRegistrationOversightDate)), FromOperationError);
         }
 
         [HttpPatch]

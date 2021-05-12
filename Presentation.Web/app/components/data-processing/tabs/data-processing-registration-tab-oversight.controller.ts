@@ -10,10 +10,11 @@
             "select2LoadingService",
             "dataProcessingRegistrationOptions",
             "bindingService",
-            "notify"
+            "$uibModal"
         ];
 
         private readonly dataProcessingRegistrationId: number;
+        private readonly modal;
         constructor(
             private readonly dataProcessingRegistrationService: Services.DataProcessing.IDataProcessingRegistrationService,
             public hasWriteAccess,
@@ -22,7 +23,7 @@
             private readonly select2LoadingService: Services.ISelect2LoadingService,
             private readonly dataProcessingRegistrationOptions: Models.DataProcessing.IDataProcessingRegistrationOptions,
             private readonly bindingService: Kitos.Services.Generic.IBindingService,
-            private readonly notify) {
+            private readonly $modal) {
 
             this.dataProcessingRegistrationId = this.dataProcessingRegistration.id;
             this.bindOversightInterval();
@@ -30,8 +31,10 @@
             this.bindOversigthOptions();
             this.bindOversigthOptionsRemark();
             this.bindOversightCompleted();
-            this.bindLatestOversightCompletedDate();
             this.bindOversightCompletedRemark();
+
+            this.bindOversightDates();
+            this.modal = $modal;
         }
 
         headerName = this.dataProcessingRegistration.name;
@@ -40,9 +43,57 @@
         oversigthOptions: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
         isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
-        latestOversightCompletedDate: Models.ViewModel.Generic.IDateSelectionViewModel;
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
+
+        oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+
+        createOversightDate() {
+            this.modal.open({
+                windowClass: "modal fade in",
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-create-modal.html",
+                controller: Kitos.DataProcessing.Registration.Edit.Oversight.Modal.OversightModalController,
+                controllerAs: "modalvm",
+                resolve: {
+                    hasWriteAccess: [() => this.hasWriteAccess],
+                    datepickerOptions: [() => this.datepickerOptions],
+                    submitFunction: [() => this.assignOversightDate],
+                    mainController: [() => this],
+                    oversightId: [() => null], //As we don't know the id when creating this field is null
+                    oversightDate: [() => null], //As this field is required to have a value entered by the user we initialize it with null
+                    oversightRemark: [() => ""],
+                    modalType: [() => DataProcessing.Registration.Edit.Oversight.Modal.ModalType.create]
+                }
+            });
+        };
+
+        updateOversightDate(oversightId: number, oversightDate: string, oversightRemark: string) {
+            this.modal.open({
+                windowClass: "modal fade in",
+                templateUrl: "app/components/data-processing/tabs/data-processing-registration-tab-oversight-create-modal.html",
+                controller: Kitos.DataProcessing.Registration.Edit.Oversight.Modal.OversightModalController,
+                controllerAs: "modalvm",
+                resolve: {
+                    hasWriteAccess: [() => this.hasWriteAccess],
+                    datepickerOptions: [() => this.datepickerOptions],
+                    submitFunction: [() => this.modifyOversightDate],
+                    mainController: [() => this],
+                    oversightId: [() => oversightId],
+                    oversightDate: [() => oversightDate],
+                    oversightRemark: [() => oversightRemark],
+                    modalType: [() => DataProcessing.Registration.Edit.Oversight.Modal.ModalType.modify]
+                }
+            });
+        };
+
+        deleteOversightDate(oversightId: number) {
+            this.removeOversightDate(oversightId);
+        };
+
+        datepickerOptions = {
+            format: "dd-MM-yyyy"
+        };
+
 
         private bindOversigthOptions() {
             this.bindingService.bindMultiSelectConfiguration<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>(
@@ -111,16 +162,18 @@
                 this.isOversightCompleted.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoUndecidedOption.Yes;
         }
 
-        private bindLatestOversightCompletedDate() {
-            this.latestOversightCompletedDate = new Models.ViewModel.Generic.DateSelectionViewModel(
-                this.dataProcessingRegistration.oversightCompleted.optionalDateValue,
-                (newDate) => this.changeLatestOversightCompletedDate(newDate));
-        }
-
         private bindOversightCompletedRemark() {
             this.oversightCompletedRemark = new Models.ViewModel.Generic.EditTextViewModel(
                 this.dataProcessingRegistration.oversightCompleted.remark,
                 (newText) => this.changeOversightCompletedRemark(newText));
+        }
+
+        private bindOversightDates() {
+            this.oversightDates = _.map(this.dataProcessingRegistration.oversightDates, (oversightDate) => new Models.ViewModel.GDPR.OversightDateViewModel(
+                oversightDate.id,
+                moment(oversightDate.oversightDate).format("DD-MM-YYYY"),
+                oversightDate.oversightRemark
+            ));
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
@@ -211,29 +264,10 @@
 
                     this.dataProcessingRegistration.oversightCompleted.value = isOversightCompleted.optionalObjectContext;
                     this.bindOversightCompleted();
-                    this.bindLatestOversightCompletedDate();
+                    this.bindOversightDates();
                     return success;
                 });
 
-        }
-
-        private changeLatestOversightCompletedDate(latestOversightCompletedDate: string) {
-            if (!!latestOversightCompletedDate) {
-                var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(latestOversightCompletedDate);
-                if (!!formattedDate.convertedValue) {
-                    return this.apiUseCaseFactory
-                        .createUpdate("Dato for seneste tilsyn",
-                            () => this.dataProcessingRegistrationService.updateLatestOversightCompletedDate(
-                                this.dataProcessingRegistrationId,
-                                formattedDate.convertedValue))
-                        .executeAsync(success => {
-                            this.dataProcessingRegistration.oversightCompleted.optionalDateValue = latestOversightCompletedDate;
-                            this.bindLatestOversightCompletedDate();
-                            return success;
-                        });
-                }
-                return this.notify.addErrorMessage(formattedDate.errorMessage);
-            }
         }
 
         private changeOversightCompletedRemark(oversightCompletedRemark: string) {
@@ -246,6 +280,57 @@
                 .executeAsync(success => {
                     this.dataProcessingRegistration.oversightCompleted.remark = oversightCompletedRemark;
                     this.bindOversightCompletedRemark();
+                    return success;
+                });
+        }
+
+        private assignOversightDate(self: EditOversightDataProcessingRegistrationController, oversightDate: string, oversightRemark: string) {
+            if (oversightDate == null || oversightRemark == null) {
+                return null;
+            }
+            var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(oversightDate);
+            if (!!formattedDate.convertedValue) {
+                return self.apiUseCaseFactory
+                    .createAssignmentCreation(
+                        () => self.dataProcessingRegistrationService.assignOversightDate(self.dataProcessingRegistrationId, formattedDate.convertedValue, oversightRemark))
+                    .executeAsync(success => {
+                        self.dataProcessingRegistration.oversightDates.push(success);
+                        self.bindOversightDates();
+                        return success;
+                    });
+            }
+            return null;
+        }
+
+        private modifyOversightDate(self: EditOversightDataProcessingRegistrationController, oversightId: number, oversightDate: string, oversightRemark: string) {
+            if (oversightId == null || oversightDate == null || oversightRemark == null) {
+                return null;
+            }
+            var formattedDate = Helpers.DateStringFormat.fromDDMMYYYYToYYYYMMDD(oversightDate);
+            if (!!formattedDate.convertedValue) {
+                return self.apiUseCaseFactory
+                    .createAssignmentCreation(
+                        () => self.dataProcessingRegistrationService.updateOversightDate(self.dataProcessingRegistrationId, oversightId, formattedDate.convertedValue, oversightRemark))
+                    .executeAsync(success => {
+                        var updatedOversightDates = _.map(self.dataProcessingRegistration.oversightDates, (dateRemark) => dateRemark.id === success.id ? success : dateRemark); //Update modified entry
+                        self.dataProcessingRegistration.oversightDates = updatedOversightDates;
+                        self.bindOversightDates();
+                        return success;
+                    });
+            }
+            return null;
+        }
+
+        private removeOversightDate(oversightId: number) {
+            if (oversightId == null) {
+                return;
+            }
+            this.apiUseCaseFactory
+                .createAssignmentRemoval(
+                    () => this.dataProcessingRegistrationService.removeOversightDate(this.dataProcessingRegistrationId, oversightId))
+                .executeAsync(success => {
+                    _.remove(this.dataProcessingRegistration.oversightDates, x => x.id === success.id);
+                    this.bindOversightDates();
                     return success;
                 });
         }
