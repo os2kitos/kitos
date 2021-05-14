@@ -333,7 +333,7 @@
                                     if ($scope.startDate && $scope.stopDate) {
                                         if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
                                             $scope.errMessage =
-                                                "'Til Dato' skal være senere end eller samme som 'Fra dato'!";
+                                                "'Til Dato' skal være senere end eller samme som 'Fra dato'!"; 
                                             return false;
                                         }
                                     } else {
@@ -358,16 +358,41 @@
                                     format: "dd-MM-yyyy",
                                     parseFormats: ["yyyy-MM-dd"]
                                 };
-
+                                
                                 $scope.validateInputs = () => {
-                                    return ($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                        $scope.subject &&
-                                        $scope.adviceRepetitionData &&
-                                        $scope.stopDate &&
-                                        $scope.startDate &&
-                                        this.checkErrStart($scope.startDate, $scope.stopDate) &&
-                                        this.checkErrEnd($scope.startDate, $scope.stopDate) &&
-                                        this.isEditable();
+
+                                    if ($scope.adviceTypeData == null) {
+                                        return true;
+                                    }
+
+                                    switch ($scope.adviceTypeData.id) {
+                                        case "0":
+                                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                                $scope.subject &&
+                                                $scope.adviceRepetitionData &&
+                                                $scope.isEditable()) {
+                                                return false;
+                                            }
+                                            else {
+                                                return true;
+                                            }
+                                        case "1":
+                                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                                $scope.subject &&
+                                                $scope.adviceRepetitionData &&
+                                                $scope.stopDate &&
+                                                $scope.startDate &&
+                                                $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
+                                                $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
+                                                $scope.isEditable()) {
+                                                return false;
+                                            }
+                                            else {
+                                                return true;
+                                            }
+                                        default:
+                                            return true;
+                                    }
                                 }
 
                                 function dateString2Date(dateString) {

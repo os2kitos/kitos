@@ -18,25 +18,36 @@ class AdviceHelper {
 
 
     public goToSpecificItSystemAdvice(name: string) {   
-        return systemUsageHelper.openLocalSystem("DefaultTestItSystem")
+        return systemUsageHelper.openLocalSystem(name)
             .then(() => localSystemNavigation.openAdvicePage());
     }
 
-    public createNewAdvice(email: string, startDate: string, endDate: string, subject: string) {
+    public createNewRepetitionAdvice(email: string, startDate: string, endDate: string, subject: string) {
         return element(this.cssLocator.byDataElementType("NewAdviceButton")).click()
             .then(() => element(this.cssLocator.byDataElementType("adviceEmailToInput")).sendKeys(email))
             .then(() => element(this.cssLocator.byDataElementType("adviceEmailCCToInput"))
                 .sendKeys(email))
             .then(() => Select2.selectMultipleWithNoSearch("Systemejer", "s2id_role-receivers"))
             .then(() => Select2.selectMultipleWithNoSearch("Systemejer", "s2id_role-ccs"))
-            .then(() => element(this.cssLocator.byDataElementType("advisTypeDropdown")).click())
-            .then(() => element(by.cssContainingText("option", "Gentagelse")).click())
-            .then(() => element(this.cssLocator.byDataElementType("repetitionDropdown")).click())
-            .then(() => element(by.cssContainingText("option", "Dag")).click())
+            .then(() => Select2.selectWithNoSearch("Gentagelse", "s2id_advisType"))
+            .then(() => Select2.selectWithNoSearch("Uge", "s2id_adviceRepetition"))
             .then(() => element(this.cssLocator.byDataElementType("adviceStartDate"))
                 .sendKeys(startDate))
             .then(() => element(this.cssLocator.byDataElementType("adviceEndDate"))
                 .sendKeys(endDate))
+            .then(() => element(this.cssLocator.byDataElementType("adviceSubject")).sendKeys(subject))
+            .then(() => element(this.cssLocator.byDataElementType("adviceSaveButton")).click());
+    }
+
+
+    public createNewInstantAdvice(email: string, subject: string) {
+        return element(this.cssLocator.byDataElementType("NewAdviceButton")).click()
+            .then(() => element(this.cssLocator.byDataElementType("adviceEmailToInput")).sendKeys(email))
+            .then(() => element(this.cssLocator.byDataElementType("adviceEmailCCToInput"))
+                .sendKeys(email))
+            .then(() => Select2.selectMultipleWithNoSearch("Systemejer", "s2id_role-receivers"))
+            .then(() => Select2.selectMultipleWithNoSearch("Systemejer", "s2id_role-ccs"))
+            .then(() => Select2.selectWithNoSearch("Straks", "s2id_advisType"))
             .then(() => element(this.cssLocator.byDataElementType("adviceSubject")).sendKeys(subject))
             .then(() => element(this.cssLocator.byDataElementType("adviceSaveButton")).click());
     }

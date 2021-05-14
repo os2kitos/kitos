@@ -64,8 +64,8 @@
                 </div>
 
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
-                    <label for="advisTyp" class="control-label small">Gentagelse <span class="text-danger">*</span></label>
-                    <select-simple data-id="advisType"
+                    <label for="adviceRepetition" class="control-label small">Gentagelse <span class="text-danger">*</span></label>
+                    <select-simple data-id="adviceRepetition"
                                    data-options="adviceRepetitionOptions"
                                    data-ng-model="adviceRepetitionData"
                                    data-ng-disabled="!isEditable()">
@@ -107,7 +107,7 @@
     <div class="modal-footer">
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-        <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="!validateInputs()" ">Gem</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="validateInputs()">Gem</button>
         <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable()">Deaktiver</button>
         <input type="hidden" ng-model="hiddenForjob" />
     </div>
