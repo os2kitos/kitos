@@ -68,7 +68,7 @@
             </div>
         </div>
         <div id="OversightCompleted" class="h4">
-            <table class="table">
+            <table id="oversightCompletedTable" class="table">
                 <thead>
                     <tr>
                         <th class="col-xs-2">Gennemført tilsyn</th>
@@ -103,7 +103,7 @@
             </table>
         </div>
         <div id="OversightDates" class="h4">
-            <table class="table" ng-hide="vm.oversightDates.length < 1">
+            <table id="oversightDatesTable" class="table" ng-hide="vm.oversightDates.length < 1">
                 <thead>
                     <tr>
                         <th class="col-xs-2">Dato for seneste tilsyn</th>
@@ -115,16 +115,19 @@
                 <tbody>
                     <tr data-ng-repeat="oversightDate in vm.oversightDates">
                         <td>
-                            <input type="text" class="form-control input-sm"
+                            <input id="date" 
+                                   type="text" 
+                                   class="form-control input-sm"
                                    ng-disabled="true"
                                    ng-model="oversightDate.oversightDate">
                         </td>
                         <td>
                             <div class="form-group">
-                                <textarea class="form-control input-sm"
-                                    rows="1"
-                                    ng-disabled="true"
-                                    ng-model="oversightDate.oversightRemark">
+                                <textarea id="remark"
+                                          class="form-control input-sm"
+                                          rows="1"
+                                          ng-disabled="true"
+                                          ng-model="oversightDate.oversightRemark">
                                 </textarea>
                             </div>
                         </td>

@@ -49,8 +49,32 @@ class DataProcessingRegistrationEditOversightPageObject {
         return element(by.id("oversightCompletedRemark_remark"));
     }
 
-    getLatestOversightCompletedDate() {
-        return element(by.id("latestOversightCompletedDate")).element(by.tagName("input"));
+    getAssignOversightDateButton() {
+        return element(by.id("create-oversight-date"));
+    }
+
+    getRemoveOversightDateButton(oversightDate: string) {
+        return element(by.xpath(`${this.getOversightDateRowExpression(oversightDate)}//button[@id='delete-oversight-date']`));
+    }
+
+    getOversightDateRow(oversightDate: string) {
+        return element(by.xpath(this.getOversightDateRowExpression(oversightDate)));
+    }
+
+    getOversightDateModalDateField() {
+        return element(by.id("date"));
+    }
+
+    getOversightDateModalRemarkField() {
+        return element(by.id("remark"));
+    }
+
+    getOversightDateModalSaveButton() {
+        return element(by.id("save"));
+    }
+
+    private getOversightDateRowExpression(oversightDate: string) {
+        return `//*/table[@id="oversightDatesTable"]//*/input[@id="date"]/../..`;
     }
 
     getDpaMainNameHeader() {

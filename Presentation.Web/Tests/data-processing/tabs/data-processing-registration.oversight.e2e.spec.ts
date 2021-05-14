@@ -40,8 +40,9 @@ describe("Data processing registration oversight detail tests", () => {
             const dropdownInterval = "Hver andet år";
             const oversightOptionName = "Egen kontrol";
             const oversightOptionRemark = createRemark();
+            const oversightDateRemark = createRemark();
             const dropdownCompleted = "Ja";
-            const date = DateHelper.getTodayAsString();
+            const oversightDate = DateHelper.getTodayAsString();
 
             // Creating and navigating to DPR
             dpaHelper.createAndOpenDataProcessingRegistration(name)
@@ -61,12 +62,14 @@ describe("Data processing registration oversight detail tests", () => {
                 // Oversight is completed
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
-                .then(() => dpaHelper.changeOversightCompletedLatestDate(date))
                 .then(() => pageObject.getOversightCompletedRemark().sendKeys(completedRemark))
+                .then(() => dpaHelper.assignOversightDateAndRemark(oversightDate, oversightDateRemark))
                 .then(() => verifyOversightCompletedRemark(completedRemark))
                 .then(() => verifyOversightCompleted(dropdownCompleted))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
-                .then(() => verifyOversightCompletedDate(date));
+                .then(() => dpaHelper.verifyOversightDateAndRemark(oversightDate, oversightDateRemark))
+                .then(() => dpaHelper.removeOversightDateAndRemark(oversightDate))
+                .then(() => verifyOversightDateAndRemarkRemoved(oversightDate));
         });
 
 
@@ -92,7 +95,7 @@ describe("Data processing registration oversight detail tests", () => {
     function expectOversightCompletedLatestDateVisibility(visible: boolean) {
         console.log(`Expecting visiblity of oversight completed date to be set to: ${visible}`);
         activateBlur()
-            .then(() => expect(pageObject.getLatestOversightCompletedDate().isPresent()).toBe(visible));
+            .then(() => expect(pageObject.getAssignOversightDateButton().isPresent()).toBe(visible));
     }
 
     function verifyOversightOptionRemark(expectedValue: string) {
@@ -120,15 +123,14 @@ describe("Data processing registration oversight detail tests", () => {
 
     }
 
-    function verifyOversightCompletedDate(expectedValue: string) {
-        console.log(`Expecting OversightCompletedDate value: ${expectedValue}`);
-        activateBlur()
-            .then(() => expect(pageObject.getLatestOversightCompletedDate().getAttribute("value")).toEqual(expectedValue));
-    }
-
     function activateBlur() {
         console.log(`Making sure blur is triggered`);
         return pageObject.getDpaMainNameHeader().click();
+    }
+
+    function verifyOversightDateAndRemarkRemoved(date: string) {
+        console.log(`Expecting OversightDateAndRemarkRemoved`);
+        expect(pageObject.getOversightDateRow(date).isPresent()).toBeFalsy();
     }
 
 }); 
