@@ -22,10 +22,13 @@
                 .Index(t => t.ParentId);
 
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migration_DPR_LatestOversightDate.sql"));
+
+            DropColumn("dbo.DataProcessingRegistrations", "LatestOversightDate");
         }
         
         public override void Down()
         {
+            AddColumn("dbo.DataProcessingRegistrations", "LatestOversightDate", c => c.DateTime(precision: 7, storeType: "datetime2"));
             DropForeignKey("dbo.DataProcessingRegistrationOversightDates", "ParentId", "dbo.DataProcessingRegistrations");
             DropIndex("dbo.DataProcessingRegistrationOversightDates", new[] { "ParentId" });
             DropTable("dbo.DataProcessingRegistrationOversightDates");

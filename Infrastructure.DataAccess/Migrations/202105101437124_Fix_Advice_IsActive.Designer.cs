@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_OversightDates_To_DPR : IMigrationMetadata
+    public sealed partial class Fix_Advice_IsActive : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_OversightDates_To_DPR));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Fix_Advice_IsActive));
         
         string IMigrationMetadata.Id
         {
-            get { return "202105070645090_Add_OversightDates_To_DPR"; }
+            get { return "202105101437124_Fix_Advice_IsActive"; }
         }
         
         string IMigrationMetadata.Source

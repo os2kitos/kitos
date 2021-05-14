@@ -699,13 +699,13 @@
     <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.designer.cs">
       <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105070645090_Add_OversightDates_To_DPR.cs" />
-    <Compile Include="Migrations\202105070645090_Add_OversightDates_To_DPR.designer.cs">
-      <DependentUpon>202105070645090_Add_OversightDates_To_DPR.cs</DependentUpon>
+    <Compile Include="Migrations\202105101437124_Fix_Advice_IsActive.cs" />
+    <Compile Include="Migrations\202105101437124_Fix_Advice_IsActive.designer.cs">
+      <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105070648575_Remove_LatestOversightDate_From_DPR.cs" />
-    <Compile Include="Migrations\202105070648575_Remove_LatestOversightDate_From_DPR.designer.cs">
-      <DependentUpon>202105070648575_Remove_LatestOversightDate_From_DPR.cs</DependentUpon>
+    <Compile Include="Migrations\202105141131577_Add_OversightDates_To_DPR.cs" />
+    <Compile Include="Migrations\202105141131577_Add_OversightDates_To_DPR.designer.cs">
+      <DependentUpon>202105141131577_Add_OversightDates_To_DPR.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1146,11 +1146,11 @@
     <EmbeddedResource Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.resx">
       <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105070645090_Add_OversightDates_To_DPR.resx">
-      <DependentUpon>202105070645090_Add_OversightDates_To_DPR.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105101437124_Fix_Advice_IsActive.resx">
+      <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105070648575_Remove_LatestOversightDate_From_DPR.resx">
-      <DependentUpon>202105070648575_Remove_LatestOversightDate_From_DPR.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105141131577_Add_OversightDates_To_DPR.resx">
+      <DependentUpon>202105141131577_Add_OversightDates_To_DPR.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
@@ -1170,6 +1170,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migration_DPR_LatestOversightDate.sql" />
