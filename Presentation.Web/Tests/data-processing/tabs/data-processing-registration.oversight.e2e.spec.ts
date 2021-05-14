@@ -63,10 +63,11 @@ describe("Data processing registration oversight detail tests", () => {
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
                 .then(() => pageObject.getOversightCompletedRemark().sendKeys(completedRemark))
-                .then(() => dpaHelper.assignOversightDateAndRemark(oversightDate, oversightDateRemark))
                 .then(() => verifyOversightCompletedRemark(completedRemark))
                 .then(() => verifyOversightCompleted(dropdownCompleted))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
+                // Oversight dates
+                .then(() => dpaHelper.assignOversightDateAndRemark(oversightDate, oversightDateRemark))
                 .then(() => dpaHelper.verifyOversightDateAndRemark(oversightDate, oversightDateRemark))
                 .then(() => dpaHelper.removeOversightDateAndRemark(oversightDate))
                 .then(() => verifyOversightDateAndRemarkRemoved(oversightDate));
