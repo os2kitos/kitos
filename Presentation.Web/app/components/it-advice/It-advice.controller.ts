@@ -170,14 +170,12 @@
                             "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper", "adviceData",
                             ($scope, roles, $window, type, action, object, currentUser: Kitos.Services.IUser, entityMapper: Kitos.Services.LocalOptions.IEntityMapper, adviceData) => {
                                 $scope.showRoleFields = true;
-                                $scope.collapsed = true;
-                                $scope.CCcollapsed = true;
                                 $scope.hasWriteAccess = hasWriteAccess;
                                 $scope.selectedReceivers = [];
                                 $scope.selectedCCs = [];
                                 $scope.adviceTypeData;
-                                $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                                 $scope.adviceRepetitionData;
+                                $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                                 $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
                                 var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
