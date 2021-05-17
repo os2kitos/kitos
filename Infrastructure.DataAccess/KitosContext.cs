@@ -169,6 +169,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewInterfaceReadModel> ItSystemUsageOverviewInterfaceReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewItSystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
         public DbSet<KendoOrganizationalConfiguration> KendoOrganizationalConfigurations { get; set; }
+        public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -273,6 +274,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewInterfaceReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new KendoOrganizationalConfigurationMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
         }
     }
 }

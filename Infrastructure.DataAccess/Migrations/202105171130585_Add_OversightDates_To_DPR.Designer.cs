@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Advicetype_To_Advice : IMigrationMetadata
+    public sealed partial class Add_OversightDates_To_DPR : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Advicetype_To_Advice));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_OversightDates_To_DPR));
         
         string IMigrationMetadata.Id
         {
-            get { return "202105120831331_Added_Advicetype_To_Advice"; }
+            get { return "202105171130585_Add_OversightDates_To_DPR"; }
         }
         
         string IMigrationMetadata.Source

@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ItSystemUsageOverviewReadModelMap()
         {
-            Property(x => x.Name)
+            Property(x => x.SystemName)
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Name", 0);
