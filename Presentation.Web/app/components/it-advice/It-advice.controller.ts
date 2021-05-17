@@ -239,10 +239,12 @@
                                     var url = "";
                                     var payload = createPayload();
                                     payload.Name = $scope.name;
+                                    if ($scope.adviceTypeData.id === "1") {
                                     payload.Scheduling = $scope.adviceRepetitionData.id;
                                     payload.AlarmDate = dateString2Date($scope.startDate);
                                     payload.StopDate = dateString2Date($scope.stopDate);
                                     payload.StopDate.setHours(23, 59, 59, 99);
+                                    }
                                     if (action === "POST") {
                                         url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                                         httpCall(payload, action, url);
@@ -270,12 +272,6 @@
                                                 }
                                             );
                                     }
-                                };
-
-                                $scope.send = () => {
-                                    var url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
-                                    var payload = createPayload();
-                                    httpCall(payload, action, url);
                                 };
 
                                 $scope.deactivate = () => {
@@ -367,7 +363,6 @@
                                         case "0":
                                             if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
                                                 $scope.subject &&
-                                                $scope.adviceRepetitionData &&
                                                 $scope.isEditable()) {
                                                 return false;
                                             }
@@ -429,12 +424,12 @@
 
                                 function createPayload() {
                                     const payload = {
-                                        Name: "TO BE NAMED",
+                                        Name: "",
                                         Subject: $scope.subject,
                                         Body: $scope.emailBody,
                                         RelationId: object.id,
                                         Type: type,
-                                        Scheduling: "Immediate",
+                                        Scheduling: "",
                                         AdviceType: $scope.adviceTypeData.id,
                                         Reciepients: [],
                                         AlarmDate: null,
