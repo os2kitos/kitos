@@ -424,7 +424,7 @@
 
                                 function createPayload() {
                                     const payload = {
-                                        Name: null,
+                                        Name: "Straks afsendt",
                                         Subject: $scope.subject,
                                         Body: $scope.emailBody,
                                         RelationId: object.id,
