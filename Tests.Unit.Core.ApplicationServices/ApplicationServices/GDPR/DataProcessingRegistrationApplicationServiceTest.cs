@@ -40,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
         private readonly Mock<IDataProcessingRegistrationBasisForTransferAssignmentService> _basisForTransferAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
+        private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -56,6 +57,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
             _basisForTransferAssignmentServiceMock = new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>();
             _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
+            _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -68,6 +70,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _insecureThirdCountryAssignmentMock.Object,
                 _basisForTransferAssignmentServiceMock.Object,
                 _oversightOptionAssignmentServiceMock.Object,
+                _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _rightsRepositoryMock.Object);
         }
@@ -1431,28 +1434,108 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Can_Update_LatestOversightDate()
+        public void Can_AssignOversightDate()
         {
-            Test_Command_Which_ModifiesState_With_Success(registration =>
-            {
-                //Arrange
-                var latestOversightDate = A<DateTime>();
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var oversightDate = A<DateTime>();
+            var oversightRemark = A<string>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
 
-                //Act
-                return _sut.UpdateLatestOversightDate(registration.Id, latestOversightDate);
-            });
+            var transaction = ExpectTransaction();
+            _oversightDateAssignmentServiceMock.Setup(x => x.Assign(registration, oversightDate, oversightRemark)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
+
+            //Act
+            var result = _sut.AssignOversightDate(id, oversightDate, oversightRemark);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
-        public void Update_LatestOversightDate_Returns_Forbidden()
+        public void Cannot_AssignOversightDate_If_Dpr_Is_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>()));
         }
 
         [Fact]
-        public void Update_LatestOversightDate_Returns_Not_Found()
+        public void Cannot_AssignOversightDate_If_Write_Access_Is_Denied()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateLatestOversightDate(id, A<DateTime>()));
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>()));
+        }
+
+        [Fact]
+        public void Can_ModifyOversightDate()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var oversightDateId = A<int>();
+            var oversightDate = A<DateTime>();
+            var oversightRemark = A<string>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _oversightDateAssignmentServiceMock.Setup(x => x.Modify(registration, oversightDateId, oversightDate, oversightRemark)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
+
+            //Act
+            var result = _sut.ModifyOversightDate(id, oversightDateId, oversightDate, oversightRemark);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_ModifyOversightDate_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.ModifyOversightDate(id, A<int>(), A<DateTime>(), A<string>()));
+        }
+
+        [Fact]
+        public void Cannot_ModifyOversightDate_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ModifyOversightDate(id, A<int>(), A<DateTime>(), A<string>()));
+        }
+
+        [Fact]
+        public void Can_RemoveOversightDate()
+        {
+            //Arrange
+            var id = A<int>();
+            var registration = new DataProcessingRegistration();
+            var oversightDateId = A<int>();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowModifyReturns(registration, true);
+
+            var transaction = ExpectTransaction();
+            _oversightDateAssignmentServiceMock.Setup(x => x.Remove(registration, oversightDateId)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
+
+            //Act
+            var result = _sut.RemoveOversightDate(id, oversightDateId);
+
+            //Assert
+            Assert.True(result.Ok);
+
+            transaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_RemoveOversightDate_If_Dpr_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.RemoveOversightDate(id, A<int>()));
+        }
+
+        [Fact]
+        public void Cannot_RemoveOversightDate_If_Write_Access_Is_Denied()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.RemoveOversightDate(id, A<int>()));
         }
 
         [Fact]

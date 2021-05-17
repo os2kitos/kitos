@@ -26,6 +26,12 @@ namespace Core.DomainModel.Advice
        Quarter = 6,
        Semiannual = 7
     }
+
+    public enum AdviceType
+    {
+        Immediate = 0,
+        Repeat = 1
+    }
     
     /// <summary>
     /// Contains info about Advices on a contract.
@@ -151,5 +157,10 @@ namespace Core.DomainModel.Advice
         /// Gets or sets the job id.
         /// </summary>
         public string JobId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the advice type
+        /// </summary>
+        public AdviceType AdviceType { get; set; }
     }
 }

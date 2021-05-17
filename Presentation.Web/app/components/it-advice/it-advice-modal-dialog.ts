@@ -24,7 +24,10 @@
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
-                    $scope.adviceTypeData = null;
+                    $scope.adviceTypeData = null; 
+                    $scope.adviceRepetitionData;
+                    $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
+                    $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
@@ -47,7 +50,8 @@
                             $scope.name = adviceData.Name;
                             $scope.subject = adviceData.Subject;
                             $scope.emailBody = adviceData.Body;
-                            $scope.scheduling = adviceData.Scheduling;
+                            $scope.adviceTypeData = Models.ViewModel.Advice.AdviceTypeOptions.getOptionFromEnumString(adviceData.AdviceType);
+                            $scope.adviceRepetitionData = Models.ViewModel.Advice.AdviceRepetitionOptions.getOptionFromEnumString(adviceData.Scheduling);
                             $scope.startDate = adviceData.AlarmDate;
                             $scope.stopDate = adviceData.StopDate;
                             $scope.hiddenForjob = adviceData.JobId;
@@ -87,10 +91,12 @@
                         var url = "";
                         var payload = createPayload();
                         payload.Name = $scope.name;
-                        payload.Scheduling = $scope.scheduling;
-                        payload.AlarmDate = dateString2Date($scope.startDate);
-                        payload.StopDate = dateString2Date($scope.stopDate);
-                        payload.StopDate.setHours(23, 59, 59, 99);
+                        if ($scope.adviceTypeData.id === "1") {
+                            payload.Scheduling = $scope.adviceRepetitionData.id;
+                            payload.AlarmDate = dateString2Date($scope.startDate);
+                            payload.StopDate = dateString2Date($scope.stopDate);
+                            payload.StopDate.setHours(23, 59, 59, 99);
+                        }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                             httpCall(payload, action, url);
@@ -204,6 +210,39 @@
                         format: "dd-MM-yyyy",
                         parseFormats: ["yyyy-MM-dd"]
                     };
+                    
+                    $scope.validateInputs = () => {
+                        if ($scope.adviceTypeData == null) {
+                            return true;
+                        }
+                        switch ($scope.adviceTypeData.id) {
+                            case "0":
+                                if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                    $scope.subject &&
+                                    $scope.isEditable()) {
+                                    return false;
+                                }
+                                else {
+                                    return true;
+                                }
+                            case "1":
+                                if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                    $scope.subject &&
+                                    $scope.adviceRepetitionData &&
+                                    $scope.stopDate &&
+                                    $scope.startDate &&
+                                    $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
+                                    $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
+                                    $scope.isEditable()) {
+                                    return false;
+                                }
+                                else {
+                                    return true;
+                                }
+                            default:
+                                return true;
+                        }
+                    }
 
                     function dateString2Date(dateString) {
                         const dt = dateString.split("-");
@@ -241,12 +280,13 @@
 
                     function createPayload() {
                         const payload = {
-                            Name: "Straks afsendt",
+                            Name: "",
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
                             Type: type,
-                            Scheduling: "Immediate",
+                            Scheduling: "",
+                            AdviceType: $scope.adviceTypeData.id,
                             Reciepients: [],
                             AlarmDate: null,
                             StopDate: null,

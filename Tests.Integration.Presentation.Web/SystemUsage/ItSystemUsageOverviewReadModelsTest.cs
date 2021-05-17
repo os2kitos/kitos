@@ -46,11 +46,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             //Assert
             Assert.Equal(2, page1.Count);
-            Assert.Equal(name1, page1.First().Name);
-            Assert.Equal(name2, page1.Last().Name);
+            Assert.Equal(name1, page1.First().SystemName);
+            Assert.Equal(name2, page1.Last().SystemName);
 
             Assert.Single(page2);
-            Assert.Equal(name3, page2.Single().Name);
+            Assert.Equal(name3, page2.Single().SystemName);
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(sensitiveDataLevel.DataSensitivityLevel.GetReadableName(), readModel.SensitiveDataLevelsAsCsv);
 
             // From System
-            Assert.Equal(systemName, readModel.Name);
+            Assert.Equal(systemName, readModel.SystemName);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);

@@ -31,7 +31,7 @@
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
-        Name: string;
+        SystemName: string;
         ItSystemDisabled: boolean;
         IsActive: boolean;
         ItSystemUuid: string;

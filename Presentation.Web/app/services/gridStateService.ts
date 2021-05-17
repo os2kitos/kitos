@@ -20,6 +20,7 @@
         removeProfile: () => void;
         removeLocal: () => void;
         removeSession: () => void;
+        deleteGridProfileForOrg: (overviewType: Models.Generic.OverviewType) => void;
     }
 
     gridStateService.$inject = [
@@ -29,7 +30,8 @@
         "JSONfn",
         "_",
         "KendoFilterService",
-        "notify"
+        "notify",
+        "$state"
     ];
 
     function gridStateService(
@@ -39,7 +41,8 @@
         JSONfn: JSONfn.JSONfnStatic,
         _: _.LoDashStatic,
         KendoFilterService: KendoFilterService,
-        notify
+        notify,
+        $state: ng.ui.IStateService
     ): IGridStateFactory {
         var factory: IGridStateFactory = {
             getService: getService
@@ -53,7 +56,7 @@
 
             storageKey = user.id+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageKey = user.currentOrganizationId + "-OrgProfile";
+            var orgStorageKey = storageKey + "-OrgProfile";
             getOrgFilterOptions(overviewType);
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
@@ -64,7 +67,8 @@
                 doesGridProfileExist: doesGridProfileExist,
                 removeProfile: removeProfile,
                 removeLocal: removeLocal,
-                removeSession: removeSession
+                removeSession: removeSession,
+                deleteGridProfileForOrg: deleteGridProfileForOrg
             };
             return service;
 
@@ -81,7 +85,7 @@
                 }
 
                 KendoFilterService
-                    .GetSystemFilterOptionFromOrg(user.currentOrganizationId, overviewType)
+                    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
                             const orgStorageItem = result.data.response.configuration;
@@ -280,14 +284,28 @@
 
                 var jsonString = JSONfn.stringify(pickedOptions);
 
-                KendoFilterService.PostSystemFilterOptionFromOrg(user.currentOrganizationId, overviewType, jsonString)
+                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, jsonString)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Filtre og sortering gemt gemt din organisation");
+                            notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
                         }
                     })
                     .catch((res) => {
-                        notify.addErrorMessage("Der opstod en fejl i forsøg på at gemme det nye filter");
+                        notify.addErrorMessage("Der opstod en fejl i forsøget på at gemme det nye filter");
+                    });
+            }
+
+            function deleteGridProfileForOrg(overviewType: Models.Generic.OverviewType) {
+                KendoFilterService.DeleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
+                    .then((res) => {
+                        if (res.status === 200) {
+                            notify.addSuccessMessage("Organisationens gemte filtre og sorteringer er slettet");
+                            removeSession();
+                            $state.go(".", null, { reload: true });
+                        }
+                    })
+                    .catch((res) => {
+                        notify.addErrorMessage("Der opstod en fejl i forsøget på at slette det gemte filter");
                     });
             }
 
