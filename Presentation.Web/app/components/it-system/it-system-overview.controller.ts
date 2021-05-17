@@ -306,13 +306,13 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("Name")
+                        .withDataSourceName("SystemName")
                         .withTitle("IT System")
                         .withId("sysname")
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
-                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.SystemName, dataItem.ItSystemDisabled)))
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.SystemName, dataItem.ItSystemDisabled)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Version")
@@ -351,7 +351,7 @@
                             dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.name)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
-                .withStandardSorting("Name");
+                .withStandardSorting("SystemName");
 
             overviewOptions.systemRoles.forEach(role =>
                 launcher = launcher

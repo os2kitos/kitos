@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
-    public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>, IHasName
+    public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>
     {
 
         public static int MaxReferenceTitleLenght = 100;
@@ -51,7 +51,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public int Id { get; set; }
         public int SourceEntityId { get; set; }
         public ItSystemUsage SourceEntity { get; set; }
-        public string Name { get; set; }
+        public string SystemName { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool IsActive { get; set; }
         public string ParentItSystemName { get; set; }
