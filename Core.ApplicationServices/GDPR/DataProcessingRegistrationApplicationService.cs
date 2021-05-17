@@ -36,6 +36,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
         private readonly IDataProcessingRegistrationBasisForTransferAssignmentService _basisForTransferAssignmentService;
         private readonly IDataProcessingRegistrationOversightOptionsAssignmentService _oversightOptionAssignmentService;
+        private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
 
@@ -52,6 +53,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
             IDataProcessingRegistrationBasisForTransferAssignmentService basisForTransferAssignmentService,
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
+            IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
             IGenericRepository<DataProcessingRegistrationRight> rightRepository)
         {
@@ -66,6 +68,7 @@ namespace Core.ApplicationServices.GDPR
             _countryAssignmentService = countryAssignmentService;
             _basisForTransferAssignmentService = basisForTransferAssignmentService;
             _oversightOptionAssignmentService = oversightOptionAssignmentService;
+            _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
         }
@@ -463,18 +466,28 @@ namespace Core.ApplicationServices.GDPR
         {
             return Modify<DataProcessingRegistration>(id, registration =>
             {
-                registration.SetOversightCompleted(isOversightCompleted);
+                var oversightDates = registration.SetOversightCompleted(isOversightCompleted);
+                if (oversightDates.HasValue)
+                {
+                    oversightDates.Value.ToList().ForEach(x => _oversightDateAssignmentService.Remove(registration, x.Id));
+                }
                 return registration;
             });
         }
 
-        public Result<DataProcessingRegistration, OperationError> UpdateLatestOversightDate(int id, DateTime? latestDate)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark)
         {
-            return Modify<DataProcessingRegistration>(id, registration =>
-            {
-                registration.LatestOversightDate = latestDate;
-                return registration;
-            });
+            return Modify(id, registration => _oversightDateAssignmentService.Assign(registration, oversightDate, oversightRemark));
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark)
+        {
+            return Modify(id, registration => _oversightDateAssignmentService.Modify(registration, oversightDateId, oversightDate, oversightRemark));
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId)
+        {
+            return Modify(id, registration => _oversightDateAssignmentService.Remove(registration, oversightDateId));
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)

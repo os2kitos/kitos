@@ -27,6 +27,7 @@ namespace Core.DomainModel.GDPR
             InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
             OversightOptions = new List<DataProcessingOversightOption>();
             AssociatedContracts = new List<ItContract.ItContract>();
+            OversightDates = new List<DataProcessingRegistrationOversightDate>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -336,20 +337,70 @@ namespace Core.DomainModel.GDPR
 
         public YesNoUndecidedOption? IsOversightCompleted { get; set; }
 
-        public DateTime? LatestOversightDate { get; set; }
-
         public string OversightCompletedRemark { get; set; }
 
-        public void SetOversightCompleted(YesNoUndecidedOption completed)
+        public virtual ICollection<DataProcessingRegistrationOversightDate> OversightDates { get; set; }
+
+        public Maybe<IEnumerable<DataProcessingRegistrationOversightDate>> SetOversightCompleted(YesNoUndecidedOption completed)
         {
             IsOversightCompleted = completed;
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)
             {
-                LatestOversightDate = null;
+                var oversightDatesToBeRemoved = OversightDates;
+                return Maybe<IEnumerable<DataProcessingRegistrationOversightDate>>.Some(oversightDatesToBeRemoved);
             }
-
+            return Maybe<IEnumerable<DataProcessingRegistrationOversightDate>>.None;
         }
 
         public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
+        {
+            if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
+            if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
+
+            var newOversightDate = new DataProcessingRegistrationOversightDate
+            {
+                OversightDate = oversightDate,
+                OversightRemark = oversightRemark,
+                Parent = this
+            };
+
+            OversightDates.Add(newOversightDate);
+
+            return newOversightDate;
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int oversightId, DateTime oversightDate, string oversightRemark)
+        {
+            if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
+            if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
+            if (!HasOversightDate(oversightId))
+                return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
+
+            var oversightDateToModify = OversightDates.Where(x => x.Id == oversightId).First();
+
+            oversightDateToModify.OversightDate = oversightDate;
+            oversightDateToModify.OversightRemark = oversightRemark;
+
+            return oversightDateToModify;
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int oversightId)
+        {
+            if (!HasOversightDate(oversightId))
+                return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
+
+            var oversightDateToRemove = OversightDates.Where(x => x.Id == oversightId).First();
+
+            OversightDates.Remove(oversightDateToRemove);
+
+            return oversightDateToRemove;
+        }
+
+        private bool HasOversightDate(int oversightId)
+        {
+            return OversightDates.Where(x => x.Id == oversightId).Any();
+        }
     }
 }

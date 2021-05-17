@@ -64,6 +64,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRightMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRoleAssignmentReadModelMap.cs" />
@@ -706,6 +707,10 @@
     <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.designer.cs">
       <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105171130585_Add_OversightDates_To_DPR.cs" />
+    <Compile Include="Migrations\202105171130585_Add_OversightDates_To_DPR.designer.cs">
+      <DependentUpon>202105171130585_Add_OversightDates_To_DPR.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1151,6 +1156,9 @@
     <EmbeddedResource Include="Migrations\202105171042142_Added_Advicetype_To_Advice.resx">
       <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105171130585_Add_OversightDates_To_DPR.resx">
+      <DependentUpon>202105171130585_Add_OversightDates_To_DPR.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1172,6 +1180,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migration_DPR_LatestOversightDate.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
