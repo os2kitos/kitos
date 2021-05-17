@@ -66,6 +66,7 @@
     <Compile Include="GDPR\DataProcessingDataResponsibleOption.cs" />
     <Compile Include="GDPR\DataProcessingOversightOption.cs" />
     <Compile Include="GDPR\DataProcessingBasisForTransferOption.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationOversightDate.cs" />
     <Compile Include="GDPR\Read\DataProcessingRegistrationReadModel.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRight.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRole.cs" />

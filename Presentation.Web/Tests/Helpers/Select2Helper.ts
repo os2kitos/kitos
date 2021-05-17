@@ -6,6 +6,7 @@ class Select2Helper {
     private static readonly selectInput = "select2-input";
     private static readonly selectDrop = "select2-drop";
     private static readonly selectChoice = "select2-choice";
+    private static readonly selectChoices = "select2-choices";
     private static readonly selectResult = "select2-result-label";
     private static readonly disabledSelect2Class = "container-disabled";
 
@@ -48,6 +49,14 @@ class Select2Helper {
     static selectWithNoSearch(name: string, elementId: string) {
         return element(by.id(elementId))
             .element(by.className(Select2Helper.selectChoice))
+            .click()
+            .then(() => this.findResult(name).first().click())
+            .then(() => console.log(`Selected ${name}`));
+    }
+
+    static selectMultipleWithNoSearch(name: string, elementId: string) {
+        return element(by.id(elementId))
+            .element(by.className(Select2Helper.selectChoices))
             .click()
             .then(() => this.findResult(name).first().click())
             .then(() => console.log(`Selected ${name}`));

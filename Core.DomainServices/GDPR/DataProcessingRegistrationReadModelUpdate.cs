@@ -191,7 +191,8 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.LatestOversightDate = source.LatestOversightDate;
+            // Only show the lastes oversight date in the overview
+            destination.LatestOversightDate = source.OversightDates.OrderByDescending(x => x.OversightDate).Select(x => x.OversightDate).FirstOrDefault();
         }
     }
 }

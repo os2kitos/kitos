@@ -104,10 +104,10 @@
                     ],
                     toolbar: [
                         {
-                            name: "opretRolle",
-                            text: "Opret rolle",
+                            name: "advis",
+                            text: "Opret advis",
                             template:
-                                "<button data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
+                                "<button data-element-type=\"NewAdviceButton\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
                         }
                     ],
                     pageable: {
@@ -170,12 +170,13 @@
                             "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper", "adviceData",
                             ($scope, roles, $window, type, action, object, currentUser: Kitos.Services.IUser, entityMapper: Kitos.Services.LocalOptions.IEntityMapper, adviceData) => {
                                 $scope.showRoleFields = true;
-                                $scope.collapsed = true;
-                                $scope.CCcollapsed = true;
                                 $scope.hasWriteAccess = hasWriteAccess;
                                 $scope.selectedReceivers = [];
                                 $scope.selectedCCs = [];
-                                $scope.adviceTypeData = null;
+                                $scope.adviceTypeData;
+                                $scope.adviceRepetitionData;
+                                $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
+                                $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
                                 $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+"
 
@@ -200,7 +201,8 @@
                                         $scope.name = adviceData.Name;
                                         $scope.subject = adviceData.Subject;
                                         $scope.emailBody = adviceData.Body;
-                                        $scope.repitionPattern = adviceData.Scheduling;
+                                        $scope.adviceTypeData = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.getOptionFromEnumString(adviceData.AdviceType);
+                                        $scope.adviceRepetitionData = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.getOptionFromEnumString(adviceData.Scheduling);
                                         $scope.startDate = adviceData.AlarmDate;
                                         $scope.stopDate = adviceData.StopDate;
                                         $scope.hiddenForjob = adviceData.JobId;
@@ -241,10 +243,12 @@
                                     var url = "";
                                     var payload = createPayload();
                                     payload.Name = $scope.name;
-                                    payload.Scheduling = $scope.repitionPattern;
+                                    if ($scope.adviceTypeData.id === "1") {
+                                    payload.Scheduling = $scope.adviceRepetitionData.id;
                                     payload.AlarmDate = dateString2Date($scope.startDate);
                                     payload.StopDate = dateString2Date($scope.stopDate);
                                     payload.StopDate.setHours(23, 59, 59, 99);
+                                    }
                                     if (action === "POST") {
                                         url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                                         httpCall(payload, action, url);
@@ -272,12 +276,6 @@
                                                 }
                                             );
                                     }
-                                };
-
-                                $scope.send = () => {
-                                    var url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
-                                    var payload = createPayload();
-                                    httpCall(payload, action, url);
                                 };
 
                                 $scope.deactivate = () => {
@@ -333,7 +331,7 @@
                                     if ($scope.startDate && $scope.stopDate) {
                                         if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
                                             $scope.errMessage =
-                                                "'Til Dato' skal være senere end eller samme som 'Fra dato'!";
+                                                "'Til Dato' skal være senere end eller samme som 'Fra dato'!"; 
                                             return false;
                                         }
                                     } else {
@@ -358,6 +356,41 @@
                                     format: "dd-MM-yyyy",
                                     parseFormats: ["yyyy-MM-dd"]
                                 };
+                                
+                                $scope.validateInputs = () => {
+
+                                    if ($scope.adviceTypeData == null) {
+                                        return true;
+                                    }
+
+                                    switch ($scope.adviceTypeData.id) {
+                                        case "0":
+                                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                                $scope.subject &&
+                                                $scope.isEditable()) {
+                                                return false;
+                                            }
+                                            else {
+                                                return true;
+                                            }
+                                        case "1":
+                                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                                $scope.subject &&
+                                                $scope.adviceRepetitionData &&
+                                                $scope.stopDate &&
+                                                $scope.startDate &&
+                                                $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
+                                                $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
+                                                $scope.isEditable()) {
+                                                return false;
+                                            }
+                                            else {
+                                                return true;
+                                            }
+                                        default:
+                                            return true;
+                                    }
+                                }
 
                                 function dateString2Date(dateString) {
                                     const dt = dateString.split("-");
@@ -400,7 +433,8 @@
                                         Body: $scope.emailBody,
                                         RelationId: object.id,
                                         Type: type,
-                                        Scheduling: "Immediate",
+                                        Scheduling: "",
+                                        AdviceType: $scope.adviceTypeData.id,
                                         Reciepients: [],
                                         AlarmDate: null,
                                         StopDate: null,
@@ -457,7 +491,6 @@
                                     }
                                     return payload;
                                 };
-
                             }
                         ],
                         resolve: {

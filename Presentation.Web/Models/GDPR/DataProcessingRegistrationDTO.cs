@@ -40,7 +40,9 @@ namespace Presentation.Web.Models.GDPR
         public ValueWithOptionalRemarkDTO<NamedEntityWithExpirationStatusDTO[]> OversightOptions { get; set; }
 
 
-        public ValueWithOptionalDateAndRemark<YesNoUndecidedOption?> OversightCompleted { get; set; }
+        public ValueWithOptionalRemarkDTO<YesNoUndecidedOption?> OversightCompleted { get; set; }
+
+        public DataProcessingRegistrationOversightDateDTO[] OversightDates { get; set; }
 
         public NamedEntityDTO[] AssociatedContracts { get; set; }
 

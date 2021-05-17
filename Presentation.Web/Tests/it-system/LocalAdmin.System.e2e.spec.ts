@@ -20,25 +20,24 @@ describe("Local admin IT Systems tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Save filter to org button is enabled and visible for local admin" +
-        "", () => {
-        loginHelper.loginAsLocalAdmin()
-            .then(() => pageObject.getPage())
-            .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(true));
-        });
+    // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
 
-    it("Save filter to org button is not visible for regular user" +
-        "", () => {
-        loginHelper.loginAsRegularUser()
-                .then(() => pageObject.getPage())
-            .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
-    });
+    //it("Save filter to org button is enabled and visible for local admin", () => {
+    //    loginHelper.loginAsLocalAdmin()
+    //        .then(() => pageObject.getPage())
+    //        .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(true));
+    //    });
 
-    it("Save filter to org button is not visible for global admin" +
-        "", () => {
-            loginHelper.loginAsGlobalAdmin()
-                .then(() => pageObject.getPage())
-                .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
-    });
+    //it("Save filter to org button is not visible for regular user", () => {
+    //    loginHelper.loginAsRegularUser()
+    //            .then(() => pageObject.getPage())
+    //        .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
+    //});
+
+    //it("Save filter to org button is not visible for global admin", () => {
+    //        loginHelper.loginAsGlobalAdmin()
+    //            .then(() => pageObject.getPage())
+    //            .then(() => expect(headerButtons.saveFilterToOrg.isDisplayed()).toBe(false));
+    //});
 
 });
