@@ -5,23 +5,22 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Hangfire;
 using Ninject;
 using System;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Core.ApplicationServices.Helpers;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
+using Ninject.Extensions.Logging;
 
 namespace Core.ApplicationServices
 {
-    using DomainModel.ItSystemUsage;
-    using Ninject.Extensions.Logging;
-
     public class AdviceService : IAdviceService
     {
         [Inject]
-        public MailClient MailClient { get; set; }
+        public IMailClient MailClient { get; set; }
 
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
@@ -62,7 +61,8 @@ namespace Core.ApplicationServices
         [Inject]
         public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
-        public AdviceService() { }
+        [Inject]
+        public IHangfireHelper HangfireHelper { get; set; }
 
         public bool SendAdvice(int id)
         {
@@ -79,7 +79,7 @@ namespace Core.ApplicationServices
 
                     if (advice.StopDate < DateTime.Now)
                     {
-                        RecurringJob.RemoveIfExists(advice.JobId);
+                        HangfireHelper.RemoveFromHangfire(advice);
                         return false;
                     }
                 }
