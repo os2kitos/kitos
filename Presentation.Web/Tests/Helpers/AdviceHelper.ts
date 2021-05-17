@@ -30,7 +30,6 @@ class AdviceHelper {
             .then(() => element(this.cssLocator.byDataElementType(this.constants.adviceSaveButton)).click());
     }
 
-
     public createNewInstantAdvice(email: string, subject: string) {
         return element(this.cssLocator.byDataElementType(this.constants.adviceNewButton)).click()
             .then(() => element(this.cssLocator.byDataElementType(this.constants.adviceEmailInput)).sendKeys(email))
@@ -43,7 +42,6 @@ class AdviceHelper {
             .then(() => element(this.cssLocator.byDataElementType(this.constants.adviceSaveButton)).click());
     }
 
-
     public deleteAdvice(subjectName: string) {
         return this.getDeleteButton(subjectName).click()
             .then(() => browser.switchTo().alert().accept());
@@ -53,5 +51,4 @@ class AdviceHelper {
         return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='deleteAdviceButton']`));
     }
 }
-
 export = AdviceHelper;
