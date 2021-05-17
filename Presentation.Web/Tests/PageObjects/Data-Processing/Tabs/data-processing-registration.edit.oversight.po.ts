@@ -53,12 +53,20 @@ class DataProcessingRegistrationEditOversightPageObject {
         return element(by.id("create-oversight-date"));
     }
 
-    getRemoveOversightDateButton(oversightDate: string) {
-        return element(by.xpath(`${this.getOversightDateRowExpression(oversightDate)}//button[@id='delete-oversight-date']`));
+    getRemoveOversightDateButton() {
+        return element(by.xpath(`${this.getOversightDateRowExpression()}//button[@id='delete-oversight-date']`));
     }
 
-    getOversightDateRow(oversightDate: string) {
-        return element(by.xpath(this.getOversightDateRowExpression(oversightDate)));
+    getOversightDateRow() {
+        return element(by.xpath(this.getOversightDateRowExpression()));
+    }
+
+    getOversightDateRowDate() {
+        return element(by.xpath(this.getOversightDateRowExpression())).element(by.id("date"));
+    }
+
+    getOversightDateRowRemark() {
+        return element(by.xpath(this.getOversightDateRowExpression())).element(by.id("remark"));
     }
 
     getOversightDateModalDateField() {
@@ -73,7 +81,7 @@ class DataProcessingRegistrationEditOversightPageObject {
         return element(by.id("save"));
     }
 
-    private getOversightDateRowExpression(oversightDate: string) {
+    private getOversightDateRowExpression() {
         return `//*/table[@id="oversightDatesTable"]//*/input[@id="date"]/../..`;
     }
 

@@ -69,8 +69,8 @@ describe("Data processing registration oversight detail tests", () => {
                 // Oversight dates
                 .then(() => dpaHelper.assignOversightDateAndRemark(oversightDate, oversightDateRemark))
                 .then(() => dpaHelper.verifyOversightDateAndRemark(oversightDate, oversightDateRemark))
-                .then(() => dpaHelper.removeOversightDateAndRemark(oversightDate))
-                .then(() => verifyOversightDateAndRemarkRemoved(oversightDate));
+                .then(() => dpaHelper.removeOversightDateAndRemark())
+                .then(() => verifyOversightDateAndRemarkRemoved());
         });
 
 
@@ -129,9 +129,9 @@ describe("Data processing registration oversight detail tests", () => {
         return pageObject.getDpaMainNameHeader().click();
     }
 
-    function verifyOversightDateAndRemarkRemoved(date: string) {
+    function verifyOversightDateAndRemarkRemoved() {
         console.log(`Expecting OversightDateAndRemarkRemoved`);
-        expect(pageObject.getOversightDateRow(date).isPresent()).toBeFalsy();
+        expect(pageObject.getOversightDateRow().isPresent()).toBeFalsy();
     }
 
 }); 
