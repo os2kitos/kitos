@@ -42,6 +42,16 @@ class AdviceHelper {
             .then(() => element(this.cssLocator.byDataElementType(this.constants.adviceSubjectInput)).sendKeys(subject))
             .then(() => element(this.cssLocator.byDataElementType(this.constants.adviceSaveButton)).click());
     }
+
+
+    public deleteAdvice(subjectName: string) {
+        return this.getDeleteButton(subjectName).click()
+            .then(() => browser.switchTo().alert().accept());
+    }
+
+    private getDeleteButton(subjectName: string) {
+        return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='deleteAdviceButton']`));
+    }
 }
 
 export = AdviceHelper;
