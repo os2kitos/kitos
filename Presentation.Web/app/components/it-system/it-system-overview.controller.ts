@@ -23,8 +23,7 @@
             "needsWidthFixService",
             "overviewOptions",
             "_",
-            "gridStateService",
-            "notify"
+            "gridStateService"
         ];
 
         constructor(
@@ -35,8 +34,8 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            gridStateService: Services.IGridStateFactory,
-            notify) {
+            gridStateService: Services.IGridStateFactory
+            ) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
@@ -185,21 +184,41 @@
                         }
                     });
                     return response;
-                }).withToolbarEntry({
-                    id: "filterOrg",
-                    title: "Gem filter for organisation",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => true,
-                    onClick: () => {
-                        if (confirm('Er du sikker på at du vil gemme denne opsætning som standard til ' + user.currentOrganizationName)) {
-                            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
-                        }
+                })
+
+                // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
+
+                //.withToolbarEntry({
+                //    id: "filterOrg",
+                //    title: "Gem filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
+                //            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
+                //        }
                         
-                    },
-                    show: user.isLocalAdmin,
-                } as Utility.KendoGrid.IKendoToolbarEntry)
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
+                //.withToolbarEntry({
+                //    id: "removeFilterOrg",
+                //    title: "Slet filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
+                //            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
+                //        }
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
+
+
                 .withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
@@ -287,13 +306,13 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("Name")
+                        .withDataSourceName("SystemName")
                         .withTitle("IT System")
                         .withId("sysname")
                         .withStandardWidth(320)
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
-                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.Name, dataItem.ItSystemDisabled)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-rendering`, "it-system.usage.main", dataItem.SourceEntityId, Helpers.SystemNameFormat.apply(dataItem.SystemName, dataItem.ItSystemDisabled)))
+                        .withExcelOutput(dataItem => Helpers.SystemNameFormat.apply(dataItem.SystemName, dataItem.ItSystemDisabled)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Version")
@@ -332,7 +351,7 @@
                             dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.name)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
-                .withStandardSorting("Name");
+                .withStandardSorting("SystemName");
 
             overviewOptions.systemRoles.forEach(role =>
                 launcher = launcher
